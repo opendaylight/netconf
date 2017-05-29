@@ -34,6 +34,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.restconf.parser.IdentifierCodec;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
@@ -84,6 +85,8 @@ public class ParserIdentifierTest {
     private static final String TEST_MODULE_NAME = "test-module";
     private static final String TEST_MODULE_REVISION = "2016-06-02";
     private static final String TEST_MODULE_NAMESPACE = "test:module";
+
+    private static final String INVOKE_RPC = "invoke-rpc-module:rpc-test";
 
     // mount point and mount point service
     private DOMMountPoint mountPoint;
@@ -639,5 +642,49 @@ public class ParserIdentifierTest {
                 + "/"
                 + TEST_MODULE_REVISION,
                 mockMountPointService);
+    }
+
+    /**
+     * Test invoke RPC.
+     *
+     * <p>
+     * Verify if RPC schema node was found.
+     */
+    @Test
+    public void invokeRpcTest() {
+        final InstanceIdentifierContext<?> result = ParserIdentifier.toInstanceIdentifier(
+                INVOKE_RPC, this.schemaContext, Optional.absent());
+
+        // RPC schema node
+        final QName rpcQName = result.getSchemaNode().getQName();
+        assertEquals("invoke:rpc:module", rpcQName.getModule().getNamespace().toString());
+        assertEquals("rpc-test", rpcQName.getLocalName());
+
+        // other fields
+        assertEquals(IdentifierCodec.deserialize(INVOKE_RPC, schemaContext), result.getInstanceIdentifier());
+        assertEquals(null, result.getMountPoint());
+        assertEquals(this.schemaContext, result.getSchemaContext());
+    }
+
+    /**
+     * Test invoke RPC on mount point.
+     *
+     * <p>
+     * Verify if RPC schema node was found.
+     */
+    @Test
+    public void invokeRpcOnMountPointTest() {
+        final InstanceIdentifierContext<?> result = ParserIdentifier.toInstanceIdentifier(
+                MOUNT_POINT_IDENT + "/" + INVOKE_RPC, this.schemaContext, Optional.of(this.mountPointService));
+
+        // RPC schema node
+        final QName rpcQName = result.getSchemaNode().getQName();
+        assertEquals("invoke:rpc:module", rpcQName.getModule().getNamespace().toString());
+        assertEquals("rpc-test", rpcQName.getLocalName());
+
+        // other fields
+        assertEquals(IdentifierCodec.deserialize(INVOKE_RPC, schemaContext), result.getInstanceIdentifier());
+        assertEquals(this.mountPoint, result.getMountPoint());
+        assertEquals(this.schemaContextOnMountPoint, result.getSchemaContext());
     }
 }
