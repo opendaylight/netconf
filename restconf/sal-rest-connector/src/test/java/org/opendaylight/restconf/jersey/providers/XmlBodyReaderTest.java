@@ -20,11 +20,15 @@ import java.net.URI;
 import java.text.ParseException;
 import java.util.Collection;
 import javax.ws.rs.core.MediaType;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
+import org.opendaylight.controller.sal.rest.impl.test.providers.TestXmlBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
@@ -66,8 +70,8 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
         schemaContext = YangParserTestUtils.parseYangSources(testFiles);
-        controllerContext.setSchemas(schemaContext);
-        when(mountPointServiceHandler.get()).thenReturn(mock(DOMMountPointService.class));
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
+        when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mock(DOMMountPointService.class));
     }
 
     @Test
@@ -214,4 +218,25 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         assertEquals("Not correct container found, namespace was ignored", "bar:module",
                 returnValue.getData().getNodeType().getNamespace().toString());
     }
+
+    /**
+     * Test PUT operation when message root element is not the same as the last element in request URI.
+     * PUT operation message should always start with schema node from URI otherwise exception should be
+     * thrown.
+     */
+    @Test
+    public void wrongRootElementTest() throws Exception {
+        mockBodyReader("instance-identifier-module:cont", this.xmlBodyReader, false);
+        final InputStream inputStream = TestXmlBodyReader.class.getResourceAsStream(
+                "/instanceidentifier/xml/bug7933.xml");
+        try {
+            this.xmlBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream);
+            Assert.fail("Test should fail due to malformed PUT operation message");
+        } catch (final RestconfDocumentedException exception) {
+            final RestconfError restconfError = exception.getErrors().get(0);
+            Assert.assertEquals(RestconfError.ErrorType.PROTOCOL, restconfError.getErrorType());
+            Assert.assertEquals(RestconfError.ErrorTag.MALFORMED_MESSAGE, restconfError.getErrorTag());
+        }
+    }
+
 }

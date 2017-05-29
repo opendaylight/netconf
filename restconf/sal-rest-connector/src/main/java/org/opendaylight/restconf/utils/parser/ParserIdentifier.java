@@ -71,7 +71,7 @@ public final class ParserIdentifier {
             final String identifier,
             final SchemaContext schemaContext,
             final Optional<DOMMountPointService> mountPointService) {
-        if ((identifier != null) && identifier.contains(RestconfConstants.MOUNT)) {
+        if (identifier != null && identifier.contains(RestconfConstants.MOUNT)) {
             if (!mountPointService.isPresent()) {
                 throw new RestconfDocumentedException("Mount point service is not available");
             }
@@ -88,27 +88,29 @@ public final class ParserIdentifier {
                         "Mount point does not exist.", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
             }
 
+            final DOMMountPoint domMountPoint = mountPoint.get();
+            final SchemaContext mountSchemaContext = domMountPoint.getSchemaContext();
+
             final String pathId = pathsIt.next().replaceFirst("/", "");
             final YangInstanceIdentifier pathYangInstanceIdentifier = IdentifierCodec.deserialize(
-                    pathId, mountPoint.get().getSchemaContext());
+                    pathId, mountSchemaContext);
 
-            final DataSchemaContextNode<?> child = DataSchemaContextTree.from(
-                    mountPoint.get().getSchemaContext()).getChild(pathYangInstanceIdentifier);
+            final DataSchemaContextNode<?> child = DataSchemaContextTree.from(mountSchemaContext)
+                .getChild(pathYangInstanceIdentifier);
             if (child != null) {
                 return new InstanceIdentifierContext<SchemaNode>(pathYangInstanceIdentifier, child.getDataSchemaNode(),
-                        mountPoint.get(), mountPoint.get().getSchemaContext());
+                        domMountPoint, mountSchemaContext);
             }
-            final QName rpcQName = mountYangInstanceIdentifier.getLastPathArgument().getNodeType();
+            final QName rpcQName = pathYangInstanceIdentifier.getLastPathArgument().getNodeType();
             RpcDefinition def = null;
-            for (final RpcDefinition rpcDefinition : schemaContext
+            for (final RpcDefinition rpcDefinition : mountSchemaContext
                     .findModuleByNamespaceAndRevision(rpcQName.getNamespace(), rpcQName.getRevision()).getRpcs()) {
                 if (rpcDefinition.getQName().getLocalName().equals(rpcQName.getLocalName())) {
                     def = rpcDefinition;
                     break;
                 }
             }
-            return new InstanceIdentifierContext<>(mountYangInstanceIdentifier, def, mountPoint.get(),
-                    mountPoint.get().getSchemaContext());
+            return new InstanceIdentifierContext<>(pathYangInstanceIdentifier, def, domMountPoint, mountSchemaContext);
         } else {
             final YangInstanceIdentifier deserialize = IdentifierCodec.deserialize(identifier, schemaContext);
             final DataSchemaContextNode<?> child = DataSchemaContextTree.from(schemaContext).getChild(deserialize);
@@ -158,7 +160,7 @@ public final class ParserIdentifier {
         }
 
         final int mountIndex = identifier.indexOf(RestconfConstants.MOUNT);
-        String moduleNameAndRevision = "";
+        final String moduleNameAndRevision;
         if (mountIndex >= 0) {
             moduleNameAndRevision = identifier.substring(mountIndex + RestconfConstants.MOUNT.length())
                     .replaceFirst(String.valueOf(RestconfConstants.SLASH), "");
