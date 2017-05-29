@@ -134,6 +134,13 @@ public class PATCHXmlBodyWriter implements MessageBodyWriter<PATCHStatusContext>
                 writer.writeCharacters(restconfError.getErrorMessage());
                 writer.writeEndElement();
             }
+
+            // optional node
+            if (restconfError.getErrorInfo() != null) {
+                writer.writeStartElement("error-info");
+                writer.writeCharacters(restconfError.getErrorInfo());
+                writer.writeEndElement();
+            }
         }
 
         writer.writeEndElement();
