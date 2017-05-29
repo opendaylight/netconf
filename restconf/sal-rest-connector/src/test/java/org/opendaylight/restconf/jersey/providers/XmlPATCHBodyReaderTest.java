@@ -41,8 +41,8 @@ public class XmlPATCHBodyReaderTest extends AbstractBodyReaderTest {
     @BeforeClass
     public static void initialization() {
         schemaContext = schemaContextLoader("/instanceidentifier/yang", schemaContext);
-        when(mountPointServiceHandler.get()).thenReturn(mock(DOMMountPointService.class));
-        controllerContext.setSchemas(schemaContext);
+        when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mock(DOMMountPointService.class));
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test
