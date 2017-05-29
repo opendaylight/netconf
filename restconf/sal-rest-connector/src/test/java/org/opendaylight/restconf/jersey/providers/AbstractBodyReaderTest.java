@@ -30,11 +30,11 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 abstract class AbstractBodyReaderTest {
 
-    protected final static ControllerContext controllerContext = ControllerContext.getInstance();
+    protected static final ControllerContext CONTROLLER_CONTEXT = ControllerContext.getInstance();
     protected final MediaType mediaType;
     private static Field uriField;
     private static Field requestField;
-    protected final static DOMMountPointServiceHandler mountPointServiceHandler = mock(
+    protected static final  DOMMountPointServiceHandler MOUNT_POINT_SERVICE_HANDLER = mock(
             DOMMountPointServiceHandler.class);
 
     AbstractBodyReaderTest() throws NoSuchFieldException, IllegalAccessException {
@@ -51,7 +51,7 @@ abstract class AbstractBodyReaderTest {
         final Field mountPointServiceHandlerField = RestConnectorProvider.class.
                 getDeclaredField("mountPointServiceHandler");
         mountPointServiceHandlerField.setAccessible(true);
-        mountPointServiceHandlerField.set(RestConnectorProvider.class, mountPointServiceHandler);
+        mountPointServiceHandlerField.set(RestConnectorProvider.class, MOUNT_POINT_SERVICE_HANDLER);
     }
 
     protected abstract MediaType getMediaType();
@@ -85,6 +85,11 @@ abstract class AbstractBodyReaderTest {
         }
 
         requestField.set(normalizedNodeProvider, request);
+    }
+
+    protected static void checkMountPointNormalizedNodeContext(final NormalizedNodeContext nnContext) {
+        checkNormalizedNodeContext(nnContext);
+        assertNotNull(nnContext.getInstanceIdentifierContext().getMountPoint());
     }
 
     protected static void checkNormalizedNodeContext(
