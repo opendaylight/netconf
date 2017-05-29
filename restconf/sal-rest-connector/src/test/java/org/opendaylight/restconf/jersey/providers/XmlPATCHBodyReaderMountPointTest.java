@@ -50,11 +50,11 @@ public class XmlPATCHBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
 
-        when(mountPointServiceHandler.get()).thenReturn(mountPointService);
+        when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mountPointService);
         when(mountPointService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountPoint));
         when(mountPoint.getSchemaContext()).thenReturn(schemaContext);
 
-        controllerContext.setSchemas(schemaContext);
+        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test
