@@ -16,6 +16,24 @@
       "revId": "e06660c98add5e550b0af10e4642ccbca58ac5f3",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_9bc0377e",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/file/MdsalNetconfFileService.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T07:19:35Z",
+      "side": 1,
+      "message": "I reworked it to final. But my opinion is, that it looks worse as before",
+      "parentUuid": "9a0b7d60_92d77abf",
+      "revId": "e06660c98add5e550b0af10e4642ccbca58ac5f3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
