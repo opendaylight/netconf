@@ -1,0 +1,388 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3afa9182_c66786e9",
+        "filename": "netconf/mdsal-netconf-connector/pom.xml",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "Please not commit the empty line ;)",
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_a6f51acd",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "Here throw the DocumentedException",
+      "range": {
+        "startLine": 125,
+        "startChar": 11,
+        "endLine": 126,
+        "endChar": 71
+      },
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_662b3231",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "You can throw directly the DocumentedException",
+      "range": {
+        "startLine": 193,
+        "startChar": 16,
+        "endLine": 193,
+        "endChar": 57
+      },
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_066cee9b",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/Filter.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "We don\u0027t need the wrapper UncheckedDocumentedException. We can catch the general exception by Exception.class. Next thing is the method getDataRootsFromFilter should throw DocumentedException and here should be created. For example: throw new DocumentedException(e.getMessage(),\n                    DocumentedException.ErrorType.PROTOCOL,\n                    DocumentedException.ErrorTag.OPERATION_FAILED,\n                    DocumentedException.ErrorSeverity.ERROR);",
+      "range": {
+        "startLine": 59,
+        "startChar": 8,
+        "endLine": 61,
+        "endChar": 9
+      },
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_460556c1",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterCombiner.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "please remove the \"else\" statement",
+      "range": {
+        "startLine": 37,
+        "startChar": 14,
+        "endLine": 37,
+        "endChar": 20
+      },
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_260acad2",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterCombiner.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "please remove \"else\" statement",
+      "range": {
+        "startLine": 66,
+        "startChar": 18,
+        "endLine": 66,
+        "endChar": 22
+      },
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_06beaeff",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "final List\u003cInputStream\u003e sources \u003d Lists.newArrayList(getClass().getResourceAsStream(\"/yang/mdsal-netconf-mapping-test.yang\"))",
+      "range": {
+        "startLine": 50,
+        "startChar": 8,
+        "endLine": 51,
+        "endChar": 93
+      },
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_06e7ce41",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "Please make refactoring in this method. Extract a code which create YangInstanceIdentifier. Should be more clearly, what is preparing the data and then what is tested.",
+      "range": {
+        "startLine": 60,
+        "startChar": 16,
+        "endLine": 60,
+        "endChar": 42
+      },
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_e6ba8209",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "The variable ns1 and ns2 are same. Please use only the one of them. The best will be to extract as constant.",
+      "range": {
+        "startLine": 61,
+        "startChar": 21,
+        "endLine": 61,
+        "endChar": 24
+      },
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_46d0b653",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "I think, that these three lines should be rewritten by XmlElement.fromDomDocument(fromResource(\"/filter/multiple-roots/mr1.xml\"))",
+      "range": {
+        "startLine": 84,
+        "startChar": 8,
+        "endLine": 86,
+        "endChar": 72
+      },
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_66f852e6",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "The method should be not static",
+      "range": {
+        "startLine": 92,
+        "startChar": 12,
+        "endLine": 92,
+        "endChar": 18
+      },
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_86f3be09",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "The method should be not static",
+      "range": {
+        "startLine": 96,
+        "startChar": 12,
+        "endLine": 96,
+        "endChar": 19
+      },
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_46e9d619",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "The method is unused",
+      "range": {
+        "startLine": 115,
+        "startChar": 30,
+        "endLine": 115,
+        "endChar": 38
+      },
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_26ee4a23",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "The method should be not static",
+      "range": {
+        "startLine": 120,
+        "startChar": 12,
+        "endLine": 120,
+        "endChar": 18
+      },
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_86a57e06",
+        "filename": "netconf/mdsal-netconf-connector/src/test/resources/filter/multiple-roots/mr1.xml",
+        "patchSetId": 8
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "I would prefer rename the file name from mr1.xml to something verbose",
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_06b98e2e",
+        "filename": "netconf/mdsal-netconf-connector/src/test/resources/filter/multiple-roots/r11.xml",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "I would prefer rename the file name from r11.xml to something verbose",
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_e6b56232",
+        "filename": "netconf/mdsal-netconf-connector/src/test/resources/filter/multiple-roots/r12.xml",
+        "patchSetId": 8
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "I would prefer rename the file name from r12.xml to something verbose",
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_bb0b732a",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/messages/SubtreeFilter.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T13:17:31Z",
+      "side": 1,
+      "message": "The methods \"applyRpcSubtreeFilter\" and  method \"filtered\" , which has Documents args,  are dead. It is used only in tests. Remove it, or join it somehow with the method \"filtered\" which has the Element args.",
+      "revId": "98225716c528ec50acadfe56372263fc48235490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
