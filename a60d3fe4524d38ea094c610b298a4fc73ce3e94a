@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "3afa9182_7b7c6b73",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfParameter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-05-30T06:57:17Z",
+      "side": 1,
+      "message": "Sorry, first paragraph actually isn\u0027t possible, since java uses static dispatch for overloaded methods.",
+      "parentUuid": "3afa9182_3b9b03cb",
+      "range": {
+        "startLine": 14,
+        "startChar": 13,
+        "endLine": 14,
+        "endChar": 34
+      },
+      "revId": "a60d3fe4524d38ea094c610b298a4fc73ce3e94a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3afa9182_9b3dd7be",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfParameter.java",
         "patchSetId": 6
