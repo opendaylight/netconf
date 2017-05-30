@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "3afa9182_1bd56743",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/Validate.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T07:17:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a0b7d60_32b68edd",
+      "revId": "33a569d227bf2de59d724b2dae9d60006bd8dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a0b7d60_12bb8ac5",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfOperation.java",
         "patchSetId": 5
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "3afa9182_7bcaaba2",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfOperation.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T07:17:22Z",
+      "side": 1,
+      "message": "Abstract was added",
+      "parentUuid": "9a0b7d60_12bb8ac5",
+      "revId": "33a569d227bf2de59d724b2dae9d60006bd8dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a0b7d60_72b016de",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfOperation.java",
         "patchSetId": 5
@@ -64,6 +100,24 @@
       "writtenOn": "2017-05-22T12:58:59Z",
       "side": 1,
       "message": "typo:Too many elements\nFormat the source code according to guidelines https://wiki.opendaylight.org/view/BestPractices/Coding_Guidelines",
+      "revId": "33a569d227bf2de59d724b2dae9d60006bd8dc04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_5bcfefb0",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfOperation.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T07:17:22Z",
+      "side": 1,
+      "message": "The code was redesign",
+      "parentUuid": "9a0b7d60_72b016de",
       "revId": "33a569d227bf2de59d724b2dae9d60006bd8dc04",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
