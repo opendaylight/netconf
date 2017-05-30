@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3afa9182_db475f4a",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfOperation.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-05-30T06:50:57Z",
+      "side": 1,
+      "message": "Do you need to override this methods here? Class is abstract and methods are overriden in subclasses.",
+      "range": {
+        "startLine": 77,
+        "startChar": 4,
+        "endLine": 85,
+        "endChar": 5
+      },
+      "revId": "a60d3fe4524d38ea094c610b298a4fc73ce3e94a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_3b9b03cb",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfParameter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-05-30T06:50:57Z",
+      "side": 1,
+      "message": "In my opinion, instead of this union like structure, you could create marker interface Source and its implementations - Config and Datastore. extractSourceParameter(operationElement) would return one of this implementations according to operationElement. Then you could overload validate method in Validate class validate(Config config) and validate(Datastore datastore).\nI also wouldn\u0027t use this class as you use it in e.g. Lock rpc, since lock can use only datastore type and not config type.",
+      "range": {
+        "startLine": 14,
+        "startChar": 13,
+        "endLine": 14,
+        "endChar": 34
+      },
+      "revId": "a60d3fe4524d38ea094c610b298a4fc73ce3e94a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_9b3dd7be",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfParameter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-05-30T06:50:57Z",
+      "side": 1,
+      "message": "Constructors should be defined before methods.",
+      "range": {
+        "startLine": 30,
+        "startChar": 4,
+        "endLine": 30,
+        "endChar": 53
+      },
+      "revId": "a60d3fe4524d38ea094c610b298a4fc73ce3e94a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
