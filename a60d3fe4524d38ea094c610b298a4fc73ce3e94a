@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3afa9182_e151ccd9",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfOperation.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T20:56:05Z",
+      "side": 1,
+      "message": "I removed it. Thx",
+      "parentUuid": "3afa9182_db475f4a",
+      "range": {
+        "startLine": 77,
+        "startChar": 4,
+        "endLine": 85,
+        "endChar": 5
+      },
+      "revId": "a60d3fe4524d38ea094c610b298a4fc73ce3e94a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3afa9182_3b9b03cb",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfParameter.java",
         "patchSetId": 6
@@ -72,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "3afa9182_21ee3423",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfParameter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T20:56:05Z",
+      "side": 1,
+      "message": "Paragraph 2: yes it is true. But the extracting is same.",
+      "parentUuid": "3afa9182_3b9b03cb",
+      "range": {
+        "startLine": 14,
+        "startChar": 13,
+        "endLine": 14,
+        "endChar": 34
+      },
+      "revId": "a60d3fe4524d38ea094c610b298a4fc73ce3e94a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3afa9182_9b3dd7be",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfParameter.java",
         "patchSetId": 6
@@ -83,6 +131,30 @@
       "writtenOn": "2017-05-30T06:50:57Z",
       "side": 1,
       "message": "Constructors should be defined before methods.",
+      "range": {
+        "startLine": 30,
+        "startChar": 4,
+        "endLine": 30,
+        "endChar": 53
+      },
+      "revId": "a60d3fe4524d38ea094c610b298a4fc73ce3e94a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_0155f8c5",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/parser/MdsalNetconfParameter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T20:56:05Z",
+      "side": 1,
+      "message": "Constructors were moved. Thx",
+      "parentUuid": "3afa9182_9b3dd7be",
       "range": {
         "startLine": 30,
         "startChar": 4,
