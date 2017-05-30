@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3afa9182_db8f5fcb",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/osgi/NetconfSessionDatastore.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T11:10:00Z",
+      "side": 1,
+      "message": "Yes it could be. I made it concurrently",
+      "parentUuid": "3afa9182_1b2ba783",
+      "range": {
+        "startLine": 18,
+        "startChar": 16,
+        "endLine": 18,
+        "endChar": 19
+      },
+      "revId": "9a0cf9e744178301f7ce1cd3c45139249f62dcb9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3afa9182_bb39b3da",
         "filename": "netconf/netconf-impl/src/test/java/org/opendaylight/netconf/impl/mapping/operations/DefaultKillSessionTest.java",
         "patchSetId": 4
@@ -36,6 +60,30 @@
       "writtenOn": "2017-05-30T06:11:48Z",
       "side": 1,
       "message": "I would split this to 3 tests, one for every case.",
+      "range": {
+        "startLine": 71,
+        "startChar": 16,
+        "endLine": 71,
+        "endChar": 31
+      },
+      "revId": "9a0cf9e744178301f7ce1cd3c45139249f62dcb9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_fb921bf5",
+        "filename": "netconf/netconf-impl/src/test/java/org/opendaylight/netconf/impl/mapping/operations/DefaultKillSessionTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 6871
+      },
+      "writtenOn": "2017-05-30T11:10:00Z",
+      "side": 1,
+      "message": "I split it",
+      "parentUuid": "3afa9182_bb39b3da",
       "range": {
         "startLine": 71,
         "startChar": 16,
