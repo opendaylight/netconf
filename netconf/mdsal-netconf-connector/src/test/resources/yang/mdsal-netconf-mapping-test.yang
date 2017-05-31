@@ -34,8 +34,45 @@ module config {
             }
         }
         
-        list mapping-node{
+        list mapping-node {
             key "id";
+            leaf id {
+                type string;
+            }
+
+            leaf content {
+                type string;
+            }
+        }
+
+        choice ordered-choice {
+            case a {
+                container ordered-items {
+                    list ordered-item {
+                        key "id";
+                        ordered-by user;
+                        leaf id {
+                            type string;
+                        }
+
+                        leaf content {
+                            type string;
+                        }
+                    }
+                }
+            }
+            case b {
+                container augmented-ordered-items {
+
+                }
+            }
+        }
+    }
+
+    augment "/map:mapping-nodes/map:ordered-choice/map:b/map:augmented-ordered-items" {
+        list augmented-ordered-item {
+            key "id";
+            ordered-by user;
             leaf id {
                 type string;
             }
