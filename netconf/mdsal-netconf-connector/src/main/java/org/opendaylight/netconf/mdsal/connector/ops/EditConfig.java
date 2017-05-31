@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -16,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
@@ -44,6 +46,8 @@ import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -155,7 +159,27 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
                                 final NormalizedNode change) {
         if (change instanceof MapEntryNode) {
             final YangInstanceIdentifier mapNodeYid = path.getParent();
-            //merge empty map
+
+            final SchemaNode schemaNode = SchemaContextUtil.findNodeInSchemaContext(
+                    schemaContext.getCurrentContext(),
+                    mapNodeYid.getPathArguments().stream()
+                            // filter out identifiers not present in the schema tree
+                            .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
+                            .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
+                            .map(YangInstanceIdentifier.PathArgument::getNodeType).collect(Collectors.toList()));
+
+            // we should have the schema node that points to the parent list now, enforce it
+            Preconditions.checkState(schemaNode instanceof ListSchemaNode, "Schema node is not pointing to a list.");
+
+            //merge empty ordered or unordered map
+            if (((ListSchemaNode) schemaNode).isUserOrdered()) {
+                final MapNode mixinNode = Builders.orderedMapBuilder()
+                        .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(mapNodeYid.getLastPathArgument().getNodeType()))
+                        .build();
+                rwtx.merge(LogicalDatastoreType.CONFIGURATION, mapNodeYid, mixinNode);
+                return;
+            }
+
             final MapNode mixinNode = Builders.mapBuilder()
                     .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(mapNodeYid.getLastPathArgument().getNodeType()))
                     .build();
