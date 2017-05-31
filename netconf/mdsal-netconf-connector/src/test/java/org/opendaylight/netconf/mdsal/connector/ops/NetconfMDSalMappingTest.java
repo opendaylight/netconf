@@ -300,6 +300,34 @@ public class NetconfMDSalMappingTest {
     }
 
     @Test
+    public void testOrderedListEdits() throws Exception {
+
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_ordered_list_create.xml"), RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_ordered_list_replace.xml"), RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+
+        deleteDatastore();
+
+    }
+
+    @Test
+    public void testAugmentedOrderedListEdits() throws Exception {
+
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_augmented_ordered_list_create.xml"),
+                RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_augmented_ordered_list_replace.xml"),
+                RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+
+        deleteDatastore();
+
+    }
+
+    @Test
     public void testLock() throws Exception {
 
         verifyResponse(lockCandidate(), RPC_REPLY_OK);
