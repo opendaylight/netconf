@@ -7,74 +7,81 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
+import com.google.common.base.Preconditions;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Collections;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.Config;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.Delete;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.Get;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.Operational;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.Post;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.Put;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.RestConnectorRuntimeMXBean;
-import org.opendaylight.controller.config.yang.md.sal.rest.connector.Rpcs;
+import org.opendaylight.controller.md.sal.common.util.jmx.AbstractMXBean;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.sal.core.api.Broker.ProviderSession;
-import org.opendaylight.controller.sal.core.api.Provider;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
+import org.opendaylight.netconf.sal.restconf.impl.jmx.Config;
+import org.opendaylight.netconf.sal.restconf.impl.jmx.Delete;
+import org.opendaylight.netconf.sal.restconf.impl.jmx.Get;
+import org.opendaylight.netconf.sal.restconf.impl.jmx.Operational;
+import org.opendaylight.netconf.sal.restconf.impl.jmx.Post;
+import org.opendaylight.netconf.sal.restconf.impl.jmx.Put;
+import org.opendaylight.netconf.sal.restconf.impl.jmx.RestConnectorRuntimeMXBean;
+import org.opendaylight.netconf.sal.restconf.impl.jmx.Rpcs;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 
-public class RestconfProviderImpl implements Provider, AutoCloseable, RestConnector, RestConnectorRuntimeMXBean {
-
+public class RestconfProviderImpl extends AbstractMXBean
+        implements AutoCloseable, RestConnector, RestConnectorRuntimeMXBean {
+    private final DOMDataBroker domDataBroker;
+    private final SchemaService schemaService;
+    private final DOMRpcService rpcService;
+    private final DOMNotificationService notificationService;
+    private final DOMMountPointService mountPointService;
+    private final PortNumber websocketPort;
     private final StatisticsRestconfServiceWrapper stats = StatisticsRestconfServiceWrapper.getInstance();
     private ListenerRegistration<SchemaContextListener> listenerRegistration;
-    private PortNumber port;
     private Thread webSocketServerThread;
 
-    public void setWebsocketPort(final PortNumber port) {
-        this.port = port;
+    public RestconfProviderImpl(DOMDataBroker domDataBroker, SchemaService schemaService, DOMRpcService rpcService,
+            DOMNotificationService notificationService, DOMMountPointService mountPointService,
+            PortNumber websocketPort) {
+        super("Draft18Statistics", "restconf-connector", null);
+        this.domDataBroker = Preconditions.checkNotNull(domDataBroker);
+        this.schemaService = Preconditions.checkNotNull(schemaService);
+        this.rpcService = Preconditions.checkNotNull(rpcService);
+        this.notificationService = Preconditions.checkNotNull(notificationService);
+        this.mountPointService = Preconditions.checkNotNull(mountPointService);
+        this.websocketPort = Preconditions.checkNotNull(websocketPort);
     }
 
-    @Override
-    public void onSessionInitiated(final ProviderSession session) {
-        final DOMDataBroker domDataBroker = session.getService(DOMDataBroker.class);
-
-        BrokerFacade.getInstance().setContext(session);
-        BrokerFacade.getInstance().setDomDataBroker(domDataBroker);
-        final SchemaService schemaService = session.getService(SchemaService.class);
+    public void start() {
         this.listenerRegistration = schemaService.registerSchemaContextListener(ControllerContext.getInstance());
-        BrokerFacade.getInstance().setRpcService(session.getService(DOMRpcService.class));
-        BrokerFacade.getInstance().setDomNotificationService(session.getService(DOMNotificationService.class));
+
+        BrokerFacade.getInstance().setDomDataBroker(domDataBroker);
+        BrokerFacade.getInstance().setRpcService(rpcService);
+        BrokerFacade.getInstance().setDomNotificationService(notificationService);
 
         ControllerContext.getInstance().setSchemas(schemaService.getGlobalContext());
-        ControllerContext.getInstance().setMountService(session.getService(DOMMountPointService.class));
+        ControllerContext.getInstance().setMountService(mountPointService);
 
-        this.webSocketServerThread = new Thread(WebSocketServer.createInstance(this.port.getValue().intValue()));
-        this.webSocketServerThread.setName("Web socket server on port " + this.port);
+        this.webSocketServerThread = new Thread(WebSocketServer.createInstance(websocketPort.getValue().intValue()));
+        this.webSocketServerThread.setName("Web socket server on port " + websocketPort);
         this.webSocketServerThread.start();
-    }
 
-    @Override
-    public Collection<ProviderFunctionality> getProviderFunctionality() {
-        return Collections.emptySet();
+        registerMBean();
     }
 
     @Override
     public void close() {
-
         if (this.listenerRegistration != null) {
             this.listenerRegistration.close();
         }
 
         WebSocketServer.destroyInstance();
-        this.webSocketServerThread.interrupt();
+        if (this.webSocketServerThread != null) {
+            this.webSocketServerThread.interrupt();
+        }
+
+        unregisterMBean();
     }
 
     @Override
