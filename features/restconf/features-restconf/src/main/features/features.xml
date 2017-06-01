@@ -40,8 +40,9 @@
         <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-xml/{{VERSION}}</bundle>
         <bundle>mvn:org.codehaus.woodstox/stax2-api/{{VERSION}}</bundle>
         <bundle>wrap:mvn:javax.xml.stream/stax-api/{{VERSION}}</bundle>
-        <configfile finalname="${config.configfile.directory}/${config.restconf.configfile}">mvn:org.opendaylight.netconf/sal-rest-connector-config/{{VERSION}}/xml/config</configfile>
+        <configfile finalname="${config.configfile.directory}/${config.restconf.configfile}" override="true">mvn:org.opendaylight.netconf/sal-rest-connector-config/{{VERSION}}/xml/config</configfile>
         <configfile finalname="${config.configfile.directory}/${config.restconf.service.configfile}">mvn:org.opendaylight.netconf/sal-rest-connector-config/{{VERSION}}/xml/configrestconfservice</configfile>
+        <configfile finalname="etc/org.opendaylight.restconf.cfg">mvn:org.opendaylight.netconf/sal-rest-connector-config/{{VERSION}}/cfg/restconf</configfile>
     </feature>
     <feature name ='odl-mdsal-apidocs' version='${project.version}' description="OpenDaylight :: MDSAL :: APIDOCS">
         <feature version='${project.version}'>odl-restconf</feature>

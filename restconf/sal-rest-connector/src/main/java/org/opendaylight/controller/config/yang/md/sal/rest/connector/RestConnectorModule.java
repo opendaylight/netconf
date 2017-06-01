@@ -8,16 +8,13 @@
 
 package org.opendaylight.controller.config.yang.md.sal.rest.connector;
 
-import org.opendaylight.RestconfWrapperProviders;
-import org.opendaylight.aaa.api.AAAService;
 import org.opendaylight.controller.config.api.osgi.WaitingServiceTracker;
+import org.opendaylight.netconf.sal.rest.api.RestConnector;
 import org.osgi.framework.BundleContext;
 
-
+@Deprecated
 public class RestConnectorModule
         extends org.opendaylight.controller.config.yang.md.sal.rest.connector.AbstractRestConnectorModule {
-
-    private static RestConnectorRuntimeRegistration runtimeRegistration;
 
     private BundleContext bundleContext;
 
@@ -41,21 +38,18 @@ public class RestConnectorModule
 
     @Override
     public java.lang.AutoCloseable createInstance() {
+        final WaitingServiceTracker<RestConnector> tracker =
+                WaitingServiceTracker.create(RestConnector.class, bundleContext);
+        tracker.waitForService(WaitingServiceTracker.FIVE_MINUTES);
 
-        final WaitingServiceTracker<AAAService> aaaServiceWaitingServiceTracker =
-                WaitingServiceTracker.create(AAAService.class, bundleContext);
-        aaaServiceWaitingServiceTracker.waitForService(WaitingServiceTracker.FIVE_MINUTES);
-
-        final RestconfWrapperProviders wrapperProviders = new RestconfWrapperProviders(getWebsocketPort());
-        wrapperProviders.registerProviders(getDomBrokerDependency());
-
-        if (runtimeRegistration != null) {
-            runtimeRegistration.close();
+        final class AutoCloseableRestConnector implements RestConnector, AutoCloseable {
+            @Override
+            public void close() {
+                tracker.close();
+            }
         }
 
-        runtimeRegistration = wrapperProviders.runtimeRegistration(getRootRuntimeBeanRegistratorWrapper());
-
-        return wrapperProviders;
+        return new AutoCloseableRestConnector();
     }
 
     public void setBundleContext(final BundleContext bundleContext) {

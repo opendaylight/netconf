@@ -206,7 +206,7 @@
             <Private-Package>org.opendaylight.netconf.sal.rest.*,
               org.opendaylight.restconf.*,
               org.opendaylight.netconf.sal.restconf.rpc.*,
-              org.opendaylight.netconf.sal.restconf.impl,
+              org.opendaylight.netconf.sal.restconf.impl.*,
               org.opendaylight.netconf.md.sal.rest.common.*,
               org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.rest.connector.rev140724.*,
             </Private-Package>
@@ -218,6 +218,7 @@
               org.opendaylight.aaa.shiro.realm,
               org.opendaylight.aaa.shiro.web.env,
               org.opendaylight.aaa.filterchain.filters,
+              org.opendaylight.aaa.api,
               org.apache.shiro.web.env
             </Import-Package>
             <Web-ContextPath>/restconf</Web-ContextPath>

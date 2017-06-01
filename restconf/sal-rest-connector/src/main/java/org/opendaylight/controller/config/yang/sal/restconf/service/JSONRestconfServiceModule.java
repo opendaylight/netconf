@@ -8,10 +8,19 @@
 
 package org.opendaylight.controller.config.yang.sal.restconf.service;
 
-import org.opendaylight.netconf.sal.restconf.impl.JSONRestconfServiceImpl;
+import com.google.common.base.Optional;
+import org.opendaylight.controller.config.api.osgi.WaitingServiceTracker;
+import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.netconf.sal.restconf.api.JSONRestconfService;
+import org.opendaylight.yangtools.yang.common.OperationFailedException;
+import org.osgi.framework.BundleContext;
 
+@Deprecated
 public class JSONRestconfServiceModule
         extends org.opendaylight.controller.config.yang.sal.restconf.service.AbstractJSONRestconfServiceModule {
+
+    private BundleContext bundleContext;
+
     public JSONRestconfServiceModule(org.opendaylight.controller.config.api.ModuleIdentifier identifier,
                                      org.opendaylight.controller.config.api.DependencyResolver dependencyResolver) {
         super(identifier, dependencyResolver);
@@ -26,12 +35,49 @@ public class JSONRestconfServiceModule
     }
 
     @Override
-    public void customValidation() {
-        // add custom validation form module attributes here.
+    public java.lang.AutoCloseable createInstance() {
+        final WaitingServiceTracker<JSONRestconfService> tracker =
+                WaitingServiceTracker.create(JSONRestconfService.class, bundleContext);
+        final JSONRestconfService service = tracker.waitForService(WaitingServiceTracker.FIVE_MINUTES);
+
+        final class AutoCloseableJSONRestconfService implements JSONRestconfService, AutoCloseable {
+            @Override
+            public void close() {
+                tracker.close();
+            }
+
+            @Override
+            public void delete(String uriPath) throws OperationFailedException {
+                service.delete(uriPath);
+            }
+
+
+            @Override
+            public void put(String uriPath, String payload) throws OperationFailedException {
+                service.put(uriPath, payload);
+            }
+
+            @Override
+            public void post(String uriPath, String payload) throws OperationFailedException {
+                service.post(uriPath, payload);
+            }
+
+            @Override
+            public Optional<String> get(String uriPath, LogicalDatastoreType datastoreType)
+                    throws OperationFailedException {
+                return service.get(uriPath, datastoreType);
+            }
+
+            @Override
+            public Optional<String> invokeRpc(String uriPath, Optional<String> input) throws OperationFailedException {
+                return service.invokeRpc(uriPath, input);
+            }
+        }
+
+        return new AutoCloseableJSONRestconfService();
     }
 
-    @Override
-    public java.lang.AutoCloseable createInstance() {
-        return new JSONRestconfServiceImpl();
+    public void setBundleContext(final BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
     }
 }
