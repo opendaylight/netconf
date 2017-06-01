@@ -9,8 +9,6 @@
 package org.opendaylight.restconf;
 
 import com.google.common.base.Preconditions;
-import java.util.Collection;
-import java.util.Collections;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
@@ -18,8 +16,6 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.sal.core.api.Broker.ProviderSession;
-import org.opendaylight.controller.sal.core.api.Provider;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -39,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * Provider for restconf draft18.
  *
  */
-public class RestConnectorProvider implements Provider, RestConnector, AutoCloseable {
+public class RestConnectorProvider implements RestConnector, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestConnectorProvider.class);
 
@@ -58,35 +54,43 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         }
     };
 
-    private ListenerRegistration<SchemaContextListener> listenerRegistration;
-
-    private SchemaContextHandler schemaCtxHandler;
     private static TransactionChainHandler transactionChainHandler;
     private static DOMDataBroker dataBroker;
     private static DOMMountPointServiceHandler mountPointServiceHandler;
 
-    @Override
-    public void onSessionInitiated(final ProviderSession session) {
-        final SchemaService schemaService = Preconditions.checkNotNull(session.getService(SchemaService.class));
+    private final SchemaService schemaService;
+    private final DOMRpcService rpcService;
+    private final DOMNotificationService notificationService;
+    private final DOMMountPointService mountPointService;
+    private ListenerRegistration<SchemaContextListener> listenerRegistration;
 
+    private SchemaContextHandler schemaCtxHandler;
+
+    public RestConnectorProvider(DOMDataBroker domDataBroker, SchemaService schemaService, DOMRpcService rpcService,
+            DOMNotificationService notificationService, DOMMountPointService mountPointService) {
+        this.schemaService = Preconditions.checkNotNull(schemaService);
+        this.rpcService = Preconditions.checkNotNull(rpcService);
+        this.notificationService = Preconditions.checkNotNull(notificationService);
+        this.mountPointService = Preconditions.checkNotNull(mountPointService);
+
+        RestConnectorProvider.dataBroker = Preconditions.checkNotNull(domDataBroker);
+    }
+
+    public void start() {
         final ServicesWrapperImpl wrapperServices = ServicesWrapperImpl.getInstance();
 
-        RestConnectorProvider.mountPointServiceHandler = new DOMMountPointServiceHandler(
-                session.getService(DOMMountPointService.class));
+        mountPointServiceHandler = new DOMMountPointServiceHandler(mountPointService);
 
-        RestConnectorProvider.dataBroker = session.getService(DOMDataBroker.class);
-        final DOMDataBrokerHandler brokerHandler = new DOMDataBrokerHandler(RestConnectorProvider.dataBroker);
+        final DOMDataBrokerHandler brokerHandler = new DOMDataBrokerHandler(dataBroker);
 
-        RestConnectorProvider.transactionChainHandler = new TransactionChainHandler(RestConnectorProvider.dataBroker
+        RestConnectorProvider.transactionChainHandler = new TransactionChainHandler(dataBroker
                 .createTransactionChain(RestConnectorProvider.TRANSACTION_CHAIN_LISTENER));
 
         this.schemaCtxHandler = new SchemaContextHandler(transactionChainHandler);
         this.listenerRegistration = schemaService.registerSchemaContextListener(this.schemaCtxHandler);
 
-        final DOMRpcService rpcService = session.getService(DOMRpcService.class);
         final RpcServiceHandler rpcServiceHandler = new RpcServiceHandler(rpcService);
 
-        final DOMNotificationService notificationService = session.getService(DOMNotificationService.class);
         final NotificationServiceHandler notificationServiceHandler =
                 new NotificationServiceHandler(notificationService);
 
@@ -105,7 +109,7 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         LOG.trace("Resetting TransactionChain({})", chain);
         chain.close();
         RestConnectorProvider.transactionChainHandler.update(
-                Preconditions.checkNotNull(RestConnectorProvider.dataBroker).createTransactionChain(
+                Preconditions.checkNotNull(dataBroker).createTransactionChain(
                         RestConnectorProvider.TRANSACTION_CHAIN_LISTENER)
         );
     }
@@ -115,12 +119,7 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
      * @return {@link DOMMountPointService}
      */
     public static DOMMountPointService getMountPointService() {
-        return RestConnectorProvider.mountPointServiceHandler.get();
-    }
-
-    @Override
-    public Collection<ProviderFunctionality> getProviderFunctionality() {
-        return Collections.emptySet();
+        return mountPointServiceHandler.get();
     }
 
     @Override
@@ -131,8 +130,12 @@ public class RestConnectorProvider implements Provider, RestConnector, AutoClose
         }
 
         // close transaction chain
-        if ((transactionChainHandler != null) && (transactionChainHandler.get() != null)) {
+        if (transactionChainHandler != null && transactionChainHandler.get() != null) {
             transactionChainHandler.get().close();
         }
+
+        transactionChainHandler = null;
+        mountPointServiceHandler = null;
+        dataBroker = null;
     }
 }

@@ -50,7 +50,6 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
-import org.opendaylight.controller.sal.core.api.Broker.ConsumerSession;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
@@ -90,8 +89,6 @@ public class BrokerFacadeTest {
     @Mock
     private DOMNotificationService domNotification;
     @Mock
-    private ConsumerSession context;
-    @Mock
     private DOMRpcService mockRpcService;
     @Mock
     private DOMMountPoint mockMountInstance;
@@ -116,7 +113,6 @@ public class BrokerFacadeTest {
         this.brokerFacade.setDomDataBroker(this.domDataBroker);
         this.brokerFacade.setDomNotificationService(this.domNotification);
         this.brokerFacade.setRpcService(this.mockRpcService);
-        this.brokerFacade.setContext(this.context);
         when(this.domDataBroker.newReadOnlyTransaction()).thenReturn(this.readTransaction);
         when(this.domDataBroker.newWriteOnlyTransaction()).thenReturn(this.writeTransaction);
         when(this.domDataBroker.newReadWriteTransaction()).thenReturn(this.rwTransaction);
@@ -204,7 +200,7 @@ public class BrokerFacadeTest {
 
     @Test(expected = RestconfDocumentedException.class)
     public void testInvokeRpcWithNoConsumerSession() {
-        this.brokerFacade.setContext(null);
+        brokerFacade.setDomDataBroker(null);
         this.brokerFacade.invokeRpc(this.type, this.dummyNode);
     }
 

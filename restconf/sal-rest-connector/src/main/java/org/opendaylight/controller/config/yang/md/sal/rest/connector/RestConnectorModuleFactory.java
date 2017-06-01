@@ -23,6 +23,7 @@ import org.osgi.framework.BundleContext;
 * <p>
 * Do not modify this file unless it is present under src/main directory
 */
+@Deprecated
 public class RestConnectorModuleFactory
         extends org.opendaylight.controller.config.yang.md.sal.rest.connector.AbstractRestConnectorModuleFactory {
 
