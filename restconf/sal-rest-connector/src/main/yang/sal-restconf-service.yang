@@ -12,11 +12,14 @@ module sal-restconf-service {
     }
 
     identity json-restconf-service {
+        status deprecated;
         base "config:service-type";
         config:java-class "org.opendaylight.netconf.sal.restconf.api.JSONRestconfService";
+        config:disable-osgi-service-registration;
     }
 
     identity json-restconf-service-impl {
+        status deprecated;
         base config:module-type;
         config:provided-service json-restconf-service;
         config:java-name-prefix JSONRestconfService;

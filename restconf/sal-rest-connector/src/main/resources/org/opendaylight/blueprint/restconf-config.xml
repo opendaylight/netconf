@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2017 Inocybe Technologies Inc. and others.  All rights reserved.
+
+ This program and the accompanying materials are made available under the
+ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ and is available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.4.0"
+           odl:use-default-for-reference-types="true">
+
+  <!-- JSONRestconfService -->
+
+  <bean id="jsonRestconfService"
+      class="org.opendaylight.netconf.sal.restconf.impl.JSONRestconfServiceImpl"
+      destroy-method="close"/>
+
+  <service ref="jsonRestconfService"
+      interface="org.opendaylight.netconf.sal.restconf.api.JSONRestconfService" />
+
+  <!-- Restconf providers -->
+
+  <cm:property-placeholder persistent-id="org.opendaylight.restconf" update-strategy="reload">
+    <cm:default-properties>
+      <cm:property name="websocket-port" value="8185"/>
+      <cm:property name="databroker-service-type" value="default"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <!-- We need the AAAService available even though we don't use it -->
+  <reference interface="org.opendaylight.aaa.api.AAAService"/>
+
+  <reference id="schemaService" interface="org.opendaylight.controller.sal.core.api.model.SchemaService"/>
+  <reference id="domRpcService" interface="org.opendaylight.controller.md.sal.dom.api.DOMRpcService"/>
+  <reference id="domMountPointService" interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"/>
+  <reference id="domNotificationService" interface="org.opendaylight.controller.md.sal.dom.api.DOMNotificationService"/>
+  <reference id="domDataBroker" interface="org.opendaylight.controller.md.sal.dom.api.DOMDataBroker"
+          ext:filter="(type=${databroker-service-type})"/>
+
+  <bean id="webSocketPort" class="org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber">
+    <argument value="${websocket-port}"/>
+  </bean>
+
+  <bean id="restconfProviderDraft02" class="org.opendaylight.netconf.sal.restconf.impl.RestconfProviderImpl"
+          init-method="start" destroy-method="close">
+    <argument ref="domDataBroker"/>
+    <argument ref="schemaService"/>
+    <argument ref="domRpcService"/>
+    <argument ref="domNotificationService"/>
+    <argument ref="domMountPointService"/>
+    <argument ref="webSocketPort"/>
+  </bean>
+
+  <bean id="restconfProviderDraft18" class="org.opendaylight.restconf.RestConnectorProvider"
+          init-method="start" destroy-method="close">
+    <argument ref="domDataBroker"/>
+    <argument ref="schemaService"/>
+    <argument ref="domRpcService"/>
+    <argument ref="domNotificationService"/>
+    <argument ref="domMountPointService"/>
+  </bean>
+
+  <service ref="restconfProviderDraft18"
+      interface="org.opendaylight.netconf.sal.rest.api.RestConnector" />
+
+</blueprint>

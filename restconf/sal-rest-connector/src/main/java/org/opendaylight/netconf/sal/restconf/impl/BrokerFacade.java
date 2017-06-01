@@ -40,7 +40,6 @@ import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.sal.core.api.Broker.ConsumerSession;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
@@ -84,7 +83,6 @@ public class BrokerFacade {
     private static final BrokerFacade INSTANCE = new BrokerFacade();
 
     private volatile DOMRpcService rpcService;
-    private volatile ConsumerSession context;
 
     private DOMDataBroker domDataBroker;
     private DOMNotificationService domNotification;
@@ -99,16 +97,12 @@ public class BrokerFacade {
         this.domNotification = domNotification;
     }
 
-    public void setContext(final ConsumerSession context) {
-        this.context = context;
-    }
-
     public static BrokerFacade getInstance() {
         return BrokerFacade.INSTANCE;
     }
 
     private void checkPreconditions() {
-        if (this.context == null || this.domDataBroker == null) {
+        if (this.domDataBroker == null) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
     }
