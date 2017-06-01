@@ -8,6 +8,9 @@
 
 package org.opendaylight.controller.config.yang.sal.restconf.service;
 
+import org.opendaylight.controller.config.api.DependencyResolver;
+import org.osgi.framework.BundleContext;
+
 /**
 * Generated file.
 *
@@ -19,7 +22,25 @@ package org.opendaylight.controller.config.yang.sal.restconf.service;
 * <p>
 * Do not modify this file unless it is present under src/main directory
 */
+@Deprecated
 public class JSONRestconfServiceModuleFactory
         extends org.opendaylight.controller.config.yang.sal.restconf.service.AbstractJSONRestconfServiceModuleFactory {
+    @Override
+    public JSONRestconfServiceModule instantiateModule(final String instanceName,
+            final DependencyResolver dependencyResolver, final BundleContext bundleContext) {
+        final JSONRestconfServiceModule restConnectorModule = super.instantiateModule(instanceName,
+                dependencyResolver, bundleContext);
+        restConnectorModule.setBundleContext(bundleContext);
+        return restConnectorModule;
+    }
 
+    @Override
+    public JSONRestconfServiceModule instantiateModule(final String instanceName,
+            final DependencyResolver dependencyResolver, final JSONRestconfServiceModule oldModule,
+            final AutoCloseable oldInstance, final BundleContext bundleContext) {
+        final JSONRestconfServiceModule restConnectorModule = super.instantiateModule(instanceName,
+                dependencyResolver, oldModule, oldInstance, bundleContext);
+        restConnectorModule.setBundleContext(bundleContext);
+        return restConnectorModule;
+    }
 }
