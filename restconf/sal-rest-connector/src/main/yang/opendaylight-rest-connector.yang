@@ -7,86 +7,42 @@ module opendaylight-rest-connector {
     import opendaylight-md-sal-dom {prefix dom; revision-date 2013-10-28;}
     import opendaylight-md-sal-binding {prefix sal; revision-date 2013-10-28;}
     import ietf-inet-types {prefix inet; revision-date 2013-07-15;}
- 
+
     description
         "Service definition for Rest Connector";
- 
+
     revision "2014-07-24" {
         description
             "Initial revision";
     }
-    
+
     identity rest-connector {
+        status deprecated;
         base "config:service-type";
         config:java-class "org.opendaylight.netconf.sal.rest.api.RestConnector";
+        config:disable-osgi-service-registration;
     }
-    
+
     identity rest-connector-impl {
+        status deprecated;
         base config:module-type;
         config:provided-service rest-connector;
         config:java-name-prefix RestConnector;
-    }
-    
-    grouping statistics {
-        leaf received-requests {
-           type uint64;
-        }
-
-        leaf successful-responses {
-            type uint64;
-        }
-
-        leaf failed-responses {
-            type uint64;
-        }
     }
 
     augment "/config:modules/config:module/config:configuration" {
         case rest-connector-impl {
             when "/config:modules/config:module/config:type = 'rest-connector-impl'";
             leaf websocket-port {
-                mandatory true;
+                mandatory false;
                 type inet:port-number;
             }
             container dom-broker {
                 uses config:service-ref {
                     refine type {
-                        mandatory true;
+                        mandatory false;
                         config:required-identity dom:dom-broker-osgi-registry;
                     }
-                }
-            }
-        }
-    }
-    
-    augment "/config:modules/config:module/config:state" {
-        case rest-connector-impl {
-            when "/config:modules/config:module/config:type = 'rest-connector-impl'";
-            container rpcs {
-                uses statistics;
-            }
-
-            container config {
-                container get {
-                    uses statistics;
-                }
-                
-                container post {
-                    uses statistics;
-                }
-                
-                container put {
-                    uses statistics;
-                }
-                
-                container delete {
-                    uses statistics;
-                }
-            }
-
-            container operational {
-                container get {
-                    uses statistics;
                 }
             }
         }
