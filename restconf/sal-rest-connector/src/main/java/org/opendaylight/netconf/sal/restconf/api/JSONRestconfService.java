@@ -14,9 +14,10 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 
 /**
- * @author Thomas Pantelis
+ * Provides restconf CRUD operations via code with input/output data in JSON format.
+ *
+ * @author Thomas Pantelis.
  */
-@Deprecated
 public interface JSONRestconfService {
     /**
      * The data tree root path.

@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Pantelis
  */
-@Deprecated
 public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseable {
     private final static Logger LOG = LoggerFactory.getLogger(JSONRestconfServiceImpl.class);
 
