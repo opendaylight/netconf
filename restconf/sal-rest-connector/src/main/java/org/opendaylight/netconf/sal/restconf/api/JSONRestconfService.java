@@ -13,8 +13,9 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 
-@Deprecated
 /**
+ * Provides restconf CRUD operations via code with input/output data in JSON format.
+ *
  * @author Thomas Pantelis.
  */
 public interface JSONRestconfService {
