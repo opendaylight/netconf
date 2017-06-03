@@ -125,7 +125,7 @@ public abstract class BasicDataHolderReader<T extends DataSchemaNode> extends Ab
         return Collections.<NormalizedNode<?, ?>>singletonList(newNode);
     }
 
-    protected abstract TypeDefinition<?> getType(final T schemaNode);
+    protected abstract TypeDefinition<?> getType(T schemaNode);
 
     protected final DataHolderCompleter getBaseCompleter(final T schemaNode) {
         final TypeDefinition<?> type = getType(schemaNode);
