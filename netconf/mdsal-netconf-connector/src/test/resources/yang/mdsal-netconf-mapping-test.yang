@@ -181,10 +181,16 @@ module config {
     }
 
     augment "/map:top/map:modules/" {
-        container augmented-container{
+        container augmented-container {
             leaf identifier {
                 type string;
             }
+        }
+    }
+
+    augment "/map:top/map:modules/" {
+        leaf leaf-from-augment {
+            type string;
         }
     }
 
