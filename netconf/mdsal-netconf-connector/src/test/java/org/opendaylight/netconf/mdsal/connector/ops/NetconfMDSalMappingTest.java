@@ -330,6 +330,19 @@ public class NetconfMDSalMappingTest {
     }
 
     @Test
+    public void testAugmentedContainerReplace() throws Exception {
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_augmented_container_create_parent.xml"),
+            RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_augmented_container_replace.xml"),
+            RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+
+        deleteDatastore();
+    }
+
+    @Test
     public void testLock() throws Exception {
 
         verifyResponse(lockCandidate(), RPC_REPLY_OK);
