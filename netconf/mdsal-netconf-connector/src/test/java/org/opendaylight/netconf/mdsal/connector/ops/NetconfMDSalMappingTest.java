@@ -327,6 +327,32 @@ public class NetconfMDSalMappingTest {
     }
 
     @Test
+    public void testAugmentedContainerReplace() throws Exception {
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_empty_modules_create.xml"),
+            RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_augmented_container_replace.xml"),
+            RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+
+        deleteDatastore();
+    }
+
+    @Test
+    public void testLeafFromAugmentReplace() throws Exception {
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_empty_modules_create.xml"),
+            RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+
+        verifyResponse(edit("messages/mapping/editConfigs/editConfig_leaf_from_augment_replace.xml"),
+            RPC_REPLY_OK);
+        verifyResponse(commit(), RPC_REPLY_OK);
+
+        deleteDatastore();
+    }
+
+    @Test
     public void testLock() throws Exception {
         verifyResponse(lockCandidate(), RPC_REPLY_OK);
 
