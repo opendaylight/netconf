@@ -9,10 +9,13 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -34,16 +37,15 @@ import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.DomUtils;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -114,7 +116,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             return;
         case MERGE:
             rwtx.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(change.getPath()), change.getChangeRoot());
-            mergeParentMap(rwtx, path, changeData);
+            ensureParentsByMerge(LogicalDatastoreType.CONFIGURATION, path, rwtx, schemaContext.getCurrentContext());
             break;
         case CREATE:
             try {
@@ -122,14 +124,14 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
                 if (readResult.isPresent()) {
                     throw new DocumentedException("Data already exists, cannot execute CREATE operation", ErrorType.protocol, ErrorTag.data_exists, ErrorSeverity.error);
                 }
-                mergeParentMap(rwtx, path, changeData);
+                ensureParentsByMerge(LogicalDatastoreType.CONFIGURATION, path, rwtx, schemaContext.getCurrentContext());
                 rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
             } catch (final ReadFailedException e) {
                 LOG.warn("Read from datastore failed when trying to read data for create operation", change, e);
             }
             break;
         case REPLACE:
-            mergeParentMap(rwtx, path, changeData);
+            ensureParentsByMerge(LogicalDatastoreType.CONFIGURATION, path, rwtx, schemaContext.getCurrentContext());
             rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
             break;
         case DELETE:
@@ -151,16 +153,33 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         }
     }
 
-    private void mergeParentMap(final DOMDataReadWriteTransaction rwtx, final YangInstanceIdentifier path,
-                                final NormalizedNode change) {
-        if (change instanceof MapEntryNode) {
-            final YangInstanceIdentifier mapNodeYid = path.getParent();
-            //merge empty map
-            final MapNode mixinNode = Builders.mapBuilder()
-                    .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(mapNodeYid.getLastPathArgument().getNodeType()))
-                    .build();
-            rwtx.merge(LogicalDatastoreType.CONFIGURATION, mapNodeYid, mixinNode);
+    private static void ensureParentsByMerge(final LogicalDatastoreType store, final YangInstanceIdentifier normalizedPath,
+                                             final DOMDataReadWriteTransaction rwTx, final SchemaContext schemaContext) {
+        final List<YangInstanceIdentifier.PathArgument> normalizedPathWithoutChildArgs = new ArrayList<>();
+        YangInstanceIdentifier rootNormalizedPath = null;
+
+        final Iterator<YangInstanceIdentifier.PathArgument> it = normalizedPath.getPathArguments().iterator();
+
+        while (it.hasNext()) {
+            final YangInstanceIdentifier.PathArgument pathArgument = it.next();
+            if (rootNormalizedPath == null) {
+                rootNormalizedPath = YangInstanceIdentifier.create(pathArgument);
+            }
+
+            if (it.hasNext()) {
+                normalizedPathWithoutChildArgs.add(pathArgument);
+            }
         }
+
+        if (normalizedPathWithoutChildArgs.isEmpty()) {
+            return;
+        }
+
+        Preconditions.checkArgument(rootNormalizedPath != null, "Empty path received");
+
+        final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
+            YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
+        rwTx.merge(store, rootNormalizedPath, parentStructure);
     }
 
     private NormalizedNode parseIntoNormalizedNode(final DataSchemaNode schemaNode, final XmlElement element,
