@@ -36,6 +36,7 @@ import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -118,7 +119,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             return;
         case MERGE:
             rwtx.merge(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create(change.getPath()), change.getChangeRoot());
-            mergeParentMap(rwtx, path, changeData);
+            mergeParentMixin(rwtx, path, changeData);
             break;
         case CREATE:
             try {
@@ -126,14 +127,14 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
                 if (readResult.isPresent()) {
                     throw new DocumentedException("Data already exists, cannot execute CREATE operation", ErrorType.protocol, ErrorTag.data_exists, ErrorSeverity.error);
                 }
-                mergeParentMap(rwtx, path, changeData);
+                mergeParentMixin(rwtx, path, changeData);
                 rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
             } catch (final ReadFailedException e) {
                 LOG.warn("Read from datastore failed when trying to read data for create operation", change, e);
             }
             break;
         case REPLACE:
-            mergeParentMap(rwtx, path, changeData);
+            mergeParentMixin(rwtx, path, changeData);
             rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
             break;
         case DELETE:
@@ -155,14 +156,14 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         }
     }
 
-    private void mergeParentMap(final DOMDataReadWriteTransaction rwtx, final YangInstanceIdentifier path,
+    private void mergeParentMixin(final DOMDataReadWriteTransaction rwtx, final YangInstanceIdentifier path,
                                 final NormalizedNode change) {
+        final YangInstanceIdentifier parentNodeYid = path.getParent();
         if (change instanceof MapEntryNode) {
-            final YangInstanceIdentifier mapNodeYid = path.getParent();
 
             final SchemaNode schemaNode = SchemaContextUtil.findNodeInSchemaContext(
                     schemaContext.getCurrentContext(),
-                    mapNodeYid.getPathArguments().stream()
+                    parentNodeYid.getPathArguments().stream()
                             // filter out identifiers not present in the schema tree
                             .filter(arg -> !(arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates))
                             .filter(arg -> !(arg instanceof YangInstanceIdentifier.AugmentationIdentifier))
@@ -174,16 +175,23 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             //merge empty ordered or unordered map
             if (((ListSchemaNode) schemaNode).isUserOrdered()) {
                 final MapNode mixinNode = Builders.orderedMapBuilder()
-                        .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(mapNodeYid.getLastPathArgument().getNodeType()))
+                        .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(parentNodeYid.getLastPathArgument().getNodeType()))
                         .build();
-                rwtx.merge(LogicalDatastoreType.CONFIGURATION, mapNodeYid, mixinNode);
+                rwtx.merge(LogicalDatastoreType.CONFIGURATION, parentNodeYid, mixinNode);
                 return;
             }
 
             final MapNode mixinNode = Builders.mapBuilder()
-                    .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(mapNodeYid.getLastPathArgument().getNodeType()))
+                    .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(parentNodeYid.getLastPathArgument().getNodeType()))
                     .build();
-            rwtx.merge(LogicalDatastoreType.CONFIGURATION, mapNodeYid, mixinNode);
+            rwtx.merge(LogicalDatastoreType.CONFIGURATION, parentNodeYid, mixinNode);
+        } else if (parentNodeYid.getLastPathArgument() instanceof YangInstanceIdentifier.AugmentationIdentifier) {
+            // merge empty augmentation node
+            final YangInstanceIdentifier.AugmentationIdentifier augmentationYid =
+                (YangInstanceIdentifier.AugmentationIdentifier) parentNodeYid.getLastPathArgument();
+            final AugmentationNode augmentationNode = Builders.augmentationBuilder()
+                .withNodeIdentifier(augmentationYid).build();
+            rwtx.merge(LogicalDatastoreType.CONFIGURATION, parentNodeYid, augmentationNode);
         }
     }
 
