@@ -1,0 +1,209 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3afa9182_762c64ac",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/BaseCallHomeTopology.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-06T17:52:19Z",
+      "side": 1,
+      "message": "Remove this space please.",
+      "revId": "be91b1605b7073ac243e8915505b7c856bc8fe01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_d618b886",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountDispatcher.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-06T17:52:19Z",
+      "side": 1,
+      "message": "Remove this space please.",
+      "revId": "be91b1605b7073ac243e8915505b7c856bc8fe01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_b61d2c76",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeTopology.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-06T17:52:19Z",
+      "side": 1,
+      "message": "Remove this space please.",
+      "revId": "be91b1605b7073ac243e8915505b7c856bc8fe01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_f617b44f",
+        "filename": "netconf/netconf-netty-util/pom.xml",
+        "patchSetId": 21
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-06T17:52:19Z",
+      "side": 1,
+      "message": "Please fix the spacing so it is consistent with the rest of the pom",
+      "range": {
+        "startLine": 111,
+        "startChar": 6,
+        "endLine": 115,
+        "endChar": 19
+      },
+      "revId": "be91b1605b7073ac243e8915505b7c856bc8fe01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_7603c40f",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/authentication/LoginPassword.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-06T17:52:19Z",
+      "side": 1,
+      "message": "You add a Logger but don\u0027t use it?  Please take it out unless you plan to use it.",
+      "range": {
+        "startLine": 24,
+        "startChar": 4,
+        "endLine": 24,
+        "endChar": 83
+      },
+      "revId": "be91b1605b7073ac243e8915505b7c856bc8fe01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_b904ff15",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-06T17:52:19Z",
+      "side": 1,
+      "message": "This should be final.",
+      "revId": "be91b1605b7073ac243e8915505b7c856bc8fe01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_59135b5c",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-06T17:52:19Z",
+      "side": 1,
+      "message": "Should be final.",
+      "revId": "be91b1605b7073ac243e8915505b7c856bc8fe01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_d9262bba",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-06T17:52:19Z",
+      "side": 1,
+      "message": "Please remove this space.",
+      "revId": "be91b1605b7073ac243e8915505b7c856bc8fe01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_f925e7ab",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-06T17:52:19Z",
+      "side": 1,
+      "message": "Still think there should be a maxAttempts sort of toggle.  Some sort of escape condition.",
+      "range": {
+        "startLine": 252,
+        "startChar": 19,
+        "endLine": 252,
+        "endChar": 35
+      },
+      "revId": "be91b1605b7073ac243e8915505b7c856bc8fe01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_b92b5f81",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-06T17:52:19Z",
+      "side": 1,
+      "message": "Should be final.",
+      "revId": "be91b1605b7073ac243e8915505b7c856bc8fe01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_593a3bce",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/impl/NetconfTopologyImpl.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-06T17:52:19Z",
+      "side": 1,
+      "message": "Please remove the space here.",
+      "revId": "be91b1605b7073ac243e8915505b7c856bc8fe01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
