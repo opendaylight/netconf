@@ -11,7 +11,7 @@ package org.opendaylight.netconf.topology.singleton.messages.transactions;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 
-public class MergeRequest implements TransactionRequest {
+public class MergeRequest implements WriteActorMessage {
     private static final long serialVersionUID = 1L;
 
     private final NormalizedNodeMessage data;
