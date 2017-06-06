@@ -11,6 +11,7 @@ package org.opendaylight.netconf.sal.connect.netconf;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyCollectionOf;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -25,6 +26,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.SettableFuture;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -89,7 +91,7 @@ public class NetconfDeviceTest {
         }
         try {
             notification = new NetconfMessage(XmlUtil.readXmlToDocument(NetconfDeviceTest.class.getResourceAsStream("/notification-payload.xml")));
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new ExceptionInInitializerError(e);
         }
     }
@@ -268,9 +270,12 @@ public class NetconfDeviceTest {
     public void testNotificationBeforeSchema() throws Exception {
         final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
-
+        final SchemaContextFactory schemaContextProviderFactory = mock(SchemaContextFactory.class);
+        final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
+        doReturn(Futures.makeChecked(schemaFuture, e -> new SchemaResolutionException("fail")))
+                .when(schemaContextProviderFactory).createSchemaContext(any(Collection.class));
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
-                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(), getSchemaFactory(), stateSchemasResolver);
+                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, stateSchemasResolver);
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
@@ -279,18 +284,14 @@ public class NetconfDeviceTest {
                 .setSalFacade(facade)
                 .build();
 
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
+                Lists.newArrayList(TEST_CAPABILITY));
+        device.onRemoteSessionUp(sessionCaps, listener);
         device.onNotification(notification);
         device.onNotification(notification);
 
         verify(facade, times(0)).onNotification(any(DOMNotification.class));
-
-        final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
-                Lists.newArrayList(TEST_CAPABILITY));
-
-        final DOMRpcService deviceRpc = mock(DOMRpcService.class);
-
-        device.handleSalInitializationSuccess(NetconfToNotificationTest.getNotificationSchemaContext(getClass(), false), sessionCaps, deviceRpc);
-
+        schemaFuture.set(NetconfToNotificationTest.getNotificationSchemaContext(getClass(), false));
         verify(facade, timeout(10000).times(2)).onNotification(any(DOMNotification.class));
 
         device.onNotification(notification);
@@ -327,6 +328,37 @@ public class NetconfDeviceTest {
 
         verify(schemaContextProviderFactory, timeout(5000).times(2)).createSchemaContext(any(Collection.class));
         verify(facade, timeout(5000).times(2)).onDeviceConnected(any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+    }
+
+    @Test
+    public void testNetconfDeviceDisconnectListenerCallCancellation() throws Exception {
+        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final NetconfDeviceCommunicator listener = getListener();
+        final SchemaContextFactory schemaContextProviderFactory = mock(SchemaContextFactory.class);
+        final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
+        doReturn(Futures.makeChecked(schemaFuture, e -> new SchemaResolutionException("fail")))
+                .when(schemaContextProviderFactory).createSchemaContext(any(Collection.class));
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
+                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(),
+                schemaContextProviderFactory, stateSchemasResolver);
+        final NetconfDevice device = new NetconfDeviceBuilder()
+                .setReconnectOnSchemasChange(true)
+                .setSchemaResourcesDTO(schemaResourcesDTO)
+                .setGlobalProcessingExecutor(getExecutor())
+                .setId(getId())
+                .setSalFacade(facade)
+                .build();
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
+                Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
+        //session up, start schema resolution
+        device.onRemoteSessionUp(sessionCaps, listener);
+        //session closed
+        device.onRemoteSessionDown();
+        verify(facade, timeout(5000)).onDeviceDisconnected();
+        //complete schema setup
+        schemaFuture.set(getSchema());
+        //facade.onDeviceDisconnected() was called, so facade.onDeviceConnected() shouldn't be called anymore
+        verify(facade, after(1000).never()).onDeviceConnected(any(), any(), any());
     }
 
     private SchemaContextFactory getSchemaFactory() {
