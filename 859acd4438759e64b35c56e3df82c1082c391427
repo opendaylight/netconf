@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3afa9182_8bbe02fe",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeTopology.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-08T00:30:49Z",
+      "side": 1,
+      "message": "should be final",
+      "revId": "859acd4438759e64b35c56e3df82c1082c391427",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_6bbbd60e",
+        "filename": "netconf/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImplTest.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-08T00:30:49Z",
+      "side": 1,
+      "message": "Instead of this, can you just add the @Mock annotation above line 109?  initMocks will then take care of doing this...",
+      "range": {
+        "startLine": 121,
+        "startChar": 8,
+        "endLine": 121,
+        "endChar": 61
+      },
+      "revId": "859acd4438759e64b35c56e3df82c1082c391427",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_cb376aaf",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/impl/NetconfTopologyImpl.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-08T00:30:49Z",
+      "side": 1,
+      "message": "Remove this space...",
+      "revId": "859acd4438759e64b35c56e3df82c1082c391427",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3afa9182_0b421210",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/AuthEncryptor.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-06-08T00:30:49Z",
+      "side": 1,
+      "message": "javadoc.",
+      "revId": "859acd4438759e64b35c56e3df82c1082c391427",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
