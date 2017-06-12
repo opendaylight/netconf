@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.EffectiveSchemaContext;
+import org.opendaylight.yangtools.yang.model.util.SimpleSchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,9 +129,7 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
         neededModules.forEach(imp -> fakeModules.add(new FakeImportedModule(imp)));
         fakeModules.add(new FakeRestconfModule(neededModules, fakeCont));
 
-        // FIXME: use a separate sublcass of AbstractSchemaContext
-        final SchemaContext fakeSchemaCtx =
-                EffectiveSchemaContext.resolveSchemaContext(ImmutableSet.copyOf(fakeModules));
+        final SchemaContext fakeSchemaCtx = SimpleSchemaContext.forModules(ImmutableSet.copyOf(fakeModules));
         final InstanceIdentifierContext<ContainerSchemaNode> instanceIdentifierContext =
                 new InstanceIdentifierContext<>(null, fakeCont, mountPoint, fakeSchemaCtx);
         return new NormalizedNodeContext(instanceIdentifierContext, containerBuilder.build());
