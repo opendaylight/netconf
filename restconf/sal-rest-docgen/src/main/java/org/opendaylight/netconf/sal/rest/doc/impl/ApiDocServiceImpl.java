@@ -7,13 +7,14 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.json.JSONWriter;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
@@ -86,16 +87,16 @@ public class ApiDocServiceImpl implements ApiDocService {
     public synchronized Response getListOfMounts(final UriInfo uriInfo) {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (OutputStreamWriter streamWriter = new OutputStreamWriter(baos, StandardCharsets.UTF_8)) {
-            final JSONWriter writer = new JSONWriter(streamWriter);
-            writer.array();
+            JsonGenerator writer = new JsonFactory().createGenerator(streamWriter);
+            writer.writeStartArray();
             for (final Entry<String, Long> entry : MountPointSwagger.getInstance().getInstanceIdentifiers()
                     .entrySet()) {
-                writer.object();
-                writer.key("instance").value(entry.getKey());
-                writer.key("id").value(entry.getValue());
-                writer.endObject();
+                writer.writeStartObject();
+                writer.writeObjectField("instance", entry.getKey());
+                writer.writeObjectField("id", entry.getValue());
+                writer.writeEndObject();
             }
-            writer.endArray();
+            writer.writeEndArray();
         } catch (final Exception e) {
             return Response.status(500).entity(e.getMessage()).build();
         }

@@ -8,9 +8,9 @@
 
 package org.opendaylight.controller.sal.rest.doc.impl;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import java.sql.Date;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class ModelGeneratorTest {
             if (m.getQNameModule().getNamespace().toString().equals(NAMESPACE)
                     && m.getQNameModule().getRevision().equals(REVISION)) {
 
-                final JSONObject jsonObject = generator.convertToJsonSchema(m, this.schemaContext);
+                final ObjectNode jsonObject = generator.convertToJsonSchema(m, this.schemaContext);
                 Assert.assertNotNull(jsonObject);
             }
         }
