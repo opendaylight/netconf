@@ -133,9 +133,8 @@
           <instructions>
             <Bundle-Name>MD SAL Rest Api Doc Generator</Bundle-Name>
             <Embed-Dependency>generex, automaton</Embed-Dependency>
-            <Import-Package>!org.apache.maven.plugin.logging,
-              !org.apache.maven.project,
-              !org.opendaylight.yangtools.yang2sources.spi,
+            <!-- needed for web.xml. Remove once we have Jersey 2 -->
+            <Import-Package>
               *,
               com.sun.jersey.spi.container.servlet,
               org.eclipse.jetty.servlets,
