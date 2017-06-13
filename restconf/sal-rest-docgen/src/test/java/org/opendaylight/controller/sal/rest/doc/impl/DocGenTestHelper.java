@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsonorg.JsonOrgModule;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
@@ -65,7 +64,6 @@ public class DocGenTestHelper {
     public void setUp() throws Exception {
         this.modules = loadModules("/yang");
         this.mapper = new ObjectMapper();
-        this.mapper.registerModule(new JsonOrgModule());
         this.mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
     }
 
