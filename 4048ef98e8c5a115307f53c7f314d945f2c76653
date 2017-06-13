@@ -22,6 +22,30 @@
       "revId": "4048ef98e8c5a115307f53c7f314d945f2c76653",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1af78d9a_439a6115",
+        "filename": "restconf/sal-rest-docgen/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-06-13T16:29:06Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "1af78d9a_23775504",
+      "range": {
+        "startLine": 142,
+        "startChar": 14,
+        "endLine": 145,
+        "endChar": 38
+      },
+      "revId": "4048ef98e8c5a115307f53c7f314d945f2c76653",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
