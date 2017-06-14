@@ -37,6 +37,9 @@
         <bundle>mvn:com.google.code.gson/gson/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.yangtools/yang-data-codec-gson/{{VERSION}}</bundle>
         <bundle>mvn:org.opendaylight.yangtools/yang-model-export/{{VERSION}}</bundle>
+        <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-xml/{{VERSION}}</bundle>
+        <bundle>mvn:org.codehaus.woodstox/stax2-api/{{VERSION}}</bundle>
+        <bundle>wrap:mvn:javax.xml.stream/stax-api/{{VERSION}}</bundle>
         <configfile finalname="${config.configfile.directory}/${config.restconf.configfile}">mvn:org.opendaylight.netconf/sal-rest-connector-config/{{VERSION}}/xml/config</configfile>
         <configfile finalname="${config.configfile.directory}/${config.restconf.service.configfile}">mvn:org.opendaylight.netconf/sal-rest-connector-config/{{VERSION}}/xml/configrestconfservice</configfile>
     </feature>
@@ -46,14 +49,12 @@
         <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/{{VERSION}}</bundle>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-core/{{VERSION}}</bundle>
         <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/{{VERSION}}</bundle>
-        <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-json-org/{{VERSION}}</bundle>
         <bundle>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/{{VERSION}}</bundle>
         <bundle>mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/{{VERSION}}</bundle>
         <bundle>mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/{{VERSION}}</bundle>
         <bundle>mvn:com.sun.jersey/jersey-core/{{VERSION}}</bundle>
         <bundle>mvn:com.sun.jersey/jersey-server/{{VERSION}}</bundle>
         <bundle>mvn:com.sun.jersey/jersey-servlet/{{VERSION}}</bundle>
-        <bundle>wrap:mvn:org.json/json/{{VERSION}}</bundle>
     </feature>
 
 </features>
