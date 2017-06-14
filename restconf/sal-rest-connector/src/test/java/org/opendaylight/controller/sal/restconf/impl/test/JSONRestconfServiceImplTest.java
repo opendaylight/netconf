@@ -29,13 +29,9 @@ import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -138,11 +134,7 @@ public class JSONRestconfServiceImplTest {
         when(result.getStatus()).thenReturn(Status.OK);
         final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
         final String payload = loadData("/parts/ietf-interfaces_interfaces.json");
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
-        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
-        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
-        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
-        this.service.put(uriPath, payload, uriInfo);
+        this.service.put(uriPath, payload);
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
@@ -175,11 +167,7 @@ public class JSONRestconfServiceImplTest {
         final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont/cont1";
         final String payload = loadData("/full-versions/testCont1Data.json");
 
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
-        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
-        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
-        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
-        this.service.put(uriPath, payload, uriInfo);
+        this.service.put(uriPath, payload);
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
@@ -209,11 +197,7 @@ public class JSONRestconfServiceImplTest {
         final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
         final String payload = loadData("/parts/ietf-interfaces_interfaces.json");
 
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
-        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
-        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
-        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
-        this.service.put(uriPath, payload, uriInfo);
+        this.service.put(uriPath, payload);
     }
 
     @SuppressWarnings("rawtypes")
@@ -226,13 +210,7 @@ public class JSONRestconfServiceImplTest {
         final String uriPath = null;
         final String payload = loadData("/parts/ietf-interfaces_interfaces_absolute_path.json");
 
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
-        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
-        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
-        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
-        final UriBuilder uriBuilder = UriBuilder.fromPath("");
-        Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(uriBuilder);
-        this.service.post(uriPath, payload, uriInfo);
+        this.service.post(uriPath, payload);
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
@@ -272,13 +250,7 @@ public class JSONRestconfServiceImplTest {
         final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont";
         final String payload = loadData("/full-versions/testCont1Data.json");
 
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
-        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
-        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
-        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
-        final UriBuilder uriBuilder = UriBuilder.fromPath("");
-        Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(uriBuilder);
-        this.service.post(uriPath, payload, uriInfo);
+        this.service.post(uriPath, payload);
 
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath = ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
@@ -303,15 +275,8 @@ public class JSONRestconfServiceImplTest {
         final String uriPath = null;
         final String payload = loadData("/parts/ietf-interfaces_interfaces_absolute_path.json");
 
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
-        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
-        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
-        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
-        final UriBuilder uriBuilder = UriBuilder.fromPath("");
-        Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(uriBuilder);
-
         try {
-            this.service.post(uriPath, payload, uriInfo);
+            this.service.post(uriPath, payload);
         } catch (final OperationFailedException e) {
             assertNotNull(e.getCause());
             throw e.getCause();
@@ -356,21 +321,13 @@ public class JSONRestconfServiceImplTest {
         doReturn(null).when(brokerFacade).readConfigurationData(notNull(YangInstanceIdentifier.class),
                 Mockito.anyString());
         final String uriPath = "ietf-interfaces:interfaces";
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
-        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
-        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
-        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
-        this.service.get(uriPath, LogicalDatastoreType.CONFIGURATION, uriInfo);
+        this.service.get(uriPath, LogicalDatastoreType.CONFIGURATION);
     }
 
     @Test(expected=OperationFailedException.class)
     public void testGetFailure() throws Exception {
         final String invalidUriPath = "/ietf-interfaces:interfaces/invalid";
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
-        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
-        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
-        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
-        this.service.get(invalidUriPath, LogicalDatastoreType.CONFIGURATION, uriInfo);
+        this.service.get(invalidUriPath, LogicalDatastoreType.CONFIGURATION);
     }
 
     @SuppressWarnings("rawtypes")
@@ -465,14 +422,8 @@ public class JSONRestconfServiceImplTest {
         }
 
         final String uriPath = "/ietf-interfaces:interfaces/interface/eth0";
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
-        final MultivaluedMap<String, String> value = Mockito.mock(MultivaluedMap.class);
-        Mockito.when(value.entrySet()).thenReturn(new HashSet<>());
-        Mockito.when(uriInfo.getQueryParameters()).thenReturn(value);
-        Mockito.when(uriInfo.getQueryParameters(false)).thenReturn(value);
-        Mockito.when(value.getFirst("depth")).thenReturn("");
 
-        final Optional<String> optionalResp = this.service.get(uriPath, datastoreType, uriInfo);
+        final Optional<String> optionalResp = this.service.get(uriPath, datastoreType);
         assertEquals("Response present", true, optionalResp.isPresent());
         final String jsonResp = optionalResp.get();
 
