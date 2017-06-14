@@ -116,18 +116,6 @@
             <artifactId>sal-rest-connector</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-data-codec-gson</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yang-model-export</artifactId>
-        </dependency>
-        <dependency>
             <!-- finalname="${config.configfile.directory}/${config.restconf.configfile}" -->
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>sal-rest-connector-config</artifactId>

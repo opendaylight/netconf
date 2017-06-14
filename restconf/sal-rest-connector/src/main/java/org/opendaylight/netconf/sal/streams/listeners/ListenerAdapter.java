@@ -7,15 +7,16 @@
  */
 package org.opendaylight.netconf.sal.streams.listeners;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
-import org.json.JSONObject;
-import org.json.XML;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -117,8 +118,13 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
     private void prepareAndPostData(final String xml) {
         final Event event = new Event(EventType.NOTIFY);
         if (this.outputType.equals(NotificationOutputType.JSON)) {
-            final JSONObject jsonObject = XML.toJSONObject(xml);
-            event.setData(jsonObject.toString());
+            try {
+                JsonNode node = new XmlMapper().readTree(xml.getBytes());
+                event.setData(node.toString());
+            } catch (IOException e) {
+                LOG.error("Error parsing XML {}", xml, e);
+                Throwables.propagate(e);
+            }
         } else {
             event.setData(xml);
         }
