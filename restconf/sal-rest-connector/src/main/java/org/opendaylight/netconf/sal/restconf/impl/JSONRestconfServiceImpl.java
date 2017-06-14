@@ -14,9 +14,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
@@ -42,7 +48,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public void put(final String uriPath, final String payload, final UriInfo uriInfo) throws OperationFailedException {
+    public void put(final String uriPath, final String payload) throws OperationFailedException {
         Preconditions.checkNotNull(payload, "payload can't be null");
 
         LOG.debug("put: uriPath: {}, payload: {}", uriPath, payload);
@@ -54,7 +60,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         LOG.debug("Parsed NormalizedNode: {}", context.getData());
 
         try {
-            RestconfImpl.getInstance().updateConfigurationData(uriPath, context, uriInfo);
+            RestconfImpl.getInstance().updateConfigurationData(uriPath, context, new SimpleUriInfo(uriPath));
         } catch (final Exception e) {
             propagateExceptionAs(uriPath, e, "PUT");
         }
@@ -62,7 +68,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public void post(final String uriPath, final String payload, final UriInfo uriInfo)
+    public void post(final String uriPath, final String payload)
             throws OperationFailedException {
         Preconditions.checkNotNull(payload, "payload can't be null");
 
@@ -75,7 +81,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         LOG.debug("Parsed NormalizedNode: {}", context.getData());
 
         try {
-            RestconfImpl.getInstance().createConfigurationData(uriPath, context, uriInfo);
+            RestconfImpl.getInstance().createConfigurationData(uriPath, context, new SimpleUriInfo(uriPath));
         } catch (final Exception e) {
             propagateExceptionAs(uriPath, e, "POST");
         }
@@ -95,12 +101,13 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public Optional<String> get(final String uriPath, final LogicalDatastoreType datastoreType, final UriInfo uriInfo)
+    public Optional<String> get(final String uriPath, final LogicalDatastoreType datastoreType)
             throws OperationFailedException {
         LOG.debug("get: uriPath: {}", uriPath);
 
         try {
             NormalizedNodeContext readData;
+            final SimpleUriInfo uriInfo = new SimpleUriInfo(uriPath);
             if (datastoreType == LogicalDatastoreType.CONFIGURATION) {
                 readData = RestconfImpl.getInstance().readConfigurationData(uriPath, uriInfo);
             } else {
@@ -223,6 +230,115 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
             default: {
                 return ErrorType.APPLICATION;
             }
+        }
+    }
+
+    private static class SimpleUriInfo implements UriInfo {
+        private final String path;
+        private final MultivaluedMap<String, String> queryParams;
+
+        SimpleUriInfo(String path) {
+            this(path, new MultivaluedHashMap<>());
+        }
+
+        SimpleUriInfo(String path, MultivaluedMap<String, String> queryParams) {
+            this.path = path;
+            this.queryParams = queryParams;
+        }
+
+        @Override
+        public String getPath() {
+            return path;
+        }
+
+        @Override
+        public String getPath(boolean decode) {
+            return path;
+        }
+
+        @Override
+        public List<PathSegment> getPathSegments() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public List<PathSegment> getPathSegments(boolean decode) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public URI getRequestUri() {
+            return URI.create(path);
+        }
+
+        @Override
+        public UriBuilder getRequestUriBuilder() {
+            return UriBuilder.fromUri(getRequestUri());
+        }
+
+        @Override
+        public URI getAbsolutePath() {
+            return getRequestUri();
+        }
+
+        @Override
+        public UriBuilder getAbsolutePathBuilder() {
+            return UriBuilder.fromUri(getAbsolutePath());
+        }
+
+        @Override
+        public URI getBaseUri() {
+            return URI.create("");
+        }
+
+        @Override
+        public UriBuilder getBaseUriBuilder() {
+            return UriBuilder.fromUri(getBaseUri());
+        }
+
+        @Override
+        public MultivaluedMap<String, String> getPathParameters() {
+            return new MultivaluedHashMap<>();
+        }
+
+        @Override
+        public MultivaluedMap<String, String> getPathParameters(boolean decode) {
+            return getPathParameters();
+        }
+
+        @Override
+        public MultivaluedMap<String, String> getQueryParameters() {
+            return queryParams;
+        }
+
+        @Override
+        public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
+            return getQueryParameters();
+        }
+
+        @Override
+        public List<String> getMatchedURIs() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public List<String> getMatchedURIs(boolean decode) {
+            return getMatchedURIs();
+        }
+
+        @Override
+        public List<Object> getMatchedResources() {
+            return Collections.emptyList();
+        }
+
+        @Override
+        public URI resolve(URI uri) {
+            return uri;
+        }
+
+        @Override
+        public URI relativize(URI uri) {
+            return uri;
         }
     }
 }
