@@ -8,12 +8,8 @@
 package org.opendaylight.restconf.restful.utils;
 
 import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -43,68 +39,29 @@ final class FutureCallbackTx {
      *             type of operation (READ, POST, PUT, DELETE)
      * @param dataFactory
      *             factory setting result
+     * @throws RestconfDocumentedException
+     *             if the Future throws an exception
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
     static <T, X extends Exception> void addCallback(final CheckedFuture<T, X> listenableFuture, final String txType,
-            final FutureDataFactory<T> dataFactory) {
-        final CountDownLatch responseWaiter = new CountDownLatch(1);
-        Futures.addCallback(listenableFuture, new FutureCallback<T>() {
+            final FutureDataFactory<T> dataFactory) throws RestconfDocumentedException {
 
-            @Override
-            public void onFailure(final Throwable throwable) {
-                responseWaiter.countDown();
-                handlingLoggerAndValues(throwable, txType, null, dataFactory);
-            }
-
-            @Override
-            public void onSuccess(final T result) {
-                handlingLoggerAndValues(null, txType, result, dataFactory);
-                responseWaiter.countDown();
-            }
-
-        });
         try {
-            responseWaiter.await();
-        } catch (final Exception e) {
-            final String msg = "Problem while waiting for response";
-            LOG.warn(msg);
-            throw new RestconfDocumentedException(msg, e);
-        }
-    }
-
-    /**
-     * Handling logger and result of callback - on success or on failure.
-     * <ul>
-     * <li>on success - set result to the factory
-     * <li>on failure - throw exception
-     * </ul>
-     *
-     * @param throwable
-     *             exception - if callback is onFailure
-     * @param txType
-     *             type of operation (READ, POST, PUT, DELETE)
-     * @param result
-     *             result of future - if callback is on Success
-     * @param dataFactory
-     *             setter for result - in callback is onSuccess
-     */
-    protected static <T> void handlingLoggerAndValues(@Nullable final Throwable throwable, final String txType,
-            final T result, final FutureDataFactory<T> dataFactory) {
-        if (throwable != null) {
+            final T result = listenableFuture.checkedGet();
+            dataFactory.setResult(result);
+            LOG.trace("Transaction({}) SUCCESSFUL", txType);
+        } catch (Exception e) {
             dataFactory.setFailureStatus();
-            LOG.warn("Transaction({}) FAILED!", txType, throwable);
-            if (throwable instanceof DOMRpcException) {
+            LOG.warn("Transaction({}) FAILED!", txType, e);
+            if (e instanceof DOMRpcException) {
                 final List<RpcError> rpcErrorList = new ArrayList<>();
                 rpcErrorList.add(
-                        RpcResultBuilder.newError(RpcError.ErrorType.RPC, "operation-failed", throwable.getMessage()));
+                        RpcResultBuilder.newError(RpcError.ErrorType.RPC, "operation-failed", e.getMessage()));
                 dataFactory.setResult((T) new DefaultDOMRpcResult(rpcErrorList));
             } else {
                 throw new RestconfDocumentedException(
-                        "Transaction(" + txType + ") not committed correctly", throwable);
+                        "Transaction(" + txType + ") not committed correctly", e);
             }
-        } else {
-            LOG.trace("Transaction({}) SUCCESSFUL!", txType);
-            dataFactory.setResult(result);
         }
     }
 }
