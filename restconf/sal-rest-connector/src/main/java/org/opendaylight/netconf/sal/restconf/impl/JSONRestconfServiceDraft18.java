@@ -18,17 +18,23 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
+import javax.annotation.Nullable;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
-import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.restconf.api.JSONRestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
+import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.jersey.providers.JsonNormalizedNodeBodyReader;
+import org.opendaylight.restconf.jersey.providers.NormalizedNodeJsonBodyWriter;
+import org.opendaylight.restconf.restful.services.api.TransactionServicesWrapper;
+import org.opendaylight.restconf.restful.utils.RestconfDataServiceConstant;
+import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcError.ErrorType;
@@ -37,16 +43,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of the JSONRestconfService interface using the restconf Draft02 implementation.
+ * Implementation of the JSONRestconfService interface using the restconf Draft18 implementation.
  *
  * @author Thomas Pantelis
- * @deprecated Replaced by {@link JSONRestconfServiceDraft18}
  */
-@Deprecated
-public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseable {
-    private static final Logger LOG = LoggerFactory.getLogger(JSONRestconfServiceImpl.class);
+public class JSONRestconfServiceDraft18 implements JSONRestconfService, AutoCloseable {
+    private static final Logger LOG = LoggerFactory.getLogger(JSONRestconfServiceDraft18.class);
 
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
+
+    private final TransactionServicesWrapper services;
+    private final DOMMountPointServiceHandler mountPointServiceHandler;
+
+    public JSONRestconfServiceDraft18(final TransactionServicesWrapper services,
+            final DOMMountPointServiceHandler mountPointServiceHandler) {
+        this.services = services;
+        this.mountPointServiceHandler = mountPointServiceHandler;
+    }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
@@ -55,14 +68,13 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
 
         LOG.debug("put: uriPath: {}, payload: {}", uriPath, payload);
 
-        final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
-        final NormalizedNodeContext context = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, false);
+        final NormalizedNodeContext context = toNormalizedNodeContext(uriPath, payload, false);
 
         LOG.debug("Parsed YangInstanceIdentifier: {}", context.getInstanceIdentifierContext().getInstanceIdentifier());
         LOG.debug("Parsed NormalizedNode: {}", context.getData());
 
         try {
-            RestconfImpl.getInstance().updateConfigurationData(uriPath, context, new SimpleUriInfo(uriPath));
+            services.putData(uriPath, context, new SimpleUriInfo(uriPath));
         } catch (final Exception e) {
             propagateExceptionAs(uriPath, e, "PUT");
         }
@@ -76,14 +88,13 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
 
         LOG.debug("post: uriPath: {}, payload: {}", uriPath, payload);
 
-        final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
-        final NormalizedNodeContext context = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, true);
+        final NormalizedNodeContext context = toNormalizedNodeContext(uriPath, payload, true);
 
         LOG.debug("Parsed YangInstanceIdentifier: {}", context.getInstanceIdentifierContext().getInstanceIdentifier());
         LOG.debug("Parsed NormalizedNode: {}", context.getData());
 
         try {
-            RestconfImpl.getInstance().createConfigurationData(uriPath, context, new SimpleUriInfo(uriPath));
+            services.postData(uriPath, context, new SimpleUriInfo(uriPath));
         } catch (final Exception e) {
             propagateExceptionAs(uriPath, e, "POST");
         }
@@ -95,7 +106,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         LOG.debug("delete: uriPath: {}", uriPath);
 
         try {
-            RestconfImpl.getInstance().deleteConfigurationData(uriPath);
+            services.deleteData(uriPath);
         } catch (final Exception e) {
             propagateExceptionAs(uriPath, e, "DELETE");
         }
@@ -108,13 +119,13 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         LOG.debug("get: uriPath: {}", uriPath);
 
         try {
-            NormalizedNodeContext readData;
-            final SimpleUriInfo uriInfo = new SimpleUriInfo(uriPath);
-            if (datastoreType == LogicalDatastoreType.CONFIGURATION) {
-                readData = RestconfImpl.getInstance().readConfigurationData(uriPath, uriInfo);
-            } else {
-                readData = RestconfImpl.getInstance().readOperationalData(uriPath, uriInfo);
-            }
+            final MultivaluedMap<String, String> queryParams = new MultivaluedHashMap<>();
+            queryParams.putSingle(RestconfDataServiceConstant.ReadData.CONTENT,
+                    datastoreType == LogicalDatastoreType.CONFIGURATION ? RestconfDataServiceConstant.ReadData.CONFIG :
+                        RestconfDataServiceConstant.ReadData.NONCONFIG);
+
+            final Response response = services.readData(uriPath, new SimpleUriInfo(uriPath, queryParams));
+            NormalizedNodeContext readData = (NormalizedNodeContext) response.getEntity();
 
             final Optional<String> result = Optional.of(toJson(readData));
 
@@ -143,20 +154,13 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
 
         String output = null;
         try {
-            NormalizedNodeContext outputContext;
-            if (actualInput != null) {
-                final InputStream entityStream = new ByteArrayInputStream(actualInput.getBytes(StandardCharsets.UTF_8));
-                final NormalizedNodeContext inputContext =
-                        JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, true);
+            final NormalizedNodeContext inputContext = toNormalizedNodeContext(uriPath, actualInput, true);
 
-                LOG.debug("Parsed YangInstanceIdentifier: {}", inputContext.getInstanceIdentifierContext()
-                        .getInstanceIdentifier());
-                LOG.debug("Parsed NormalizedNode: {}", inputContext.getData());
+            LOG.debug("Parsed YangInstanceIdentifier: {}", inputContext.getInstanceIdentifierContext()
+                    .getInstanceIdentifier());
+            LOG.debug("Parsed NormalizedNode: {}", inputContext.getData());
 
-                outputContext = RestconfImpl.getInstance().invokeRpc(uriPath, inputContext, null);
-            } else {
-                outputContext = RestconfImpl.getInstance().invokeRpc(uriPath, "", null);
-            }
+            NormalizedNodeContext outputContext = services.invokeRpc(uriPath, inputContext, new SimpleUriInfo(uriPath));
 
             if (outputContext.getData() != null) {
                 output = toJson(outputContext);
@@ -172,6 +176,25 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
     public void close() {
     }
 
+    private NormalizedNodeContext toNormalizedNodeContext(final String uriPath, @Nullable final String payload,
+            final boolean isPost) throws OperationFailedException {
+        final InstanceIdentifierContext<?> instanceIdentifierContext = ParserIdentifier.toInstanceIdentifier(
+                uriPath, ControllerContext.getInstance().getGlobalSchema(),
+                Optional.of(mountPointServiceHandler.get()));
+
+        if (payload == null) {
+            return new NormalizedNodeContext(instanceIdentifierContext, null);
+        }
+
+        final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
+        try {
+            return JsonNormalizedNodeBodyReader.readFrom(instanceIdentifierContext, entityStream, isPost);
+        } catch (IOException e) {
+            propagateExceptionAs(uriPath, e, "GET");
+            return null;
+        }
+    }
+
     private static String toJson(final NormalizedNodeContext readData) throws IOException {
         final NormalizedNodeJsonBodyWriter writer = new NormalizedNodeJsonBodyWriter();
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -181,17 +204,12 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
     }
 
     private static boolean isDataMissing(final Exception exception) {
-        boolean dataMissing = false;
         if (exception instanceof RestconfDocumentedException) {
             final RestconfDocumentedException rde = (RestconfDocumentedException)exception;
-            if (!rde.getErrors().isEmpty()) {
-                if (rde.getErrors().get(0).getErrorTag() == ErrorTag.DATA_MISSING) {
-                    dataMissing = true;
-                }
-            }
+            return !rde.getErrors().isEmpty() && rde.getErrors().get(0).getErrorTag() == ErrorTag.DATA_MISSING;
         }
 
-        return dataMissing;
+        return false;
     }
 
     private static void propagateExceptionAs(final String uriPath, final Exception exception, final String operation)
@@ -220,18 +238,14 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
 
     private static ErrorType toRpcErrorType(final RestconfError.ErrorType errorType) {
         switch (errorType) {
-            case TRANSPORT: {
+            case TRANSPORT:
                 return ErrorType.TRANSPORT;
-            }
-            case RPC: {
+            case RPC:
                 return ErrorType.RPC;
-            }
-            case PROTOCOL: {
+            case PROTOCOL:
                 return ErrorType.PROTOCOL;
-            }
-            default: {
+            default:
                 return ErrorType.APPLICATION;
-            }
         }
     }
 
