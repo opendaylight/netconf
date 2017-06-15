@@ -62,7 +62,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         }
     }
 
-    private static NormalizedNodeContext readFrom(
+    public static NormalizedNodeContext readFrom(
             final InstanceIdentifierContext<?> path, final InputStream entityStream, final boolean isPost)
             throws IOException {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
