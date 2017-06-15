@@ -37,7 +37,7 @@ public class JSONRestconfServiceModule
     @Override
     public java.lang.AutoCloseable createInstance() {
         final WaitingServiceTracker<JSONRestconfService> tracker =
-                WaitingServiceTracker.create(JSONRestconfService.class, bundleContext);
+                WaitingServiceTracker.create(JSONRestconfService.class, bundleContext, "(type=default)");
         final JSONRestconfService service = tracker.waitForService(WaitingServiceTracker.FIVE_MINUTES);
 
         final class AutoCloseableJSONRestconfService implements JSONRestconfService, AutoCloseable {
