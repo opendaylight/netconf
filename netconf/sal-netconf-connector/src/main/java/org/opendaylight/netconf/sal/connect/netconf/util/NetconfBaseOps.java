@@ -35,6 +35,8 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
+import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade.KeepaliveDOMRpcService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.SchemalessNetconfDeviceRpc;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
@@ -63,7 +65,9 @@ public final class NetconfBaseOps {
     public NetconfBaseOps(final DOMRpcService rpc, final SchemaContext schemaContext) {
         this.rpc = rpc;
         this.schemaContext = schemaContext;
-        if (rpc instanceof SchemalessNetconfDeviceRpc) {
+
+        if ((rpc instanceof KeepaliveDOMRpcService)
+                && (((KeepaliveDOMRpcService) rpc).deviceRpc instanceof SchemalessNetconfDeviceRpc)) {
             this.transformer = new SchemalessRpcStructureTransformer();
         } else {
             this.transformer = new NetconfRpcStructureTransformer(schemaContext);
