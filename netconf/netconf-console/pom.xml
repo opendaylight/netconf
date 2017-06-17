@@ -9,9 +9,9 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.opendaylight.controller</groupId>
-    <artifactId>config-parent</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <groupId>org.opendaylight.odlparent</groupId>
+    <artifactId>bundle-parent</artifactId>
+    <version>1.9.0</version>
     <relativePath/>
   </parent>
 
@@ -20,6 +20,18 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
   <version>1.3.0-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <packaging>bundle</packaging>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.opendaylight.netconf</groupId>
+        <artifactId>netconf-subsystem</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
       <!-- Apache Karaf console dependency -->
@@ -40,7 +52,6 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
       <dependency>
           <groupId>org.opendaylight.netconf</groupId>
           <artifactId>sal-netconf-connector</artifactId>
-          <version>${mdsal.version}</version>
       </dependency>
       <dependency>
           <groupId>org.mockito</groupId>
