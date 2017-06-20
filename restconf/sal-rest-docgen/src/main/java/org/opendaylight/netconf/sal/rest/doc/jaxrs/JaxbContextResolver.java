@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.rest.doc.jaxrs;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsonorg.JsonOrgModule;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -26,7 +25,6 @@ public class JaxbContextResolver implements ContextResolver<ObjectMapper> {
 
     public JaxbContextResolver() {
         ctx = new ObjectMapper();
-        ctx.registerModule(new JsonOrgModule());
         ctx.getSerializationConfig().withSerializationInclusion(JsonInclude.Include.ALWAYS);
     }
 

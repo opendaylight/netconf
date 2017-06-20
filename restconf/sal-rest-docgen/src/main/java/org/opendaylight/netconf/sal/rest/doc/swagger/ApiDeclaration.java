@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.swagger;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
-import org.json.JSONObject;
 
 /**
  * Implementation of swagger spec (see <a href=
@@ -23,13 +23,13 @@ public class ApiDeclaration {
     private String resourcePath;
     private List<String> produces;
     private List<Api> apis;
-    private JSONObject models;
+    private ObjectNode models;
 
-    public JSONObject getModels() {
+    public ObjectNode getModels() {
         return models;
     }
 
-    public void setModels(JSONObject models) {
+    public void setModels(ObjectNode models) {
         this.models = models;
     }
 
@@ -86,6 +86,6 @@ public class ApiDeclaration {
     }
 
     public boolean hasModel() {
-        return (models != null && models.length() > 0);
+        return (models != null && models.size() > 0);
     }
 }

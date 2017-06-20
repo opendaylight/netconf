@@ -13,6 +13,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import java.sql.Date;
 import java.util.Arrays;
@@ -21,8 +23,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.ws.rs.core.UriInfo;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -164,72 +164,67 @@ public class ApiDocGeneratorTest {
      * Validates whether doc {@code doc} contains concrete specified models.
      */
     private void validateSwaggerModules(final ApiDeclaration doc) {
-        final JSONObject models = doc.getModels();
+        final ObjectNode models = doc.getModels();
         assertNotNull(models);
-        try {
-            final JSONObject configLstTop = models.getJSONObject("toaster2(config)lst-TOP");
-            assertNotNull(configLstTop);
 
-            containsReferences(configLstTop, "toaster2:lst", "toaster2(config)");
+        final JsonNode configLstTop = models.get("toaster2(config)lst-TOP");
+        assertNotNull(configLstTop);
 
-            final JSONObject configLst = models.getJSONObject("toaster2(config)lst");
-            assertNotNull(configLst);
+        containsReferences(configLstTop, "toaster2:lst", "toaster2(config)");
 
-            containsReferences(configLst, "toaster2:lst1", "toaster2/lst(config)");
-            containsReferences(configLst, "toaster2:cont1", "toaster2/lst(config)");
+        final JsonNode configLst = models.get("toaster2(config)lst");
+        assertNotNull(configLst);
 
-            final JSONObject configLst1Top = models.getJSONObject("toaster2/lst(config)lst1-TOP");
-            assertNotNull(configLst1Top);
+        containsReferences(configLst, "toaster2:lst1", "toaster2/lst(config)");
+        containsReferences(configLst, "toaster2:cont1", "toaster2/lst(config)");
 
-            containsReferences(configLst1Top, "toaster2:lst1", "toaster2/lst(config)");
+        final JsonNode configLst1Top = models.get("toaster2/lst(config)lst1-TOP");
+        assertNotNull(configLst1Top);
 
-            final JSONObject configLst1 = models.getJSONObject("toaster2/lst(config)lst1");
-            assertNotNull(configLst1);
+        containsReferences(configLst1Top, "toaster2:lst1", "toaster2/lst(config)");
 
-            final JSONObject configCont1Top = models.getJSONObject("toaster2/lst(config)cont1-TOP");
-            assertNotNull(configCont1Top);
+        final JsonNode configLst1 = models.get("toaster2/lst(config)lst1");
+        assertNotNull(configLst1);
 
-            containsReferences(configCont1Top, "toaster2:cont1", "toaster2/lst(config)");
-            final JSONObject configCont1 = models.getJSONObject("toaster2/lst(config)cont1");
-            assertNotNull(configCont1);
+        final JsonNode configCont1Top = models.get("toaster2/lst(config)cont1-TOP");
+        assertNotNull(configCont1Top);
 
-            containsReferences(configCont1, "toaster2:cont11", "toaster2/lst/cont1(config)");
-            containsReferences(configCont1, "toaster2:lst11", "toaster2/lst/cont1(config)");
+        containsReferences(configCont1Top, "toaster2:cont1", "toaster2/lst(config)");
+        final JsonNode configCont1 = models.get("toaster2/lst(config)cont1");
+        assertNotNull(configCont1);
 
-            final JSONObject configCont11Top = models.getJSONObject("toaster2/lst/cont1(config)cont11-TOP");
-            assertNotNull(configCont11Top);
+        containsReferences(configCont1, "toaster2:cont11", "toaster2/lst/cont1(config)");
+        containsReferences(configCont1, "toaster2:lst11", "toaster2/lst/cont1(config)");
 
-            containsReferences(configCont11Top, "toaster2:cont11", "toaster2/lst/cont1(config)");
-            final JSONObject configCont11 = models.getJSONObject("toaster2/lst/cont1(config)cont11");
-            assertNotNull(configCont11);
+        final JsonNode configCont11Top = models.get("toaster2/lst/cont1(config)cont11-TOP");
+        assertNotNull(configCont11Top);
 
-            final JSONObject configlst11Top = models.getJSONObject("toaster2/lst/cont1(config)lst11-TOP");
-            assertNotNull(configlst11Top);
+        containsReferences(configCont11Top, "toaster2:cont11", "toaster2/lst/cont1(config)");
+        final JsonNode configCont11 = models.get("toaster2/lst/cont1(config)cont11");
+        assertNotNull(configCont11);
 
-            containsReferences(configlst11Top, "toaster2:lst11", "toaster2/lst/cont1(config)");
-            final JSONObject configLst11 = models.getJSONObject("toaster2/lst/cont1(config)lst11");
-            assertNotNull(configLst11);
-        } catch (final JSONException e) {
-            fail("JSONException wasn't expected");
-        }
+        final JsonNode configlst11Top = models.get("toaster2/lst/cont1(config)lst11-TOP");
+        assertNotNull(configlst11Top);
 
+        containsReferences(configlst11Top, "toaster2:lst11", "toaster2/lst/cont1(config)");
+        final JsonNode configLst11 = models.get("toaster2/lst/cont1(config)lst11");
+        assertNotNull(configLst11);
     }
 
     /**
      * Checks whether object {@code mainObject} contains in properties/items key $ref with concrete value.
      */
-    private void containsReferences(final JSONObject mainObject, final String childObject, final String prefix)
-            throws JSONException {
-        final JSONObject properties = mainObject.getJSONObject("properties");
+    private void containsReferences(final JsonNode mainObject, final String childObject, final String prefix) {
+        final JsonNode properties = mainObject.get("properties");
         assertNotNull(properties);
 
-        final JSONObject nodeInProperties = properties.getJSONObject(childObject);
+        final JsonNode nodeInProperties = properties.get(childObject);
         assertNotNull(nodeInProperties);
 
-        final JSONObject itemsInNodeInProperties = nodeInProperties.getJSONObject("items");
+        final JsonNode itemsInNodeInProperties = nodeInProperties.get("items");
         assertNotNull(itemsInNodeInProperties);
 
-        final String itemRef = itemsInNodeInProperties.getString("$ref");
+        final String itemRef = itemsInNodeInProperties.get("$ref").asText();
         assertEquals(prefix + childObject.split(":")[1], itemRef);
     }
 
@@ -246,7 +241,7 @@ public class ApiDocGeneratorTest {
 
                 // testing bugs.opendaylight.org bug 1290. UnionType model type.
                 final String jsonString = doc.getModels().toString();
-                assertTrue(jsonString.contains("testUnion\":{\"type\":\"-2147483648\",\"required\":false,"
+                assertTrue(jsonString.contains("testUnion\":{\"required\":false,\"type\":\"-2147483648\","
                         + "\"enum\":[\"-2147483648\",\"Some testUnion\"]}"));
             }
         }
@@ -263,13 +258,13 @@ public class ApiDocGeneratorTest {
                         this.schemaContext);
                 assertNotNull(doc);
 
-                final JSONObject models = doc.getModels();
-                final JSONObject inputTop = models.getJSONObject("(make-toast)input-TOP");
+                final ObjectNode models = doc.getModels();
+                final JsonNode inputTop = models.get("(make-toast)input-TOP");
                 final String testString =
                         "{\"toaster:input\":{\"type\":\"object\",\"items\":{\"$ref\":\"(make-toast)input\"}}}";
-                assertEquals(testString, inputTop.getJSONObject("properties").toString());
-                final JSONObject input = models.getJSONObject("(make-toast)input");
-                final JSONObject properties = input.getJSONObject("properties");
+                assertEquals(testString, inputTop.get("properties").toString());
+                final JsonNode input = models.get("(make-toast)input");
+                final JsonNode properties = input.get("properties");
                 assertTrue(properties.has("toaster:toasterDoneness"));
                 assertTrue(properties.has("toaster:toasterToastType"));
             }
@@ -322,7 +317,7 @@ public class ApiDocGeneratorTest {
 
         // TODO: we should really do some more validation of the
         // documentation...
-        /**
+        /*
          * Missing validation: Explicit validation of URLs, and their methods Input / output models.
          */
     }
@@ -355,28 +350,24 @@ public class ApiDocGeneratorTest {
     }
 
     private void validateTosterDocContainsModulePrefixes(final ApiDeclaration doc) {
-        final JSONObject topLevelJson = doc.getModels();
-        try {
-            final JSONObject configToaster = topLevelJson.getJSONObject("toaster2(config)toaster");
-            assertNotNull("(config)toaster JSON object missing", configToaster);
-            // without module prefix
-            containsProperties(configToaster, "toaster2:toasterSlot");
+        final ObjectNode topLevelJson = doc.getModels();
 
-            final JSONObject toasterSlot = topLevelJson.getJSONObject("toaster2/toaster(config)toasterSlot");
-            assertNotNull("(config)toasterSlot JSON object missing", toasterSlot);
-            // with module prefix
-            containsProperties(toasterSlot, "toaster2:toaster-augmented:slotInfo");
+        final JsonNode configToaster = topLevelJson.get("toaster2(config)toaster");
+        assertNotNull("(config)toaster JSON object missing", configToaster);
+        // without module prefix
+        containsProperties(configToaster, "toaster2:toasterSlot");
 
-        } catch (final JSONException e) {
-            fail("Json exception while reading JSON object. Original message " + e.getMessage());
-        }
+        final JsonNode toasterSlot = topLevelJson.get("toaster2/toaster(config)toasterSlot");
+        assertNotNull("(config)toasterSlot JSON object missing", toasterSlot);
+        // with module prefix
+        containsProperties(toasterSlot, "toaster2:toaster-augmented:slotInfo");
     }
 
-    private void containsProperties(final JSONObject jsonObject, final String... properties) throws JSONException {
+    private void containsProperties(final JsonNode jsonObject, final String... properties) {
         for (final String property : properties) {
-            final JSONObject propertiesObject = jsonObject.getJSONObject("properties");
+            final JsonNode propertiesObject = jsonObject.get("properties");
             assertNotNull("Properties object missing in ", propertiesObject);
-            final JSONObject concretePropertyObject = propertiesObject.getJSONObject(property);
+            final JsonNode concretePropertyObject = propertiesObject.get(property);
             assertNotNull(property + " is missing", concretePropertyObject);
         }
     }

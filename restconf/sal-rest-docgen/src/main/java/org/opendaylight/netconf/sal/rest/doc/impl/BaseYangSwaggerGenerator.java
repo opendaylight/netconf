@@ -11,7 +11,7 @@ import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolveP
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsonorg.JsonOrgModule;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.net.URI;
@@ -28,8 +28,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.ws.rs.core.UriInfo;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Delete;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Get;
@@ -72,7 +70,6 @@ public class BaseYangSwaggerGenerator {
     private static boolean newDraft;
 
     protected BaseYangSwaggerGenerator() {
-        this.mapper.registerModule(new JsonOrgModule());
         this.mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
     }
 
@@ -231,7 +228,7 @@ public class BaseYangSwaggerGenerator {
 
         if (!apis.isEmpty()) {
             doc.setApis(apis);
-            JSONObject models = null;
+            ObjectNode models = null;
 
             try {
                 models = this.jsonConverter.convertToJsonSchema(module, schemaContext);
@@ -239,7 +236,7 @@ public class BaseYangSwaggerGenerator {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(this.mapper.writeValueAsString(doc));
                 }
-            } catch (IOException | JSONException e) {
+            } catch (IOException e) {
                 LOG.error("Exception occured in ModelGenerator", e);
             }
 
