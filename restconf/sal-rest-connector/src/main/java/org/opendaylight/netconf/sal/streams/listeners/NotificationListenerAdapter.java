@@ -9,6 +9,8 @@ package org.opendaylight.netconf.sal.streams.listeners;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -16,7 +18,6 @@ import java.time.Instant;
 import java.util.Collection;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
-import org.json.JSONObject;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -137,9 +138,10 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      */
     @VisibleForTesting
     String prepareJson() {
-        final JSONObject json = new JSONObject();
-        json.put("ietf-restconf:notification",
-                new JSONObject(writeBodyToString()).put("event-time", ListenerAdapter.toRFC3339(Instant.now())));
+        JsonParser jsonParser = new JsonParser();
+        JsonObject json = new JsonObject();
+        json.add("ietf-restconf:notification", jsonParser.parse(writeBodyToString()));
+        json.addProperty("event-time", ListenerAdapter.toRFC3339(Instant.now()));
         return json.toString();
     }
 
