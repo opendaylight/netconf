@@ -106,7 +106,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.parser.stmt.reactor.EffectiveSchemaContext;
+import org.opendaylight.yangtools.yang.model.util.SimpleSchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -383,9 +383,7 @@ public class RestconfImpl implements RestconfService {
         neededModules.forEach(imp -> fakeModules.add(new FakeImportedModule(imp)));
         fakeModules.add(new FakeRestconfModule(neededModules, fakeCont));
 
-        // FIXME: use a separate sublcass of AbstractSchemaContext
-        final SchemaContext fakeSchemaCtx =
-                EffectiveSchemaContext.resolveSchemaContext(ImmutableSet.copyOf(fakeModules));
+        final SchemaContext fakeSchemaCtx = SimpleSchemaContext.forModules(ImmutableSet.copyOf(fakeModules));
         final InstanceIdentifierContext<ContainerSchemaNode> instanceIdentifierContext =
                 new InstanceIdentifierContext<>(null, fakeCont, mountPoint, fakeSchemaCtx);
         return new NormalizedNodeContext(instanceIdentifierContext, containerBuilder.build());
@@ -1264,7 +1262,7 @@ public class RestconfImpl implements RestconfService {
      * @return {@link URI} of location
      */
     private URI dataSubs(final String identifier, final UriInfo uriInfo, final Instant start, final Instant stop,
-            final String filter, boolean leafNodesOnly) {
+            final String filter, final boolean leafNodesOnly) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
