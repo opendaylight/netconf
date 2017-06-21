@@ -152,7 +152,8 @@ public class ModelGenerator {
         final String moduleName = module.getName();
         for (final RpcDefinition rpc : rpcs) {
             final ContainerSchemaNode input = rpc.getInput();
-            if (!input.getChildNodes().isEmpty()) {
+            if (input != null && input.getChildNodes() != null
+                    && !input.getChildNodes().isEmpty()) {
                 final ObjectNode properties =
                         processChildren(input.getChildNodes(), moduleName, models, true, schemaContext);
 
@@ -167,7 +168,8 @@ public class ModelGenerator {
             }
 
             final ContainerSchemaNode output = rpc.getOutput();
-            if (!output.getChildNodes().isEmpty()) {
+            if (output != null && output.getChildNodes() != null
+                    && !output.getChildNodes().isEmpty()) {
                 final ObjectNode properties =
                         processChildren(output.getChildNodes(), moduleName, models, true, schemaContext);
                 final String filename = "(" + rpc.getQName().getLocalName() + ")output";
