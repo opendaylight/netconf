@@ -8,6 +8,6 @@
   -->
 <features name="odl-netconf-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
     <feature name="odl-netconf-netty-util" version="${project.version}">
-        <feature version="${karaf4.version}">ssh</feature>
+        <feature version="${karaf.version}">ssh</feature>
     </feature>
 </features>
