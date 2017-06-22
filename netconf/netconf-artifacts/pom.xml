@@ -292,7 +292,7 @@
             <!-- netconf features -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>features4-netconf</artifactId>
+                <artifactId>features-netconf</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
                 <classifier>features</classifier>
@@ -413,7 +413,7 @@
             <!-- netconf-connector features -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>features4-netconf-connector</artifactId>
+                <artifactId>features-netconf-connector</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
                 <classifier>features</classifier>
@@ -478,7 +478,7 @@
             <!-- yanglib features -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>features4-yanglib</artifactId>
+                <artifactId>features-yanglib</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
                 <classifier>features</classifier>

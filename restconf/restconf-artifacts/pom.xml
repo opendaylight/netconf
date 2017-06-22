@@ -77,7 +77,7 @@
             <!-- restconf features -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>features4-restconf</artifactId>
+                <artifactId>features-restconf</artifactId>
                 <version>${project.version}</version>
                 <type>xml</type>
                 <classifier>features</classifier>

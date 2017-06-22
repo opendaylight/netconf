@@ -33,7 +33,7 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>features4-netconf</artifactId>
+      <artifactId>features-netconf</artifactId>
       <version>${netconf.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -41,7 +41,7 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>features4-netconf-connector</artifactId>
+      <artifactId>features-netconf-connector</artifactId>
       <version>${netconf.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -49,7 +49,7 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>features4-restconf</artifactId>
+      <artifactId>features-restconf</artifactId>
       <version>${restconf.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -57,7 +57,7 @@
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>features4-yanglib</artifactId>
+      <artifactId>features-yanglib</artifactId>
       <version>${netconf.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
