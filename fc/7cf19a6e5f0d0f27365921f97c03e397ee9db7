@@ -1,0 +1,8 @@
+Code-Review+1: Robert Varga <nite@hq.sk>
+Code-Review+2: Jakub Morvay <jmorvay@cisco.com>
+Verified+1: Jakub Morvay <jmorvay@cisco.com>
+Submitted-by: Jakub Morvay <jmorvay@cisco.com>
+Submitted-at: Thu, 22 Jun 2017 16:57:29 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/59414
+Project: netconf
+Branch: refs/heads/master
