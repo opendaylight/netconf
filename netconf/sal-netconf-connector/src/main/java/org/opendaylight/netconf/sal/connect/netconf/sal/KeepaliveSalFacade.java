@@ -266,7 +266,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
      * DOMRpcService proxy that attaches reset-keepalive-task and schedule
      * request-timeout-task to each RPC invocation.
      */
-    private static final class KeepaliveDOMRpcService implements DOMRpcService {
+    public static final class KeepaliveDOMRpcService implements DOMRpcService {
 
         private final DOMRpcService deviceRpc;
         private ResetKeepalive resetKeepaliveTask;
@@ -279,6 +279,10 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
             this.resetKeepaliveTask = resetKeepaliveTask;
             this.defaultRequestTimeoutMillis = defaultRequestTimeoutMillis;
             this.executor = executor;
+        }
+
+        public DOMRpcService getDeviceRpc() {
+            return deviceRpc;
         }
 
         @Nonnull
