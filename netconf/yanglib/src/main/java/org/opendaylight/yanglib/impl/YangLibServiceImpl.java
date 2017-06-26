@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 public class YangLibServiceImpl implements YangLibService {
     private static final Logger LOG = LoggerFactory.getLogger(YangLibServiceImpl.class);
 
-    private SchemaRepository schemaRepository;
+    private volatile SchemaRepository schemaRepository;
 
     public YangLibServiceImpl() {
 

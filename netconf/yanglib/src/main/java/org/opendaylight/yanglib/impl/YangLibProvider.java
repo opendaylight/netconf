@@ -8,18 +8,19 @@
 
 package org.opendaylight.yanglib.impl;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.binding.api.BindingAwareProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesStateBuilder;
@@ -29,7 +30,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.ModuleBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.ModuleKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
-import org.opendaylight.yanglib.api.YangLibRestAppService;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -37,6 +38,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaListenerRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceListener;
+import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -51,38 +53,53 @@ import org.slf4j.LoggerFactory;
  * along with source identifier to
  * ietf-netconf-yang-library/modules-state/module list.
  */
-public class YangLibProvider implements BindingAwareProvider, AutoCloseable, SchemaSourceListener {
+public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
     private static final Logger LOG = LoggerFactory.getLogger(YangLibProvider.class);
 
     private static final OptionalRevision NO_REVISION = new OptionalRevision("");
     private static final Predicate<PotentialSchemaSource<?>> YANG_SCHEMA_SOURCE =
         input -> YangTextSchemaSource.class.isAssignableFrom(input.getRepresentation());
 
-    protected DataBroker dataBroker;
-    protected SchemaListenerRegistration schemaListenerRegistration;
-    protected final SharedSchemaRepository schemaRepository;
-    private final String bindingAddress;
-    private final long bindingPort;
+    private final DataBroker dataBroker;
+    private final YangLibServiceImpl yangLibService;
+    private final YanglibConfig yanglibConfig;
+    private SchemaListenerRegistration schemaListenerRegistration;
+    private SharedSchemaRepository schemaRepository;
 
-    public YangLibProvider(final SharedSchemaRepository schemaRepository,
-                           final String bindingAddress, final long bindingPort) {
-        this.schemaRepository = schemaRepository;
-        this.bindingAddress = bindingAddress;
-        this.bindingPort = bindingPort;
+    public YangLibProvider(final YanglibConfig yanglibConfig, final DataBroker dataBroker,
+            final YangLibServiceImpl yangLibService) {
+        this.yanglibConfig = Preconditions.checkNotNull(yanglibConfig);
+        this.dataBroker = Preconditions.checkNotNull(dataBroker);
+        this.yangLibService = Preconditions.checkNotNull(yangLibService);
     }
 
     @Override
-    public void close() throws Exception {
-        dataBroker = null;
-        schemaListenerRegistration.close();
+    public void close() {
+        if (schemaListenerRegistration != null) {
+            schemaListenerRegistration.close();
+        }
     }
 
-    @Override
-    public void onSessionInitiated(final BindingAwareBroker.ProviderContext providerContext) {
-        this.dataBroker = providerContext.getSALService(DataBroker.class);
+    public void init() {
+        if (Strings.isNullOrEmpty(yanglibConfig.getCacheFolder())) {
+            LOG.info("No cache-folder set in yanglib-config - yang library services will not be available");
+            return;
+        }
+
+        final File cacheFolderFile = new File(yanglibConfig.getCacheFolder());
+        Preconditions.checkArgument(cacheFolderFile.exists(), "cache-folder %s does not exist", cacheFolderFile);
+        Preconditions.checkArgument(cacheFolderFile.isDirectory(), "cache-folder %s is not a directory",
+                cacheFolderFile);
+
+        schemaRepository = new SharedSchemaRepository("yang-library");
+        final FilesystemSchemaSourceCache<YangTextSchemaSource> cache =
+                new FilesystemSchemaSourceCache<>(schemaRepository, YangTextSchemaSource.class, cacheFolderFile);
+        schemaRepository.registerSchemaSourceListener(cache);
+
         schemaListenerRegistration = schemaRepository.registerSchemaSourceListener(this);
-        getObjectFromBundleContext(YangLibRestAppService.class, YangLibRestAppService.class.getName())
-        .getYangLibService().setSchemaRepository(schemaRepository);
+        yangLibService.setSchemaRepository(schemaRepository);
+
+        LOG.info("Started yang library with sources from {}", cacheFolderFile);
     }
 
     @Override
@@ -162,8 +179,8 @@ public class YangLibProvider implements BindingAwareProvider, AutoCloseable, Sch
 
 
     private Uri getUrlForModule(final SourceIdentifier sourceIdentifier) {
-        return new Uri("http://" + bindingAddress + ':' + bindingPort + "/yanglib/schemas/"
-                + sourceIdentifier.getName() + '/' + revString(sourceIdentifier));
+        return new Uri("http://" + yanglibConfig.getBindingAddr() + ':' + yanglibConfig.getBindingPort()
+                + "/yanglib/schemas/" + sourceIdentifier.getName() + '/' + revString(sourceIdentifier));
     }
 
     private static String revString(final SourceIdentifier id) {
