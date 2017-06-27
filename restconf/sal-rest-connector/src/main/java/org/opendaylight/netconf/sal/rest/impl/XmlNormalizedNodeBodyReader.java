@@ -92,7 +92,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
             LOG.debug("Error parsing xml input", e);
 
             throw new RestconfDocumentedException("Error parsing input: " + e.getMessage(), ErrorType.PROTOCOL,
-                    ErrorTag.MALFORMED_MESSAGE);
+                    ErrorTag.MALFORMED_MESSAGE, e);
         }
     }
 
