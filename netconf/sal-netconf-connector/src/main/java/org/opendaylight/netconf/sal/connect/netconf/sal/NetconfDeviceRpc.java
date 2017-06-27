@@ -12,6 +12,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Collection;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,7 +29,6 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
@@ -36,14 +36,6 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
  * Invokes RPC by sending netconf message via listener. Also transforms result from NetconfMessage to CompositeNode.
  */
 public final class NetconfDeviceRpc implements DOMRpcService {
-
-    private static final Function<RpcDefinition, DOMRpcIdentifier> RPC_TO_RPC_IDENTIFIER =
-        new Function<RpcDefinition, DOMRpcIdentifier>() {
-            @Override
-            public DOMRpcIdentifier apply(final RpcDefinition input) {
-                return DOMRpcIdentifier.create(input.getPath());
-            }
-        };
 
     private final RemoteDeviceCommunicator<NetconfMessage> listener;
     private final MessageTransformer<NetconfMessage> transformer;
@@ -54,7 +46,8 @@ public final class NetconfDeviceRpc implements DOMRpcService {
         this.listener = listener;
         this.transformer = transformer;
 
-        availableRpcs = Collections2.transform(schemaContext.getOperations(), RPC_TO_RPC_IDENTIFIER);
+        availableRpcs = Collections2.transform(schemaContext.getOperations(),
+            input -> DOMRpcIdentifier.create(input.getPath()));
     }
 
     @Nonnull
@@ -66,16 +59,13 @@ public final class NetconfDeviceRpc implements DOMRpcService {
                 listener.sendRequest(message, type.getLastComponent());
 
         final ListenableFuture<DOMRpcResult> transformed =
-            Futures.transform(delegateFutureWithPureResult, new Function<RpcResult<NetconfMessage>, DOMRpcResult>() {
-                @Override
-                public DOMRpcResult apply(final RpcResult<NetconfMessage> input) {
-                    if (input.isSuccessful()) {
-                        return transformer.toRpcResult(input.getResult(), type);
-                    } else {
-                        return new DefaultDOMRpcResult(input.getErrors());
-                    }
+            Futures.transform(delegateFutureWithPureResult, input1 -> {
+                if (input1.isSuccessful()) {
+                    return transformer.toRpcResult(input1.getResult(), type);
+                } else {
+                    return new DefaultDOMRpcResult(input1.getErrors());
                 }
-            });
+            }, MoreExecutors.directExecutor());
 
         return Futures.makeChecked(transformed, new Function<Exception, DOMRpcException>() {
             @Nullable
