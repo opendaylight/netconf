@@ -19,9 +19,9 @@ import org.opendaylight.aaa.encrypt.AAAEncryptionService;
  */
 public class LoginPassword extends AuthenticationHandler {
 
-    private final String username;
-    private final String password;
     private final AAAEncryptionService encryptionService;
+    protected final String username;
+    protected final String password;
 
     public LoginPassword(String username, String password) {
         this(username, password, null);

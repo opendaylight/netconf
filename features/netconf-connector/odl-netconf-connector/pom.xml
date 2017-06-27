@@ -94,6 +94,5 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
-
     </dependencies>
 </project>
