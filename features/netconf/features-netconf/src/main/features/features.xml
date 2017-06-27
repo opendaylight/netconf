@@ -80,6 +80,7 @@
     <feature version='${project.version}'>odl-netconf-mapping-api</feature>
     <feature version='${project.version}'>odl-netconf-util</feature>
     <feature version='[4.0.30,5.0.0)'>odl-netty</feature>
+    <feature version='${aaa.version}'>odl-aaa-encryption-service</feature>
     <bundle>mvn:org.opendaylight.netconf/netconf-netty-util/{{VERSION}}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/{{VERSION}}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/{{VERSION}}</bundle>
