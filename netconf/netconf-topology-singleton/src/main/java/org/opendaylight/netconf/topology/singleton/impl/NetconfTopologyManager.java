@@ -77,6 +77,8 @@ public class NetconfTopologyManager
     private final DOMMountPointService mountPointService;
 
     private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
+    private String privateKeyPath;
+    private String privateKeyPassphrase;
 
     public NetconfTopologyManager(final DataBroker dataBroker, final RpcProviderRegistry rpcProviderRegistry,
                                   final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
@@ -219,6 +221,20 @@ public class NetconfTopologyManager
         clusterRegistrations.clear();
     }
 
+    /**
+     * Sets the private key path from location specified in configuration file using blueprint.
+     */
+    public void setPrivateKeyPath(String privateKeyPath) {
+        this.privateKeyPath = privateKeyPath;
+    }
+
+    /**
+     * Sets the private key passphrase from location specified in configuration file using blueprint.
+     */
+    public void setPrivateKeyPassphrase(String privateKeyPassphrase) {
+        this.privateKeyPassphrase = privateKeyPassphrase;
+    }
+
     private ListenerRegistration<NetconfTopologyManager> registerDataTreeChangeListener(final String topologyId) {
         final WriteTransaction wtx = dataBroker.newWriteOnlyTransaction();
         initTopology(wtx, LogicalDatastoreType.CONFIGURATION, topologyId);
@@ -266,7 +282,9 @@ public class NetconfTopologyManager
                 .setTopologyId(topologyId)
                 .setNetconfClientDispatcher(clientDispatcher)
                 .setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node))
-                .setIdleTimeout(writeTxIdleTimeout);
+                .setIdleTimeout(writeTxIdleTimeout)
+                .setPrivateKeyPath(privateKeyPath)
+                .setPrivateKeyPassphrase(privateKeyPassphrase);
 
         return builder.build();
     }
