@@ -8,6 +8,7 @@
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
            odl:use-default-for-reference-types="true">
 
     <reference id="clientDispatcherDependency"
@@ -32,9 +33,18 @@
         <argument value="shared-schema-repository-impl"/>
     </bean>
 
+    <cm:property-placeholder persistent-id="odl-sb-netconf-client-keypair" update-strategy="none">
+      <cm:default-properties>
+        <cm:property name="private-key-path" value=""/>
+        <cm:property name="private-key-passphrase" value=""/>
+      </cm:default-properties>
+    </cm:property-placeholder>
+
     <bean id="netconfTopology" class="org.opendaylight.netconf.topology.impl.NetconfTopologyImpl"
           init-method="init"
           destroy-method="close">
+        <cm:managed-properties persistent-id="odl-sb-netconf-client-keypair"
+                           update-strategy="container-managed"/>
         <argument value="topology-netconf"/>
         <argument ref="clientDispatcherDependency"/>
         <argument ref="eventExecutor"/>
@@ -43,6 +53,8 @@
         <argument ref="schemaRepository"/>
         <argument ref="dataBroker"/>
         <argument ref="mountPointService"/>
+        <property name="privateKeyPath" value="${private-key-path}"/>
+        <property name="privateKeyPassphrase" value="${private-key-passphrase}"/>
     </bean>
 
     <bean id="netconfConnectorFactory" class="org.opendaylight.netconf.topology.impl.NetconfConnectorFactoryImpl"/>
