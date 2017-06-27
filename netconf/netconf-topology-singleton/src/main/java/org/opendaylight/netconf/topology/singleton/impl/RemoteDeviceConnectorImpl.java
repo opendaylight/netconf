@@ -34,6 +34,7 @@ import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurati
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.PublicKeyAuth;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemas;
@@ -78,6 +79,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     private final RemoteDeviceId remoteDeviceId;
     private final DOMMountPointService mountService;
     private final Timeout actorResponseWaitTime;
+    private final String privateKeyPath;
+    private final String privateKeyPassphrase;
 
     private NetconfConnectorDTO deviceCommunicatorDTO;
 
@@ -89,6 +92,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         this.remoteDeviceId = remoteDeviceId;
         this.actorResponseWaitTime = actorResponseWaitTime;
         this.mountService = mountService;
+        this.privateKeyPath = netconfTopologyDeviceSetup.getPrivateKeyPath();
+        this.privateKeyPassphrase = netconfTopologyDeviceSetup.getPrivateKeyPassphrase();
     }
 
     @Override
@@ -274,9 +279,12 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final AuthenticationHandler authHandler;
         final Credentials credentials = node.getCredentials();
         if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) {
-            authHandler = new LoginPassword(
-                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getUsername(),
-                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getPassword());
+            authHandler = new PublicKeyAuth(
+                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf
+                            .node.credentials.credentials.LoginPassword) credentials).getUsername(),
+                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf
+                            .node.credentials.credentials.LoginPassword) credentials).getPassword(),
+                            this.privateKeyPath, this.privateKeyPassphrase);
         } else {
             throw new IllegalStateException(remoteDeviceId + ": Only login/password authentication is supported");
         }

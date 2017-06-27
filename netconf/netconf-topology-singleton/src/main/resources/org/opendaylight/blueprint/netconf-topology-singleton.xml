@@ -9,6 +9,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
            odl:use-default-for-reference-types="true">
 
     <reference id="dataBroker"
@@ -39,9 +40,18 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
             binding-class="org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config"
     />
 
+    <cm:property-placeholder persistent-id="odl-sb-netconf-client-keypair" update-strategy="none">
+        <cm:default-properties>
+            <cm:property name="private-key-path" value=""/>
+            <cm:property name="private-key-passphrase" value=""/>
+        </cm:default-properties>
+    </cm:property-placeholder>
+
     <bean id="netconfTopologyManager"
           class="org.opendaylight.netconf.topology.singleton.impl.NetconfTopologyManager"
           init-method="init" destroy-method="close">
+        <cm:managed-properties persistent-id="odl-sb-netconf-client-keypair"
+                               update-strategy="container-managed"/>
         <argument ref="dataBroker"/>
         <argument ref="rpcRegistry"/>
         <argument ref="clusterSingletonService"/>
@@ -53,6 +63,8 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         <argument value="topology-netconf"/>
         <argument ref="singletonConfig"/>
         <argument ref="mountPointService"/>
+        <property name="privateKeyPath" value="${private-key-path}"/>
+        <property name="privateKeyPassphrase" value="${private-key-passphrase}"/>
     </bean>
     <service ref="netconfTopologyManager"
              interface="org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService"/>
