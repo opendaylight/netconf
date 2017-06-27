@@ -17,10 +17,15 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.Futures;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.io.FileUtils;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -28,7 +33,6 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesStateBuilder;
@@ -38,18 +42,17 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.ModuleBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.ModuleKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YinSchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
-import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.parser.util.ASTSchemaSource;
 
 public class YangLibProviderTest {
-
-    @Mock
-    private BindingAwareBroker.ProviderContext context;
+    private static final File CACHE_DIR = new File("target/yanglib");
 
     @Mock
     private DataBroker dataBroker;
@@ -57,18 +60,40 @@ public class YangLibProviderTest {
     @Mock
     private WriteTransaction writeTransaction;
 
-    private TestingYangLibProvider yangLibProvider;
+    private YangLibProvider yangLibProvider;
+
+    @BeforeClass
+    public static void staticSetup() {
+        if (!CACHE_DIR.exists() && !CACHE_DIR.mkdirs()) {
+            throw new RuntimeException("Failed to create " + CACHE_DIR);
+        }
+    }
+
+    @AfterClass
+    public static void staticCleanup() {
+        FileUtils.deleteQuietly(CACHE_DIR);
+    }
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        yangLibProvider = new TestingYangLibProvider(new SharedSchemaRepository("test"), "www.fake.com", 300);
-        when(context.getSALService(eq(DataBroker.class))).thenReturn(dataBroker);
+
+        try {
+            if (CACHE_DIR.exists()) {
+                FileUtils.cleanDirectory(CACHE_DIR);
+            }
+        } catch (IOException e) {
+            // Ignore
+        }
+
+        final YanglibConfig yanglibConfig = new YanglibConfigBuilder().setBindingAddr("www.fake.com")
+                .setBindingPort(300L).setCacheFolder(CACHE_DIR.getAbsolutePath()).build();
+        yangLibProvider = new YangLibProvider(yanglibConfig, dataBroker, new YangLibServiceImpl());
     }
 
     @Test
     public void testSchemaSourceRegistered() {
-        yangLibProvider.onSessionInitiated(context);
+        yangLibProvider.init();
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
         doNothing().when(writeTransaction)
                 .merge(eq(LogicalDatastoreType.OPERATIONAL), eq(InstanceIdentifier.create(ModulesState.class)), any());
@@ -114,7 +139,7 @@ public class YangLibProviderTest {
 
     @Test
     public void testFilteringNonYangSchemaSourceRegistered() {
-        yangLibProvider.onSessionInitiated(context);
+        yangLibProvider.init();
 
         // test empty list of schema sources registered
         List<PotentialSchemaSource<?>> potentialSources = Collections.emptyList();
@@ -158,7 +183,7 @@ public class YangLibProviderTest {
 
     @Test
     public void testNonYangSchemaSourceUnregistered() {
-        yangLibProvider.onSessionInitiated(context);
+        yangLibProvider.init();
 
         final PotentialSchemaSource<YinSchemaSourceRepresentation> nonYangSource =
                 PotentialSchemaSource.create(
@@ -173,7 +198,7 @@ public class YangLibProviderTest {
 
     @Test
     public void testSchemaSourceUnregistered() {
-        yangLibProvider.onSessionInitiated(context);
+        yangLibProvider.init();
 
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
         doNothing().when(writeTransaction)
@@ -213,20 +238,4 @@ public class YangLibProviderTest {
 
         verify(writeTransaction, times(2)).submit();
     }
-
-    private static class TestingYangLibProvider extends YangLibProvider {
-
-        TestingYangLibProvider(
-                SharedSchemaRepository schemaRepository, String bindingAddress, long bindingPort) {
-            super(schemaRepository, bindingAddress, bindingPort);
-        }
-
-        @Override
-        public void onSessionInitiated(BindingAwareBroker.ProviderContext providerContext) {
-            this.dataBroker = providerContext.getSALService(DataBroker.class);
-            schemaListenerRegistration = schemaRepository.registerSchemaSourceListener(this);
-        }
-    }
-
-
 }
