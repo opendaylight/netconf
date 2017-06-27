@@ -17,8 +17,8 @@ import org.apache.sshd.client.future.AuthFuture;
  * {@link org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler}.
  */
 public class LoginPassword extends AuthenticationHandler {
-    private final String username;
-    private final String password;
+    protected final String username;
+    protected final String password;
 
     public LoginPassword(String username, String password) {
         this.username = username;
