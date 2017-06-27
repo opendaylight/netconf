@@ -36,6 +36,8 @@ public class NetconfTopologySetup {
     private final String topologyId;
     private final NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
     private final Duration idleTimeout;
+    private final String privateKeyPath;
+    private final String privateKeyPassphrase;
 
     private NetconfTopologySetup(final NetconfTopologySetupBuilder builder) {
         this.clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
@@ -51,6 +53,8 @@ public class NetconfTopologySetup {
         this.topologyId = builder.getTopologyId();
         this.schemaResourceDTO = builder.getSchemaResourceDTO();
         this.idleTimeout = builder.getIdleTimeout();
+        this.privateKeyPath = builder.getPrivateKeyPath();
+        this.privateKeyPassphrase = builder.getPrivateKeyPassphrase();
     }
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
@@ -105,6 +109,10 @@ public class NetconfTopologySetup {
         return idleTimeout;
     }
 
+    public String getPrivateKeyPath(){ return privateKeyPath; }
+
+    public String getPrivateKeyPassphrase(){ return privateKeyPassphrase; }
+
     public static class NetconfTopologySetupBuilder {
 
         private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
@@ -120,6 +128,8 @@ public class NetconfTopologySetup {
         private NetconfClientDispatcher netconfClientDispatcher;
         private NetconfDevice.SchemaResourcesDTO schemaResourceDTO;
         private Duration idleTimeout;
+        private String privateKeyPath;
+        private String privateKeyPassphrase;
 
         public NetconfTopologySetupBuilder(){
         }
@@ -245,6 +255,24 @@ public class NetconfTopologySetup {
 
         private Duration getIdleTimeout() {
             return idleTimeout;
+        }
+
+        public NetconfTopologySetupBuilder setPrivateKeyPath(String privateKeyPath){
+            this.privateKeyPath = privateKeyPath;
+            return this;
+        }
+
+        public String getPrivateKeyPath(){
+            return this.privateKeyPath;
+        }
+
+        public NetconfTopologySetupBuilder setPrivateKeyPassphrase(String privateKeyPassphrase){
+            this.privateKeyPassphrase = privateKeyPassphrase;
+            return this;
+        }
+
+        public String getPrivateKeyPassphrase(){
+            return this.privateKeyPassphrase;
         }
 
         public static NetconfTopologySetupBuilder create() {
