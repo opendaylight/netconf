@@ -35,7 +35,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.PublicKeyAuth;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemas;
@@ -164,6 +164,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected SchemaSourceRegistry schemaRegistry = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaRepository schemaRepository = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaContextFactory schemaContextFactory = DEFAULT_SCHEMA_CONTEXT_FACTORY;
+    protected String privateKeyPath;
+    protected String privateKeyPassphrase;
 
     protected final HashMap<NodeId, NetconfConnectorDTO> activeConnectors = new HashMap<>();
 
@@ -397,6 +399,20 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 new File(relativeSchemaCacheDirectory));
     }
 
+    /**
+     * Sets the private key path from location specified in configuration file using blueprint.
+     */
+    public void setPrivateKeyPath(String privateKeyPath) {
+        this.privateKeyPath = privateKeyPath;
+    }
+
+    /**
+     * Sets the private key passphrase from location specified in configuration file using blueprint.
+     */
+    public void setPrivateKeyPassphrase(String privateKeyPassphrase) {
+        this.privateKeyPassphrase = privateKeyPassphrase;
+    }
+
     public NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
                                                                   final NetconfNode node) {
 
@@ -419,11 +435,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final Credentials credentials = node.getCredentials();
         if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114
                 .netconf.node.credentials.credentials.LoginPassword) {
-            authHandler = new LoginPassword(
+            authHandler = new PublicKeyAuth(
                     ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114
                             .netconf.node.credentials.credentials.LoginPassword) credentials).getUsername(),
                     ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114
-                            .netconf.node.credentials.credentials.LoginPassword) credentials).getPassword());
+                            .netconf.node.credentials.credentials.LoginPassword) credentials).getPassword(),
+                    privateKeyPath, privateKeyPassphrase);
         } else {
             throw new IllegalStateException("Only login/password authentification is supported");
         }
