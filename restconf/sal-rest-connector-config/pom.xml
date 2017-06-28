@@ -37,11 +37,6 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>${project.build.directory}/classes/initial/10-restconf-service.xml</file>
-                  <type>xml</type>
-                  <classifier>configrestconfservice</classifier>
-                </artifact>
-                <artifact>
                   <file>${project.build.directory}/classes/initial/restconf.cfg</file>
                   <type>cfg</type>
                   <classifier>restconf</classifier>
