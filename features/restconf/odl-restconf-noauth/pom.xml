@@ -25,11 +25,6 @@
 
     <name>OpenDaylight :: Restconf</name>
 
-    <properties>
-        <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
-        <config.restconf.service.configfile>10-restconf-service.xml</config.restconf.service.configfile>
-    </properties>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -113,14 +108,6 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>sal-rest-connector</artifactId>
-        </dependency>
-        <dependency>
-            <!-- finalname="${config.configfile.directory}/${config.restconf.service.configfile}" -->
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>sal-rest-connector-config</artifactId>
-            <version>${project.version}</version>
-            <type>xml</type>
-            <classifier>configrestconfservice</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
