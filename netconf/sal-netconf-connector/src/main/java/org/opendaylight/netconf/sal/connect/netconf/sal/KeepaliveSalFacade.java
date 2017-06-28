@@ -97,7 +97,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
      * <p>
      * Then schedule next keepalive.
      */
-    private void resetKeepalive() {
+    void resetKeepalive() {
         LOG.trace("{}: Resetting netconf keepalive timer", id);
         if (currentKeepalive != null) {
             currentKeepalive.cancel(false);
@@ -115,7 +115,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         currentDeviceRpc = null;
     }
 
-    private void reconnect() {
+    void reconnect() {
         Preconditions.checkState(listener != null, "%s: Unable to reconnect, session listener is missing", id);
         stopKeepalives();
         LOG.info("{}: Reconnecting inactive netconf session", id);
