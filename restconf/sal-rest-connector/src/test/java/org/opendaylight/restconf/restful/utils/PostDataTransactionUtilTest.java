@@ -9,6 +9,8 @@
 package org.opendaylight.restconf.restful.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -29,6 +31,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.yangtools.util.SingletonSet;
@@ -187,13 +190,19 @@ public class PostDataTransactionUtilTest {
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node,
                 payload.getData());
-        doReturn(Futures.immediateFailedCheckedFuture(new DOMException((short) 414, "Post request failed")))
-                .when(this.readWrite).submit();
+        final DOMException domException = new DOMException((short) 414, "Post request failed");
+        doReturn(Futures.immediateFailedCheckedFuture(domException)).when(this.readWrite).submit();
         final TransactionVarsWrapper wrapper =
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain);
-        final Response response =
-                PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
-        assertEquals(Response.Status.INTERNAL_SERVER_ERROR, response.getStatusInfo());
+
+        try {
+            PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
+            fail("Expected RestconfDocumentedException");
+        } catch (RestconfDocumentedException e) {
+            assertEquals(1, e.getErrors().size());
+            assertTrue(e.getErrors().get(0).getErrorInfo().contains(domException.getMessage()));
+        }
+
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
