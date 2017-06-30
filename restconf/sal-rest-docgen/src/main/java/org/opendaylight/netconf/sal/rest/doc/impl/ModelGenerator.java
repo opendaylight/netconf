@@ -12,7 +12,6 @@ import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolveN
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.mifmif.common.regex.Generex;
@@ -110,7 +109,8 @@ public class ModelGenerator {
     public ObjectNode convertToJsonSchema(final Module module,
                                           final SchemaContext schemaContext) throws IOException {
         final ObjectNode models = JsonNodeFactory.instance.objectNode();
-        models.put(UNIQUE_EMPTY_IDENTIFIER, NullNode.getInstance());
+        final ObjectNode emptyIdentifier = JsonNodeFactory.instance.objectNode();
+        models.put(UNIQUE_EMPTY_IDENTIFIER, emptyIdentifier);
         topLevelModule = module;
         processModules(module, models, schemaContext);
         processContainersAndLists(module, models, schemaContext);
