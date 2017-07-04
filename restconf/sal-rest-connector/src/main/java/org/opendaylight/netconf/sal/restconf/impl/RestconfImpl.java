@@ -29,15 +29,8 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.Context;
@@ -65,6 +58,7 @@ import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
+import org.opendaylight.restconf.restful.utils.URIEntrySetUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -109,6 +103,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.util.SimpleSchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.opendaylight.restconf.restful.utils.SubscribeToStreamUtil.parseDateFromQueryParam;
 
 public class RestconfImpl implements RestconfService {
 
@@ -752,38 +748,20 @@ public class RestconfImpl implements RestconfService {
     @Override
     public Response updateConfigurationData(final String identifier, final NormalizedNodeContext payload,
             final UriInfo uriInfo) {
-        boolean insertUsed = false;
-        boolean pointUsed = false;
-        String insert = null;
-        String point = null;
+        final String insert = "insert";
+        final String point = "point";
+        Set<String> uriEntriesExpected = new HashSet<>();
+        uriEntriesExpected.add(insert);
+        uriEntriesExpected.add(point);
+        URIEntrySetUtils processURIEntries = new URIEntrySetUtils(uriEntriesExpected, uriInfo);
 
-        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            switch (entry.getKey()) {
-                case "insert":
-                    if (!insertUsed) {
-                        insertUsed = true;
-                        insert = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Insert parameter can be used only once.");
-                    }
-                    break;
-                case "point":
-                    if (!pointUsed) {
-                        pointUsed = true;
-                        point = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Point parameter can be used only once.");
-                    }
-                    break;
-                default:
-                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey());
-            }
-        }
-
-        if (pointUsed && !insertUsed) {
+        if (processURIEntries.getEntriesSet().get(point).isKeyUsed() &&
+                !processURIEntries.getEntriesSet().get(insert).isKeyUsed()) {
             throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.");
         }
-        if (pointUsed && (insert.equals("first") || insert.equals("last"))) {
+        if (processURIEntries.getEntriesSet().get(point).isKeyUsed() &&
+                (processURIEntries.getEntriesSet().get(insert).getKeyValue().equals("first")
+                        || processURIEntries.getEntriesSet().get(insert).getKeyValue().equals("last"))) {
             throw new RestconfDocumentedException(
                     "Point parameter can be used only with 'after' or 'before' values of Insert parameter.");
         }
@@ -820,11 +798,13 @@ public class RestconfImpl implements RestconfService {
         while (true) {
             if (mountPoint != null) {
 
-                result = this.broker.commitMountPointDataPut(mountPoint, normalizedII, payload.getData(), insert,
-                        point);
+                result = this.broker.commitMountPointDataPut(mountPoint, normalizedII, payload.getData(),
+                        processURIEntries.getEntriesSet().get(insert).getKeyValue(),
+                        processURIEntries.getEntriesSet().get(point).getKeyValue());
             } else {
                 result = this.broker.commitConfigurationDataPut(this.controllerContext.getGlobalSchema(), normalizedII,
-                        payload.getData(), insert, point);
+                        payload.getData(), processURIEntries.getEntriesSet().get(insert).getKeyValue(),
+                        processURIEntries.getEntriesSet().get(point).getKeyValue());
             }
 
             try {
@@ -929,49 +909,33 @@ public class RestconfImpl implements RestconfService {
         final InstanceIdentifierContext<?> iiWithData = payload.getInstanceIdentifierContext();
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
 
-        boolean insertUsed = false;
-        boolean pointUsed = false;
-        String insert = null;
-        String point = null;
+        final String insert = "insert";
+        final String point = "point";
+        Set<String> uriEntriesExpected = new HashSet<>();
+        uriEntriesExpected.add(insert);
+        uriEntriesExpected.add(point);
+        URIEntrySetUtils processURIEntries = new URIEntrySetUtils(uriEntriesExpected, uriInfo);
 
-        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            switch (entry.getKey()) {
-                case "insert":
-                    if (!insertUsed) {
-                        insertUsed = true;
-                        insert = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Insert parameter can be used only once.");
-                    }
-                    break;
-                case "point":
-                    if (!pointUsed) {
-                        pointUsed = true;
-                        point = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Point parameter can be used only once.");
-                    }
-                    break;
-                default:
-                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey());
-            }
-        }
-
-        if (pointUsed && !insertUsed) {
+        if (processURIEntries.getEntriesSet().get(point).isKeyUsed() &&
+                !processURIEntries.getEntriesSet().get(insert).isKeyUsed()) {
             throw new RestconfDocumentedException("Point parameter can't be used without Insert parameter.");
         }
-        if (pointUsed && (insert.equals("first") || insert.equals("last"))) {
+        if (processURIEntries.getEntriesSet().get(point).isKeyUsed() &&
+                (processURIEntries.getEntriesSet().get(insert).getKeyValue().equals("first")
+                        || processURIEntries.getEntriesSet().get(insert).getKeyValue().equals("last"))) {
             throw new RestconfDocumentedException(
                     "Point parameter can be used only with 'after' or 'before' values of Insert parameter.");
         }
 
         CheckedFuture<Void, TransactionCommitFailedException> future;
         if (mountPoint != null) {
-            future = this.broker.commitConfigurationDataPost(mountPoint, normalizedII, payload.getData(), insert,
-                    point);
+            future = this.broker.commitConfigurationDataPost(mountPoint, normalizedII, payload.getData(),
+                    processURIEntries.getEntriesSet().get(insert).getKeyValue(),
+                    processURIEntries.getEntriesSet().get(point).getKeyValue());
         } else {
             future = this.broker.commitConfigurationDataPost(this.controllerContext.getGlobalSchema(), normalizedII,
-                    payload.getData(), insert, point);
+                    payload.getData(), processURIEntries.getEntriesSet().get(insert).getKeyValue(),
+                    processURIEntries.getEntriesSet().get(point).getKeyValue());
         }
 
         try {
@@ -1165,18 +1129,6 @@ public class RestconfImpl implements RestconfService {
         final String msg = "Bad type of notification of sal-remote";
         LOG.warn(msg);
         throw new RestconfDocumentedException(msg);
-    }
-
-    private static Instant parseDateFromQueryParam(final Entry<String, List<String>> entry) {
-        final DateAndTime event = new DateAndTime(entry.getValue().iterator().next());
-        final String value = event.getValue();
-        final TemporalAccessor p;
-        try {
-            p = FORMATTER.parse(value);
-        } catch (DateTimeParseException e) {
-            throw new RestconfDocumentedException("Cannot parse of value in date: " + value, e);
-        }
-        return Instant.from(p);
     }
 
     /**
