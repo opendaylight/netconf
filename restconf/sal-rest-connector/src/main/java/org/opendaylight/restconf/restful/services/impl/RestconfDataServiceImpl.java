@@ -17,8 +17,10 @@ import com.google.common.base.Preconditions;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -40,12 +42,7 @@ import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
-import org.opendaylight.restconf.restful.utils.DeleteDataTransactionUtil;
-import org.opendaylight.restconf.restful.utils.PatchDataTransactionUtil;
-import org.opendaylight.restconf.restful.utils.PostDataTransactionUtil;
-import org.opendaylight.restconf.restful.utils.PutDataTransactionUtil;
-import org.opendaylight.restconf.restful.utils.ReadDataTransactionUtil;
-import org.opendaylight.restconf.restful.utils.RestconfDataServiceConstant;
+import org.opendaylight.restconf.restful.utils.*;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -165,35 +162,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response putData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
         Preconditions.checkNotNull(payload);
 
-        boolean insertUsed = false;
-        boolean pointUsed = false;
-        String insert = null;
-        String point = null;
+        final String insert = "insert";
+        final String point = "point";
+        Set<String> uriEntriesExpected = new HashSet<>();
+        uriEntriesExpected.add(insert);
+        uriEntriesExpected.add(point);
+        URIEntrySetUtils processURIEntries = new URIEntrySetUtils(uriEntriesExpected, uriInfo);
 
-        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            switch (entry.getKey()) {
-                case "insert":
-                    if (!insertUsed) {
-                        insertUsed = true;
-                        insert = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Insert parameter can be used only once.");
-                    }
-                    break;
-                case "point":
-                    if (!pointUsed) {
-                        pointUsed = true;
-                        point = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Point parameter can be used only once.");
-                    }
-                    break;
-                default:
-                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey());
-            }
-        }
-
-        checkQueryParams(insertUsed, pointUsed, insert);
+        checkQueryParams(processURIEntries.getEntriesSet().get(insert).isKeyUsed(),
+                processURIEntries.getEntriesSet().get(point).isKeyUsed(),
+                processURIEntries.getEntriesSet().get(insert).getKeyValue());
 
         final InstanceIdentifierContext<? extends SchemaNode> iid = payload
                 .getInstanceIdentifierContext();
@@ -215,7 +193,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 payload.getInstanceIdentifierContext(), mountPoint, transactionChain);
-        return PutDataTransactionUtil.putData(payload, ref, transactionNode, insert, point);
+        return PutDataTransactionUtil.putData(payload, ref, transactionNode,
+                processURIEntries.getEntriesSet().get(insert).getKeyValue(),
+                processURIEntries.getEntriesSet().get(point).getKeyValue());
     }
 
     private static void checkQueryParams(final boolean insertUsed, final boolean pointUsed, final String insert) {
@@ -236,36 +216,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @Override
     public Response postData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
         Preconditions.checkNotNull(payload);
+        final URIEntrySetUtils.InsertAndPoint uriEntrySetPoint = new URIEntrySetUtils.InsertAndPoint(uriInfo);
 
-        boolean insertUsed = false;
-        boolean pointUsed = false;
-        String insert = null;
-        String point = null;
-
-        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            switch (entry.getKey()) {
-                case "insert":
-                    if (!insertUsed) {
-                        insertUsed = true;
-                        insert = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Insert parameter can be used only once.");
-                    }
-                    break;
-                case "point":
-                    if (!pointUsed) {
-                        pointUsed = true;
-                        point = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Point parameter can be used only once.");
-                    }
-                    break;
-                default:
-                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey());
-            }
-        }
-
-        checkQueryParams(insertUsed, pointUsed, insert);
+        checkQueryParams(uriEntrySetPoint.insertUsed, uriEntrySetPoint.pointUsed, uriEntrySetPoint.insert);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final DOMTransactionChain transactionChain;
@@ -279,7 +232,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 payload.getInstanceIdentifierContext(), mountPoint, transactionChain);
-        return PostDataTransactionUtil.postData(uriInfo, payload, transactionNode, ref, insert, point);
+        return PostDataTransactionUtil.postData(uriInfo, payload, transactionNode, ref, uriEntrySetPoint.insert, uriEntrySetPoint.point);
     }
 
     @Override
