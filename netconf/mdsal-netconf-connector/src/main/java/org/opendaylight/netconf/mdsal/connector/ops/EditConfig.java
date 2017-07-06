@@ -11,13 +11,21 @@ package org.opendaylight.netconf.mdsal.connector.ops;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
@@ -33,6 +41,7 @@ import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.DataTreeChangeTracker.DataTreeChange;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -40,9 +49,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.DomUtils;
-import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -58,6 +68,8 @@ import org.w3c.dom.NodeList;
 public class EditConfig extends AbstractSingletonNetconfOperation {
 
     private static final Logger LOG = LoggerFactory.getLogger(EditConfig.class);
+
+    private static final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
     private static final String OPERATION_NAME = "edit-config";
     private static final String CONFIG_KEY = "config";
@@ -93,10 +105,13 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             final DataSchemaNode schemaNode = getSchemaNodeFromNamespace(ns, element).get();
 
             final DataTreeChangeTracker changeTracker = new DataTreeChangeTracker(defaultAction);
-            final DomToNormalizedNodeParserFactory.BuildingStrategyProvider editOperationStrategyProvider =
-                    new EditOperationStrategyProvider(changeTracker);
 
-            parseIntoNormalizedNode(schemaNode, element, editOperationStrategyProvider);
+            try {
+                parseIntoNormalizedNode(schemaNode, element, changeTracker);
+            } catch (Exception ex) {
+                throw new RuntimeException("Error while parsing yang-modeled XML data.", ex);
+            }
+
             executeOperations(changeTracker);
         }
 
@@ -207,22 +222,35 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
     }
 
     private NormalizedNode<?, ?> parseIntoNormalizedNode(final DataSchemaNode schemaNode, final XmlElement element,
-            final DomToNormalizedNodeParserFactory.BuildingStrategyProvider editOperationStrategyProvider) {
-        if (schemaNode instanceof ContainerSchemaNode) {
-            return DomToNormalizedNodeParserFactory.getInstance(DomUtils.defaultValueCodecProvider(),
-                            schemaContext.getCurrentContext(), editOperationStrategyProvider)
-                    .getContainerNodeParser()
-                    .parse(Collections.singletonList(element.getDomElement()), (ContainerSchemaNode) schemaNode);
-        } else if (schemaNode instanceof ListSchemaNode) {
-            return DomToNormalizedNodeParserFactory.getInstance(DomUtils.defaultValueCodecProvider(),
-                            schemaContext.getCurrentContext(), editOperationStrategyProvider)
-                    .getMapNodeParser()
-                    .parse(Collections.singletonList(element.getDomElement()), (ListSchemaNode) schemaNode);
-        } else {
+            final DataTreeChangeTracker changeTracker) throws Exception {
+        if (!(schemaNode instanceof ContainerSchemaNode) && !(schemaNode instanceof ListSchemaNode)) {
             //this should never happen since edit-config on any other node type should not be possible nor makes sense
             LOG.debug("DataNode from module is not ContainerSchemaNode nor ListSchemaNode, aborting..");
+            throw new UnsupportedOperationException("implement exception if parse fails");
         }
-        throw new UnsupportedOperationException("implement exception if parse fails");
+
+        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizedNodeStreamWriter writer = new EditOperationNormalizedNodeStreamWriter(resultHolder,
+                changeTracker);
+        final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext.getCurrentContext(), schemaNode);
+        xmlParser.parse(UntrustedXML.createXMLStreamReader(new StringReader(xmlElementToString(element))));
+        return resultHolder.getResult();
+    }
+
+    private static String xmlElementToString(final XmlElement element) {
+        try {
+            final Transformer transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+            final StreamResult result = new StreamResult(new StringWriter());
+            final DOMSource source = new DOMSource(element.getDomElement());
+            transformer.transform(source, result);
+
+            return result.getWriter().toString();
+        } catch (IllegalArgumentException | TransformerFactoryConfigurationError | TransformerException e) {
+            throw new RuntimeException("Unable to serialize xml element " + element, e);
+        }
     }
 
     private Optional<DataSchemaNode> getSchemaNodeFromNamespace(final String namespace, final XmlElement element)
