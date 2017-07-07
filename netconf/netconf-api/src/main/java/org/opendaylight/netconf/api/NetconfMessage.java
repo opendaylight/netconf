@@ -39,7 +39,10 @@ public class NetconfMessage {
         TRANSFORMER = t;
     }
 
-    private final Document doc;
+    private Document doc;
+
+    public NetconfMessage() {
+    }
 
     public NetconfMessage(final Document doc) {
         this.doc = doc;
@@ -65,4 +68,5 @@ public class NetconfMessage {
 
         return result.getWriter().toString();
     }
+
 }
