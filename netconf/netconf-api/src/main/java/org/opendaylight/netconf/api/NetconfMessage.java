@@ -41,6 +41,11 @@ public class NetconfMessage {
 
     private final Document doc;
 
+    public NetconfMessage() {
+        // Required for FailedNetconfMessage
+        this.doc = null;
+    }
+
     public NetconfMessage(final Document doc) {
         this.doc = doc;
     }
