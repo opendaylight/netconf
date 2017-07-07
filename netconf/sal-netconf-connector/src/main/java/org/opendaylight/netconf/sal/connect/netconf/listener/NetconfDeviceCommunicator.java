@@ -22,8 +22,11 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.api.FailedNetconfMessage;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
@@ -291,6 +294,11 @@ public class NetconfDeviceCommunicator
 
         if (request != null) {
 
+            if (FailedNetconfMessage.class.isInstance(message)) {
+                request.future.set(NetconfMessageTransformUtil.toRpcResult((FailedNetconfMessage) message));
+                return;
+            }
+
             LOG.debug("{}: Message received {}", id, message);
 
             if (LOG.isTraceEnabled()) {
@@ -401,6 +409,10 @@ public class NetconfDeviceCommunicator
     }
 
     private static boolean isNotification(final NetconfMessage message) {
+        if (message.getDocument() == null) {
+            // We have no message, which mean we have a FailedNetconfMessage
+            return false;
+        }
         final XmlElement xmle = XmlElement.fromDomDocument(message.getDocument());
         return XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME.equals(xmle.getName()) ;
     }

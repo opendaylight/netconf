@@ -9,11 +9,14 @@
 package org.opendaylight.netconf.nettyutil.handler;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Lists;
 import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
 import org.junit.Test;
+import org.opendaylight.netconf.api.FailedNetconfMessage;
+import org.opendaylight.netconf.api.NetconfMessage;
 import org.xml.sax.SAXParseException;
 
 public class NetconfXMLToMessageDecoderTest {
@@ -57,12 +60,14 @@ public class NetconfXMLToMessageDecoderTest {
         assertEquals(1, out.size());
     }
 
-    @Test(expected = SAXParseException.class)
+    @Test
     public void testDecodeGibberish() throws Exception {
         /* Test that we reject inputs where we cannot find the xml start '<' character */
         final ArrayList<Object> out = Lists.newArrayList();
         new NetconfXMLToMessageDecoder().decode(null, Unpooled.wrappedBuffer("\r\n?xml version>".getBytes()), out);
         assertEquals(1, out.size());
+        assertTrue(FailedNetconfMessage.class.isInstance(out.get(0)));
+        assertTrue(((FailedNetconfMessage) out.get(0)).getException().getClass().isAssignableFrom(SAXParseException.class));
     }
 
     @Test
