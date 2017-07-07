@@ -28,6 +28,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.api.FailedNetconfMessage;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.notifications.NetconfNotification;
@@ -41,6 +42,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcError.ErrorSeverity;
+import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -403,5 +405,17 @@ public class NetconfMessageTransformUtil {
                 LOG.warn("Unable to close resource properly", e);
             }
         }
+    }
+
+    public static RpcResult<NetconfMessage> toRpcResult(final FailedNetconfMessage message) {
+        return RpcResultBuilder.<NetconfMessage>failed()
+                .withRpcError(
+                        toRpcError(
+                                new NetconfDocumentedException(
+                                        message.getException().getMessage(),
+                                        DocumentedException.ErrorType.APPLICATION,
+                                        DocumentedException.ErrorTag.MALFORMED_MESSAGE,
+                                        DocumentedException.ErrorSeverity.ERROR)))
+                .build();
     }
 }
