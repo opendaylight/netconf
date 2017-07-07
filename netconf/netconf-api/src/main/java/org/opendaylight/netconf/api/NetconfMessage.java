@@ -39,10 +39,19 @@ public class NetconfMessage {
         TRANSFORMER = t;
     }
 
-    private final Document doc;
+    private Document doc;
+    private Throwable exception;
 
     public NetconfMessage(final Document doc) {
         this.doc = doc;
+    }
+
+    public NetconfMessage(final Throwable exception) {
+        this.exception = exception;
+    }
+
+    public Throwable getException() {
+        return this.exception;
     }
 
     public Document getDocument() {
@@ -65,4 +74,5 @@ public class NetconfMessage {
 
         return result.getWriter().toString();
     }
+
 }

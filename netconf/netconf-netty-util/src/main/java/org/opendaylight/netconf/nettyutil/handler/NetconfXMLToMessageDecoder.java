@@ -20,6 +20,7 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 public final class NetconfXMLToMessageDecoder extends ByteToMessageDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfXMLToMessageDecoder.class);
@@ -67,7 +68,16 @@ public final class NetconfXMLToMessageDecoder extends ByteToMessageDecoder {
             }
         }
         if (in.isReadable()) {
-            out.add(new NetconfMessage(XmlUtil.readXmlToDocument(new ByteBufInputStream(in))));
+            NetconfMessage msg;
+
+            try {
+                msg = new NetconfMessage(XmlUtil.readXmlToDocument(new ByteBufInputStream(in)));
+            } catch (SAXParseException exception) {
+                LOG.error("Failed to parse received message", exception);
+                msg = new NetconfMessage(exception);
+            }
+
+            out.add(msg);
         } else {
             LOG.debug("No more content in incoming buffer.");
         }
