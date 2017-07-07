@@ -22,6 +22,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -287,6 +289,12 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
         if( request != null ) {
 
+            if (message.getException() != null) {
+                request.future.set( RpcResultBuilder.<NetconfMessage>failed()
+                        .withRpcError( NetconfMessageTransformUtil.toRpcError( new NetconfDocumentedException(message.getException().getMessage(), DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.MALFORMED_MESSAGE, DocumentedException.ErrorSeverity.ERROR) ) ).build() );
+                return;
+            }
+
             LOG.debug("{}: Message received {}", id, message);
 
             if(LOG.isTraceEnabled()) {
@@ -395,6 +403,10 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
     }
 
     private static boolean isNotification(final NetconfMessage message) {
+        if (message.getDocument() == null) {
+            // We have no message, which mean we failed to parse the returned Document.
+            return false;
+        }
         final XmlElement xmle = XmlElement.fromDomDocument(message.getDocument());
         return XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME.equals(xmle.getName()) ;
     }
