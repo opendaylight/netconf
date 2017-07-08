@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da2a55be_186548e1",
+        "filename": "netconf/netconf-topology-config/src/main/resources/initial/netconf-topology.cfg",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2017-07-08T14:43:02Z",
+      "side": 1,
+      "message": "I believe this should be provided per netconf device, hence I\u0027m not sure how this approach can scale, as most probably, devices would have different private key.\n\nCan\u0027t this be provided the same way every configs are provided, via the netconf-node-topology.yang: \nhttps://github.com/opendaylight/netconf/blob/master/netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang#L34",
+      "revId": "fd428f1d42e0272620e0b0d891982b19ed96f55f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
