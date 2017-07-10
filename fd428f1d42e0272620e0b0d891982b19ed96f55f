@@ -52,6 +52,24 @@
       "revId": "fd428f1d42e0272620e0b0d891982b19ed96f55f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da2a55be_39748d98",
+        "filename": "netconf/netconf-topology-config/src/main/resources/initial/netconf-topology.cfg",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6995
+      },
+      "writtenOn": "2017-07-10T18:20:47Z",
+      "side": 1,
+      "message": "Regarding the config file and per device usage, i replied to the comment from Alexis earlier. \n\nIf you look at the code, i have already transferred the encoding/decoding of public/private keys to AAA in a different patch few days back. The code i have put here is only the most essential part which is very specific to netconf.",
+      "parentUuid": "da2a55be_731d860f",
+      "revId": "fd428f1d42e0272620e0b0d891982b19ed96f55f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
