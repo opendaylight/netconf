@@ -28,6 +28,10 @@ public class NetconfNorthboundSshServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNorthboundSshServer.class);
 
+    private static final String DEFAULT_PRIVATE_KEY_PATH = "./configuration/netconf-mdsal-nb/RSA.pk";
+    private static final String DEFAULT_ALGORITHM = "RSA";
+    private static final int DEFAULT_KEY_SIZE = 4096;
+
     private final ChannelFuture localServer;
     private final SshProxyServer sshProxyServer;
 
@@ -50,7 +54,8 @@ public class NetconfNorthboundSshServer {
         sshProxyServerConfigurationBuilder.setLocalAddress(localAddress);
         sshProxyServerConfigurationBuilder.setAuthenticator(authProvider);
         sshProxyServerConfigurationBuilder.setIdleTimeout(Integer.MAX_VALUE);
-        sshProxyServerConfigurationBuilder.setKeyPairProvider(new PEMGeneratorHostKeyProvider());
+        sshProxyServerConfigurationBuilder.setKeyPairProvider(new PEMGeneratorHostKeyProvider(DEFAULT_PRIVATE_KEY_PATH,
+                DEFAULT_ALGORITHM, DEFAULT_KEY_SIZE));
 
         localServer.addListener(future -> {
             if (future.isDone() && !future.isCancelled()) {

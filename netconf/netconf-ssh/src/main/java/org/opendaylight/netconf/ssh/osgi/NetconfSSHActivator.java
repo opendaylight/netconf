@@ -14,7 +14,6 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
 import org.apache.sshd.common.util.ThreadUtils;
 import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
 import org.opendaylight.netconf.ssh.SshProxyServer;
@@ -44,12 +43,8 @@ public class NetconfSSHActivator implements BundleActivator {
 
     @Override
     public void start(final BundleContext bundleContext) throws IOException, InvalidSyntaxException {
-        minaTimerExecutor = Executors.newScheduledThreadPool(POOL_SIZE, new ThreadFactory() {
-            @Override
-            public Thread newThread(final Runnable runnable) {
-                return new Thread(runnable, "netconf-ssh-server-mina-timers");
-            }
-        });
+        minaTimerExecutor = Executors.newScheduledThreadPool(POOL_SIZE,
+            runnable -> new Thread(runnable, "netconf-ssh-server-mina-timers"));
         clientGroup = new NioEventLoopGroup();
         nioExecutor = ThreadUtils.newFixedThreadPool("netconf-ssh-server-nio-group", POOL_SIZE);
         server = startSSHServer(bundleContext);
