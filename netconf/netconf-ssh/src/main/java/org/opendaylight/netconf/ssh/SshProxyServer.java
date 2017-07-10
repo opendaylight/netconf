@@ -13,7 +13,6 @@ import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -35,9 +34,7 @@ import org.apache.sshd.common.io.nio2.Nio2Acceptor;
 import org.apache.sshd.common.io.nio2.Nio2Connector;
 import org.apache.sshd.common.io.nio2.Nio2ServiceFactoryFactory;
 import org.apache.sshd.common.util.CloseableUtils;
-import org.apache.sshd.server.PasswordAuthenticator;
 import org.apache.sshd.server.ServerFactoryManager;
-import org.apache.sshd.server.session.ServerSession;
 
 /**
  * Proxy SSH server that just delegates decrypted content to a delegate server within same VM.
@@ -67,19 +64,11 @@ public class SshProxyServer implements AutoCloseable {
 
         //remove rc4 ciphers
         final List<NamedFactory<Cipher>> cipherFactories = sshServer.getCipherFactories();
-        for (Iterator<NamedFactory<Cipher>> i = cipherFactories.iterator(); i.hasNext(); ) {
-            final NamedFactory<Cipher> factory = i.next();
-            if (factory.getName().contains(DEFAULT_ARCFOUR128_FACTORY.getName())
-                    || factory.getName().contains(DEFAULT_ARCFOUR256_FACTORY.getName())) {
-                i.remove();
-            }
-        }
-        sshServer.setPasswordAuthenticator(new PasswordAuthenticator() {
-            @Override
-            public boolean authenticate(final String username, final String password, final ServerSession session) {
-                return sshProxyServerConfiguration.getAuthenticator().authenticated(username, password);
-            }
-        });
+        cipherFactories.removeIf(factory -> factory.getName().contains(DEFAULT_ARCFOUR128_FACTORY.getName())
+                || factory.getName().contains(DEFAULT_ARCFOUR256_FACTORY.getName()));
+        sshServer.setPasswordAuthenticator(
+            (username, password, session)
+                -> sshProxyServerConfiguration.getAuthenticator().authenticated(username, password));
 
         sshServer.setKeyPairProvider(sshProxyServerConfiguration.getKeyPairProvider());
 
