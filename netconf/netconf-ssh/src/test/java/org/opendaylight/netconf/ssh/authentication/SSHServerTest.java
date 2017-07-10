@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
@@ -74,13 +73,9 @@ public class SSHServerTest {
         server = new SshProxyServer(minaTimerEx, clientGroup, nioExec);
         server.bind(new SshProxyServerConfigurationBuilder()
                 .setBindingAddress(addr).setLocalAddress(NetconfConfiguration.NETCONF_LOCAL_ADDRESS)
-                .setAuthenticator(new AuthProvider() {
-                    @Override
-                    public boolean authenticated(final String username, final String password) {
-                        return true;
-                    }
-                })
-                .setKeyPairProvider(new PEMGeneratorHostKeyProvider(sshKeyPair.toPath().toAbsolutePath().toString()))
+                .setAuthenticator((username, password) -> true)
+                .setKeyPairProvider(new PEMGeneratorHostKeyProvider(sshKeyPair.toPath().toAbsolutePath().toString(),
+                        "RSA", 4096))
                 .setIdleTimeout(Integer.MAX_VALUE).createSshProxyServerConfiguration());
         LOG.info("SSH server started on {}", PORT);
     }

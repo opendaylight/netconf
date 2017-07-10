@@ -43,7 +43,6 @@ import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.config.util.capability.YangModuleCapability;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl;
 import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.impl.SessionIdProvider;
@@ -263,12 +262,7 @@ public class NetconfDeviceSimulator implements Closeable {
         return new SshProxyServerConfigurationBuilder()
                 .setBindingAddress(bindingAddress)
                 .setLocalAddress(tcpLocalAddress)
-                .setAuthenticator(new AuthProvider() {
-                    @Override
-                    public boolean authenticated(final String username, final String password) {
-                        return true;
-                    }
-                })
+                .setAuthenticator((username, password) -> true)
                 .setKeyPairProvider(keyPairProvider)
                 .setIdleTimeout(Integer.MAX_VALUE)
                 .createSshProxyServerConfiguration();
@@ -277,7 +271,7 @@ public class NetconfDeviceSimulator implements Closeable {
     private PEMGeneratorHostKeyProvider getPemGeneratorHostKeyProvider() {
         try {
             final Path tempFile = Files.createTempFile("tempKeyNetconfTest", "suffix");
-            return new PEMGeneratorHostKeyProvider(tempFile.toAbsolutePath().toString());
+            return new PEMGeneratorHostKeyProvider(tempFile.toAbsolutePath().toString(), "RSA", 4096);
         } catch (final IOException e) {
             LOG.error("Unable to generate PEM key", e);
             throw new RuntimeException(e);

@@ -30,7 +30,6 @@ import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.netty.EchoClientHandler.State;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
@@ -75,13 +74,9 @@ public class SSHTest {
         final SshProxyServer sshProxyServer = new SshProxyServer(minaTimerEx, nettyGroup, nioExec);
         sshProxyServer.bind(new SshProxyServerConfigurationBuilder()
                 .setBindingAddress(addr).setLocalAddress(NetconfConfiguration.NETCONF_LOCAL_ADDRESS)
-                .setAuthenticator(new AuthProvider() {
-                        @Override
-                        public boolean authenticated(final String username, final String password) {
-                            return true;
-                        }
-                })
-                .setKeyPairProvider(new PEMGeneratorHostKeyProvider(sshKeyPair.toPath().toAbsolutePath().toString()))
+                .setAuthenticator((username, password) -> true)
+                .setKeyPairProvider(new PEMGeneratorHostKeyProvider(sshKeyPair.toPath().toAbsolutePath().toString(),
+                        "RSA", 4096))
                 .setIdleTimeout(Integer.MAX_VALUE).createSshProxyServerConfiguration());
 
         final EchoClientHandler echoClientHandler = connectClient(addr);
