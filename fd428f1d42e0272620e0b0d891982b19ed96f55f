@@ -34,6 +34,24 @@
       "revId": "fd428f1d42e0272620e0b0d891982b19ed96f55f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da2a55be_78e72441",
+        "filename": "netconf/netconf-topology-config/src/main/resources/initial/netconf-topology.cfg",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6995
+      },
+      "writtenOn": "2017-07-10T18:17:54Z",
+      "side": 1,
+      "message": "Alexis \nThis is the private key which represents netconf (southbound) client. Netconf topology client will be represented by a single keypair. Each of the netconf server (device) will basically have to trust the public key of ODL netconf client to allow it to authenticate without using password (SSH passwordless access basically).\nThis cannot be provided in yang because its not specific per device and secondly, private key and passphrase should not be visible on the datastore.",
+      "parentUuid": "da2a55be_186548e1",
+      "revId": "fd428f1d42e0272620e0b0d891982b19ed96f55f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
