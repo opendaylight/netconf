@@ -63,6 +63,8 @@ public class KeepaliveSalFacadeTest {
     @Mock
     private ScheduledFuture currentKeepalive;
 
+    private KeepaliveSalFacade keepaliveSalFacade;
+
     @Before
     public void setUp() throws Exception {
         executorServiceSpy = Executors.newScheduledThreadPool(1);
@@ -76,6 +78,7 @@ public class KeepaliveSalFacadeTest {
 
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorServiceSpy = Mockito.spy(executorService);
+
         doAnswer(
             invocationOnMock -> {
                 invocationOnMock.callRealMethod();
@@ -83,6 +86,10 @@ public class KeepaliveSalFacadeTest {
             }).when(executorServiceSpy).schedule(Mockito.<Runnable>any(), Mockito.anyLong(), Matchers.any());
 
         Mockito.when(currentKeepalive.isDone()).thenReturn(true);
+
+        keepaliveSalFacade =
+                new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorServiceSpy, 1L, 1L);
+        keepaliveSalFacade.setListener(listener);
     }
 
     @After
@@ -111,18 +118,9 @@ public class KeepaliveSalFacadeTest {
     }
 
     @Test
-    public void testKeepaliveFail() throws Exception {
-        final DOMRpcResult result = new DefaultDOMRpcResult(Builders.containerBuilder().withNodeIdentifier(
-                new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME)).build());
+    public void testKeepaliveRpcFailure() {
 
-        RpcError error = mock(RpcError.class);
-        doReturn("Failure").when(error).toString();
-
-        final DOMRpcResult resultFailWithResultAndError = new DefaultDOMRpcResult(mock(NormalizedNode.class), error);
-
-        doReturn(Futures.immediateCheckedFuture(result))
-                .doReturn(Futures.immediateCheckedFuture(resultFailWithResultAndError))
-                .doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("illegal-state")))
+        doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("illegal-state")))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         final KeepaliveSalFacade keepaliveSalFacade =
@@ -134,39 +132,27 @@ public class KeepaliveSalFacadeTest {
         verify(underlyingSalFacade).onDeviceConnected(
                 any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
 
-        // 1 failed that results in disconnect
+        // Should disconnect the session
         verify(listener, timeout(15000).times(1)).disconnect();
-        // 3 attempts total
-        verify(deviceRpc, times(3)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        verify(deviceRpc, times(1)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+    }
 
-        // Reconnect with same keepalive responses
-        doReturn(Futures.immediateCheckedFuture(result))
-                .doReturn(Futures.immediateCheckedFuture(resultFailWithResultAndError))
-                .doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("illegal-state")))
+    @Test
+    public void testKeepaliveSuccessWithRpcError() {
+
+        final DOMRpcResult rpcSuccessWithError = new DefaultDOMRpcResult(mock(RpcError.class));
+
+        doReturn(Futures.immediateCheckedFuture(rpcSuccessWithError))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
-        // 1 failed that results in disconnect, 2 total with previous fail
-        verify(listener, timeout(15000).times(2)).disconnect();
-        // 6 attempts now total
-        verify(deviceRpc, times(3 * 2)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        verify(underlyingSalFacade).onDeviceConnected(
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
 
-        final DOMRpcResult resultFailwithError = new DefaultDOMRpcResult(error);
-
-        doReturn(Futures.immediateCheckedFuture(resultFailwithError))
-                .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
-
-        keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
-
-        // 1 failed that results in disconnect, 3 total with previous fail
-        verify(listener, timeout(15000).times(3)).disconnect();
-
-
-        Mockito.when(currentKeepalive.isDone()).thenReturn(false);
-        keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
-        // 1 failed that results in disconnect, 4 total with previous fail
-        verify(listener, timeout(15000).times(4)).disconnect();
+        // Shouldn't disconnect the session
+        verify(listener, times(0)).disconnect();
+        verify(deviceRpc, timeout(15000).times(1)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
     }
 
     @Test
