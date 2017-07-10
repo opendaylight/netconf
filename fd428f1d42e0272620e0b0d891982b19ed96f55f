@@ -16,6 +16,24 @@
       "revId": "fd428f1d42e0272620e0b0d891982b19ed96f55f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da2a55be_731d860f",
+        "filename": "netconf/netconf-topology-config/src/main/resources/initial/netconf-topology.cfg",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-07-10T11:56:14Z",
+      "side": 1,
+      "message": "Agreed.  And you shouldn\u0027t be using config files for this; use clustered-app-config so it is persisted across the cluster.  Furthermore I do believe that this code should be served by AAA and consumed by NETCONF!",
+      "parentUuid": "da2a55be_186548e1",
+      "revId": "fd428f1d42e0272620e0b0d891982b19ed96f55f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
