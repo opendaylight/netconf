@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "da2a55be_b9699d8d",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/authentication/PublicKeyAuth.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2017-07-10T19:59:19Z",
+      "side": 1,
+      "message": "Strings.isNullOrEmpty()",
+      "range": {
+        "startLine": 35,
+        "startChar": 37,
+        "endLine": 35,
+        "endChar": 75
+      },
+      "revId": "fd428f1d42e0272620e0b0d891982b19ed96f55f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da2a55be_1906e9ce",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/authentication/PublicKeyAuth.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2017-07-10T19:59:19Z",
+      "side": 1,
+      "message": "expand",
+      "range": {
+        "startLine": 48,
+        "startChar": 8,
+        "endLine": 48,
+        "endChar": 67
+      },
+      "revId": "fd428f1d42e0272620e0b0d891982b19ed96f55f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da2a55be_186548e1",
         "filename": "netconf/netconf-topology-config/src/main/resources/initial/netconf-topology.cfg",
         "patchSetId": 5
@@ -67,6 +113,47 @@
       "side": 1,
       "message": "Regarding the config file and per device usage, i replied to the comment from Alexis earlier. \n\nIf you look at the code, i have already transferred the encoding/decoding of public/private keys to AAA in a different patch few days back. The code i have put here is only the most essential part which is very specific to netconf.",
       "parentUuid": "da2a55be_731d860f",
+      "revId": "fd428f1d42e0272620e0b0d891982b19ed96f55f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da2a55be_19b709da",
+        "filename": "netconf/netconf-topology-config/src/main/resources/initial/netconf-topology.cfg",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2017-07-10T19:59:19Z",
+      "side": 1,
+      "message": "\u003e This is the private key which represents netconf (southbound) client. Netconf topology client will be represented by a single keypair. Each of the netconf server (device) will basically have to trust the public key of ODL netconf client to allow it to authenticate without using password (SSH passwordless access basically).\n\nAh ok, understood. I reviewed this with callhome in mind. My bad.\n\n\u003e This cannot be provided in yang because its not specific per device and secondly, private key and passphrase should not be visible on the datastore.\n\nFor security reason? ok... but at any rate, I don\u0027t think, if held in a file, it should be called netconf-topology.cfg Maybe something more like, odl-sb-netconf-client-keypair.cfg with a comment explaining what it is.",
+      "parentUuid": "da2a55be_78e72441",
+      "revId": "fd428f1d42e0272620e0b0d891982b19ed96f55f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da2a55be_f90af5d0",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2017-07-10T19:59:19Z",
+      "side": 1,
+      "message": "If I understood correctly, the user will have to provide private key and passphrase, else it would fail considering the preconditions in the ctr of PublicKeyAuth. \nCan we not enforce this? and make this not mandatory.",
+      "range": {
+        "startLine": 433,
+        "startChar": 39,
+        "endLine": 433,
+        "endChar": 75
+      },
       "revId": "fd428f1d42e0272620e0b0d891982b19ed96f55f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
