@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -90,9 +89,6 @@ public class NetconfTopologyImplTest {
     @Mock
     private DOMMountPointService mountPointService;
 
-    @Mock
-    private AAAEncryptionService encryptionService;
-
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
 
@@ -109,7 +105,7 @@ public class NetconfTopologyImplTest {
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher,
                 mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedSchemaRepositoryProvider,
-                dataBroker, mountPointService, encryptionService);
+                dataBroker, mountPointService);
 
         spyTopology = spy(topology);
     }
@@ -192,14 +188,14 @@ public class NetconfTopologyImplTest {
 
     public static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
 
-        public TestingNetconfTopologyImpl(
-                final String topologyId, final NetconfClientDispatcher clientDispatcher,
-                final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-                final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
-                final DataBroker dataBroker, final DOMMountPointService mountPointService,
-                final AAAEncryptionService encryptionService) {
+        public TestingNetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
+                                          final EventExecutor eventExecutor,
+                                          final ScheduledThreadPool keepaliveExecutor,
+                                          final ThreadPool processingExecutor,
+                                          final SchemaRepositoryProvider schemaRepositoryProvider,
+                                          final DataBroker dataBroker, final DOMMountPointService mountPointService) {
             super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
-                    processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService, encryptionService);
+                    processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService);
         }
 
         @Override

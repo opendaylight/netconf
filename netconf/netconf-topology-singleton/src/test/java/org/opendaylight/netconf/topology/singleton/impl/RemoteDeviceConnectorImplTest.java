@@ -32,7 +32,6 @@ import java.util.concurrent.ExecutorService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
@@ -106,9 +105,6 @@ public class RemoteDeviceConnectorImplTest {
     @Mock
     private WriteTransaction writeTx;
 
-    @Mock
-    private AAAEncryptionService encryptionService;
-
     private NetconfTopologySetup.NetconfTopologySetupBuilder builder;
     private RemoteDeviceId remoteDeviceId;
 
@@ -134,7 +130,6 @@ public class RemoteDeviceConnectorImplTest {
         builder.setEventExecutor(eventExecutor);
         builder.setNetconfClientDispatcher(clientDispatcher);
         builder.setTopologyId(TOPOLOGY_ID);
-        builder.setEncryptionService(encryptionService);
     }
 
     @Test
@@ -263,7 +258,7 @@ public class RemoteDeviceConnectorImplTest {
         assertEquals(defaultClientConfig.getAddress(), new InetSocketAddress(InetAddresses.forString("127.0.0.1"),
             9999));
         assertSame(defaultClientConfig.getSessionListener(), listener);
-        assertEquals(defaultClientConfig.getAuthHandler().getUsername(), encryptionService.encrypt("testuser"));
+        assertEquals(defaultClientConfig.getAuthHandler().getUsername(), "testuser");
         assertEquals(defaultClientConfig.getProtocol(), NetconfClientConfiguration.NetconfClientProtocol.TCP);
     }
 }
