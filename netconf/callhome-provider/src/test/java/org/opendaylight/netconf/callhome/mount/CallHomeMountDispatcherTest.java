@@ -22,7 +22,6 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -54,7 +53,6 @@ public class CallHomeMountDispatcherTest {
     private CallHomeMountSessionManager mockSessMgr;
     private CallHomeTopology mockTopology;
     private CallHomeProtocolSessionContext mockProtoSess;
-    private AAAEncryptionService mockEncryptionService;
 
     @Before
     public void setup() {
@@ -68,10 +66,9 @@ public class CallHomeMountDispatcherTest {
         mockSessMgr = mock(CallHomeMountSessionManager.class);
         mockTopology = mock(CallHomeTopology.class);
         mockProtoSess = mock(CallHomeProtocolSessionContext.class);
-        mockEncryptionService = mock(AAAEncryptionService.class);
 
         instance = new CallHomeMountDispatcher(topologyId, mockExecutor, mockKeepAlive,
-                mockProcessingExecutor, mockSchemaRepoProvider, mockDataBroker, mockMount, mockEncryptionService) {
+                mockProcessingExecutor, mockSchemaRepoProvider, mockDataBroker, mockMount) {
             @Override
             public CallHomeMountSessionManager getSessionManager() {
                 return mockSessMgr;

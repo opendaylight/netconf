@@ -108,11 +108,6 @@
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>mockito-configuration</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.opendaylight.aaa</groupId>
-      <artifactId>aaa-encrypt-service</artifactId>
-      <version>0.5.1-SNAPSHOT</version>
-    </dependency>
   </dependencies>
 
   <build>
