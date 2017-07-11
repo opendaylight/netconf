@@ -99,6 +99,10 @@ public class RestConnectorProvider implements RestConnector, AutoCloseable {
                 notificationServiceHandler);
     }
 
+    public DOMMountPointServiceHandler getMountPointServiceHandler() {
+        return mountPointServiceHandler;
+    }
+
     /**
      * After {@link TransactionChain} failed, this updates {@link TransactionChainHandler} with new transaction chain.
      *
