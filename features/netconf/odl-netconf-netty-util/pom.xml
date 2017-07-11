@@ -68,11 +68,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.aaa</groupId>
-            <artifactId>aaa-encrypt-service</artifactId>
-            <version>0.7.0-SNAPSHOT</version>
-            <classifier>config</classifier>
-            <type>xml</type>
         </dependency>
     </dependencies>
 </project>

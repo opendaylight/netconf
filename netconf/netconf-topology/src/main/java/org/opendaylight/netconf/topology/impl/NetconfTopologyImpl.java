@@ -13,7 +13,6 @@ import com.google.common.util.concurrent.Futures;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
 import javax.annotation.Nonnull;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -52,12 +51,10 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
 
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-                               final ThreadPool processingExecutor,
-                               final SchemaRepositoryProvider schemaRepositoryProvider,
-                               final DataBroker dataBroker, final DOMMountPointService mountPointService,
-                               final AAAEncryptionService encryptionService) {
+                               final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
+                               final DataBroker dataBroker, final DOMMountPointService mountPointService) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService);
+                schemaRepositoryProvider, dataBroker, mountPointService);
     }
 
     @Override
