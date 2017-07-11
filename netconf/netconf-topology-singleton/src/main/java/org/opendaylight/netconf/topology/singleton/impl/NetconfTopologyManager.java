@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -76,18 +75,15 @@ public class NetconfTopologyManager
     private final String topologyId;
     private final Duration writeTxIdleTimeout;
     private final DOMMountPointService mountPointService;
-    private final AAAEncryptionService encryptionService;
+
     private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
 
     public NetconfTopologyManager(final DataBroker dataBroker, final RpcProviderRegistry rpcProviderRegistry,
                                   final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
                                   final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-                                  final ActorSystemProvider actorSystemProvider,
-                                  final EventExecutor eventExecutor, final NetconfClientDispatcher clientDispatcher,
-                                  final String topologyId, final Config config,
-                                  final DOMMountPointService mountPointService,
-                                  final AAAEncryptionService encryptionService) {
-
+                                  final ActorSystemProvider actorSystemProvider, final EventExecutor eventExecutor,
+                                  final NetconfClientDispatcher clientDispatcher, final String topologyId,
+                                  final Config config, final DOMMountPointService mountPointService) {
         this.dataBroker = Preconditions.checkNotNull(dataBroker);
         this.rpcProviderRegistry = Preconditions.checkNotNull(rpcProviderRegistry);
         this.clusterSingletonServiceProvider = Preconditions.checkNotNull(clusterSingletonServiceProvider);
@@ -99,7 +95,6 @@ public class NetconfTopologyManager
         this.topologyId = Preconditions.checkNotNull(topologyId);
         this.writeTxIdleTimeout = Duration.apply(config.getWriteTransactionIdleTimeout(), TimeUnit.SECONDS);
         this.mountPointService = mountPointService;
-        this.encryptionService = Preconditions.checkNotNull(encryptionService);
     }
 
     // Blueprint init method
@@ -271,8 +266,7 @@ public class NetconfTopologyManager
                 .setTopologyId(topologyId)
                 .setNetconfClientDispatcher(clientDispatcher)
                 .setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node))
-                .setIdleTimeout(writeTxIdleTimeout)
-                .setEncryptionService(encryptionService);
+                .setIdleTimeout(writeTxIdleTimeout);
 
         return builder.build();
     }
