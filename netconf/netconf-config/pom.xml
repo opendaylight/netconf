@@ -34,13 +34,6 @@
     </dependencies>
   </dependencyManagement>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>threadpool-config-impl</artifactId>
-    </dependency>
-  </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -50,7 +43,11 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Embed-Dependency>threadpool-config-impl</Embed-Dependency>
+            <Import-Package>
+              org.opendaylight.controller.config.threadpool.util,
+              org.opendaylight.controller.config.threadpool,
+              *
+            </Import-Package>
           </instructions>
         </configuration>
       </plugin>
