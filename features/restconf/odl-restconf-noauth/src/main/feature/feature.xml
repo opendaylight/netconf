@@ -8,9 +8,6 @@
  -->
 <features name="odl-controller-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.2.0">
     <feature name="odl-restconf-noauth" version="${project.version}">
-        <configfile finalname="${config.configfile.directory}/${config.restconf.configfile}" override="true">
-            mvn:org.opendaylight.netconf/sal-rest-connector-config/${project.version}/xml/config
-        </configfile>
         <configfile finalname="${config.configfile.directory}/${config.restconf.service.configfile}">
             mvn:org.opendaylight.netconf/sal-rest-connector-config/${project.version}/xml/configrestconfservice
         </configfile>
