@@ -1,0 +1,9 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Ryan Goulding <ryandgoulding@gmail.com>
+Code-Review+2: Tomas Cere <tcere@cisco.com>
+Code-Review+1: A H <an.ho@huawei.com>
+Submitted-by: Thanh Ha <thanh.ha@linuxfoundation.org>
+Submitted-at: Tue, 11 Jul 2017 17:15:56 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/60206
+Project: netconf
+Branch: refs/heads/stable/carbon
