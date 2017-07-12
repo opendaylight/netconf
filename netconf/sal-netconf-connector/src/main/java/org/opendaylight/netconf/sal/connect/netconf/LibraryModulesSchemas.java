@@ -22,7 +22,7 @@ import com.google.gson.stream.JsonReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -35,12 +35,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
@@ -61,12 +55,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
-import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
-import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -75,7 +67,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
 /**
  * Holds URLs with YANG schema resources for all yang modules reported in
@@ -319,9 +310,8 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
                 ? Optional.of(resultHolder.getResult()) : Optional.<NormalizedNode<?, ?>>absent();
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     private static Optional<NormalizedNode<?, ?>> readXml(final InputStream in) {
-        final DomToNormalizedNodeParserFactory parserFactory =
-                DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, LIBRARY_CONTEXT);
         try {
             final DocumentBuilder docBuilder = UntrustedXML.newDocumentBuilder();
 
@@ -342,16 +332,16 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
                 }
             }
 
-            final Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            final StringWriter sw = new StringWriter();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            transformer.transform(new DOMSource(doc), new StreamResult(sw));
-            final NormalizedNode<?, ?> parsed =
-                    parserFactory.getContainerNodeParser()
-                            .parse(Collections.singleton(XmlUtil.readXmlToElement(sw.toString())),
-                            (ContainerSchemaNode) LIBRARY_CONTEXT.getDataChildByName(ModulesState.QNAME));
+            final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+            final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+            final XmlParserStream xmlParser = XmlParserStream.create(writer, LIBRARY_CONTEXT,
+                    LIBRARY_CONTEXT.getDataChildByName(ModulesState.QNAME));
+
+            xmlParser.parse(UntrustedXML.createXMLStreamReader(new StringReader(XmlUtil.toString(
+                    doc.getDocumentElement(), false))));
+            final NormalizedNode<?, ?> parsed = resultHolder.getResult();
             return Optional.of(parsed);
-        } catch (final SAXException | IOException | TransformerException e) {
+        } catch (final Exception e) {
             LOG.warn("Unable to parse yang library xml content", e);
         }
 

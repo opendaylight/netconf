@@ -12,6 +12,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,19 +32,22 @@ import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.DomUtils;
-import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -254,12 +258,26 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
      * @param input   input container schema node, or null if rpc does not take any input
      * @return parsed rpc into normalized node, or null if input schema is null
      */
+    @SuppressWarnings("checkstyle:IllegalCatch")
     @Nullable
-    private NormalizedNode<?, ?> rpcToNNode(final XmlElement element, @Nullable final ContainerSchemaNode input) {
-        return input.getChildNodes().isEmpty() ? null : DomToNormalizedNodeParserFactory
-                .getInstance(DomUtils.defaultValueCodecProvider(), schemaContext.getCurrentContext())
-                .getContainerNodeParser()
-                .parse(Collections.singletonList(element.getDomElement()), input);
+    private NormalizedNode<?, ?> rpcToNNode(final XmlElement element, @Nullable final ContainerSchemaNode input)
+            throws DocumentedException {
+        if (input.getChildNodes().isEmpty()) {
+            return null;
+        }
+
+        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+        final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext.getCurrentContext(), input);
+
+        try {
+            xmlParser.parse(UntrustedXML.createXMLStreamReader(new StringReader(XmlUtil.toString(element))));
+        } catch (final Exception ex) {
+            throw new NetconfDocumentedException("Error parsing input: " + ex.getMessage(), ex, ErrorType.PROTOCOL,
+                    ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
+        }
+
+        return resultHolder.getResult();
     }
 
 }
