@@ -11,19 +11,26 @@ package org.opendaylight.controller.md.sal.rest.common;
 import com.google.common.base.Preconditions;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
+import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.sal.rest.impl.test.providers.TestJsonBodyWriter;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
-import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -35,7 +42,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 public class TestRestconfUtils {
 
@@ -80,8 +87,8 @@ public class TestRestconfUtils {
         return null;
     }
 
-    private static NormalizedNode<?, ?> parse(final InstanceIdentifierContext<?> iiContext, final Document doc) {
-        final List<Element> elements = Collections.singletonList(doc.getDocumentElement());
+    private static NormalizedNode<?, ?> parse(final InstanceIdentifierContext<?> iiContext, final Document doc)
+            throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = iiContext.getSchemaNode();
         DataSchemaNode schemaNode = null;
         if (schemaNodeContext instanceof RpcDefinition) {
@@ -111,16 +118,17 @@ public class TestRestconfUtils {
                 }
             }
         }
-        final DomToNormalizedNodeParserFactory parserFactory = DomToNormalizedNodeParserFactory
-                .getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER, iiContext.getSchemaContext());
 
-        if (schemaNode instanceof ContainerSchemaNode) {
-            return parserFactory.getContainerNodeParser().parse(Collections.singletonList(doc.getDocumentElement()),
-                    (ContainerSchemaNode) schemaNode);
-        } else if (schemaNode instanceof ListSchemaNode) {
-            final ListSchemaNode casted = (ListSchemaNode) schemaNode;
-            return parserFactory.getMapEntryNodeParser().parse(elements, casted);
-        } // FIXME : add another DataSchemaNode extensions e.g. LeafSchemaNode
+        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+        final XmlParserStream xmlParser = XmlParserStream.create(writer, iiContext.getSchemaContext(), schemaNode);
+
+        if (schemaNode instanceof ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
+            xmlParser.parse(UntrustedXML.createXMLStreamReader(new StringReader(XmlUtil.toString(
+                    doc.getDocumentElement()))));
+            return resultHolder.getResult();
+        }
+        // FIXME : add another DataSchemaNode extensions e.g. LeafSchemaNode
         return null;
     }
 

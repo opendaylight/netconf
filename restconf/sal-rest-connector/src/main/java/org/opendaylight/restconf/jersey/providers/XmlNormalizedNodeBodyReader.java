@@ -11,16 +11,20 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
+import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -32,9 +36,11 @@ import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaUtils;
-import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchema;
 import org.opendaylight.yangtools.yang.model.api.AugmentationTarget;
 import org.opendaylight.yangtools.yang.model.api.ChoiceCaseNode;
@@ -49,7 +55,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 @Provider
 @Consumes({ Rfc8040.MediaTypes.DATA + RestconfConstants.XML, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
@@ -73,9 +79,8 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         }
     }
 
-    private NormalizedNodeContext parse(final InstanceIdentifierContext<?> pathContext,final Document doc) {
-
-        final List<Element> elements = Collections.singletonList(doc.getDocumentElement());
+    private NormalizedNodeContext parse(final InstanceIdentifierContext<?> pathContext, final Document doc)
+            throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = pathContext.getSchemaNode();
         DataSchemaNode schemaNode;
         boolean isRpc = false;
@@ -92,10 +97,6 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         final String docRootNamespace = doc.getDocumentElement().getNamespaceURI();
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
         InstanceIdentifierContext<? extends SchemaNode> outIIContext;
-
-        final DomToNormalizedNodeParserFactory parserFactory =
-                DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER,
-                    pathContext.getSchemaContext());
 
         if (isPost() && !isRpc) {
             final Deque<Object> foundSchemaNodes = findPathToSchemaNodeByName(schemaNode, docRootElm, docRootNamespace);
@@ -123,21 +124,23 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                             docRootElm, scQName));
         }
 
-        final NormalizedNode<?, ?> parsed;
-        if (schemaNode instanceof ContainerSchemaNode) {
-            parsed = parserFactory.getContainerNodeParser().parse(
-                    Collections.singletonList(doc.getDocumentElement()), (ContainerSchemaNode) schemaNode);
-        } else if (schemaNode instanceof ListSchemaNode) {
-            parsed = parserFactory.getMapEntryNodeParser().parse(elements, (ListSchemaNode) schemaNode);
-            if (isPost()) {
+        NormalizedNode<?, ?> parsed = null;
+        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+
+        if (schemaNode instanceof ContainerSchemaNode || schemaNode instanceof ListSchemaNode
+                || schemaNode instanceof LeafSchemaNode) {
+            final XmlParserStream xmlParser = XmlParserStream.create(writer, pathContext.getSchemaContext(),
+                    schemaNode);
+            xmlParser.parse(UntrustedXML.createXMLStreamReader(new StringReader(XmlUtil.toString(
+                    doc.getDocumentElement()))));
+            parsed = resultHolder.getResult();
+            if (schemaNode instanceof  ListSchemaNode && isPost()) {
                 iiToDataList.add(parsed.getIdentifier());
             }
-        } else if (schemaNode instanceof LeafSchemaNode) {
-            parsed = parserFactory.getLeafNodeParser().parse(elements, (LeafSchemaNode) schemaNode);
-        } else {
-            LOG.warn("Unknown schema node extension {} was not parsed", schemaNode.getClass());
-            parsed = null;
         }
+
+        LOG.warn("Unknown schema node extension {} was not parsed", schemaNode.getClass());
 
         final YangInstanceIdentifier fullIIToData = YangInstanceIdentifier.create(Iterables.concat(
                 pathContext.getInstanceIdentifier().getPathArguments(), iiToDataList));

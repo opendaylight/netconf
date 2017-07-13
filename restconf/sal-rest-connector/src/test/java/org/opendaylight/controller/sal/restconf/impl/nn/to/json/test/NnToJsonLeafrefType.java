@@ -10,7 +10,6 @@ package org.opendaylight.controller.sal.restconf.impl.nn.to.json.test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.util.concurrent.UncheckedExecutionException;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.regex.Matcher;
@@ -53,7 +52,7 @@ public class NnToJsonLeafrefType extends AbstractBodyReaderTest {
         validateJson(".*\"lf2\":\\p{Blank}*\"121\".*", json);
     }
 
-    @Test(expected = UncheckedExecutionException.class)
+    @Test(expected = NullPointerException.class)
     public void leafrefToNonExistingLeafTest() throws Exception {
         toJson("/nn-to-json/leafref/xml/data_ref_to_non_existing_leaf.xml");
     }
