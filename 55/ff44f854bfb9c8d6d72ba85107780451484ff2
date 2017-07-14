@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Tomas Cere <tcere@cisco.com>
+Submitted-by: Tomas Cere <tcere@cisco.com>
+Submitted-at: Fri, 14 Jul 2017 09:29:47 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/60296
+Project: netconf
+Branch: refs/heads/master
