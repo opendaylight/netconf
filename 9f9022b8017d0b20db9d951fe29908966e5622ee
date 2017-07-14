@@ -22,6 +22,30 @@
       "revId": "9f9022b8017d0b20db9d951fe29908966e5622ee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da2a55be_fa7c9522",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/NetconfMessage.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2017-07-14T13:08:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da2a55be_da91d19b",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 5
+      },
+      "revId": "9f9022b8017d0b20db9d951fe29908966e5622ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
