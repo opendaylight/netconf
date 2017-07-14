@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da2a55be_da91d19b",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/NetconfMessage.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-07-14T11:40:12Z",
+      "side": 1,
+      "message": "Instead of this i would much rather create a FailedNetconfMessage class and a new method in NetconfMessageTransformUtil that would generate the whole rpcResult with this class passed in.",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 5
+      },
+      "revId": "9f9022b8017d0b20db9d951fe29908966e5622ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
