@@ -153,7 +153,7 @@ public class NetconfNodeActor extends UntypedActor {
                 final DOMDataWriteTransaction tx = deviceDataBroker.newWriteOnlyTransaction();
                 final ActorRef txActor = context().actorOf(WriteTransactionActor.props(tx, writeTxIdleTimeout));
                 sender().tell(new NewWriteTransactionReply(txActor), self());
-            } catch (final Throwable t) {
+            } catch (final Exception t) {
                 sender().tell(t, self());
             }
 
@@ -162,7 +162,7 @@ public class NetconfNodeActor extends UntypedActor {
                 final DOMDataReadWriteTransaction tx = deviceDataBroker.newReadWriteTransaction();
                 final ActorRef txActor = context().actorOf(ReadWriteTransactionActor.props(tx, writeTxIdleTimeout));
                 sender().tell(new NewReadWriteTransactionReply(txActor), self());
-            } catch (final Throwable t) {
+            } catch (final Exception t) {
                 sender().tell(t, self());
             }
         } else if (message instanceof InvokeRpcMessage) { // master

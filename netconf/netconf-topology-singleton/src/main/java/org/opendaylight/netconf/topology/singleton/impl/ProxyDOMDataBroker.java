@@ -67,51 +67,60 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
     @Override
     public DOMDataReadOnlyTransaction newReadOnlyTransaction() {
         final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewReadTransactionRequest(), askTimeout);
+        final Object msg;
         try {
-            final Object msg = Await.result(txActorFuture, askTimeout.duration());
-            if (msg instanceof Throwable) {
-                throw (Throwable) msg;
-            }
-            Preconditions.checkState(msg instanceof NewReadTransactionReply);
-            final NewReadTransactionReply reply = (NewReadTransactionReply) msg;
-            return new ProxyReadTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
-        } catch (final Throwable t) {
-            throw new IllegalStateException("Can't create ProxyReadTransaction", t);
+            msg = Await.result(txActorFuture, askTimeout.duration());
+        } catch (Exception e) {
+            throw new IllegalStateException("Can't create ProxyReadTransaction", e);
         }
+
+        if (msg instanceof Exception) {
+            throw new IllegalStateException("Can't create ProxyReadTransaction", (Exception) msg);
+        }
+
+        Preconditions.checkState(msg instanceof NewReadTransactionReply);
+        final NewReadTransactionReply reply = (NewReadTransactionReply) msg;
+        return new ProxyReadTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public DOMDataReadWriteTransaction newReadWriteTransaction() {
         final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewReadWriteTransactionRequest(), askTimeout);
+        final Object msg;
         try {
-            final Object msg = Await.result(txActorFuture, askTimeout.duration());
-            if (msg instanceof Throwable) {
-                throw (Throwable) msg;
-            }
-            Preconditions.checkState(msg instanceof NewReadWriteTransactionReply);
-            final NewReadWriteTransactionReply reply = (NewReadWriteTransactionReply) msg;
-            return new ProxyReadWriteTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
-        } catch (final Throwable t) {
-            throw new IllegalStateException("Can't create ProxyReadTransaction", t);
+            msg = Await.result(txActorFuture, askTimeout.duration());
+        } catch (Exception e) {
+            throw new IllegalStateException("Can't create ProxyReadWriteTransaction", e);
         }
+
+        if (msg instanceof Exception) {
+            throw new IllegalStateException("Can't create ProxyReadWriteTransaction", (Exception) msg);
+        }
+
+        Preconditions.checkState(msg instanceof NewReadWriteTransactionReply);
+        final NewReadWriteTransactionReply reply = (NewReadWriteTransactionReply) msg;
+        return new ProxyReadWriteTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public DOMDataWriteTransaction newWriteOnlyTransaction() {
         final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewWriteTransactionRequest(), askTimeout);
+        final Object msg;
         try {
-            final Object msg = Await.result(txActorFuture, askTimeout.duration());
-            if (msg instanceof Throwable) {
-                throw (Throwable) msg;
-            }
-            Preconditions.checkState(msg instanceof NewWriteTransactionReply);
-            final NewWriteTransactionReply reply = (NewWriteTransactionReply) msg;
-            return new ProxyWriteTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
-        } catch (final Throwable t) {
-            throw new IllegalStateException("Can't create ProxyWriteTransaction", t);
+            msg = Await.result(txActorFuture, askTimeout.duration());
+        } catch (Exception e) {
+            throw new IllegalStateException("Can't create ProxyWriteTransaction", e);
         }
+
+        if (msg instanceof Exception) {
+            throw new IllegalStateException("Can't create ProxyWriteTransaction", (Exception) msg);
+        }
+
+        Preconditions.checkState(msg instanceof NewWriteTransactionReply);
+        final NewWriteTransactionReply reply = (NewWriteTransactionReply) msg;
+        return new ProxyWriteTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
     }
 
     @Override
