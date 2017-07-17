@@ -500,32 +500,26 @@ public class NetconfDevice
 
                     capabilities.addNonModuleBasedCapabilities(remoteSessionCapabilities
                             .getNonModuleCaps().stream().map(entry -> new AvailableCapabilityBuilder()
-                            .setCapability(entry).setCapabilityOrigin(
+                                    .setCapability(entry).setCapabilityOrigin(
                                             remoteSessionCapabilities.getNonModuleBasedCapsOrigin().get(entry)).build())
                             .collect(Collectors.toList()));
 
                     handleSalInitializationSuccess(result, remoteSessionCapabilities, getDeviceSpecificRpc(result));
                     return;
-                } catch (final Throwable t) {
-                    if (t instanceof MissingSchemaSourceException) {
-                        requiredSources =
-                                handleMissingSchemaSourceException(requiredSources, (MissingSchemaSourceException) t);
-                    } else if (t instanceof SchemaResolutionException) {
-                        // schemaBuilderFuture.checkedGet() throws only SchemaResolutionException
-                        // that might be wrapping a MissingSchemaSourceException so we need to look
-                        // at the cause of the exception to make sure we don't misinterpret it.
-                        if (t.getCause() instanceof MissingSchemaSourceException) {
-                            requiredSources = handleMissingSchemaSourceException(
-                                    requiredSources, (MissingSchemaSourceException) t.getCause());
-                            continue;
-                        }
-                        requiredSources =
-                                handleSchemaResolutionException(requiredSources, (SchemaResolutionException) t);
-                    } else {
-                        // unknown error, fail
-                        handleSalInitializationFailure(t, listener);
-                        return;
+                } catch (final SchemaResolutionException e) {
+                    // schemaBuilderFuture.checkedGet() throws only SchemaResolutionException
+                    // that might be wrapping a MissingSchemaSourceException so we need to look
+                    // at the cause of the exception to make sure we don't misinterpret it.
+                    if (e.getCause() instanceof MissingSchemaSourceException) {
+                        requiredSources = handleMissingSchemaSourceException(
+                                requiredSources, (MissingSchemaSourceException) e.getCause());
+                        continue;
                     }
+                    requiredSources = handleSchemaResolutionException(requiredSources, e);
+                } catch (final Exception e) {
+                    // unknown error, fail
+                    handleSalInitializationFailure(e, listener);
+                    return;
                 }
             }
             // No more sources, fail
