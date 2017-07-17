@@ -18,7 +18,6 @@ import akka.testkit.JavaTestKit;
 import akka.testkit.TestActorRef;
 import akka.testkit.TestProbe;
 import akka.util.Timeout;
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Futures;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
@@ -101,7 +100,7 @@ public class WriteTransactionActorTest {
         when(deviceWriteTx.cancel()).thenReturn(true);
         final Future<Object> cancelFuture = Patterns.ask(actorRef, new CancelRequest(), TIMEOUT);
         final Object result = Await.result(cancelFuture, TIMEOUT.duration());
-        Preconditions.checkState(result instanceof Boolean);
+        Assert.assertTrue(result instanceof Boolean);
         verify(deviceWriteTx).cancel();
         Assert.assertTrue((Boolean) result);
     }
