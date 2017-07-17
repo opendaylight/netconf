@@ -153,7 +153,7 @@ public class ReadWriteTransactionActorTest {
         when(deviceReadWriteTx.cancel()).thenReturn(true);
         final Future<Object> cancelFuture = Patterns.ask(actorRef, new CancelRequest(), TIMEOUT);
         final Object result = Await.result(cancelFuture, TIMEOUT.duration());
-        Preconditions.checkState(result instanceof Boolean);
+        Assert.assertTrue(result instanceof Boolean);
         verify(deviceReadWriteTx).cancel();
         Assert.assertTrue((Boolean) result);
     }

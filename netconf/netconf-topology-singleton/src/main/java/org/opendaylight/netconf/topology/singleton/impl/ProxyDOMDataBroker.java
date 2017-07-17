@@ -13,6 +13,7 @@ import akka.actor.ActorSystem;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import java.util.Collections;
 import java.util.Map;
 import javax.annotation.Nonnull;
@@ -72,7 +73,7 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
             if (msg instanceof Exception) {
                 throw (Exception) msg;
             }
-            Preconditions.checkState(msg instanceof NewReadTransactionReply);
+            Verify.verify(msg instanceof NewReadTransactionReply);
             final NewReadTransactionReply reply = (NewReadTransactionReply) msg;
             return new ProxyReadTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
         } catch (final Exception t) {
@@ -89,7 +90,7 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
             if (msg instanceof Exception) {
                 throw (Exception) msg;
             }
-            Preconditions.checkState(msg instanceof NewReadWriteTransactionReply);
+            Verify.verify(msg instanceof NewReadWriteTransactionReply);
             final NewReadWriteTransactionReply reply = (NewReadWriteTransactionReply) msg;
             return new ProxyReadWriteTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
         } catch (final Exception t) {
@@ -106,7 +107,7 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
             if (msg instanceof Exception) {
                 throw (Exception) msg;
             }
-            Preconditions.checkState(msg instanceof NewWriteTransactionReply);
+            Verify.verify(msg instanceof NewWriteTransactionReply);
             final NewWriteTransactionReply reply = (NewWriteTransactionReply) msg;
             return new ProxyWriteTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
         } catch (final Exception t) {
