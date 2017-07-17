@@ -69,13 +69,13 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
         final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewReadTransactionRequest(), askTimeout);
         try {
             final Object msg = Await.result(txActorFuture, askTimeout.duration());
-            if (msg instanceof Throwable) {
-                throw (Throwable) msg;
+            if (msg instanceof Exception) {
+                throw (Exception) msg;
             }
             Preconditions.checkState(msg instanceof NewReadTransactionReply);
             final NewReadTransactionReply reply = (NewReadTransactionReply) msg;
             return new ProxyReadTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
-        } catch (final Throwable t) {
+        } catch (final Exception t) {
             throw new IllegalStateException("Can't create ProxyReadTransaction", t);
         }
     }
@@ -86,13 +86,13 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
         final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewReadWriteTransactionRequest(), askTimeout);
         try {
             final Object msg = Await.result(txActorFuture, askTimeout.duration());
-            if (msg instanceof Throwable) {
-                throw (Throwable) msg;
+            if (msg instanceof Exception) {
+                throw (Exception) msg;
             }
             Preconditions.checkState(msg instanceof NewReadWriteTransactionReply);
             final NewReadWriteTransactionReply reply = (NewReadWriteTransactionReply) msg;
             return new ProxyReadWriteTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
-        } catch (final Throwable t) {
+        } catch (final Exception t) {
             throw new IllegalStateException("Can't create ProxyReadTransaction", t);
         }
     }
@@ -103,13 +103,13 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
         final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewWriteTransactionRequest(), askTimeout);
         try {
             final Object msg = Await.result(txActorFuture, askTimeout.duration());
-            if (msg instanceof Throwable) {
-                throw (Throwable) msg;
+            if (msg instanceof Exception) {
+                throw (Exception) msg;
             }
             Preconditions.checkState(msg instanceof NewWriteTransactionReply);
             final NewWriteTransactionReply reply = (NewWriteTransactionReply) msg;
             return new ProxyWriteTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
-        } catch (final Throwable t) {
+        } catch (final Exception t) {
             throw new IllegalStateException("Can't create ProxyWriteTransaction", t);
         }
     }
