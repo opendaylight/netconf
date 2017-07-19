@@ -13,14 +13,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
+import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.sal.rest.impl.test.providers.TestJsonBodyWriter;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
@@ -124,8 +123,7 @@ public class TestRestconfUtils {
         final XmlParserStream xmlParser = XmlParserStream.create(writer, iiContext.getSchemaContext(), schemaNode);
 
         if (schemaNode instanceof ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
-            xmlParser.parse(UntrustedXML.createXMLStreamReader(new StringReader(XmlUtil.toString(
-                    doc.getDocumentElement()))));
+            xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             return resultHolder.getResult();
         }
         // FIXME : add another DataSchemaNode extensions e.g. LeafSchemaNode

@@ -11,7 +11,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
+import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -131,15 +130,14 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                 || schemaNode instanceof LeafSchemaNode) {
             final XmlParserStream xmlParser = XmlParserStream.create(writer, pathContext.getSchemaContext(),
                     schemaNode);
-            xmlParser.parse(UntrustedXML.createXMLStreamReader(new StringReader(XmlUtil.toString(
-                    doc.getDocumentElement()))));
+            xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             parsed = resultHolder.getResult();
             if (schemaNode instanceof  ListSchemaNode && isPost()) {
                 iiToDataList.add(parsed.getIdentifier());
             }
+        } else {
+            LOG.warn("Unknown schema node extension {} was not parsed", schemaNode.getClass());
         }
-
-        LOG.warn("Unknown schema node extension {} was not parsed", schemaNode.getClass());
 
         final YangInstanceIdentifier fullIIToData = YangInstanceIdentifier.create(Iterables.concat(
                 pathContext.getInstanceIdentifier().getPathArguments(), iiToDataList));

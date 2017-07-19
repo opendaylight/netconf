@@ -12,7 +12,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.Provider;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
+import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
 import org.opendaylight.netconf.sal.restconf.impl.PatchEditOperation;
@@ -142,8 +141,7 @@ public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
                     final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
                     final XmlParserStream xmlParser = XmlParserStream.create(writer, pathContext.getSchemaContext(),
                             schemaNode);
-                    xmlParser.parse(UntrustedXML.createXMLStreamReader(new StringReader(XmlUtil.toString(
-                            firstValueElement))));
+                    xmlParser.traverse(new DOMSource(firstValueElement));
                     parsed = resultHolder.getResult();
                 }
 
