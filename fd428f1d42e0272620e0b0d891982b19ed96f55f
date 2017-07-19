@@ -137,6 +137,24 @@
     },
     {
       "key": {
+        "uuid": "da2a55be_3483d057",
+        "filename": "netconf/netconf-topology-config/src/main/resources/initial/netconf-topology.cfg",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6995
+      },
+      "writtenOn": "2017-07-19T22:37:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da2a55be_19b709da",
+      "revId": "fd428f1d42e0272620e0b0d891982b19ed96f55f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da2a55be_f90af5d0",
         "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
         "patchSetId": 5
@@ -148,6 +166,30 @@
       "writtenOn": "2017-07-10T19:59:19Z",
       "side": 1,
       "message": "If I understood correctly, the user will have to provide private key and passphrase, else it would fail considering the preconditions in the ctr of PublicKeyAuth. \nCan we not enforce this? and make this not mandatory.",
+      "range": {
+        "startLine": 433,
+        "startChar": 39,
+        "endLine": 433,
+        "endChar": 75
+      },
+      "revId": "fd428f1d42e0272620e0b0d891982b19ed96f55f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da2a55be_74a6e811",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 6995
+      },
+      "writtenOn": "2017-07-19T22:37:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da2a55be_f90af5d0",
       "range": {
         "startLine": 433,
         "startChar": 39,
