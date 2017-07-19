@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da2a55be_d3a88e79",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/authentication/PublicKeyAuth.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-07-19T11:36:18Z",
+      "side": 1,
+      "message": "whitespace",
+      "range": {
+        "startLine": 47,
+        "startChar": 28,
+        "endLine": 47,
+        "endChar": 29
+      },
+      "revId": "9a312d5b9c6ff701284a5348b6873d1eb6c72c05",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da2a55be_f3add289",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-07-19T11:36:18Z",
+      "side": 1,
+      "message": "You should add this new case for Credentials into the netconf-node model and switch the AuthHandler based on that, that was the original intention to just add new cases for other authentication methods easily.",
+      "range": {
+        "startLine": 281,
+        "startChar": 8,
+        "endLine": 288,
+        "endChar": 9
+      },
+      "revId": "9a312d5b9c6ff701284a5348b6873d1eb6c72c05",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
