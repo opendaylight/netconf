@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da2a55be_542484ae",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlNormalizedNodeBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-07-19T21:34:47Z",
+      "side": 1,
+      "message": "we should be able to plugin in a DOMSource via a Transformer...",
+      "range": {
+        "startLine": 169,
+        "startChar": 63,
+        "endLine": 169,
+        "endChar": 96
+      },
+      "revId": "a6fa461a19dc4373019fab0475ab673b5d55abff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
