@@ -137,9 +137,9 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
             if (schemaNode instanceof  ListSchemaNode && isPost()) {
                 iiToDataList.add(parsed.getIdentifier());
             }
+        } else {
+            LOG.warn("Unknown schema node extension {} was not parsed", schemaNode.getClass());
         }
-
-        LOG.warn("Unknown schema node extension {} was not parsed", schemaNode.getClass());
 
         final YangInstanceIdentifier fullIIToData = YangInstanceIdentifier.create(Iterables.concat(
                 pathContext.getInstanceIdentifier().getPathArguments(), iiToDataList));

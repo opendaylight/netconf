@@ -12,9 +12,11 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +27,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
+import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
@@ -39,8 +44,10 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlUtils;
-import org.opendaylight.yangtools.yang.data.impl.schema.transform.dom.parser.DomToNormalizedNodeParserFactory;
+import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -54,6 +61,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * Yang PATCH Reader for XML.
@@ -102,13 +110,11 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
         }
     }
 
-    private static PatchContext parse(final InstanceIdentifierContext<?> pathContext, final Document doc) {
+    private static PatchContext parse(final InstanceIdentifierContext<?> pathContext, final Document doc)
+            throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final List<PatchEntity> resultCollection = new ArrayList<>();
         final String patchId = doc.getElementsByTagName("patch-id").item(0).getFirstChild().getNodeValue();
         final NodeList editNodes = doc.getElementsByTagName("edit");
-        final DomToNormalizedNodeParserFactory parserFactory =
-                DomToNormalizedNodeParserFactory.getInstance(XmlUtils.DEFAULT_XML_CODEC_PROVIDER,
-                        pathContext.getSchemaContext());
 
         for (int i = 0; i < editNodes.getLength(); i++) {
             DataSchemaNode schemaNode = (DataSchemaNode) pathContext.getSchemaNode();
@@ -160,13 +166,15 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             }
 
             if (oper.isWithValue()) {
-                final NormalizedNode<?, ?> parsed;
-                if (schemaNode instanceof ContainerSchemaNode) {
-                    parsed = parserFactory.getContainerNodeParser().parse(values, (ContainerSchemaNode) schemaNode);
-                } else if (schemaNode instanceof ListSchemaNode) {
-                    parsed = parserFactory.getMapNodeParser().parse(values, (ListSchemaNode) schemaNode);
-                } else {
-                    parsed = null;
+                NormalizedNode<?, ?> parsed = null;
+                if (schemaNode instanceof  ContainerSchemaNode || schemaNode instanceof ListSchemaNode) {
+                    final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+                    final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+                    final XmlParserStream xmlParser = XmlParserStream.create(writer, pathContext.getSchemaContext(),
+                            schemaNode);
+                    xmlParser.parse(UntrustedXML.createXMLStreamReader(new StringReader(XmlUtil.toString(
+                            firstValueElement))));
+                    parsed = resultHolder.getResult();
                 }
 
                 // for lists allow to manipulate with list items through their parent
