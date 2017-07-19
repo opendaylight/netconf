@@ -66,7 +66,7 @@ public class NetconfToNotificationTest {
         return context;
     }
 
-    @Test(expected =  IllegalStateException.class)
+    @Test(expected =  IllegalArgumentException.class)
     public void testMostRecentWrongYangModel() throws Exception {
         final SchemaContext schemaContext = getNotificationSchemaContext(getClass(), true);
         messageTransformer = new NetconfMessageTransformer(schemaContext, true);
