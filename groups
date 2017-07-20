@@ -1,5 +1,4 @@
 # UUID                                                            	Group Name
 #
-2373512464abcee3eaf50f265c4a4e428dab634e                          	Administrators
 c9025ab9ddc1e3171919e085449f22c54f8f7b54                          	GitHub Replication
 ldap:cn=gerrit-netconf-committers,ou=Groups,dc=opendaylight,dc=org	ldap/gerrit-netconf-committers
