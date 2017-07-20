@@ -22,6 +22,30 @@
       "revId": "a6fa461a19dc4373019fab0475ab673b5d55abff",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da2a55be_a8f480f2",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlNormalizedNodeBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 4561
+      },
+      "writtenOn": "2017-07-20T07:54:03Z",
+      "side": 1,
+      "message": "Well, even though the XMLInputFactory offers a createXMLStreamReader(Source), only a StreamSource is actually accepted.\nAll the other Source types including DOMSource are rejected:\n\njava.lang.UnsupportedOperationException:\nCannot create XMLStreamReader or XMLEventReader from a javax.xml.transform.dom.DOMSource at com.sun.xml.internal.stream.XMLInputFactoryImpl.jaxpSourcetoXMLInputSource(XMLInputFactoryImpl.java:302) at com.sun.xml.internal.stream.XMLInputFactoryImpl.createXMLStreamReader(XMLInputFactoryImpl.java:143)",
+      "parentUuid": "da2a55be_542484ae",
+      "range": {
+        "startLine": 169,
+        "startChar": 63,
+        "endLine": 169,
+        "endChar": 96
+      },
+      "revId": "a6fa461a19dc4373019fab0475ab673b5d55abff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
