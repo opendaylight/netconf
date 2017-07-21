@@ -27,7 +27,11 @@
     <reference id="mountPointService"
                interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"
                odl:type="default"/>
-
+    <reference id="encryptionService"
+               interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
+    <reference id="rpcRegistry"
+               interface="org.opendaylight.controller.sal.binding.api.RpcProviderRegistry"/>
+    
     <bean id="schemaRepository" class="org.opendaylight.netconf.topology.impl.SchemaRepositoryProviderImpl">
         <argument value="shared-schema-repository-impl"/>
     </bean>
@@ -43,10 +47,21 @@
         <argument ref="schemaRepository"/>
         <argument ref="dataBroker"/>
         <argument ref="mountPointService"/>
+        <argument ref="encryptionService" />
+        <argument ref="rpcRegistry" />
     </bean>
 
     <bean id="netconfConnectorFactory" class="org.opendaylight.netconf.topology.impl.NetconfConnectorFactoryImpl"/>
     <service ref="netconfConnectorFactory" interface="org.opendaylight.netconf.topology.api.NetconfConnectorFactory"
              odl:type="default"/>
 
+    <bean id="netconfNodeRegisterEncryptedRPC"
+          class="org.opendaylight.netconf.topology.singleton.impl.NetconfTopologyRPCProvider"
+          destroy-method="close">
+        <argument value="topology-netconf"/>
+        <argument ref="dataBroker"/>
+        <argument ref="encryptionService"/>
+    </bean>
+
+    <odl:rpc-implementation ref="netconfNodeRegisterEncryptedRPC"/>
 </blueprint>
