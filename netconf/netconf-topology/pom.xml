@@ -69,5 +69,9 @@
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>yang-model-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.opendaylight.aaa</groupId>
+            <artifactId>aaa-encrypt-service</artifactId>
+        </dependency>
     </dependencies>
 </project>
