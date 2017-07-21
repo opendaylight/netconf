@@ -12,10 +12,13 @@ import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.FailedFuture;
 import io.netty.util.concurrent.Future;
 import java.net.InetSocketAddress;
+
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.netconf.callhome.mount.CallHomeMountSessionContext.CloseCallback;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListener;
@@ -43,6 +46,8 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     private final CallHomeMountSessionManager sessionManager;
     private final DataBroker dataBroker;
     private final DOMMountPointService mountService;
+    private final AAAEncryptionService encryptionService;
+    private final RpcProviderRegistry rpcProviderRegistry;
 
     protected CallHomeTopology topology;
 
@@ -60,7 +65,9 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
                                    final ThreadPool processingExecutor,
                                    final SchemaRepositoryProvider schemaRepositoryProvider,
                                    final DataBroker dataBroker,
-                                   final DOMMountPointService mountService) {
+                                   final DOMMountPointService mountService,
+                                   final AAAEncryptionService encryptionService,
+                                   final RpcProviderRegistry rpcProviderRegistry) {
         this.topologyId = topologyId;
         this.eventExecutor = eventExecutor;
         this.keepaliveExecutor = keepaliveExecutor;
@@ -69,6 +76,8 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
         this.sessionManager = new CallHomeMountSessionManager();
         this.dataBroker = dataBroker;
         this.mountService = mountService;
+        this.encryptionService = encryptionService;
+        this.rpcProviderRegistry = rpcProviderRegistry;
     }
 
     @Override
@@ -93,13 +102,15 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
 
     void createTopology() {
         this.topology = new CallHomeTopology(topologyId, this, eventExecutor,
-                keepaliveExecutor, processingExecutor, schemaRepositoryProvider, dataBroker, mountService);
+                keepaliveExecutor, processingExecutor, schemaRepositoryProvider, dataBroker,
+                mountService, encryptionService, rpcProviderRegistry);
     }
 
     @Override
     public void onNetconfSubsystemOpened(final CallHomeProtocolSessionContext session,
                                          final CallHomeChannelActivator activator) {
-        final CallHomeMountSessionContext deviceContext = getSessionManager().createSession(session, activator, onCloseHandler);
+        final CallHomeMountSessionContext deviceContext = getSessionManager()
+                .createSession(session, activator, onCloseHandler);
         final NodeId nodeId = deviceContext.getId();
         final Node configNode = deviceContext.getConfigNode();
         LOG.info("Provisioning fake config {}", configNode);
