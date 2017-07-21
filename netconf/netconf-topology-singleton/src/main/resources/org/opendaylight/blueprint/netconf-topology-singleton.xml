@@ -47,6 +47,9 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         </cm:default-properties>
     </cm:property-placeholder>
 
+    <reference id="encryptionService"
+               interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
+
     <bean id="netconfTopologyManager"
           class="org.opendaylight.netconf.topology.singleton.impl.NetconfTopologyManager"
           init-method="init" destroy-method="close">
@@ -65,8 +68,19 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         <argument ref="mountPointService"/>
         <property name="privateKeyPath" value="${private-key-path}"/>
         <property name="privateKeyPassphrase" value="${private-key-passphrase}"/>
+        <argument ref="encryptionService" />
     </bean>
     <service ref="netconfTopologyManager"
              interface="org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService"/>
+
+    <bean id="netconfNodeRegisterEncryptedRPC"
+          class="org.opendaylight.netconf.sal.connect.util.NetconfTopologyRPCProvider"
+          >
+        <argument value="topology-netconf"/>
+        <argument ref="dataBroker"/>
+        <argument ref="encryptionService"/>
+    </bean>
+
+    <odl:rpc-implementation ref="netconfNodeRegisterEncryptedRPC"/>
 
 </blueprint>

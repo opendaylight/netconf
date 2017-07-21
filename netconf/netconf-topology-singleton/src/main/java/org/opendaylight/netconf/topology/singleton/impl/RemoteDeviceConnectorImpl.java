@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -81,7 +82,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     private final Timeout actorResponseWaitTime;
     private final String privateKeyPath;
     private final String privateKeyPassphrase;
-
+    private final AAAEncryptionService encryptionService;
     private NetconfConnectorDTO deviceCommunicatorDTO;
 
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
@@ -94,6 +95,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         this.mountService = mountService;
         this.privateKeyPath = netconfTopologyDeviceSetup.getPrivateKeyPath();
         this.privateKeyPassphrase = netconfTopologyDeviceSetup.getPrivateKeyPassphrase();
+        this.encryptionService = netconfTopologyDeviceSetup.getEncryptionService();
     }
 
     @Override
@@ -284,7 +286,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                             .node.credentials.credentials.LoginPassword) credentials).getUsername(),
                     ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf
                             .node.credentials.credentials.LoginPassword) credentials).getPassword(),
-                            this.privateKeyPath, this.privateKeyPassphrase);
+                            this.privateKeyPath, this.privateKeyPassphrase, encryptionService);
         } else {
             throw new IllegalStateException(remoteDeviceId + ": Only login/password authentication is supported");
         }

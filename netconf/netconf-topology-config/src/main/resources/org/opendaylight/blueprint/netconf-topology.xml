@@ -28,6 +28,8 @@
     <reference id="mountPointService"
                interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"
                odl:type="default"/>
+    <reference id="encryptionService"
+               interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
 
     <bean id="schemaRepository" class="org.opendaylight.netconf.topology.impl.SchemaRepositoryProviderImpl">
         <argument value="shared-schema-repository-impl"/>
@@ -35,7 +37,7 @@
 
     <cm:property-placeholder persistent-id="odl-sb-netconf-client-keypair" update-strategy="none">
       <cm:default-properties>
-        <cm:property name="private-key-path" value=""/>
+        <cm:property name="private-key-path" value="etc/RSA"/>
         <cm:property name="private-key-passphrase" value=""/>
       </cm:default-properties>
     </cm:property-placeholder>
@@ -55,10 +57,20 @@
         <argument ref="mountPointService"/>
         <property name="privateKeyPath" value="${private-key-path}"/>
         <property name="privateKeyPassphrase" value="${private-key-passphrase}"/>
+        <argument ref="encryptionService" />
     </bean>
 
     <bean id="netconfConnectorFactory" class="org.opendaylight.netconf.topology.impl.NetconfConnectorFactoryImpl"/>
     <service ref="netconfConnectorFactory" interface="org.opendaylight.netconf.topology.api.NetconfConnectorFactory"
              odl:type="default"/>
+
+    <bean id="netconfNodeRegisterEncryptedRPC"
+          class="org.opendaylight.netconf.sal.connect.util.NetconfTopologyRPCProvider">
+        <argument value="topology-netconf"/>
+        <argument ref="dataBroker"/>
+        <argument ref="encryptionService"/>
+    </bean>
+
+    <odl:rpc-implementation ref="netconfNodeRegisterEncryptedRPC"/>
 
 </blueprint>
