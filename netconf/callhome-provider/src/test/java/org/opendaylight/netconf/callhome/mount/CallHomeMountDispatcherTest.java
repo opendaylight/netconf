@@ -22,10 +22,12 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import org.junit.Before;
 import org.junit.Test;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext;
@@ -53,7 +55,9 @@ public class CallHomeMountDispatcherTest {
     private CallHomeMountSessionManager mockSessMgr;
     private CallHomeTopology mockTopology;
     private CallHomeProtocolSessionContext mockProtoSess;
-
+    private AAAEncryptionService mockEncryptionService;
+    private RpcProviderRegistry mockRpcProviderRegistry;
+    
     @Before
     public void setup() {
         topologyId = "";
@@ -66,9 +70,12 @@ public class CallHomeMountDispatcherTest {
         mockSessMgr = mock(CallHomeMountSessionManager.class);
         mockTopology = mock(CallHomeTopology.class);
         mockProtoSess = mock(CallHomeProtocolSessionContext.class);
-
+        mockEncryptionService = mock(AAAEncryptionService.class);
+        mockRpcProviderRegistry = mock(RpcProviderRegistry.class);
+        
         instance = new CallHomeMountDispatcher(topologyId, mockExecutor, mockKeepAlive,
-                mockProcessingExecutor, mockSchemaRepoProvider, mockDataBroker, mockMount) {
+                mockProcessingExecutor, mockSchemaRepoProvider, mockDataBroker, mockMount,
+                mockEncryptionService, mockRpcProviderRegistry) {
             @Override
             public CallHomeMountSessionManager getSessionManager() {
                 return mockSessMgr;
