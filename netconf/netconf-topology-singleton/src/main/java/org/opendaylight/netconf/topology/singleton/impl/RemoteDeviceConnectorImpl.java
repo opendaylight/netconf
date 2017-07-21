@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -78,7 +79,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     private final RemoteDeviceId remoteDeviceId;
     private final DOMMountPointService mountService;
     private final Timeout actorResponseWaitTime;
-
+    private final AAAEncryptionService encryptionService;
     private NetconfConnectorDTO deviceCommunicatorDTO;
 
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
@@ -89,6 +90,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         this.remoteDeviceId = remoteDeviceId;
         this.actorResponseWaitTime = actorResponseWaitTime;
         this.mountService = mountService;
+        this.encryptionService = netconfTopologyDeviceSetup.getEncryptionService();
     }
 
     @Override
@@ -276,7 +278,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) {
             authHandler = new LoginPassword(
                     ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getUsername(),
-                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getPassword());
+                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getPassword(),
+                    encryptionService);
         } else {
             throw new IllegalStateException(remoteDeviceId + ": Only login/password authentication is supported");
         }

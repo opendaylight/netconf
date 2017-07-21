@@ -24,10 +24,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -103,7 +105,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     /**
      * The qualified schema cache directory <code>cache/schema</code>
      */
-    private static final String QUALIFIED_DEFAULT_CACHE_DIRECTORY = CACHE_DIRECTORY + File.separator+ DEFAULT_CACHE_DIRECTORY;
+    private static final String QUALIFIED_DEFAULT_CACHE_DIRECTORY = CACHE_DIRECTORY + File.separator + DEFAULT_CACHE_DIRECTORY;
 
     /**
      * The name for the default schema repository
@@ -163,13 +165,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected SchemaSourceRegistry schemaRegistry = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaRepository schemaRepository = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaContextFactory schemaContextFactory = DEFAULT_SCHEMA_CONTEXT_FACTORY;
-
+    protected final AAAEncryptionService encryptionService;
     protected final HashMap<NodeId, NetconfConnectorDTO> activeConnectors = new HashMap<>();
 
     protected AbstractNetconfTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                       final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                                       final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
-                                      final DataBroker dataBroker, final DOMMountPointService mountPointService) {
+                                      final DataBroker dataBroker, final DOMMountPointService mountPointService,
+                                      final AAAEncryptionService encryptionService) {
         this.topologyId = topologyId;
         this.clientDispatcher = clientDispatcher;
         this.eventExecutor = eventExecutor;
@@ -178,6 +181,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.sharedSchemaRepository = schemaRepositoryProvider.getSharedSchemaRepository();
         this.dataBroker = dataBroker;
         this.mountPointService = mountPointService;
+        this.encryptionService = encryptionService;
     }
 
     public void setSchemaRegistry(final SchemaSourceRegistry schemaRegistry) {
@@ -209,7 +213,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     protected ListenableFuture<NetconfDeviceCapabilities> setupConnection(final NodeId nodeId,
-                                                                        final Node configNode) {
+                                                                          final Node configNode) {
         final NetconfNode netconfNode = configNode.getAugmentation(NetconfNode.class);
 
         Preconditions.checkNotNull(netconfNode.getHost());
@@ -241,7 +245,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId,
-                                                         final NetconfNode node) {
+                                                           final NetconfNode node) {
         //setup default values since default value is not supported in mdsal
         final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
         final Long keepaliveDelay = node.getKeepaliveDelay() == null ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
@@ -269,8 +273,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             final String yangLigPassword = node.getYangLibrary().getPassword();
 
             final LibraryModulesSchemas libraryModulesSchemas;
-            if(yangLibURL != null) {
-                if(yangLibUsername != null && yangLigPassword != null) {
+            if (yangLibURL != null) {
+                if (yangLibUsername != null && yangLigPassword != null) {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL, yangLibUsername, yangLigPassword);
                 } else {
                     libraryModulesSchemas = LibraryModulesSchemas.create(yangLibURL);
@@ -282,7 +286,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                                     new YangLibrarySchemaYangSourceProvider(remoteDeviceId, libraryModulesSchemas.getAvailableModels()),
                                     PotentialSchemaSource
                                             .create(sourceIdentifierURLEntry.getKey(), YangTextSchemaSource.class,
-                                            PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+                                                    PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
                 }
             }
         }
@@ -325,7 +329,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             // SchemaContextFactory remain the default values.
             if (!moduleSchemaCacheDirectory.equals(DEFAULT_CACHE_DIRECTORY)) {
                 // Multiple modules may be created at once;  synchronize to avoid issues with data consistency among threads.
-                synchronized(schemaResourcesDTOs) {
+                synchronized (schemaResourcesDTOs) {
                     // Look for the cached DTO to reuse SchemaRegistry and SchemaContextFactory variables if they already exist
                     schemaResourcesDTO = schemaResourcesDTOs.get(moduleSchemaCacheDirectory);
                     if (schemaResourcesDTO == null) {
@@ -401,7 +405,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) {
             authHandler = new LoginPassword(
                     ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getUsername(),
-                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getPassword());
+                    ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword) credentials).getPassword(),
+                    encryptionService);
         } else {
             throw new IllegalStateException("Only login/password authentification is supported");
         }
@@ -422,7 +427,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected abstract RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id);
 
     private InetSocketAddress getSocketAddress(final Host host, final int port) {
-        if(host.getDomainName() != null) {
+        if (host.getDomainName() != null) {
             return new InetSocketAddress(host.getDomainName().getValue(), port);
         } else {
             final IpAddress ipAddress = host.getIpAddress();
