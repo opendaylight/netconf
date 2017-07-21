@@ -13,6 +13,8 @@ import com.google.common.util.concurrent.Futures;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
 import javax.annotation.Nonnull;
+
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -23,6 +25,7 @@ import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -51,9 +54,10 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                                final ThreadPool processingExecutor, final SchemaRepositoryProvider schemaRepositoryProvider,
-                               final DataBroker dataBroker, final DOMMountPointService mountPointService) {
+                               final DataBroker dataBroker, final DOMMountPointService mountPointService,
+                               final AAAEncryptionService encryptionService, final RpcProviderRegistry rpcProviderRegistry) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountPointService);
+                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, rpcProviderRegistry);
     }
 
     @Override
@@ -99,8 +103,6 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology implements Data
                 dataBroker.registerDataTreeChangeListener(
                         new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
                                 TopologyUtil.createTopologyListPath(topologyId).child(Node.class)), this);
-
-
     }
 
     @Override
