@@ -13,6 +13,7 @@ import com.google.common.util.concurrent.Futures;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
 import javax.annotation.Nonnull;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -52,10 +53,11 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                                final ThreadPool processingExecutor,
-                               final SchemaRepositoryProvider schemaRepositoryProvider, final DataBroker dataBroker,
-                               final DOMMountPointService mountPointService) {
+                               final SchemaRepositoryProvider schemaRepositoryProvider,
+                               final DataBroker dataBroker, final DOMMountPointService mountPointService,
+                               final AAAEncryptionService encryptionService) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountPointService);
+                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService);
     }
 
     @Override
@@ -101,8 +103,6 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
                 dataBroker.registerDataTreeChangeListener(
                         new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
                                 TopologyUtil.createTopologyListPath(topologyId).child(Node.class)), this);
-
-
     }
 
     @Override

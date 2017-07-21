@@ -23,6 +23,8 @@
                interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"/>
     <reference id="domMountPointService"
                interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"/>
+    <reference id="encryptionService"
+               interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
 
     <bean id="schemaRepository" class="org.opendaylight.netconf.callhome.mount.SchemaRepositoryProviderImpl">
         <argument value="shared-schema-repository-impl"/>
@@ -44,6 +46,6 @@
         <argument ref="schemaRepository"/>
         <argument ref="dataBroker"/>
         <argument ref="domMountPointService"/>
+        <argument ref="encryptionService"/>
     </bean>
-
 </blueprint>
