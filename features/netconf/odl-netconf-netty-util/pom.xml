@@ -57,8 +57,8 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.odlparent</groupId>
-            <artifactId>odl4-netty-4</artifactId>
-            <version>1.9.0</version>
+            <artifactId>odl-netty-4</artifactId>
+            <version>2.0.2</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
