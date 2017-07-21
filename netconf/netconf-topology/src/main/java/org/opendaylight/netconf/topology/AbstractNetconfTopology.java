@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -160,20 +161,20 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected final SharedSchemaRepository sharedSchemaRepository;
     protected final DataBroker dataBroker;
     protected final DOMMountPointService mountPointService;
-
     protected SchemaSourceRegistry schemaRegistry = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaRepository schemaRepository = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaContextFactory schemaContextFactory = DEFAULT_SCHEMA_CONTEXT_FACTORY;
     protected String privateKeyPath;
     protected String privateKeyPassphrase;
-
+    protected final AAAEncryptionService encryptionService;
     protected final HashMap<NodeId, NetconfConnectorDTO> activeConnectors = new HashMap<>();
 
     protected AbstractNetconfTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                       final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                                       final ThreadPool processingExecutor,
                                       final SchemaRepositoryProvider schemaRepositoryProvider,
-                                      final DataBroker dataBroker, final DOMMountPointService mountPointService) {
+                                      final DataBroker dataBroker, final DOMMountPointService mountPointService,
+                                      final AAAEncryptionService encryptionService) {
         this.topologyId = topologyId;
         this.clientDispatcher = clientDispatcher;
         this.eventExecutor = eventExecutor;
@@ -182,6 +183,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.sharedSchemaRepository = schemaRepositoryProvider.getSharedSchemaRepository();
         this.dataBroker = dataBroker;
         this.mountPointService = mountPointService;
+        this.encryptionService = encryptionService;
     }
 
     public void setSchemaRegistry(final SchemaSourceRegistry schemaRegistry) {
@@ -214,7 +216,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     protected ListenableFuture<NetconfDeviceCapabilities> setupConnection(final NodeId nodeId,
-                                                                        final Node configNode) {
+                                                                          final Node configNode) {
         final NetconfNode netconfNode = configNode.getAugmentation(NetconfNode.class);
 
         Preconditions.checkNotNull(netconfNode.getHost());
@@ -248,7 +250,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId,
-                                                         final NetconfNode node) {
+                                                           final NetconfNode node) {
         //setup default values since default value is not supported in mdsal
         final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
                 ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
@@ -440,7 +442,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                             .netconf.node.credentials.credentials.LoginPassword) credentials).getUsername(),
                     ((org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114
                             .netconf.node.credentials.credentials.LoginPassword) credentials).getPassword(),
-                    privateKeyPath, privateKeyPassphrase);
+                     privateKeyPath, privateKeyPassphrase, encryptionService);
         } else {
             throw new IllegalStateException("Only login/password authentification is supported");
         }

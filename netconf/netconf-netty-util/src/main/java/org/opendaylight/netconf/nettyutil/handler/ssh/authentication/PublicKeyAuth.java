@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.security.KeyPair;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.future.AuthFuture;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.aaa.encrypt.PKIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +24,9 @@ public class PublicKeyAuth extends LoginPassword {
     private KeyPair keyPair = null;
     private static final Logger LOG = LoggerFactory.getLogger(PublicKeyAuth.class);
 
-    public PublicKeyAuth(String username, String password, String keyPath, String passPhrase) {
-        super(username, password);
+    public PublicKeyAuth(String username, String password, String keyPath,
+            String passPhrase, AAAEncryptionService encryptionService) {
+        super(username, password, encryptionService);
         try {
             boolean isKeyPathAbsent = Strings.isNullOrEmpty(keyPath);
             passPhrase = Strings.isNullOrEmpty(passPhrase) ? "" : passPhrase;
@@ -43,7 +45,7 @@ public class PublicKeyAuth extends LoginPassword {
         if (keyPair != null) {
             session.addPublicKeyIdentity(keyPair);
         }
-        session.addPasswordIdentity(password);
-        return session.auth();
+
+        return super.authenticate(session);
     }
 }
