@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.singleton.impl.utils;
 
 import akka.actor.ActorSystem;
 import io.netty.util.concurrent.EventExecutor;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -38,6 +39,7 @@ public class NetconfTopologySetup {
     private final Duration idleTimeout;
     private final String privateKeyPath;
     private final String privateKeyPassphrase;
+    private final AAAEncryptionService encryptionService;
 
     private NetconfTopologySetup(final NetconfTopologySetupBuilder builder) {
         this.clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
@@ -55,6 +57,7 @@ public class NetconfTopologySetup {
         this.idleTimeout = builder.getIdleTimeout();
         this.privateKeyPath = builder.getPrivateKeyPath();
         this.privateKeyPassphrase = builder.getPrivateKeyPassphrase();
+        this.encryptionService = builder.getEncryptionService();
     }
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
@@ -117,6 +120,10 @@ public class NetconfTopologySetup {
         return privateKeyPassphrase;
     }
 
+    public AAAEncryptionService getEncryptionService() {
+        return encryptionService;
+    }
+
     public static class NetconfTopologySetupBuilder {
 
         private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
@@ -134,6 +141,7 @@ public class NetconfTopologySetup {
         private Duration idleTimeout;
         private String privateKeyPath;
         private String privateKeyPassphrase;
+        private AAAEncryptionService encryptionService;
 
         public NetconfTopologySetupBuilder() {
         }
@@ -277,6 +285,15 @@ public class NetconfTopologySetup {
 
         public String getPrivateKeyPassphrase() {
             return this.privateKeyPassphrase;
+        }
+
+        private AAAEncryptionService getEncryptionService() {
+            return this.encryptionService;
+        }
+
+        public NetconfTopologySetupBuilder setEncryptionService(final AAAEncryptionService encryptionService) {
+            this.encryptionService = encryptionService;
+            return this;
         }
 
         public static NetconfTopologySetupBuilder create() {
