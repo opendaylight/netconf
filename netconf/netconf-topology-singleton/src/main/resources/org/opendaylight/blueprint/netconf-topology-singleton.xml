@@ -40,17 +40,20 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
             binding-class="org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config"
     />
 
-    <cm:property-placeholder persistent-id="odl-sb-netconf-client-keypair" update-strategy="none">
+    <cm:property-placeholder persistent-id="org.opendaylight.netconf.topology.sb.keypair" update-strategy="none">
         <cm:default-properties>
             <cm:property name="private-key-path" value=""/>
             <cm:property name="private-key-passphrase" value=""/>
         </cm:default-properties>
     </cm:property-placeholder>
 
+    <reference id="encryptionService"
+               interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
+
     <bean id="netconfTopologyManager"
           class="org.opendaylight.netconf.topology.singleton.impl.NetconfTopologyManager"
           init-method="init" destroy-method="close">
-        <cm:managed-properties persistent-id="odl-sb-netconf-client-keypair"
+        <cm:managed-properties persistent-id="org.opendaylight.netconf.topology.sb.keypair"
                                update-strategy="container-managed"/>
         <argument ref="dataBroker"/>
         <argument ref="rpcRegistry"/>
@@ -65,8 +68,19 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         <argument ref="mountPointService"/>
         <property name="privateKeyPath" value="${private-key-path}"/>
         <property name="privateKeyPassphrase" value="${private-key-passphrase}"/>
+        <argument ref="encryptionService" />
     </bean>
     <service ref="netconfTopologyManager"
              interface="org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService"/>
+
+    <bean id="netconfNodeRegisterEncryptedRPC"
+          class="org.opendaylight.netconf.sal.connect.util.NetconfTopologyRPCProvider"
+          >
+        <argument value="topology-netconf"/>
+        <argument ref="dataBroker"/>
+        <argument ref="encryptionService"/>
+    </bean>
+
+    <odl:rpc-implementation ref="netconfNodeRegisterEncryptedRPC"/>
 
 </blueprint>
