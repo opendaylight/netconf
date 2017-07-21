@@ -9,10 +9,12 @@
 package org.opendaylight.netconf.callhome.mount;
 
 import io.netty.util.concurrent.EventExecutor;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.topology.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
@@ -27,9 +29,12 @@ abstract class BaseCallHomeTopology extends AbstractNetconfTopology {
                          final ThreadPool processingExecutor,
                          final SchemaRepositoryProvider schemaRepositoryProvider,
                          final DataBroker dataBroker,
-                         final DOMMountPointService mountPointService) {
+                         final DOMMountPointService mountPointService,
+                         final AAAEncryptionService encryptionService,
+                         final RpcProviderRegistry rpcProviderRegistry) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
-                processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService);
+              processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService,
+              encryptionService, rpcProviderRegistry);
         this.mountPointService = mountPointService;
     }
 }
