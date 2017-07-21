@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -89,6 +90,9 @@ public class NetconfTopologyImplTest {
     @Mock
     private DOMMountPointService mountPointService;
 
+    @Mock
+    private AAAEncryptionService encryptionService;
+
     private TestingNetconfTopologyImpl topology;
     private TestingNetconfTopologyImpl spyTopology;
 
@@ -105,7 +109,7 @@ public class NetconfTopologyImplTest {
 
         topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher,
                 mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedSchemaRepositoryProvider,
-                dataBroker, mountPointService);
+                dataBroker, mountPointService, encryptionService);
 
         spyTopology = spy(topology);
     }
@@ -193,9 +197,11 @@ public class NetconfTopologyImplTest {
                                           final ScheduledThreadPool keepaliveExecutor,
                                           final ThreadPool processingExecutor,
                                           final SchemaRepositoryProvider schemaRepositoryProvider,
-                                          final DataBroker dataBroker, final DOMMountPointService mountPointService) {
+                                          final DataBroker dataBroker, final DOMMountPointService mountPointService,
+                                          final AAAEncryptionService encryptionService) {
             super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
-                    processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService);
+                    processingExecutor, schemaRepositoryProvider, dataBroker,
+                  mountPointService, encryptionService);
         }
 
         @Override
