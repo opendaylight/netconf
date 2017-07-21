@@ -272,10 +272,24 @@ module netconf-node-topology {
 
     }
 
+    rpc add-netconf-node {
+        input {
+            uses netconf-node-fields;
+            leaf node-id {
+                type string;
+            }
+            leaf encrypt {
+                type boolean;
+                default false;
+            }
+        }
+    }
+
     augment "/nt:network-topology/nt:topology/nt:node" {
         when "../../nt:topology-types/topology-netconf";
         ext:augment-identifier "netconf-node";
 
         uses netconf-node-fields;
     }
+
 }
