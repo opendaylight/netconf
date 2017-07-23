@@ -53,7 +53,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
-            <artifactId>sal-binding-config</artifactId>
+            <artifactId>sal-common-util</artifactId>
         </dependency>
 
         <dependency>
