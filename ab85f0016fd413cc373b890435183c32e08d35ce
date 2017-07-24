@@ -22,6 +22,30 @@
       "revId": "ab85f0016fd413cc373b890435183c32e08d35ce",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da2a55be_13be9865",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 6995
+      },
+      "writtenOn": "2017-07-24T20:09:10Z",
+      "side": 1,
+      "message": "I put false to not have this value set to true unintentionally. We can change it if thats the default behavior we want to keep.",
+      "parentUuid": "da2a55be_d39400e4",
+      "range": {
+        "startLine": 283,
+        "startChar": 16,
+        "endLine": 283,
+        "endChar": 30
+      },
+      "revId": "ab85f0016fd413cc373b890435183c32e08d35ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
