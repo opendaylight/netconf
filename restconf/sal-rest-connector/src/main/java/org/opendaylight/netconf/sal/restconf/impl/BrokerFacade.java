@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.OPERATIONAL;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -37,10 +36,10 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.sal.core.api.Broker.ConsumerSession;
+import org.opendaylight.mdsal.dom.api.DOMRpcException;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
@@ -87,6 +86,8 @@ public class BrokerFacade {
     private volatile ConsumerSession context;
     private DOMDataBroker domDataBroker;
     private DOMNotificationService domNotification;
+
+    private org.opendaylight.mdsal.dom.api.DOMRpcService domRpcService;
 
     private BrokerFacade() {}
 
@@ -505,7 +506,7 @@ public class BrokerFacade {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
         LOG.trace("Invoke RPC {} with input: {}", type, input);
-        return this.rpcService.invokeRpc(type, input);
+        return domRpcService.invokeRpc(type, input);
     }
 
     public void registerToListenDataChanges(final LogicalDatastoreType datastore, final DataChangeScope scope,
@@ -536,7 +537,7 @@ public class BrokerFacade {
             final Optional<NormalizedNode<?, ?>> optional = transaction.read(datastore, path).checkedGet();
             return !optional.isPresent() ? null : withDefa == null ? optional.get() :
                 prepareDataByParamWithDef(optional.get(), path, withDefa);
-        } catch (ReadFailedException e) {
+        } catch (final ReadFailedException e) {
             LOG.warn("Error reading {} from datastore {}", path, datastore.name(), e);
             for (final RpcError error : e.getErrorList()) {
                 if (error.getErrorType() == RpcError.ErrorType.TRANSPORT
@@ -910,7 +911,7 @@ public class BrokerFacade {
         final Entry<YangInstanceIdentifier, ReadFailedException> failure;
         try {
             failure = check.getFailure();
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             rWTransaction.cancel();
             throw new RestconfDocumentedException("Could not determine the existence of path " + path, e);
         }
@@ -940,7 +941,7 @@ public class BrokerFacade {
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         try {
             return rWTransaction.exists(store, path).checkedGet();
-        } catch (ReadFailedException e) {
+        } catch (final ReadFailedException e) {
             rWTransaction.cancel();
             throw new RestconfDocumentedException("Could not determine the existence of path " + path,
                     e, e.getErrorList());
@@ -1263,5 +1264,9 @@ public class BrokerFacade {
         public void setStatus(final PATCHStatusContext status) {
             this.status = status;
         }
+    }
+
+    public void setRpcService(final org.opendaylight.mdsal.dom.api.DOMRpcService domRpcService) {
+        this.domRpcService = domRpcService;
     }
 }

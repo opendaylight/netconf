@@ -51,11 +51,10 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.OptimisticLockFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcImplementationNotAvailableException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcException;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.md.sal.rest.common.RestconfValidationUtils;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
@@ -451,7 +450,8 @@ public class RestconfImpl implements RestconfService {
                 throw new RestconfDocumentedException("Rpc service is missing.");
             }
             schemaContext = mountPoint.getSchemaContext();
-            response = mountRpcServices.get().invokeRpc(type, payload.getData());
+            // response = mountRpcServices.get().invokeRpc(type, payload.getData());
+            response = null;
         } else {
             if (namespace.toString().equals(SAL_REMOTE_NAMESPACE)) {
                 if (identifier.contains(CREATE_DATA_SUBSCR)) {
@@ -587,7 +587,7 @@ public class RestconfImpl implements RestconfService {
             Notificator.createListener(pathIdentifier, streamName, outputType);
         }
 
-        final DOMRpcResult defaultDOMRpcResult = new DefaultDOMRpcResult(output);
+        final DOMRpcResult defaultDOMRpcResult = new org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult(output);
 
         return Futures.immediateCheckedFuture(defaultDOMRpcResult);
     }
@@ -649,7 +649,7 @@ public class RestconfImpl implements RestconfService {
             if (!mountRpcServices.isPresent()) {
                 throw new RestconfDocumentedException("Rpc service is missing.");
             }
-            response = mountRpcServices.get().invokeRpc(rpc.getPath(), null);
+            response = null;// mountRpcServices.get().invokeRpc(rpc.getPath(), null);
         } else {
             response = this.broker.invokeRpc(rpc.getPath(), null);
         }
@@ -827,7 +827,7 @@ public class RestconfImpl implements RestconfService {
             try {
                 result.getFutureOfPutData().checkedGet();
                 return Response.status(result.getStatus()).build();
-            } catch (TransactionCommitFailedException e) {
+            } catch (final TransactionCommitFailedException e) {
                 if (e instanceof OptimisticLockFailedException) {
                     if (--tries <= 0) {
                         LOG.debug("Got OptimisticLockFailedException on last try - failing " + identifier);
@@ -1006,7 +1006,7 @@ public class RestconfImpl implements RestconfService {
             future.checkedGet();
         } catch (final RestconfDocumentedException e) {
             throw e;
-        } catch (TransactionCommitFailedException e) {
+        } catch (final TransactionCommitFailedException e) {
             LOG.info("Error creating data " + (uriInfo != null ? uriInfo.getPath() : ""), e);
             throw new RestconfDocumentedException(e.getMessage(), e, e.getErrorList());
         }
@@ -1055,7 +1055,7 @@ public class RestconfImpl implements RestconfService {
 
         try {
             future.checkedGet();
-        } catch (TransactionCommitFailedException e) {
+        } catch (final TransactionCommitFailedException e) {
             final Optional<Throwable> searchedException = Iterables.tryFind(Throwables.getCausalChain(e),
                     Predicates.instanceOf(ModifiedNodeDoesNotExistException.class));
             if (searchedException.isPresent()) {
@@ -1168,7 +1168,7 @@ public class RestconfImpl implements RestconfService {
         final TemporalAccessor p;
         try {
             p = FORMATTER.parse(value);
-        } catch (DateTimeParseException e) {
+        } catch (final DateTimeParseException e) {
             throw new RestconfDocumentedException("Cannot parse of value in date: " + value, e);
         }
         return Instant.from(p);
@@ -1254,7 +1254,7 @@ public class RestconfImpl implements RestconfService {
      * @return {@link URI} of location
      */
     private URI dataSubs(final String identifier, final UriInfo uriInfo, final Instant start, final Instant stop,
-            final String filter, boolean leafNodesOnly) {
+            final String filter, final boolean leafNodesOnly) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -1554,7 +1554,7 @@ public class RestconfImpl implements RestconfService {
             Notificator.createNotificationListener(paths, streamName, outputType);
         }
 
-        final DOMRpcResult defaultDOMRpcResult = new DefaultDOMRpcResult(output);
+        final DOMRpcResult defaultDOMRpcResult = new org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult(output);
 
         return Futures.immediateCheckedFuture(defaultDOMRpcResult);
     }

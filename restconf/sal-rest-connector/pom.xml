@@ -153,6 +153,11 @@
     </dependency>
 
     <dependency>
+      <groupId>org.opendaylight.mdsal</groupId>
+      <artifactId>mdsal-dom-api</artifactId>
+      <version>2.2.2-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
     </dependency>
@@ -215,6 +220,7 @@
               org.apache.shiro.web.env
             </Import-Package>
             <Web-ContextPath>/restconf</Web-ContextPath>
+            <Bundle-Activator>org.opendaylight.netconf.sal.restconf.impl.RestconfActivator</Bundle-Activator>
           </instructions>
         </configuration>
       </plugin>
