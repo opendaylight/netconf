@@ -85,11 +85,7 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>sal-netconf-connector</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>logback-config</artifactId>
-        </dependency>
-        <dependency>
+       <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>mockito-configuration</artifactId>
         </dependency>

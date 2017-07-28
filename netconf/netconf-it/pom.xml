@@ -18,14 +18,6 @@
       <artifactId>netconf-netty-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>commons.logback_settings</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>logback-config</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>mockito-configuration</artifactId>
     </dependency>
