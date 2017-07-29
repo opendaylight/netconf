@@ -23,6 +23,7 @@
     <name>${project.artifactId}</name>
 
     <modules>
+        <module>protocol-framework</module>
         <module>netconf</module>
         <module>restconf</module>
 
