@@ -23,6 +23,7 @@
   <modules>
     <module>netconf</module>
     <module>netconf-connector</module>
+    <module>protocol-framework</module>
     <module>restconf</module>
     <module>yanglib</module>
   </modules>
