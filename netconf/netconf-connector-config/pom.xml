@@ -27,7 +27,7 @@
         <dependencies>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>netconf-subsystem</artifactId>
+                <artifactId>netconf-artifacts</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>

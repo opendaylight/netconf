@@ -30,66 +30,6 @@
         <module>karaf</module>
     </modules>
 
-    <properties>
-        <config.version>0.7.0-SNAPSHOT</config.version>
-        <config.configfile.directory>etc/opendaylight/karaf</config.configfile.directory>
-
-        <mdsal.version>2.3.0-SNAPSHOT</mdsal.version>
-        <mdsal.model.version>0.11.0-SNAPSHOT</mdsal.model.version>
-        <controller.mdsal.version>1.6.0-SNAPSHOT</controller.mdsal.version>
-        <netconf.version>1.3.0-SNAPSHOT</netconf.version>
-        <restconf.version>1.6.0-SNAPSHOT</restconf.version>
-        <yangtools.version>1.2.0-SNAPSHOT</yangtools.version>
-    </properties>
-
-
-    <dependencyManagement>
-      <dependencies>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>yangtools-artifacts</artifactId>
-            <version>${yangtools.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.opendaylight.mdsal</groupId>
-          <artifactId>mdsal-artifacts</artifactId>
-          <version>${mdsal.version}</version>
-          <type>pom</type>
-          <scope>import</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.opendaylight.mdsal.model</groupId>
-          <artifactId>mdsal-model-artifacts</artifactId>
-          <version>${mdsal.model.version}</version>
-          <type>pom</type>
-          <scope>import</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.opendaylight.aaa</groupId>
-          <artifactId>aaa-artifacts</artifactId>
-          <version>0.6.0-SNAPSHOT</version>
-          <type>pom</type>
-          <scope>import</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.opendaylight.controller</groupId>
-          <artifactId>config-artifacts</artifactId>
-          <version>${config.version}</version>
-          <type>pom</type>
-          <scope>import</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.opendaylight.controller</groupId>
-          <artifactId>mdsal-artifacts</artifactId>
-          <version>${controller.mdsal.version}</version>
-          <type>pom</type>
-          <scope>import</scope>
-        </dependency>
-      </dependencies>
-    </dependencyManagement>
-
     <profiles>
         <profile>
             <id>integrationtests</id>
