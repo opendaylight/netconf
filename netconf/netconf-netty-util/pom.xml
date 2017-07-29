@@ -26,20 +26,18 @@
     <dependencies>
       <dependency>
         <groupId>org.opendaylight.netconf</groupId>
-        <artifactId>netconf-parent</artifactId>
+        <artifactId>netconf-artifacts</artifactId>
         <version>${project.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
       <dependency>
-        <groupId>org.opendaylight.netconf</groupId>
-        <artifactId>netconf-subsystem</artifactId>
-        <version>${project.version}</version>
+        <groupId>org.opendaylight.yangtools</groupId>
+        <artifactId>yangtools-artifacts</artifactId>
+        <version>1.2.0-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
       <dependency>
         <groupId>openexi</groupId>
         <artifactId>nagasena</artifactId>
@@ -74,10 +72,6 @@
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-handler</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>protocol-framework</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.sshd</groupId>
