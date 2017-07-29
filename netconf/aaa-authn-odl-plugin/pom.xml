@@ -25,8 +25,15 @@
         <dependencies>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>netconf-subsystem</artifactId>
+                <artifactId>netconf-artifacts</artifactId>
                 <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.aaa</groupId>
+                <artifactId>aaa-artifacts</artifactId>
+                <version>0.6.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
