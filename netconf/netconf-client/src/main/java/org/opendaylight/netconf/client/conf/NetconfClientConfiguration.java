@@ -86,6 +86,7 @@ public class NetconfClientConfiguration {
                 // Fall through intentional (ssh validation is a superset of tcp validation)
             case TCP:
                 validateTcpConfiguration();
+                break;
             default:
                 LOG.warn("Unexpected protocol: {} in netconf client configuration.", clientProtocol);
         }
