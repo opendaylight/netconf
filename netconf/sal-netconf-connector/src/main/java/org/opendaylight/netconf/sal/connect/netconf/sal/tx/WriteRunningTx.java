@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
@@ -73,11 +72,10 @@ public class WriteRunningTx extends AbstractWriteTx {
     @Override
     public synchronized CheckedFuture<Void, TransactionCommitFailedException> submit() {
         final ListenableFuture<Void> commmitFutureAsVoid = Futures.transform(commit(),
-                (Function<RpcResult<TransactionStatus>, Void>) input -> null);
+                input -> null);
 
-        return Futures.makeChecked(commmitFutureAsVoid,
-            input -> new TransactionCommitFailedException("Submit of transaction " + getIdentifier() + " failed",
-                input));
+        return Futures.makeChecked(commmitFutureAsVoid, input -> new TransactionCommitFailedException("Submit of transaction " + getIdentifier() + " failed",
+                        input));
     }
 
     @Override

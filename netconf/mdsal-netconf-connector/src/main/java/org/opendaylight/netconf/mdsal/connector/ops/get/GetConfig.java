@@ -57,7 +57,7 @@ public class GetConfig extends AbstractGet {
 
         final Optional<YangInstanceIdentifier> dataRootOptional = getDataRootFromFilter(operationElement);
         if (!dataRootOptional.isPresent()) {
-            return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.<String>absent());
+            return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.absent());
         }
 
         final YangInstanceIdentifier dataRoot = dataRootOptional.get();
@@ -74,7 +74,7 @@ public class GetConfig extends AbstractGet {
             }
 
             if (!normalizedNodeOptional.isPresent()) {
-                return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.<String>absent());
+                return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.absent());
             }
 
             return serializeNodeWithParentStructure(document, dataRoot, normalizedNodeOptional.get());

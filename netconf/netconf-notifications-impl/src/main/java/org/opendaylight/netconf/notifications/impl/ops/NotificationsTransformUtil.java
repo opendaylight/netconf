@@ -81,7 +81,7 @@ public final class NotificationsTransformUtil {
      * Transform base notification for capabilities into NetconfNotification.
      */
     public static NetconfNotification transform(final Notification notification, SchemaPath path) {
-        return transform(notification, Optional.<Date>absent(), path);
+        return transform(notification, Optional.absent(), path);
     }
 
     public static NetconfNotification transform(final Notification notification,
