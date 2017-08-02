@@ -324,105 +324,54 @@ public class BrokerFacade {
         final List<PatchStatusEntity> editCollection = new ArrayList<>();
         List<RestconfError> editErrors;
         boolean withoutError = true;
-
         for (final PatchEntity patchEntity : patchContext.getData()) {
             final PatchEditOperation operation = patchEntity.getOperation();
-            switch (operation) {
-                case CREATE:
-                    if (withoutError) {
-                        try {
+            try {
+                switch (operation) {
+                    case CREATE:
+                        if (withoutError) {
                             postDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity.getTargetNode(),
                                     patchEntity.getNode(), schemaContext);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
-                        } catch (final RestconfDocumentedException e) {
-                            LOG.error("Error call http Patch operation {} on target {}",
-                                    operation,
-                                    patchEntity.getTargetNode().toString());
-
-                            editErrors = new ArrayList<>();
-                            editErrors.addAll(e.getErrors());
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, editErrors));
-                            withoutError = false;
                         }
-                    }
-                    break;
-                case REPLACE:
-                    if (withoutError) {
-                        try {
+                        break;
+                    case REPLACE:
+                        if (withoutError) {
                             putDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
                                     .getTargetNode(), patchEntity.getNode(), schemaContext);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
-                        } catch (final RestconfDocumentedException e) {
-                            LOG.error("Error call http Patch operation {} on target {}",
-                                    operation,
-                                    patchEntity.getTargetNode().toString());
-
-                            editErrors = new ArrayList<>();
-                            editErrors.addAll(e.getErrors());
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, editErrors));
-                            withoutError = false;
                         }
-                    }
-                    break;
-                case DELETE:
-                    if (withoutError) {
-                        try {
+                        break;
+                    case DELETE:
+                    case REMOVE:
+                        if (withoutError) {
                             deleteDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
                                     .getTargetNode());
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
-                        } catch (final RestconfDocumentedException e) {
-                            LOG.error("Error call http Patch operation {} on target {}",
-                                    operation,
-                                    patchEntity.getTargetNode().toString());
-
-                            editErrors = new ArrayList<>();
-                            editErrors.addAll(e.getErrors());
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, editErrors));
-                            withoutError = false;
                         }
-                    }
-                    break;
-                case REMOVE:
-                    if (withoutError) {
-                        try {
-                            deleteDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
-                                    .getTargetNode());
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
-                        } catch (final RestconfDocumentedException e) {
-                            LOG.error("Error call http Patch operation {} on target {}",
-                                    operation,
-                                    patchEntity.getTargetNode().toString());
-
-                            editErrors = new ArrayList<>();
-                            editErrors.addAll(e.getErrors());
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, editErrors));
-                            withoutError = false;
-                        }
-                    }
-                    break;
-                case MERGE:
-                    if (withoutError) {
-                        try {
+                        break;
+                    case MERGE:
+                        if (withoutError) {
                             mergeDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity.getTargetNode(),
                                     patchEntity.getNode(), schemaContext);
                             editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
-                        } catch (final RestconfDocumentedException e) {
-                            LOG.error("Error call http Patch operation {} on target {}",
-                                    operation,
-                                    patchEntity.getTargetNode().toString());
-
-                            editErrors = new ArrayList<>();
-                            editErrors.addAll(e.getErrors());
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, editErrors));
-                            withoutError = false;
                         }
-                    }
-                    break;
-                default:
-                    LOG.error("Unsupported http Patch operation {} on target {}",
-                            operation,
-                            patchEntity.getTargetNode().toString());
-                    break;
+                        break;
+                    default:
+                        LOG.error("Unsupported http Patch operation {} on target {}",
+                                operation,
+                                patchEntity.getTargetNode().toString());
+                        break;
+                }
+            } catch (final RestconfDocumentedException e) {
+                LOG.error("Error call http Patch operation {} on target {}",
+                        operation,
+                        patchEntity.getTargetNode().toString());
+
+                editErrors = new ArrayList<>();
+                editErrors.addAll(e.getErrors());
+                editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, editErrors));
+                withoutError = false;
             }
         }
 
@@ -611,18 +560,9 @@ public class BrokerFacade {
                 if (keys.contains(child.getNodeType())) {
                     leafBuilder.withValue(((LeafNode<?>) child).getValue());
                     builder.withChild(leafBuilder.build());
-                } else {
-                    if (trim) {
-                        if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                            leafBuilder.withValue(((LeafNode<?>) child).getValue());
-                            builder.withChild(leafBuilder.build());
-                        }
-                    } else {
-                        if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                            leafBuilder.withValue(((LeafNode<?>) child).getValue());
-                            builder.withChild(leafBuilder.build());
-                        }
-                    }
+                } else if (defaultVal != null && defaultVal.equals(nodeVal)) {
+                    leafBuilder.withValue(((LeafNode<?>) child).getValue());
+                    builder.withChild(leafBuilder.build());
                 }
             }
         }
