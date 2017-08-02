@@ -151,13 +151,6 @@
                 <artifactId>messagebus-netconf</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>features-netconf-connector</artifactId>
-                <version>${project.version}</version>
-                <classifier>features</classifier>
-                <type>xml</type>
-            </dependency>
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -280,16 +273,27 @@
                 <artifactId>netconf-topology-singleton</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>features-netconf</artifactId>
-                <version>${project.version}</version>
-                <type>xml</type>
-                <classifier>features</classifier>
+                <artifactId>protocol-framework</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
 
             <!-- netconf features -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>features-protocol-framework</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>odl-protocol-framework</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>features-netconf</artifactId>
