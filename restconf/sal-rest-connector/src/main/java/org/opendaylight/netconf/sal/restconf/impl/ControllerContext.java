@@ -491,7 +491,7 @@ public class ControllerContext implements SchemaContextListener {
             return childByQName((Module) container, name);
         } else {
             throw new IllegalArgumentException("Unhandled parameter types: "
-                    + Arrays.<Object>asList(container, name).toString());
+                    + Arrays.asList(container, name).toString());
         }
     }
 
@@ -521,7 +521,7 @@ public class ControllerContext implements SchemaContextListener {
     private InstanceIdentifierContext<?> collectPathArguments(final InstanceIdentifierBuilder builder,
             final List<String> strings, final DataNodeContainer parentNode, final DOMMountPoint mountPoint,
             final boolean returnJustMountPoint) {
-        Preconditions.<List<String>>checkNotNull(strings);
+        Preconditions.checkNotNull(strings);
 
         if (parentNode == null) {
             return null;

@@ -73,7 +73,7 @@ public class WriteRunningTx extends AbstractWriteTx {
     @Override
     public synchronized CheckedFuture<Void, TransactionCommitFailedException> submit() {
         final ListenableFuture<Void> commmitFutureAsVoid = Futures.transform(commit(),
-                (Function<RpcResult<TransactionStatus>, Void>) input -> null);
+                input -> null);
 
         return Futures.makeChecked(commmitFutureAsVoid,
             input -> new TransactionCommitFailedException("Submit of transaction " + getIdentifier() + " failed",

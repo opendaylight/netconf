@@ -98,7 +98,7 @@ public class ConfigReader extends AbstractReader<DataSchemaNode> {
             previous = Collections.<NormalizedNode<?, ?>>singletonList(
                     ImmutableContainerNodeBuilder.create()
                             .withNodeIdentifier(new NodeIdentifier(qualifiedName))
-                            .withValue(previous == null ? Collections.emptyList() : (Collection) previous).build()
+                            .withValue(previous == null ? Collections.emptyList() : previous).build()
             );
         }
 

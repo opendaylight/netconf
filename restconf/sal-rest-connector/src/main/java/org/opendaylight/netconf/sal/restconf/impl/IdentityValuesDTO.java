@@ -135,7 +135,7 @@ public final class IdentityValuesDTO {
         }
 
         public boolean isLeafList() {
-            return name == null ? true : false;
+            return name == null;
         }
 
     }

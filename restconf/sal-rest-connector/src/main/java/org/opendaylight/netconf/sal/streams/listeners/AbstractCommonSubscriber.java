@@ -104,7 +104,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
      * @return True if exist, false otherwise.
      */
     public boolean isListening() {
-        return this.registration == null ? false : true;
+        return this.registration != null;
     }
 
     /**

@@ -290,7 +290,7 @@ public class BaseYangSwaggerGenerator {
         LOG.debug("Adding path: [{}]", resourcePath);
         api.setPath(resourcePath.concat(getContent(dataStore)));
 
-        Iterable<DataSchemaNode> childSchemaNodes = Collections.<DataSchemaNode>emptySet();
+        Iterable<DataSchemaNode> childSchemaNodes = Collections.emptySet();
         if ((node instanceof ListSchemaNode) || (node instanceof ContainerSchemaNode)) {
             final DataNodeContainer dataNodeContainer = (DataNodeContainer) node;
             childSchemaNodes = dataNodeContainer.getChildNodes();
