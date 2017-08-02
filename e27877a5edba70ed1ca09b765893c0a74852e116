@@ -1,0 +1,435 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1f61a0_c53e4d29",
+        "filename": "features/netconf/odl-netconf-netty-util/pom.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "Do we need to explicitly specify here the config for aaa-encrypt-service?",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_25092996",
+        "filename": "netconf/callhome-provider/src/main/resources/org/opendaylight/blueprint/callhome-topology.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "remove this whitespace",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_25bbe9c5",
+        "filename": "netconf/netconf-netty-util/pom.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "You don\u0027t have to specify version here. Maven dependency management should take care of it.",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_a59fd94f",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/authentication/LoginPassword.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "You don\u0027t log anything here.",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_05ad0589",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/authentication/LoginPassword.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "This is redundant you are overwriting the variable in the next line.",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_85b0d5de",
+        "filename": "netconf/netconf-topology-config/src/main/resources/org/opendaylight/blueprint/netconf-topology.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "Please remove this leading whitespace",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_25e2c9d5",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "I think you are introducing this back by mistake. We have removed this initialization logic while ago.",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_85e735e4",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "Also here.",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_65ecc1c8",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "You don\u0027t need to change not related lines of code.",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_c5d00dfa",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "Also here.",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_a5cd1960",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "Please, don\u0027t change unrelated code.",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_05db451c",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/utils/NetconfTopologySetup.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "Remove this whitespace",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_a5f519cd",
+        "filename": "netconf/netconf-topology/pom.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "You don\u0027t need to specify version here.",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_050345b9",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "No need for introducing empty line here",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_c51f6d08",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "Why do you need this? I don\u0027t see you are actually using it somewhere..",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_452c1d4b",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "Please remove this leading whitespace on empty line.",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_253129a3",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/impl/NetconfTopologyImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "Please remove this empty line",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_a51cf914",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/NetconfTopologyRPCProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "NetconfNodeTopologyService {",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_85dd7545",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/NetconfTopologyRPCProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "Please see: https://google.github.io/styleguide/javaguide.html#s4.6.3-horizontal-alignment\n\nHorizontal alignment is not forbidden, but since we are not using it anywhere, you shouldn\u0027t use it even here.",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_05f185cd",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/NetconfTopologyRPCProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "final String topologyId) { (missing space)",
+      "range": {
+        "startLine": 47,
+        "startChar": 62,
+        "endLine": 47,
+        "endChar": 63
+      },
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_25bf69d2",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/NetconfTopologyRPCProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "(AddNetconfNodeInput input) { (missing space)",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_85b455f3",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/NetconfTopologyRPCProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "(LoginPassword) input.getCredentials(); (missing space)",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_65b961e9",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/NetconfTopologyRPCProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "if (encrypt) (missing space)",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_c5cdad88",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/NetconfTopologyRPCProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "This variable initialization is redundant, variable gets overwritten in the next line.",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_65e20105",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/NetconfTopologyRPCProvider.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T07:47:01Z",
+      "side": 1,
+      "message": "You can log the exception, not just its message.",
+      "revId": "e27877a5edba70ed1ca09b765893c0a74852e116",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
