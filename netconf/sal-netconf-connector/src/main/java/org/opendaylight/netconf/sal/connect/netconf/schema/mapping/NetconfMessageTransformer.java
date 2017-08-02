@@ -16,7 +16,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,9 +24,9 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.config.util.xml.MissingNameSpaceException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.dom.api.DOMEvent;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -36,7 +35,6 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
-import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -113,8 +111,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
             final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext,
                     notificationAsContainerSchemaNode, strictParsing);
-
-            xmlParser.parse(UntrustedXML.createXMLStreamReader(new StringReader(XmlUtil.toString(element))));
+            xmlParser.traverse(new DOMSource(element));
             content = (ContainerNode) resultHolder.getResult();
         } catch (final Exception e) {
             throw new IllegalArgumentException(String.format("Failed to parse notification %s", element), e);
@@ -196,8 +193,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
                 final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext, schemaForDataRead,
                         strictParsing);
-
-                xmlParser.parse(UntrustedXML.createXMLStreamReader(new StringReader(XmlUtil.toString(xmlData))));
+                xmlParser.traverse(new DOMSource(xmlData));
                 dataNode = (ContainerNode) resultHolder.getResult();
             } catch (final Exception e) {
                 throw new IllegalArgumentException(String.format("Failed to parse data response %s", xmlData), e);
@@ -236,8 +232,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                     final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
                     final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext,
                             rpcDefinition.getOutput(), strictParsing);
-
-                    xmlParser.parse(UntrustedXML.createXMLStreamReader(new StringReader(XmlUtil.toString(element))));
+                    xmlParser.traverse(new DOMSource(element));
                     normalizedNode = resultHolder.getResult();
                 } catch (final Exception e) {
                     throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
