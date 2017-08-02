@@ -33,7 +33,7 @@ public class NetconfClientSessionNegotiatorFactoryTest {
         Channel channel = mock(Channel.class);
         Promise<NetconfClientSession> promise = mock(Promise.class);
         NetconfClientSessionNegotiatorFactory negotiatorFactory = new NetconfClientSessionNegotiatorFactory(timer,
-                Optional.<NetconfHelloMessageAdditionalHeader>absent(), 200L);
+                Optional.absent(), 200L);
 
         SessionNegotiator<?> sessionNegotiator = negotiatorFactory.getSessionNegotiator(listenerFactory, channel,
                 promise);

@@ -99,7 +99,7 @@ public class NetconfServerSessionListenerTest {
         listener.onMessage(session, msg);
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_SUCCESS)));
         channel.runPendingTasks();
-        final NetconfMessage sentMsg = (NetconfMessage) channel.readOutbound();
+        final NetconfMessage sentMsg = channel.readOutbound();
         final Diff diff = XMLUnit.compareXML(reply, sentMsg.getDocument());
         Assert.assertTrue(diff.toString(), diff.similar());
     }
@@ -141,7 +141,7 @@ public class NetconfServerSessionListenerTest {
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_FAIL)));
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.OUT_RPC_ERROR)));
         channel.runPendingTasks();
-        final NetconfMessage sentMsg = (NetconfMessage) channel.readOutbound();
+        final NetconfMessage sentMsg = channel.readOutbound();
         System.out.println(XmlUtil.toString(sentMsg.getDocument()));
         System.out.println(XmlUtil.toString(reply));
         final Diff diff = XMLUnit.compareXML(reply, sentMsg.getDocument());

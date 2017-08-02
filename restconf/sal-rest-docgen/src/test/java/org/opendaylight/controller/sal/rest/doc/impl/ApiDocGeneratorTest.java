@@ -282,10 +282,10 @@ public class ApiDocGeneratorTest {
      * @throws Exception if operation fails
      */
     private void validateToaster(final ApiDeclaration doc) throws Exception {
-        final Set<String> expectedUrls = new TreeSet<>(Arrays.asList(new String[]{"/config/toaster2:toaster",
-            "/operational/toaster2:toaster", "/operations/toaster2:cancel-toast",
-            "/operations/toaster2:make-toast", "/operations/toaster2:restock-toaster",
-            "/config/toaster2:toaster/toasterSlot/{slotId}/toaster-augmented:slotInfo"}));
+        final Set<String> expectedUrls = new TreeSet<>(Arrays.asList("/config/toaster2:toaster",
+                "/operational/toaster2:toaster", "/operations/toaster2:cancel-toast",
+                "/operations/toaster2:make-toast", "/operations/toaster2:restock-toaster",
+                "/config/toaster2:toaster/toasterSlot/{slotId}/toaster-augmented:slotInfo"));
 
         final Set<String> actualUrls = new TreeSet<>();
 
@@ -303,7 +303,7 @@ public class ApiDocGeneratorTest {
             fail("Missing expected urls: " + expectedUrls);
         }
 
-        final Set<String> expectedConfigMethods = new TreeSet<>(Arrays.asList(new String[] { "GET", "PUT", "DELETE" }));
+        final Set<String> expectedConfigMethods = new TreeSet<>(Arrays.asList("GET", "PUT", "DELETE"));
         final Set<String> actualConfigMethods = new TreeSet<>();
         for (final Operation oper : configApi.getOperations()) {
             actualConfigMethods.add(oper.getMethod());

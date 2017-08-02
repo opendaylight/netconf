@@ -120,7 +120,7 @@ public class NetconfTopologyImplTest {
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(wtx);
         doNothing().when(wtx)
                 .merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(DataObject.class));
-        when(wtx.submit()).thenReturn(Futures.<Void, TransactionCommitFailedException>immediateCheckedFuture(null));
+        when(wtx.submit()).thenReturn(Futures.immediateCheckedFuture(null));
         topology.init();
 
         //verify initialization of topology

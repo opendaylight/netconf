@@ -131,7 +131,7 @@ public class ConcurrentClientsTest {
             }
         }).when(monitoring).registerCapabilitiesListener(any(NetconfMonitoringService.CapabilitiesListener.class));
         doReturn(sessionListener).when(monitoring).getSessionListener();
-        doReturn(new CapabilitiesBuilder().setCapability(Collections.<Uri>emptyList()).build()).when(monitoring)
+        doReturn(new CapabilitiesBuilder().setCapability(Collections.emptyList()).build()).when(monitoring)
                 .getCapabilities();
         return monitoring;
     }

@@ -89,8 +89,8 @@ public class AbstractNetconfSessionTest {
             }
         }).when(eventLoop).execute(any(Runnable.class));
 
-        clientHello = NetconfHelloMessage.createClientHello(Collections.<String>emptySet(),
-                Optional.<NetconfHelloMessageAdditionalHeader>absent());
+        clientHello = NetconfHelloMessage.createClientHello(Collections.emptySet(),
+                Optional.absent());
     }
 
     @Test
@@ -159,8 +159,8 @@ public class AbstractNetconfSessionTest {
     @Test
     public void testSendMessage() throws Exception {
         final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
-        final NetconfHelloMessage clientHello = NetconfHelloMessage.createClientHello(Collections.<String>emptySet(),
-                Optional.<NetconfHelloMessageAdditionalHeader>absent());
+        final NetconfHelloMessage clientHello = NetconfHelloMessage.createClientHello(Collections.emptySet(),
+                Optional.absent());
         testingNetconfSession.sendMessage(clientHello);
         verify(channel).writeAndFlush(clientHello);
     }

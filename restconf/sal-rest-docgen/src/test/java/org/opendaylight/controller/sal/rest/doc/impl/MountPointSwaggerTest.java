@@ -115,10 +115,9 @@ public class MountPointSwaggerTest {
             assertNotNull("expected non-null desc on " + api.getPath(), operations.get(0)
                     .getNotes());
         }
-        final Set<String> expectedApis = new TreeSet<>(Arrays.asList(new String[] {
-            "/config" + INSTANCE_URL + "yang-ext:mount",
-            "/operational" + INSTANCE_URL + "yang-ext:mount",
-            "/operations" + INSTANCE_URL + "yang-ext:mount",}));
+        final Set<String> expectedApis = new TreeSet<>(Arrays.asList("/config" + INSTANCE_URL + "yang-ext:mount",
+                "/operational" + INSTANCE_URL + "yang-ext:mount",
+                "/operations" + INSTANCE_URL + "yang-ext:mount"));
         assertEquals(expectedApis, actualApis);
     }
 

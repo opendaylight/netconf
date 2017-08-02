@@ -67,7 +67,7 @@ public class NetconfClientSessionNegotiatorTest {
     @Before
     public void setUp() throws Exception {
         helloMessage = NetconfHelloMessage.createClientHello(Sets.newSet("exi:1.0"), Optional
-                .<NetconfHelloMessageAdditionalHeader>absent());
+                .absent());
         pipeline = mockChannelPipeline();
         future = mockChannelFuture();
         channel = mockChannel();

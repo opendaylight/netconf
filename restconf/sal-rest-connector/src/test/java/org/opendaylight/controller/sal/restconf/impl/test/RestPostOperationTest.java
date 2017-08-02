@@ -175,7 +175,7 @@ public class RestPostOperationTest extends JerseyTest {
 
         when(brokerFacade.commitConfigurationDataPost(any(SchemaContext.class), any(YangInstanceIdentifier.class),
                 any(NormalizedNode.class), Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(Futures.<Void, TransactionCommitFailedException>immediateCheckedFuture(null));
+                .thenReturn(Futures.immediateCheckedFuture(null));
 
         //FIXME : find who is set schemaContext
 //        final String URI_1 = "/config";

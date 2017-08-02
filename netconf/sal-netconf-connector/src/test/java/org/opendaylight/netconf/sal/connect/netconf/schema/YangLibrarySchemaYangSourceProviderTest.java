@@ -32,7 +32,7 @@ public class YangLibrarySchemaYangSourceProviderTest {
     @Before
     public void setUp() throws Exception {
         final URL url = getClass().getResource("/schemas/config-test-rpc.yang");
-        workingSid = RevisionSourceIdentifier.create("abc", Optional.<String>absent());
+        workingSid = RevisionSourceIdentifier.create("abc", Optional.absent());
         final Map<SourceIdentifier, URL> sourceIdentifierURLMap = Collections.singletonMap(workingSid, url);
         final RemoteDeviceId id = new RemoteDeviceId("id", new InetSocketAddress("localhost", 22));
         yangLibrarySchemaYangSourceProvider = new YangLibrarySchemaYangSourceProvider(id, sourceIdentifierURLMap);

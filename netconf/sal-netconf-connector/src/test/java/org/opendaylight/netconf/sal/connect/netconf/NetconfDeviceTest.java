@@ -180,7 +180,7 @@ public class NetconfDeviceTest {
         // Make fallback attempt to fail due to empty resolved sources
         final SchemaResolutionException schemaResolutionException
                 = new SchemaResolutionException("fail first",
-                Collections.<SourceIdentifier>emptyList(), HashMultimap.<SourceIdentifier, ModuleImport>create());
+                Collections.emptyList(), HashMultimap.create());
         doReturn(Futures.immediateFailedCheckedFuture(
                 schemaResolutionException))
                 .when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));

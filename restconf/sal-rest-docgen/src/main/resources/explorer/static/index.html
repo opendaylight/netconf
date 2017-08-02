@@ -37,20 +37,20 @@
                     "swagger-ui-container");
             $("#message").empty();
             $("#message").append( "<h2><b>Showing mount points for " + mountPath + "</b></h2>");
-        }
+        };
 
         //clears the swagger UI and adds text prompting use to select a mount point.
         var selectAMount = function(string) {
             $("#swagger-ui-container").empty();
             $("#message").empty();
             $("#message").append("<p>Select a mount point.</p>");
-        }
+        };
 
         //loads the root swagger documenation (which comes from RestConf)
         var loadRootSwagger = function() {
             $("#message").empty();
             loadSwagger("/apidoc/apis", "swagger-ui-container");
-        }
+        };
 
         //main method to initialize the mount list / swagger docs / tabs on page load
         $(function() {

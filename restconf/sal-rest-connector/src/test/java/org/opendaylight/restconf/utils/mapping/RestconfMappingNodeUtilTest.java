@@ -128,7 +128,7 @@ public class RestconfMappingNodeUtilTest {
         assertNotNull(normNode);
         final List<Object> listOfValues = new ArrayList<>();
 
-        for (final DataContainerChild<? extends PathArgument, ?> child : ((ContainerNode) normNode).getValue()) {
+        for (final DataContainerChild<? extends PathArgument, ?> child : normNode.getValue()) {
             if (child.getNodeType().equals(MonitoringModule.CONT_CAPABILITES_QNAME)) {
                 for (final DataContainerChild<? extends PathArgument, ?> dataContainerChild : ((ContainerNode) child)
                         .getValue()) {
@@ -220,10 +220,10 @@ public class RestconfMappingNodeUtilTest {
 
         for (final DataContainerChild<? extends PathArgument, ?> child : containerNode.getValue()) {
             if (child instanceof LeafNode) {
-                assertEquals(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME, ((LeafNode<?>) child).getNodeType());
+                assertEquals(IetfYangLibrary.MODULE_SET_ID_LEAF_QNAME, child.getNodeType());
             }
             if (child instanceof MapNode) {
-                assertEquals(IetfYangLibrary.MODULE_QNAME_LIST, ((MapNode) child).getNodeType());
+                assertEquals(IetfYangLibrary.MODULE_QNAME_LIST, child.getNodeType());
                 for (final MapEntryNode mapEntryNode : ((MapNode) child).getValue()) {
                     String name = "";
                     String revision = "";
@@ -231,10 +231,10 @@ public class RestconfMappingNodeUtilTest {
                             .getValue()) {
                         switch (dataContainerChild.getNodeType().getLocalName()) {
                             case IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF:
-                                name = String.valueOf(((LeafNode<?>) dataContainerChild).getValue());
+                                name = String.valueOf(dataContainerChild.getValue());
                                 break;
                             case IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF:
-                                revision = String.valueOf(((LeafNode<?>) dataContainerChild).getValue());
+                                revision = String.valueOf(dataContainerChild.getValue());
                                 break;
                             default :
                                 LOG.info("Unknown local name '{}' of node.",

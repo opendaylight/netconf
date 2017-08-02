@@ -6,7 +6,7 @@ var require = function (file, cwd) {
     );
     var res = mod._cached ? mod._cached : mod();
     return res;
-}
+};
 
 require.paths = [];
 require.modules = {};
@@ -196,7 +196,7 @@ if (!process.nextTick) process.nextTick = (function () {
 if (!process.title) process.title = 'browser';
 
 if (!process.binding) process.binding = function (name) {
-    if (name === 'evals') return require('vm')
+    if (name === 'evals') return require('vm');
     else throw new Error('No such module')
 };
 
@@ -435,7 +435,7 @@ var format = function(level,message) {
   }
 };
 
-var noOp = function(message) { return this; }
+var noOp = function(message) { return this; };
 var makeLogger = function(level,fn) {
   return function(message) { 
     this.stream.write(this.format(level, message)+"\n");
@@ -488,7 +488,7 @@ var Logger = function(options) {
     case 'warn':
       logger.warn = Logger.writer('warn');
   }
-}
+};
 
 // Used to define logger methods
 Logger.writer = function(level){
@@ -501,7 +501,7 @@ Logger.writer = function(level){
   logger.stream(logger.format(level, message) + '\n');
 
   };
-}
+};
 
 
 Logger.prototype = {
@@ -551,7 +551,7 @@ require.define("/node_modules/cookiejar/cookiejar.js", function (require, module
     else {
         return new CookieAccessInfo(domain,path,secure,script)    
     }
-}
+};
 
 exports.Cookie=Cookie=function Cookie(cookiestr) {
   if(cookiestr instanceof Cookie) {
@@ -573,7 +573,7 @@ exports.Cookie=Cookie=function Cookie(cookiestr) {
         }
         return new Cookie(cookiestr)
     }
-}
+};
 
 Cookie.prototype.toString = function toString() {
   var str=[this.name+"="+this.value];
@@ -593,13 +593,13 @@ Cookie.prototype.toString = function toString() {
     str.push("httponly");
   }
   return str.join("; ");
-}
+};
 
 Cookie.prototype.toValueString = function toValueString() {
   return this.name+"="+this.value;
-}
+};
 
-var cookie_str_splitter=/[:](?=\s*[a-zA-Z0-9_\-]+\s*[=])/g
+var cookie_str_splitter=/[:](?=\s*[a-zA-Z0-9_\-]+\s*[=])/g;
 Cookie.prototype.parse = function parse(str) {
   if(this instanceof Cookie) {
       var parts=str.split(";")
@@ -641,7 +641,7 @@ Cookie.prototype.parse = function parse(str) {
       return this;
   }
     return new Cookie().parse(str)
-}
+};
 
 Cookie.prototype.matches = function matches(access_info) {
   if(this.noscript && access_info.script
@@ -650,7 +650,7 @@ Cookie.prototype.matches = function matches(access_info) {
     return false
   }
   return true;
-}
+};
 
 Cookie.prototype.collidesWith = function collidesWith(access_info) {
   if((this.path && !access_info.path) || (this.domain && !access_info.domain)) {
@@ -664,7 +664,7 @@ Cookie.prototype.collidesWith = function collidesWith(access_info) {
   }
   else if(this.domain && this.domain.charAt(0)===".")
   {
-    var wildcard=access_info.domain.indexOf(this.domain.slice(1))
+    var wildcard=access_info.domain.indexOf(this.domain.slice(1));
     if(wildcard===-1 || wildcard!==access_info.domain.length-this.domain.length+1) {
       return false;
     }
@@ -673,11 +673,11 @@ Cookie.prototype.collidesWith = function collidesWith(access_info) {
     return false
   }
   return true;
-}
+};
 
 exports.CookieJar=CookieJar=function CookieJar() {
   if(this instanceof CookieJar) {
-      var cookies = {} //name: [Cookie]
+      var cookies = {}; //name: [Cookie]
     
       this.setCookie = function setCookie(cookie) {
         cookie = Cookie(cookie);
@@ -712,7 +712,7 @@ exports.CookieJar=CookieJar=function CookieJar() {
         else {
           return cookies[cookie.name]=[cookie];
         }
-      }
+      };
       //returns a cookie
       this.getCookie = function getCookie(cookie_name,access_info) {
         var cookies_list = cookies[cookie_name];
@@ -728,7 +728,7 @@ exports.CookieJar=CookieJar=function CookieJar() {
             return cookie;
           }
         }
-      }
+      };
       //returns a list of cookies
       this.getCookies = function getCookies(access_info) {
         var matches=[];
@@ -738,15 +738,15 @@ exports.CookieJar=CookieJar=function CookieJar() {
             matches.push(cookie);
           }
         }
-        matches.toString=function toString(){return matches.join(":");}
-            matches.toValueString=function() {return matches.map(function(c){return c.toValueString();}).join(';');}
+        matches.toString=function toString(){return matches.join(":");};
+            matches.toValueString=function() {return matches.map(function(c){return c.toValueString();}).join(';');};
         return matches;
-      }
+      };
     
       return this;
   }
     return new CookieJar()
-}
+};
 
 
 //returns list of cookies that were set correctly
@@ -754,7 +754,7 @@ CookieJar.prototype.setCookies = function setCookies(cookies) {
   cookies=Array.isArray(cookies)
     ?cookies
     :cookies.split(cookie_str_splitter);
-  var successful=[]
+  var successful=[];
   for(var i=0;i<cookies.length;i++) {
     var cookie = Cookie(cookies[i]);
     if(this.setCookie(cookie)) {
@@ -936,7 +936,7 @@ Object.defineProperties(Request.prototype, {
         // Remove the last '&'
         query = query.slice(0, -1);
         return query;
-      }
+      };
 
       if (value) {
         if (typeof value === 'object') {
@@ -989,8 +989,7 @@ Object.defineProperties(Request.prototype, {
     set: function(timeout) {
       var request = this
         , milliseconds = 0;
-      ;
-      if (!timeout) return this;
+        if (!timeout) return this;
       if (typeof timeout==="number") { milliseconds = timeout; }
       else {
         milliseconds = (timeout.milliseconds||0) +
@@ -1021,16 +1020,16 @@ Request.prototype.inspect = function () {
   var request = this;
   var headers = this.format_headers();
   var summary = ["<Shred Request> ", request.method.toUpperCase(),
-      request.url].join(" ")
+      request.url].join(" ");
   return [ summary, "- Headers:", headers].join("\n");
 };
 
 Request.prototype.format_headers = function () {
-  var array = []
-  var headers = this._headers
+  var array = [];
+  var headers = this._headers;
   for (var key in headers) {
     if (headers.hasOwnProperty(key)) {
-      var value = headers[key]
+      var value = headers[key];
       array.push("\t" + key + ": " + value);
     }
   }
@@ -1269,7 +1268,7 @@ var logCurl = function (req) {
     headerString += '-H "' + key + ": " + headers[key] + '" ';
   }
 
-  var bodyString = ""
+  var bodyString = "";
 
   if (req.content) {
     bodyString += "-d '" + req.content.body + "' ";
@@ -1319,9 +1318,8 @@ function parseUri (str) {
   });
 
   return uri;
-};
-
-parseUri.options = {
+}
+    parseUri.options = {
   strictMode: false,
   key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
   q:   {
@@ -1813,7 +1811,7 @@ var Response = function(raw, request, callback) {
         type: response.getHeader("Content-Type")
       });
       callback(response);
-    }
+    };
 
     if (zlib && response.getHeader("Content-Encoding") === 'gzip'){
       zlib.gunzip(body, function (err, gunzippedBody) {
@@ -1843,15 +1841,15 @@ Response.prototype = {
   inspect: function() {
     var response = this;
     var headers = this.format_headers();
-    var summary = ["<Shred Response> ", response.status].join(" ")
+    var summary = ["<Shred Response> ", response.status].join(" ");
     return [ summary, "- Headers:", headers].join("\n");
   },
   format_headers: function () {
-    var array = []
-    var headers = this._headers
+    var array = [];
+    var headers = this._headers;
     for (var key in headers) {
       if (headers.hasOwnProperty(key)) {
-        var value = headers[key]
+        var value = headers[key];
         array.push("\t" + key + ": " + value);
       }
     }
@@ -2079,7 +2077,7 @@ Content.registerProcessor = function(types,processor) {
 
 // Register the identity processor, which is used for text-based media types.
 var identity = function(x) { return x; }
-  , toString = function(x) { return x.toString(); }
+  , toString = function(x) { return x.toString(); };
 Content.registerProcessor(
   ["text/html","text/plain","text"],
   { parser: identity, stringify: toString });
@@ -2105,7 +2103,7 @@ var Errors = {
     throw new Error("Attempt to set body attribute of a content object " +
         "when the data attributes was already set.");
   }
-}
+};
 module.exports = Content;
 
 });
@@ -2178,8 +2176,10 @@ var setHeader = function(object,name,value) {
 
 // The "real" `setHeaders` function: set multiple headers based on a hash.
 var setHeaders = function(object,hash) {
-  for( var key in hash ) { setHeader(object,key,hash[key]); };
-  return this;
+    for (var key in hash) {
+        setHeader(object, key, hash[key]);
+    }
+    return this;
 };
 
 // Here's where we actually bind the functionality to an object. These mixins work by
@@ -2399,7 +2399,7 @@ var encodingsDir = __dirname+"/encodings/",
     fs = require('fs');
 fs.readdirSync(encodingsDir).forEach(function(file) {
     if(fs.statSync(encodingsDir + file).isDirectory()) return;
-    var encodings = require(encodingsDir + file)
+    var encodings = require(encodingsDir + file);
     for (var key in encodings)
         iconv.encodings[key] = encodings[key]
 });
@@ -2411,12 +2411,12 @@ var asciiString = '\x00\x01\x02\x03\x04\x05\x06\x07\x08\t\n\x0b\x0c\r\x0e\x0f\x1
 var ensureBuffer = function(buf) {
     buf = buf || new Buffer(0);
     return (buf instanceof Buffer) ? buf : new Buffer(buf.toString(), "utf8");
-}
+};
 
 var ensureString = function(str) {
     str = str || "";
     return (str instanceof String) ? str : str.toString((str instanceof Buffer) ? 'utf8' : undefined);
-}
+};
 
 var getType = function(obj) {
     return Object.prototype.toString.call(obj).slice(8, -1);

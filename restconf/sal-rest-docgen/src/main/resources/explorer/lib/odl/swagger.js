@@ -41,4 +41,4 @@ var loadSwagger = function(url, dom_id) {
                 }
             });
     window.swaggerUi.load();
-}
+};

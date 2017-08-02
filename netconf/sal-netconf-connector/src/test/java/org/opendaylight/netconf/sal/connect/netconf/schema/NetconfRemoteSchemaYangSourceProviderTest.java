@@ -55,7 +55,7 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        final DOMRpcResult value = new DefaultDOMRpcResult(getNode(), Collections.<RpcError>emptySet());
+        final DOMRpcResult value = new DefaultDOMRpcResult(getNode(), Collections.emptySet());
         CheckedFuture<DOMRpcResult, DOMRpcException> response = Futures.immediateCheckedFuture(value);
         doReturn(response).when(service).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 

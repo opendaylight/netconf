@@ -19,4 +19,4 @@ var loadMountList = function( dom ) {
             dom.append( list );
         }
     } );
-}
+};
