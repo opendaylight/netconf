@@ -62,11 +62,7 @@ public class Get {
             return false;
         }
 
-        if (!java.util.Objects.equals(failedResponses, that.failedResponses)) {
-            return false;
-        }
-
-        return true;
+        return java.util.Objects.equals(failedResponses, that.failedResponses);
 
     }
 }

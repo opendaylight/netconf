@@ -98,7 +98,7 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
     }
 
     public final synchronized Future<NetconfMessage> sendRequest(NetconfMessage message) {
-        final RequestEntry req = new RequestEntry(GlobalEventExecutor.INSTANCE.<NetconfMessage>newPromise(), message);
+        final RequestEntry req = new RequestEntry(GlobalEventExecutor.INSTANCE.newPromise(), message);
 
         requests.add(req);
         if (clientSession != null) {

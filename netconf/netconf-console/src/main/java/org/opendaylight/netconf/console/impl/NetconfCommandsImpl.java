@@ -202,9 +202,9 @@ public class NetconfCommandsImpl implements NetconfCommands {
                     : updated.get(NetconfConsoleConstants.NETCONF_IP);
             final String devicePort = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.NETCONF_PORT))
                     ? netconfNode.getPort().getValue().toString() : updated.get(NetconfConsoleConstants.NETCONF_PORT);
-            final Boolean tcpOnly = (updated.get(NetconfConsoleConstants.TCP_ONLY).equals("true")) ? true : false;
+            final Boolean tcpOnly = updated.get(NetconfConsoleConstants.TCP_ONLY).equals("true");
             final Boolean isSchemaless =
-                    (updated.get(NetconfConsoleConstants.SCHEMALESS).equals("true")) ? true : false;
+                    updated.get(NetconfConsoleConstants.SCHEMALESS).equals("true");
             final String newUsername = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.USERNAME))
                     ? updated.get(NetconfConsoleConstants.USERNAME) : username;
             final String newPassword = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.PASSWORD))

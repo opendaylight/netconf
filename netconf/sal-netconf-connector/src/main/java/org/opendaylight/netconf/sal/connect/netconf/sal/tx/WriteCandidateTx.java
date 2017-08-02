@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
@@ -96,7 +95,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
     @Override
     public synchronized CheckedFuture<Void, TransactionCommitFailedException> submit() {
         final ListenableFuture<Void> commitFutureAsVoid = Futures.transform(commit(),
-            (Function<RpcResult<TransactionStatus>, Void>) input -> {
+            input -> {
                 Preconditions.checkArgument(input.isSuccessful() && input.getErrors().isEmpty(),
                         "Submit failed with errors: %s", input.getErrors());
                 return null;
