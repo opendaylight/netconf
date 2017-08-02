@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
-import com.google.common.base.Function;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -76,7 +75,7 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
                 listener.sendRequest(netconfMessage, type.getLastComponent());
 
         final ListenableFuture<DOMRpcResult> transformed =
-            Futures.transform(rpcResultListenableFuture, (Function<RpcResult<NetconfMessage>, DOMRpcResult>) input1 -> {
+            Futures.transform(rpcResultListenableFuture, input1 -> {
                 if (input1.isSuccessful()) {
                     return transformer.toRpcResult(input1.getResult(), type);
                 } else {

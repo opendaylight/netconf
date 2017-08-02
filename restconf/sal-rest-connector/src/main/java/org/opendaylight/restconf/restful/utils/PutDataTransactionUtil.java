@@ -367,7 +367,7 @@ public final class PutDataTransactionUtil {
         final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
         writeTx.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         TransactionUtil.ensureParentsByMerge(path, schemaContext, writeTx);
-        for (final MapEntryNode child : ((MapNode) payload).getValue()) {
+        for (final MapEntryNode child : payload.getValue()) {
             final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
             writeTx.put(datastore, childPath, child);
         }

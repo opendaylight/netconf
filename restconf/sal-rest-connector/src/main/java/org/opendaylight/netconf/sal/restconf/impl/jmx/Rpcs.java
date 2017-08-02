@@ -62,10 +62,6 @@ public class Rpcs {
             return false;
         }
 
-        if (!java.util.Objects.equals(failedResponses, that.failedResponses)) {
-            return false;
-        }
-
-        return true;
+        return java.util.Objects.equals(failedResponses, that.failedResponses);
     }
 }

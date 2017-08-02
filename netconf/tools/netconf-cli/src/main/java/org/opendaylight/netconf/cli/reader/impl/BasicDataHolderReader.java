@@ -122,7 +122,7 @@ public abstract class BasicDataHolderReader<T extends DataSchemaNode> extends Ab
         final NormalizedNode<?, ?> newNode = ImmutableLeafNodeBuilder.create()
                 .withNodeIdentifier(new NodeIdentifier(schemaNode.getQName()))
                 .withValue(value).build();
-        return Collections.<NormalizedNode<?, ?>>singletonList(newNode);
+        return Collections.singletonList(newNode);
     }
 
     protected abstract TypeDefinition<?> getType(T schemaNode);
