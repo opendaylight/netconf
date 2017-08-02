@@ -96,11 +96,11 @@ public class WriteCandidateTx extends AbstractWriteTx {
     @Override
     public synchronized CheckedFuture<Void, TransactionCommitFailedException> submit() {
         final ListenableFuture<Void> commitFutureAsVoid = Futures.transform(commit(),
-            (Function<RpcResult<TransactionStatus>, Void>) input -> {
-                Preconditions.checkArgument(input.isSuccessful() && input.getErrors().isEmpty(),
-                        "Submit failed with errors: %s", input.getErrors());
-                return null;
-            });
+                input -> {
+                    Preconditions.checkArgument(input.isSuccessful() && input.getErrors().isEmpty(),
+                            "Submit failed with errors: %s", input.getErrors());
+                    return null;
+                });
 
         return Futures.makeChecked(commitFutureAsVoid, input -> new TransactionCommitFailedException(
                 "Submit of transaction " + getIdentifier() + " failed", input));

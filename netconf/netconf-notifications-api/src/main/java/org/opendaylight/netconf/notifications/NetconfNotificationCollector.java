@@ -44,7 +44,7 @@ public interface NetconfNotificationCollector {
     /**
      * Simple listener that receives notifications about changes in stream availability.
      */
-    public interface NetconfNotificationStreamListener {
+    interface NetconfNotificationStreamListener {
 
         /**
          * Stream becomes available in the collector (first publisher is registered).

@@ -93,8 +93,8 @@ public class NetconfConnectDeviceCommand extends AbstractAction {
             return "Invalid IP:" + deviceIp + " or Port:" + devicePort + "Please enter a valid entry to proceed.";
         }
 
-        final boolean isTcpOnly = (connectionType.equals("true")) ? true : false;
-        final boolean isSchemaless = (schemaless.equals("true")) ? true : false;
+        final boolean isTcpOnly = connectionType.equals("true");
+        final boolean isSchemaless = schemaless.equals("true");
         final Credentials credentials = new LoginPasswordBuilder().setPassword(password).setUsername(username).build();
 
         final NetconfNode netconfNode = new NetconfNodeBuilder()

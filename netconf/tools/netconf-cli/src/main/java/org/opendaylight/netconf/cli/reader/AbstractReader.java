@@ -72,10 +72,7 @@ public abstract class AbstractReader<T extends DataSchemaNode> implements Reader
     }
 
     private boolean isReadingWanted(final DataSchemaNode node) {
-        if (readConfigNode && !node.isConfiguration()) {
-            return false;
-        }
-        return true;
+        return !(readConfigNode && !node.isConfiguration());
     }
 
     // TODO javadoc

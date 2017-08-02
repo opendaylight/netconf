@@ -207,7 +207,7 @@ public final class NetconfBaseOps {
 
     private ListenableFuture<Optional<NormalizedNode<?, ?>>> extractData(
             final Optional<YangInstanceIdentifier> path, final ListenableFuture<DOMRpcResult> configRunning) {
-        return Futures.transform(configRunning, (Function<DOMRpcResult, Optional<NormalizedNode<?, ?>>>) result -> {
+        return Futures.transform(configRunning, result -> {
             Preconditions.checkArgument(
                     result.getErrors().isEmpty(), "Unable to read data: %s, errors: %s", path, result.getErrors());
             final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> dataNode =
@@ -255,7 +255,7 @@ public final class NetconfBaseOps {
     public ListenableFuture<DOMRpcResult> editConfigCandidate(final FutureCallback<? super DOMRpcResult> callback,
                                                               final DataContainerChild<?, ?> editStructure,
                                                               final boolean rollback) {
-        return editConfig(callback, NETCONF_CANDIDATE_QNAME, editStructure, Optional.<ModifyAction>absent(), rollback);
+        return editConfig(callback, NETCONF_CANDIDATE_QNAME, editStructure, Optional.absent(), rollback);
     }
 
     public ListenableFuture<DOMRpcResult> editConfigRunning(final FutureCallback<? super DOMRpcResult> callback,
@@ -267,7 +267,7 @@ public final class NetconfBaseOps {
     public ListenableFuture<DOMRpcResult> editConfigRunning(final FutureCallback<? super DOMRpcResult> callback,
                                                             final DataContainerChild<?, ?> editStructure,
                                                             final boolean rollback) {
-        return editConfig(callback, NETCONF_RUNNING_QNAME, editStructure, Optional.<ModifyAction>absent(), rollback);
+        return editConfig(callback, NETCONF_RUNNING_QNAME, editStructure, Optional.absent(), rollback);
     }
 
     public ListenableFuture<DOMRpcResult> editConfig(
