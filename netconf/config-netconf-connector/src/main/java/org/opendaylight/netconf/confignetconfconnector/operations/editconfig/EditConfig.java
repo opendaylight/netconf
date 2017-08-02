@@ -56,7 +56,7 @@ public class EditConfig extends AbstractConfigNetconfOperation {
 
         LOG.trace("Operation {} successful", EditConfigXmlParser.EDIT_CONFIG);
 
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
     }
 
     @Override

@@ -60,7 +60,7 @@ public class DefaultCloseSession extends AbstractSingletonNetconfOperation imple
                     DocumentedException.ErrorSeverity.ERROR, Collections.singletonMap(
                     DocumentedException.ErrorSeverity.ERROR.toString(), e.getMessage()));
         }
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
     }
 
     @Override

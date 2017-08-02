@@ -75,11 +75,7 @@ public class Config {
             return false;
         }
 
-        if (!java.util.Objects.equals(put, that.put)) {
-            return false;
-        }
-
-        return true;
+        return java.util.Objects.equals(put, that.put);
 
     }
 }
