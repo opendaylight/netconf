@@ -116,6 +116,7 @@ public class BrokerFacadeTest {
         when(this.domDataBroker.newReadOnlyTransaction()).thenReturn(this.readTransaction);
         when(this.domDataBroker.newWriteOnlyTransaction()).thenReturn(this.writeTransaction);
         when(this.domDataBroker.newReadWriteTransaction()).thenReturn(this.rwTransaction);
+        doReturn(Optional.of(domDataBroker)).when(mockMountInstance).getService(DOMDataBroker.class);
 
         ControllerContext.getInstance().setSchemas(TestUtils.loadSchemaContext("/full-versions/test-module"));
     }
@@ -146,6 +147,11 @@ public class BrokerFacadeTest {
         final NormalizedNode<?, ?> actualNode = this.brokerFacade.readConfigurationData(this.instanceID);
 
         assertSame("readConfigurationData", this.dummyNode, actualNode);
+
+        final NormalizedNode<?, ?> noss =
+                this.brokerFacade.readConfigurationData(this.mockMountInstance, this.instanceID);
+
+        assertSame("readConfigurationData", this.dummyNode, noss);
     }
 
     @Test
