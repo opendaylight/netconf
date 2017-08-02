@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1f61a0_8583b5cb",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/authentication/PublicKeyAuth.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T08:03:20Z",
+      "side": 1,
+      "message": "2017",
+      "revId": "2f1b7c234d61a1c607f6cf558b2027d1a97b48e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_a52239ff",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/authentication/PublicKeyAuth.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T08:03:20Z",
+      "side": 1,
+      "message": "There is still unnecessary line break here.\n\nClass declaration can be done on one line\npublic class PublicKeyAuth extends LoginPassword {",
+      "revId": "2f1b7c234d61a1c607f6cf558b2027d1a97b48e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_052065f6",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/authentication/PublicKeyAuth.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T08:03:20Z",
+      "side": 1,
+      "message": "} else {\n ...\n}",
+      "revId": "2f1b7c234d61a1c607f6cf558b2027d1a97b48e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_a5699927",
+        "filename": "netconf/netconf-topology-config/src/main/resources/initial/odl-sb-netconf-client-keypair.cfg",
+        "patchSetId": 11
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T08:03:20Z",
+      "side": 1,
+      "message": "Since this is a comment, shouldn\u0027t this line begin with # sign?",
+      "revId": "2f1b7c234d61a1c607f6cf558b2027d1a97b48e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_658841e8",
+        "filename": "netconf/netconf-topology-config/src/main/resources/initial/odl-sb-netconf-client-keypair.cfg",
+        "patchSetId": 11
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T08:03:20Z",
+      "side": 1,
+      "message": "Please remove the trailing whitespace.",
+      "revId": "2f1b7c234d61a1c607f6cf558b2027d1a97b48e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_0577c503",
+        "filename": "netconf/netconf-topology-config/src/main/resources/initial/odl-sb-netconf-client-keypair.cfg",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T08:03:20Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this begin with #?",
+      "revId": "2f1b7c234d61a1c607f6cf558b2027d1a97b48e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_e51c31c4",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/utils/NetconfTopologySetup.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T08:03:20Z",
+      "side": 1,
+      "message": "Comments from previous review are still relevant here.\nThis method definition should look like this:\npublic String getPrivateKeyPath() {\n    return privateKeyPath;\n}",
+      "revId": "2f1b7c234d61a1c607f6cf558b2027d1a97b48e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_4579bdfb",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/utils/NetconfTopologySetup.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-02T08:03:20Z",
+      "side": 1,
+      "message": "Also this one",
+      "revId": "2f1b7c234d61a1c607f6cf558b2027d1a97b48e2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
