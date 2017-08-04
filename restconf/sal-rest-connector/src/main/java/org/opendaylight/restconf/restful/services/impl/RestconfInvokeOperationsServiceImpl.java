@@ -78,7 +78,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         if ((result != null) && (result.getResult() != null)) {
             resultNodeSchema = (RpcDefinition) payload.getInstanceIdentifierContext().getSchemaNode();
         }
-        return new NormalizedNodeContext(new InstanceIdentifierContext<RpcDefinition>(null, resultNodeSchema,
+        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, resultNodeSchema,
                 mountPoint, schemaContextRef.get()), resultData);
     }
 }

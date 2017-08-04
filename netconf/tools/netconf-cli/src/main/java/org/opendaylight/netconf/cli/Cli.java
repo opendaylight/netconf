@@ -135,7 +135,7 @@ public class Cli implements Runnable {
     private void handleEmptyOutput(final Command command, final Output response) {
         try {
             new NormalizedNodeWriter(consoleIO, new OutFormatter()).write(null,
-                    Collections.<NormalizedNode<?, ?>>singletonList(response.getOutput()));
+                    Collections.singletonList(response.getOutput()));
         } catch (final WriteException e) {
             throw new IllegalStateException("Unable to write value for: " + response.getOutput().getNodeType()
                     + " from: " + command.getCommandId(), e);

@@ -47,12 +47,12 @@ public class Activator implements BundleActivator {
         final Dictionary<String, String> props = new Hashtable<>();
         props.put(NetconfConstants.SERVICE_NAME, NetconfConstants.NETCONF_NOTIFICATION);
         netconfNotificationCollectorServiceRegistration = context.registerService(NetconfNotificationCollector.class,
-                netconfNotificationManager, new Hashtable<String, Object>());
+                netconfNotificationManager, new Hashtable<>());
 
         final NetconfOperationServiceFactory netconfOperationServiceFactory = new NetconfOperationServiceFactory() {
 
             private final Set<Capability> capabilities =
-                    Collections.<Capability>singleton(new BasicCapability(NetconfNotification.NOTIFICATION_NAMESPACE));
+                    Collections.singleton(new BasicCapability(NetconfNotification.NOTIFICATION_NAMESPACE));
 
             @Override
             public Set<Capability> getCapabilities() {
@@ -61,11 +61,11 @@ public class Activator implements BundleActivator {
 
             @Override
             public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-                listener.onCapabilitiesChanged(capabilities, Collections.<Capability>emptySet());
+                listener.onCapabilitiesChanged(capabilities, Collections.emptySet());
                 return new AutoCloseable() {
                     @Override
                     public void close() {
-                        listener.onCapabilitiesChanged(Collections.<Capability>emptySet(), capabilities);
+                        listener.onCapabilitiesChanged(Collections.emptySet(), capabilities);
                     }
                 };
             }
@@ -79,7 +79,7 @@ public class Activator implements BundleActivator {
 
                     @Override
                     public Set<NetconfOperation> getNetconfOperations() {
-                        return Sets.<NetconfOperation>newHashSet(
+                        return Sets.newHashSet(
                                 new Get(netconfSessionIdForReporting, netconfNotificationManager),
                                 createSubscription);
                     }
