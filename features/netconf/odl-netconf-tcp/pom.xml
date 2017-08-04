@@ -30,15 +30,14 @@
     </properties>
 
     <dependencies>
-        <!-- This is pulled in via feature.xml directly for now (until we can configure prerequisites here
         <dependency>
+            <!-- Pre-requisite, see below -->
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-util</artifactId>
             <version>${project.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
-        -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-impl</artifactId>
@@ -59,4 +58,17 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.karaf.tooling</groupId>
+                <artifactId>karaf-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <prerequisiteFeatures>odl-netconf-util</prerequisiteFeatures>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
