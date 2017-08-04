@@ -182,7 +182,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
 
             return sourceElement.isPresent()
                     ? Optional.of(Datastore.valueOf(sourceElement.get().getOnlyChildElement().getName()))
-                    : Optional.<Datastore>absent();
+                    : Optional.absent();
         }
 
         private static void validateInputRpc(final XmlElement xml, final String operationName) throws

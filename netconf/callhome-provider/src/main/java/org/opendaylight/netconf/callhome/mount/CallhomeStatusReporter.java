@@ -289,7 +289,7 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
 
     private List<Device> getDevicesAsList() {
         AllowedDevices devices = getDevices();
-        return (devices == null) ? new ArrayList<Device>() : devices.getDevice();
+        return (devices == null) ? new ArrayList<>() : devices.getDevice();
     }
 
     @Override

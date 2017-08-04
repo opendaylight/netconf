@@ -50,7 +50,7 @@ class SimulatedOperationProvider implements NetconfOperationServiceFactory {
     @Override
     public AutoCloseable registerCapabilityListener(
             final CapabilityListener listener) {
-        listener.onCapabilitiesChanged(caps, Collections.<Capability>emptySet());
+        listener.onCapabilitiesChanged(caps, Collections.emptySet());
         return new AutoCloseable() {
             @Override
             public void close() throws Exception {

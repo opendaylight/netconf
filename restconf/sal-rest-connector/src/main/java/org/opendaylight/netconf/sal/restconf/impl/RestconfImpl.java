@@ -411,7 +411,7 @@ public class RestconfImpl implements RestconfService {
 
         final Splitter splitter = Splitter.on("/").omitEmptyStrings();
         final Iterable<String> split = splitter.split(moduleNameAndRevision);
-        final List<String> pathArgs = Lists.<String>newArrayList(split);
+        final List<String> pathArgs = Lists.newArrayList(split);
         if (pathArgs.size() < 2) {
             LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' " + identifier);
             throw new RestconfDocumentedException(

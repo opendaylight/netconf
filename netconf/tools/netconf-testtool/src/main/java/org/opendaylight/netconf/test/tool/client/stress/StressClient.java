@@ -123,9 +123,9 @@ public final class StressClient {
         final List<List<NetconfMessage>> allPreparedMessages = new ArrayList<>(threadAmount);
         for (int i = 0; i < threadAmount; i++) {
             if (i != threadAmount - 1) {
-                allPreparedMessages.add(new ArrayList<NetconfMessage>(requestsPerThread));
+                allPreparedMessages.add(new ArrayList<>(requestsPerThread));
             } else {
-                allPreparedMessages.add(new ArrayList<NetconfMessage>(requestsPerThread + leftoverRequests));
+                allPreparedMessages.add(new ArrayList<>(requestsPerThread + leftoverRequests));
             }
         }
 

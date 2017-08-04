@@ -97,7 +97,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
 
     private static Optional<SslHandler> getSslHandler(final Channel channel) {
         final SslHandler sslHandler = channel.pipeline().get(SslHandler.class);
-        return sslHandler == null ? Optional.<SslHandler>absent() : Optional.of(sslHandler);
+        return Optional.fromNullable(sslHandler);
     }
 
     public P getSessionPreferences() {
