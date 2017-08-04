@@ -142,7 +142,7 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
 
                 @Override
                 public void operationComplete(final ChannelFuture future) throws Exception {
-                    if (future.isSuccess() == false) {
+                    if (!future.isSuccess()) {
                         LOG.warn("Unable to release internal connection to netconf server on channel: {}",
                                 clientChannel);
                     }

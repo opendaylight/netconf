@@ -93,7 +93,7 @@ public final class NetconfXMLToHelloMessageDecoder extends ByteToMessageDecoder 
 
             final NetconfMessage message = getNetconfMessage(additionalHeader, doc);
             if (message instanceof NetconfHelloMessage) {
-                Preconditions.checkState(helloReceived == false,
+                Preconditions.checkState(!helloReceived,
                         "Multiple hello messages received, unexpected hello: %s", message);
                 out.add(message);
                 helloReceived = true;

@@ -281,7 +281,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             session.close(false).addListener(new SshFutureListener<CloseFuture>() {
                 @Override
                 public void operationComplete(final CloseFuture future) {
-                    if (future.isClosed() == false) {
+                    if (!future.isClosed()) {
                         session.close(true);
                     }
                     session = null;

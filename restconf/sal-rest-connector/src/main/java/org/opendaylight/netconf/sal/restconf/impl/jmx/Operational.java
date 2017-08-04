@@ -32,11 +32,7 @@ public class Operational {
             return false;
         }
         final Operational that = (Operational) obj;
-        if (!java.util.Objects.equals(get, that.get)) {
-            return false;
-        }
-
-        return true;
+        return java.util.Objects.equals(get, that.get);
 
     }
 }
