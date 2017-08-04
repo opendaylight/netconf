@@ -66,7 +66,7 @@ public final class NetconfStartExiMessage extends NetconfMessage {
         createFidelityElement(doc, fidelityElements, exiOptions.getPreservePIs(), PIS_KEY);
         createFidelityElement(doc, fidelityElements, exiOptions.getPreserveNS(), PREFIXES_KEY);
 
-        if (fidelityElements.isEmpty() == false) {
+        if (!fidelityElements.isEmpty()) {
             final Element fidelityElement = doc.createElementNS(
                     XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0, FIDELITY_KEY);
             for (final Element element : fidelityElements) {

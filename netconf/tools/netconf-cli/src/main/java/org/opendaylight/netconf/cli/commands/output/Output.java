@@ -33,7 +33,7 @@ public class Output {
     }
 
     public Map<DataSchemaNode, List<NormalizedNode<?, ?>>> unwrap(final OutputDefinition outputDefinition) {
-        Preconditions.checkArgument(outputDefinition.isEmpty() == false);
+        Preconditions.checkArgument(!outputDefinition.isEmpty());
 
         final Map<QName, DataSchemaNode> mappedSchemaNodes = mapOutput(outputDefinition);
         final Map<DataSchemaNode, List<NormalizedNode<?, ?>>> mappedNodesToSchema = Maps.newHashMap();

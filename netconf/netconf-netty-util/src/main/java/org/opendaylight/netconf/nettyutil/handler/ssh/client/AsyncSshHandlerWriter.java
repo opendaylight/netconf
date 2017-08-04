@@ -67,7 +67,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
                 promise.setFailure(new IllegalStateException("Channel closed"));
             } else {
                 final ByteBuf byteBufMsg = (ByteBuf) msg;
-                if (pending.isEmpty() == false) {
+                if (!pending.isEmpty()) {
                     queueRequest(ctx, byteBufMsg, promise);
                     return;
                 }
@@ -129,7 +129,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
 
         } catch (final WritePendingException e) {
 
-            if (wasPending == false) {
+            if (!wasPending) {
                 queueRequest(ctx, byteBufMsg, promise);
             }
         }
