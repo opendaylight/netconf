@@ -25,6 +25,10 @@
 
     <!-- messagebus endpoint for netconf connector-->
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

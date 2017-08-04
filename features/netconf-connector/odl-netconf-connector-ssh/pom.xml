@@ -25,6 +25,10 @@
 
     <name>!!!DEPRECATED!!! OpenDaylight :: Netconf Connector :: Netconf Connector + Netconf SSH Server</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

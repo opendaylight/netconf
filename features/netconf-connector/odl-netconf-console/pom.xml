@@ -25,6 +25,10 @@
 
     <name>OpenDaylight :: Netconf Console + Karaf CLI for netconf CRUD operations</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
