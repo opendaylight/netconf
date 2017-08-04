@@ -95,10 +95,7 @@ public class NetconfConsoleUtils {
      * @return :<code>true</code> if not empty, else, <code>false</code>
      */
     private static boolean isNetconfNodesPresent(final Topology topology) {
-        if (topology == null || topology.getNode() == null || topology.getNode().isEmpty()) {
-            return false;
-        }
-        return true;
+        return topology != null && topology.getNode() != null && !topology.getNode().isEmpty();
     }
 
     /**

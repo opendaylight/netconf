@@ -89,7 +89,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
      */
     static NetconfStateSchemas create(final DOMRpcService deviceRpc,
                                   final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id) {
-        if (remoteSessionCapabilities.isMonitoringSupported() == false) {
+        if (!remoteSessionCapabilities.isMonitoringSupported()) {
             // TODO - need to search for get-schema support, not just ietf-netconf-monitoring support
             // issue might be a deviation to ietf-netconf-monitoring where get-schema is unsupported...
             LOG.warn("{}: Netconf monitoring not supported on device, cannot detect provided schemas", id);
@@ -108,7 +108,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
             return EMPTY;
         }
 
-        if (schemasNodeResult.getErrors().isEmpty() == false) {
+        if (!schemasNodeResult.getErrors().isEmpty()) {
             LOG.warn("{}: Unable to detect available schemas, get to {} failed, {}",
                     id, STATE_SCHEMAS_IDENTIFIER, schemasNodeResult.getErrors());
             return EMPTY;
@@ -158,13 +158,13 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         }
         final Optional<DataContainerChild<?, ?>> dataNode =
                 ((DataContainerNode<?>) result).getChild(toId(NETCONF_DATA_QNAME));
-        if (dataNode.isPresent() == false) {
+        if (!dataNode.isPresent()) {
             return Optional.absent();
         }
 
         final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> nStateNode =
                 ((DataContainerNode<?>) dataNode.get()).getChild(toId(NetconfState.QNAME));
-        if (nStateNode.isPresent() == false) {
+        if (!nStateNode.isPresent()) {
             return Optional.absent();
         }
 
@@ -191,14 +191,14 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
             final String formatAsString = getSingleChildNodeValue(schemaNode, childNode).get();
 
-            if (formatAsString.equals(Yang.QNAME.toString()) == false) {
+            if (!formatAsString.equals(Yang.QNAME.toString())) {
                 LOG.debug("{}: Ignoring schema due to unsupported format: {}", id, formatAsString);
                 return Optional.absent();
             }
 
             childNode = NetconfMessageTransformUtil.IETF_NETCONF_MONITORING_SCHEMA_LOCATION;
             final Set<String> locationsAsString = getAllChildNodeValues(schemaNode, childNode);
-            if (locationsAsString.contains(Schema.Location.Enumeration.NETCONF.toString()) == false) {
+            if (!locationsAsString.contains(Schema.Location.Enumeration.NETCONF.toString())) {
                 LOG.debug("{}: Ignoring schema due to unsupported location: {}", id, locationsAsString);
                 return Optional.absent();
             }
@@ -272,11 +272,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
             final RemoteYangSchema that = (RemoteYangSchema) obj;
 
-            if (!qname.equals(that.qname)) {
-                return false;
-            }
-
-            return true;
+            return qname.equals(that.qname);
         }
 
         @Override

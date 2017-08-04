@@ -80,7 +80,7 @@ public class CommandDispatcher {
     public synchronized Optional<Command> getCommand(final String nameWithModule) {
         final QName commandQName = mergeCommandIds().get(nameWithModule);
         final Map<QName, Command> qNameCommandMap = mergeCommands();
-        if (commandQName == null || qNameCommandMap.containsKey(commandQName) == false) {
+        if (commandQName == null || !qNameCommandMap.containsKey(commandQName)) {
             return Optional.absent();
         }
 

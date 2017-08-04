@@ -65,7 +65,7 @@ public class Get extends AbstractNetconfOperation implements AutoCloseable {
             throws DocumentedException {
         final Document partialResponse = subsequentOperation.execute(requestMessage);
         final Streams availableStreams = notificationRegistry.getNotificationPublishers();
-        if (availableStreams.getStream().isEmpty() == false) {
+        if (!availableStreams.getStream().isEmpty()) {
             serializeStreamsSubtree(partialResponse, availableStreams);
         }
         return partialResponse;

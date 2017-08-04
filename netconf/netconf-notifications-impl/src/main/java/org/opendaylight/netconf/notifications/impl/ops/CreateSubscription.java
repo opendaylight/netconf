@@ -69,18 +69,18 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
         // Replay not supported
         final Optional<XmlElement> startTime =
                 operationElement.getOnlyChildElementWithSameNamespaceOptionally("startTime");
-        Preconditions.checkArgument(startTime.isPresent() == false, "StartTime element not yet supported");
+        Preconditions.checkArgument(!startTime.isPresent(), "StartTime element not yet supported");
 
         // Stop time not supported
         final Optional<XmlElement> stopTime =
                 operationElement.getOnlyChildElementWithSameNamespaceOptionally("stopTime");
-        Preconditions.checkArgument(stopTime.isPresent() == false, "StopTime element not yet supported");
+        Preconditions.checkArgument(!stopTime.isPresent(), "StopTime element not yet supported");
 
         final StreamNameType streamNameType = parseStreamIfPresent(operationElement);
 
         Preconditions.checkNotNull(netconfSession);
         // Premature streams are allowed (meaning listener can register even if no provider is available yet)
-        if (notifications.isStreamAvailable(streamNameType) == false) {
+        if (!notifications.isStreamAvailable(streamNameType)) {
             LOG.warn("Registering premature stream {}. No publisher available yet for session {}", streamNameType,
                     getNetconfSessionIdForReporting());
         }
