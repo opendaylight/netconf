@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-connector">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">odl-aaa-encryption-service</feature>
+        <feature prerequisite="false" dependency="false">odl-mdsal-broker</feature>
+        <feature prerequisite="false" dependency="false">odl-mdsal-models</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-client</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-notifications-api</feature>
+        <bundle>mvn:org.opendaylight.controller.model/model-inventory/1.7.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/netconf-topology/1.4.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/sal-netconf-connector/1.7.0-SNAPSHOT</bundle>
+    </feature>
+</features>

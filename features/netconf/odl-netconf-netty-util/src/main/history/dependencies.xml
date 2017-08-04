@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-1.4.0-SNAPSHOT">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">odl-netconf-api</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-mapping-api</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-util</feature>
+        <feature prerequisite="false" dependency="false">odl-netty-4</feature>
+        <feature prerequisite="false" dependency="false">ssh</feature>
+        <feature prerequisite="false" dependency="false">wrap</feature>
+        <bundle>mvn:org.apache.commons/commons-lang3/3.6</bundle>
+        <bundle>mvn:org.opendaylight.aaa/aaa-encrypt-service/0.7.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.controller/sal-binding-api/1.7.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.controller/sal-common-api/1.7.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.controller/sal-common-util/1.7.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/netconf-netty-util/1.4.0-SNAPSHOT</bundle>
+        <bundle>wrap:mvn:openexi/nagasena-rta/0000.0002.0062.0</bundle>
+        <bundle>wrap:mvn:openexi/nagasena/0000.0002.0062.0</bundle>
+        <bundle>wrap:mvn:org.opendaylight.aaa/aaa-encrypt-service/0.7.0-SNAPSHOT/xml/config</bundle>
+    </feature>
+</features>

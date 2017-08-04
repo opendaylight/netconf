@@ -25,6 +25,10 @@
 
     <name>OpenDaylight :: Netconf Connector :: Netconf Connector</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

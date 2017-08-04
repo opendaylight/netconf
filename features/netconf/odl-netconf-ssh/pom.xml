@@ -25,6 +25,10 @@
 
     <name>OpenDaylight :: Netconf Connector :: SSH</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

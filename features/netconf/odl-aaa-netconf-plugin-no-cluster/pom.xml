@@ -25,6 +25,10 @@
 
     <name>OpenDaylight :: AAA :: ODL NETCONF Plugin - NO CLUSTER</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

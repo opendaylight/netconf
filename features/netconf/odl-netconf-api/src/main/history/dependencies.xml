@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-api">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">odl-mdsal-models</feature>
+        <feature prerequisite="false" dependency="false">odl-protocol-framework</feature>
+        <feature prerequisite="false" dependency="false">odl-yangtools-yang-data</feature>
+        <bundle>mvn:org.opendaylight.controller/config-util/0.8.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/ietf-netconf-monitoring-extension/1.4.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/ietf-netconf-monitoring/1.4.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/ietf-netconf-notifications/1.4.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/ietf-netconf-yang-library/1.4.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/ietf-netconf/1.4.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/netconf-api/1.4.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/netconf-auth/1.4.0-SNAPSHOT</bundle>
+    </feature>
+</features>

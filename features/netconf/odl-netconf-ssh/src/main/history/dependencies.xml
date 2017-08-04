@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-ssh">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">odl-aaa-netconf-plugin</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-tcp</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-util</feature>
+        <feature prerequisite="false" dependency="false">wrap</feature>
+        <bundle>mvn:org.opendaylight.netconf/netconf-ssh/1.4.0-SNAPSHOT</bundle>
+    </feature>
+</features>

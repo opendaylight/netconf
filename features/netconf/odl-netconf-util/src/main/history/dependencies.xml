@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-1.4.0-SNAPSHOT">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">odl-netconf-mapping-api</feature>
+        <feature prerequisite="false" dependency="false">odl-yangtools-yang-data</feature>
+        <feature prerequisite="false" dependency="false">wrap</feature>
+        <bundle>mvn:org.opendaylight.netconf/netconf-util/1.4.0-SNAPSHOT</bundle>
+    </feature>
+</features>
