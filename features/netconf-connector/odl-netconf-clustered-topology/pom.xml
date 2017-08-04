@@ -25,6 +25,10 @@
 
     <name>OpenDaylight :: Clustered Netconf Topology :: Netconf Connector + Netconf SSH Server</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>

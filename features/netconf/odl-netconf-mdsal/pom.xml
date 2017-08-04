@@ -29,6 +29,7 @@
     <properties>
         <netconf.version>1.3.0-SNAPSHOT</netconf.version>
         <controller.mdsal.version>${project.version}</controller.mdsal.version>
+        <checkDependencyChange>true</checkDependencyChange>
     </properties>
 
     <dependencyManagement>

@@ -25,6 +25,10 @@
 
     <name>OpenDaylight :: Restconf</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

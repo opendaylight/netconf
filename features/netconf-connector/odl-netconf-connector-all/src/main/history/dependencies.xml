@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-connector-all">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">odl-netconf-callhome-ssh</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-connector</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-connector-ssh</feature>
+    </feature>
+</features>

@@ -25,6 +25,10 @@
 
     <name>OpenDaylight :: Protocol Framework</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>

@@ -25,6 +25,10 @@
 
     <name>OpenDaylight :: Netconf Connector :: Netconf Connector + Netconf SSH Server + loopback connection configuration</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

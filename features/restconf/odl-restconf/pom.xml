@@ -27,6 +27,10 @@
 
     <!-- Enables AAA through the odl-shiro-act bundle Activator -->
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>
