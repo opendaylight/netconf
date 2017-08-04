@@ -25,6 +25,11 @@
 
     <name>OpenDaylight :: Netconf Connector :: TCP</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+        <failOnDependencyChange>true</failOnDependencyChange>
+    </properties>
+
     <dependencies>
         <!-- This is pulled in via feature.xml directly for now (until we can configure prerequisites here
         <dependency>

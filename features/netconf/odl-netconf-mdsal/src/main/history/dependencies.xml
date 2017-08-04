@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-mdsal">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">odl-config-all</feature>
+        <feature prerequisite="false" dependency="false">odl-config-netty</feature>
+        <feature prerequisite="false" dependency="false">odl-mdsal-broker</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-all</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-client</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-ssh</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-tcp</feature>
+        <feature prerequisite="false" dependency="false">wrap</feature>
+        <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-connector/1.3.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-impl/1.3.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-monitoring/1.3.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-notification/1.3.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-ssh/1.3.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-tcp/1.3.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/mdsal-netconf-yang-library/1.3.0-SNAPSHOT</bundle>
+    </feature>
+</features>

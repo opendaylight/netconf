@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-yanglib">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">odl-karaf-feat-jetty</feature>
+        <feature prerequisite="false" dependency="false">odl-mdsal-models</feature>
+        <feature prerequisite="false" dependency="false">odl-restconf</feature>
+        <feature prerequisite="false" dependency="false">odl-yangtools-yang-data</feature>
+        <feature prerequisite="false" dependency="false">wrap</feature>
+        <bundle>mvn:org.opendaylight.netconf/ietf-netconf-yang-library/1.3.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/yanglib/1.3.0-SNAPSHOT</bundle>
+    </feature>
+</features>

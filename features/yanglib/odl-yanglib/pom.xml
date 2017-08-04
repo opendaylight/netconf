@@ -25,6 +25,11 @@
 
     <name>OpenDaylight :: Yanglib</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+        <failOnDependencyChange>true</failOnDependencyChange>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>

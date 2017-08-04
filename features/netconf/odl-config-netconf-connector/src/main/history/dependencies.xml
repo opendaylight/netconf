@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-config-netconf-connector">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">odl-config-manager</feature>
+        <feature prerequisite="false" dependency="false">odl-config-netty</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-netty-util</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-notifications-api</feature>
+        <feature prerequisite="false" dependency="false">wrap</feature>
+        <bundle>mvn:org.opendaylight.netconf/config-netconf-connector/1.3.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/netconf-impl/1.3.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/netconf-notifications-impl/1.3.0-SNAPSHOT</bundle>
+    </feature>
+</features>

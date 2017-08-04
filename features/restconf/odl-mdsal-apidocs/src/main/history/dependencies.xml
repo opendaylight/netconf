@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-mdsal-apidocs">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">odl-restconf</feature>
+        <feature prerequisite="false" dependency="false">wrap</feature>
+        <bundle>mvn:org.opendaylight.netconf/sal-rest-docgen/1.6.0-SNAPSHOT</bundle>
+        <bundle>wrap:mvn:com.github.mifmif/generex/1.0.0</bundle>
+        <bundle>wrap:mvn:dk.brics.automaton/automaton/1.11-8</bundle>
+        <bundle>wrap:mvn:org.jboss.resteasy/jaxrs-api/3.0.12.Final</bundle>
+    </feature>
+</features>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-connector-ssh">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">odl-netconf-topology</feature>
+        <bundle>mvn:org.opendaylight.netconf/netconf-connector-config/1.3.0-SNAPSHOT</bundle>
+    </feature>
+</features>

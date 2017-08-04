@@ -25,6 +25,11 @@
 
     <name>OpenDaylight :: Netconf :: API</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+        <failOnDependencyChange>true</failOnDependencyChange>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

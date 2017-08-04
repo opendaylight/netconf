@@ -23,6 +23,11 @@
     <version>1.3.0-SNAPSHOT</version>
     <packaging>feature</packaging>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+        <failOnDependencyChange>true</failOnDependencyChange>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
