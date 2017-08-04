@@ -42,7 +42,7 @@ public class SimulatedEditConfig extends AbstractConfigNetconfOperation {
             storage.setConfigList(configElementData.getChildElements());
         }
 
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
     }
 
     @Override

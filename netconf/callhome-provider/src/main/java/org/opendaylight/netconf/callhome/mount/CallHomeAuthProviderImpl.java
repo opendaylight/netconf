@@ -131,7 +131,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
         private final AuthorizedKeysDecoder keyDecoder = new AuthorizedKeysDecoder();
 
-        private ConcurrentMap<PublicKey, Device> byPublicKey = new ConcurrentHashMap<PublicKey, Device>();
+        private ConcurrentMap<PublicKey, Device> byPublicKey = new ConcurrentHashMap<>();
 
         @Override
         public void onDataTreeChanged(Collection<DataTreeModification<Device>> mods) {

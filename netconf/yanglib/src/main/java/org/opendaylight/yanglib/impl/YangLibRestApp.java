@@ -26,7 +26,7 @@ public class YangLibRestApp extends Application implements YangLibRestAppService
 
     @Override
     public Set<Object> getSingletons() {
-        return Collections.<Object>singleton(this.yangLibService);
+        return Collections.singleton(this.yangLibService);
     }
 
     @Override

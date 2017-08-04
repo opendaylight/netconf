@@ -161,7 +161,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
         for (NotificationTopicRegistration reg : notificationTopicRegistrations.values()) {
             reg.unRegisterNotificationTopic(input.getTopicId());
         }
-        return Util.resultRpcSuccessFor((Void) null);
+        return Util.resultRpcSuccessFor(null);
     }
 
     private synchronized Future<RpcResult<JoinTopicOutput>> registerTopic(

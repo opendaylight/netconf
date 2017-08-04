@@ -43,8 +43,7 @@ public final class NetconfHelloMessage extends NetconfMessage {
     }
 
     public Optional<NetconfHelloMessageAdditionalHeader> getAdditionalHeader() {
-        return additionalHeader == null ? Optional.<NetconfHelloMessageAdditionalHeader>absent()
-                : Optional.of(additionalHeader);
+        return Optional.fromNullable(additionalHeader);
     }
 
     private static void checkHelloMessage(Document doc) {

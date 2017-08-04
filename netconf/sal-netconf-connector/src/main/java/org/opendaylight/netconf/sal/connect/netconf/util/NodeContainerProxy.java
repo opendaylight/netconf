@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -45,7 +44,7 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     public NodeContainerProxy(final QName qualifiedName, final Collection<DataSchemaNode> childNodes) {
-        this(qualifiedName, asMap(childNodes), Collections.<AugmentationSchema>emptySet());
+        this(qualifiedName, asMap(childNodes), Collections.emptySet());
     }
 
     public NodeContainerProxy(final QName qualifiedName, final Collection<DataSchemaNode> childNodes,
@@ -54,7 +53,7 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     private static Map<QName, DataSchemaNode> asMap(final Collection<DataSchemaNode> childNodes) {
-        return Maps.uniqueIndex(childNodes, (Function<DataSchemaNode, QName>) DataSchemaNode::getQName);
+        return Maps.uniqueIndex(childNodes, DataSchemaNode::getQName);
     }
 
     @Override
