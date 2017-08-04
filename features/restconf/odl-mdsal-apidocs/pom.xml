@@ -25,6 +25,10 @@
 
     <name>OpenDaylight :: MDSAL :: APIDOCS</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>

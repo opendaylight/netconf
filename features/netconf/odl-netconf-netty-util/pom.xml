@@ -25,6 +25,10 @@
 
     <name>OpenDaylight :: Netconf :: Netty Util</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

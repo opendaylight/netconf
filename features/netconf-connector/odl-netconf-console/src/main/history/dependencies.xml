@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-console">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">odl-netconf-connector-all</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-mdsal</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-topology</feature>
+        <bundle>mvn:org.opendaylight.netconf/netconf-console/1.4.0-SNAPSHOT</bundle>
+    </feature>
+</features>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-impl">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">odl-config-netconf-connector</feature>
+        <feature prerequisite="false" dependency="false">odl-config-netty</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-api</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-mapping-api</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-monitoring</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-netty-util</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-notifications-impl</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-util</feature>
+        <feature prerequisite="false" dependency="false">wrap</feature>
+    </feature>
+</features>

@@ -25,6 +25,10 @@
 
     <name>OpenDaylight :: AAA :: ODL NETCONF Plugin</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>

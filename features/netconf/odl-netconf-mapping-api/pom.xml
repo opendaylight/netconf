@@ -25,6 +25,10 @@
 
     <name>OpenDaylight :: Netconf :: Mapping API</name>
 
+    <properties>
+        <checkDependencyChange>true</checkDependencyChange>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>

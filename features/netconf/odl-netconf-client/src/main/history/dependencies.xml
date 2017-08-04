@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-client">
+    <feature version="0.0.0">
+        <feature prerequisite="false" dependency="false">odl-config-all</feature>
+        <feature prerequisite="false" dependency="false">odl-config-netty</feature>
+        <feature prerequisite="false" dependency="false">odl-netconf-netty-util</feature>
+        <feature prerequisite="false" dependency="false">wrap</feature>
+        <bundle>mvn:org.opendaylight.netconf/netconf-client/1.4.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.opendaylight.netconf/netconf-config/1.4.0-SNAPSHOT</bundle>
+    </feature>
+</features>
