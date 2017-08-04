@@ -72,7 +72,7 @@ final class NotificationHandler {
     }
 
     private void queueNotification(final NetconfMessage notification) {
-        Preconditions.checkState(passNotifications == false);
+        Preconditions.checkState(!passNotifications);
 
         LOG.debug("{}: Caching notification {}, remote schema not yet fully built", id, notification);
         if (LOG.isTraceEnabled()) {

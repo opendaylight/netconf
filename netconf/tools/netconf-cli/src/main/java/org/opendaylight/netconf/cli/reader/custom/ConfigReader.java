@@ -194,7 +194,7 @@ public class ConfigReader extends AbstractReader<DataSchemaNode> {
 
     private Optional<DataSchemaNode> getCurrentNode(DataSchemaNode parent, final String buffer) {
         for (final String part : buffer.split(SEPARATOR)) {
-            if (IOUtil.isQName(part) == false) {
+            if (!IOUtil.isQName(part)) {
                 return Optional.of(parent);
             }
 

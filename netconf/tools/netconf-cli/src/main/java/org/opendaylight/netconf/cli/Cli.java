@@ -67,7 +67,7 @@ public class Cli implements Runnable {
                 final String commandName = consoleIO.read();
                 final Optional<Command> commandOpt = commandRegistry.getCommand(commandName);
 
-                if (commandOpt.isPresent() == false) {
+                if (!commandOpt.isPresent()) {
                     continue;
                 }
 

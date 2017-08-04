@@ -140,7 +140,7 @@ public final class Main {
         public List<File> generate(final boolean useSsh, final int batchSize,
                                    final int generateConfigsTimeout, final String address,
                                    final int devicesPerPort) {
-            if (configDir.exists() == false) {
+            if (!configDir.exists()) {
                 Preconditions.checkState(configDir.mkdirs(), "Unable to create directory " + configDir);
             }
 

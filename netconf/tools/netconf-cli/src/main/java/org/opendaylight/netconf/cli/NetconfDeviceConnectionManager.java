@@ -110,7 +110,7 @@ public class NetconfDeviceConnectionManager implements Closeable {
                                                     final NetconfClientConfigurationBuilder configBuilder) {
         this.connect(name, address, configBuilder);
         synchronized (handler) {
-            while (handler.isUp() == false) {
+            while (!handler.isUp()) {
                 try {
                     // TODO implement Timeout for unsuccessful connection
                     handler.wait();
