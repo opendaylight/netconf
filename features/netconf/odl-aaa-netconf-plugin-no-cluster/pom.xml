@@ -32,7 +32,7 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-artifacts</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
@@ -48,10 +48,6 @@
             <version>0.8.0-SNAPSHOT</version>
             <type>xml</type>
             <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-auth</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>
