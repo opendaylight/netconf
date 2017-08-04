@@ -95,7 +95,7 @@ class UnionTypeReader {
         }
 
         private Collection<String> toMenuItem(final List<TypeDefinition<?>> allTypesBehindUnion) {
-            final List<String> result = new ArrayList<String>();
+            final List<String> result = new ArrayList<>();
             for (final TypeDefinition<?> type : allTypesBehindUnion) {
                 final String menuItem = type.getQName().getLocalName();
                 menuItemsToTypeDefinitions.put(menuItem, type);

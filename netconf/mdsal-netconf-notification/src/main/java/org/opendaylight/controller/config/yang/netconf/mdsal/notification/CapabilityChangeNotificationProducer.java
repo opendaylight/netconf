@@ -92,7 +92,7 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
         netconfCapabilityChangeBuilder.setAddedCapability(ImmutableList.copyOf(added));
         netconfCapabilityChangeBuilder.setDeletedCapability(ImmutableList.copyOf(removed));
         // TODO modified should be computed ... but why ?
-        netconfCapabilityChangeBuilder.setModifiedCapability(Collections.<Uri>emptyList());
+        netconfCapabilityChangeBuilder.setModifiedCapability(Collections.emptyList());
         baseNotificationPublisherRegistration.onCapabilityChanged(netconfCapabilityChangeBuilder.build());
     }
 

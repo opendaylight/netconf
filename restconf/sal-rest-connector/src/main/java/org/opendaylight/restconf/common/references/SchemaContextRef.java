@@ -35,7 +35,7 @@ public final class SchemaContextRef {
      *             actual {@link SchemaContext}
      */
     public SchemaContextRef(final SchemaContext schemaContext) {
-        this.schemaContextRef = new SoftReference<SchemaContext>(schemaContext);
+        this.schemaContextRef = new SoftReference<>(schemaContext);
     }
 
     /**
