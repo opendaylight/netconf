@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1f61a0_b53a5534",
+        "filename": "netconf/netconf-mapping-api/src/main/java/org/opendaylight/netconf/mapping/api/HandlingPriority.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-08-06T12:11:20Z",
+      "side": 1,
+      "message": "Objects.equals()",
+      "range": {
+        "startLine": 91,
+        "startChar": 15,
+        "endLine": 91,
+        "endChar": 89
+      },
+      "revId": "b9d21907ba85d42441cdb36a473706cefb80c61f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
