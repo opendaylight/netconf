@@ -18,6 +18,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataChangeListener;
 import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
@@ -198,16 +199,10 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
     }
 
     private Device readAndGetDevice(NodeId nodeId) {
-        Optional<Device> opDevGet = readDevice(nodeId);
-        if (opDevGet != null) {
-            if (opDevGet.isPresent()) {
-                return opDevGet.get();
-            }
-        }
-
-        return null;
+        return readDevice(nodeId).orNull();
     }
 
+    @Nonnull
     private Optional<Device> readDevice(NodeId nodeId) {
         ReadOnlyTransaction opTx = dataBroker.newReadOnlyTransaction();
 
@@ -218,7 +213,7 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
         try {
             return devFuture.checkedGet();
         } catch (ReadFailedException e) {
-            return null;
+            return Optional.absent();
         }
     }
 
