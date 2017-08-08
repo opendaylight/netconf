@@ -34,6 +34,8 @@ import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
@@ -122,7 +124,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                             docRootElm, scQName));
         }
 
-        final NormalizedNode<?, ?> parsed;
+        NormalizedNode<?, ?> parsed;
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
@@ -132,6 +134,13 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                     schemaNode);
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             parsed = resultHolder.getResult();
+
+            if (!isPost() && parsed instanceof MapNode) {
+                final MapNode mapNode = (MapNode) parsed;
+                final MapEntryNode mapEntryNode = mapNode.getValue().iterator().next();
+                parsed = mapEntryNode;
+            }
+
             if (schemaNode instanceof  ListSchemaNode && isPost()) {
                 iiToDataList.add(parsed.getIdentifier());
             }
