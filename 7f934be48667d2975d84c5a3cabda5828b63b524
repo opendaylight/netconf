@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1f61a0_33acb6ed",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlNormalizedNodeBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-08T14:09:25Z",
+      "side": 1,
+      "message": "I think we should leave here an explanatory comment here, why we need to unwrap MapEntryNode from parsed MapNode.",
+      "revId": "7f934be48667d2975d84c5a3cabda5828b63b524",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_f3aa1ed3",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlNormalizedNodeBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-08T14:09:25Z",
+      "side": 1,
+      "message": "If you leave the above-mentioned explanatory comment prior to the if statement, the variable mapEntryNode seems to be redundant. We can assign unwrapped MapEntryNode directly to parsed variable.",
+      "revId": "7f934be48667d2975d84c5a3cabda5828b63b524",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_f3817e4b",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/jersey/providers/XmlNormalizedNodeBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-08T14:09:25Z",
+      "side": 1,
+      "message": "The comments from the XmlNormalizedNodeBodyReader class apply also here.",
+      "revId": "7f934be48667d2975d84c5a3cabda5828b63b524",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
