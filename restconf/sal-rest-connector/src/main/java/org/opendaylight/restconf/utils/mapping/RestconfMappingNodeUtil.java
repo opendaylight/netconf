@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.utils.mapping;
 
+import com.google.common.base.Optional;
 import java.net.URI;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -579,7 +580,7 @@ public final class RestconfMappingNodeUtil {
             final Module monitoringModule, final boolean existParent, final SchemaContext schemaContext) {
         final SchemaNode schemaNode = ParserIdentifier
                 .toInstanceIdentifier(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext),
-                        schemaContext, null)
+                        schemaContext, Optional.absent())
                 .getSchemaNode();
         final DataSchemaNode streamListSchema = ((ContainerSchemaNode) ((ContainerSchemaNode) monitoringModule
                 .getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME))
