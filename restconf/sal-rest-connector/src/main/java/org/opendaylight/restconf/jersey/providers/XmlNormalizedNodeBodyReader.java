@@ -34,6 +34,7 @@ import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
@@ -122,7 +123,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                             docRootElm, scQName));
         }
 
-        final NormalizedNode<?, ?> parsed;
+        NormalizedNode<?, ?> parsed;
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
@@ -132,6 +133,16 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                     schemaNode);
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             parsed = resultHolder.getResult();
+
+//            When parsing an XML source with a list root node
+//            the new XML parser always returns a MapNode with one MapEntryNode inside.
+//            However, the old XML parser returned a MapEntryNode directly in this place.
+//            Therefore we now have to extract the MapEntryNode from the parsed MapNode.
+            if (parsed instanceof MapNode) {
+                final MapNode mapNode = (MapNode) parsed;
+                parsed = mapNode.getValue().iterator().next(); // extracting the MapEntryNode
+            }
+
             if (schemaNode instanceof  ListSchemaNode && isPost()) {
                 iiToDataList.add(parsed.getIdentifier());
             }
