@@ -22,6 +22,7 @@ import com.google.gson.stream.JsonReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -34,7 +35,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.transform.dom.DOMSource;
+import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
@@ -335,7 +336,9 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
             final XmlParserStream xmlParser = XmlParserStream.create(writer, LIBRARY_CONTEXT,
                     LIBRARY_CONTEXT.getDataChildByName(ModulesState.QNAME));
-            xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
+
+            xmlParser.parse(UntrustedXML.createXMLStreamReader(new StringReader(XmlUtil.toString(
+                    doc.getDocumentElement(), false))));
             final NormalizedNode<?, ?> parsed = resultHolder.getResult();
             return Optional.of(parsed);
         } catch (final Exception e) {

@@ -12,6 +12,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,7 +22,6 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
@@ -38,6 +38,7 @@ import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -270,7 +271,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext.getCurrentContext(), input);
 
         try {
-            xmlParser.traverse(new DOMSource(element.getDomElement()));
+            xmlParser.parse(UntrustedXML.createXMLStreamReader(new StringReader(XmlUtil.toString(element))));
         } catch (final Exception ex) {
             throw new NetconfDocumentedException("Error parsing input: " + ex.getMessage(), ex, ErrorType.PROTOCOL,
                     ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
