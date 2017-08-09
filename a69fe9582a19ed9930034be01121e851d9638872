@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1f61a0_7f9f0c60",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlNormalizedNodeBodyReader.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-09T13:35:30Z",
+      "side": 1,
+      "message": "You should indent this at same level as surrounding code.",
+      "revId": "a69fe9582a19ed9930034be01121e851d9638872",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_df87180e",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlNormalizedNodeBodyReader.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-09T13:35:30Z",
+      "side": 1,
+      "message": "Please put this on the new line preceding extraction of MapEntryNode",
+      "revId": "a69fe9582a19ed9930034be01121e851d9638872",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_1f79b02f",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/jersey/providers/XmlNormalizedNodeBodyReader.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-08-09T13:35:30Z",
+      "side": 1,
+      "message": "Comments from other class apply also here",
+      "revId": "a69fe9582a19ed9930034be01121e851d9638872",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
