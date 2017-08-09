@@ -10,6 +10,8 @@ package org.opendaylight.restconf.jersey.providers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +35,9 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -69,9 +74,44 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
     public static void initialization() throws Exception {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
+        testFiles.addAll(TestRestconfUtils.loadFiles("/foo-xml-test/yang"));
         schemaContext = YangParserTestUtils.parseYangSources(testFiles);
         CONTROLLER_CONTEXT.setSchemas(schemaContext);
         when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mock(DOMMountPointService.class));
+    }
+
+    @Test
+    public void putXmlTest() throws Exception {
+        runXmlTest(false, "foo:top-level-list=key-value");
+    }
+
+    @Test
+    public void postXmlTest() throws Exception {
+        runXmlTest(true, "");
+    }
+
+    private void runXmlTest(final boolean isPost, final String path) throws Exception {
+        mockBodyReader(path, xmlBodyReader, isPost);
+        final InputStream inputStream = TestXmlBodyReader.class.getResourceAsStream("/foo-xml-test/foo.xml");
+        final NormalizedNodeContext nnc = xmlBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
+        assertNotNull(nnc);
+
+        assertTrue(nnc.getData() instanceof MapEntryNode);
+        final MapEntryNode data = (MapEntryNode) nnc.getData();
+        assertTrue(data.getValue().size() == 2);
+        for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
+            switch (child.getNodeType().getLocalName()) {
+                case "key-leaf":
+                    assertEquals("key-value", child.getValue());
+                    break;
+
+                case "ordinary-leaf":
+                    assertEquals("leaf-value", child.getValue());
+                    break;
+                default:
+                    fail();
+            }
+        }
     }
 
     @Test
