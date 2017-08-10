@@ -16,6 +16,24 @@
       "revId": "f0931f7ac525218dfb99f9829f11d7dd7a17f82f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_8589cacc",
+        "filename": "restconf/sal-rest-docgen/src/main/resources/org/opendaylight/blueprint/blueprint.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-08-10T14:02:25Z",
+      "side": 1,
+      "message": "It isn\u0027t an advertised service in the original version.  However, there may be a use case for it in the future, so  I decided to advertise it here.  In all reality, it would be an external application that would probably pull this in (like DLUX or something).  I can take it out if you would rather that, but since we already define the service I figure we might as well expose it for proper consumption.  Open to thoughts.",
+      "parentUuid": "ba1f61a0_569aee63",
+      "revId": "f0931f7ac525218dfb99f9829f11d7dd7a17f82f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
