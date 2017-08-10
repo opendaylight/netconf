@@ -34,6 +34,24 @@
       "revId": "f0931f7ac525218dfb99f9829f11d7dd7a17f82f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_45b7d286",
+        "filename": "restconf/sal-rest-docgen/src/main/resources/org/opendaylight/blueprint/blueprint.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2017-08-10T17:07:00Z",
+      "side": 1,
+      "message": "But where was it instantiated before? I don\u0027t see it elsewhere in your patch set, ie if we\u0027re now instantiating in BP then I\u0027d expect the prior instantiation removed. Or am I missing something?",
+      "parentUuid": "ba1f61a0_8589cacc",
+      "revId": "f0931f7ac525218dfb99f9829f11d7dd7a17f82f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
