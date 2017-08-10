@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1f61a0_569aee63",
+        "filename": "restconf/sal-rest-docgen/src/main/resources/org/opendaylight/blueprint/blueprint.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2017-08-10T00:22:56Z",
+      "side": 1,
+      "message": "What is this service for? I don\u0027t see where was instantiated in the original DocProvider.",
+      "revId": "f0931f7ac525218dfb99f9829f11d7dd7a17f82f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
