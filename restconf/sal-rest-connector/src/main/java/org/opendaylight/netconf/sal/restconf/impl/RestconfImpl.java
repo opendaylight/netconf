@@ -39,7 +39,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -824,7 +823,7 @@ public class RestconfImpl implements RestconfService {
             try {
                 result.getFutureOfPutData().checkedGet();
                 return Response.status(result.getStatus()).build();
-            } catch (TransactionCommitFailedException e) {
+            } catch (final TransactionCommitFailedException e) {
                 if (e instanceof OptimisticLockFailedException) {
                     if (--tries <= 0) {
                         LOG.debug("Got OptimisticLockFailedException on last try - failing " + identifier);
@@ -1003,7 +1002,7 @@ public class RestconfImpl implements RestconfService {
             future.checkedGet();
         } catch (final RestconfDocumentedException e) {
             throw e;
-        } catch (TransactionCommitFailedException e) {
+        } catch (final TransactionCommitFailedException e) {
             LOG.info("Error creating data " + (uriInfo != null ? uriInfo.getPath() : ""), e);
             throw new RestconfDocumentedException(e.getMessage(), e, e.getErrorList());
         }
@@ -1052,7 +1051,7 @@ public class RestconfImpl implements RestconfService {
 
         try {
             future.checkedGet();
-        } catch (TransactionCommitFailedException e) {
+        } catch (final TransactionCommitFailedException e) {
             final Optional<Throwable> searchedException = Iterables.tryFind(Throwables.getCausalChain(e),
                     Predicates.instanceOf(ModifiedNodeDoesNotExistException.class));
             if (searchedException.isPresent()) {
@@ -1299,28 +1298,37 @@ public class RestconfImpl implements RestconfService {
     }
 
     @Override
-    public PATCHStatusContext patchConfigurationData(final String identifier, final PATCHContext context,
+    public Response patchConfigurationData(final String identifier, final PATCHContext context,
             final UriInfo uriInfo) {
-        if (context == null) {
-            throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
-        }
-
-        try {
-            return this.broker.patchConfigurationDataWithinTransaction(context);
-        } catch (final Exception e) {
-            LOG.debug("Patch transaction failed", e);
-            throw new RestconfDocumentedException(e.getMessage());
-        }
+        return patchConfigurationData(context, uriInfo);
     }
 
     @Override
-    public PATCHStatusContext patchConfigurationData(final PATCHContext context, @Context final UriInfo uriInfo) {
+    public Response patchConfigurationData(final PATCHContext context, final UriInfo uriInfo) {
         if (context == null) {
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
 
         try {
-            return this.broker.patchConfigurationDataWithinTransaction(context);
+            final PATCHStatusContext patch = this.broker.patchConfigurationDataWithinTransaction(context);
+            ResponseBuilder response = null;
+            if (patch.isOk()) {
+                response = Response.status(Status.OK);
+            } else {
+                for (final PATCHStatusEntity patchStatusEntity : patch.getEditCollection()) {
+                    if (patchStatusEntity.getEditErrors() != null) {
+                        for (final RestconfError restconfError : patchStatusEntity.getEditErrors()) {
+                            response = Response.status(restconfError.getErrorTag().getStatusCode());
+                            break;
+                        }
+                    }
+                }
+                if (response == null) {
+                    response = Response.status(Status.BAD_REQUEST);
+                }
+            }
+            response.entity(patch);
+            return response.build();
         } catch (final Exception e) {
             LOG.debug("Patch transaction failed", e);
             throw new RestconfDocumentedException(e.getMessage());

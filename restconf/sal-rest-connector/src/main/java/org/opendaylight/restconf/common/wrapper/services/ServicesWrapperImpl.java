@@ -13,7 +13,6 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.restconf.base.services.api.BaseServicesWrapper;
 import org.opendaylight.restconf.base.services.api.RestconfOperationsService;
 import org.opendaylight.restconf.base.services.api.RestconfSchemaService;
@@ -110,12 +109,12 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
     }
 
     @Override
-    public PATCHStatusContext patchData(final String identifier, final PATCHContext context, final UriInfo uriInfo) {
+    public Response patchData(final String identifier, final PATCHContext context, final UriInfo uriInfo) {
         return this.delegRestconfDataService.patchData(identifier, context, uriInfo);
     }
 
     @Override
-    public PATCHStatusContext patchData(final PATCHContext context, final UriInfo uriInfo) {
+    public Response patchData(final PATCHContext context, final UriInfo uriInfo) {
         return this.delegRestconfDataService.patchData(context, uriInfo);
     }
 

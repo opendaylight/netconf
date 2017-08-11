@@ -16,23 +16,19 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -428,7 +424,8 @@ public class RestconfDataServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doReturn(Futures.immediateCheckedFuture(true)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
-        final PATCHStatusContext status = this.dataService.patchData(patch, this.uriInfo);
+        final PATCHStatusContext status =
+                (PATCHStatusContext) this.dataService.patchData(patch, this.uriInfo).getEntity();
         assertTrue(status.isOk());
         assertEquals(3, status.getEditCollection().size());
         assertEquals("replace data", status.getEditCollection().get(1).getEditId());
@@ -457,7 +454,8 @@ public class RestconfDataServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doReturn(Futures.immediateCheckedFuture(true)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
 
-        final PATCHStatusContext status = this.dataService.patchData(patch, this.uriInfo);
+        final PATCHStatusContext status =
+                (PATCHStatusContext) this.dataService.patchData(patch, this.uriInfo).getEntity();
         assertTrue(status.isOk());
         assertEquals(3, status.getEditCollection().size());
         assertNull(status.getGlobalErrors());
@@ -493,7 +491,8 @@ public class RestconfDataServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doReturn(Futures.immediateCheckedFuture(false)).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
         doReturn(true).when(this.readWrite).cancel();
-        final PATCHStatusContext status = this.dataService.patchData(patch, this.uriInfo);
+        final PATCHStatusContext status =
+                (PATCHStatusContext) this.dataService.patchData(patch, this.uriInfo).getEntity();
 
         handler.set(RestConnectorProvider.class, null);
         handler.setAccessible(false);

@@ -11,7 +11,6 @@ import static org.opendaylight.restconf.restful.utils.RestconfStreamsConstants.C
 import static org.opendaylight.restconf.restful.utils.RestconfStreamsConstants.STREAM_ACCESS_PATH_PART;
 import static org.opendaylight.restconf.restful.utils.RestconfStreamsConstants.STREAM_LOCATION_PATH_PART;
 import static org.opendaylight.restconf.restful.utils.RestconfStreamsConstants.STREAM_PATH;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.text.SimpleDateFormat;
@@ -21,6 +20,8 @@ import java.util.Map.Entry;
 import java.util.TimeZone;
 import javax.annotation.Nonnull;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
@@ -29,6 +30,7 @@ import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.restconf.impl.WriterParameters;
@@ -306,12 +308,12 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     }
 
     @Override
-    public PATCHStatusContext patchData(final String identifier, final PATCHContext context, final UriInfo uriInfo) {
+    public Response patchData(final String identifier, final PATCHContext context, final UriInfo uriInfo) {
         return patchData(context, uriInfo);
     }
 
     @Override
-    public PATCHStatusContext patchData(final PATCHContext context, final UriInfo uriInfo) {
+    public Response patchData(final PATCHContext context, final UriInfo uriInfo) {
         Preconditions.checkNotNull(context);
         final DOMMountPoint mountPoint = context.getInstanceIdentifierContext().getMountPoint();
 
@@ -328,7 +330,25 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 context.getInstanceIdentifierContext(), mountPoint, transactionChain);
 
-        return PatchDataTransactionUtil.patchData(context, transactionNode, ref);
+        final PATCHStatusContext patchData = PatchDataTransactionUtil.patchData(context, transactionNode, ref);
+        ResponseBuilder response = null;
+        if (patchData.isOk()) {
+            response = Response.status(Status.OK);
+        } else {
+            for (final PATCHStatusEntity patchStatusEntity : patchData.getEditCollection()) {
+                if (patchStatusEntity.getEditErrors() != null) {
+                    for (final RestconfError restconfError : patchStatusEntity.getEditErrors()) {
+                        response = Response.status(restconfError.getErrorTag().getStatusCode());
+                        break;
+                    }
+                }
+            }
+            if (response == null) {
+                response = Response.status(Status.BAD_REQUEST);
+            }
+        }
+        response.entity(patchData);
+        return response.build();
     }
 
     /**
