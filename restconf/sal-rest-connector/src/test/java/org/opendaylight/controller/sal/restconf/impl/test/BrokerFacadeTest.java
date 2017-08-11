@@ -22,11 +22,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Future;
+import javax.ws.rs.core.Response;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -53,12 +57,14 @@ import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHEntity;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PutResult;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
@@ -135,6 +141,36 @@ public class BrokerFacadeTest {
     private NormalizedNode<?, ?> createDummyNode(final String namespace, final String date, final String localName) {
         return Builders.containerBuilder()
                 .withNodeIdentifier(new NodeIdentifier(QName.create(namespace, date, localName))).build();
+    }
+
+    @Test
+    public void deleteNonExistingDataFailResponseTest() {
+        failResponseTestOnExistAndNonExistData(false, 404, "delete");
+    }
+
+    @Test
+    public void createExistingDataFailResponseTest() {
+        failResponseTestOnExistAndNonExistData(true, 409, "create");
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private void failResponseTestOnExistAndNonExistData(final boolean exist, final int status, final String operation) {
+        final RestconfImpl restconf = RestconfImpl.getInstance();
+        restconf.setBroker(brokerFacade);
+        final PATCHContext patchCtx = mock(PATCHContext.class);
+        final InstanceIdentifierContext iictx = mock(InstanceIdentifierContext.class);
+        when(patchCtx.getInstanceIdentifierContext()).thenReturn(iictx);
+        final List<PATCHEntity> patchEnts = new ArrayList<>();
+        final QName identityType = QName.create("test:fail:response", "2017-11-08", "fail-response");
+        final YangInstanceIdentifier targetNode = YangInstanceIdentifier.create(NodeIdentifier.create(identityType));
+        final PATCHEntity patchEntity = new PATCHEntity("test", operation, targetNode);
+        patchEnts.add(patchEntity);
+        when(patchCtx.getData()).thenReturn(patchEnts);
+        final CheckedFuture<Boolean, ReadFailedException> value = Futures.immediateCheckedFuture(exist);
+        when(rwTransaction.exists(LogicalDatastoreType.CONFIGURATION, targetNode)).thenReturn(value);
+        final Response response = restconf.patchConfigurationData(patchCtx, null);
+        assertNotNull(response);
+        assertEquals(status, response.getStatus());
     }
 
     @Test

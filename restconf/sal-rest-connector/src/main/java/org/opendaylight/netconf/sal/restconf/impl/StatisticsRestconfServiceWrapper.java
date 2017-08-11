@@ -216,13 +216,13 @@ public class StatisticsRestconfServiceWrapper implements RestconfService {
     }
 
     @Override
-    public PATCHStatusContext patchConfigurationData(final String identifier, final PATCHContext payload,
+    public Response patchConfigurationData(final String identifier, final PATCHContext payload,
             final UriInfo uriInfo) {
         return this.delegate.patchConfigurationData(identifier, payload, uriInfo);
     }
 
     @Override
-    public PATCHStatusContext patchConfigurationData(final PATCHContext payload, final UriInfo uriInfo) {
+    public Response patchConfigurationData(final PATCHContext payload, final UriInfo uriInfo) {
         return this.delegate.patchConfigurationData(payload, uriInfo);
     }
 

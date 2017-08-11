@@ -139,7 +139,7 @@ public interface RestconfDataService {
     @Consumes({ Rfc8040.MediaTypes.PATCH + RestconfConstants.JSON, Rfc8040.MediaTypes.PATCH + RestconfConstants.XML })
     @Produces({ Rfc8040.MediaTypes.PATCH_STATUS + RestconfConstants.JSON,
             Rfc8040.MediaTypes.PATCH_STATUS + RestconfConstants.XML })
-    PATCHStatusContext patchData(@Encoded @PathParam("identifier") String identifier, PATCHContext context,
+    Response patchData(@Encoded @PathParam("identifier") String identifier, PATCHContext context,
             @Context UriInfo uriInfo);
 
     /**
@@ -156,5 +156,5 @@ public interface RestconfDataService {
     @Consumes({ Rfc8040.MediaTypes.PATCH + RestconfConstants.JSON, Rfc8040.MediaTypes.PATCH + RestconfConstants.XML })
     @Produces({ Rfc8040.MediaTypes.PATCH_STATUS + RestconfConstants.JSON,
             Rfc8040.MediaTypes.PATCH_STATUS + RestconfConstants.XML })
-    PATCHStatusContext patchData(PATCHContext context, @Context UriInfo uriInfo);
+    Response patchData(PATCHContext context, @Context UriInfo uriInfo);
 }

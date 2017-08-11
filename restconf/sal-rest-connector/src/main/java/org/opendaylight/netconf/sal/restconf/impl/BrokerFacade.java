@@ -381,7 +381,7 @@ public class BrokerFacade {
                 case REMOVE:
                     if (withoutError) {
                         try {
-                            deleteDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
+                            removeDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
                                     .getTargetNode());
                             editCollection.add(new PATCHStatusEntity(patchEntity.getEditId(), true, null));
                         } catch (final RestconfDocumentedException e) {
@@ -534,7 +534,7 @@ public class BrokerFacade {
             final Optional<NormalizedNode<?, ?>> optional = transaction.read(datastore, path).checkedGet();
             return !optional.isPresent() ? null : withDefa == null ? optional.get() :
                 prepareDataByParamWithDef(optional.get(), path, withDefa);
-        } catch (ReadFailedException e) {
+        } catch (final ReadFailedException e) {
             LOG.warn("Error reading {} from datastore {}", path, datastore.name(), e);
             throw new RestconfDocumentedException("Error reading data.", e, e.getErrorList());
         }
@@ -901,7 +901,7 @@ public class BrokerFacade {
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         try {
             return rWTransaction.exists(store, path).checkedGet();
-        } catch (ReadFailedException e) {
+        } catch (final ReadFailedException e) {
             rWTransaction.cancel();
             throw new RestconfDocumentedException("Could not determine the existence of path " + path,
                     e, e.getErrorList());
@@ -1151,8 +1151,14 @@ public class BrokerFacade {
     }
 
     private void deleteDataWithinTransaction(
-            final DOMDataWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
+            final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path) {
+        checkItemExists(writeTransaction, datastore, path);
+        removeDataWithinTransaction(writeTransaction, datastore, path);
+    }
+
+    private void removeDataWithinTransaction(final DOMDataWriteTransaction writeTransaction,
+            final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
         LOG.trace("Delete {} within Restconf PATCH: {}", datastore.name(), path);
         writeTransaction.delete(datastore, path);
     }

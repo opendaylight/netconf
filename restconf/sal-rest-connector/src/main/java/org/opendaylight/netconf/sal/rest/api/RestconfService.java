@@ -25,7 +25,6 @@ import org.opendaylight.netconf.sal.rest.api.Draft02.MediaTypes;
 import org.opendaylight.netconf.sal.rest.impl.PATCH;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
-import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
 import org.opendaylight.restconf.base.services.api.RestconfOperationsService;
 import org.opendaylight.restconf.restful.services.api.RestconfDataService;
 import org.opendaylight.restconf.restful.services.api.RestconfInvokeOperationsService;
@@ -235,7 +234,7 @@ public interface RestconfService {
     @Path("/config/{identifier:.+}")
     @Consumes({MediaTypes.PATCH + JSON, MediaTypes.PATCH + XML})
     @Produces({MediaTypes.PATCH_STATUS + JSON, MediaTypes.PATCH_STATUS + XML})
-    PATCHStatusContext patchConfigurationData(@Encoded @PathParam("identifier") String identifier, PATCHContext
+    Response patchConfigurationData(@Encoded @PathParam("identifier") String identifier, PATCHContext
             context, @Context UriInfo uriInfo);
 
     /**
@@ -247,5 +246,5 @@ public interface RestconfService {
     @Path("/config")
     @Consumes({MediaTypes.PATCH + JSON, MediaTypes.PATCH + XML})
     @Produces({MediaTypes.PATCH_STATUS + JSON, MediaTypes.PATCH_STATUS + XML})
-    PATCHStatusContext patchConfigurationData(PATCHContext context, @Context UriInfo uriInfo);
+    Response patchConfigurationData(PATCHContext context, @Context UriInfo uriInfo);
 }
