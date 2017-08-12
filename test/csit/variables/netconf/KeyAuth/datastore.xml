@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datastores xmlns="urn:cesnet:tmc:datastores:file">
+  <running lock="">
+    <netopeer xmlns="urn:cesnet:tmc:netopeer:1.0">
+      <ssh>
+        <client-auth-keys>
+          <client-auth-key>
+            <path>/root/RSA.pub</path>
+            <username>root</username>
+          </client-auth-key>
+        </client-auth-keys>
+      </ssh>
+    </netopeer>
+  </running>
+  <startup lock="">
+    <netopeer xmlns="urn:cesnet:tmc:netopeer:1.0">
+      <ssh>
+        <client-auth-keys>
+          <client-auth-key>
+            <path>/root/RSA.pub</path>
+            <username>root</username>
+          </client-auth-key>
+        </client-auth-keys>
+      </ssh>
+    </netopeer>
+  </startup>
+  <candidate modified="false" lock=""/>
+</datastores>
