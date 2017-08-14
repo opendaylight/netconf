@@ -27,11 +27,6 @@ import org.slf4j.LoggerFactory;
 public final class CredentialServiceAuthProvider implements AuthProvider, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(CredentialServiceAuthProvider.class);
 
-    /**
-     * Singleton instance with delayed instantiation.
-     */
-    public static volatile Map.Entry<BundleContext, CredentialServiceAuthProvider> INSTANCE;
-
     // FIXME CredentialAuth is generic and it causes warnings during compilation
     // Maybe there should be a PasswordCredentialAuth implements CredentialAuth<PasswordCredentials>
     private volatile CredentialAuth<PasswordCredentials> nullableCredService;
