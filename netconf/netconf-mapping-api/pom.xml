@@ -18,7 +18,7 @@
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>netconf-mapping-api</artifactId>
-  <version>1.3.0-SNAPSHOT</version>
+  <version>1.4.0-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <packaging>bundle</packaging>
 
