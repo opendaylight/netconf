@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.sal.restconf.impl;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -21,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
+import java.lang.reflect.Array;
 import java.net.URI;
 import java.text.ParseException;
 import java.time.Instant;
@@ -106,6 +108,8 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.BinaryTypeDefinition;
 import org.opendaylight.yangtools.yang.parser.stmt.rfc6020.effective.EffectiveSchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -827,7 +831,7 @@ public class RestconfImpl implements RestconfService {
             try {
                 result.getFutureOfPutData().checkedGet();
                 return Response.status(result.getStatus()).build();
-            } catch (TransactionCommitFailedException e) {
+            } catch (final TransactionCommitFailedException e) {
                 if (e instanceof OptimisticLockFailedException) {
                     if (--tries <= 0) {
                         LOG.debug("Got OptimisticLockFailedException on last try - failing " + identifier);
@@ -885,13 +889,14 @@ public class RestconfImpl implements RestconfService {
             if (lastPathArgument instanceof NodeIdentifierWithPredicates && data instanceof MapEntryNode) {
                 final Map<QName, Object> uriKeyValues =
                         ((NodeIdentifierWithPredicates) lastPathArgument).getKeyValues();
-                isEqualUriAndPayloadKeyValues(uriKeyValues, (MapEntryNode) data, keyDefinitions);
+                isEqualUriAndPayloadKeyValues(uriKeyValues, (MapEntryNode) data, keyDefinitions, schemaNode);
             }
         }
     }
 
-    private static void isEqualUriAndPayloadKeyValues(final Map<QName, Object> uriKeyValues, final MapEntryNode payload,
-            final List<QName> keyDefinitions) {
+    @VisibleForTesting
+    public static void isEqualUriAndPayloadKeyValues(final Map<QName, Object> uriKeyValues, final MapEntryNode payload,
+            final List<QName> keyDefinitions, final SchemaNode schemaNode) {
 
         final Map<QName, Object> mutableCopyUriKeyValues = Maps.newHashMap(uriKeyValues);
         for (final QName keyDefinition : keyDefinitions) {
@@ -901,14 +906,37 @@ public class RestconfImpl implements RestconfService {
                     "Missing key " + keyDefinition + " in URI.");
 
             final Object dataKeyValue = payload.getIdentifier().getKeyValues().get(keyDefinition);
+            final TypeDefinition<?> leafType =
+                    ((LeafSchemaNode) ((ListSchemaNode) schemaNode).getDataChildByName(keyDefinition)).getType();
+            if (leafType instanceof BinaryTypeDefinition) {
 
-            if (!uriKeyValue.equals(dataKeyValue)) {
-                final String errMsg = "The value '" + uriKeyValue + "' for key '" + keyDefinition.getLocalName()
-                        + "' specified in the URI doesn't match the value '" + dataKeyValue
-                        + "' specified in the message body. ";
-                throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+                final List<Byte> uriBinVal = prepareBinariObj(uriKeyValue);
+                final List<Byte> dataBinVal = prepareBinariObj(dataKeyValue);
+                if (!uriBinVal.equals(dataBinVal)) {
+                    throwKeyErr(keyDefinition, uriBinVal, dataBinVal);
+                }
+            } else {
+                if (!uriKeyValue.equals(dataKeyValue)) {
+                    throwKeyErr(keyDefinition, uriKeyValue, dataKeyValue);
+                }
             }
         }
+    }
+
+    private static List<Byte> prepareBinariObj(final Object obj) {
+        final int length = Array.getLength(obj);
+        final List<Byte> al = new ArrayList<>();
+        for (int i = 0; i < length; i++) {
+            al.add((Byte) Array.get(obj, i));
+        }
+        return al;
+    }
+
+    private static void throwKeyErr(final QName keyDefinition, final Object uriKeyValue, final Object dataKeyValue) {
+        final String errMsg = "The value '" + uriKeyValue + "' for key '" + keyDefinition.getLocalName()
+                + "' specified in the URI doesn't match the value '" + dataKeyValue
+                + "' specified in the message body. ";
+        throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
     }
 
     @Override
@@ -1006,7 +1034,7 @@ public class RestconfImpl implements RestconfService {
             future.checkedGet();
         } catch (final RestconfDocumentedException e) {
             throw e;
-        } catch (TransactionCommitFailedException e) {
+        } catch (final TransactionCommitFailedException e) {
             LOG.info("Error creating data " + (uriInfo != null ? uriInfo.getPath() : ""), e);
             throw new RestconfDocumentedException(e.getMessage(), e, e.getErrorList());
         }
@@ -1055,7 +1083,7 @@ public class RestconfImpl implements RestconfService {
 
         try {
             future.checkedGet();
-        } catch (TransactionCommitFailedException e) {
+        } catch (final TransactionCommitFailedException e) {
             final Optional<Throwable> searchedException = Iterables.tryFind(Throwables.getCausalChain(e),
                     Predicates.instanceOf(ModifiedNodeDoesNotExistException.class));
             if (searchedException.isPresent()) {
@@ -1168,7 +1196,7 @@ public class RestconfImpl implements RestconfService {
         final TemporalAccessor p;
         try {
             p = FORMATTER.parse(value);
-        } catch (DateTimeParseException e) {
+        } catch (final DateTimeParseException e) {
             throw new RestconfDocumentedException("Cannot parse of value in date: " + value, e);
         }
         return Instant.from(p);
@@ -1254,7 +1282,7 @@ public class RestconfImpl implements RestconfService {
      * @return {@link URI} of location
      */
     private URI dataSubs(final String identifier, final UriInfo uriInfo, final Instant start, final Instant stop,
-            final String filter, boolean leafNodesOnly) {
+            final String filter, final boolean leafNodesOnly) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
