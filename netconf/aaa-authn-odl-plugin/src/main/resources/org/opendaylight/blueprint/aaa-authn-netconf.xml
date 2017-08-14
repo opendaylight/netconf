@@ -10,10 +10,10 @@
            xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
            odl:use-default-for-reference-types="true">
 
-    <bean id="credentialServiceAuthProvider"
-          class="org.opendaylight.aaa.odl.CredentialServiceAuthProvider"
-          destroy-method="close">
-        <argument ref="blueprintBundleContext"/>
+    <reference id="credentialAuth" interface="org.opendaylight.aaa.api.CredentialAuth" odl:type="default" />
+
+    <bean id="credentialServiceAuthProvider" class="org.opendaylight.aaa.odl.CredentialServiceAuthProvider">
+        <argument ref="credentialAuth"/>
     </bean>
     <service ref="credentialServiceAuthProvider" interface="org.opendaylight.netconf.auth.AuthProvider"
              odl:type="netconf-auth-provider"/>
