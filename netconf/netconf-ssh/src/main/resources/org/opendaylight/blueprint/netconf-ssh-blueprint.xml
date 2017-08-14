@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2017 Inocybe Technologies Inc. and others.  All rights reserved.
+
+ This program and the accompanying materials are made available under the
+ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ and is available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           odl:restart-dependents-on-updates="true">
+
+    <bean id="authProvider" class="org.opendaylight.aaa.odl.CredentialServiceAuthProvider" />
+
+    <bean id="netconfSshProvider" class="org.opendaylight.netconf.ssh.NetconfSSHProvider"
+          init-method="init" destroy-method="destroy">
+        <argument ref="authProvider" />
+    </bean>
+
+
+
+</blueprint>
