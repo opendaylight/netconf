@@ -24,8 +24,11 @@ import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -43,20 +46,30 @@ import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
+import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.BinaryTypeDefinition;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 /**
@@ -83,6 +96,50 @@ public class RestconfImplTest {
     public void initMethod() {
         this.restconfImpl = RestconfImpl.getInstance();
         this.restconfImpl.setControllerContext(controllerContext);
+    }
+
+    @Test
+    public void binaryKeyTest() {
+        final List<Byte> al = new ArrayList<>();
+        al.add(new Byte((byte) 1));
+        binaryKeyTest(al, al);
+    }
+
+    @Test
+    public void binaryKeyFailTest() {
+        final List<Byte> al = new ArrayList<>();
+        al.add(new Byte((byte) 1));
+        final List<Byte> al2 = new ArrayList<>();
+        try {
+            binaryKeyTest(al, al2);
+        } catch (final RestconfDocumentedException e) {
+            final RestconfError err = e.getErrors().iterator().next();
+            assertEquals(ErrorType.PROTOCOL, err.getErrorType());
+            assertEquals(ErrorTag.INVALID_VALUE, err.getErrorTag());
+        }
+    }
+
+    private void binaryKeyTest(final List<Byte> al, final List<Byte> al2) {
+
+        final QName keyDef = QName.create("test:key:binary", "2017-14-08", "b1");
+
+        final Map<QName, Object> uriKeyValues = new HashMap<>();
+        uriKeyValues.put(keyDef, al.toArray());
+
+        final MapEntryNode payload = mock(MapEntryNode.class);
+        final NodeIdentifierWithPredicates nodeIdWithPred =
+                new NodeIdentifierWithPredicates(keyDef, keyDef, al2.toArray());
+        when(payload.getIdentifier()).thenReturn(nodeIdWithPred);
+
+        final List<QName> keyDefinitions = new ArrayList<>();
+        keyDefinitions.add(keyDef);
+
+        final ListSchemaNode schemaNode = mock(ListSchemaNode.class);
+        final LeafSchemaNode leafSchemaNode = mock(LeafSchemaNode.class);
+        final TypeDefinition<?> binaryType = mock(BinaryTypeDefinition.class);
+        when(leafSchemaNode.getType()).thenReturn((TypeDefinition) binaryType);
+        when(schemaNode.getDataChildByName(keyDef)).thenReturn(leafSchemaNode);
+        RestconfImpl.isEqualUriAndPayloadKeyValues(uriKeyValues, payload, keyDefinitions, schemaNode);
     }
 
     @SuppressWarnings("unchecked")
