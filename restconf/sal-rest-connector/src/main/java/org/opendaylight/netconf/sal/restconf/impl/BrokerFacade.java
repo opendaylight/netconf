@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.CONFIGURATION;
 import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.OPERATIONAL;
-
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -62,6 +61,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.OrderedLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
@@ -134,6 +134,20 @@ public class BrokerFacade {
      */
     public NormalizedNode<?, ?> readConfigurationData(final YangInstanceIdentifier path, final String withDefa) {
         checkPreconditions();
+
+        final DTChangeListenerImpl listener = new DTChangeListenerImpl(domDataBroker, CONFIGURATION, path);
+        final Collection<DataTreeCandidate> readData = listener.readData();
+        final Optional<NormalizedNode<?, ?>> data = readData.iterator().next().getRootNode().getDataAfter();
+        if (data.isPresent()) {
+            return data.get();
+        }
+
+        if (readData != null && !readData.isEmpty()) {
+            LOG.info("IM NULL");
+        } else {
+            LOG.info("IM NOT NULL :) :) :) :)");
+        }
+
         try (DOMDataReadOnlyTransaction tx = this.domDataBroker.newReadOnlyTransaction()) {
             return readDataViaTransaction(tx, CONFIGURATION, path, withDefa);
         }
@@ -536,7 +550,7 @@ public class BrokerFacade {
             final Optional<NormalizedNode<?, ?>> optional = transaction.read(datastore, path).checkedGet();
             return !optional.isPresent() ? null : withDefa == null ? optional.get() :
                 prepareDataByParamWithDef(optional.get(), path, withDefa);
-        } catch (ReadFailedException e) {
+        } catch (final ReadFailedException e) {
             LOG.warn("Error reading {} from datastore {}", path, datastore.name(), e);
             for (final RpcError error : e.getErrorList()) {
                 if (error.getErrorType() == RpcError.ErrorType.TRANSPORT
@@ -910,7 +924,7 @@ public class BrokerFacade {
         final Entry<YangInstanceIdentifier, ReadFailedException> failure;
         try {
             failure = check.getFailure();
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             rWTransaction.cancel();
             throw new RestconfDocumentedException("Could not determine the existence of path " + path, e);
         }
@@ -940,7 +954,7 @@ public class BrokerFacade {
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         try {
             return rWTransaction.exists(store, path).checkedGet();
-        } catch (ReadFailedException e) {
+        } catch (final ReadFailedException e) {
             rWTransaction.cancel();
             throw new RestconfDocumentedException("Could not determine the existence of path " + path,
                     e, e.getErrorList());
