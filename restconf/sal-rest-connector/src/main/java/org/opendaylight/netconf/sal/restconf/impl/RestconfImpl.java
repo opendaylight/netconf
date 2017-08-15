@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.sal.restconf.impl;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -37,6 +38,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -827,7 +829,7 @@ public class RestconfImpl implements RestconfService {
             try {
                 result.getFutureOfPutData().checkedGet();
                 return Response.status(result.getStatus()).build();
-            } catch (TransactionCommitFailedException e) {
+            } catch (final TransactionCommitFailedException e) {
                 if (e instanceof OptimisticLockFailedException) {
                     if (--tries <= 0) {
                         LOG.debug("Got OptimisticLockFailedException on last try - failing " + identifier);
@@ -890,7 +892,8 @@ public class RestconfImpl implements RestconfService {
         }
     }
 
-    private static void isEqualUriAndPayloadKeyValues(final Map<QName, Object> uriKeyValues, final MapEntryNode payload,
+    @VisibleForTesting
+    public static void isEqualUriAndPayloadKeyValues(final Map<QName, Object> uriKeyValues, final MapEntryNode payload,
             final List<QName> keyDefinitions) {
 
         final Map<QName, Object> mutableCopyUriKeyValues = Maps.newHashMap(uriKeyValues);
@@ -902,7 +905,7 @@ public class RestconfImpl implements RestconfService {
 
             final Object dataKeyValue = payload.getIdentifier().getKeyValues().get(keyDefinition);
 
-            if (!uriKeyValue.equals(dataKeyValue)) {
+            if (!Objects.deepEquals(uriKeyValue, dataKeyValue)) {
                 final String errMsg = "The value '" + uriKeyValue + "' for key '" + keyDefinition.getLocalName()
                         + "' specified in the URI doesn't match the value '" + dataKeyValue
                         + "' specified in the message body. ";
@@ -1006,7 +1009,7 @@ public class RestconfImpl implements RestconfService {
             future.checkedGet();
         } catch (final RestconfDocumentedException e) {
             throw e;
-        } catch (TransactionCommitFailedException e) {
+        } catch (final TransactionCommitFailedException e) {
             LOG.info("Error creating data " + (uriInfo != null ? uriInfo.getPath() : ""), e);
             throw new RestconfDocumentedException(e.getMessage(), e, e.getErrorList());
         }
@@ -1055,7 +1058,7 @@ public class RestconfImpl implements RestconfService {
 
         try {
             future.checkedGet();
-        } catch (TransactionCommitFailedException e) {
+        } catch (final TransactionCommitFailedException e) {
             final Optional<Throwable> searchedException = Iterables.tryFind(Throwables.getCausalChain(e),
                     Predicates.instanceOf(ModifiedNodeDoesNotExistException.class));
             if (searchedException.isPresent()) {
@@ -1168,7 +1171,7 @@ public class RestconfImpl implements RestconfService {
         final TemporalAccessor p;
         try {
             p = FORMATTER.parse(value);
-        } catch (DateTimeParseException e) {
+        } catch (final DateTimeParseException e) {
             throw new RestconfDocumentedException("Cannot parse of value in date: " + value, e);
         }
         return Instant.from(p);
@@ -1254,7 +1257,7 @@ public class RestconfImpl implements RestconfService {
      * @return {@link URI} of location
      */
     private URI dataSubs(final String identifier, final UriInfo uriInfo, final Instant start, final Instant stop,
-            final String filter, boolean leafNodesOnly) {
+            final String filter, final boolean leafNodesOnly) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
