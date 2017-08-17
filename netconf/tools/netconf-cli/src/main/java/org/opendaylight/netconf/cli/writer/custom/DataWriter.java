@@ -20,7 +20,7 @@ import org.opendaylight.netconf.cli.writer.impl.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlDocumentUtils;
+import org.opendaylight.yangtools.yang.data.impl.schema.SchemaUtils;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
@@ -50,7 +50,7 @@ public class DataWriter extends AbstractWriter<DataSchemaNode> {
 
         for (final Object childNodeObject : ((DataContainerNode) dataNode).getValue()) {
             final NormalizedNode<?, ?> childNode = (NormalizedNode<?, ?>) childNodeObject;
-            final Optional<DataSchemaNode> schemaNode = XmlDocumentUtils.findFirstSchema(childNode.getNodeType(),
+            final Optional<DataSchemaNode> schemaNode = SchemaUtils.findFirstSchema(childNode.getNodeType(),
                 remoteSchemaContext.getDataDefinitions());
             Preconditions.checkState(schemaNode.isPresent(), "Unknown data node %s, not defined in schema",
                 childNode.getNodeType());

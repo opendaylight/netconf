@@ -36,7 +36,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.codec.xml.XmlDocumentUtils;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -51,6 +50,7 @@ import org.w3c.dom.Element;
 abstract class AbstractNotificationsData {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationsData.class);
     private static final TransformerFactory TF = TransformerFactory.newInstance();
+    private static final XMLOutputFactory OF = XMLOutputFactory.newFactory();
 
     private TransactionChainHandler transactionChainHandler;
     private SchemaContextHandler schemaHandler;
@@ -124,15 +124,14 @@ abstract class AbstractNotificationsData {
      */
     protected DOMResult writeNormalizedNode(final NormalizedNode<?, ?> normalized, final SchemaContext context,
             final SchemaPath schemaPath) throws IOException, XMLStreamException {
-        final XMLOutputFactory xmlFactory = XMLOutputFactory.newFactory();
-        final Document doc = XmlDocumentUtils.getDocument();
+        final Document doc = UntrustedXML.newDocumentBuilder().newDocument();
         final DOMResult result = new DOMResult(doc);
         NormalizedNodeWriter normalizedNodeWriter = null;
         NormalizedNodeStreamWriter normalizedNodeStreamWriter = null;
         XMLStreamWriter writer = null;
 
         try {
-            writer = xmlFactory.createXMLStreamWriter(result);
+            writer = OF.createXMLStreamWriter(result);
             normalizedNodeStreamWriter = XMLStreamNormalizedNodeStreamWriter.create(writer, context, schemaPath);
             normalizedNodeWriter = NormalizedNodeWriter.forStreamWriter(normalizedNodeStreamWriter);
 
