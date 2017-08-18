@@ -100,7 +100,7 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
         }
 
         return new NetconfServerSessionNegotiator(proposal, promise, channel, timer,
-                getListener(Long.toString(sessionId), channel.localAddress()), connectionTimeoutMillis);
+                getListener(Long.toString(sessionId), channel.parent().localAddress()), connectionTimeoutMillis);
     }
 
     private NetconfServerSessionListener getListener(final String netconfSessionIdForReporting, final SocketAddress socketAddress) {
