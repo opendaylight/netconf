@@ -37,7 +37,7 @@
 
     <cm:property-placeholder persistent-id="org.opendaylight.netconf.topology.sb.keypair" update-strategy="none">
       <cm:default-properties>
-        <cm:property name="private-key-path" value="etc/RSA"/>
+        <cm:property name="private-key-path" value=""/>
         <cm:property name="private-key-passphrase" value=""/>
       </cm:default-properties>
     </cm:property-placeholder>
