@@ -206,7 +206,7 @@ public class NetconfMessageTransformUtil {
         final String inputMsgId = input.getDocument().getDocumentElement().getAttribute(MESSAGE_ID_ATTR);
         final String outputMsgId = output.getDocument().getDocumentElement().getAttribute(MESSAGE_ID_ATTR);
 
-        if (inputMsgId.equals(outputMsgId) == false) {
+        if (!inputMsgId.equals(outputMsgId)) {
             final Map<String, String> errorInfo = ImmutableMap.<String, String>builder()
                     .put("actual-message-id", outputMsgId)
                     .put("expected-message-id", inputMsgId)

@@ -18,7 +18,7 @@ public class MessageCounter {
     private static final String MESSAGE_ID_BLUEPRINT = "%s-%s";
 
     public String getNewMessageId(final String prefix) {
-        Preconditions.checkArgument(Strings.isNullOrEmpty(prefix) == false, "Null or empty prefix");
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(prefix), "Null or empty prefix");
         return String.format(MESSAGE_ID_BLUEPRINT, prefix, getNewMessageId());
     }
 

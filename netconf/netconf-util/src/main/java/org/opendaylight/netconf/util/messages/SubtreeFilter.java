@@ -135,10 +135,10 @@ public class SubtreeFilter {
         MatchingResult matches = matches(src, filter);
         if (matches != MatchingResult.NO_MATCH && matches != MatchingResult.CONTENT_MISMATCH) {
             // copy srcChild to dst
-            boolean filterHasChildren = filter.getChildElements().isEmpty() == false;
+            boolean filterHasChildren = !filter.getChildElements().isEmpty();
             // copy to depth if this is leaf of filter tree
-            Element copied = (Element) document.importNode(src.getDomElement(), filterHasChildren == false);
-            boolean shouldAppend = filterHasChildren == false;
+            Element copied = (Element) document.importNode(src.getDomElement(), !filterHasChildren);
+            boolean shouldAppend = !filterHasChildren;
             if (filterHasChildren) { // this implies TAG_MATCH
                 // do the same recursively
                 int numberOfTextMatchingChildren = 0;
@@ -191,7 +191,7 @@ public class SubtreeFilter {
             if (result == null) {
                 for (Attr attr : filter.getAttributes().values()) {
                     // ignore namespace declarations
-                    if (XmlUtil.XMLNS_URI.equals(attr.getNamespaceURI()) == false) {
+                    if (!XmlUtil.XMLNS_URI.equals(attr.getNamespaceURI())) {
                         // find attr with matching localName(),  namespaceURI(),  == value() in src
                         String found = src.getAttribute(attr.getLocalName(), attr.getNamespaceURI());
                         if (attr.getValue().equals(found) && result != MatchingResult.NO_MATCH) {

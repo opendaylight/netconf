@@ -125,7 +125,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
 
                         // Do not fail negotiation if promise is done or canceled
                         // It would result in setting result of the promise second time and that throws exception
-                        if (isPromiseFinished() == false) {
+                        if (!isPromiseFinished()) {
                             LOG.warn("Netconf session was not established after {}", connectionTimeoutMillis);
                             changeState(State.FAILED);
 
