@@ -102,9 +102,11 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final NetconfNode netconfNode = netconfTopologyDeviceSetup.getNode().getAugmentation(NetconfNode.class);
         final NodeId nodeId = netconfTopologyDeviceSetup.getNode().getNodeId();
 
-        AuthEncryptor.encryptIfNeeded(nodeId, netconfNode, encryptionService,
+        if (AuthEncryptor.encryptIfNeeded(nodeId, netconfNode, encryptionService,
                 netconfTopologyDeviceSetup.getTopologyId(),
-                netconfTopologyDeviceSetup.getDataBroker());
+                netconfTopologyDeviceSetup.getDataBroker())) {
+            return;
+        }
 
         Preconditions.checkNotNull(netconfNode.getHost());
         Preconditions.checkNotNull(netconfNode.getPort());

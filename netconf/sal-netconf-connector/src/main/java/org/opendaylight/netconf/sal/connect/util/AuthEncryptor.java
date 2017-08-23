@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 public class AuthEncryptor {
     private static final Logger LOG = LoggerFactory.getLogger(AuthEncryptor.class);
 
-    public static void encryptIfNeeded(final NodeId nodeId, final NetconfNode netconfNode,
+    public static boolean encryptIfNeeded(final NodeId nodeId, final NetconfNode netconfNode,
                                  AAAEncryptionService encryptionService,
                                  final String topologyId, final DataBroker dataBroker) {
         final org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node
@@ -75,6 +75,8 @@ public class AuthEncryptor {
                     LOG.error("Unable to encrypt netconf username/password." + exception.getMessage());
                 }
             });
+            return true;
         }
+        return false;
     }
 }

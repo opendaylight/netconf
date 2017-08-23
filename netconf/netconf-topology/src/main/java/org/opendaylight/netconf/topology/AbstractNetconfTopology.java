@@ -221,7 +221,9 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                                                                         final Node configNode) {
         final NetconfNode netconfNode = configNode.getAugmentation(NetconfNode.class);
 
-        AuthEncryptor.encryptIfNeeded(nodeId, netconfNode, encryptionService, topologyId, dataBroker);
+        if (AuthEncryptor.encryptIfNeeded(nodeId, netconfNode, encryptionService, topologyId, dataBroker)) {
+            return null;
+        }
 
         Preconditions.checkNotNull(netconfNode.getHost());
         Preconditions.checkNotNull(netconfNode.getPort());
