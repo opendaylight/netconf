@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Jakub Morvay <jmorvay@cisco.com>
+Submitted-by: Jakub Morvay <jmorvay@cisco.com>
+Submitted-at: Wed, 23 Aug 2017 08:16:04 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/61714
+Project: netconf
+Branch: refs/heads/master
