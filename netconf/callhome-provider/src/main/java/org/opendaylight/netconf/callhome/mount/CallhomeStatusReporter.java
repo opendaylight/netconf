@@ -16,16 +16,17 @@ import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataChangeListener;
+import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
+import org.opendaylight.controller.md.sal.binding.api.DataTreeChangeListener;
+import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
+import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.binding.api.ReadWriteTransaction;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.netconf.callhome.protocol.AuthorizedKeysDecoder;
@@ -48,12 +49,11 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, AutoCloseable {
+class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusRecorder, AutoCloseable {
     private static final InstanceIdentifier<Topology> NETCONF_TOPO_IID =
             InstanceIdentifier.create(NetworkTopology.class).child(Topology.class,
                     new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())));
@@ -61,38 +61,46 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
     private static final Logger LOG = LoggerFactory.getLogger(CallhomeStatusReporter.class);
 
     private final DataBroker dataBroker;
-    private final ListenerRegistration<DataChangeListener> reg;
+    private final ListenerRegistration<CallhomeStatusReporter> reg;
 
     CallhomeStatusReporter(DataBroker broker) {
         this.dataBroker = broker;
-        this.reg = dataBroker.registerDataChangeListener(LogicalDatastoreType.OPERATIONAL,
-            NETCONF_TOPO_IID.child(Node.class), this, AsyncDataBroker.DataChangeScope.SUBTREE);
+        this.reg = dataBroker.registerDataTreeChangeListener(new DataTreeIdentifier<>(LogicalDatastoreType.OPERATIONAL,
+            NETCONF_TOPO_IID.child(Node.class)), this);
     }
 
     @Override
-    public void onDataChanged(AsyncDataChangeEvent<InstanceIdentifier<?>, DataObject> change) {
-        for (InstanceIdentifier<?> removedPath : change.getRemovedPaths()) {
-            if (removedPath.getTargetType() != NetconfNode.class) {
-                continue;
-            }
-
-            final NodeId nodeId = getNodeId(removedPath);
-            if (nodeId != null) {
-                handleDisconnectedNetconfNode(nodeId);
-                return;
+    public void onDataTreeChanged(Collection<DataTreeModification<Node>> changes) {
+        for (DataTreeModification<Node> change: changes) {
+            final DataObjectModification<Node> rootNode = change.getRootNode();
+            final InstanceIdentifier<Node> identifier = change.getRootPath().getRootIdentifier();
+            switch (rootNode.getModificationType()) {
+                case WRITE:
+                case SUBTREE_MODIFIED:
+                    if (isNetconfNode(rootNode.getDataAfter())) {
+                        NodeId nodeId = getNodeId(identifier);
+                        if (nodeId != null) {
+                            NetconfNode nnode = rootNode.getDataAfter().getAugmentation(NetconfNode.class);
+                            handledNetconfNode(nodeId, nnode);
+                        }
+                    }
+                    break;
+                case DELETE:
+                    if (isNetconfNode(rootNode.getDataBefore())) {
+                        final NodeId nodeId = getNodeId(identifier);
+                        if (nodeId != null) {
+                            handleDisconnectedNetconfNode(nodeId);
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
         }
+    }
 
-        for (Map.Entry<InstanceIdentifier<?>, DataObject> entry : change.getUpdatedData().entrySet()) {
-            if (entry.getKey().getTargetType() == NetconfNode.class) {
-                NodeId nodeId = getNodeId(entry.getKey());
-                if (nodeId != null) {
-                    NetconfNode nnode = (NetconfNode) entry.getValue();
-                    handledNetconfNode(nodeId, nnode);
-                    return;
-                }
-            }
-        }
+    private boolean isNetconfNode(Node node) {
+        return node.getAugmentation(NetconfNode.class) != null;
     }
 
     private NodeId getNodeId(final InstanceIdentifier<?> path) {
@@ -284,7 +292,7 @@ class CallhomeStatusReporter implements DataChangeListener, StatusRecorder, Auto
 
     private List<Device> getDevicesAsList() {
         AllowedDevices devices = getDevices();
-        return (devices == null) ? new ArrayList<Device>() : devices.getDevice();
+        return devices == null ? new ArrayList<>() : devices.getDevice();
     }
 
     @Override
