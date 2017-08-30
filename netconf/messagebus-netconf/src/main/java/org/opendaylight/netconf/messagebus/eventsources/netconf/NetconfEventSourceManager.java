@@ -9,12 +9,14 @@
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
 import com.google.common.base.Preconditions;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataChangeListener;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
+import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
+import org.opendaylight.controller.md.sal.binding.api.DataTreeChangeListener;
+import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
+import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationPublishService;
@@ -27,7 +29,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * NetconfEventSourceManager implements DataChangeListener. On topology changes, it manages creation,
  * updating and removing registrations of event sources.
  */
-public final class NetconfEventSourceManager implements DataChangeListener, AutoCloseable {
+public final class NetconfEventSourceManager implements DataTreeChangeListener<Node>, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEventSourceManager.class);
     private static final TopologyKey NETCONF_TOPOLOGY_KEY = new TopologyKey(
@@ -49,7 +50,7 @@ public final class NetconfEventSourceManager implements DataChangeListener, Auto
             new ConcurrentHashMap<>();
     private final DOMNotificationPublishService publishService;
     private final DOMMountPointService domMounts;
-    private ListenerRegistration<DataChangeListener> listenerRegistration;
+    private ListenerRegistration<NetconfEventSourceManager> listenerRegistration;
     private final EventSourceRegistry eventSourceRegistry;
     private final DataBroker dataBroker;
 
@@ -72,35 +73,29 @@ public final class NetconfEventSourceManager implements DataChangeListener, Auto
      */
     public void initialize() {
         Preconditions.checkNotNull(dataBroker);
-        listenerRegistration = dataBroker
-                .registerDataChangeListener(LogicalDatastoreType.OPERATIONAL, NETCONF_DEVICE_PATH, this,
-                        DataChangeScope.SUBTREE);
+        listenerRegistration = dataBroker.registerDataTreeChangeListener(new DataTreeIdentifier<>(
+                LogicalDatastoreType.OPERATIONAL, NETCONF_DEVICE_PATH), this);
         LOG.info("NetconfEventSourceManager initialized.");
     }
 
     @Override
-    public void onDataChanged(final AsyncDataChangeEvent<InstanceIdentifier<?>, DataObject> event) {
-
-        LOG.debug("[DataChangeEvent<InstanceIdentifier<?>, DataObject>: {}]", event);
-        for (final Map.Entry<InstanceIdentifier<?>, DataObject> changeEntry : event.getCreatedData().entrySet()) {
-            if (changeEntry.getValue() instanceof Node) {
-                nodeCreated(changeEntry.getKey(), (Node) changeEntry.getValue());
+    public void onDataTreeChanged(Collection<DataTreeModification<Node>> changes) {
+        for (DataTreeModification<Node> change: changes) {
+            LOG.debug("DataTreeModification: {}", change);
+            final DataObjectModification<Node> rootNode = change.getRootNode();
+            final InstanceIdentifier<Node> identifier = change.getRootPath().getRootIdentifier();
+            switch (rootNode.getModificationType()) {
+                case WRITE:
+                case SUBTREE_MODIFIED:
+                    nodeCreated(identifier, rootNode.getDataAfter());
+                    break;
+                case DELETE:
+                    nodeRemoved(identifier);
+                    break;
+                default:
+                    break;
             }
         }
-
-        for (final Map.Entry<InstanceIdentifier<?>, DataObject> changeEntry : event.getUpdatedData().entrySet()) {
-            if (changeEntry.getValue() instanceof Node) {
-                nodeUpdated(changeEntry.getKey(), (Node) changeEntry.getValue());
-            }
-        }
-
-        for (InstanceIdentifier<?> removePath : event.getRemovedPaths()) {
-            DataObject removeObject = event.getOriginalData().get(removePath);
-            if (removeObject instanceof Node) {
-                nodeRemoved(removePath);
-            }
-        }
-
     }
 
     private void nodeCreated(final InstanceIdentifier<?> key, final Node node) {
@@ -188,5 +183,4 @@ public final class NetconfEventSourceManager implements DataChangeListener, Auto
         }
         registrationMap.clear();
     }
-
 }
