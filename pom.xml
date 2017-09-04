@@ -26,6 +26,7 @@
         <module>protocol-framework</module>
         <module>netconf</module>
         <module>restconf</module>
+        <module>restconf-rfc</module>
 
         <module>features</module>
         <module>karaf</module>
