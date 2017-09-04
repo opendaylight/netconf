@@ -36,14 +36,25 @@
                 <artifactId>ietf-yang-library</artifactId>
                 <version>${project.version}</version>
             </dependency>
-             <dependency>
+            <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>ietf-restconf-monitoring</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>restconf-common-models</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>sal-rest-connector</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>restconf-nb-rfc8040</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
