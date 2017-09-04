@@ -23,7 +23,11 @@
     <name>${project.artifactId}</name>
 
     <modules>
-        <module>sal-rest-connector</module>
+        <module>restconf-artifacts</module>
+        <module>restconf-models</module>
+        <module>restconf-common-models</module>
+        <module>restconf-nb-bierman02</module>
+        <module>restconf-nb-rfc8040</module>
         <module>sal-rest-connector-config</module>
         <module>sal-rest-docgen</module>
         <module>sal-rest-docgen-maven</module>
@@ -31,8 +35,6 @@
         FIXME: Needs to be reimplemented to not use YANGTools restconf impl
         <module>sal-restconf-broker</module>
         -->
-        <module>restconf-artifacts</module>
-        <module>models</module>
     </modules>
 
 </project>
