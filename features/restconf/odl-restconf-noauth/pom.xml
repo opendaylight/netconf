@@ -106,7 +106,8 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>sal-rest-connector</artifactId>
+            <artifactId>restconf-nb-bierman02</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
