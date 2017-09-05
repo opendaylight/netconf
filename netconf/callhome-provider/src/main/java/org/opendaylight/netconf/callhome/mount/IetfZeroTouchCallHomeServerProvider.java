@@ -8,23 +8,24 @@
 
 package org.opendaylight.netconf.callhome.mount;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataChangeListener;
+import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
+import org.opendaylight.controller.md.sal.binding.api.DataTreeChangeListener;
+import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
+import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.binding.api.ReadWriteTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.netconf.callhome.protocol.CallHomeAuthorizationProvider;
@@ -38,12 +39,11 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.DeviceBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.DeviceKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataChangeListener {
+public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataTreeChangeListener<AllowedDevices> {
     private static final String APPNAME = "CallHomeServer";
     static final InstanceIdentifier<AllowedDevices> ALL_DEVICES = InstanceIdentifier.create(NetconfCallhomeServer.class)
         .child(AllowedDevices.class);
@@ -52,7 +52,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
 
     private final DataBroker dataBroker;
     private final CallHomeMountDispatcher mountDispacher;
-    private CallHomeAuthProviderImpl authProvider;
+    private final CallHomeAuthProviderImpl authProvider;
 
     protected NetconfCallHomeServer server;
 
@@ -60,7 +60,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
 
     private static final String CALL_HOME_PORT_KEY = "DefaultCallHomePort";
     private int port = 0; // 0 = use default in NetconfCallHomeBuilder
-    private CallhomeStatusReporter statusReporter;
+    private final CallhomeStatusReporter statusReporter;
 
     public IetfZeroTouchCallHomeServerProvider(DataBroker dataBroker, CallHomeMountDispatcher mountDispacher) {
         this.dataBroker = dataBroker;
@@ -74,8 +74,8 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
         try {
             LOG.info("Initializing provider for {}", APPNAME);
             initializeServer();
-            dataBroker.registerDataChangeListener(
-                LogicalDatastoreType.CONFIGURATION, ALL_DEVICES, this, AsyncDataBroker.DataChangeScope.SUBTREE);
+            listenerReg = dataBroker.registerDataTreeChangeListener(new DataTreeIdentifier<>(
+                    LogicalDatastoreType.CONFIGURATION, ALL_DEVICES), this);
             LOG.info("Initialization complete for {}", APPNAME);
         } catch (IOException | Configuration.ConfigurationException e) {
             LOG.error("Unable to successfully initialize", e);
@@ -136,8 +136,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
     }
 
     @Override
-    public void onDataChanged(AsyncDataChangeEvent<InstanceIdentifier<?>, DataObject> change) {
-
+    public void onDataTreeChanged(Collection<DataTreeModification<AllowedDevices>> changes) {
         // In case of any changes to the devices datatree, register the changed values with callhome server
         // As of now, no way to add a new callhome client key to the CallHomeAuthorization instance since
         // its created under CallHomeAuthorizationProvider.
@@ -147,9 +146,19 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
         CheckedFuture<Optional<AllowedDevices>, ReadFailedException> devicesFuture =
                 roConfigTx.read(LogicalDatastoreType.CONFIGURATION, IetfZeroTouchCallHomeServerProvider.ALL_DEVICES);
 
-        if (hasDeletedDevices(change)) {
-            handleDeletedDevices(change);
+        Set<InstanceIdentifier<?>> deletedDevices = new HashSet<>();
+        for (DataTreeModification<AllowedDevices> change: changes) {
+            DataObjectModification<AllowedDevices> rootNode = change.getRootNode();
+            switch (rootNode.getModificationType()) {
+                case DELETE:
+                    deletedDevices.add(change.getRootPath().getRootIdentifier());
+                    break;
+                default:
+                    break;
+            }
         }
+
+        handleDeletedDevices(deletedDevices);
 
         try {
             for (Device confDevice : getReadDevices(devicesFuture)) {
@@ -160,19 +169,16 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataC
         }
     }
 
-    private boolean hasDeletedDevices(AsyncDataChangeEvent<InstanceIdentifier<?>, DataObject> change) {
-        return change.getRemovedPaths() != null;
-    }
-
-    private void handleDeletedDevices(AsyncDataChangeEvent<InstanceIdentifier<?>, DataObject> change) {
-        checkArgument(change.getRemovedPaths() != null);
+    private void handleDeletedDevices(Set<InstanceIdentifier<?>> deletedDevices) {
+        if (deletedDevices.isEmpty()) {
+            return;
+        }
 
         ReadWriteTransaction opTx = dataBroker.newReadWriteTransaction();
 
-        Set<InstanceIdentifier<?>> removedDevices = change.getRemovedPaths();
-        int numRemoved = removedDevices.size();
+        int numRemoved = deletedDevices.size();
 
-        Iterator<InstanceIdentifier<?>> iterator = removedDevices.iterator();
+        Iterator<InstanceIdentifier<?>> iterator = deletedDevices.iterator();
         while (iterator.hasNext()) {
             InstanceIdentifier<?> removedIID = iterator.next();
             LOG.info("Deleting the entry for callhome device {}", removedIID);
