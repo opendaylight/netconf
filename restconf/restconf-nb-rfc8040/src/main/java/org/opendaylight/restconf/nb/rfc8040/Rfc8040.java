@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf;
+package org.opendaylight.restconf.nb.rfc8040;
 
 import java.net.URI;
 import java.text.ParseException;
@@ -15,7 +15,6 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 
 /**
- * {@link Deprecated} move to splitted module restconf-nb-rfc8040.
  * Base Draft for Restconf project.
  * <ul>
  * <li>Supported {@link MediaTypes}
@@ -26,7 +25,6 @@ import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
  * </ul>
  * </ul>
  */
-@Deprecated
 public final class Rfc8040 {
 
     private Rfc8040() {
