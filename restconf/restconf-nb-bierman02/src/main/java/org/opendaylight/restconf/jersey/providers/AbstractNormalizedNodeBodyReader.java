@@ -10,8 +10,8 @@ package org.opendaylight.restconf.jersey.providers;
 import com.google.common.annotations.Beta;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
-import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 
 /**
  * Common superclass for readers producing {@link NormalizedNodeContext}.

@@ -29,12 +29,9 @@ import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PatchStatusEntity;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
-import org.opendaylight.restconf.Rfc8040;
-import org.opendaylight.restconf.utils.RestconfConstants;
 
 @Provider
-@Produces({Draft02.MediaTypes.PATCH_STATUS + RestconfService.XML,
-        Rfc8040.MediaTypes.PATCH_STATUS + RestconfConstants.XML})
+@Produces({ Draft02.MediaTypes.PATCH_STATUS + RestconfService.XML })
 public class PatchXmlBodyWriter implements MessageBodyWriter<PatchStatusContext> {
 
     private static final XMLOutputFactory XML_FACTORY;
@@ -51,7 +48,7 @@ public class PatchXmlBodyWriter implements MessageBodyWriter<PatchStatusContext>
     }
 
     @Override
-    public long getSize(final PatchStatusContext patchStatusContext, Class<?> type, final Type genericType,
+    public long getSize(final PatchStatusContext patchStatusContext, final Class<?> type, final Type genericType,
                         final Annotation[] annotations, final MediaType mediaType) {
         return -1;
     }
