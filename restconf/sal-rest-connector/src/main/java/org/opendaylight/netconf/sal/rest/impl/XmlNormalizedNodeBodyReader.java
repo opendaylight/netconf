@@ -107,6 +107,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
 
         if (entityStream.available() < 1) {
             // represent empty nopayload input
+            LOG.warn("Reading empty payload!");
             return new NormalizedNodeContext(path, null);
         }
 
