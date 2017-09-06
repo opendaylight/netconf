@@ -49,7 +49,6 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
-import org.opendaylight.yangtools.yang.parser.util.NamedFileInputStream;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +61,7 @@ public final class TestUtils {
 
     public static SchemaContext loadSchemaContext(final String... yangPath)
             throws FileNotFoundException, ReactorException {
-        final List<InputStream> files = new ArrayList<>();
+        final List<File> files = new ArrayList<>();
         for (final String path : yangPath) {
             final String pathToFile = TestUtils.class.getResource(path).getPath();
             final File testDir = new File(pathToFile);
@@ -74,11 +73,12 @@ public final class TestUtils {
             for (final String fileName : fileList) {
                 final File file = new File(testDir, fileName);
                 if (file.isDirectory() == false) {
-                    files.add(new NamedFileInputStream(file, file.getPath()));
+                    files.add(file);
                 }
             }
         }
-        return YangParserTestUtils.parseYangStreams(files);
+
+        return YangParserTestUtils.parseYangSources(files);
     }
 
     public static Module findModule(final Set<Module> modules, final String moduleName) {
@@ -225,7 +225,7 @@ public final class TestUtils {
 
     public static NodeIdentifierWithPredicates getNodeIdentifierPredicate(final String localName,
             final String namespace, final String revision, final String... keysAndValues) throws ParseException {
-        Preconditions.checkArgument((keysAndValues.length % 2) == 0,
+        Preconditions.checkArgument(keysAndValues.length % 2 == 0,
                 "number of keys argument have to be divisible by 2 (map)");
         final Map<QName, Object> predicate = new HashMap<>();
 
