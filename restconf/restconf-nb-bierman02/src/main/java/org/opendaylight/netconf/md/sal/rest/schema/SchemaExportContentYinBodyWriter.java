@@ -18,12 +18,11 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLStreamException;
-import org.opendaylight.restconf.Rfc8040;
-import org.opendaylight.restconf.utils.RestconfConstants;
+import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.yangtools.yang.model.export.YinExportUtils;
 
 @Provider
-@Produces({ SchemaRetrievalService.YIN_MEDIA_TYPE, Rfc8040.MediaTypes.YIN + RestconfConstants.XML })
+@Produces({ SchemaRetrievalService.YIN_MEDIA_TYPE })
 public class SchemaExportContentYinBodyWriter implements MessageBodyWriter<SchemaExportContext> {
 
     @Override

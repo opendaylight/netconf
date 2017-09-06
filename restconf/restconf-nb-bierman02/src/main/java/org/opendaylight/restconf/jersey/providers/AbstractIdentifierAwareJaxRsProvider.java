@@ -23,8 +23,8 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
-import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.restconf.RestConnectorProvider;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 
 public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements MessageBodyReader<T> {
