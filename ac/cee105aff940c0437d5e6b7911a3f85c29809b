@@ -1,0 +1,8 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Vratko Polák <vrpolak@cisco.com>
+Code-Review+2: Jakub Morvay <jmorvay@cisco.com>
+Submitted-by: Thanh Ha <thanh.ha@linuxfoundation.org>
+Submitted-at: Wed, 06 Sep 2017 15:20:24 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/62682
+Project: netconf
+Branch: refs/heads/stable/nitrogen
