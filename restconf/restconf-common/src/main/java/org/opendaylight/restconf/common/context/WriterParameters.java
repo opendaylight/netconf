@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.sal.restconf.impl;
+package org.opendaylight.restconf.common.context;
 
 import java.util.List;
 import java.util.Set;

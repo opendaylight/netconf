@@ -14,15 +14,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.restconf.Rfc8040;
+import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
- * Container that provides access to the data-model specific operations
- * supported by the server.
- *
+ * Container that provides access to the
+ * data-model specific operations supported by the server.
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public interface RestconfOperationsService {
 
     /**

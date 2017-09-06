@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import com.google.common.base.Preconditions;
 import java.util.List;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public class PatchContext {
