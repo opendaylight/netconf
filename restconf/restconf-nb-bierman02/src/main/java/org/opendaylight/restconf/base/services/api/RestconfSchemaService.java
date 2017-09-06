@@ -11,14 +11,16 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
 import org.opendaylight.restconf.Rfc8040;
+import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
- * Retrieval of the YANG modules which server supports.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Retrieval of the YANG modules which server
+ * supports.
  *
  */
+@Deprecated
 @Path("/")
 public interface RestconfSchemaService {
 

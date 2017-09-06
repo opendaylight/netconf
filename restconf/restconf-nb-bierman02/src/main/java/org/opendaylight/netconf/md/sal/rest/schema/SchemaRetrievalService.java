@@ -13,6 +13,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import org.opendaylight.restconf.base.services.api.RestconfSchemaService;
+import org.opendaylight.restconf.common.schema.SchemaExportContext;
 
 /**
  * Retrieval of the YANG modules which server supports.

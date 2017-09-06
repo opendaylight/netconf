@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
+import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 
 public class StatisticsRestconfServiceWrapper implements RestconfService {
 
