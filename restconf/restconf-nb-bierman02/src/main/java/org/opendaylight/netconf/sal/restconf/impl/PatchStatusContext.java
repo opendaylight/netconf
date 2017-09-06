@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.sal.restconf.impl;
 
 import java.util.List;
+import org.opendaylight.restconf.common.errors.RestconfError;
 
 public class PatchStatusContext {
 
