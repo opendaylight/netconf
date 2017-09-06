@@ -26,7 +26,7 @@ import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PatchStatusEntity;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 
 

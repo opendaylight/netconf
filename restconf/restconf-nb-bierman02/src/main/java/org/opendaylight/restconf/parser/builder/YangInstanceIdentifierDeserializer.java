@@ -17,7 +17,7 @@ import java.util.List;
 import org.opendaylight.netconf.md.sal.rest.common.RestconfValidationUtils;
 import org.opendaylight.netconf.sal.rest.impl.RestUtil;
 import org.opendaylight.netconf.sal.restconf.impl.RestCodec;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.restconf.utils.schema.context.RestconfSchemaUtil;

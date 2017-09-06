@@ -19,8 +19,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
 
 /**
  * Unit test for {@link RestconfValidation}.
