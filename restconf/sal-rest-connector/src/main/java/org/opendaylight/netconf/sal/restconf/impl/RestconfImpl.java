@@ -925,6 +925,7 @@ public class RestconfImpl implements RestconfService {
 
     @Override
     public Response createConfigurationData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
+        LOG.info("createConfigurationData payload={}", payload);
         if (payload == null) {
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }

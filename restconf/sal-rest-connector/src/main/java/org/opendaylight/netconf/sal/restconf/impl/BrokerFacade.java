@@ -465,6 +465,7 @@ public class BrokerFacade {
             final SchemaContext globalSchema, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final String insert, final String point) {
         checkPreconditions();
+        LOG.info("commitConfigurationDataPost payload={}", payload);
         return postDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload,
                 globalSchema, insert, point);
     }
