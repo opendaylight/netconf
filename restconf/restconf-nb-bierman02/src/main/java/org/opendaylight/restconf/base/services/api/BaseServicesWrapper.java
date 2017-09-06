@@ -8,12 +8,13 @@
 package org.opendaylight.restconf.base.services.api;
 
 /**
- * Wrapper for all base services.
+ * @deprecated move to splitted module restconf-nb-rfc8040. Wrapper for all base services.
  * <ul>
  * <li>{@link RestconfOperationsService}
  * <li>{@link RestconfSchemaService}
  * </ul>
  *
  */
+@Deprecated
 public interface BaseServicesWrapper extends RestconfOperationsService, RestconfSchemaService, RestconfService {
 }

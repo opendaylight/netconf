@@ -11,14 +11,15 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.restconf.Rfc8040;
+import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
- * Service for getting yang library version.
+ * @deprecated move to splitted module restconf-nb-rfc8040. Service for getting yang library version.
  *
  */
+@Deprecated
 public interface RestconfService {
 
     /**
