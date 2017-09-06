@@ -10,7 +10,7 @@ package org.opendaylight.restconf.restful.transaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
-import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 
 /**
  * This class represent delegation wrapper for transaction variables.
