@@ -10,6 +10,8 @@ package org.opendaylight.netconf.sal.restconf.impl;
 import com.google.common.base.Strings;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.common.context.WriterParameters;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
 
 public class QueryParametersParser {
 

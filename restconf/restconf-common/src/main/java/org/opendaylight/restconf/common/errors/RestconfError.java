@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.sal.restconf.impl;
+package org.opendaylight.restconf.common.errors;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
