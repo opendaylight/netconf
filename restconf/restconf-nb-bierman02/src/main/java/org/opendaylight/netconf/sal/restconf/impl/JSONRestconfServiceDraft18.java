@@ -29,6 +29,8 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.restconf.api.JSONRestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.jersey.providers.NormalizedNodeJsonBodyWriter;

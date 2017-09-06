@@ -13,7 +13,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
-import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 
 /**
  * JAX-RS Provider.

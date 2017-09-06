@@ -19,6 +19,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.Rfc8040;
+import org.opendaylight.restconf.common.schema.SchemaExportContext;
 
 @Provider
 @Produces({ SchemaRetrievalService.YANG_MEDIA_TYPE, Rfc8040.MediaTypes.YANG })
