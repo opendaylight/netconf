@@ -31,7 +31,6 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
-import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
@@ -40,6 +39,7 @@ import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapte
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
 import org.opendaylight.restconf.Rfc8040.MonitoringModule;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.parser.IdentifierCodec;
@@ -258,7 +258,7 @@ public final class SubscribeToStreamUtil {
         final TemporalAccessor p;
         try {
             p = FORMATTER.parse(value);
-        } catch (DateTimeParseException e) {
+        } catch (final DateTimeParseException e) {
             throw new RestconfDocumentedException("Cannot parse of value in date: " + value, e);
         }
         return Instant.from(p);

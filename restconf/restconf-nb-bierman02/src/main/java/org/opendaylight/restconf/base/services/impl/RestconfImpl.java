@@ -7,11 +7,11 @@
  */
 package org.opendaylight.restconf.base.services.impl;
 
-import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
-import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.restconf.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.Rfc8040.RestconfModule;
 import org.opendaylight.restconf.base.services.api.RestconfService;
+import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;

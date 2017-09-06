@@ -28,6 +28,11 @@
       <artifactId>restconf-common-models</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>restconf-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>

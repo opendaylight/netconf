@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import com.google.common.base.Strings;
 import javax.ws.rs.core.UriInfo;
+import org.opendaylight.restconf.common.context.WriterParameters;
 
 public class QueryParametersParser {
 

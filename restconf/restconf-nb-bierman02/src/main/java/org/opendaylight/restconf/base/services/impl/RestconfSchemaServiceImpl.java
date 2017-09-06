@@ -7,9 +7,9 @@
  */
 package org.opendaylight.restconf.base.services.impl;
 
-import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
 import org.opendaylight.restconf.base.services.api.RestconfSchemaService;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
+import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
