@@ -10,9 +10,10 @@ package org.opendaylight.restconf.utils;
 import com.google.common.base.Splitter;
 
 /**
- * Util class for Restconf constants.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Util class for Restconf constants.
  *
  */
+@Deprecated
 public final class RestconfConstants {
 
     public static final String XML = "+xml";
