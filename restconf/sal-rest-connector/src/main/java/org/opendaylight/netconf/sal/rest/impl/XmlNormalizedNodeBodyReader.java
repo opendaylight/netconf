@@ -107,6 +107,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
 
         if (entityStream.available() < 1) {
             // represent empty nopayload input
+            LOG.warn("Reading empty payload!");
             return new NormalizedNodeContext(path, null);
         }
 
@@ -193,6 +194,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
         final InstanceIdentifierContext<? extends SchemaNode> outIIContext = new InstanceIdentifierContext<>(
                 fullIIToData, pathContext.getSchemaNode(), pathContext.getMountPoint(), pathContext.getSchemaContext());
 
+        LOG.info("Parsed {}", parsed);
         return new NormalizedNodeContext(outIIContext, parsed);
     }
 
