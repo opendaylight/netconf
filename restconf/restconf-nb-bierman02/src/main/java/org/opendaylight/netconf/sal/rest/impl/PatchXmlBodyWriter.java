@@ -28,7 +28,7 @@ import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
 import org.opendaylight.netconf.sal.restconf.impl.PatchStatusEntity;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
+import org.opendaylight.restconf.common.errors.RestconfError;
 
 @Provider
 @Produces({ Draft02.MediaTypes.PATCH_STATUS + RestconfService.XML })
