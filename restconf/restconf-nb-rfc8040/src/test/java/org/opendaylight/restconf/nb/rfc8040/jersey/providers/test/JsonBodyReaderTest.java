@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.restconf.jersey.providers;
+package org.opendaylight.restconf.nb.rfc8040.jersey.providers.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -24,9 +24,9 @@ import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.controller.sal.rest.impl.test.providers.TestXmlBodyReader;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
+import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
@@ -72,7 +72,6 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
         schemaContext = YangParserTestUtils.parseYangSources(testFiles);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
         when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mock(DOMMountPointService.class));
     }
 
@@ -136,7 +135,8 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
                 .node(contAugmentQName);
         final String uri = "instance-identifier-module:cont";
         mockBodyReader(uri, this.jsonBodyReader, true);
-        final InputStream inputStream = TestXmlBodyReader.class
+        final InputStream inputStream =
+                XmlBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/json_augment_container.json");
         final NormalizedNodeContext returnValue = this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null,
                 inputStream);
@@ -160,7 +160,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
                 .node(augmentChoice1QName).node(augChoice2II).node(augmentChoice2QName).node(containerQName);
         final String uri = "instance-identifier-module:cont";
         mockBodyReader(uri, this.jsonBodyReader, true);
-        final InputStream inputStream = TestXmlBodyReader.class
+        final InputStream inputStream = XmlBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/json_augment_choice_container.json");
         final NormalizedNodeContext returnValue = this.jsonBodyReader.readFrom(null, null, null, this.mediaType, null,
                 inputStream);
