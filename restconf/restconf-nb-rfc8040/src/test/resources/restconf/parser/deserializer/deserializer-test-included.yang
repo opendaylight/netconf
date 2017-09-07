@@ -1,0 +1,22 @@
+module deserializer-test-included {
+  namespace "deserializer:test:included";
+  prefix "dti";
+  yang-version 1;
+
+  revision 2016-06-06 {
+    description
+      "Initial revision.";
+  }
+
+  list augmented-list {
+    key list-key;
+
+    leaf list-key {
+      type uint16;
+    }
+
+    leaf list-value {
+      type string;
+    }
+  }
+}
