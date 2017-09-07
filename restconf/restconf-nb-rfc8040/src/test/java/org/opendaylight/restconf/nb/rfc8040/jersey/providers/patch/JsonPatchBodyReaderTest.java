@@ -6,35 +6,32 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.restconf.jersey.providers;
+package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
 import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.sal.rest.impl.test.providers.TestJsonBodyReader;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.JsonBodyReaderTest;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
+public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
 
-    private static final String MOUNT_POINT = "instance-identifier-module:cont/yang-ext:mount/";
-    private static SchemaContext schemaContext;
     private final JsonToPatchBodyReader jsonToPatchBodyReader;
+    private static SchemaContext schemaContext;
 
-    public JsonPatchBodyReaderMountPointTest() throws Exception {
+    public JsonPatchBodyReaderTest() throws Exception {
         super();
         jsonToPatchBodyReader = new JsonToPatchBodyReader();
     }
@@ -47,28 +44,21 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
     @BeforeClass
     public static void initialization() {
         schemaContext = schemaContextLoader("/instanceidentifier/yang", schemaContext);
-
-        final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
-        final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
-
-        when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mountPointService);
-        when(mountPointService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountPoint));
-        when(mountPoint.getSchemaContext()).thenReturn(schemaContext);
-
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
+        when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mock(DOMMountPointService.class));
+        SchemaContextHandler.setActualSchemaContext(schemaContext);
     }
 
     @Test
     public void modulePatchDataTest() throws Exception {
-        final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
+        final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
         mockBodyReader(uri, jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = TestJsonBodyReader.class
+        final InputStream inputStream = JsonBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHdata.json");
 
         final PatchContext returnValue = jsonToPatchBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
-        checkPatchContextMountPoint(returnValue);
+        checkPatchContext(returnValue);
     }
 
     /**
@@ -76,15 +66,15 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
      */
     @Test
     public void modulePatchCreateAndDeleteTest() throws Exception {
-        final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
+        final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
         mockBodyReader(uri, jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = TestJsonBodyReader.class
+        final InputStream inputStream = JsonBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataCreateAndDelete.json");
 
         final PatchContext returnValue = jsonToPatchBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
-        checkPatchContextMountPoint(returnValue);
+        checkPatchContext(returnValue);
     }
 
     /**
@@ -93,10 +83,10 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
      */
     @Test
     public void modulePatchValueMissingNegativeTest() throws Exception {
-        final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
+        final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
         mockBodyReader(uri, jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = TestJsonBodyReader.class
+        final InputStream inputStream = JsonBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataValueMissing.json");
 
         try {
@@ -113,10 +103,10 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
      */
     @Test
     public void modulePatchValueNotSupportedNegativeTest() throws Exception {
-        final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
+        final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
         mockBodyReader(uri, jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = TestJsonBodyReader.class
+        final InputStream inputStream = JsonBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataValueNotSupported.json");
 
         try {
@@ -132,15 +122,15 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
      */
     @Test
     public void modulePatchCompleteTargetInURITest() throws Exception {
-        final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont";
+        final String uri = "instance-identifier-patch-module:patch-cont";
         mockBodyReader(uri, jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = TestJsonBodyReader.class
+        final InputStream inputStream = JsonBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHdataCompleteTargetInURI.json");
 
         final PatchContext returnValue = jsonToPatchBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
-        checkPatchContextMountPoint(returnValue);
+        checkPatchContext(returnValue);
     }
 
     /**
@@ -148,15 +138,15 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
      */
     @Test
     public void modulePatchMergeOperationOnListTest() throws Exception {
-        final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
+        final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
         mockBodyReader(uri, jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = TestJsonBodyReader.class
+        final InputStream inputStream = JsonBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHMergeOperationOnList.json");
 
         final PatchContext returnValue = jsonToPatchBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
-        checkPatchContextMountPoint(returnValue);
+        checkPatchContext(returnValue);
     }
 
     /**
@@ -164,15 +154,15 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
      */
     @Test
     public void modulePatchMergeOperationOnContainerTest() throws Exception {
-        final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont";
+        final String uri = "instance-identifier-patch-module:patch-cont";
         mockBodyReader(uri, jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = TestJsonBodyReader.class
+        final InputStream inputStream = JsonBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHMergeOperationOnContainer.json");
 
         final PatchContext returnValue = jsonToPatchBodyReader
                 .readFrom(null, null, null, mediaType, null, inputStream);
-        checkPatchContextMountPoint(returnValue);
+        checkPatchContext(returnValue);
     }
 
     /**
@@ -180,10 +170,11 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
      */
     @Test
     public void modulePatchSimpleLeafValueTest() throws Exception {
-        final String uri = MOUNT_POINT + "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
+        final String uri = "instance-identifier-patch-module:patch-cont/my-list1=leaf1";
         mockBodyReader(uri, jsonToPatchBodyReader, false);
 
-        final InputStream inputStream = TestJsonBodyReader.class
+        final InputStream inputStream =
+                JsonBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/json/jsonPATCHSimpleLeafValue.json");
 
         final PatchContext returnValue = jsonToPatchBodyReader

@@ -85,11 +85,11 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
         return HttpMethod.POST.equals(this.request.getMethod());
     }
 
-    void setUriInfo(final UriInfo uriInfo) {
+    public void setUriInfo(final UriInfo uriInfo) {
         this.uriInfo = uriInfo;
     }
 
-    void setRequest(final Request request) {
+    public void setRequest(final Request request) {
         this.request = request;
     }
 }
