@@ -8,9 +8,10 @@
 package org.opendaylight.restconf.utils.mapping;
 
 /**
- * Util class for constants of mapping node.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Util class for constants of mapping node.
  *
  */
+@Deprecated
 public final class RestconfMappingNodeConstants {
 
     public static final String NAME = "name";

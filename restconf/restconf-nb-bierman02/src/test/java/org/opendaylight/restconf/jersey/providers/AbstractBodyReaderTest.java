@@ -22,9 +22,9 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
-import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
 import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
+import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 

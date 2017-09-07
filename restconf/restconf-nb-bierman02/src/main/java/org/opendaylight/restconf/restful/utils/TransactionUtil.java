@@ -31,9 +31,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Util class for common methods of transactions.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Util class for common methods of
+ * transactions.
  *
  */
+@Deprecated
 public final class TransactionUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransactionUtil.class);

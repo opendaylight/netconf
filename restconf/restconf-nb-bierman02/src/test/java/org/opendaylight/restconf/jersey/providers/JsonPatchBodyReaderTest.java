@@ -20,8 +20,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.rest.impl.test.providers.TestJsonBodyReader;
-import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {

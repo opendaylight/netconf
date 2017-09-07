@@ -8,9 +8,10 @@
 package org.opendaylight.restconf.utils.mapping;
 
 /**
- * Util class for mapping entry stream.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Util class for mapping entry stream.
  *
  */
+@Deprecated
 public final class RestconfMappingStreamConstants {
 
     public static final String DESCRIPTION = "DESCRIPTION_PLACEHOLDER";

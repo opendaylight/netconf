@@ -18,10 +18,11 @@ import org.opendaylight.yangtools.yang.model.api.UnknownSchemaNode;
 import org.opendaylight.yangtools.yang.model.util.type.BaseTypes;
 
 /**
- * Special case only use by GET restconf/operations (since moment of old Yang
- * parser and old yang model API removal) to build and use fake leaf like child
- * in container.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Special case only use by GET
+ * restconf/operations (since moment of old Yang parser and old yang model API removal) to build and use fake
+ * leaf like child in container.
  */
+@Deprecated
 final class FakeLeafSchemaNode implements LeafSchemaNode {
 
     private final SchemaPath path;
