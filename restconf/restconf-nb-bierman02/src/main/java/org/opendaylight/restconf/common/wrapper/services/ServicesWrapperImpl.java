@@ -10,8 +10,6 @@ package org.opendaylight.restconf.common.wrapper.services;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
-import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
 import org.opendaylight.restconf.base.services.api.BaseServicesWrapper;
 import org.opendaylight.restconf.base.services.api.RestconfOperationsService;
 import org.opendaylight.restconf.base.services.api.RestconfSchemaService;
@@ -20,6 +18,8 @@ import org.opendaylight.restconf.base.services.impl.RestconfImpl;
 import org.opendaylight.restconf.base.services.impl.RestconfOperationsServiceImpl;
 import org.opendaylight.restconf.base.services.impl.RestconfSchemaServiceImpl;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
+import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
@@ -36,13 +36,14 @@ import org.opendaylight.restconf.restful.services.impl.RestconfInvokeOperationsS
 import org.opendaylight.restconf.restful.services.impl.RestconfStreamsSubscriptionServiceImpl;
 
 /**
- * Wrapper for services.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Wrapper for services.
  * <ul>
  * <li>{@link BaseServicesWrapper}
  * <li>{@link TransactionServicesWrapper}
  * </ul>
  *
  */
+@Deprecated
 @Path("/")
 public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServicesWrapper {
 

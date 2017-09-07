@@ -18,12 +18,12 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
- * This class creates {@link SoftReference} of actual {@link SchemaContext}
- * object and even if the {@link SchemaContext} changes, this will be sticks
- * reference to the old {@link SchemaContext} and provides work with the old
- * {@link SchemaContext}.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. This class creates {@link SoftReference} of
+ * actual {@link SchemaContext} object and even if the {@link SchemaContext} changes, this will be sticks
+ * reference to the old {@link SchemaContext} and provides work with the old {@link SchemaContext}.
  *
  */
+@Deprecated
 public final class SchemaContextRef {
 
     private final SoftReference<SchemaContext> schemaContextRef;

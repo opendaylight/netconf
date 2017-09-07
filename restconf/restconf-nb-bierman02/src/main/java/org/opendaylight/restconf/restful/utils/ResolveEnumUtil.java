@@ -8,9 +8,11 @@
 package org.opendaylight.restconf.restful.utils;
 
 /**
- * Common util class for resolve enum from String.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Common util class for resolve enum from
+ * String.
  *
  */
+@Deprecated
 public final class ResolveEnumUtil {
 
     private ResolveEnumUtil() {

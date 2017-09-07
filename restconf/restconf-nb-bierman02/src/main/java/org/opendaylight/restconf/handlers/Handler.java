@@ -9,11 +9,13 @@
 package org.opendaylight.restconf.handlers;
 
 /**
- * Handler for handling object prepared by provider for Restconf services.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Handler for handling object prepared by
+ * provider for Restconf services.
  *
  * @param <T>
- *             specific type go object for handling it
+ *            specific type go object for handling it
  */
+@Deprecated
 interface Handler<T> {
 
     /**
@@ -29,5 +31,5 @@ interface Handler<T> {
      * @param object
      *             new object to update old object
      */
-    default void update(T object) {}
+    default void update(final T object) {}
 }

@@ -20,18 +20,19 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.netconf.sal.rest.impl.Patch;
-import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
-import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
 import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
+import org.opendaylight.restconf.common.patch.Patch;
+import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
- * The "{+restconf}/data" subtree represents the datastore resource type, which
- * is a collection of configuration data and state data nodes.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. The "{+restconf}/data" subtree represents
+ * the datastore resource type, which is a collection of configuration data and state data nodes.
  *
  */
+@Deprecated
 public interface RestconfDataService {
 
     /**

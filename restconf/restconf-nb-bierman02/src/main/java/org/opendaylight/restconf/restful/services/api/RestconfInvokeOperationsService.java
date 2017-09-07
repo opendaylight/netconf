@@ -21,10 +21,12 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
- * An operation resource represents a protocol operation defined with the YANG
- * "rpc" statement. It is invoked using a POST method on the operation resource.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. An operation resource represents a protocol
+ * operation defined with the YANG "rpc" statement. It is invoked using a POST method on the operation
+ * resource.
  *
  */
+@Deprecated
 public interface RestconfInvokeOperationsService {
 
     /**

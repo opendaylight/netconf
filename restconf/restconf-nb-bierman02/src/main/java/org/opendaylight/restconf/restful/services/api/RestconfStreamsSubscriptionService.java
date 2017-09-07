@@ -16,9 +16,10 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 
 /**
- * Subscribing to streams.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Subscribing to streams.
  *
  */
+@Deprecated
 public interface RestconfStreamsSubscriptionService {
 
     /**

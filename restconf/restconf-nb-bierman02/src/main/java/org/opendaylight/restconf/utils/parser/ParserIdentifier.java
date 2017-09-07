@@ -37,8 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Util class for parsing identifier.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Util class for parsing identifier.
  */
+@Deprecated
 public final class ParserIdentifier {
 
     private static final Logger LOG = LoggerFactory.getLogger(ParserIdentifier.class);
