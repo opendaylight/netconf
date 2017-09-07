@@ -10,8 +10,8 @@ package org.opendaylight.netconf.sal.rest.doc;
 import java.util.LinkedList;
 import java.util.List;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.core.api.mount.MountProvisionListener;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGenerator;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
@@ -24,7 +24,7 @@ public class DocProvider {
 
     private final List<AutoCloseable> toClose = new LinkedList<>();
 
-    public DocProvider(final SchemaService schemaService, final DOMMountPointService mountService) {
+    public DocProvider(final DOMSchemaService schemaService, final DOMMountPointService mountService) {
 
         ApiDocGenerator.getInstance().setSchemaService(schemaService);
 

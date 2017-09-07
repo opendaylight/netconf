@@ -25,9 +25,7 @@ import java.util.Set;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.mockito.ArgumentCaptor;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
@@ -71,16 +69,16 @@ public class DocGenTestHelper {
         return this.schemaContext;
     }
 
-    public SchemaService createMockSchemaService() {
+    public DOMSchemaService createMockSchemaService() {
         return createMockSchemaService(null);
     }
 
-    public SchemaService createMockSchemaService(SchemaContext mockContext) {
+    public DOMSchemaService createMockSchemaService(SchemaContext mockContext) {
         if (mockContext == null) {
             mockContext = createMockSchemaContext();
         }
 
-        final SchemaService mockSchemaService = mock(SchemaService.class);
+        final DOMSchemaService mockSchemaService = mock(DOMSchemaService.class);
         when(mockSchemaService.getGlobalContext()).thenReturn(mockContext);
         return mockSchemaService;
     }
@@ -93,32 +91,26 @@ public class DocGenTestHelper {
         final ArgumentCaptor<Date> dateCapture = ArgumentCaptor.forClass(Date.class);
         final ArgumentCaptor<URI> namespaceCapture = ArgumentCaptor.forClass(URI.class);
         when(mockContext.findModuleByName(moduleCapture.capture(), dateCapture.capture())).then(
-                new Answer<Module>() {
-                    @Override
-                    public Module answer(final InvocationOnMock invocation) throws Throwable {
-                        final String module = moduleCapture.getValue();
-                        final Date date = dateCapture.getValue();
-                        for (final Module m : Collections.unmodifiableSet(DocGenTestHelper.this.modules)) {
-                            if (m.getName().equals(module) && m.getRevision().equals(date)) {
-                                return m;
-                            }
+                invocation -> {
+                    final String module = moduleCapture.getValue();
+                    final Date date = dateCapture.getValue();
+                    for (final Module m : Collections.unmodifiableSet(DocGenTestHelper.this.modules)) {
+                        if (m.getName().equals(module) && m.getRevision().equals(date)) {
+                            return m;
                         }
-                        return null;
                     }
+                    return null;
                 });
         when(mockContext.findModuleByNamespaceAndRevision(namespaceCapture.capture(), dateCapture.capture())).then(
-                new Answer<Module>() {
-                    @Override
-                    public Module answer(final InvocationOnMock invocation) throws Throwable {
-                        final URI namespace = namespaceCapture.getValue();
-                        final Date date = dateCapture.getValue();
-                        for (final Module m : Collections.unmodifiableSet(DocGenTestHelper.this.modules)) {
-                            if (m.getNamespace().equals(namespace) && m.getRevision().equals(date)) {
-                                return m;
-                            }
+                invocation -> {
+                    final URI namespace = namespaceCapture.getValue();
+                    final Date date = dateCapture.getValue();
+                    for (final Module m : Collections.unmodifiableSet(DocGenTestHelper.this.modules)) {
+                        if (m.getNamespace().equals(namespace) && m.getRevision().equals(date)) {
+                            return m;
                         }
-                        return null;
                     }
+                    return null;
                 });
         return mockContext;
     }
@@ -130,12 +122,7 @@ public class DocGenTestHelper {
 
         final ArgumentCaptor<String> subStringCapture = ArgumentCaptor.forClass(String.class);
         when(mockBuilder.path(subStringCapture.capture())).thenReturn(mockBuilder);
-        when(mockBuilder.build()).then(new Answer<URI>() {
-            @Override
-            public URI answer(final InvocationOnMock invocation) throws Throwable {
-                return URI.create(uri + "/" + subStringCapture.getValue());
-            }
-        });
+        when(mockBuilder.build()).then(invocation -> URI.create(uri + "/" + subStringCapture.getValue()));
 
         final UriInfo info = mock(UriInfo.class);
 

@@ -14,7 +14,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
     <!-- AAAService is used in web.xml and is needed here -->
     <reference id="aaaService" interface="org.opendaylight.aaa.api.AAAService" />
 
-    <reference id="schemaService" interface="org.opendaylight.controller.sal.core.api.model.SchemaService"/>
+    <reference id="schemaService" interface="org.opendaylight.mdsal.dom.api.DOMSchemaService"/>
     <reference id="domMountPointService" interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"/>
 
     <bean id="provider" class="org.opendaylight.netconf.sal.rest.doc.DocProvider" destroy-method="close">
