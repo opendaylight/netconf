@@ -356,7 +356,8 @@ public class RestCodec {
         return module;
     }
 
-    private static URI resolveValidNamespace(final String namespace, final DOMMountPoint mountPoint, final SchemaContext schemaContext) {
+    private static URI resolveValidNamespace(final String namespace, final DOMMountPoint mountPoint,
+            final SchemaContext schemaContext) {
         URI validNamespace;
         if (mountPoint != null) {
             validNamespace = findFirstModuleByName(schemaContext, namespace);
@@ -384,7 +385,7 @@ public class RestCodec {
         Preconditions.checkNotNull(namespace);
 
         final Iterable<DataSchemaNode> result = Iterables.filter(findInstanceDataChildrenByName(container, name),
-                node -> namespace.equals(node.getQName().getNamespace()));
+            node -> namespace.equals(node.getQName().getNamespace()));
         return Iterables.getFirst(result, null);
     }
 
