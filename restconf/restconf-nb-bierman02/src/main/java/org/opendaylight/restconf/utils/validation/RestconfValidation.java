@@ -10,17 +10,18 @@ package org.opendaylight.restconf.utils.validation;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
-import org.opendaylight.netconf.md.sal.rest.common.RestconfValidationUtils;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
+import org.opendaylight.restconf.common.validation.RestconfValidationUtils;
 import org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 
 /**
- * Util class for validations.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Util class for validations.
  *
  */
+@Deprecated
 public final class RestconfValidation {
 
     private RestconfValidation() {

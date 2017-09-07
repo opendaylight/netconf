@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.restful.utils;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.util.List;
@@ -17,15 +18,15 @@ import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFaile
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
-import org.opendaylight.netconf.md.sal.rest.common.RestconfValidationUtils;
-import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
+import org.opendaylight.restconf.common.validation.RestconfValidationUtils;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
+import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -47,9 +48,10 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
- * Util class for put data to DS.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Util class for put data to DS.
  *
  */
+@Deprecated
 public final class PutDataTransactionUtil {
 
     /**
@@ -153,9 +155,11 @@ public final class PutDataTransactionUtil {
     public static Response putData(final NormalizedNodeContext payload, final SchemaContextRef schemaCtxRef,
                                final TransactionVarsWrapper transactionNode, final String insert, final String point) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
+        final SchemaContext schemaContext = schemaCtxRef.get();
         final ResponseFactory responseFactory = new ResponseFactory(
-                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.CONFIG, transactionNode));
-        final CheckedFuture<Void, TransactionCommitFailedException> submitData = submitData(path, schemaCtxRef.get(),
+                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.CONFIG, transactionNode,
+                        schemaContext));
+        final CheckedFuture<Void, TransactionCommitFailedException> submitData = submitData(path, schemaContext,
                 transactionNode.getTransactionChain(), payload.getData(), insert, point);
         FutureCallbackTx.addCallback(submitData, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, responseFactory);
         return responseFactory.build();
@@ -285,7 +289,7 @@ public final class PutDataTransactionUtil {
         final TransactionVarsWrapper transactionNode =
                 new TransactionVarsWrapper(iid, null, domTransactionChain);
         final NormalizedNode<?, ?> readData = ReadDataTransactionUtil
-                .readData(RestconfDataServiceConstant.ReadData.CONFIG, transactionNode);
+                .readData(RestconfDataServiceConstant.ReadData.CONFIG, transactionNode, schemaContext);
         return readData;
     }
 
@@ -295,7 +299,7 @@ public final class PutDataTransactionUtil {
             final OrderedLeafSetNode<?> readLeafList, final boolean before) {
         rwTransaction.delete(datastore, path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
-                ControllerContext.getInstance().toInstanceIdentifier(point);
+                ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.absent());
         int lastItemPosition = 0;
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
@@ -325,7 +329,7 @@ public final class PutDataTransactionUtil {
             final OrderedMapNode readList, final boolean before) {
         writeTx.delete(datastore, path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
-                ControllerContext.getInstance().toInstanceIdentifier(point);
+                ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.absent());
         int lastItemPosition = 0;
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
             if (mapEntryNode.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {

@@ -32,6 +32,10 @@ import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.UnknownSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
 
+/**
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040.
+ */
+@Deprecated
 final class FakeImportedModule extends ForwardingObject implements Module {
 
     private final Module delegate;
