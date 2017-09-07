@@ -1,0 +1,44 @@
+module ordered-example {
+  namespace "ordered:example";
+  prefix "oex";
+
+  revision 2016-11-13 {
+    description
+      "Initial revision.";
+  }
+
+    container cont {
+        list playlist {
+            key name;
+
+            leaf name {
+              type string;
+            }
+            list song {
+              key index;
+              ordered-by user;
+
+              leaf index {
+                type uint32;
+              }
+              leaf id {
+                type instance-identifier;
+                mandatory true;
+                description
+                  "Song identifier. Must identify an instance of
+                   /songs-cont/songs/song-name.";
+              }
+            }
+          }
+    }
+
+    container songs-cont{
+        list songs{
+            key song-name;
+
+            leaf song-name{
+                type string;
+            }
+        }
+    }
+}
