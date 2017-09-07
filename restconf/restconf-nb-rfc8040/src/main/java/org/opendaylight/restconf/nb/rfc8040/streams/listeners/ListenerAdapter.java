@@ -191,7 +191,9 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
      * @param operation
      *            {@link Operation}
      * @param schemaContext
+     *            schema context
      * @param dataSchemaContextTree
+     *            data schema context tree
      */
     private void addValuesFromDataToElement(final Document doc, final Set<YangInstanceIdentifier> data,
             final Element element, final Operation operation, final SchemaContext schemaContext,
@@ -234,6 +236,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
      * @param operation
      *            {@link Operation}
      * @param schemaContext
+     *            schema context
      * @return {@link Node} node represented by changed event element.
      */
     private Node createDataChangeEventElement(final Document doc, final YangInstanceIdentifier path,
@@ -293,6 +296,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
      * @param element
      *            {@link Element}
      * @param schemaContext
+     *            schema context
      */
     @SuppressWarnings("rawtypes")
     private void addPathAsValueToElement(final YangInstanceIdentifier path, final Element element,
@@ -336,6 +340,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
      * @param qualifiedName
      *            QName
      * @param schemaContext
+     *            schema context
      */
     private static void writeIdentifierWithNamespacePrefix(final Element element, final StringBuilder textContent,
             final QName qualifiedName, final SchemaContext schemaContext) {

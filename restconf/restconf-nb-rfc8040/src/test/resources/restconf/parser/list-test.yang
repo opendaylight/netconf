@@ -1,0 +1,39 @@
+module list-test {
+  namespace "list:test";
+  prefix "listt";
+
+  revision 2016-04-29 {
+    description
+      "Initial revision.";
+  }
+
+    container top {
+       list list1 {
+           key "key1 key2 key3";
+           leaf key1 {
+               type string;
+           }
+           leaf key2 {
+               type string;
+           }
+           leaf key3 {
+               type string;
+           }
+           list list2 {
+                key "key4 key5";
+                leaf key4 {
+                   type string;
+                }
+                leaf key5 {
+                   type string;
+                }
+                leaf result {
+                    type string;
+                }
+           }
+        }
+        leaf-list Y {
+          type uint32;
+        }
+    }
+}

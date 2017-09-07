@@ -53,7 +53,7 @@ public class NotificationListenerTest {
         try {
             MODULE = QNameModule.create(URI.create("notifi:mod"),
                 SimpleDateFormatUtil.getRevisionFormat().parse("2016-11-23"));
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             throw new ExceptionInInitializerError(e);
         }
     }
