@@ -23,7 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Api;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
@@ -128,7 +128,7 @@ public class MountPointSwaggerTest {
         // in our test.
         // OK for testing - real thing would have seperate instances.
         final SchemaContext context = this.helper.createMockSchemaContext();
-        final SchemaService schemaService = this.helper.createMockSchemaService(context);
+        final DOMSchemaService schemaService = this.helper.createMockSchemaService(context);
 
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         when(mountPoint.getSchemaContext()).thenReturn(context);
