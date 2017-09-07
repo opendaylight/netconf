@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.restconf.jersey.providers;
+package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,11 +27,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.controller.sal.rest.impl.test.providers.TestXmlBodyReader;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
@@ -82,8 +84,7 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mountPointService);
         when(mountPointService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountPoint));
         when(mountPoint.getSchemaContext()).thenReturn(schemaContext);
-
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
+        SchemaContextHandler.setActualSchemaContext(schemaContext);
     }
 
     @Test
@@ -190,7 +191,7 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
     @Test
     public void findFooContainerUsingNamespaceTest() throws Exception {
         mockBodyReader("instance-identifier-module:cont/yang-ext:mount", this.xmlBodyReader, true);
-        final InputStream inputStream = TestXmlBodyReader.class
+        final InputStream inputStream = XmlBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlDataFindFooContainer.xml");
         final NormalizedNodeContext returnValue = this.xmlBodyReader
                 .readFrom(null, null, null, this.mediaType, null, inputStream);
@@ -212,7 +213,7 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
     @Test
     public void findBarContainerUsingNamespaceTest() throws Exception {
         mockBodyReader("instance-identifier-module:cont/yang-ext:mount", this.xmlBodyReader, true);
-        final InputStream inputStream = TestXmlBodyReader.class
+        final InputStream inputStream = XmlBodyReaderTest.class
                 .getResourceAsStream("/instanceidentifier/xml/xmlDataFindBarContainer.xml");
         final NormalizedNodeContext returnValue = this.xmlBodyReader
                 .readFrom(null, null, null, this.mediaType, null, inputStream);
@@ -234,7 +235,8 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
     @Test
     public void wrongRootElementTest() throws Exception {
         mockBodyReader("instance-identifier-module:cont/yang-ext:mount", this.xmlBodyReader, false);
-        final InputStream inputStream = TestXmlBodyReader.class.getResourceAsStream(
+        final InputStream inputStream =
+                XmlBodyReaderTest.class.getResourceAsStream(
                 "/instanceidentifier/xml/bug7933.xml");
         try {
             this.xmlBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream);

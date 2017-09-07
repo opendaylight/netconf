@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.restconf.jersey.providers;
+package org.opendaylight.restconf.nb.rfc8040.jersey.providers.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -26,11 +26,12 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.controller.sal.rest.impl.test.providers.TestXmlBodyReader;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyReader;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
@@ -76,8 +77,8 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
         testFiles.addAll(TestRestconfUtils.loadFiles("/foo-xml-test/yang"));
         schemaContext = YangParserTestUtils.parseYangSources(testFiles);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
         when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mock(DOMMountPointService.class));
+        SchemaContextHandler.setActualSchemaContext(schemaContext);
     }
 
     @Test
@@ -92,7 +93,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
 
     private void runXmlTest(final boolean isPost, final String path) throws Exception {
         mockBodyReader(path, xmlBodyReader, isPost);
-        final InputStream inputStream = TestXmlBodyReader.class.getResourceAsStream("/foo-xml-test/foo.xml");
+        final InputStream inputStream = XmlBodyReaderTest.class.getResourceAsStream("/foo-xml-test/foo.xml");
         final NormalizedNodeContext nnc = xmlBodyReader.readFrom(null, null, null, mediaType, null, inputStream);
         assertNotNull(nnc);
 
@@ -267,8 +268,8 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
     @Test
     public void wrongRootElementTest() throws Exception {
         mockBodyReader("instance-identifier-module:cont", this.xmlBodyReader, false);
-        final InputStream inputStream = TestXmlBodyReader.class.getResourceAsStream(
-                "/instanceidentifier/xml/bug7933.xml");
+        final InputStream inputStream =
+                XmlBodyReaderTest.class.getResourceAsStream("/instanceidentifier/xml/bug7933.xml");
         try {
             this.xmlBodyReader.readFrom(null, null, null, this.mediaType, null, inputStream);
             Assert.fail("Test should fail due to malformed PUT operation message");
