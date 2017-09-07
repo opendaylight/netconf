@@ -26,7 +26,7 @@ import javax.ws.rs.core.UriInfo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGenerator;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Api;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
@@ -111,8 +111,8 @@ public class ApiDocGeneratorTest {
     /**
      * Tries to find operation with name {@code operationName} and with summary {@code summary}.
      */
-    private boolean findOperation(final List<Operation> operations, final String operationName, final String type,
-                                  final String... searchedParameters) {
+    private static boolean findOperation(final List<Operation> operations, final String operationName,
+            final String type, final String... searchedParameters) {
         final Set<Operation> filteredOperations = findOperations(operations, operationName);
         for (final Operation operation : filteredOperations) {
             if (operation.getType().equals(type)) {
@@ -123,7 +123,7 @@ public class ApiDocGeneratorTest {
         return false;
     }
 
-    private Set<Operation> findOperations(final List<Operation> operations, final String operationName) {
+    private static Set<Operation> findOperations(final List<Operation> operations, final String operationName) {
         final Set<Operation> filteredOperations = new HashSet<>();
         for (final Operation operation : operations) {
             if (operation.getMethod().equals(operationName)) {
@@ -133,7 +133,7 @@ public class ApiDocGeneratorTest {
         return filteredOperations;
     }
 
-    private boolean containAllParameters(final List<Parameter> searchedIns, final String[] searchedWhats) {
+    private static boolean containAllParameters(final List<Parameter> searchedIns, final String[] searchedWhats) {
         for (final String searchedWhat : searchedWhats) {
             boolean parameterFound = false;
             for (final Parameter searchedIn : searchedIns) {
@@ -151,7 +151,7 @@ public class ApiDocGeneratorTest {
     /**
      * Tries to find {@code Api} with path {@code path}.
      */
-    private Api findApi(final String path, final ApiDeclaration doc) {
+    private static Api findApi(final String path, final ApiDeclaration doc) {
         for (final Api api : doc.getApis()) {
             if (api.getPath().equals(path)) {
                 return api;
@@ -163,7 +163,7 @@ public class ApiDocGeneratorTest {
     /**
      * Validates whether doc {@code doc} contains concrete specified models.
      */
-    private void validateSwaggerModules(final ApiDeclaration doc) {
+    private static void validateSwaggerModules(final ApiDeclaration doc) {
         final ObjectNode models = doc.getModels();
         assertNotNull(models);
 
@@ -214,7 +214,7 @@ public class ApiDocGeneratorTest {
     /**
      * Checks whether object {@code mainObject} contains in properties/items key $ref with concrete value.
      */
-    private void containsReferences(final JsonNode mainObject, final String childObject, final String prefix) {
+    private static void containsReferences(final JsonNode mainObject, final String childObject, final String prefix) {
         final JsonNode properties = mainObject.get("properties");
         assertNotNull(properties);
 
@@ -281,7 +281,7 @@ public class ApiDocGeneratorTest {
      * @param doc Api declaration
      * @throws Exception if operation fails
      */
-    private void validateToaster(final ApiDeclaration doc) throws Exception {
+    private static void validateToaster(final ApiDeclaration doc) throws Exception {
         final Set<String> expectedUrls = new TreeSet<>(Arrays.asList(new String[]{"/config/toaster2:toaster",
             "/operational/toaster2:toaster", "/operations/toaster2:cancel-toast",
             "/operations/toaster2:make-toast", "/operations/toaster2:restock-toaster",
@@ -325,7 +325,7 @@ public class ApiDocGeneratorTest {
     @Test
     public void testGetResourceListing() throws Exception {
         final UriInfo info = this.helper.createMockUriInfo(HTTP_HOST);
-        final SchemaService mockSchemaService = this.helper.createMockSchemaService(this.schemaContext);
+        final DOMSchemaService mockSchemaService = this.helper.createMockSchemaService(this.schemaContext);
 
         this.generator.setSchemaService(mockSchemaService);
 
@@ -349,7 +349,7 @@ public class ApiDocGeneratorTest {
         assertEquals(HTTP_HOST + "/toaster2(2009-11-20)", toaster2.getPath());
     }
 
-    private void validateTosterDocContainsModulePrefixes(final ApiDeclaration doc) {
+    private static void validateTosterDocContainsModulePrefixes(final ApiDeclaration doc) {
         final ObjectNode topLevelJson = doc.getModels();
 
         final JsonNode configToaster = topLevelJson.get("toaster2(config)toaster");
@@ -363,7 +363,7 @@ public class ApiDocGeneratorTest {
         containsProperties(toasterSlot, "toaster2:toaster-augmented:slotInfo");
     }
 
-    private void containsProperties(final JsonNode jsonObject, final String... properties) {
+    private static void containsProperties(final JsonNode jsonObject, final String... properties) {
         for (final String property : properties) {
             final JsonNode propertiesObject = jsonObject.get("properties");
             assertNotNull("Properties object missing in ", propertiesObject);

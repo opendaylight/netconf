@@ -23,8 +23,8 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.broker.impl.SerializedDOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.core.spi.data.DOMStore;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
@@ -54,7 +54,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -69,7 +68,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
     private final Set<Capability> caps;
     private final SchemaContext schemaContext;
-    private SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
+    private final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
     MdsalOperationProvider(final SessionIdProvider idProvider,
                            final Set<Capability> caps,
@@ -87,17 +86,14 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
     @Override
     public AutoCloseable registerCapabilityListener(
-            CapabilityListener listener) {
+            final CapabilityListener listener) {
         listener.onCapabilitiesChanged(caps, Collections.<Capability>emptySet());
-        return new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-            }
+        return () -> {
         };
     }
 
     @Override
-    public NetconfOperationService createService(String netconfSessionIdForReporting) {
+    public NetconfOperationService createService(final String netconfSessionIdForReporting) {
         return new MdsalOperationService(Long.parseLong(netconfSessionIdForReporting), schemaContext,
             caps, sourceProvider);
     }
@@ -106,9 +102,9 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
         private final long currentSessionId;
         private final SchemaContext schemaContext;
         private final Set<Capability> caps;
-        private final SchemaService schemaService;
+        private final DOMSchemaService schemaService;
         private final DOMDataBroker dataBroker;
-        private SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
+        private final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
         MdsalOperationService(final long currentSessionId,
                               final SchemaContext schemaContext,
@@ -207,11 +203,11 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
             ContainerNode schemasContainer = Builders.containerBuilder().withNodeIdentifier(
                     new YangInstanceIdentifier.NodeIdentifier(Schemas.QNAME)).withChild(schemaList).build();
-            return (ContainerNode) Builders.containerBuilder().withNodeIdentifier(
+            return Builders.containerBuilder().withNodeIdentifier(
                     new YangInstanceIdentifier.NodeIdentifier(NetconfState.QNAME)).withChild(schemasContainer).build();
         }
 
-        private DOMDataBroker createDataStore(SchemaService schemaService, long sessionId) {
+        private static DOMDataBroker createDataStore(final DOMSchemaService schemaService, final long sessionId) {
             LOG.debug("Session {}: Creating data stores for simulated device", sessionId);
             final DOMStore operStore = InMemoryDOMDataStoreFactory
                     .create("DOM-OPER", schemaService);
@@ -228,18 +224,8 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             return new SerializedDOMDataBroker(datastores, MoreExecutors.listeningDecorator(listenableFutureExecutor));
         }
 
-        private SchemaService createSchemaService() {
-            return new SchemaService() {
-
-                @Override
-                public void addModule(Module module) {
-                }
-
-                @Override
-                public void removeModule(Module module) {
-
-                }
-
+        private DOMSchemaService createSchemaService() {
+            return new DOMSchemaService() {
                 @Override
                 public SchemaContext getSessionContext() {
                     return schemaContext;

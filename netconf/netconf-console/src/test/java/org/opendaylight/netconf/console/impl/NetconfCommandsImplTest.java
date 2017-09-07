@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -35,9 +36,7 @@ import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.binding.impl.BindingDOMDataBrokerAdapter;
 import org.opendaylight.controller.md.sal.binding.impl.BindingToNormalizedNodeCodec;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.core.spi.data.DOMStore;
 import org.opendaylight.mdsal.binding.dom.codec.gen.impl.DataObjectSerializerGenerator;
 import org.opendaylight.mdsal.binding.dom.codec.gen.impl.StreamWriterGenerator;
@@ -46,6 +45,7 @@ import org.opendaylight.mdsal.binding.generator.impl.GeneratedClassLoadingStrate
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.binding.generator.util.BindingRuntimeContext;
 import org.opendaylight.mdsal.binding.generator.util.JavassistUtils;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 import org.opendaylight.netconf.console.utils.NetconfConsoleUtils;
 import org.opendaylight.netconf.console.utils.NetconfIidFactory;
@@ -70,7 +70,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -92,7 +91,7 @@ public class NetconfCommandsImplTest {
     public void setUp() throws Exception {
         schemaContext = YangParserTestUtils.parseYangStreams(getYangSchemas());
         schemaContext.getModules();
-        final SchemaService schemaService = createSchemaService();
+        final DOMSchemaService schemaService = createSchemaService();
 
         final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
         final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
@@ -124,41 +123,41 @@ public class NetconfCommandsImplTest {
     }
 
     @Test
-    public void testListDevice() throws TimeoutException, TransactionCommitFailedException {
+    public void testListDevice() throws TimeoutException, InterruptedException, ExecutionException {
         createTopology(LogicalDatastoreType.OPERATIONAL);
 
-        final Map map = netconfCommands.listDevices();
+        final Map<?, ?> map = netconfCommands.listDevices();
         map.containsKey(NetconfConsoleConstants.NETCONF_ID);
         assertTrue(map.containsKey(NODE_ID));
 
-        final Map mapNode = (Map) map.get(NODE_ID);
+        final Map<?, ?> mapNode = (Map<?, ?>) map.get(NODE_ID);
         assertBaseNodeAttributes(mapNode);
     }
 
     @Test
-    public void testShowDevice() throws TimeoutException, TransactionCommitFailedException {
+    public void testShowDevice() throws TimeoutException, InterruptedException, ExecutionException {
         createTopology(LogicalDatastoreType.OPERATIONAL);
 
-        final Map mapCorrect = netconfCommands.showDevice(IP, String.valueOf(PORT));
+        final Map<?, ?> mapCorrect = netconfCommands.showDevice(IP, String.valueOf(PORT));
         mapCorrect.containsKey(NetconfConsoleConstants.NETCONF_ID);
         assertTrue(mapCorrect.containsKey(NODE_ID));
 
-        assertBaseNodeAttributesImmutableList((Map) mapCorrect.get(NODE_ID));
+        assertBaseNodeAttributesImmutableList((Map<?, ?>) mapCorrect.get(NODE_ID));
 
-        final Map mapWrongPort = netconfCommands.showDevice(IP, "1");
+        final Map<?, ?> mapWrongPort = netconfCommands.showDevice(IP, "1");
         assertFalse(mapWrongPort.containsKey(NODE_ID));
 
-        final Map mapWrongIP = netconfCommands.showDevice("1.1.1.1", String.valueOf(PORT));
+        final Map<?, ?> mapWrongIP = netconfCommands.showDevice("1.1.1.1", String.valueOf(PORT));
         assertFalse(mapWrongIP.containsKey(NODE_ID));
 
-        final Map mapId = netconfCommands.showDevice(NODE_ID);
+        final Map<?, ?> mapId = netconfCommands.showDevice(NODE_ID);
         assertTrue(mapId.containsKey(NODE_ID));
-        assertBaseNodeAttributesImmutableList((Map) mapId.get(NODE_ID));
+        assertBaseNodeAttributesImmutableList((Map<?, ?>) mapId.get(NODE_ID));
     }
 
     @Test
     public void testConnectDisconnectDevice()
-            throws InterruptedException, TimeoutException, TransactionCommitFailedException {
+            throws InterruptedException, TimeoutException, ExecutionException {
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setPort(new PortNumber(7777)).setHost(HostBuilder.getDefaultInstance("10.10.1.1")).build();
 
@@ -194,7 +193,7 @@ public class NetconfCommandsImplTest {
     }
 
     @Test
-    public void testUpdateDevice() throws TimeoutException, TransactionCommitFailedException {
+    public void testUpdateDevice() throws TimeoutException, InterruptedException, ExecutionException {
         //We need both, read data from OPERATIONAL DS and update data in CONFIGURATIONAL DS
         createTopology(LogicalDatastoreType.OPERATIONAL);
         createTopology(LogicalDatastoreType.CONFIGURATION);
@@ -221,7 +220,7 @@ public class NetconfCommandsImplTest {
     }
 
     @Test
-    public void testNetconfNodeFromIp() throws TimeoutException, TransactionCommitFailedException {
+    public void testNetconfNodeFromIp() throws TimeoutException, InterruptedException, ExecutionException {
         final List<Node> nodesNotExist = NetconfConsoleUtils.getNetconfNodeFromIp(IP, dataBroker);
         assertNull(nodesNotExist);
         createTopology(LogicalDatastoreType.OPERATIONAL);
@@ -230,8 +229,8 @@ public class NetconfCommandsImplTest {
         assertEquals(1, nodes.size());
     }
 
-    private void createTopology(LogicalDatastoreType dataStoreType)
-            throws TransactionCommitFailedException, TimeoutException {
+    private void createTopology(final LogicalDatastoreType dataStoreType)
+            throws TimeoutException, InterruptedException, ExecutionException {
         final List<Node> nodes = new ArrayList<>();
         final Node node = getNetconfNode(NODE_ID, IP, PORT, CONN_STATUS, CAP_PREFIX);
         nodes.add(node);
@@ -242,11 +241,11 @@ public class NetconfCommandsImplTest {
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeTransaction.put(dataStoreType, NetconfIidFactory.NETCONF_TOPOLOGY_IID, topology);
-        writeTransaction.submit().checkedGet(2, TimeUnit.SECONDS);
+        writeTransaction.submit().get(2, TimeUnit.SECONDS);
     }
 
-    private Node getNetconfNode(String nodeIdent, String ip, int portNumber,
-                                NetconfNodeConnectionStatus.ConnectionStatus cs, String notificationCapabilityPrefix) {
+    private static Node getNetconfNode(final String nodeIdent, final String ip, final int portNumber,
+            final NetconfNodeConnectionStatus.ConnectionStatus cs, final String notificationCapabilityPrefix) {
 
         final Host host = HostBuilder.getDefaultInstance(ip);
         final PortNumber port = new PortNumber(portNumber);
@@ -269,7 +268,7 @@ public class NetconfCommandsImplTest {
         return nb.build();
     }
 
-    private void assertBaseNodeAttributes(Map mapNode) {
+    private static void assertBaseNodeAttributes(final Map<?, ?> mapNode) {
 
         assertTrue(mapNode.containsKey(NetconfConsoleConstants.NETCONF_ID));
         assertTrue(mapNode.containsKey(NetconfConsoleConstants.NETCONF_IP));
@@ -282,7 +281,7 @@ public class NetconfCommandsImplTest {
         assertEquals(CONN_STATUS.name().toLowerCase(), mapNode.get(NetconfConsoleConstants.STATUS));
     }
 
-    private void assertBaseNodeAttributesImmutableList(Map mapNode) {
+    private static void assertBaseNodeAttributesImmutableList(final Map<?, ?> mapNode) {
         assertTrue(mapNode.containsKey(NetconfConsoleConstants.NETCONF_ID));
         assertTrue(mapNode.containsKey(NetconfConsoleConstants.NETCONF_IP));
         assertTrue(mapNode.containsKey(NetconfConsoleConstants.NETCONF_PORT));
@@ -307,18 +306,8 @@ public class NetconfCommandsImplTest {
         return schemas;
     }
 
-    private SchemaService createSchemaService() {
-        return new SchemaService() {
-
-            @Override
-            public void addModule(Module module) {
-            }
-
-            @Override
-            public void removeModule(Module module) {
-
-            }
-
+    private DOMSchemaService createSchemaService() {
+        return new DOMSchemaService() {
             @Override
             public SchemaContext getSessionContext() {
                 return schemaContext;
