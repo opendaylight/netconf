@@ -237,7 +237,7 @@ public final class TestUtils {
         return new NodeIdentifierWithPredicates(QName.create(namespace, revision, localName), predicate);
     }
 
-    static NormalizedNode<?,?> prepareNormalizedNodeWithIetfInterfacesInterfacesData() throws ParseException {
+    public static NormalizedNode<?, ?> prepareNormalizedNodeWithIetfInterfacesInterfacesData() throws ParseException {
         final String ietfInterfacesDate = "2013-07-04";
         final String namespace = "urn:ietf:params:xml:ns:yang:ietf-interfaces";
         final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryNode =
