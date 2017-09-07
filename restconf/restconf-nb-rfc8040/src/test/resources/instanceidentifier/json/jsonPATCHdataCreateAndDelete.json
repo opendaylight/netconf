@@ -1,0 +1,31 @@
+{
+  "ietf-yang-patch:yang-patch" : {
+    "patch-id" : "test-patch",
+    "comment" : "this is test patch",
+    "edit" : [
+      {
+        "edit-id": "edit1",
+        "value": {
+          "my-list2": [
+            {
+              "name": "my-leaf20",
+              "my-leaf21": "I am leaf20"
+            },
+            {
+              "name": "my-leaf21",
+              "my-leaf21": "I am leaf21-1",
+              "my-leaf22": "I am leaf21-2"
+            }
+          ]
+        },
+        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name='my-leaf20']",
+        "operation": "create"
+      },
+      {
+        "edit-id": "edit2",
+        "operation": "delete",
+        "target": "/instance-identifier-patch-module:my-list2[instance-identifier-patch-module:name='my-leaf20']"
+      }
+    ]
+  }
+}

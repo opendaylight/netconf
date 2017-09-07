@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<top-level-list xmlns="foo">
+    <key-leaf>key-value</key-leaf>
+    <ordinary-leaf>leaf-value</ordinary-leaf>
+</top-level-list>
