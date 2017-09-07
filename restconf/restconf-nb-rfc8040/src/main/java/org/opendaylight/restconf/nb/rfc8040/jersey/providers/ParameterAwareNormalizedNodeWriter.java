@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.restconf.jersey.providers;
+package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import static org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter.UNKNOWN_SIZE;
 
@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
@@ -42,13 +42,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is an experimental iterator over a {@link NormalizedNode}. This is essentially the opposite of a
- * {@link javax.xml.stream.XMLStreamReader} -- unlike instantiating an iterator over the backing data, this
- * encapsulates a {@link NormalizedNodeStreamWriter} and allows us to write multiple nodes.
- *
- * @deprecated move to splitted module restconf-nb-rfc8040
+ * This is an experimental iterator over a {@link NormalizedNode}. This is essentially
+ * the opposite of a {@link javax.xml.stream.XMLStreamReader} -- unlike instantiating an iterator over
+ * the backing data, this encapsulates a {@link NormalizedNodeStreamWriter} and allows
+ * us to write multiple nodes.
  */
-@Deprecated
 @Beta
 public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNodeWriter {
     private static final QName ROOT_DATA_QNAME = QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "data");

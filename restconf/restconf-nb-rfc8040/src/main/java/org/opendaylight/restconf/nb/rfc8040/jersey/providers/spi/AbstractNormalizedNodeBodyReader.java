@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.restconf.jersey.providers;
+package org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi;
 
 import com.google.common.annotations.Beta;
 import javax.ws.rs.core.Request;
@@ -16,10 +16,8 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 /**
  * Common superclass for readers producing {@link NormalizedNodeContext}.
  *
- * @deprecated move to splitted module restconf-nb-rfc8040
  * @author Robert Varga
  */
-@Deprecated
 @Beta
 public abstract class AbstractNormalizedNodeBodyReader
         extends AbstractIdentifierAwareJaxRsProvider<NormalizedNodeContext> {

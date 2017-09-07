@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.restconf.jersey.providers;
+package org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi;
 
 import com.google.common.base.Optional;
 import java.io.IOException;
@@ -21,18 +21,12 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
-import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
-import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
-import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
+import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 
-/**
- * JaxRd identifier aware provider.
- *
- * @deprecated move to splitted module restconf-nb-rfc8040
- */
-@Deprecated
 public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements MessageBodyReader<T> {
 
     @Context
@@ -79,7 +73,7 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
     private InstanceIdentifierContext<?> getInstanceIdentifierContext() {
         return ParserIdentifier.toInstanceIdentifier(
                 getIdentifier(),
-                ControllerContext.getInstance().getGlobalSchema(),
+                SchemaContextHandler.getActualSchemaContext(),
                 Optional.of(RestConnectorProvider.getMountPointService()));
     }
 

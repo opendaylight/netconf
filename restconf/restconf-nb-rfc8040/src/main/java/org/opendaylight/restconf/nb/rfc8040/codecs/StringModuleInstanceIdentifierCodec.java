@@ -23,13 +23,13 @@ public final class StringModuleInstanceIdentifierCodec extends AbstractModuleStr
     private final SchemaContext context;
     private final String defaultPrefix;
 
-    public StringModuleInstanceIdentifierCodec(SchemaContext context) {
+    public StringModuleInstanceIdentifierCodec(final SchemaContext context) {
         this.context = Preconditions.checkNotNull(context);
         this.dataContextTree = DataSchemaContextTree.from(context);
         this.defaultPrefix = "";
     }
 
-    StringModuleInstanceIdentifierCodec(final SchemaContext context, @Nonnull final String defaultPrefix) {
+    public StringModuleInstanceIdentifierCodec(final SchemaContext context, @Nonnull final String defaultPrefix) {
         this.context = Preconditions.checkNotNull(context);
         this.dataContextTree = DataSchemaContextTree.from(context);
         this.defaultPrefix = defaultPrefix;
@@ -46,7 +46,7 @@ public final class StringModuleInstanceIdentifierCodec extends AbstractModuleStr
 
     @Nonnull
     @Override
-    protected DataSchemaContextTree getDataContextTree() {
+    public DataSchemaContextTree getDataContextTree() {
         return this.dataContextTree;
     }
 
