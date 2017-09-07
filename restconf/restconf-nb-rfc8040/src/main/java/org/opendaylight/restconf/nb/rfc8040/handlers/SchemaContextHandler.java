@@ -84,6 +84,10 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
         return actualSchemaContext;
     }
 
+    public static void setActualSchemaContext(final SchemaContext schemaContext) {
+        actualSchemaContext = schemaContext;
+    }
+
     private void putData(
             final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode) {
         final DOMDataWriteTransaction wTx = this.transactionChainHandler.get().newWriteOnlyTransaction();
