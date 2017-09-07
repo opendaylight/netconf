@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.restconf.jersey.providers;
+package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -22,8 +22,6 @@ import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
-import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -31,7 +29,12 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
-import org.opendaylight.restconf.utils.RestconfConstants;
+import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
+import org.opendaylight.restconf.nb.rfc8040.codecs.StringModuleInstanceIdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -45,10 +48,6 @@ import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * {@link Deprecated} move to splitted module restconf-nb-rfc8040.
- */
-@Deprecated
 @Provider
 @Consumes({Rfc8040.MediaTypes.PATCH + RestconfConstants.JSON})
 public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
@@ -80,7 +79,9 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
     public PatchContext readFrom(final String uriPath, final InputStream entityStream) throws
             RestconfDocumentedException {
         try {
-            return readFrom(ControllerContext.getInstance().toInstanceIdentifier(uriPath), entityStream);
+            return readFrom(
+                    ParserIdentifier.toInstanceIdentifier(uriPath, SchemaContextHandler.getActualSchemaContext(),
+                            DOMMountPointServiceHandler.getActualMountPointService()), entityStream);
         } catch (final Exception e) {
             propagateExceptionAs(e);
             return null; // no-op
