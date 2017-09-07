@@ -21,7 +21,10 @@ public final class RestconfConstants {
     public static final String IDENTIFIER = "identifier";
     public static final char SLASH = '/';
     public static final Splitter SLASH_SPLITTER = Splitter.on(SLASH);
-    public static final String DRAFT_PATTERN = "restconf/17";
+    public static final String DRAFT_PATTERN = "restconf/18";
+
+    public static final CharSequence DATA_SUBSCR = "data-change-event-subscription";
+    public static final CharSequence NOTIFICATION_STREAM = "notification-stream";
 
     private RestconfConstants() {
         throw new UnsupportedOperationException("Util class");

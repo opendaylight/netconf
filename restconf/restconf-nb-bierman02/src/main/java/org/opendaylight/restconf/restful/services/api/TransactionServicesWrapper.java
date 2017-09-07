@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.restful.services.api;
 
 /**
- * Wrapper for all transaction services.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Wrapper for all transaction services.
  * <ul>
  * <li>{@link RestconfDataService}
  * <li>{@link RestconfInvokeOperationsService}
@@ -16,6 +16,7 @@ package org.opendaylight.restconf.restful.services.api;
  * </ul>
  *
  */
+@Deprecated
 public interface TransactionServicesWrapper
         extends RestconfDataService, RestconfInvokeOperationsService, RestconfStreamsSubscriptionService {
 

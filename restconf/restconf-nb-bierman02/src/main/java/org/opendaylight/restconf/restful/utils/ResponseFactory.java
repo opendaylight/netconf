@@ -14,6 +14,10 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.commons.lang3.builder.Builder;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
+/**
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040.
+ */
+@Deprecated
 final class ResponseFactory extends FutureDataFactory<Void> implements Builder<Response> {
 
     private ResponseBuilder responseBuilder;

@@ -10,6 +10,10 @@ package org.opendaylight.restconf.restful.utils;
 import org.apache.commons.lang3.builder.Builder;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 
+/**
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040.
+ */
+@Deprecated
 public class RpcResultFactory extends FutureDataFactory<DOMRpcResult> implements Builder<DOMRpcResult> {
 
     @Override

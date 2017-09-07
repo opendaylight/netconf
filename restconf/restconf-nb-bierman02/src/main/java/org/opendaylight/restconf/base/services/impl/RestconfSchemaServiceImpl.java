@@ -16,9 +16,11 @@ import org.opendaylight.restconf.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
- * Implementation of {@link RestconfSchemaService}.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Implementation of
+ * {@link RestconfSchemaService}.
  *
  */
+@Deprecated
 public class RestconfSchemaServiceImpl implements RestconfSchemaService {
 
     private final SchemaContextHandler schemaContextHandler;

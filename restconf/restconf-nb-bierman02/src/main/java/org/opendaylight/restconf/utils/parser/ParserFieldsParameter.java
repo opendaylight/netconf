@@ -25,6 +25,10 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
+/**
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040.
+ */
+@Deprecated
 public class ParserFieldsParameter {
     private static final char COLON = ':';
     private static final char SEMICOLON = ';';
@@ -112,7 +116,7 @@ public class ParserFieldsParameter {
                             currentNode,
                             input.substring(startPosition, currentPosition), currentQNameModule, currentLevel);
                     // call with child node as new start node for one level down
-                    int closingParenthesis = currentPosition
+                    final int closingParenthesis = currentPosition
                             + findClosingParenthesis(input.substring(currentPosition + 1));
                     parseInput(
                             input.substring(currentPosition + 1, closingParenthesis),

@@ -11,6 +11,10 @@ import com.google.common.base.Optional;
 import org.apache.commons.lang3.builder.Builder;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
+/**
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040.
+ */
+@Deprecated
 class NormalizedNodeFactory extends FutureDataFactory<Optional<NormalizedNode<?, ?>>>
         implements Builder<NormalizedNode<?, ?>> {
 

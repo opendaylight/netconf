@@ -39,9 +39,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link RestconfStreamsSubscriptionService}.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Implementation of
+ * {@link RestconfStreamsSubscriptionService}.
  *
  */
+@Deprecated
 public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSubscriptionService {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsSubscriptionServiceImpl.class);
