@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.restconf.jersey.providers;
+package org.opendaylight.restconf.nb.rfc8040.jersey.providers.test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -19,24 +19,23 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
-import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
-import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
+import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
+import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
-abstract class AbstractBodyReaderTest {
+public abstract class AbstractBodyReaderTest {
 
-    protected static final ControllerContext CONTROLLER_CONTEXT = ControllerContext.getInstance();
     protected static final DOMMountPointServiceHandler MOUNT_POINT_SERVICE_HANDLER =
             mock(DOMMountPointServiceHandler.class);
 
     protected final MediaType mediaType;
 
-    AbstractBodyReaderTest() throws NoSuchFieldException, IllegalAccessException {
+    protected AbstractBodyReaderTest() throws NoSuchFieldException, IllegalAccessException {
         mediaType = getMediaType();
 
         final Field mountPointServiceHandlerField =

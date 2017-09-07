@@ -1,0 +1,18 @@
+module foo {
+    namespace foo;
+    prefix foo;
+
+    revision 2017-08-09;
+
+    list top-level-list {
+        key key-leaf;
+
+        leaf key-leaf {
+            type string;
+        }
+
+        leaf ordinary-leaf {
+            type string;
+        }
+    }
+}
