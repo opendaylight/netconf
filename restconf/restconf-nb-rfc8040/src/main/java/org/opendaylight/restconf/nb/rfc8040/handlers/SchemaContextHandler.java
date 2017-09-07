@@ -38,6 +38,7 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
 
     private final TransactionChainHandler transactionChainHandler;
     private SchemaContext context;
+    private static SchemaContext actualSchemaContext;
 
     private int moduleSetId;
 
@@ -49,6 +50,7 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
     public SchemaContextHandler(final TransactionChainHandler transactionChainHandler) {
         this.transactionChainHandler = transactionChainHandler;
         this.moduleSetId = 0;
+        actualSchemaContext = null;
     }
 
     @Override
@@ -56,6 +58,9 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
         Preconditions.checkNotNull(context);
         this.context = null;
         this.context = context;
+
+        actualSchemaContext = context;
+
         this.moduleSetId++;
         final Module ietfYangLibraryModule =
                 context.findModuleByNamespaceAndRevision(IetfYangLibrary.URI_MODULE, IetfYangLibrary.DATE);
@@ -73,6 +78,10 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
     @Override
     public SchemaContext get() {
         return this.context;
+    }
+
+    public static SchemaContext getActualSchemaContext() {
+        return actualSchemaContext;
     }
 
     private void putData(
