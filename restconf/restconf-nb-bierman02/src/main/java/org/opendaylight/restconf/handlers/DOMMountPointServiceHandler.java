@@ -11,9 +11,11 @@ import com.google.common.base.Preconditions;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 
 /**
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040.
  * Implementation of {@link DOMMountPointServiceHandler}.
  *
  */
+@Deprecated
 public class DOMMountPointServiceHandler implements Handler<DOMMountPointService> {
 
     private final DOMMountPointService domMountPointService;

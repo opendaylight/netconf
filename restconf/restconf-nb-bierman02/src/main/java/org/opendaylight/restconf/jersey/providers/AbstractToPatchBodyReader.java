@@ -7,8 +7,8 @@
  */
 package org.opendaylight.restconf.jersey.providers;
 
-import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.restconf.common.patch.PatchContext;
 
 /**
  * Common superclass for readers producing {@link PatchContext}.

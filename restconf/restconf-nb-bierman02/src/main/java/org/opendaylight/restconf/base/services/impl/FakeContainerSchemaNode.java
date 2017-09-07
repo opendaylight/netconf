@@ -27,10 +27,11 @@ import org.opendaylight.yangtools.yang.model.api.UnknownSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
 
 /**
- * Special case only use by GET restconf/operations (since moment of old Yang
- * parser and old yang model API removal) to build and use fake container for
- * module.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Special case only use by GET
+ * restconf/operations (since moment of old Yang parser and old yang model API removal) to build and use fake
+ * container for module.
  */
+@Deprecated
 class FakeContainerSchemaNode implements ContainerSchemaNode {
     static final SchemaPath PATH =
             SchemaPath.create(true, QName.create(FakeRestconfModule.QNAME, "operations").intern());

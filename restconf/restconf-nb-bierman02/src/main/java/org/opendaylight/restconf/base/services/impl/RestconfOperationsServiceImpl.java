@@ -40,9 +40,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link RestconfOperationsService}.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Implementation of
+ * {@link RestconfOperationsService}.
  *
  */
+@Deprecated
 public class RestconfOperationsServiceImpl implements RestconfOperationsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfOperationsServiceImpl.class);

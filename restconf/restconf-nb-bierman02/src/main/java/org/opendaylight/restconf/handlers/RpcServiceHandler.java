@@ -10,9 +10,11 @@ package org.opendaylight.restconf.handlers;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 
 /**
- * Implementation of {@link RpcServiceHandler}.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Implementation of
+ * {@link RpcServiceHandler}.
  *
  */
+@Deprecated
 public class RpcServiceHandler implements Handler<DOMRpcService> {
 
     private final DOMRpcService rpcService;

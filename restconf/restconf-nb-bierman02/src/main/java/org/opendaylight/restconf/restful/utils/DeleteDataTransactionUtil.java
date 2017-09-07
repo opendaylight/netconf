@@ -17,9 +17,11 @@ import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 /**
- * Util class for delete specific data in config DS.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Util class for delete specific data in
+ * config DS.
  *
  */
+@Deprecated
 public final class DeleteDataTransactionUtil {
 
     private DeleteDataTransactionUtil() {

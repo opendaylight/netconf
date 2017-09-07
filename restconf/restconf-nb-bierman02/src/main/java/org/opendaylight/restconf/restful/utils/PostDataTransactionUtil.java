@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.restful.utils;
 
+import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.net.URI;
 import javax.ws.rs.core.Response;
@@ -16,7 +17,6 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
-import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -38,9 +38,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Util class to post data to DS.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Util class to post data to DS.
  *
  */
+@Deprecated
 public final class PostDataTransactionUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(PostDataTransactionUtil.class);
@@ -216,7 +217,7 @@ public final class PostDataTransactionUtil {
             final boolean before, final DOMTransactionChain domTransactionChain) {
         rwTransaction.delete(datastore, path.getParent().getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
-                ControllerContext.getInstance().toInstanceIdentifier(point);
+                ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.absent());
         int lastItemPosition = 0;
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
@@ -251,7 +252,7 @@ public final class PostDataTransactionUtil {
             final DOMTransactionChain domTransactionChain) {
         rwTransaction.delete(datastore, path.getParent().getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
-                ControllerContext.getInstance().toInstanceIdentifier(point);
+                ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.absent());
         int lastItemPosition = 0;
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
             if (mapEntryNode.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {

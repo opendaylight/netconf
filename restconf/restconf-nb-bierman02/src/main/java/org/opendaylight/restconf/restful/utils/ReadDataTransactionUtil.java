@@ -27,7 +27,6 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
@@ -71,7 +70,8 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
- * Util class for read data from data store via transaction.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Util class for read data from data store
+ * via transaction.
  * <ul>
  * <li>config
  * <li>state
@@ -79,6 +79,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  * </ul>
  *
  */
+@Deprecated
 public final class ReadDataTransactionUtil {
 
     private ReadDataTransactionUtil() {
@@ -105,7 +106,6 @@ public final class ReadDataTransactionUtil {
 
     /**
      * Parse parameters from URI request and check their types and values.
-     *
      *
      * @param identifier
      *             {@link InstanceIdentifierContext}
@@ -195,31 +195,35 @@ public final class ReadDataTransactionUtil {
      * Read specific type of data from data store via transaction.
      *
      * @param valueOfContent
-     *             type of data to read (config, state, all)
+     *            type of data to read (config, state, all)
      * @param transactionNode
-     *             {@link TransactionVarsWrapper} - wrapper for variables
+     *            {@link TransactionVarsWrapper} - wrapper for variables
+     * @param ctx
+     *            schema context
      * @return {@link NormalizedNode}
      */
     @Nullable
     public static NormalizedNode<?, ?> readData(@Nonnull final String valueOfContent,
-            @Nonnull final TransactionVarsWrapper transactionNode) {
-        return readData(valueOfContent, transactionNode, null);
+            @Nonnull final TransactionVarsWrapper transactionNode, final SchemaContext ctx) {
+        return readData(valueOfContent, transactionNode, null, ctx);
     }
 
     /**
      * Read specific type of data from data store via transaction.
      *
      * @param valueOfContent
-     *             type of data to read (config, state, all)
+     *            type of data to read (config, state, all)
      * @param transactionNode
-     *             {@link TransactionVarsWrapper} - wrapper for variables
+     *            {@link TransactionVarsWrapper} - wrapper for variables
      * @param withDefa
-     *             vaule of with-defaults parameter
+     *            vaule of with-defaults parameter
+     * @param ctx
+     *            schema context
      * @return {@link NormalizedNode}
      */
     @Nullable
     public static NormalizedNode<?, ?> readData(@Nonnull final String valueOfContent,
-            @Nonnull final TransactionVarsWrapper transactionNode, final String withDefa) {
+            @Nonnull final TransactionVarsWrapper transactionNode, final String withDefa, final SchemaContext ctx) {
         switch (valueOfContent) {
             case RestconfDataServiceConstant.ReadData.CONFIG:
                 transactionNode.setLogicalDatastoreType(LogicalDatastoreType.CONFIGURATION);
@@ -227,14 +231,14 @@ public final class ReadDataTransactionUtil {
                     return readDataViaTransaction(transactionNode);
                 } else {
                     return prepareDataByParamWithDef(readDataViaTransaction(transactionNode),
-                            transactionNode.getInstanceIdentifier().getInstanceIdentifier(), withDefa);
+                            transactionNode.getInstanceIdentifier().getInstanceIdentifier(), withDefa, ctx);
                 }
             case RestconfDataServiceConstant.ReadData.NONCONFIG:
                 transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
                 return readDataViaTransaction(transactionNode);
 
             case RestconfDataServiceConstant.ReadData.ALL:
-                return readAllData(transactionNode, withDefa);
+                return readAllData(transactionNode, withDefa, ctx);
 
             default:
                 throw new RestconfDocumentedException(
@@ -265,9 +269,9 @@ public final class ReadDataTransactionUtil {
     public static NormalizedNode<?, ?> readData(final String identifier, final String content,
                                                 final TransactionVarsWrapper transactionNode, final String withDefa,
                                                 final SchemaContextRef schemaContextRef, final UriInfo uriInfo) {
+        final SchemaContext schemaContext = schemaContextRef.get();
         if (identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
             final DOMDataReadWriteTransaction wTx = transactionNode.getTransactionChain().newReadWriteTransaction();
-            final SchemaContext schemaContext = schemaContextRef.get();
             final boolean exist = SubscribeToStreamUtil.checkExist(schemaContext, wTx);
 
             for (final NotificationDefinition notificationDefinition : schemaContextRef.get().getNotifications()) {
@@ -293,11 +297,11 @@ public final class ReadDataTransactionUtil {
             }
             SubscribeToStreamUtil.submitData(wTx);
         }
-        return readData(content, transactionNode, withDefa);
+        return readData(content, transactionNode, withDefa, schemaContext);
     }
 
     private static NormalizedNode<?, ?> prepareDataByParamWithDef(final NormalizedNode<?, ?> result,
-            final YangInstanceIdentifier path, final String withDefa) {
+            final YangInstanceIdentifier path, final String withDefa, final SchemaContext ctx) {
         boolean trim;
         switch (withDefa) {
             case "trim":
@@ -310,7 +314,6 @@ public final class ReadDataTransactionUtil {
                 throw new RestconfDocumentedException("");
         }
 
-        final SchemaContext ctx = ControllerContext.getInstance().getGlobalSchema();
         final DataSchemaContextTree baseSchemaCtxTree = DataSchemaContextTree.from(ctx);
         final DataSchemaNode baseSchemaNode = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
         if (result instanceof ContainerNode) {
@@ -447,13 +450,16 @@ public final class ReadDataTransactionUtil {
      * Read config and state data, then map them.
      *
      * @param transactionNode
-     *             {@link TransactionVarsWrapper} - wrapper for variables
-     * @param withDefa with-defaults parameter
+     *            {@link TransactionVarsWrapper} - wrapper for variables
+     * @param withDefa
+     *            with-defaults parameter
+     * @param ctx
+     *            schema context
      * @return {@link NormalizedNode}
      */
     @Nullable
     private static NormalizedNode<?, ?> readAllData(@Nonnull final TransactionVarsWrapper transactionNode,
-            final String withDefa) {
+            final String withDefa, final SchemaContext ctx) {
         // PREPARE STATE DATA NODE
         transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
         final NormalizedNode<?, ?> stateDataNode = readDataViaTransaction(transactionNode);
@@ -465,7 +471,7 @@ public final class ReadDataTransactionUtil {
             configDataNode = readDataViaTransaction(transactionNode);
         } else {
             configDataNode = prepareDataByParamWithDef(readDataViaTransaction(transactionNode),
-                    transactionNode.getInstanceIdentifier().getInstanceIdentifier(), withDefa);
+                    transactionNode.getInstanceIdentifier().getInstanceIdentifier(), withDefa, ctx);
         }
 
         // if no data exists

@@ -13,9 +13,11 @@ import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 
 
 /**
- * Implementation of {@link TransactionChainHandler}.
+ * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Implementation of
+ * {@link TransactionChainHandler}.
  *
  */
+@Deprecated
 public class TransactionChainHandler implements Handler<DOMTransactionChain> {
 
     private DOMTransactionChain transactionChain;
