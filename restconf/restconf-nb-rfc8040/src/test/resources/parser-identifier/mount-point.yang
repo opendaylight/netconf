@@ -1,0 +1,17 @@
+module mount-point {
+  namespace "mount:point";
+  prefix "mountp";
+  yang-version 1;
+
+  import parser-identifier-included { prefix pii; revision-date 2016-06-02; }
+
+  revision 2016-06-02 {
+    description "Initial revision.";
+  }
+
+  container mount-container {
+    leaf point-number {
+      type uint8;
+    }
+  }
+}

@@ -65,8 +65,9 @@ public class RestConnectorProvider implements RestconfConnector, AutoCloseable {
 
     private SchemaContextHandler schemaCtxHandler;
 
-    public RestConnectorProvider(final DOMDataBroker domDataBroker, final SchemaService schemaService, final DOMRpcService rpcService,
-            final DOMNotificationService notificationService, final DOMMountPointService mountPointService) {
+    public RestConnectorProvider(final DOMDataBroker domDataBroker, final SchemaService schemaService,
+            final DOMRpcService rpcService, final DOMNotificationService notificationService,
+            final DOMMountPointService mountPointService) {
         this.schemaService = Preconditions.checkNotNull(schemaService);
         this.rpcService = Preconditions.checkNotNull(rpcService);
         this.notificationService = Preconditions.checkNotNull(notificationService);

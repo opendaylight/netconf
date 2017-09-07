@@ -174,7 +174,7 @@ public class JSONRestconfServiceDraft18Test {
 
         doReturn(schemaContext).when(mockSchemaContextHandler).get();
 
-        TransactionChainHandler txChainHandler = new TransactionChainHandler(mockTxChain);
+        final TransactionChainHandler txChainHandler = new TransactionChainHandler(mockTxChain);
 
         final DOMMountPointServiceHandler mountPointServiceHandler =
                 new DOMMountPointServiceHandler(mockMountPointService);
