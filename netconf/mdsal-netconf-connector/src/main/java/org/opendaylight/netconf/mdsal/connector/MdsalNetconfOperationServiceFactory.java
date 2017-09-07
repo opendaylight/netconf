@@ -21,7 +21,7 @@ import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.config.util.capability.YangModuleCapability;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
@@ -48,7 +48,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
 
     public MdsalNetconfOperationServiceFactory(
-            final SchemaService schemaService,
+            final DOMSchemaService schemaService,
             final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency,
             final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
             final DOMDataBroker dataBroker,

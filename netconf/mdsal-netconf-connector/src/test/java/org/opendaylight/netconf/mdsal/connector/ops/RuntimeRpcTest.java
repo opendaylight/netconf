@@ -45,7 +45,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
@@ -153,7 +153,7 @@ public class RuntimeRpcTest {
     private CurrentSchemaContext currentSchemaContext = null;
 
     @Mock
-    private SchemaService schemaService;
+    private DOMSchemaService schemaService;
     @Mock
     private SchemaContextListener listener;
     @Mock
@@ -166,8 +166,6 @@ public class RuntimeRpcTest {
         initMocks(this);
         doNothing().when(registration).close();
         doReturn(listener).when(registration).getInstance();
-        doNothing().when(schemaService).addModule(any(Module.class));
-        doNothing().when(schemaService).removeModule(any(Module.class));
         doReturn(schemaContext).when(schemaService).getGlobalContext();
         doReturn(schemaContext).when(schemaService).getSessionContext();
         doAnswer(invocationOnMock -> {

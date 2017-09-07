@@ -16,7 +16,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
@@ -57,7 +57,7 @@ public class RestConnectorProvider implements RestconfConnector, AutoCloseable {
     private static DOMDataBroker dataBroker;
     private static DOMMountPointServiceHandler mountPointServiceHandler;
 
-    private final SchemaService schemaService;
+    private final DOMSchemaService schemaService;
     private final DOMRpcService rpcService;
     private final DOMNotificationService notificationService;
     private final DOMMountPointService mountPointService;
@@ -65,7 +65,7 @@ public class RestConnectorProvider implements RestconfConnector, AutoCloseable {
 
     private SchemaContextHandler schemaCtxHandler;
 
-    public RestConnectorProvider(final DOMDataBroker domDataBroker, final SchemaService schemaService,
+    public RestConnectorProvider(final DOMDataBroker domDataBroker, final DOMSchemaService schemaService,
             final DOMRpcService rpcService, final DOMNotificationService notificationService,
             final DOMMountPointService mountPointService) {
         this.schemaService = Preconditions.checkNotNull(schemaService);

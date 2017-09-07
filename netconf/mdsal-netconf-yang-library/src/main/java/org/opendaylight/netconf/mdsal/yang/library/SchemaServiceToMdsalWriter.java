@@ -11,6 +11,7 @@ package org.opendaylight.netconf.mdsal.yang.library;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,7 +19,7 @@ import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesStateBuilder;
@@ -41,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * Listens for updates on global schema context, transforms context to ietf-yang-library:modules-state and
  * writes this state to operational data store.
  */
-// TODO Implement also yang-library-change notfication
+// TODO Implement also yang-library-change notification
 public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(SchemaServiceToMdsalWriter.class);
@@ -49,11 +50,11 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
     private static final InstanceIdentifier<ModulesState> MODULES_STATE_INSTANCE_IDENTIFIER =
             InstanceIdentifier.create(ModulesState.class);
 
-    private final SchemaService schemaService;
+    private final DOMSchemaService schemaService;
     private final AtomicInteger moduleSetId;
     private final DataBroker dataBroker;
 
-    public SchemaServiceToMdsalWriter(final SchemaService schemaService,
+    public SchemaServiceToMdsalWriter(final DOMSchemaService schemaService,
                                       final DataBroker dataBroker) {
         this.schemaService = schemaService;
         this.dataBroker = dataBroker;
@@ -91,7 +92,7 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
             public void onFailure(final Throwable throwable) {
                 LOG.warn("Failed to update modules state", throwable);
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     private ModulesState createModuleStateFromModules(final Set<Module> modules) {
@@ -108,7 +109,8 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
                 .build();
     }
 
-    private org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.Module
+    private static
+        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.Module
         createModuleEntryFromModule(final Module module) {
         final ModuleBuilder moduleBuilder = new ModuleBuilder();
 
@@ -123,7 +125,7 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
         return moduleBuilder.build();
     }
 
-    private Submodules createSubmodulesForModule(final Module module) {
+    private static Submodules createSubmodulesForModule(final Module module) {
         final List<Submodule> submodulesList = Lists.newArrayList();
         for (final Module subModule : module.getSubmodules()) {
             final SubmoduleBuilder subModuleEntryBuilder = new SubmoduleBuilder();

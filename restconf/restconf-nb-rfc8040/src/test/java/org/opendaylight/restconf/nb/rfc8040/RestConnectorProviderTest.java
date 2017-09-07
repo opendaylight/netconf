@@ -23,7 +23,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
@@ -35,13 +35,20 @@ public class RestConnectorProviderTest {
     // service under test
     private RestConnectorProvider connectorProvider;
 
-    @Mock private SchemaService mockSchemaService;
-    @Mock private DOMMountPointService mockMountPointService;
-    @Mock private DOMDataBroker mockDataBroker;
-    @Mock private DOMRpcService mockRpcService;
-    @Mock private DOMNotificationService mockNotificationService;
-    @Mock DOMTransactionChain mockTransactionChain;
-    @Mock private ListenerRegistration<SchemaContextListener> mockRegistration;
+    @Mock
+    private DOMSchemaService mockSchemaService;
+    @Mock
+    private DOMMountPointService mockMountPointService;
+    @Mock
+    private DOMDataBroker mockDataBroker;
+    @Mock
+    private DOMRpcService mockRpcService;
+    @Mock
+    private DOMNotificationService mockNotificationService;
+    @Mock
+    private DOMTransactionChain mockTransactionChain;
+    @Mock
+    private ListenerRegistration<SchemaContextListener> mockRegistration;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();

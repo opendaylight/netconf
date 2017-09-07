@@ -42,7 +42,6 @@ import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.core.spi.data.DOMStore;
 import org.opendaylight.mdsal.binding.dom.codec.gen.impl.DataObjectSerializerGenerator;
 import org.opendaylight.mdsal.binding.dom.codec.gen.impl.StreamWriterGenerator;
@@ -51,6 +50,7 @@ import org.opendaylight.mdsal.binding.generator.impl.GeneratedClassLoadingStrate
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.binding.generator.util.BindingRuntimeContext;
 import org.opendaylight.mdsal.binding.generator.util.JavassistUtils;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -65,14 +65,13 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class NetconfDeviceTopologyAdapterTest {
 
-    private RemoteDeviceId id = new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
+    private final RemoteDeviceId id = new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
 
     @Mock
     private DataBroker broker;
@@ -83,10 +82,10 @@ public class NetconfDeviceTopologyAdapterTest {
     @Mock
     private NetconfNode data;
 
-    private String txIdent = "test transaction";
+    private final String txIdent = "test transaction";
 
     private SchemaContext schemaContext = null;
-    private String sessionIdForReporting = "netconf-test-session1";
+    private final String sessionIdForReporting = "netconf-test-session1";
 
     private BindingTransactionChain transactionChain;
 
@@ -108,7 +107,7 @@ public class NetconfDeviceTopologyAdapterTest {
 
         this.schemaContext = YangParserTestUtils.parseYangStreams(getYangSchemas());
         schemaContext.getModules();
-        final SchemaService schemaService = createSchemaService();
+        final DOMSchemaService schemaService = createSchemaService();
 
         final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
         final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
@@ -137,13 +136,13 @@ public class NetconfDeviceTopologyAdapterTest {
 
         transactionChain = dataBroker.createTransactionChain(new TransactionChainListener() {
             @Override
-            public void onTransactionChainFailed(TransactionChain<?, ?> chain, AsyncTransaction<?, ?> transaction,
-                                                 Throwable cause) {
+            public void onTransactionChainFailed(final TransactionChain<?, ?> chain,
+                    final AsyncTransaction<?, ?> transaction, final Throwable cause) {
 
             }
 
             @Override
-            public void onTransactionChainSuccessful(TransactionChain<?, ?> chain) {
+            public void onTransactionChainSuccessful(final TransactionChain<?, ?> chain) {
 
             }
         });
@@ -186,7 +185,6 @@ public class NetconfDeviceTopologyAdapterTest {
         verify(writeTx, times(1))
                 .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetconfNode.class));
         verify(writeTx, times(1)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
-
     }
 
     @Test
@@ -243,17 +241,8 @@ public class NetconfDeviceTopologyAdapterTest {
         return schemas;
     }
 
-    private SchemaService createSchemaService() {
-        return new SchemaService() {
-
-            @Override
-            public void addModule(Module module) {
-            }
-
-            @Override
-            public void removeModule(Module module) {
-
-            }
+    private DOMSchemaService createSchemaService() {
+        return new DOMSchemaService() {
 
             @Override
             public SchemaContext getSessionContext() {

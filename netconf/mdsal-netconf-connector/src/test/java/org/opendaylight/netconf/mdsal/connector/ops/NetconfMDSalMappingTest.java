@@ -47,8 +47,8 @@ import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.core.spi.data.DOMStore;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
@@ -61,7 +61,6 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -135,7 +134,7 @@ public class NetconfMDSalMappingTest {
 
         this.schemaContext = YangParserTestUtils.parseYangStreams(getYangSchemas());
         schemaContext.getModules();
-        final SchemaService schemaService = createSchemaService();
+        final DOMSchemaService schemaService = createSchemaService();
 
         final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
         final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
@@ -556,7 +555,7 @@ public class NetconfMDSalMappingTest {
                         + "  </edit-config>\n"
                         + "</rpc>";
         XmlElement xe = getXmlElement(stringWithoutPrefix);
-        NodeList nodeList = editConfig.getElementsByTagName(xe, TARGET_KEY);
+        NodeList nodeList = EditConfig.getElementsByTagName(xe, TARGET_KEY);
         Assert.assertEquals(1, nodeList.getLength());
 
         String stringWithPrefix =
@@ -569,7 +568,7 @@ public class NetconfMDSalMappingTest {
                         + "</nc:rpc>";
 
         xe = getXmlElement(stringWithPrefix);
-        nodeList = editConfig.getElementsByTagName(xe, TARGET_KEY);
+        nodeList = EditConfig.getElementsByTagName(xe, TARGET_KEY);
         Assert.assertEquals(1, nodeList.getLength());
 
         String stringWithoutTarget =
@@ -582,7 +581,7 @@ public class NetconfMDSalMappingTest {
         xe = getXmlElement(stringWithoutTarget);
 
         try {
-            nodeList = editConfig.getElementsByTagName(xe, TARGET_KEY);
+            nodeList = EditConfig.getElementsByTagName(xe, TARGET_KEY);
             XmlElement.fromDomElement((Element) nodeList.item(0)).getOnlyChildElement();
             Assert.fail("Not specified target, we should fail");
         } catch (DocumentedException documentedException) {
@@ -837,18 +836,8 @@ public class NetconfMDSalMappingTest {
         return schemas;
     }
 
-    private SchemaService createSchemaService() {
-        return new SchemaService() {
-
-            @Override
-            public void addModule(final Module module) {
-            }
-
-            @Override
-            public void removeModule(final Module module) {
-
-            }
-
+    private DOMSchemaService createSchemaService() {
+        return new DOMSchemaService() {
             @Override
             public SchemaContext getSessionContext() {
                 return schemaContext;
