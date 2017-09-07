@@ -13,7 +13,9 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 /**
  * Implementation of {@link DOMMountPointServiceHandler}.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public class DOMMountPointServiceHandler implements Handler<DOMMountPointService> {
 
     private final DOMMountPointService domMountPointService;

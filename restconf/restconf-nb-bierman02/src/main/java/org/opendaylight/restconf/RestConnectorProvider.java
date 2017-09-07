@@ -34,7 +34,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Provider for restconf draft18.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public class RestConnectorProvider implements RestConnector, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestConnectorProvider.class);
@@ -66,8 +68,9 @@ public class RestConnectorProvider implements RestConnector, AutoCloseable {
 
     private SchemaContextHandler schemaCtxHandler;
 
-    public RestConnectorProvider(DOMDataBroker domDataBroker, SchemaService schemaService, DOMRpcService rpcService,
-            DOMNotificationService notificationService, DOMMountPointService mountPointService) {
+    public RestConnectorProvider(final DOMDataBroker domDataBroker, final SchemaService schemaService,
+            final DOMRpcService rpcService, final DOMNotificationService notificationService,
+            final DOMMountPointService mountPointService) {
         this.schemaService = Preconditions.checkNotNull(schemaService);
         this.rpcService = Preconditions.checkNotNull(rpcService);
         this.notificationService = Preconditions.checkNotNull(notificationService);

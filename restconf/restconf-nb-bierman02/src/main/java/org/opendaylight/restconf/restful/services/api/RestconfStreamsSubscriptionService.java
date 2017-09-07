@@ -18,7 +18,9 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 /**
  * Subscribing to streams.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public interface RestconfStreamsSubscriptionService {
 
     /**

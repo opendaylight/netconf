@@ -53,7 +53,9 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 /**
  * Util class for mapping nodes.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public final class RestconfMappingNodeUtil {
 
     private RestconfMappingNodeUtil() {

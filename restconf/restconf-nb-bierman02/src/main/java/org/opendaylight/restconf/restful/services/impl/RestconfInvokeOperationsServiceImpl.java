@@ -30,7 +30,9 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 /**
  * Implementation of {@link RestconfInvokeOperationsService}.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
 
     private final RpcServiceHandler rpcServiceHandler;

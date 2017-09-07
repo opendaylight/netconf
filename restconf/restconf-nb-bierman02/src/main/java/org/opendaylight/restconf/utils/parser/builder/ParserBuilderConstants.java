@@ -13,10 +13,12 @@ import org.opendaylight.restconf.parser.builder.YangInstanceIdentifierDeserializ
 import org.opendaylight.restconf.parser.builder.YangInstanceIdentifierSerializer;
 
 /**
- * Util class of constants of {@link YangInstanceIdentifierSerializer}
- * and {@link YangInstanceIdentifierDeserializer}.
+ * Util class of constants of {@link YangInstanceIdentifierSerializer} and
+ * {@link YangInstanceIdentifierDeserializer}.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public final class ParserBuilderConstants {
 
     private ParserBuilderConstants() {

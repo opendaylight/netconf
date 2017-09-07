@@ -10,8 +10,9 @@ package org.opendaylight.restconf.utils;
 import com.google.common.base.Splitter;
 
 /**
- * {@link Deprecated} move to splitted module restconf-nb-rfc8040. Util class for Restconf constants.
+ * Util class for Restconf constants.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
 @Deprecated
 public final class RestconfConstants {
@@ -22,7 +23,7 @@ public final class RestconfConstants {
     public static final String IDENTIFIER = "identifier";
     public static final char SLASH = '/';
     public static final Splitter SLASH_SPLITTER = Splitter.on(SLASH);
-    public static final String DRAFT_PATTERN = "restconf/17";
+    public static final String DRAFT_PATTERN = "restconf/18";
 
     private RestconfConstants() {
         throw new UnsupportedOperationException("Util class");

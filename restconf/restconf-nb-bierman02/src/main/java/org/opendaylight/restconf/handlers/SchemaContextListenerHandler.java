@@ -10,6 +10,12 @@ package org.opendaylight.restconf.handlers;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 
+/**
+ * SchemaContextListener handler.
+ *
+ * @deprecated move to splitted module restconf-nb-rfc8040
+ */
+@Deprecated
 interface SchemaContextListenerHandler extends Handler<SchemaContext>, SchemaContextListener {
 
 }

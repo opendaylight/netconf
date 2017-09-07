@@ -87,7 +87,8 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
-        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, wrapper);
+        final NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
         assertEquals(DATA.data3, normalizedNode);
     }
 
@@ -99,7 +100,8 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
-        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, wrapper);
+        final NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
         assertEquals(DATA.data3, normalizedNode);
     }
 
@@ -111,7 +113,8 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path2);
         doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
-        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, wrapper);
+        final NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
         assertEquals(DATA.data2, normalizedNode);
     }
 
@@ -121,7 +124,8 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path2);
         doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.NONCONFIG;
-        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, wrapper);
+        final NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
         assertEquals(DATA.data2, normalizedNode);
     }
 
@@ -133,7 +137,8 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
-        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, wrapper);
+        final NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
         final ContainerNode checkingData = Builders
                 .containerBuilder()
                 .withNodeIdentifier(NODE_IDENTIFIER)
@@ -151,7 +156,7 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(
-                RestconfDataServiceConstant.ReadData.ALL, wrapper);
+                RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
         final ContainerNode checkingData = Builders
                 .containerBuilder()
                 .withNodeIdentifier(NODE_IDENTIFIER)
@@ -169,7 +174,8 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path3);
         doReturn(DATA.path3).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
-        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, wrapper);
+        final NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
         final MapNode checkingData = Builders
                 .mapBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("ns", "2016-02-28", "list")))
@@ -184,7 +190,8 @@ public class ReadDataTransactionUtilTest {
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path2);
         doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
-        final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(valueOfContent, wrapper);
+        final NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(valueOfContent, wrapper, schemaContext);
         assertNull(normalizedNode);
     }
 
@@ -192,7 +199,7 @@ public class ReadDataTransactionUtilTest {
     public void readDataFailTest() {
         final String valueOfContent = RestconfDataServiceConstant.ReadData.READ_TYPE_TX;
         final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(
-                valueOfContent, wrapper);
+                valueOfContent, wrapper, schemaContext);
         assertNull(normalizedNode);
     }
 

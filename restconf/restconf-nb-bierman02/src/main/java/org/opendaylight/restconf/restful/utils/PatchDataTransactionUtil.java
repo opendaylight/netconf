@@ -18,15 +18,15 @@ import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
-import org.opendaylight.netconf.sal.restconf.impl.PatchEntity;
-import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
-import org.opendaylight.netconf.sal.restconf.impl.PatchStatusEntity;
 import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
+import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.common.patch.PatchEntity;
+import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.restconf.restful.utils.RestconfDataServiceConstant.PatchData;
@@ -39,6 +39,12 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * PatchDataTransaction util.
+ *
+ * @deprecated move to splitted module restconf-nb-rfc8040
+ */
+@Deprecated
 public final class PatchDataTransactionUtil {
     private static final Logger LOG = LoggerFactory.getLogger(PatchDataTransactionUtil.class);
 

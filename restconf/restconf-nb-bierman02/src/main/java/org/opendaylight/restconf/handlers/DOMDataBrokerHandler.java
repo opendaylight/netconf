@@ -12,7 +12,10 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 /**
  * Implementation of {@link DOMDataBrokerHandler}.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
+ *
  */
+@Deprecated
 public class DOMDataBrokerHandler implements Handler<DOMDataBroker> {
 
     private final DOMDataBroker broker;

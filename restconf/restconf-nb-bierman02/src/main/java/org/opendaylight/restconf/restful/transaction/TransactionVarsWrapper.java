@@ -15,7 +15,9 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 /**
  * This class represent delegation wrapper for transaction variables.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public final class TransactionVarsWrapper {
 
     private final InstanceIdentifierContext<?> instanceIdentifier;

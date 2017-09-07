@@ -23,6 +23,12 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
+/**
+ * Implementation of RestconfService.
+ *
+ * @deprecated move to splitted module restconf-nb-rfc8040
+ */
+@Deprecated
 public class RestconfImpl implements RestconfService {
 
     private final SchemaContextHandler schemaContextHandler;

@@ -9,6 +9,12 @@ package org.opendaylight.restconf.handlers;
 
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 
+/**
+ * Handling DOMNotificationService.
+ *
+ * @deprecated move to splitted module restconf-nb-rfc8040
+ */
+@Deprecated
 public class NotificationServiceHandler implements Handler<DOMNotificationService> {
 
     private final DOMNotificationService notificationService;

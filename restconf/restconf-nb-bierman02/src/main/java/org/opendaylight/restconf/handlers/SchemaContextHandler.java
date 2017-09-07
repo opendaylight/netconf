@@ -31,7 +31,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of {@link SchemaContextHandler}.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public class SchemaContextHandler implements SchemaContextListenerHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);

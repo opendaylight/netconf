@@ -17,6 +17,12 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 
+/**
+ * URI parameters.
+ *
+ * @deprecated move to splitted module restconf-nb-rfc8040
+ */
+@Deprecated
 class ParametersUtil {
 
     private ParametersUtil() {

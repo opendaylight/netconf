@@ -21,7 +21,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Add callback for future objects and result set to the data factory.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 final class FutureCallbackTx {
 
     private static final Logger LOG = LoggerFactory.getLogger(FutureCallbackTx.class);
@@ -50,7 +52,7 @@ final class FutureCallbackTx {
             final T result = listenableFuture.checkedGet();
             dataFactory.setResult(result);
             LOG.trace("Transaction({}) SUCCESSFUL", txType);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             dataFactory.setFailureStatus();
             LOG.warn("Transaction({}) FAILED!", txType, e);
             if (e instanceof DOMRpcException) {

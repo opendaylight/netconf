@@ -14,13 +14,13 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import org.opendaylight.netconf.md.sal.rest.common.RestconfValidationUtils;
-import org.opendaylight.netconf.sal.rest.impl.RestUtil;
 import org.opendaylight.netconf.sal.restconf.impl.RestCodec;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.common.util.RestUtil;
+import org.opendaylight.restconf.common.util.RestconfSchemaUtil;
+import org.opendaylight.restconf.common.validation.RestconfValidationUtils;
 import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.restconf.utils.parser.builder.ParserBuilderConstants;
-import org.opendaylight.restconf.utils.schema.context.RestconfSchemaUtil;
 import org.opendaylight.yangtools.concepts.Codec;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -43,10 +43,11 @@ import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 
 /**
- * Deserializer for {@link String} to {@link YangInstanceIdentifier} for
- * restconf.
+ * Deserializer for {@link String} to {@link YangInstanceIdentifier} for restconf.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public final class YangInstanceIdentifierDeserializer {
 
     private YangInstanceIdentifierDeserializer() {

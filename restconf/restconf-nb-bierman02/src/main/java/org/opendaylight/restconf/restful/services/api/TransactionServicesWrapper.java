@@ -15,7 +15,9 @@ package org.opendaylight.restconf.restful.services.api;
  * <li>{@link RestconfStreamsSubscriptionService}
  * </ul>
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public interface TransactionServicesWrapper
         extends RestconfDataService, RestconfInvokeOperationsService, RestconfStreamsSubscriptionService {
 

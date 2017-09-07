@@ -27,7 +27,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Util class for rpc.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public class RestconfInvokeOperationsUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfInvokeOperationsUtil.class);

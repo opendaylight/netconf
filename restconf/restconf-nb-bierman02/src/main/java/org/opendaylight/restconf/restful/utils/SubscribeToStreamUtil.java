@@ -67,7 +67,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Subscribe to stream util class.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public final class SubscribeToStreamUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(SubscribeToStreamUtil.class);

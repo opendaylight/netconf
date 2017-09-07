@@ -43,13 +43,14 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Util class for streams.
- *
  * <ul>
  * <li>create stream
  * <li>subscribe
  * </ul>
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public final class CreateStreamUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(CreateStreamUtil.class);

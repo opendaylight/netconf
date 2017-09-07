@@ -25,14 +25,14 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
-import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
-import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
 import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.references.SchemaContextRef;
 import org.opendaylight.restconf.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.handlers.SchemaContextHandler;
@@ -55,7 +55,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link RestconfDataService}.
+ *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public class RestconfDataServiceImpl implements RestconfDataService {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);

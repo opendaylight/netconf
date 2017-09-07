@@ -15,8 +15,10 @@ import org.opendaylight.yangtools.yang.model.api.ModuleImport;
 /**
  * Fake {@link ModuleImport} implementation used to attach corrent prefix mapping to fake RPCs.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  * @author Robert Varga
  */
+@Deprecated
 final class FakeModuleImport implements ModuleImport {
     private final Module module;
 

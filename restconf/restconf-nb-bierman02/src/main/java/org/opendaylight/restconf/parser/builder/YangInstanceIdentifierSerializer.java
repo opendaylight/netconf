@@ -27,7 +27,10 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Serializer for {@link YangInstanceIdentifier} to {@link String} for restconf.
+ *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public final class YangInstanceIdentifierSerializer {
 
     private YangInstanceIdentifierSerializer() {

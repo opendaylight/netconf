@@ -26,9 +26,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
-import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
-import org.opendaylight.netconf.sal.restconf.impl.PatchStatusEntity;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 
 @Provider
 @Produces({ Draft02.MediaTypes.PATCH_STATUS + RestconfService.XML })

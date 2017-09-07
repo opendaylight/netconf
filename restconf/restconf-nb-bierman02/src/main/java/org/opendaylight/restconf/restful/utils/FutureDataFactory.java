@@ -7,6 +7,12 @@
  */
 package org.opendaylight.restconf.restful.utils;
 
+/**
+ * Future data factory.
+ *
+ * @deprecated move to splitted module restconf-nb-rfc8040
+ */
+@Deprecated
 class FutureDataFactory<T> {
 
     protected T result;

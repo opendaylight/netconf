@@ -18,7 +18,9 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
 /**
  * Constants for RestconfDataService.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public final class RestconfDataServiceConstant {
 
     public static final QName NETCONF_BASE_QNAME;

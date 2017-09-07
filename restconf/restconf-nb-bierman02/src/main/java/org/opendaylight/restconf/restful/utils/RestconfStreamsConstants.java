@@ -28,7 +28,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Constants for streams.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public final class RestconfStreamsConstants {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsConstants.class);

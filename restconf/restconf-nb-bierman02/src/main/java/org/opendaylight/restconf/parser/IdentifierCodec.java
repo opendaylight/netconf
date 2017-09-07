@@ -13,11 +13,12 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
- * Codec for identifier to serialize {@link YangInstanceIdentifier} to
- * {@link String} and deserialize {@link String} to
- * {@link YangInstanceIdentifier}.
+ * Codec for identifier to serialize {@link YangInstanceIdentifier} to {@link String} and deserialize
+ * {@link String} to {@link YangInstanceIdentifier}.
  *
+ * @deprecated move to splitted module restconf-nb-rfc8040
  */
+@Deprecated
 public final class IdentifierCodec {
 
     private IdentifierCodec() {
