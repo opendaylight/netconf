@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import org.opendaylight.controller.config.util.capability.Capability;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -33,7 +33,7 @@ public class CurrentSchemaContext implements SchemaContextListener, AutoCloseabl
         return currentContext.get();
     }
 
-    public CurrentSchemaContext(final SchemaService schemaService,
+    public CurrentSchemaContext(final DOMSchemaService schemaService,
                                 final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider) {
         this.rootSchemaSourceProvider = rootSchemaSourceProvider;
         schemaContextListenerListenerRegistration = schemaService.registerSchemaContextListener(this);

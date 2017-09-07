@@ -36,7 +36,7 @@
   <!-- We need the AAAService available even though we don't use it -->
   <reference interface="org.opendaylight.aaa.api.AAAService"/>
 
-  <reference id="schemaService" interface="org.opendaylight.controller.sal.core.api.model.SchemaService"/>
+  <reference id="schemaService" interface="org.opendaylight.mdsal.dom.api.DOMSchemaService"/>
   <reference id="domRpcService" interface="org.opendaylight.controller.md.sal.dom.api.DOMRpcService"/>
   <reference id="domMountPointService" interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"/>
   <reference id="domNotificationService" interface="org.opendaylight.controller.md.sal.dom.api.DOMNotificationService"/>

@@ -26,7 +26,7 @@ import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesStateBuilder;
@@ -49,7 +49,7 @@ public class SchemaServiceToMdsalWriterTest {
             InstanceIdentifier.create(ModulesState.class);
 
     @Mock
-    private SchemaService schemaService;
+    private DOMSchemaService schemaService;
     @Mock
     private BindingAwareBroker.ProviderContext context;
     @Mock
@@ -91,7 +91,7 @@ public class SchemaServiceToMdsalWriterTest {
                 eq(MODULES_STATE_INSTANCE_IDENTIFIER), eq(createTestModuleState()));
     }
 
-    private SchemaContext getSchema() throws Exception {
+    private static SchemaContext getSchema() throws Exception {
         final List<InputStream> modelsToParse = Lists.newArrayList(
                 SchemaServiceToMdsalWriterTest.class.getResourceAsStream("/test-module.yang"),
                 SchemaServiceToMdsalWriterTest.class.getResourceAsStream("/test-submodule.yang")
@@ -99,7 +99,7 @@ public class SchemaServiceToMdsalWriterTest {
         return YangParserTestUtils.parseYangStreams(modelsToParse);
     }
 
-    private ModulesState createTestModuleState() {
+    private static ModulesState createTestModuleState() {
         Submodule sub = new SubmoduleBuilder().setName(new YangIdentifier("test-submodule"))
                 .setRevision(new OptionalRevision("1970-01-01"))
                 .build();

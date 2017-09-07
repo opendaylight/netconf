@@ -20,8 +20,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.core.api.mount.MountProvisionListener;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Api;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
@@ -50,7 +50,7 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
     private final Object lock = new Object();
 
     private final AtomicLong idKey = new AtomicLong(0);
-    private SchemaService globalSchema;
+    private DOMSchemaService globalSchema;
     private static boolean newDraft;
 
     public Map<String, Long> getInstanceIdentifiers() {
@@ -65,11 +65,11 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
         return urlToId;
     }
 
-    public void setGlobalSchema(final SchemaService globalSchema) {
+    public void setGlobalSchema(final DOMSchemaService globalSchema) {
         this.globalSchema = globalSchema;
     }
 
-    private String findModuleName(final YangInstanceIdentifier id, final SchemaContext context) {
+    private static String findModuleName(final YangInstanceIdentifier id, final SchemaContext context) {
         final PathArgument rootQName = id.getPathArguments().iterator().next();
         for (final Module mod : context.getModules()) {
             if (mod.getDataChildByName(rootQName.getNodeType()) != null) {
@@ -79,7 +79,7 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
         return null;
     }
 
-    private String generateUrlPrefixFromInstanceID(final YangInstanceIdentifier key, final String moduleName) {
+    private static String generateUrlPrefixFromInstanceID(final YangInstanceIdentifier key, final String moduleName) {
         final StringBuilder builder = new StringBuilder();
         builder.append("/");
         if (moduleName != null) {
