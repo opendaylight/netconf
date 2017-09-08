@@ -68,8 +68,6 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     NotificationListenerAdapter(final SchemaPath path, final String streamName, final String outputType) {
         super();
         register(this);
-        setLocalNameOfPath(path.getLastComponent().getLocalName());
-
         this.outputType = Preconditions.checkNotNull(outputType);
         this.path = Preconditions.checkNotNull(path);
         Preconditions.checkArgument(streamName != null && !streamName.isEmpty());
@@ -138,8 +136,8 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      */
     @VisibleForTesting
     String prepareJson() {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject json = new JsonObject();
+        final JsonParser jsonParser = new JsonParser();
+        final JsonObject json = new JsonObject();
         json.add("ietf-restconf:notification", jsonParser.parse(writeBodyToString()));
         json.addProperty("event-time", ListenerAdapter.toRFC3339(Instant.now()));
         return json.toString();

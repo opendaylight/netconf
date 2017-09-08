@@ -69,8 +69,6 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
             final NotificationOutputType outputType) {
         super();
         register(this);
-        setLocalNameOfPath(path.getLastPathArgument().getNodeType().getLocalName());
-
         this.outputType = Preconditions.checkNotNull(outputType);
         this.path = Preconditions.checkNotNull(path);
         Preconditions.checkArgument((streamName != null) && !streamName.isEmpty());
@@ -119,9 +117,9 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
         final Event event = new Event(EventType.NOTIFY);
         if (this.outputType.equals(NotificationOutputType.JSON)) {
             try {
-                JsonNode node = new XmlMapper().readTree(xml.getBytes());
+                final JsonNode node = new XmlMapper().readTree(xml.getBytes());
                 event.setData(node.toString());
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 LOG.error("Error parsing XML {}", xml, e);
                 Throwables.propagate(e);
             }

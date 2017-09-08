@@ -33,7 +33,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -63,8 +62,6 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.handlers.TransactionChainHandler;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -117,7 +114,8 @@ public class BrokerFacadeTest {
         when(this.domDataBroker.newWriteOnlyTransaction()).thenReturn(this.writeTransaction);
         when(this.domDataBroker.newReadWriteTransaction()).thenReturn(this.rwTransaction);
 
-        ControllerContext.getInstance().setSchemas(TestUtils.loadSchemaContext("/full-versions/test-module"));
+        ControllerContext.getInstance()
+                .setSchemas(TestUtils.loadSchemaContext("/full-versions/test-module", "/modules"));
     }
 
     private static CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> wrapDummyNode(
@@ -380,11 +378,6 @@ public class BrokerFacadeTest {
         final CheckedFuture<Void, TransactionCommitFailedException> checked = Futures.immediateCheckedFuture(null);
         when(wTx.submit()).thenReturn(checked);
         when(transactionChain.newWriteOnlyTransaction()).thenReturn(wTx);
-        final TransactionChainHandler transactionChainHandler = new TransactionChainHandler(transactionChain);
-        final SchemaContextHandler schemaHandler = Mockito.mock(SchemaContextHandler.class);
-        final SchemaContext schCtx = TestUtils.loadSchemaContext("/modules");
-        when(schemaHandler.get()).thenReturn(schCtx);
-        listener.setCloseVars(transactionChainHandler, schemaHandler);
         // close and remove test notification listener
         listener.close();
         Notificator.removeListenerIfNoSubscriberExists(listener);

@@ -24,14 +24,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.restconf.Rfc8040.MonitoringModule;
-import org.opendaylight.restconf.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.parser.IdentifierCodec;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
@@ -51,46 +44,6 @@ abstract class AbstractNotificationsData {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationsData.class);
     private static final TransformerFactory TF = TransformerFactory.newInstance();
     private static final XMLOutputFactory OF = XMLOutputFactory.newFactory();
-
-    private TransactionChainHandler transactionChainHandler;
-    private SchemaContextHandler schemaHandler;
-    private String localName;
-
-    /**
-     * Transaction chain for delete data in DS on close().
-     *
-     * @param transactionChainHandler
-     *            creating new write transaction for delete data on close
-     * @param schemaHandler
-     *            for getting schema to deserialize
-     *            {@link MonitoringModule#PATH_TO_STREAM_WITHOUT_KEY} to
-     *            {@link YangInstanceIdentifier}
-     */
-    public void setCloseVars(final TransactionChainHandler transactionChainHandler,
-            final SchemaContextHandler schemaHandler) {
-        this.transactionChainHandler = transactionChainHandler;
-        this.schemaHandler = schemaHandler;
-    }
-
-    /**
-     * Delete data in DS.
-     */
-    protected void deleteDataInDS() throws Exception {
-        final DOMDataWriteTransaction wTx = this.transactionChainHandler.get().newWriteOnlyTransaction();
-        wTx.delete(LogicalDatastoreType.OPERATIONAL, IdentifierCodec
-                .deserialize(MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + this.localName, this.schemaHandler.get()));
-        wTx.submit().checkedGet();
-    }
-
-    /**
-     * Set localName of last path element of specific listener.
-     *
-     * @param localName
-     *            local name
-     */
-    protected void setLocalNameOfPath(final String localName) {
-        this.localName = localName;
-    }
 
     /**
      * Formats data specified by RFC3339.
@@ -191,7 +144,7 @@ abstract class AbstractNotificationsData {
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             transformer.transform(new DOMSource(doc), new StreamResult(out));
-        } catch (TransformerException e) {
+        } catch (final TransformerException e) {
             // FIXME: this should raise an exception
             final String msg = "Error during transformation of Document into String";
             LOG.error(msg, e);
