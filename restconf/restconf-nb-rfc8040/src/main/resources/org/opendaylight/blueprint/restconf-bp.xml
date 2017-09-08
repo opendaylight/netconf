@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2017 Pantheon technologies s.r.o. and others.  All rights reserved.
+
+ This program and the accompanying materials are made available under the
+ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ and is available at http://www.eclipse.org/legal/epl-v10.html
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.4.0"
+           odl:use-default-for-reference-types="true">
+
+  <!-- Restconf providers -->
+  <!--
+    This cfg file defines the type of the DOMDataBroker service to use. 'default' indicates to use
+    the default DOMDataBroker provided by MD-SAL. This setting is useful for providing a custom
+    DOMDataBroker implementation that does, e.g., validation or additional security checking on
+    top of the default DOMDataBroker.
+  -->
+  <cm:property-placeholder persistent-id="org.opendaylight.restconf.databroker"
+        placeholder-prefix = "@{" placeholder-suffix = "}" update-strategy="reload">
+    <cm:default-properties>
+      <cm:property name="databroker-service-type" value="default"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <!-- We need the AAAService available even though we don't use it -->
+  <reference interface="org.opendaylight.aaa.api.AAAService"/>
+
+  <reference id="schemaService" interface="org.opendaylight.controller.sal.core.api.model.SchemaService"/>
+  <reference id="domRpcService" interface="org.opendaylight.controller.md.sal.dom.api.DOMRpcService"/>
+  <reference id="domMountPointService" interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"/>
+  <reference id="domNotificationService" interface="org.opendaylight.controller.md.sal.dom.api.DOMNotificationService"/>
+  <reference id="domDataBroker" interface="org.opendaylight.controller.md.sal.dom.api.DOMDataBroker"
+          ext:filter="(type=@{databroker-service-type})"/>
+
+  <bean id="restconfProvider" class="org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider"
+          init-method="start" destroy-method="close">
+    <argument ref="domDataBroker"/>
+    <argument ref="schemaService"/>
+    <argument ref="domRpcService"/>
+    <argument ref="domNotificationService"/>
+    <argument ref="domMountPointService"/>
+  </bean>
+
+  <service ref="restconfProvider"
+      interface="org.opendaylight.restconf.nb.rfc8040.RestconfConnector" />
+
+  <!-- JSONRestconfService -->
+  <bean id="jsonRestconfService" depends-on="restconfProvider"
+      class="org.opendaylight.restconf.nb.rfc8040.rests.services.impl.JSONRestconfServiceRfc8040Impl"
+      destroy-method="close">
+    <argument>
+      <bean class="org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl"
+          factory-method="getInstance" />
+    </argument>
+    <argument>
+      <bean factory-ref="restconfProvider" factory-method="getMountPointServiceHandler" />
+    </argument>
+  </bean>
+
+  <service ref="jsonRestconfService" odl:type="rfc8040"
+      interface="org.opendaylight.restconf.nb.rfc8040.rests.services.api.JSONRestconfService" />
+
+</blueprint>
