@@ -18,8 +18,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 /**
  * JAX-RS Provider.
  *
- * @deprecated This class will be replaced by
- *             {@link org.opendaylight.restconf.jersey.providers.AbstractIdentifierAwareJaxRsProvider}
+ * @deprecated This class will be replaced by AbstractIdentifierAwareJaxRsProvider in restconf-nb-rfc8040
  */
 @Deprecated
 public class AbstractIdentifierAwareJaxRsProvider {

@@ -4,13 +4,13 @@
     version="3.0">
 
     <servlet>
-        <servlet-name>Restconf</servlet-name>
+        <servlet-name>Restconf-rfc8040</servlet-name>
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>javax.ws.rs.Application</param-name>
             <param-value>org.opendaylight.restconf.nb.rfc8040.RestconfApplication</param-value>
         </init-param>
-        <load-on-startup>1</load-on-startup>
+        <load-on-startup>0</load-on-startup>
     </servlet>
 
     <context-param>
@@ -43,7 +43,7 @@
     </filter-mapping>
 
     <servlet-mapping>
-        <servlet-name>Restconf NB - RFC 8040</servlet-name>
+        <servlet-name>Restconf-rfc8040</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
@@ -87,7 +87,7 @@
 
     <security-constraint>
         <web-resource-collection>
-            <web-resource-name>NB RFC api</web-resource-name>
+            <web-resource-name>Restconf NB RFC api</web-resource-name>
             <url-pattern>/*</url-pattern>
             <http-method>POST</http-method>
             <http-method>GET</http-method>

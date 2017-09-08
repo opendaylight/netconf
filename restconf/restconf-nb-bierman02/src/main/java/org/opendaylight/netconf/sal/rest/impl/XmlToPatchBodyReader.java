@@ -65,8 +65,7 @@ import org.xml.sax.SAXException;
 /**
  * Yang PATCH Reader for XML.
  *
- * @deprecated This class will be replaced by
- *             {@link org.opendaylight.restconf.jersey.providers.XmlToPatchBodyReader}
+ * @deprecated This class will be replaced by XmlToPatchBodyReader from restconf-nb-rfc8040
  */
 @Deprecated
 @Provider

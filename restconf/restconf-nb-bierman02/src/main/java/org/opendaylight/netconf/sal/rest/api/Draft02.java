@@ -7,14 +7,12 @@
  */
 package org.opendaylight.netconf.sal.rest.api;
 
-import org.opendaylight.restconf.Rfc8040;
 import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * Base Draft for Restconf project.
  *
- * @deprecated Do not use old implementation of restconf draft. It will be
- *             replaced by {@link Rfc8040}.
+ * @deprecated Do not use old implementation of restconf draft. It will be replaced by Rfc8040.
  */
 @Deprecated
 public class Draft02 {
