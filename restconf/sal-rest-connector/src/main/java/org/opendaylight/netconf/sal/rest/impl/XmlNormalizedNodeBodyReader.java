@@ -104,13 +104,9 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
     private NormalizedNodeContext readFrom(final InputStream entityStream) throws IOException, SAXException,
             XMLStreamException, ParserConfigurationException, URISyntaxException {
         final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
-
-        if (entityStream.available() < 1) {
-            // represent empty nopayload input
-            return new NormalizedNodeContext(path, null);
-        }
-
+        LOG.info("Reading XML from stream {}", entityStream);
         final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
+        LOG.info("Document read {}", doc);
         return parse(path, doc);
     }
 
