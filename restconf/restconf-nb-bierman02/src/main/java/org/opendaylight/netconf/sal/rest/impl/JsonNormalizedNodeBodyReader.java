@@ -30,7 +30,6 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
-import org.opendaylight.restconf.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
@@ -71,13 +70,6 @@ public class JsonNormalizedNodeBodyReader
             final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws IOException,
             WebApplicationException {
         try {
-            if (getUriInfo().getAbsolutePath().getPath().contains(RestconfConstants.DRAFT_PATTERN)) {
-                final org.opendaylight.restconf.jersey.providers.JsonNormalizedNodeBodyReader jsonReaderNewRest =
-                        new org.opendaylight.restconf.jersey.providers.JsonNormalizedNodeBodyReader();
-                jsonReaderNewRest.injectParams(getUriInfo(), getRequest());
-                return jsonReaderNewRest.readFrom(type, genericType, annotations, mediaType, httpHeaders, entityStream);
-            }
-
             return readFrom(getInstanceIdentifierContext(), entityStream, isPost());
         } catch (final Exception e) {
             propagateExceptionAs(e);

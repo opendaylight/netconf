@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * Implementation of the JSONRestconfService interface using the restconf Draft02 implementation.
  *
  * @author Thomas Pantelis
- * @deprecated Replaced by {@link JSONRestconfServiceDraft18}
+ * @deprecated Replaced by {JSONRestconfServiceDraft18 from restconf-nb-rfc8040
  */
 @Deprecated
 public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseable {
@@ -242,11 +242,11 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         private final String path;
         private final MultivaluedMap<String, String> queryParams;
 
-        SimpleUriInfo(String path) {
+        SimpleUriInfo(final String path) {
             this(path, new MultivaluedHashMap<>());
         }
 
-        SimpleUriInfo(String path, MultivaluedMap<String, String> queryParams) {
+        SimpleUriInfo(final String path, final MultivaluedMap<String, String> queryParams) {
             this.path = path;
             this.queryParams = queryParams;
         }
@@ -257,7 +257,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         }
 
         @Override
-        public String getPath(boolean decode) {
+        public String getPath(final boolean decode) {
             return path;
         }
 
@@ -267,7 +267,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         }
 
         @Override
-        public List<PathSegment> getPathSegments(boolean decode) {
+        public List<PathSegment> getPathSegments(final boolean decode) {
             throw new UnsupportedOperationException();
         }
 
@@ -307,7 +307,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         }
 
         @Override
-        public MultivaluedMap<String, String> getPathParameters(boolean decode) {
+        public MultivaluedMap<String, String> getPathParameters(final boolean decode) {
             return getPathParameters();
         }
 
@@ -317,7 +317,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         }
 
         @Override
-        public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
+        public MultivaluedMap<String, String> getQueryParameters(final boolean decode) {
             return getQueryParameters();
         }
 
@@ -327,7 +327,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         }
 
         @Override
-        public List<String> getMatchedURIs(boolean decode) {
+        public List<String> getMatchedURIs(final boolean decode) {
             return getMatchedURIs();
         }
 
@@ -337,12 +337,12 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         }
 
         @Override
-        public URI resolve(URI uri) {
+        public URI resolve(final URI uri) {
             return uri;
         }
 
         @Override
-        public URI relativize(URI uri) {
+        public URI relativize(final URI uri) {
             return uri;
         }
     }

@@ -53,8 +53,6 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     public final void close() throws Exception {
         this.registration.close();
         this.registration = null;
-
-        deleteDataInDS();
         unregister();
     }
 
