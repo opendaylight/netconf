@@ -159,6 +159,11 @@
       <artifactId>stax-utils</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.opendaylight.aaa</groupId>
+      <artifactId>aaa-shiro-api</artifactId>
+    </dependency>
+
     <!-- Testing Dependencies -->
     <dependency>
       <groupId>org.glassfish.jersey.test-framework.providers</groupId>
@@ -188,6 +193,28 @@
             <!-- Removes com.sun.jersey from testing classpath so there is no conflict with org.glassfish.jersey -->
             <classpathDependencyExclude>com.sun.jersey</classpathDependencyExclude>
           </classpathDependencyExcludes>
+        </configuration>
+      </plugin>
+<plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-Name>MD SAL Restconf Connector</Bundle-Name>
+            <Import-Package>
+              *,
+              com.sun.jersey.spi.container.servlet,
+              org.eclipse.jetty.servlets,
+              org.opendaylight.aaa.shiro.filters,
+              org.opendaylight.aaa.shiro.realm,
+              org.opendaylight.aaa.shiro.web.env,
+              org.opendaylight.aaa.filterchain.filters,
+              org.opendaylight.aaa.api,
+              org.apache.shiro.web.env
+            </Import-Package>
+            <Web-ContextPath>/restconf/rfc</Web-ContextPath>
+          </instructions>
         </configuration>
       </plugin>
       <plugin>
