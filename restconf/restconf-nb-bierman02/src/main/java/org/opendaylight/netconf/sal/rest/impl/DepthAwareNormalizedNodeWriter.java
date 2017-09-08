@@ -39,13 +39,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This is an experimental iterator over a {@link NormalizedNode}. This is essentially
- * the opposite of a {@link javax.xml.stream.XMLStreamReader} -- unlike instantiating an iterator over
- * the backing data, this encapsulates a {@link NormalizedNodeStreamWriter} and allows
- * us to write multiple nodes.
+ * This is an experimental iterator over a {@link NormalizedNode}. This is essentially the opposite of a
+ * {@link javax.xml.stream.XMLStreamReader} -- unlike instantiating an iterator over the backing data, this
+ * encapsulates a {@link NormalizedNodeStreamWriter} and allows us to write multiple nodes.
  *
- * @deprecated This class will be replaced by
- * {@link org.opendaylight.restconf.jersey.providers.ParameterAwareNormalizedNodeWriter}
+ * @deprecated This class will be replaced by ParameterAwareNormalizedNodeWriter in restconf-nb-rfc8040
  */
 @Deprecated
 public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWriter {
@@ -177,7 +175,7 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
      */
     protected final boolean writeChildren(final Iterable<? extends NormalizedNode<?, ?>> children) throws IOException {
         if (currentDepth < maxDepth) {
-            for (NormalizedNode<?, ?> child : children) {
+            for (final NormalizedNode<?, ?> child : children) {
                 write(child);
             }
         }
@@ -195,7 +193,7 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
     }
 
     private void writeOnlyKeys(final Map<QName, Object> keyValues) throws IllegalArgumentException, IOException {
-        for (Map.Entry<QName, Object> entry : keyValues.entrySet()) {
+        for (final Map.Entry<QName, Object> entry : keyValues.entrySet()) {
             writer.leafNode(new NodeIdentifier(entry.getKey()), entry.getValue());
         }
         writer.endNode();
@@ -290,7 +288,7 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
 
             final Set<QName> qnames = node.getIdentifier().getKeyValues().keySet();
             // Write out all the key children
-            for (QName qname : qnames) {
+            for (final QName qname : qnames) {
                 final Optional<? extends NormalizedNode<?, ?>> child = node.getChild(new NodeIdentifier(qname));
                 if (child.isPresent()) {
                     write(child.get());
@@ -301,7 +299,7 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
 
             // Write all the rest
             currentDepth++;
-            boolean result = writeChildren(Iterables.filter(node.getValue(), input -> {
+            final boolean result = writeChildren(Iterables.filter(node.getValue(), input -> {
                 if (input instanceof AugmentationNode) {
                     return true;
                 }

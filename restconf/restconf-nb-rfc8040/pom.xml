@@ -195,7 +195,7 @@
           </classpathDependencyExcludes>
         </configuration>
       </plugin>
-<plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -213,7 +213,7 @@
               org.opendaylight.aaa.api,
               org.apache.shiro.web.env
             </Import-Package>
-            <Web-ContextPath>/restconf/rfc</Web-ContextPath>
+            <Web-ContextPath>/rests</Web-ContextPath>
           </instructions>
         </configuration>
       </plugin>

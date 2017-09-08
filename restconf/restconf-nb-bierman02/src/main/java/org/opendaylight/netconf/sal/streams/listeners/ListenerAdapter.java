@@ -67,8 +67,6 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
             final NotificationOutputType outputType) {
         super();
         register(this);
-        setLocalNameOfPath(path.getLastPathArgument().getNodeType().getLocalName());
-
         this.outputType = Preconditions.checkNotNull(outputType);
         this.path = Preconditions.checkNotNull(path);
         Preconditions.checkArgument((streamName != null) && !streamName.isEmpty());

@@ -235,7 +235,6 @@
           <instructions>
             <Bundle-Name>MD SAL Restconf Connector</Bundle-Name>
             <Private-Package>org.opendaylight.netconf.sal.rest.*,
-              org.opendaylight.restconf.*,
               org.opendaylight.netconf.sal.restconf.rpc.*,
               org.opendaylight.netconf.sal.restconf.impl.*,
               org.opendaylight.netconf.md.sal.rest.common.*,
