@@ -47,8 +47,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 /**
  * Normalized node writer for JSON.
  *
- * @deprecated This class will be replaced by
- * {@link org.opendaylight.restconf.jersey.providers.NormalizedNodeJsonBodyWriter}
+ * @deprecated This class will be replaced by NormalizedNodeJsonBodyWriter from restconf-nb-rfc8040
  */
 @Deprecated
 @Provider

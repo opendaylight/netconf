@@ -13,16 +13,6 @@
         <load-on-startup>0</load-on-startup>
     </servlet>
 
-    <servlet>
-        <servlet-name>Restconf</servlet-name>
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
-            <param-value>org.opendaylight.restconf.RestconfApplication</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
     <context-param>
       <param-name>shiroEnvironmentClass</param-name>
       <param-value>org.opendaylight.aaa.shiro.web.env.KarafIniWebEnvironment</param-value>
@@ -56,11 +46,6 @@
     <servlet-mapping>
         <servlet-name>JAXRSRestconf</servlet-name>
         <url-pattern>/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>Restconf</servlet-name>
-        <url-pattern>/18/*</url-pattern>
     </servlet-mapping>
 
     <filter>

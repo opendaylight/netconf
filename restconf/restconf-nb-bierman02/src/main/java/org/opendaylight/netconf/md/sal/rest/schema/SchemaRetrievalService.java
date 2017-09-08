@@ -12,14 +12,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import org.opendaylight.restconf.base.services.api.RestconfSchemaService;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
 
 /**
  * Retrieval of the YANG modules which server supports.
  *
- * @deprecated do not use this api. It is replaced by
- *             {@link RestconfSchemaService}
+ * @deprecated do not use this api. It is replaced by RestconfSchemaService
  */
 @Deprecated
 @Beta
