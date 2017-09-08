@@ -22,14 +22,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.rest.api.Draft02.MediaTypes;
-import org.opendaylight.restconf.base.services.api.RestconfOperationsService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.Patch;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.restful.services.api.RestconfDataService;
-import org.opendaylight.restconf.restful.services.api.RestconfInvokeOperationsService;
-import org.opendaylight.restconf.restful.services.api.RestconfStreamsSubscriptionService;
 
 /**
  * The URI hierarchy for the RESTCONF resources consists of an entry point
@@ -66,10 +62,10 @@ public interface RestconfService {
     /**
      * Get all modules supported by controller.
      *
-     * @param uriInfo URI info
+     * @param uriInfo
+     *            URI info
      * @return {@link NormalizedNodeContext}
-     * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#readData(UriInfo)}
+     * @deprecated do not use this method. It will be replaced by RestconfDataService#readData(UriInfo)
      */
     @Deprecated
     @GET
@@ -81,11 +77,13 @@ public interface RestconfService {
     /**
      * Get all modules supported by mount point.
      *
-     * @param identifier mount point identifier
-     * @param uriInfo URI info
+     * @param identifier
+     *            mount point identifier
+     * @param uriInfo
+     *            URI info
      * @return {@link NormalizedNodeContext}
-     * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#readData(String, UriInfo)}
+     * @deprecated do not use this method. It will be replaced by RestconfDataService#readData(String,
+     *             UriInfo)
      */
     @Deprecated
     @GET
@@ -97,11 +95,13 @@ public interface RestconfService {
     /**
      * Get module.
      *
-     * @param identifier path to target
-     * @param uriInfo URI info
+     * @param identifier
+     *            path to target
+     * @param uriInfo
+     *            URI info
      * @return {@link NormalizedNodeContext}
-     * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#readData(String, UriInfo)}
+     * @deprecated do not use this method. It will be replaced by RestconfDataService#readData(String,
+     *             UriInfo)
      */
     @Deprecated
     @GET
@@ -113,10 +113,11 @@ public interface RestconfService {
     /**
      * List of rpc or action operations supported by the server.
      *
-     * @param uriInfo URI information
+     * @param uriInfo
+     *            URI information
      * @return {@link NormalizedNodeContext}
      * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfOperationsService#getOperations(UriInfo)}
+     *             RestconfOperationsService#getOperations(UriInfo)
      */
     @Deprecated
     @GET
@@ -128,11 +129,13 @@ public interface RestconfService {
     /**
      * Valid for mount points. List of operations supported by the server.
      *
-     * @param identifier path parameter
-     * @param uriInfo URI information
+     * @param identifier
+     *            path parameter
+     * @param uriInfo
+     *            URI information
      * @return {@link NormalizedNodeContext}
      * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfOperationsService#getOperations(String, UriInfo)}
+     *             RestconfOperationsService#getOperations(String, UriInfo)
      */
     @Deprecated
     @GET
@@ -144,12 +147,15 @@ public interface RestconfService {
     /**
      * Invoke RPC operation.
      *
-     * @param identifier module name and rpc identifier string for the desired operation
-     * @param payload {@link NormalizedNodeContext} - the body of the operation
-     * @param uriInfo URI info
+     * @param identifier
+     *            module name and rpc identifier string for the desired operation
+     * @param payload
+     *            {@link NormalizedNodeContext} - the body of the operation
+     * @param uriInfo
+     *            URI info
      * @return {@link NormalizedNodeContext}
      * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfInvokeOperationsService#invokeRpc(String, NormalizedNodeContext, UriInfo)}
+     *             RestconfInvokeOperationsService#invokeRpc(String, NormalizedNodeContext, UriInfo)
      */
     @Deprecated
     @POST
@@ -184,11 +190,13 @@ public interface RestconfService {
     /**
      * Get target data resource from config data store.
      *
-     * @param identifier path to target
-     * @param uriInfo URI info
+     * @param identifier
+     *            path to target
+     * @param uriInfo
+     *            URI info
      * @return {@link NormalizedNodeContext}
-     * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#readData(String, UriInfo)}
+     * @deprecated do not use this method. It will be replaced by RestconfDataService#readData(String,
+     *             UriInfo)
      */
     @Deprecated
     @GET
@@ -201,11 +209,13 @@ public interface RestconfService {
     /**
      * Get target data resource from operational data store.
      *
-     * @param identifier path to target
-     * @param uriInfo URI info
+     * @param identifier
+     *            path to target
+     * @param uriInfo
+     *            URI info
      * @return {@link NormalizedNodeContext}
-     * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#readData(String, UriInfo)}
+     * @deprecated do not use this method. It will be replaced by RestconfDataService#readData(String,
+     *             UriInfo)
      */
     @Deprecated
     @GET
@@ -218,11 +228,13 @@ public interface RestconfService {
     /**
      * Create or replace the target data resource.
      *
-     * @param identifier path to target
-     * @param payload data node for put to config DS
+     * @param identifier
+     *            path to target
+     * @param payload
+     *            data node for put to config DS
      * @return {@link Response}
-     * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#putData(String, NormalizedNodeContext, UriInfo)}
+     * @deprecated do not use this method. It will be replaced by RestconfDataService#putData(String,
+     *             NormalizedNodeContext, UriInfo)
      */
     @Deprecated
     @PUT
@@ -235,12 +247,15 @@ public interface RestconfService {
     /**
      * Create a data resource in target.
      *
-     * @param identifier path to target
-     * @param payload new data
-     * @param uriInfo URI info
+     * @param identifier
+     *            path to target
+     * @param payload
+     *            new data
+     * @param uriInfo
+     *            URI info
      * @return {@link Response}
-     * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#postData(String, NormalizedNodeContext, UriInfo)}
+     * @deprecated do not use this method. It will be replaced by RestconfDataService#postData(String,
+     *             NormalizedNodeContext, UriInfo)
      */
     @Deprecated
     @POST
@@ -253,11 +268,13 @@ public interface RestconfService {
     /**
      * Create a data resource.
      *
-     * @param payload new data
-     * @param uriInfo URI info
+     * @param payload
+     *            new data
+     * @param uriInfo
+     *            URI info
      * @return {@link Response}
      * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#postData(NormalizedNodeContext, UriInfo)}
+     *             RestconfDataService#postData(NormalizedNodeContext, UriInfo)
      */
     @Deprecated
     @POST
@@ -269,10 +286,10 @@ public interface RestconfService {
     /**
      * Delete the target data resource.
      *
-     * @param identifier path to target
+     * @param identifier
+     *            path to target
      * @return {@link Response}
-     * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#deleteData(String)}
+     * @deprecated do not use this method. It will be replaced by RestconfDataService#deleteData(String)
      */
     @Deprecated
     @DELETE
@@ -282,11 +299,13 @@ public interface RestconfService {
     /**
      * Subscribe to stream.
      *
-     * @param identifier stream identifier
-     * @param uriInfo URI info
+     * @param identifier
+     *            stream identifier
+     * @param uriInfo
+     *            URI info
      * @return {@link NormalizedNodeContext}
      * @deprecated do not use this method. It will be replaced by
-     *              {@link RestconfStreamsSubscriptionService#subscribeToStream(String, UriInfo)}
+     *             RestconfStreamsSubscriptionService#subscribeToStream(String, UriInfo)
      */
     @Deprecated
     @GET
@@ -297,10 +316,11 @@ public interface RestconfService {
     /**
      * Get list of all streams.
      *
-     * @param uriInfo URI info
+     * @param uriInfo
+     *            URI info
      * @return {@link NormalizedNodeContext}
-     * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#readData(String, UriInfo)}
+     * @deprecated do not use this method. It will be replaced by RestconfDataService#readData(String,
+     *             UriInfo)
      **/
     @Deprecated
     @GET
@@ -312,12 +332,15 @@ public interface RestconfService {
     /**
      * Ordered list of edits that are applied to the target datastore by the server.
      *
-     * @param identifier path to target
-     * @param context edits
-     * @param uriInfo URI info
+     * @param identifier
+     *            path to target
+     * @param context
+     *            edits
+     * @param uriInfo
+     *            URI info
      * @return {@link PatchStatusContext}
-     * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#patchData(String, PatchContext, UriInfo)}
+     * @deprecated do not use this method. It will be replaced by RestconfDataService#patchData(String,
+     *             PatchContext, UriInfo)
      */
     @Deprecated
     @Patch
@@ -330,11 +353,13 @@ public interface RestconfService {
     /**
      * Ordered list of edits that are applied to the datastore by the server.
      *
-     * @param context edits
-     * @param uriInfo URI info
+     * @param context
+     *            edits
+     * @param uriInfo
+     *            URI info
      * @return {@link PatchStatusContext}
-     * @deprecated do not use this method. It will be replaced by
-     *             {@link RestconfDataService#patchData(PatchContext, UriInfo)}
+     * @deprecated do not use this method. It will be replaced by RestconfDataService#patchData(PatchContext,
+     *             UriInfo)
      */
     @Deprecated
     @Patch

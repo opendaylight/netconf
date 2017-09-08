@@ -26,6 +26,9 @@
         <module>odl-restconf</module>
         <module>odl-restconf-all</module>
         <module>odl-restconf-noauth</module>
+        <module>odl-restconf-nb-rfc8040-noauth</module>
+        <module>odl-restconf-nb-rfc8040</module>
+        <module>odl-restconf-nb-rfc8040-all</module>
     </modules>
 
     <scm>

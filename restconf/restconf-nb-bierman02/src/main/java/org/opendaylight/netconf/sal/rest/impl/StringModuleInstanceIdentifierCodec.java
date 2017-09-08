@@ -20,8 +20,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 /**
  * Codec for module instance identifiers.
  *
- * @deprecated This class will be replaced by
- *             {@link org.opendaylight.restconf.jersey.providers.StringModuleInstanceIdentifierCodec}
+ * @deprecated This class will be replaced by StringModuleInstanceIdentifierCodec from restconf-nb-rfc8040
  */
 @Deprecated
 public final class StringModuleInstanceIdentifierCodec extends AbstractModuleStringInstanceIdentifierCodec {

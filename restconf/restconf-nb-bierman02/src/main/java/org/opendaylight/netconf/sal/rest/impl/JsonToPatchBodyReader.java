@@ -52,8 +52,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Patch reader for JSON.
  *
- * @deprecated This class will be replaced by
- *             {@link org.opendaylight.restconf.jersey.providers.JsonToPatchBodyReader}
+ * @deprecated This class will be replaced by JsonToPatchBodyReader in restconf-nb-rfc8040
  */
 @Deprecated
 @Provider

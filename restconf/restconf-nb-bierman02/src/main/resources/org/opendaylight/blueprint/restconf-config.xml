@@ -57,40 +57,12 @@
     <argument ref="webSocketPort"/>
   </bean>
 
-  <bean id="restconfProviderDraft18" class="org.opendaylight.restconf.RestConnectorProvider"
-          init-method="start" destroy-method="close">
-    <argument ref="domDataBroker"/>
-    <argument ref="schemaService"/>
-    <argument ref="domRpcService"/>
-    <argument ref="domNotificationService"/>
-    <argument ref="domMountPointService"/>
-  </bean>
-
-  <service ref="restconfProviderDraft18"
-      interface="org.opendaylight.netconf.sal.rest.api.RestConnector" />
-
   <!-- JSONRestconfService -->
-
   <bean id="jsonRestconfServiceDraft02"
       class="org.opendaylight.netconf.sal.restconf.impl.JSONRestconfServiceImpl"
       destroy-method="close"/>
 
   <service ref="jsonRestconfServiceDraft02" odl:type="default"
-      interface="org.opendaylight.netconf.sal.restconf.api.JSONRestconfService" />
-
-  <bean id="jsonRestconfServiceDraft18" depends-on="restconfProviderDraft18"
-      class="org.opendaylight.netconf.sal.restconf.impl.JSONRestconfServiceDraft18"
-      destroy-method="close">
-    <argument>
-      <bean class="org.opendaylight.restconf.common.wrapper.services.ServicesWrapperImpl"
-          factory-method="getInstance" />
-    </argument>
-    <argument>
-      <bean factory-ref="restconfProviderDraft18" factory-method="getMountPointServiceHandler" />
-    </argument>
-  </bean>
-
-  <service ref="jsonRestconfServiceDraft18" odl:type="draft18"
       interface="org.opendaylight.netconf.sal.restconf.api.JSONRestconfService" />
 
 </blueprint>
