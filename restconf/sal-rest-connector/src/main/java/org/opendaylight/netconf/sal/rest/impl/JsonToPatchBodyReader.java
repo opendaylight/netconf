@@ -19,6 +19,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -96,11 +97,12 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
 
     private PatchContext readFrom(final InstanceIdentifierContext<?> path, final InputStream entityStream)
             throws IOException {
-        if (entityStream.available() < 1) {
+        final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
+        if (!nonEmptyInputStreamOptional.isPresent()) {
             return new PatchContext(path, null, null);
         }
 
-        final JsonReader jsonReader = new JsonReader(new InputStreamReader(entityStream));
+        final JsonReader jsonReader = new JsonReader(new InputStreamReader(nonEmptyInputStreamOptional.get()));
         final List<PatchEntity> resultList = read(jsonReader, path);
         jsonReader.close();
 
