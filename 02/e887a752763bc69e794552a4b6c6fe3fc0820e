@@ -1,0 +1,9 @@
+Code-Review+1: Jakub Toth <jakub.toth@pantheon.tech>
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Ryan Goulding <ryandgoulding@gmail.com>
+Code-Review+2: Jakub Morvay <jmorvay@cisco.com>
+Submitted-by: Thanh Ha <thanh.ha@linuxfoundation.org>
+Submitted-at: Tue, 12 Sep 2017 18:43:12 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/63048
+Project: netconf
+Branch: refs/heads/stable/nitrogen
