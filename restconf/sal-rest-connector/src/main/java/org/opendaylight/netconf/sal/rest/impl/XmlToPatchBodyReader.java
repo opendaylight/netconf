@@ -19,6 +19,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -91,13 +92,13 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
 
         try {
             final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
-
-            if (entityStream.available() < 1) {
+            final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
+            if (!nonEmptyInputStreamOptional.isPresent()) {
                 // represent empty nopayload input
                 return new PatchContext(path, null, null);
             }
 
-            final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
+            final Document doc = UntrustedXML.newDocumentBuilder().parse(nonEmptyInputStreamOptional.get());
             return parse(path, doc);
         } catch (final RestconfDocumentedException e) {
             throw e;
