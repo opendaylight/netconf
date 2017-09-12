@@ -16,6 +16,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -101,7 +102,8 @@ public class JsonNormalizedNodeBodyReader
     private static NormalizedNodeContext readFrom(final InstanceIdentifierContext<?> path,
                                                   final InputStream entityStream, final boolean isPost)
             throws IOException {
-        if (entityStream.available() < 1) {
+        final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
+        if (!nonEmptyInputStreamOptional.isPresent()) {
             return new NormalizedNodeContext(path, null);
         }
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
@@ -123,7 +125,7 @@ public class JsonNormalizedNodeBodyReader
         }
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer, path.getSchemaContext(), parentSchema);
-        final JsonReader reader = new JsonReader(new InputStreamReader(entityStream));
+        final JsonReader reader = new JsonReader(new InputStreamReader(nonEmptyInputStreamOptional.get()));
         jsonParser.parse(reader);
 
         NormalizedNode<?, ?> result = resultHolder.getResult();

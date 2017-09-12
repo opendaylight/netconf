@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
+import java.util.Optional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -104,13 +105,13 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
     private NormalizedNodeContext readFrom(final InputStream entityStream) throws IOException, SAXException,
             XMLStreamException, ParserConfigurationException, URISyntaxException {
         final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
-
-        if (entityStream.available() < 1) {
+        final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
+        if (!nonEmptyInputStreamOptional.isPresent()) {
             // represent empty nopayload input
             return new NormalizedNodeContext(path, null);
         }
 
-        final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
+        final Document doc = UntrustedXML.newDocumentBuilder().parse(nonEmptyInputStreamOptional.get());
         return parse(path, doc);
     }
 
