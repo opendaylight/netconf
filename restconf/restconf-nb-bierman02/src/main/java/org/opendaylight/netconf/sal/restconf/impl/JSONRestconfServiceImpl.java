@@ -14,16 +14,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
@@ -32,6 +25,7 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
+import org.opendaylight.restconf.common.util.SimpleUriInfo;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcError.ErrorType;
@@ -43,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * Implementation of the JSONRestconfService interface using the restconf Draft02 implementation.
  *
  * @author Thomas Pantelis
- * @deprecated Replaced by {JSONRestconfServiceDraft18 from restconf-nb-rfc8040
+ * @deprecated Replaced by {JSONRestconfServiceRfc8040Impl from restconf-nb-rfc8040
  */
 @Deprecated
 public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseable {
@@ -235,115 +229,6 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
             default: {
                 return ErrorType.APPLICATION;
             }
-        }
-    }
-
-    private static class SimpleUriInfo implements UriInfo {
-        private final String path;
-        private final MultivaluedMap<String, String> queryParams;
-
-        SimpleUriInfo(final String path) {
-            this(path, new MultivaluedHashMap<>());
-        }
-
-        SimpleUriInfo(final String path, final MultivaluedMap<String, String> queryParams) {
-            this.path = path;
-            this.queryParams = queryParams;
-        }
-
-        @Override
-        public String getPath() {
-            return path;
-        }
-
-        @Override
-        public String getPath(final boolean decode) {
-            return path;
-        }
-
-        @Override
-        public List<PathSegment> getPathSegments() {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public List<PathSegment> getPathSegments(final boolean decode) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public URI getRequestUri() {
-            return URI.create(path);
-        }
-
-        @Override
-        public UriBuilder getRequestUriBuilder() {
-            return UriBuilder.fromUri(getRequestUri());
-        }
-
-        @Override
-        public URI getAbsolutePath() {
-            return getRequestUri();
-        }
-
-        @Override
-        public UriBuilder getAbsolutePathBuilder() {
-            return UriBuilder.fromUri(getAbsolutePath());
-        }
-
-        @Override
-        public URI getBaseUri() {
-            return URI.create("");
-        }
-
-        @Override
-        public UriBuilder getBaseUriBuilder() {
-            return UriBuilder.fromUri(getBaseUri());
-        }
-
-        @Override
-        public MultivaluedMap<String, String> getPathParameters() {
-            return new MultivaluedHashMap<>();
-        }
-
-        @Override
-        public MultivaluedMap<String, String> getPathParameters(final boolean decode) {
-            return getPathParameters();
-        }
-
-        @Override
-        public MultivaluedMap<String, String> getQueryParameters() {
-            return queryParams;
-        }
-
-        @Override
-        public MultivaluedMap<String, String> getQueryParameters(final boolean decode) {
-            return getQueryParameters();
-        }
-
-        @Override
-        public List<String> getMatchedURIs() {
-            return Collections.emptyList();
-        }
-
-        @Override
-        public List<String> getMatchedURIs(final boolean decode) {
-            return getMatchedURIs();
-        }
-
-        @Override
-        public List<Object> getMatchedResources() {
-            return Collections.emptyList();
-        }
-
-        @Override
-        public URI resolve(final URI uri) {
-            return uri;
-        }
-
-        @Override
-        public URI relativize(final URI uri) {
-            return uri;
         }
     }
 }
