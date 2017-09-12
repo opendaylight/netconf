@@ -19,6 +19,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -36,6 +37,7 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
+import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -95,11 +97,12 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
 
     private PatchContext readFrom(final InstanceIdentifierContext<?> path, final InputStream entityStream)
             throws IOException {
-        if (entityStream.available() < 1) {
+        final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
+        if (!nonEmptyInputStreamOptional.isPresent()) {
             return new PatchContext(path, null, null);
         }
 
-        final JsonReader jsonReader = new JsonReader(new InputStreamReader(entityStream));
+        final JsonReader jsonReader = new JsonReader(new InputStreamReader(nonEmptyInputStreamOptional.get()));
         final List<PatchEntity> resultList = read(jsonReader, path);
         jsonReader.close();
 
