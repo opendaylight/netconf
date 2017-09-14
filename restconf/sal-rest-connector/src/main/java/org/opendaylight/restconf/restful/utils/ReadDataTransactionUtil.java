@@ -11,6 +11,7 @@ import static org.opendaylight.restconf.restful.utils.RestconfStreamsConstants.S
 import static org.opendaylight.restconf.restful.utils.RestconfStreamsConstants.STREAM_PATH_PART;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Iterable;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.net.URI;
@@ -277,9 +278,7 @@ public final class ReadDataTransactionUtil {
                 final List<NotificationListenerAdapter> notifiStreamJSON =
                         CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContextRef,
                                 NotificationOutputType.JSON.getName());
-                notifiStreamJSON.addAll(notifiStreamXML);
-
-                for (final NotificationListenerAdapter listener : notifiStreamJSON) {
+                for (final NotificationListenerAdapter listener : Iterable.concat(notifiStreamXML, notifiStreamJSON)) {
                     final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName());
                     final NormalizedNode mapToStreams =
                             RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
@@ -679,7 +678,6 @@ public final class ReadDataTransactionUtil {
      * @param builder
      *           - builder
      */
-    @SuppressWarnings("unchecked")
     private static <T extends NormalizedNode<? extends PathArgument, ?>> void mergeDataToBuilder(
             @Nonnull final Map<PathArgument, T> configMap,
             @Nonnull final Map<PathArgument, T> stateMap,
