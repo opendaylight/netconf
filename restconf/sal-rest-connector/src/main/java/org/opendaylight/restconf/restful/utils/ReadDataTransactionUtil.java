@@ -277,9 +277,11 @@ public final class ReadDataTransactionUtil {
                 final List<NotificationListenerAdapter> notifiStreamJSON =
                         CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContextRef,
                                 NotificationOutputType.JSON.getName());
-                notifiStreamJSON.addAll(notifiStreamXML);
 
-                for (final NotificationListenerAdapter listener : notifiStreamJSON) {
+                List<NotificationListenerAdapter> notifiStream = Lists.newArrayList();
+                notifiStream.addAll(notifiStreamXML);
+                notifiStream.addAll(notifiStreamJSON);
+                for (final NotificationListenerAdapter listener : notifiStream) {
                     final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName());
                     final NormalizedNode mapToStreams =
                             RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
