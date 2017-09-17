@@ -1,0 +1,19 @@
+{
+    "notification": {
+        "data-changed-notification": {
+            "data-change-event": {
+                "data": {
+                    "my-leaf12": {
+                        "content": "Bertha",
+                        "xmlns": "instance:identifier:patch:module"
+                    }
+                },
+                "operation": "created",
+                "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12"
+            },
+            "xmlns": "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote"
+        },
+        "eventTime": "2017-09-17T13:56:47.032+03:00",
+        "xmlns": "urn:ietf:params:xml:ns:netconf:notification:1.0"
+    }
+}
