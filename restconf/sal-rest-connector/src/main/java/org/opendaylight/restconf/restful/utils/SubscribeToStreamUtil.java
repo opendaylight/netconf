@@ -28,8 +28,9 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -63,6 +64,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+
 
 /**
  * Subscribe to stream util class.
@@ -336,10 +339,14 @@ public final class SubscribeToStreamUtil {
         }
 
         final YangInstanceIdentifier path = listener.getPath();
-        final ListenerRegistration<DOMDataChangeListener> registration =
-                domDataBroker.registerDataChangeListener(ds, path, listener, scope);
+        DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)
+                        domDataBroker.getSupportedExtensions().get(DOMDataTreeChangeService.class);
+        if (changeService == null) {
+            throw new UnsupportedOperationException("DOMDataTreeChangeService not supported by DOMDataBroker");
+        }
+        DOMDataTreeIdentifier loc = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, path);
+        listener.setRegistration(changeService.registerDataTreeChangeListener(loc, listener));
 
-        listener.setRegistration(registration);
     }
 
     /**

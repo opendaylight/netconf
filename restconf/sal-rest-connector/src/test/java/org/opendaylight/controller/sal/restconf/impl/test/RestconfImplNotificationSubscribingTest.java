@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
@@ -37,7 +36,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class RestconfImplNotificationSubscribingTest {
@@ -209,11 +208,10 @@ public class RestconfImplNotificationSubscribingTest {
 
         subscribe(list);
 
-        final AsyncDataChangeEvent<YangInstanceIdentifier, NormalizedNode<?, ?>> change =
-                Mockito.mock(AsyncDataChangeEvent.class);
+        ArrayList<DataTreeCandidate> candidates = new ArrayList<DataTreeCandidate>(0);
         Instant startOrig = listener.getStart();
         Assert.assertNotNull(startOrig);
-        listener.onDataChanged(change);
+        listener.onDataTreeChanged(candidates);
 
         startOrig = listener.getStart();
         Assert.assertNull(startOrig);

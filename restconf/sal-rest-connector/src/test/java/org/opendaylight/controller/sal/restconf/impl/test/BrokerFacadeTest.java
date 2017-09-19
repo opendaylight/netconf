@@ -28,6 +28,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
+
+import java.util.HashMap;
 import java.util.concurrent.Future;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,9 +42,10 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
@@ -116,6 +119,9 @@ public class BrokerFacadeTest {
         when(this.domDataBroker.newReadOnlyTransaction()).thenReturn(this.readTransaction);
         when(this.domDataBroker.newWriteOnlyTransaction()).thenReturn(this.writeTransaction);
         when(this.domDataBroker.newReadWriteTransaction()).thenReturn(this.rwTransaction);
+        HashMap extensions = new HashMap();
+        extensions.put(DOMDataTreeChangeService.class, Mockito.mock(DOMDataTreeChangeService.class));
+        when(this.domDataBroker.getSupportedExtensions()).thenReturn(extensions);
 
         ControllerContext.getInstance().setSchemas(TestUtils.loadSchemaContext("/full-versions/test-module"));
     }
@@ -329,22 +335,23 @@ public class BrokerFacadeTest {
                 NotificationOutputType.XML);
 
         @SuppressWarnings("unchecked")
-        final ListenerRegistration<DOMDataChangeListener> mockRegistration = mock(ListenerRegistration.class);
+        final ListenerRegistration<ListenerAdapter> mockRegistration = mock(ListenerRegistration.class);
 
-        when(this.domDataBroker.registerDataChangeListener(any(LogicalDatastoreType.class), eq(this.instanceID),
-                eq(listener), eq(DataChangeScope.BASE))).thenReturn(mockRegistration);
+        DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)
+                this.domDataBroker.getSupportedExtensions().get(DOMDataTreeChangeService.class);
+        DOMDataTreeIdentifier loc = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, this.instanceID);
+        when(changeService.registerDataTreeChangeListener(eq(loc), eq(listener))).thenReturn(mockRegistration);
 
         this.brokerFacade.registerToListenDataChanges(
                 LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE, listener);
 
-        verify(this.domDataBroker).registerDataChangeListener(
-                LogicalDatastoreType.CONFIGURATION, this.instanceID, listener, DataChangeScope.BASE);
+        verify(changeService).registerDataTreeChangeListener(loc, listener);
 
         assertEquals("isListening", true, listener.isListening());
 
         this.brokerFacade.registerToListenDataChanges(
                 LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE, listener);
-        verifyNoMoreInteractions(this.domDataBroker);
+        verifyNoMoreInteractions(changeService);
     }
 
     /**

@@ -38,6 +38,7 @@ import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFaile
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
@@ -97,6 +98,12 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         final ListenerRegistration<DOMDataChangeListener> listener = mock(ListenerRegistration.class);
         doReturn(dataBroker).when(this.dataBrokerHandler).get();
         doReturn(listener).when(dataBroker).registerDataChangeListener(any(), any(), any(), any());
+        DOMDataTreeChangeService changeService = Mockito.mock(DOMDataTreeChangeService.class);
+        Mockito.when(changeService.registerDataTreeChangeListener(any(), any()))
+                                                            .thenReturn(Mockito.mock(ListenerRegistration.class));
+        HashMap extensions = new HashMap();
+        extensions.put(DOMDataTreeChangeService.class, Mockito.mock(DOMDataTreeChangeService.class));
+        Mockito.when(dataBroker.getSupportedExtensions()).thenReturn(extensions);
         final MultivaluedMap<String, String> map = Mockito.mock(MultivaluedMap.class);
         final Set<Entry<String, List<String>>> set = new HashSet<>();
         Mockito.when(map.entrySet()).thenReturn(set);
