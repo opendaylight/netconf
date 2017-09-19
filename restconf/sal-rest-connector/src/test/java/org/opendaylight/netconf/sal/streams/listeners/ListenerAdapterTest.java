@@ -24,9 +24,10 @@ import org.junit.Test;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.binding.test.AbstractConcurrentDataBrokerTest;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.PatchCont;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1;
@@ -38,8 +39,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
+    private static final Logger LOG = LoggerFactory.getLogger(ListenerAdapterTest.class);
 
     private static final String JSON_NOTIF_LEAVES_CREATE = "/listener-adapter-test/notif-leaves-create.json";
     private static final String JSON_NOTIF_LEAVES_UPDATE =  "/listener-adapter-test/notif-leaves-update.json";
@@ -89,6 +93,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
                 }
                 Thread.currentThread().sleep(200);
             }
+            LOG.debug("Comparing {} {}", json, lastNotification);
             JSONAssert.assertEquals(json, withFakeDate(lastNotification), false);
             this.lastNotification = null;
         }
@@ -112,11 +117,12 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testJsonNotifsLeaves() throws Exception {
-
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
                                         NotificationOutputTypeGrouping.NotificationOutputType.JSON, true);
-        domDataBroker.registerDataChangeListener(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID, adapter,
-                                                        AsyncDataBroker.DataChangeScope.SUBTREE);
+        DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)
+                domDataBroker.getSupportedExtensions().get(DOMDataTreeChangeService.class);
+        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
+        changeService.registerDataTreeChangeListener(root, adapter);
 
         WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
@@ -127,7 +133,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_CREATE));
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder.setMyLeaf12("Bertha");
+        builder = new MyList1Builder().setKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
         writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
         writeTransaction.submit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_UPDATE));
@@ -140,11 +146,12 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
     @Test
     public void testJsonNotifs() throws Exception {
-
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
                 NotificationOutputTypeGrouping.NotificationOutputType.JSON, false);
-        domDataBroker.registerDataChangeListener(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID, adapter,
-                AsyncDataBroker.DataChangeScope.SUBTREE);
+        DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)
+                domDataBroker.getSupportedExtensions().get(DOMDataTreeChangeService.class);
+        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
+        changeService.registerDataTreeChangeListener(root, adapter);
 
         WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
@@ -155,7 +162,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         adapter.assertGot(getNotifJson(JSON_NOTIF_CREATE));
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder.setMyLeaf12("Bertha");
+        builder = new MyList1Builder().setKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
         writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
         writeTransaction.submit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_UPDATE));

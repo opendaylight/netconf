@@ -29,10 +29,11 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
@@ -517,9 +518,15 @@ public class BrokerFacade {
         }
 
         final YangInstanceIdentifier path = listener.getPath();
-        final ListenerRegistration<DOMDataChangeListener> registration = this.domDataBroker.registerDataChangeListener(
-                datastore, path, listener, scope);
-
+        DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)
+                                    this.domDataBroker.getSupportedExtensions().get(DOMDataTreeChangeService.class);
+        if (changeService == null) {
+            throw new UnsupportedOperationException("DOMDataBroker does not support the DOMDataTreeChangeService"
+                                                        + this.domDataBroker);
+        }
+        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(datastore, path);
+        ListenerRegistration<ListenerAdapter> registration =
+                                    changeService.registerDataTreeChangeListener(root, listener);
         listener.setRegistration(registration);
     }
 
