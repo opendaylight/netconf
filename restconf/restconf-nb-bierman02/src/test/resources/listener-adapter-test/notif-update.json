@@ -4,16 +4,6 @@
             "data-change-event": [
                 {
                     "data": {
-                        "my-leaf12": {
-                            "content": "Bertha",
-                            "xmlns": "instance:identifier:patch:module"
-                        }
-                    },
-                    "operation": "created",
-                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12"
-                },
-                {
-                    "data": {
                         "patch-cont": {
                             "my-list1": {
                                 "my-leaf11": "Jed",
@@ -37,11 +27,31 @@
                     },
                     "operation": "updated",
                     "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']"
+                },
+                {
+                    "data": {
+                        "my-leaf12": {
+                            "content": "Bertha",
+                            "xmlns": "instance:identifier:patch:module"
+                        }
+                    },
+                    "operation": "created",
+                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12"
+                },
+                {
+                    "data": {
+                        "name": {
+                            "content": "Althea",
+                            "xmlns": "instance:identifier:patch:module"
+                        }
+                    },
+                    "operation": "updated",
+                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name"
                 }
             ],
             "xmlns": "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote"
         },
-        "eventTime": "2017-09-17T14:15:05.839+03:00",
+        "eventTime": "2017-09-18T15:52:25.213+03:00",
         "xmlns": "urn:ietf:params:xml:ns:netconf:notification:1.0"
     }
 }
