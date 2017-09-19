@@ -132,7 +132,7 @@ public class ExpressionParserTest {
             }
         }
         final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
-        final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-12-14", "localName"));
+        final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-12-12", "localName"));
         Mockito.when(path.getLastPathArgument()).thenReturn(pathValue);
         final ListenerAdapter listener = Notificator.createListener(path, "streamName", NotificationOutputType.JSON);
         listener.setQueryParams(Instant.now(), Optional.empty(), Optional.ofNullable(filter), false);
