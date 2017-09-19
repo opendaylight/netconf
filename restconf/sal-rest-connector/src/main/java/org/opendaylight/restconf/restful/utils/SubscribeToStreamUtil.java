@@ -28,8 +28,9 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -335,9 +336,12 @@ public final class SubscribeToStreamUtil {
             return;
         }
 
-        final YangInstanceIdentifier path = listener.getPath();
-        final ListenerRegistration<DOMDataChangeListener> registration =
-                domDataBroker.registerDataChangeListener(ds, path, listener, scope);
+        DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)
+                domDataBroker.getSupportedExtensions().get(DOMDataTreeChangeService.class);
+        //TBD: JOSH: Check for null???
+        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(ds, listener.getPath());
+        ListenerRegistration<ListenerAdapter> registration =
+                changeService.registerDataTreeChangeListener(root, listener);
 
         listener.setRegistration(registration);
     }
