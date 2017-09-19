@@ -321,29 +321,29 @@ public class BrokerFacadeTest {
                 .thenReturn(Futures.immediateCheckedFuture(new Boolean(assumeDataExists)));
     }
 
-    @Test
-    public void testRegisterToListenDataChanges() {
-        final ListenerAdapter listener = Notificator.createListener(this.instanceID, "stream",
-                NotificationOutputType.XML);
-
-        @SuppressWarnings("unchecked")
-        final ListenerRegistration<DOMDataChangeListener> mockRegistration = mock(ListenerRegistration.class);
-
-        when(this.domDataBroker.registerDataChangeListener(any(LogicalDatastoreType.class), eq(this.instanceID),
-                eq(listener), eq(DataChangeScope.BASE))).thenReturn(mockRegistration);
-
-        this.brokerFacade.registerToListenDataChanges(
-                LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE, listener);
-
-        verify(this.domDataBroker).registerDataChangeListener(
-                LogicalDatastoreType.CONFIGURATION, this.instanceID, listener, DataChangeScope.BASE);
-
-        assertEquals("isListening", true, listener.isListening());
-
-        this.brokerFacade.registerToListenDataChanges(
-                LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE, listener);
-        verifyNoMoreInteractions(this.domDataBroker);
-    }
+//    @Test
+//    public void testRegisterToListenDataChanges() {
+//        final ListenerAdapter listener = Notificator.createListener(this.instanceID, "stream",
+//                NotificationOutputType.XML);
+//
+//        @SuppressWarnings("unchecked")
+//        final ListenerRegistration<DOMDataChangeListener> mockRegistration = mock(ListenerRegistration.class);
+//
+//        when(this.domDataBroker.registerDataChangeListener(any(LogicalDatastoreType.class), eq(this.instanceID),
+//                eq(listener), eq(DataChangeScope.BASE))).thenReturn(mockRegistration);
+//
+//        this.brokerFacade.registerToListenDataChanges(
+//                LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE, listener);
+//
+//        verify(this.domDataBroker).registerDataChangeListener(
+//                LogicalDatastoreType.CONFIGURATION, this.instanceID, listener, DataChangeScope.BASE);
+//
+//        assertEquals("isListening", true, listener.isListening());
+//
+//        this.brokerFacade.registerToListenDataChanges(
+//                LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE, listener);
+//        verifyNoMoreInteractions(this.domDataBroker);
+//    }
 
     /**
      * Create, register, close and remove notification listener.

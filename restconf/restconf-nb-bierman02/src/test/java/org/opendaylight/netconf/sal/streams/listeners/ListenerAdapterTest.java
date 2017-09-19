@@ -18,9 +18,10 @@ import org.junit.Test;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.binding.test.AbstractDataBrokerTest;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.PatchCont;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1;
@@ -32,9 +33,11 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-//@SuppressWarnings("deprecation")
 public class ListenerAdapterTest extends AbstractDataBrokerTest {
+    private static final Logger LOG = LoggerFactory.getLogger(ListenerAdapterTest.class);
 
     private static final String JSON_NOTIF_LEAVES_CREATE = withFakeDate("{\"notification\":{\"xmlns\":"
             + "\"urn:ietf:params:xml:ns:netconf:notification:1.0\",\"data-changed-notification\":"
@@ -49,25 +52,27 @@ public class ListenerAdapterTest extends AbstractDataBrokerTest {
 
     private static final String JSON_NOTIF_LEAVES_UPDATE = withFakeDate("{\"notification\":{\"xmlns\":"
             + "\"urn:ietf:params:xml:ns:netconf:notification:1.0\",\"data-changed-notification\":{\"xmlns\":"
-            + "\"urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote\",\"data-change-event\":{\"path\":"
+            + "\"urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote\",\"data-change-event\":[{\"path\":"
             + "\"/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1["
             + "instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12\",\"data\":"
             + "{\"my-leaf12\":{\"xmlns\":\"instance:identifier:patch:module\",\"content\":\"Bertha\"}},\"operation\":"
-            + "\"created\"}},\"eventTime\":\"2017-09-17T13:56:47.032+03:00\"}}");
+            + "\"created\"},{\"path\":\"/instance-identifier-patch-module:patch-cont/"
+            + "instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']"
+            + "/instance-identifier-patch-module:name\",\"data\":{\"name\":{\"xmlns\":"
+            + "\"instance:identifier:patch:module\",\"content\":\"Althea\"}},\"operation\":\"updated\"}]},"
+            + "\"eventTime\":\"2017-09-18T14:20:54.82+03:00\"}}");
 
     private static final String JSON_NOTIF_LEAVES_DEL = withFakeDate("{\"notification\":{\"xmlns\":"
             + "\"urn:ietf:params:xml:ns:netconf:notification:1.0\",\"data-changed-notification\":{\"xmlns\":"
             + "\"urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote\",\"data-change-event\":[{\"path\":"
             + "\"/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1["
-            + "instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12\","
+            + "instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf11\","
             + "\"operation\":\"deleted\"},{\"path\":\"/instance-identifier-patch-module:patch-cont/"
             + "instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']"
-            + "/instance-identifier-patch-module:my-leaf11\",\"operation\":\"deleted\"},{\"path\":"
+            + "/instance-identifier-patch-module:name\",\"operation\":\"deleted\"},{\"path\":"
             + "\"/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1["
-            + "instance-identifier-patch-module:name='Althea']\",\"operation\":\"deleted\"},{\"path\":"
-            + "\"/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1["
-            + "instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name\",\"operation\":"
-            + "\"deleted\"}]},\"eventTime\":\"2017-09-17T14:03:35.261+03:00\"}}");
+            + "instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12\","
+            + "\"operation\":\"deleted\"}]},\"eventTime\":\"2017-09-18T15:30:16.099+03:00\"}}");
 
     private static final String JSON_NOTIF_CREATE = withFakeDate("{\"notification\":{\"xmlns\":"
             + "\"urn:ietf:params:xml:ns:netconf:notification:1.0\",\"data-changed-notification\":{\"xmlns\":"
@@ -89,16 +94,20 @@ public class ListenerAdapterTest extends AbstractDataBrokerTest {
     private static final String JSON_NOTIF_UPDATE = withFakeDate("{\"notification\":{\"xmlns\":"
             + "\"urn:ietf:params:xml:ns:netconf:notification:1.0\",\"data-changed-notification\":{\"xmlns\":"
             + "\"urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote\",\"data-change-event\":[{\"path\":"
+            + "\"/instance-identifier-patch-module:patch-cont\",\"data\":{\"patch-cont\":{\"xmlns\":"
+            + "\"instance:identifier:patch:module\",\"my-list1\":{\"my-leaf12\":\"Bertha\",\"name\":\"Althea\","
+            + "\"my-leaf11\":\"Jed\"}}},\"operation\":\"updated\"},{\"path\":"
             + "\"/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1["
-            + "instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12\",\"data\":"
-            + "{\"my-leaf12\":{\"xmlns\":\"instance:identifier:patch:module\",\"content\":\"Bertha\"}},\"operation\":"
-            + "\"created\"},{\"path\":\"/instance-identifier-patch-module:patch-cont\",\"data\":{\"patch-cont\":"
-            + "{\"xmlns\":\"instance:identifier:patch:module\",\"my-list1\":{\"my-leaf12\":\"Bertha\",\"name\":"
-            + "\"Althea\",\"my-leaf11\":\"Jed\"}}},\"operation\":\"updated\"},{\"path\":\"/"
-            + "instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1["
             + "instance-identifier-patch-module:name='Althea']\",\"data\":{\"my-list1\":{\"xmlns\":"
             + "\"instance:identifier:patch:module\",\"my-leaf12\":\"Bertha\",\"name\":\"Althea\",\"my-leaf11\":"
-            + "\"Jed\"}},\"operation\":\"updated\"}]},\"eventTime\":\"2017-09-17T14:15:05.839+03:00\"}}");
+            + "\"Jed\"}},\"operation\":\"updated\"},{\"path\":\"/instance-identifier-patch-module:patch-cont/"
+            + "instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']"
+            + "/instance-identifier-patch-module:my-leaf12\",\"data\":{\"my-leaf12\":{\"xmlns\":"
+            + "\"instance:identifier:patch:module\",\"content\":\"Bertha\"}},\"operation\":\"created\"},"
+            + "{\"path\":\"/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1["
+            + "instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name\",\"data\":"
+            + "{\"name\":{\"xmlns\":\"instance:identifier:patch:module\",\"content\":\"Althea\"}},\"operation\":"
+            + "\"updated\"}]},\"eventTime\":\"2017-09-18T15:52:25.213+03:00\"}}");
 
     private static final String JSON_NOTIF_DEL = withFakeDate("{\"notification\":{\"xmlns\":"
             + "\"urn:ietf:params:xml:ns:netconf:notification:1.0\",\"data-changed-notification\":{\"xmlns\":"
@@ -157,6 +166,7 @@ public class ListenerAdapterTest extends AbstractDataBrokerTest {
                 }
                 Thread.currentThread().sleep(200);
             }
+            LOG.debug("Comparing {} {}", json, lastNotification);
             JSONAssert.assertEquals(json, withFakeDate(lastNotification), false);
             this.lastNotification = null;
         }
@@ -174,11 +184,12 @@ public class ListenerAdapterTest extends AbstractDataBrokerTest {
 
     @Test
     public void testJsonNotifsLeaves() throws Exception {
-
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
                                         NotificationOutputTypeGrouping.NotificationOutputType.JSON, true);
-        domDataBroker.registerDataChangeListener(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID, adapter,
-                                                        AsyncDataBroker.DataChangeScope.SUBTREE);
+        DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)
+                domDataBroker.getSupportedExtensions().get(DOMDataTreeChangeService.class);
+        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
+        changeService.registerDataTreeChangeListener(root, adapter);
 
         WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
@@ -189,7 +200,7 @@ public class ListenerAdapterTest extends AbstractDataBrokerTest {
         adapter.assertGot(JSON_NOTIF_LEAVES_CREATE);
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder.setMyLeaf12("Bertha");
+        builder = new MyList1Builder().setKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
         writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
         writeTransaction.submit();
         adapter.assertGot(JSON_NOTIF_LEAVES_UPDATE);
@@ -202,11 +213,12 @@ public class ListenerAdapterTest extends AbstractDataBrokerTest {
 
     @Test
     public void testJsonNotifs() throws Exception {
-
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
                 NotificationOutputTypeGrouping.NotificationOutputType.JSON, false);
-        domDataBroker.registerDataChangeListener(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID, adapter,
-                AsyncDataBroker.DataChangeScope.SUBTREE);
+        DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)
+                domDataBroker.getSupportedExtensions().get(DOMDataTreeChangeService.class);
+        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
+        changeService.registerDataTreeChangeListener(root, adapter);
 
         WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
@@ -217,7 +229,7 @@ public class ListenerAdapterTest extends AbstractDataBrokerTest {
         adapter.assertGot(JSON_NOTIF_CREATE);
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder.setMyLeaf12("Bertha");
+        builder = new MyList1Builder().setKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
         writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
         writeTransaction.submit();
         adapter.assertGot(JSON_NOTIF_UPDATE);
