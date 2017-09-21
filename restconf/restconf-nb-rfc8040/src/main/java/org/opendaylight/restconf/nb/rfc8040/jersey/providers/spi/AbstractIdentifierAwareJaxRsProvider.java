@@ -11,6 +11,7 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi;
 import com.google.common.base.Optional;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.HttpMethod;
@@ -47,11 +48,17 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
             final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws IOException,
             WebApplicationException {
         final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
-        if (entityStream.available() < 1) {
+
+        final PushbackInputStream pushbackInputStream = new PushbackInputStream(entityStream);
+
+        int firstByte = pushbackInputStream.read();
+        if (firstByte == -1) {
             return emptyBody(path);
+        } else {
+            pushbackInputStream.unread(firstByte);
+            return readBody(path, pushbackInputStream);
         }
 
-        return readBody(path, entityStream);
     }
 
     /**

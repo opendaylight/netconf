@@ -7,8 +7,13 @@
  */
 package org.opendaylight.restconf.common.util;
 
+import com.google.common.base.Preconditions;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.stream.events.StartElement;
@@ -30,6 +35,30 @@ public final class RestUtil {
             superType = superType.getBaseType();
         }
         return superType;
+    }
+
+    /**
+     * Utility method to find out if is provided {@link InputStream} empty.
+     *
+     * @param  entityStream {@link InputStream} to be checked if it is empty.
+     * @return Empty Optional if provided input stream is empty or Optional
+     *         containing input stream otherwise.
+     *
+     * @throws IOException if an IO error arises during stream inspection.
+     * @throws NullPointerException if provided stream is null.
+     *
+     */
+    public static Optional<InputStream> isInputStreamEmpty(final InputStream entityStream) throws IOException {
+        Preconditions.checkNotNull(entityStream);
+        final PushbackInputStream pushbackInputStream = new PushbackInputStream(entityStream);
+
+        int firstByte = pushbackInputStream.read();
+        if (firstByte == -1) {
+            return Optional.empty();
+        } else {
+            pushbackInputStream.unread(firstByte);
+            return Optional.of(pushbackInputStream);
+        }
     }
 
     public static IdentityValuesDTO asInstanceIdentifier(final String value, final PrefixesMaping prefixMap) {

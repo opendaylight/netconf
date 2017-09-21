@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
+import java.util.Optional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -35,6 +36,7 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
+import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -96,13 +98,13 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
     private NormalizedNodeContext readFrom(final InputStream entityStream) throws IOException, SAXException,
             XMLStreamException, ParserConfigurationException, URISyntaxException {
         final InstanceIdentifierContext<?> path = getInstanceIdentifierContext();
-
-        if (entityStream.available() < 1) {
+        final Optional<InputStream> nonEmptyInputStreamOptional = RestUtil.isInputStreamEmpty(entityStream);
+        if (!nonEmptyInputStreamOptional.isPresent()) {
             // represent empty nopayload input
             return new NormalizedNodeContext(path, null);
         }
 
-        final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
+        final Document doc = UntrustedXML.newDocumentBuilder().parse(nonEmptyInputStreamOptional.get());
         return parse(path, doc);
     }
 
