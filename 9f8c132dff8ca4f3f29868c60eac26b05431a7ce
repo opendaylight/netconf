@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1f61a0_11c8ca53",
+        "filename": "netconf/aaa-authn-odl-plugin/src/main/java/org/opendaylight/aaa/odl/CredentialServiceAuthProvider.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-09-27T15:46:37Z",
+      "side": 1,
+      "message": "If the service is not available, IllegalStateException is thrown. -- This is not true anymore..",
+      "revId": "9f8c132dff8ca4f3f29868c60eac26b05431a7ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
