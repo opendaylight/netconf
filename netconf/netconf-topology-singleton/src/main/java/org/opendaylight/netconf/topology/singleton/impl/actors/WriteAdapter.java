@@ -21,10 +21,16 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelR
 import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.MergeRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.PutRequest;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitFailedReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class WriteAdapter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(WriteAdapter.class);
+
     private final DOMDataWriteTransaction tx;
 
     WriteAdapter(final DOMDataWriteTransaction tx) {
@@ -48,27 +54,35 @@ class WriteAdapter {
 
             @Override
             public void onFailure(@Nonnull final Throwable throwable) {
-                requester.tell(throwable, self);
+                requester.tell(new SubmitFailedReply(throwable), self);
             }
         });
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public void handle(final Object message, final ActorRef sender, final ActorContext context, final ActorRef self) {
-        if (message instanceof MergeRequest) {
-            final MergeRequest mergeRequest = (MergeRequest) message;
-            final NormalizedNodeMessage data = mergeRequest.getNormalizedNodeMessage();
-            tx.merge(mergeRequest.getStore(), data.getIdentifier(), data.getNode());
-        } else if (message instanceof PutRequest) {
-            final PutRequest putRequest = (PutRequest) message;
-            final NormalizedNodeMessage data = putRequest.getNormalizedNodeMessage();
-            tx.put(putRequest.getStore(), data.getIdentifier(), data.getNode());
-        } else if (message instanceof DeleteRequest) {
-            final DeleteRequest deleteRequest = (DeleteRequest) message;
-            tx.delete(deleteRequest.getStore(), deleteRequest.getPath());
-        } else if (message instanceof CancelRequest) {
-            cancel(context, sender, self);
-        } else if (message instanceof SubmitRequest) {
-            submit(sender, self, context);
+        // we need to catch everything, since an unchecked exception can be thrown from the underlying parse.
+        // TODO Maybe we should store it and fail the submit immediately?.
+        try {
+            if (message instanceof MergeRequest) {
+                final MergeRequest mergeRequest = (MergeRequest) message;
+                final NormalizedNodeMessage data = mergeRequest.getNormalizedNodeMessage();
+                tx.merge(mergeRequest.getStore(), data.getIdentifier(), data.getNode());
+            } else if (message instanceof PutRequest) {
+                final PutRequest putRequest = (PutRequest) message;
+                final NormalizedNodeMessage data = putRequest.getNormalizedNodeMessage();
+                tx.put(putRequest.getStore(), data.getIdentifier(), data.getNode());
+            } else if (message instanceof DeleteRequest) {
+                final DeleteRequest deleteRequest = (DeleteRequest) message;
+                tx.delete(deleteRequest.getStore(), deleteRequest.getPath());
+            } else if (message instanceof CancelRequest) {
+                cancel(context, sender, self);
+            } else if (message instanceof SubmitRequest) {
+                submit(sender, self, context);
+            }
+
+        } catch (final RuntimeException exception) {
+            LOG.error("Write command has failed.", exception);
         }
     }
 }
