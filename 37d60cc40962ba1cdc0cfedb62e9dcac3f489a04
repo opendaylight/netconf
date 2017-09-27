@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1f61a0_2bcda166",
+        "filename": "netconf/aaa-authn-odl-plugin/src/main/java/org/opendaylight/aaa/odl/CredentialServiceAuthProvider.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-09-27T13:41:11Z",
+      "side": 1,
+      "message": "I don\u0027t think we need volatile modifier anymore.",
+      "revId": "37d60cc40962ba1cdc0cfedb62e9dcac3f489a04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_abe071cd",
+        "filename": "netconf/aaa-authn-odl-plugin/src/main/java/org/opendaylight/aaa/odl/CredentialServiceAuthProvider.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-09-27T13:41:11Z",
+      "side": 1,
+      "message": "I think we don\u0027t need synchronization here anymore. credService should not change anymore during CredentialServiceAuthProvider\u0027s instance lifetime.",
+      "revId": "37d60cc40962ba1cdc0cfedb62e9dcac3f489a04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_cbe965b8",
+        "filename": "netconf/aaa-authn-odl-plugin/src/main/java/org/opendaylight/aaa/odl/CredentialServiceAuthProvider.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-09-27T13:41:11Z",
+      "side": 1,
+      "message": "We can move this check to ctor and make credService final.",
+      "revId": "37d60cc40962ba1cdc0cfedb62e9dcac3f489a04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_0bc89d53",
+        "filename": "netconf/aaa-authn-odl-plugin/src/main/java/org/opendaylight/aaa/odl/CredentialServiceAuthProvider.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-09-27T13:41:11Z",
+      "side": 1,
+      "message": "Do we really need this?",
+      "revId": "37d60cc40962ba1cdc0cfedb62e9dcac3f489a04",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
