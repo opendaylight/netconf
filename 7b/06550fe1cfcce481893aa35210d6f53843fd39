@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Tomas Cere <tcere@cisco.com>
+Submitted-by: Jakub Morvay <jmorvay@cisco.com>
+Submitted-at: Wed, 27 Sep 2017 13:42:17 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/63462
+Project: netconf
+Branch: refs/heads/stable/nitrogen
