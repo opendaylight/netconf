@@ -101,7 +101,10 @@ public class ProxyWriteAdapter {
                 } else {
                     if (success instanceof SubmitFailedReply) {
                         LOG.error("{}: Transaction was not submitted because already closed.", id);
+                        settableFuture.setException(((SubmitFailedReply) success).getThrowable());
+                        return;
                     }
+
                     settableFuture.set(null);
                 }
             }

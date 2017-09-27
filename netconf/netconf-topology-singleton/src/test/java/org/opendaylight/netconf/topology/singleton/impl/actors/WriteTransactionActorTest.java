@@ -34,6 +34,7 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelR
 import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.MergeRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.PutRequest;
+import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitFailedReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitRequest;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -122,7 +123,8 @@ public class WriteTransactionActorTest {
         when(deviceWriteTx.submit()).thenReturn(Futures.immediateFailedCheckedFuture(cause));
         final Future<Object> submitFuture = Patterns.ask(actorRef, new SubmitRequest(), TIMEOUT);
         final Object result = Await.result(submitFuture, TIMEOUT.duration());
-        Assert.assertEquals(cause, result);
+        Assert.assertTrue(result instanceof SubmitFailedReply);
+        Assert.assertEquals(cause, ((SubmitFailedReply)result).getThrowable());
         verify(deviceWriteTx).submit();
     }
 
