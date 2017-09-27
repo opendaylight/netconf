@@ -11,8 +11,18 @@ package org.opendaylight.netconf.topology.singleton.messages.transactions;
 import java.io.Serializable;
 
 /**
- * Message sent from master back to the slave when submit is not performed, tx is closed.
+ * Message sent from master back to the slave when submit fails, with the offending exception attached.
  */
 public class SubmitFailedReply implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    private final Throwable throwable;
+
+    public SubmitFailedReply(final Throwable throwable) {
+        this.throwable = throwable;
+    }
+
+    public Throwable getThrowable() {
+        return throwable;
+    }
 }
