@@ -345,10 +345,10 @@ public class NetconfDeviceSimulator implements Closeable {
 
     private void addDefaultSchemas(final SharedSchemaRepository consumer) {
         SourceIdentifier srcId = RevisionSourceIdentifier.create("ietf-netconf-monitoring", "2010-10-04");
-        registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring@2010-10-04.yang", srcId);
+        registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring.yang", srcId);
 
         srcId = RevisionSourceIdentifier.create("ietf-netconf-monitoring-extension", "2013-12-10");
-        registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring-extension@2013-12-10.yang", srcId);
+        registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring-extension.yang", srcId);
 
         srcId = RevisionSourceIdentifier.create("ietf-yang-types", "2013-07-15");
         registerSource(consumer, "/META-INF/yang/ietf-yang-types@2013-07-15.yang", srcId);
