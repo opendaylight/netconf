@@ -867,9 +867,10 @@ public class NetconfMappingTest extends AbstractConfigTest {
 
     private List<InputStream> getYangs() {
         final List<String> paths = Arrays.asList("/META-INF/yang/config@2013-04-05.yang",
-                "/META-INF/yang/rpc-context@2013-06-17.yang", "/META-INF/yang/config-test@2013-06-13.yang",
-                "/META-INF/yang/config-test-impl@2013-04-03.yang", "/META-INF/yang/test-types@2013-11-27.yang",
-                "/META-INF/yang/test-groups@2014-12-08.yang", "/META-INF/yang/ietf-inet-types@2013-07-15.yang");
+                "/META-INF/yang/rpc-context@2013-06-17.yang",
+                "/META-INF/yang/config-test.yang", "/META-INF/yang/config-test-impl.yang",
+                "/META-INF/yang/test-types.yang", "/META-INF/yang/test-groups.yang",
+                "/META-INF/yang/ietf-inet-types@2013-07-15.yang");
         final Collection<InputStream> yangDependencies = new ArrayList<>();
         for (final String path : paths) {
             final InputStream is = Preconditions

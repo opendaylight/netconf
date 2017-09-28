@@ -102,7 +102,7 @@ public class RestconfImplTest {
 
     private void binaryKeyTest(final List<Byte> al, final List<Byte> al2) {
 
-        final QName keyDef = QName.create("test:key:binary", "2017-08-14", "b1");
+        final QName keyDef = QName.create("test:key:binary", "2017-14-08", "b1");
 
         final Map<QName, Object> uriKeyValues = new HashMap<>();
         uriKeyValues.put(keyDef, al.toArray());
