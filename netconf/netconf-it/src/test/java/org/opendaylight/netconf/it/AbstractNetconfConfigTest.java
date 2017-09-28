@@ -184,7 +184,8 @@ public abstract class AbstractNetconfConfigTest extends AbstractConfigTest {
 
     static Collection<InputStream> getBasicYangs() throws IOException {
 
-        final List<String> paths = Arrays.asList("/META-INF/yang/config.yang", "/META-INF/yang/rpc-context.yang",
+        final List<String> paths = Arrays.asList("/META-INF/yang/config@2013-04-05.yang",
+                "/META-INF/yang/rpc-context@2013-06-17.yang",
                 "/META-INF/yang/config-test.yang", "/META-INF/yang/config-test-impl.yang",
                 "/META-INF/yang/test-types.yang", "/META-INF/yang/test-groups.yang",
                 "/META-INF/yang/ietf-inet-types@2013-07-15.yang");

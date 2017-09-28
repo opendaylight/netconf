@@ -15,7 +15,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 
-import com.google.common.base.Preconditions;
 import com.google.common.io.ByteSource;
 import com.google.common.util.concurrent.Futures;
 import java.io.InputStream;
@@ -831,9 +830,7 @@ public class NetconfMDSalMappingTest {
         final List<InputStream> schemas = new ArrayList<>();
 
         for (final String schemaPath : schemaPaths) {
-            final InputStream resourceAsStream =
-                    Preconditions.checkNotNull(
-                            getClass().getResourceAsStream(schemaPath), "Resource " + schemaPath + " not found.");
+            final InputStream resourceAsStream = getClass().getResourceAsStream(schemaPath);
             schemas.add(resourceAsStream);
         }
 
