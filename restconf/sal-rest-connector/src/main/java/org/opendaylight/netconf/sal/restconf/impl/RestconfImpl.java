@@ -1492,7 +1492,7 @@ public class RestconfImpl implements RestconfService {
         instanceDataChildrenByName = ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "events");
         final DataSchemaNode eventsSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(eventsSchemaNode instanceof LeafSchemaNode);
-        streamNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) eventsSchemaNode).withValue("").build());
+        streamNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) eventsSchemaNode).build());
 
         return streamNodeValues.build();
     }
