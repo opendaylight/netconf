@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Iterables;
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,17 +50,17 @@ public class NetconfToNotificationTest {
 
     static SchemaContext getNotificationSchemaContext(final Class<?> loadClass,
                                                       final boolean getExceptionTest) throws Exception {
-        final List<InputStream> modelsToParse = new ArrayList<>();
+        final List<File> modelsToParse = new ArrayList<>();
 
         if (getExceptionTest) {
-            modelsToParse.add(loadClass.getResourceAsStream("/schemas/user-notification4.yang"));
-            modelsToParse.add(loadClass.getResourceAsStream("/schemas/user-notification3.yang"));
+            modelsToParse.add(new File(loadClass.getResource("/schemas/user-notification4.yang").toURI()));
+            modelsToParse.add(new File(loadClass.getResource("/schemas/user-notification3.yang").toURI()));
         } else {
-            modelsToParse.add(loadClass.getResourceAsStream("/schemas/user-notification.yang"));
-            modelsToParse.add(loadClass.getResourceAsStream("/schemas/user-notification2.yang"));
+            modelsToParse.add(new File(loadClass.getResource("/schemas/user-notification.yang").toURI()));
+            modelsToParse.add(new File(loadClass.getResource("/schemas/user-notification2.yang").toURI()));
         }
 
-        final SchemaContext context = YangParserTestUtils.parseYangStreams(modelsToParse);
+        final SchemaContext context = YangParserTestUtils.parseYangFiles(modelsToParse);
         final Set<Module> modules = context.getModules();
         assertTrue(!modules.isEmpty());
         assertNotNull(context);

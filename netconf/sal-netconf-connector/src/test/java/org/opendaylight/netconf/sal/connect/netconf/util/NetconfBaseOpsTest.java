@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.base.Optional;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -92,7 +93,9 @@ public class NetconfBaseOpsTest {
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME)))
                 .thenReturn(RpcResultBuilder.success(ok).buildFuture());
         final SchemaContext schemaContext =
-                YangParserTestUtils.parseYangStreams(getClass().getResourceAsStream("/schemas/test-module.yang"));
+                YangParserTestUtils.parseYangFiles(
+                        new File(getClass().getResource("/schemas/test-module.yang").toURI()));
+
         final MessageTransformer<NetconfMessage> transformer = new NetconfMessageTransformer(schemaContext, true);
         final DOMRpcService rpc = new NetconfDeviceRpc(schemaContext, listener, transformer);
         final RemoteDeviceId id =

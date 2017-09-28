@@ -39,7 +39,7 @@ public class Bug8084 {
         sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-mod-0.yang"));
         sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-augment.yang"));
         sources.add(getClass().getResourceAsStream("/yang/mdsal-netconf-mapping-test.yang"));
-        final SchemaContext context = YangParserTestUtils.parseYangStreams(sources);
+        final SchemaContext context = YangParserTestUtils.parseYangResourceDirectory("/yang/");
         final CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
         doReturn(context).when(currentContext).getCurrentContext();
         final FilterContentValidator validator = new FilterContentValidator(currentContext);

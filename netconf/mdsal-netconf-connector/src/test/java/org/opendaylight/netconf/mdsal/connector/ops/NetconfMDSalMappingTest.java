@@ -15,15 +15,10 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 
-import com.google.common.base.Preconditions;
 import com.google.common.io.ByteSource;
 import com.google.common.util.concurrent.Futures;
-import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -108,8 +103,11 @@ public class NetconfMDSalMappingTest {
     private static final String SESSION_ID_FOR_REPORTING = "netconf-test-session1";
     private static final Document RPC_REPLY_OK = NetconfMDSalMappingTest.getReplyOk();
 
+    private static final SchemaContext TEST_SCHEMA_CONTEXT =
+            YangParserTestUtils.parseYangResources(NetconfMDSalMappingTest.class,
+                    "/META-INF/yang/config@2013-04-05.yang", "/yang/mdsal-netconf-mapping-test.yang");
+
     private CurrentSchemaContext currentSchemaContext = null;
-    private SchemaContext schemaContext = null;
     private TransactionProvider transactionProvider = null;
 
     @Mock
@@ -134,8 +132,6 @@ public class NetconfMDSalMappingTest {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
 
-        this.schemaContext = YangParserTestUtils.parseYangStreams(getYangSchemas());
-        schemaContext.getModules();
         final SchemaService schemaService = createSchemaService();
 
         final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
@@ -825,21 +821,6 @@ public class NetconfMDSalMappingTest {
         return response;
     }
 
-    private List<InputStream> getYangSchemas() {
-        final List<String> schemaPaths = Arrays.asList("/META-INF/yang/config@2013-04-05.yang",
-                "/yang/mdsal-netconf-mapping-test.yang");
-        final List<InputStream> schemas = new ArrayList<>();
-
-        for (final String schemaPath : schemaPaths) {
-            final InputStream resourceAsStream =
-                    Preconditions.checkNotNull(
-                            getClass().getResourceAsStream(schemaPath), "Resource " + schemaPath + " not found.");
-            schemas.add(resourceAsStream);
-        }
-
-        return schemas;
-    }
-
     private SchemaService createSchemaService() {
         return new SchemaService() {
 
@@ -854,12 +835,12 @@ public class NetconfMDSalMappingTest {
 
             @Override
             public SchemaContext getSessionContext() {
-                return schemaContext;
+                return TEST_SCHEMA_CONTEXT;
             }
 
             @Override
             public SchemaContext getGlobalContext() {
-                return schemaContext;
+                return TEST_SCHEMA_CONTEXT;
             }
 
             @Override

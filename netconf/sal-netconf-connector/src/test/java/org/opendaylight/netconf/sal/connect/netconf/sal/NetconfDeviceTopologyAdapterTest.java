@@ -17,14 +17,17 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Futures;
+import java.io.File;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import javassist.ClassPool;
 import org.junit.Before;
 import org.junit.Test;
@@ -106,8 +109,7 @@ public class NetconfDeviceTopologyAdapterTest {
 
         doReturn(txIdent).when(writeTx).getIdentifier();
 
-        this.schemaContext = YangParserTestUtils.parseYangStreams(getYangSchemas());
-        schemaContext.getModules();
+        this.schemaContext = YangParserTestUtils.parseYangFiles(getYangSchemas());
         final SchemaService schemaService = createSchemaService();
 
         final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
@@ -229,18 +231,19 @@ public class NetconfDeviceTopologyAdapterTest {
                 dataTestId, testNode.get().getValue());
     }
 
-    private List<InputStream> getYangSchemas() {
+    private List<File> getYangSchemas() {
         final List<String> schemaPaths = Arrays.asList("/schemas/network-topology@2013-10-21.yang",
                 "/schemas/ietf-inet-types@2013-07-15.yang", "/schemas/yang-ext.yang",
                 "/schemas/netconf-node-topology.yang", "/schemas/network-topology-augment-test@2016-08-08.yang");
-        final List<InputStream> schemas = new ArrayList<>();
 
-        for (String schemaPath : schemaPaths) {
-            InputStream resourceAsStream = getClass().getResourceAsStream(schemaPath);
-            schemas.add(resourceAsStream);
-        }
 
-        return schemas;
+        return schemaPaths.stream().map(yangResourceName -> {
+            try {
+                return new File(NetconfDeviceTopologyAdapter.class.getResource(yangResourceName).toURI());
+            } catch (final URISyntaxException e) {
+                throw new IllegalStateException("Cannot parse " + yangResourceName + " to URI reference", e);
+            }
+        }).collect(Collectors.toList());
     }
 
     private SchemaService createSchemaService() {

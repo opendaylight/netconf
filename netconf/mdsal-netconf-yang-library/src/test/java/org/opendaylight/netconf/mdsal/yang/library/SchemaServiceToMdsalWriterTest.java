@@ -16,8 +16,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
-import java.io.InputStream;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -39,7 +37,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -86,17 +83,9 @@ public class SchemaServiceToMdsalWriterTest {
     public void testOnGlobalContextUpdated() throws Exception {
         schemaServiceToMdsalWriter.start();
 
-        schemaServiceToMdsalWriter.onGlobalContextUpdated(getSchema());
+        schemaServiceToMdsalWriter.onGlobalContextUpdated(YangParserTestUtils.parseYangResourceDirectory("/yang"));
         verify(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL),
                 eq(MODULES_STATE_INSTANCE_IDENTIFIER), eq(createTestModuleState()));
-    }
-
-    private SchemaContext getSchema() throws Exception {
-        final List<InputStream> modelsToParse = Lists.newArrayList(
-                SchemaServiceToMdsalWriterTest.class.getResourceAsStream("/test-module.yang"),
-                SchemaServiceToMdsalWriterTest.class.getResourceAsStream("/test-submodule.yang")
-        );
-        return YangParserTestUtils.parseYangStreams(modelsToParse);
     }
 
     private ModulesState createTestModuleState() {

@@ -16,6 +16,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.Futures;
+import java.io.File;
 import java.net.InetSocketAddress;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +43,8 @@ public class WriteRunningTxTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         final SchemaContext schemaContext =
-                YangParserTestUtils.parseYangStreams(getClass().getResourceAsStream("/schemas/test-module.yang"));
+                YangParserTestUtils.parseYangFiles(
+                        new File(getClass().getResource("/schemas/test-module.yang").toURI()));
         doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult())).when(rpc).invokeRpc(any(), any());
         netconfOps = new NetconfBaseOps(rpc, schemaContext);
         id = new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830));
