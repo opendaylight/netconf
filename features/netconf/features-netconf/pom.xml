@@ -46,8 +46,6 @@
     <dependency>
       <groupId>org.opendaylight.aaa</groupId>
       <artifactId>odl-aaa-encryption-service</artifactId>
-      <!-- FIXME: version declaration should be coming from aaa-artifacts -->
-      <version>0.6.1-SNAPSHOT</version>
       <classifier>features</classifier>
       <type>xml</type>
     </dependency>
