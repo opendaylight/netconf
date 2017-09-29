@@ -1,0 +1,7 @@
+Code-Review+2: Tomas Cere <tcere@cisco.com>
+Verified+1: Tomas Cere <tcere@cisco.com>
+Submitted-by: Tomas Cere <tcere@cisco.com>
+Submitted-at: Fri, 29 Sep 2017 12:43:05 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/63841
+Project: netconf
+Branch: refs/heads/stable/nitrogen
