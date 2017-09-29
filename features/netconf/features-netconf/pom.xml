@@ -23,130 +23,130 @@
   <version>1.3.1-SNAPSHOT</version>
   <packaging>feature</packaging>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>netconf-artifacts</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.opendaylight.aaa</groupId>
+        <artifactId>aaa-artifacts</artifactId>
+        <version>0.6.1-SNAPSHOT</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
+    <dependency>
+      <groupId>org.opendaylight.aaa</groupId>
+      <artifactId>odl-aaa-encryption-service</artifactId>
+      <!-- FIXME: version declaration should be coming from aaa-artifacts -->
+      <version>0.6.1-SNAPSHOT</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+    </dependency>
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-aaa-netconf-plugin</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-aaa-netconf-plugin-no-cluster</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-config-netconf-connector</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-all</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-api</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-client</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-impl</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-mapping-api</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-mdsal</artifactId>
-      <version>1.6.1-SNAPSHOT</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-monitoring</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-netty-util</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-notifications-api</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-notifications-impl</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-ssh</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-tcp</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-util</artifactId>
-      <version>${project.version}</version>
       <type>xml</type>
       <classifier>features</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.aaa</groupId>
-      <artifactId>aaa-encrypt-service</artifactId>
-      <version>0.6.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.aaa</groupId>
-      <artifactId>aaa-encrypt-service</artifactId>
-      <version>0.6.1-SNAPSHOT</version>
-      <classifier>config</classifier>
-      <type>xml</type>
     </dependency>
   </dependencies>
 </project>
