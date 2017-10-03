@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a245df4_b01c3915",
+        "filename": "restconf/restconf-nb-bierman02/src/test/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapterTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-10-03T12:48:30Z",
+      "side": 1,
+      "message": "remove this",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 34
+      },
+      "revId": "e0a93d316e0f7598b6c452685aaef4a870e98dd6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_101a6517",
+        "filename": "restconf/restconf-nb-bierman02/src/test/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapterTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-10-03T12:48:30Z",
+      "side": 1,
+      "message": "Why didn\u0027t you use the undeprecated AbstractConcurrentDataBrokerTest?",
+      "range": {
+        "startLine": 37,
+        "startChar": 41,
+        "endLine": 37,
+        "endChar": 63
+      },
+      "revId": "e0a93d316e0f7598b6c452685aaef4a870e98dd6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_f016b1f0",
+        "filename": "restconf/restconf-nb-bierman02/src/test/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapterTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-10-03T12:48:30Z",
+      "side": 1,
+      "message": "These should be formatted and in separate files, otherwise its going to be a pita to maintain.",
+      "range": {
+        "startLine": 39,
+        "startChar": 4,
+        "endLine": 117,
+        "endChar": 96
+      },
+      "revId": "e0a93d316e0f7598b6c452685aaef4a870e98dd6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
