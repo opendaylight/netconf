@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
@@ -97,9 +99,14 @@ public class NetconfCommandsImpl implements NetconfCommands {
                             ImmutableList.of(netconfNode.getPort().getValue().toString()));
                     attributes.put(NetconfConsoleConstants.STATUS,
                             ImmutableList.of(netconfNode.getConnectionStatus().name()));
-                    attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES,
-                            netconfNode.getAvailableCapabilities().getAvailableCapability().stream()
-                                    .map(AvailableCapability::getCapability).collect(Collectors.toList()));
+                    if (netconfNode.getConnectionStatus().equals(
+                            NetconfNodeConnectionStatus.ConnectionStatus.Connected)) {
+                        attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES,
+                                netconfNode.getAvailableCapabilities().getAvailableCapability().stream()
+                                        .map(AvailableCapability::getCapability).collect(Collectors.toList()));
+                    } else {
+                        attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES, Collections.singletonList(""));
+                    }
                     device.put(node.getNodeId().getValue(), attributes);
                 }
             }
@@ -122,9 +129,13 @@ public class NetconfCommandsImpl implements NetconfCommands {
                         ImmutableList.of(netconfNode.getPort().getValue().toString()));
                 attributes.put(NetconfConsoleConstants.STATUS,
                         ImmutableList.of(netconfNode.getConnectionStatus().name()));
-                attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES,
-                        netconfNode.getAvailableCapabilities().getAvailableCapability().stream()
-                                .map(AvailableCapability::getCapability).collect(Collectors.toList()));
+                if (netconfNode.getConnectionStatus().equals(NetconfNodeConnectionStatus.ConnectionStatus.Connected)) {
+                    attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES,
+                            netconfNode.getAvailableCapabilities().getAvailableCapability().stream()
+                                    .map(AvailableCapability::getCapability).collect(Collectors.toList()));
+                } else {
+                    attributes.put(NetconfConsoleConstants.AVAILABLE_CAPABILITIES, Collections.singletonList(""));
+                }
                 device.put(node.getNodeId().getValue(), attributes);
             }
         }
