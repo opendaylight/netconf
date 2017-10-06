@@ -25,5 +25,6 @@
   <modules>
     <module>netconf-cli</module>
     <module>netconf-testtool</module>
+    <module>netconf-testtool-core</module>
   </modules>
 </project>
