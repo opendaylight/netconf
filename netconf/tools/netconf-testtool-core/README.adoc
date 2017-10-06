@@ -1,0 +1,68 @@
+# NetConf TestTool Core
+
+This project is used to simulate NetConf devices in order to test NetConf
+south-bound plugin and applications using this plugin. *netconf-testtool-core*
+project is designed as versatile java library to be used for custom NetConf device
+test applications.
+
+## How to use it in your code
+* Use maven dependency in your project
+----
+<dependency>
+    <groupId>org.opendaylight.netconf</groupId>
+    <artifactId>netconf-testtool-core</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+</dependency>
+----
+* Prepare configuration - models are loaded by classloader
+  from classpath.
+----
+Set<String> models = ImmutableSet.of(
+    "models/iana-afn-safi@2013-07-04.yang",
+    "models/ietf-inet-types@2013-07-15.yang",
+    "models/ietf-netconf@2011-06-01.yang",
+    "models/ietf-netconf-monitoring@2010-10-04.yang",
+    "models/ietf-netconf-monitoring-extension@2013-12-10.yang",
+    "models/ietf-yang-library@2016-06-21.yang",
+    "models/ietf-yang-types@2013-07-15.yang",
+    "models/nc-notifications@2008-07-14.yang",
+    "models/notifications@2008-07-14.yang",
+    ...
+);
+----
+* Prepare list of capabilities
+----
+Set<String> capabilities = ImmutableSet.of(
+    "urn:ietf:params:netconf:base:1.0",
+    "urn:ietf:params:netconf:base:1.1",
+    ...
+);
+----
+* Override RPC mapping provider org.opendaylight.netconf.testtool.core.impl.rpc.RpcMapping
+----
+public class RpcMappingImpl implements RpcMapping {
+    @Override
+    public Optional<Document> getResponse(XmlElement rpcElement) {
+        ...
+        return response;
+    }
+}
+
+----
+* Start NetConf device simulator in your code
+----
+public class Main {
+
+    public static void main(String[] args) {
+        Configuration configuration = new ConfigurationBuilder()
+                .setModels(models)
+                .setCapabilities(capabilities)
+                .setRpcMapping(new RpcMappingImpl())
+                .build();
+        NetConfDeviceSimulator netConfDeviceSimulator =
+                new NetConfDeviceSimulator(configuration);
+        netConfDeviceSimulator.start();
+    }
+
+}
+----
