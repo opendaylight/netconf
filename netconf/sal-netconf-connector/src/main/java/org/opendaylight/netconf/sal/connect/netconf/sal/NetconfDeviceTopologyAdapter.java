@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -242,8 +243,7 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
                 throw new IllegalStateException(
                         id + "  Transaction(" + txType + ") not committed correctly", throwable);
             }
-        });
-
+        }, MoreExecutors.directExecutor());
     }
 
     private static Node getNodeWithId(final RemoteDeviceId id) {

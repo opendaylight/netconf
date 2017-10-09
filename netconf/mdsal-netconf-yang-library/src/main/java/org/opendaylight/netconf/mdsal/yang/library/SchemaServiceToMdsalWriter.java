@@ -11,6 +11,7 @@ package org.opendaylight.netconf.mdsal.yang.library;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -91,7 +92,7 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
             public void onFailure(final Throwable throwable) {
                 LOG.warn("Failed to update modules state", throwable);
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     private ModulesState createModuleStateFromModules(final Set<Module> modules) {

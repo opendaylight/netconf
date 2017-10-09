@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -120,7 +121,7 @@ public class AsyncSshHandlerTest {
             public void onSuccess(final SshFutureListener<AuthFuture> result) {
                 sshAuthListener = result;
             }
-        });
+        }, MoreExecutors.directExecutor());
         doReturn(authFuture).when(authHandler).authenticate(any(ClientSession.class));
     }
 
@@ -169,7 +170,7 @@ public class AsyncSshHandlerTest {
             public void onSuccess(final SshFutureListener<ConnectFuture> result) {
                 sshConnectListener = result;
             }
-        });
+        }, MoreExecutors.directExecutor());
         doReturn(connectFuture).when(sshClient).connect("usr", remoteAddress);
     }
 
@@ -227,7 +228,7 @@ public class AsyncSshHandlerTest {
                 doReturn(true).when(asyncOut).isClosed();
                 result.operationComplete(mockedReadFuture);
             }
-        });
+        }, MoreExecutors.directExecutor());
 
         final IoOutputStream asyncIn = getMockedIoOutputStream();
         final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
@@ -256,7 +257,7 @@ public class AsyncSshHandlerTest {
                         .removeListener(Matchers.<SshFutureListener<IoReadFuture>>any());
                 result.operationComplete(mockedReadFuture);
             }
-        });
+        }, MoreExecutors.directExecutor());
 
         final IoOutputStream asyncIn = getMockedIoOutputStream();
         final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
@@ -308,7 +309,7 @@ public class AsyncSshHandlerTest {
                 doReturn(true).when(asyncIn).isClosed();
                 result.operationComplete(ioWriteFuture);
             }
-        });
+        }, MoreExecutors.directExecutor());
 
         final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
@@ -463,7 +464,7 @@ public class AsyncSshHandlerTest {
                 doReturn(true).when(closeFuture).isClosed();
                 result.operationComplete(closeFuture);
             }
-        });
+        }, MoreExecutors.directExecutor());
         doReturn(closeFuture).when(sshSession).close(false);
 
         doReturn(subsystemChannel).when(sshSession).createSubsystemChannel(anyString());
@@ -484,7 +485,7 @@ public class AsyncSshHandlerTest {
             public void onSuccess(final SshFutureListener<OpenFuture> result) {
                 sshChannelOpenListener = result;
             }
-        });
+        }, MoreExecutors.directExecutor());
 
         doReturn(asyncOut).when(subsystemChannel).getAsyncOut();
 
@@ -504,7 +505,7 @@ public class AsyncSshHandlerTest {
             public void onSuccess(final SshFutureListener<IoWriteFuture> result) {
                 result.operationComplete(ioWriteFuture);
             }
-        });
+        }, MoreExecutors.directExecutor());
 
         doReturn(ioWriteFuture).when(mock).write(any(Buffer.class));
         doReturn(false).when(mock).isClosed();
@@ -527,7 +528,7 @@ public class AsyncSshHandlerTest {
             public void onSuccess(final SshFutureListener<IoReadFuture> result) {
                 result.operationComplete(ioReadFuture);
             }
-        });
+        }, MoreExecutors.directExecutor());
 
         doReturn(ioReadFuture).when(mock).read(any(Buffer.class));
         doReturn(false).when(mock).isClosed();

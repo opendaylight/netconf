@@ -33,6 +33,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade.KeepaliveDOMRpcService;
@@ -79,14 +80,14 @@ public final class NetconfBaseOps {
 
         final ListenableFuture<DOMRpcResult> future =
                 rpc.invokeRpc(toPath(NETCONF_LOCK_QNAME), getLockContent(datastore));
-        Futures.addCallback(future, callback);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
     public ListenableFuture<DOMRpcResult> lockCandidate(final FutureCallback<DOMRpcResult> callback) {
         final ListenableFuture<DOMRpcResult> future =
                 rpc.invokeRpc(toPath(NETCONF_LOCK_QNAME), getLockContent(NETCONF_CANDIDATE_QNAME));
-        Futures.addCallback(future, callback);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
@@ -94,7 +95,7 @@ public final class NetconfBaseOps {
     public ListenableFuture<DOMRpcResult> lockRunning(final FutureCallback<DOMRpcResult> callback) {
         final ListenableFuture<DOMRpcResult> future =
                 rpc.invokeRpc(toPath(NETCONF_LOCK_QNAME), getLockContent(NETCONF_RUNNING_QNAME));
-        Futures.addCallback(future, callback);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
@@ -104,21 +105,21 @@ public final class NetconfBaseOps {
 
         final ListenableFuture<DOMRpcResult> future =
                 rpc.invokeRpc(toPath(NETCONF_UNLOCK_QNAME), getUnLockContent(datastore));
-        Futures.addCallback(future, callback);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
     public ListenableFuture<DOMRpcResult> unlockRunning(final FutureCallback<DOMRpcResult> callback) {
         final ListenableFuture<DOMRpcResult> future =
                 rpc.invokeRpc(toPath(NETCONF_UNLOCK_QNAME), getUnLockContent(NETCONF_RUNNING_QNAME));
-        Futures.addCallback(future, callback);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
     public ListenableFuture<DOMRpcResult> unlockCandidate(final FutureCallback<DOMRpcResult> callback) {
         final ListenableFuture<DOMRpcResult> future =
                 rpc.invokeRpc(toPath(NETCONF_UNLOCK_QNAME), getUnLockContent(NETCONF_CANDIDATE_QNAME));
-        Futures.addCallback(future, callback);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
@@ -126,7 +127,7 @@ public final class NetconfBaseOps {
         Preconditions.checkNotNull(callback);
 
         final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(toPath(NETCONF_DISCARD_CHANGES_QNAME), null);
-        Futures.addCallback(future, callback);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
@@ -135,7 +136,7 @@ public final class NetconfBaseOps {
 
         final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(
             toPath(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME), NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
-        Futures.addCallback(future, callback);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
@@ -145,7 +146,7 @@ public final class NetconfBaseOps {
 
         final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(
                 toPath(NetconfMessageTransformUtil.NETCONF_VALIDATE_QNAME), getValidateContent(datastore));
-        Futures.addCallback(future, callback);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
@@ -166,7 +167,7 @@ public final class NetconfBaseOps {
 
         final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(
                 toPath(NetconfMessageTransformUtil.NETCONF_COPY_CONFIG_QNAME), getCopyConfigContent(source, target));
-        Futures.addCallback(future, callback);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
@@ -189,7 +190,7 @@ public final class NetconfBaseOps {
                             NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, getSourceNode(datastore)));
         }
 
-        Futures.addCallback(future, callback);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
@@ -281,7 +282,7 @@ public final class NetconfBaseOps {
         final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(toPath(NETCONF_EDIT_CONFIG_QNAME),
                 getEditConfigContent(datastore, editStructure, modifyAction, rollback));
 
-        Futures.addCallback(future, callback);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 

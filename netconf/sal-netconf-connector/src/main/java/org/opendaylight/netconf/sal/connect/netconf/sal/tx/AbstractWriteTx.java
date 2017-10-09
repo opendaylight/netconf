@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -169,7 +170,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
             public void onFailure(final Throwable throwable) {
                 listeners.forEach(listener -> listener.onTransactionFailed(AbstractWriteTx.this, throwable));
             }
-        });
+        }, MoreExecutors.directExecutor());
         return result;
     }
 
@@ -218,7 +219,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
                                 DocumentedException.ErrorSeverity.ERROR);
                 transformed.setException(exception);
             }
-        });
+        }, MoreExecutors.directExecutor());
 
         return transformed;
     }

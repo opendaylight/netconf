@@ -165,7 +165,7 @@ public class NetconfDevice
             }
         };
 
-        Futures.addCallback(sourceResolverFuture, resolvedSourceCallback);
+        Futures.addCallback(sourceResolverFuture, resolvedSourceCallback, MoreExecutors.directExecutor());
     }
 
     private void registerToBaseNetconfStream(final NetconfDeviceRpc deviceRpc,
@@ -206,7 +206,7 @@ public class NetconfDevice
                 LOG.warn("Unable to subscribe to base notification stream. Schemas will not be reloaded on the fly",
                         throwable);
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     private boolean shouldListenOnSchemaChange(final NetconfSessionPreferences remoteSessionCapabilities) {

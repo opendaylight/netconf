@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -160,7 +161,7 @@ public class NetconfCommandsImpl implements NetconfCommands {
                 LOG.error("Failed to created NetconfNode={}", netconfNode);
                 throw new RuntimeException(throwable);
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     @Override
@@ -242,7 +243,7 @@ public class NetconfCommandsImpl implements NetconfCommands {
                     LOG.error("Failed to updated NetconfNode={}", netconfNode);
                     throw new RuntimeException(throwable);
                 }
-            });
+            }, MoreExecutors.directExecutor());
 
             return "NETCONF node: " + netconfNodeId + " updated successfully.";
         } else {

@@ -15,6 +15,7 @@ import akka.util.Timeout;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -214,7 +215,7 @@ public class NetconfNodeActor extends UntypedActor {
             public void onFailure(@Nonnull final Throwable throwable) {
                 sender.tell(throwable, getSelf());
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     private void invokeSlaveRpc(final SchemaPath schemaPath, final NormalizedNodeMessage normalizedNodeMessage,
@@ -242,7 +243,7 @@ public class NetconfNodeActor extends UntypedActor {
             public void onFailure(@Nonnull final Throwable throwable) {
                 recipient.tell(throwable, getSelf());
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     private void registerSlaveMountPoint(final ActorRef masterReference) {
@@ -268,7 +269,7 @@ public class NetconfNodeActor extends UntypedActor {
             public void onFailure(@Nonnull final Throwable throwable) {
                 LOG.error("{}: Failed to register mount point: {}", id, throwable);
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     private DOMRpcService getDOMRpcService(final ActorRef masterReference) {

@@ -11,6 +11,7 @@ package org.opendaylight.controller.config.yang.netconf.mdsal.monitoring;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Collection;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
@@ -112,7 +113,7 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
             public void onFailure(Throwable throwable) {
                 LOG.warn("Unable to update netconf state", throwable);
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     private static void updateSessions(WriteTransaction tx, Collection<Session> sessions) {

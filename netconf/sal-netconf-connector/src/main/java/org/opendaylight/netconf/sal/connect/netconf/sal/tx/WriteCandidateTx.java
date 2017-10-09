@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
@@ -131,7 +132,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
                 // cleanup is trying to do unlock, but this will fail
                 cleanup();
             }
-        });
+        }, MoreExecutors.directExecutor());
 
         return txResult;
     }

@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.restconf.impl;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
@@ -59,7 +60,7 @@ final class BatchedExistenceCheck {
 
                     ret.complete(path, ReadFailedException.MAPPER.apply(e));
                 }
-            });
+            }, MoreExecutors.directExecutor());
         }
 
         return ret;

@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import java.io.File;
 import java.math.BigDecimal;
@@ -244,7 +245,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 LOG.error("Connector for : " + nodeId.getValue() + " failed");
                 // remove this node from active connectors?
             }
-        });
+        }, MoreExecutors.directExecutor());
 
         return future;
     }

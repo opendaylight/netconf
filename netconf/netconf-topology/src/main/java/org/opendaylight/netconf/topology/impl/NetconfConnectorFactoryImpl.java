@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.impl;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
@@ -90,7 +91,7 @@ public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
             public void onFailure(final Throwable throwable) {
                 LOG.error("Node {} creation failed: {}", instanceName, throwable);
             }
-        });
+        }, MoreExecutors.directExecutor());
         return node;
     }
 }
