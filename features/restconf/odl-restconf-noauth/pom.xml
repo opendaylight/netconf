@@ -14,13 +14,13 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>single-feature-parent</artifactId>
-        <version>1.8.2-SNAPSHOT</version>
+        <version>1.8.2-Carbon</version>
         <relativePath/>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-restconf-noauth</artifactId>
-    <version>1.5.2-SNAPSHOT</version>
+    <version>1.5.2-Carbon</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Restconf</name>
@@ -36,35 +36,35 @@
             <dependency>
                 <groupId>org.opendaylight.odlparent</groupId>
                 <artifactId>odlparent-artifacts</artifactId>
-                <version>1.8.2-SNAPSHOT</version>
+                <version>1.8.2-Carbon</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.yangtools</groupId>
                 <artifactId>yangtools-artifacts</artifactId>
-                <version>1.1.2-SNAPSHOT</version>
+                <version>1.1.2-Carbon</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.aaa</groupId>
                 <artifactId>aaa-artifacts</artifactId>
-                <version>0.5.2-SNAPSHOT</version>
+                <version>0.5.2-Carbon</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>netconf-artifacts</artifactId>
-                <version>1.2.2-SNAPSHOT</version>
+                <version>1.2.2-Carbon</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>restconf-artifacts</artifactId>
-                <version>1.5.2-SNAPSHOT</version>
+                <version>1.5.2-Carbon</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -75,21 +75,21 @@
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>odl-aaa-shiro</artifactId>
-            <version>0.5.2-SNAPSHOT</version>
+            <version>0.5.2-Carbon</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-mdsal-broker</artifactId>
-            <version>1.5.2-SNAPSHOT</version>
+            <version>1.5.2-Carbon</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.odlparent</groupId>
             <artifactId>odl4-netty-4</artifactId>
-            <version>1.8.2-SNAPSHOT</version>
+            <version>1.8.2-Carbon</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

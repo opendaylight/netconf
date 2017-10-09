@@ -14,13 +14,13 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>feature-repo-parent</artifactId>
-        <version>1.8.2-SNAPSHOT</version>
+        <version>1.8.2-Carbon</version>
         <relativePath/>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>features4-netconf</artifactId>
-    <version>1.2.2-SNAPSHOT</version>
+    <version>1.2.2-Carbon</version>
     <packaging>feature</packaging>
 
     <dependencies>
@@ -83,7 +83,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-mdsal</artifactId>
-            <version>1.5.2-SNAPSHOT</version>
+            <version>1.5.2-Carbon</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

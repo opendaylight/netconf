@@ -14,13 +14,13 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>single-feature-parent</artifactId>
-        <version>1.8.2-SNAPSHOT</version>
+        <version>1.8.2-Carbon</version>
         <relativePath/>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-connector</artifactId>
-    <version>1.2.2-SNAPSHOT</version>
+    <version>1.2.2-Carbon</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Netconf Connector :: Netconf Connector</name>
@@ -30,7 +30,7 @@
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>netconf-artifacts</artifactId>
-                <version>1.2.2-SNAPSHOT</version>
+                <version>1.2.2-Carbon</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -41,7 +41,7 @@
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-mdsal-broker</artifactId>
-            <version>1.5.2-SNAPSHOT</version>
+            <version>1.5.2-Carbon</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -62,7 +62,7 @@
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
             <artifactId>odl-mdsal-models</artifactId>
-            <version>0.10.2-SNAPSHOT</version>
+            <version>0.10.2-Carbon</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -77,7 +77,7 @@
         <dependency>
             <groupId>org.opendaylight.controller.model</groupId>
             <artifactId>model-inventory</artifactId>
-            <version>1.5.2-SNAPSHOT</version>
+            <version>1.5.2-Carbon</version>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
@@ -90,7 +90,7 @@
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>odl-aaa-encryption-service</artifactId>
-            <version>0.5.2-SNAPSHOT</version>
+            <version>0.5.2-Carbon</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

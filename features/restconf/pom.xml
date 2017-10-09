@@ -12,12 +12,12 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>odlparent-lite</artifactId>
-        <version>1.8.2-SNAPSHOT</version>
+        <version>1.8.2-Carbon</version>
         <relativePath/>
     </parent>
     <artifactId>features-restconf-aggregator</artifactId>
     <groupId>org.opendaylight.netconf</groupId>
-    <version>1.5.2-SNAPSHOT</version>
+    <version>1.5.2-Carbon</version>
     <packaging>pom</packaging>
 
     <modules>

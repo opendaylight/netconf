@@ -12,24 +12,24 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>odlparent</artifactId>
-        <version>1.8.2-SNAPSHOT</version>
+        <version>1.8.2-Carbon</version>
         <relativePath/>
     </parent>
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>features-netconf-connector-aggregator</artifactId>
-    <version>1.2.2-SNAPSHOT</version>
+    <version>1.2.2-Carbon</version>
     <packaging>pom</packaging>
 
     <properties>
-      <commons.opendaylight.version>1.8.2-SNAPSHOT</commons.opendaylight.version>
-      <controller.mdsal.version>1.5.2-SNAPSHOT</controller.mdsal.version>
-      <config.version>0.6.2-SNAPSHOT</config.version>
-      <features.test.version>1.8.2-SNAPSHOT</features.test.version>
-      <mdsal.version>2.2.2-SNAPSHOT</mdsal.version>
-      <mdsal.model.version>0.10.2-SNAPSHOT</mdsal.model.version>
-      <netconf.version>1.2.2-SNAPSHOT</netconf.version>
-      <netconf.connector.version>1.5.2-SNAPSHOT</netconf.connector.version>
-      <yangtools.version>1.1.2-SNAPSHOT</yangtools.version>
+      <commons.opendaylight.version>1.8.2-Carbon</commons.opendaylight.version>
+      <controller.mdsal.version>1.5.2-Carbon</controller.mdsal.version>
+      <config.version>0.6.2-Carbon</config.version>
+      <features.test.version>1.8.2-Carbon</features.test.version>
+      <mdsal.version>2.2.2-Carbon</mdsal.version>
+      <mdsal.model.version>0.10.2-Carbon</mdsal.model.version>
+      <netconf.version>1.2.2-Carbon</netconf.version>
+      <netconf.connector.version>1.5.2-Carbon</netconf.connector.version>
+      <yangtools.version>1.1.2-Carbon</yangtools.version>
     </properties>
 
     <modules>
@@ -50,7 +50,7 @@
       <dependency>
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>netconf-artifacts</artifactId>
-        <version>1.2.2-SNAPSHOT</version>
+        <version>1.2.2-Carbon</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

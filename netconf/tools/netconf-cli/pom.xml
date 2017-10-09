@@ -12,13 +12,13 @@
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
     <artifactId>odlparent</artifactId>
-    <version>1.8.2-SNAPSHOT</version>
+    <version>1.8.2-Carbon</version>
     <relativePath/>
   </parent>
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>netconf-cli</artifactId>
-  <version>1.2.2-SNAPSHOT</version>
+  <version>1.2.2-Carbon</version>
   <packaging>jar</packaging>
   <name>${project.artifactId}</name>
 

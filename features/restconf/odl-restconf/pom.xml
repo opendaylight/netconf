@@ -14,13 +14,13 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>single-feature-parent</artifactId>
-        <version>1.8.2-SNAPSHOT</version>
+        <version>1.8.2-Carbon</version>
         <relativePath/>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-restconf</artifactId>
-    <version>1.5.2-SNAPSHOT</version>
+    <version>1.5.2-Carbon</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Restconf</name>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>aaa-shiro-act</artifactId>
-            <version>0.5.2-SNAPSHOT</version>
+            <version>0.5.2-Carbon</version>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>

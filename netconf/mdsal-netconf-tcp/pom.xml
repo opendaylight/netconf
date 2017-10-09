@@ -12,13 +12,13 @@
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
     <artifactId>bundle-parent</artifactId>
-    <version>1.8.2-SNAPSHOT</version>
+    <version>1.8.2-Carbon</version>
     <relativePath/>
   </parent>
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>mdsal-netconf-tcp</artifactId>
-  <version>1.2.2-SNAPSHOT</version>
+  <version>1.2.2-Carbon</version>
   <name>${project.artifactId}</name>
   <packaging>bundle</packaging>
 
