@@ -16,6 +16,7 @@
 
   <cm:property-placeholder persistent-id="org.opendaylight.restconf" update-strategy="reload">
     <cm:default-properties>
+      <cm:property name="websocket-address" value="0.0.0.0"/>
       <cm:property name="websocket-port" value="8185"/>
     </cm:default-properties>
   </cm:property-placeholder>
@@ -47,6 +48,10 @@
     <argument value="${websocket-port}"/>
   </bean>
 
+  <bean id="webSocketAddress" class="org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress">
+    <argument value="${websocket-address}"/>
+  </bean>
+
   <bean id="restconfProviderDraft02" class="org.opendaylight.netconf.sal.restconf.impl.RestconfProviderImpl"
           init-method="start" destroy-method="close">
     <argument ref="domDataBroker"/>
@@ -54,6 +59,7 @@
     <argument ref="domRpcService"/>
     <argument ref="domNotificationService"/>
     <argument ref="domMountPointService"/>
+    <argument ref="webSocketAddress"/>
     <argument ref="webSocketPort"/>
   </bean>
 

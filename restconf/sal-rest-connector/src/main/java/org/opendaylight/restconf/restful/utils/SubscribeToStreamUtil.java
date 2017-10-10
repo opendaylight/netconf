@@ -348,14 +348,9 @@ public final class SubscribeToStreamUtil {
      * @return port
      */
     private static int prepareNotificationPort() {
-        int port = RestconfStreamsConstants.NOTIFICATION_PORT;
-        try {
-            final WebSocketServer webSocketServer = WebSocketServer.getInstance();
-            port = webSocketServer.getPort();
-        } catch (final NullPointerException e) {
-            WebSocketServer.createInstance(RestconfStreamsConstants.NOTIFICATION_PORT);
-        }
-        return port;
+        final WebSocketServer webSocketServer =
+                WebSocketServer.getInstance(RestconfStreamsConstants.NOTIFICATION_PORT);
+        return webSocketServer.getPort();
     }
 
     static boolean checkExist(final SchemaContext schemaContext,

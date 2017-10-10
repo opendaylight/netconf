@@ -70,6 +70,7 @@ public final class RestconfStreamsConstants {
 
     public static final String SCOPE_URI = RestconfConstants.SLASH + SCOPE_PARAM_NAME + EQUAL;
 
+    public static final String NOTIFICATION_ADDRESS_DEFAULT = "0.0.0.0";
     public static final int NOTIFICATION_PORT = 8181;
 
     public static final String SCHEMA_SUBSCIBRE_URI = "ws";
