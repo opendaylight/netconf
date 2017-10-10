@@ -25,6 +25,7 @@ import org.opendaylight.netconf.sal.restconf.impl.jmx.Put;
 import org.opendaylight.netconf.sal.restconf.impl.jmx.RestConnectorRuntimeMXBean;
 import org.opendaylight.netconf.sal.restconf.impl.jmx.Rpcs;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
@@ -36,6 +37,7 @@ public class RestconfProviderImpl extends AbstractMXBean
     private final DOMRpcService rpcService;
     private final DOMNotificationService notificationService;
     private final DOMMountPointService mountPointService;
+    private final IpAddress websocketAddress;
     private final PortNumber websocketPort;
     private final StatisticsRestconfServiceWrapper stats = StatisticsRestconfServiceWrapper.getInstance();
     private ListenerRegistration<SchemaContextListener> listenerRegistration;
@@ -43,13 +45,14 @@ public class RestconfProviderImpl extends AbstractMXBean
 
     public RestconfProviderImpl(DOMDataBroker domDataBroker, SchemaService schemaService, DOMRpcService rpcService,
             DOMNotificationService notificationService, DOMMountPointService mountPointService,
-            PortNumber websocketPort) {
+            IpAddress websocketAddress, PortNumber websocketPort) {
         super("Draft02ProviderStatistics", "restconf-connector", null);
         this.domDataBroker = Preconditions.checkNotNull(domDataBroker);
         this.schemaService = Preconditions.checkNotNull(schemaService);
         this.rpcService = Preconditions.checkNotNull(rpcService);
         this.notificationService = Preconditions.checkNotNull(notificationService);
         this.mountPointService = Preconditions.checkNotNull(mountPointService);
+        this.websocketAddress = Preconditions.checkNotNull(websocketAddress);
         this.websocketPort = Preconditions.checkNotNull(websocketPort);
     }
 
@@ -63,7 +66,8 @@ public class RestconfProviderImpl extends AbstractMXBean
         ControllerContext.getInstance().setSchemas(schemaService.getGlobalContext());
         ControllerContext.getInstance().setMountService(mountPointService);
 
-        this.webSocketServerThread = new Thread(WebSocketServer.createInstance(websocketPort.getValue().intValue()));
+        this.webSocketServerThread = new Thread(WebSocketServer.createInstance(
+                new String(websocketAddress.getValue()), websocketPort.getValue()));
         this.webSocketServerThread.setName("Web socket server on port " + websocketPort);
         this.webSocketServerThread.start();
 
