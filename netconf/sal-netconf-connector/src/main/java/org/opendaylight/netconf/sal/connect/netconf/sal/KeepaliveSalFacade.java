@@ -16,6 +16,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -191,7 +192,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
                 if (previousKeepalive != null && !previousKeepalive.isDone()) {
                     onFailure(new IllegalStateException("Previous keepalive timed out"));
                 } else {
-                    Futures.addCallback(currentDeviceRpc.invokeRpc(PATH, KEEPALIVE_PAYLOAD), this);
+                    Futures.addCallback(currentDeviceRpc.invokeRpc(PATH, KEEPALIVE_PAYLOAD), this,
+                                        MoreExecutors.directExecutor());
                 }
             } catch (NullPointerException e) {
                 LOG.debug("{}: Skipping keepalive while reconnecting", id);
@@ -296,7 +298,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
                                                                       final NormalizedNode<?, ?> input) {
             final CheckedFuture<DOMRpcResult, DOMRpcException> domRpcResultDOMRpcExceptionCheckedFuture =
                     deviceRpc.invokeRpc(type, input);
-            Futures.addCallback(domRpcResultDOMRpcExceptionCheckedFuture, resetKeepaliveTask);
+            Futures.addCallback(domRpcResultDOMRpcExceptionCheckedFuture, resetKeepaliveTask,
+                                MoreExecutors.directExecutor());
 
             final RequestTimeoutTask timeoutTask = new RequestTimeoutTask(domRpcResultDOMRpcExceptionCheckedFuture);
             executor.schedule(timeoutTask, defaultRequestTimeoutMillis, TimeUnit.MILLISECONDS);

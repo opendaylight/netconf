@@ -14,6 +14,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -145,7 +146,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
             public void onFailure(final Throwable throwable) {
                 LOG.warn("Unable to update modules state", throwable);
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     @Override
@@ -174,7 +175,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
             public void onFailure(final Throwable throwable) {
                 LOG.warn("Unable to update modules state", throwable);
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
 

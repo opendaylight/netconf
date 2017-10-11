@@ -13,6 +13,7 @@ import akka.util.Timeout;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
 import java.util.HashMap;
@@ -255,7 +256,7 @@ public class NetconfTopologyManager
             public void onFailure(@Nonnull final Throwable throwable) {
                 LOG.error("Unable to initialize netconf-topology, {}", throwable);
             }
-        });
+        }, MoreExecutors.directExecutor());
 
         LOG.debug("Registering datastore listener");
         return dataBroker.registerDataTreeChangeListener(

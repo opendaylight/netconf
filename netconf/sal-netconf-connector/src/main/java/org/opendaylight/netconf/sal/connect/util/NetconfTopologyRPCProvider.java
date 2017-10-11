@@ -11,6 +11,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.concurrent.Future;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -101,7 +102,7 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
                 LOG.error("add-netconf-node RPC: Unable to add netconf node.", exception);
                 futureResult.setException(exception);
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
 }

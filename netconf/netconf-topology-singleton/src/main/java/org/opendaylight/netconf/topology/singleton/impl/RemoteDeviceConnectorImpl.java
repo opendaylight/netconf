@@ -16,6 +16,7 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
@@ -124,7 +125,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
             public void onFailure(@Nullable final Throwable throwable) {
                 LOG.error("{}: Connector failed, {}", remoteDeviceId, throwable);
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")

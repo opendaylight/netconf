@@ -10,6 +10,7 @@ package org.opendaylight.netconf.topology.impl;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
 import javax.annotation.Nonnull;
@@ -96,7 +97,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             public void onFailure(final Throwable throwable) {
                 LOG.error("Unable to initialize netconf-topology, {}", throwable);
             }
-        });
+        }, MoreExecutors.directExecutor());
 
         LOG.debug("Registering datastore listener");
         datastoreListenerRegistration =

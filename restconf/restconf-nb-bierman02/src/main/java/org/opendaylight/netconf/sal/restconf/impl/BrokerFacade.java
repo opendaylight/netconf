@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -462,7 +463,7 @@ public class BrokerFacade {
                         new RestconfError(ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, throwable.getMessage()))));
                 waiter.countDown();
             }
-        });
+        }, MoreExecutors.directExecutor());
 
         waiter.await();
         return status.getStatus();

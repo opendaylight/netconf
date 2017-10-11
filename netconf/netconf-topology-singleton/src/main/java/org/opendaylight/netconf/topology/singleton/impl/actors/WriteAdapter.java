@@ -13,6 +13,7 @@ import akka.actor.ActorRef;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -50,7 +51,7 @@ class WriteAdapter {
             public void onFailure(@Nonnull final Throwable throwable) {
                 requester.tell(throwable, self);
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     public void handle(final Object message, final ActorRef sender, final ActorContext context, final ActorRef self) {

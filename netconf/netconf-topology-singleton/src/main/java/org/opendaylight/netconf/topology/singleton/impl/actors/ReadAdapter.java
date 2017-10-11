@@ -13,6 +13,7 @@ import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
@@ -67,7 +68,7 @@ class ReadAdapter {
             public void onFailure(@Nonnull final Throwable throwable) {
                 sender.tell(throwable, self);
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     private void exists(final YangInstanceIdentifier path, final LogicalDatastoreType store, final ActorRef sender,
@@ -87,6 +88,6 @@ class ReadAdapter {
             public void onFailure(@Nonnull final Throwable throwable) {
                 sender.tell(throwable, self);
             }
-        });
+        }, MoreExecutors.directExecutor());
     }
 }

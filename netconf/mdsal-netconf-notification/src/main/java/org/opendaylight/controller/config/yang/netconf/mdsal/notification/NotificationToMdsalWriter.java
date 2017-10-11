@@ -11,6 +11,7 @@ package org.opendaylight.controller.config.yang.netconf.mdsal.notification;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -61,7 +62,7 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
             public void onFailure(Throwable throwable) {
                 LOG.warn("Unable to clear streams", throwable);
             }
-        });
+        }, MoreExecutors.directExecutor());
 
         notificationRegistration.close();
     }
