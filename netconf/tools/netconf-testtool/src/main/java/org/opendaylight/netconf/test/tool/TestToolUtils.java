@@ -8,19 +8,23 @@
 
 package org.opendaylight.netconf.test.tool;
 
-public class TestToolUtils {
+import java.io.InputStream;
+
+public final class TestToolUtils {
 
     public static String getMac(long mac) {
         final StringBuilder builder = new StringBuilder(Long.toString(mac, 16));
-
         for (int i = builder.length(); i < 12; i++) {
             builder.insert(0, "0");
         }
-
         for (int j = builder.length() - 2; j >= 2; j -= 2) {
             builder.insert(j, ":");
         }
-
         return builder.toString();
     }
+
+    public static InputStream getDataAsStream(final String path) {
+        return TestToolUtils.class.getClassLoader().getResourceAsStream(path);
+    }
+
 }
