@@ -90,10 +90,8 @@ public class TesttoolParameters {
     @Arg(dest = "time-out")
     public long timeOut;
     private InputStream stream;
-
     @Arg(dest = "ip")
     public String ip;
-
     @Arg(dest = "thread-pool-size")
     public int threadPoolSize;
     @Arg(dest = "rpc-config")

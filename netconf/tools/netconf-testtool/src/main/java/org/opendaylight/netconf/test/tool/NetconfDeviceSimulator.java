@@ -42,7 +42,6 @@ import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.config.util.capability.YangModuleCapability;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
-import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl;
 import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.impl.SessionIdProvider;
@@ -53,7 +52,11 @@ import org.opendaylight.netconf.monitoring.osgi.NetconfMonitoringOperationServic
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfiguration;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
+import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.customrpc.SettableOperationProvider;
+import org.opendaylight.netconf.test.tool.operations.OperationsProvider;
+import org.opendaylight.netconf.test.tool.rpchandler.SettableOperationRpcProvider;
+import org.opendaylight.netconf.test.tool.schemacache.SchemaSourceCache;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -83,27 +86,23 @@ public class NetconfDeviceSimulator implements Closeable {
     private final List<SshProxyServer> sshWrappers = Lists.newArrayList();
     private final ScheduledExecutorService minaTimerExecutor;
     private final ExecutorService nioExecutor;
+    private final Configuration configuration;
     private SchemaContext schemaContext;
 
     private boolean sendFakeSchema = false;
 
-    public NetconfDeviceSimulator(final int threadPoolSize) {
-        this(new NioEventLoopGroup(), new HashedWheelTimer(),
-                Executors.newScheduledThreadPool(threadPoolSize,
-                    new ThreadFactoryBuilder().setNameFormat("netconf-ssh-server-mina-timers-%d").build()),
-                ThreadUtils.newFixedThreadPool("netconf-ssh-server-nio-group", threadPoolSize));
-    }
-
-    private NetconfDeviceSimulator(final NioEventLoopGroup eventExecutors, final HashedWheelTimer hashedWheelTimer,
-            final ScheduledExecutorService minaTimerExecutor, final ExecutorService nioExecutor) {
-        this.nettyThreadgroup = eventExecutors;
-        this.hashedWheelTimer = hashedWheelTimer;
-        this.minaTimerExecutor = minaTimerExecutor;
-        this.nioExecutor = nioExecutor;
+    public NetconfDeviceSimulator(Configuration configuration) {
+        this.configuration = configuration;
+        this.nettyThreadgroup = new NioEventLoopGroup();
+        this.hashedWheelTimer = new HashedWheelTimer();
+        this.minaTimerExecutor = Executors.newScheduledThreadPool(configuration.getThreadPoolSize(),
+                new ThreadFactoryBuilder().setNameFormat("netconf-ssh-server-mina-timers-%d").build());
+        this.nioExecutor = ThreadUtils
+                .newFixedThreadPool("netconf-ssh-server-nio-group", configuration.getThreadPoolSize());
     }
 
     private NetconfServerDispatcherImpl createDispatcher(final Set<Capability> capabilities,
-            final SchemaSourceProvider<YangTextSchemaSource> sourceProvider, final TesttoolParameters params) {
+            final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
 
         final Set<Capability> transformedCapabilities = Sets.newHashSet(Collections2.transform(capabilities, input -> {
             if (sendFakeSchema) {
@@ -118,15 +117,13 @@ public class NetconfDeviceSimulator implements Closeable {
         final SessionIdProvider idProvider = new SessionIdProvider();
 
         final NetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory = createOperationServiceFactory(
-            sourceProvider, params, transformedCapabilities, monitoringService1, idProvider);
+            sourceProvider, transformedCapabilities, monitoringService1, idProvider);
 
-        final Set<String> serverCapabilities = params.exi
-                ? NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES
-                : Sets.newHashSet(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
-                    XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1);
+        final Set<String> serverCapabilities = configuration.getCapabilities();
 
         final NetconfServerSessionNegotiatorFactory serverNegotiatorFactory = new TesttoolNegotiationFactory(
-                hashedWheelTimer, aggregatedNetconfOperationServiceFactory, idProvider, params.generateConfigsTimeout,
+                hashedWheelTimer, aggregatedNetconfOperationServiceFactory, idProvider,
+                configuration.getGenerateConfigsTimeout(),
                 monitoringService1, serverCapabilities);
 
         final NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer =
@@ -135,20 +132,25 @@ public class NetconfDeviceSimulator implements Closeable {
     }
 
     private NetconfOperationServiceFactory createOperationServiceFactory(
-            final SchemaSourceProvider<YangTextSchemaSource> sourceProvider, final TesttoolParameters params,
+            final SchemaSourceProvider<YangTextSchemaSource> sourceProvider,
             final Set<Capability> transformedCapabilities, final NetconfMonitoringService monitoringService1,
             final SessionIdProvider idProvider) {
         final AggregatedNetconfOperationServiceFactory aggregatedNetconfOperationServiceFactory =
             new AggregatedNetconfOperationServiceFactory();
 
         final NetconfOperationServiceFactory operationProvider;
-        if (params.mdSal) {
+        if (configuration.isMdSal()) {
+            LOG.info("using MdsalOperationProvider.");
             operationProvider = new MdsalOperationProvider(
                 idProvider, transformedCapabilities, schemaContext, sourceProvider);
-        } else {
+        } else if (configuration.isXmlConfigurationProvided()) {
+            LOG.info("using SimulatedOperationProvider.");
             operationProvider = new SimulatedOperationProvider(idProvider, transformedCapabilities,
-                    Optional.fromNullable(params.notificationFile),
-                    Optional.fromNullable(params.initialConfigXMLFile));
+                    Optional.fromNullable(configuration.getNotificationFile()),
+                    Optional.fromNullable(configuration.getInitialConfigXMLFile()));
+        } else {
+            LOG.info("using OperationsProvider.");
+            operationProvider = new OperationsProvider(idProvider, transformedCapabilities);
         }
 
 
@@ -157,39 +159,44 @@ public class NetconfDeviceSimulator implements Closeable {
                         new NetconfMonitoringOperationService(monitoringService1));
         aggregatedNetconfOperationServiceFactory.onAddNetconfOperationServiceFactory(operationProvider);
         aggregatedNetconfOperationServiceFactory.onAddNetconfOperationServiceFactory(monitoringService);
-        if (params.rpcConfig != null) {
-            final SettableOperationProvider settableService = new SettableOperationProvider(params.rpcConfig);
+        if (configuration.getRpcConfigFile() != null) {
+            final SettableOperationProvider settableService =
+                    new SettableOperationProvider(configuration.getRpcConfigFile());
+            aggregatedNetconfOperationServiceFactory.onAddNetconfOperationServiceFactory(settableService);
+        } else {
+            final SettableOperationRpcProvider settableService =
+                    new SettableOperationRpcProvider(configuration.getRpcHandler());
             aggregatedNetconfOperationServiceFactory.onAddNetconfOperationServiceFactory(settableService);
         }
         return aggregatedNetconfOperationServiceFactory;
     }
 
-    public List<Integer> start(final TesttoolParameters params) {
+    public List<Integer> start() {
         LOG.info("Starting {}, {} simulated devices starting on port {}",
-            params.deviceCount, params.ssh ? "SSH" : "TCP", params.startingPort);
+                configuration.getDeviceCount(), configuration.isSsh() ? "SSH" : "TCP", configuration.getStartingPort());
 
         final SharedSchemaRepository schemaRepo = new SharedSchemaRepository("netconf-simulator");
-        final Set<Capability> capabilities = parseSchemasToModuleCapabilities(params, schemaRepo);
+        final Set<Capability> capabilities = parseSchemasToModuleCapabilities(schemaRepo);
 
         final NetconfServerDispatcherImpl dispatcher = createDispatcher(capabilities,
-            sourceIdentifier -> schemaRepo.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class), params);
+            sourceIdentifier -> schemaRepo.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class));
 
-        int currentPort = params.startingPort;
+        int currentPort = configuration.getStartingPort();
 
         final List<Integer> openDevices = Lists.newArrayList();
 
         // Generate key to temp folder
         final PEMGeneratorHostKeyProvider keyPairProvider = getPemGeneratorHostKeyProvider();
 
-        for (int i = 0; i < params.deviceCount; i++) {
+        for (int i = 0; i < configuration.getDeviceCount(); i++) {
             if (currentPort > 65535) {
                 LOG.warn("Port cannot be greater than 65535, stopping further attempts.");
                 break;
             }
-            final InetSocketAddress address = getAddress(params.ip, currentPort);
+            final InetSocketAddress address = getAddress(configuration.getIp(), currentPort);
 
             final ChannelFuture server;
-            if (params.ssh) {
+            if (configuration.isSsh()) {
                 final InetSocketAddress bindingAddress = InetSocketAddress.createUnresolved("0.0.0.0", currentPort);
                 final LocalAddress tcpLocalAddress = new LocalAddress(address.toString());
 
@@ -245,9 +252,9 @@ public class NetconfDeviceSimulator implements Closeable {
             openDevices.add(currentPort - 1);
         }
 
-        if (openDevices.size() == params.deviceCount) {
+        if (openDevices.size() == configuration.getDeviceCount()) {
             LOG.info("All simulated devices started successfully from port {} to {}",
-                params.startingPort, currentPort - 1);
+                    configuration.getStartingPort(), currentPort - 1);
         } else if (openDevices.size() == 0) {
             LOG.warn("No simulated devices started.");
         } else {
@@ -278,12 +285,9 @@ public class NetconfDeviceSimulator implements Closeable {
         }
     }
 
-    private Set<Capability> parseSchemasToModuleCapabilities(final TesttoolParameters params,
-                                                             final SharedSchemaRepository consumer) {
+    private Set<Capability> parseSchemasToModuleCapabilities(final SharedSchemaRepository consumer) {
         final Set<SourceIdentifier> loadedSources = Sets.newHashSet();
-
         consumer.registerSchemaSourceListener(TextToASTTransformer.create(consumer, consumer));
-
         consumer.registerSchemaSourceListener(new SchemaSourceListener() {
             @Override
             public void schemaSourceEncountered(final SchemaSourceRepresentation schemaSourceRepresentation) {}
@@ -299,10 +303,18 @@ public class NetconfDeviceSimulator implements Closeable {
             public void schemaSourceUnregistered(final PotentialSchemaSource<?> potentialSchemaSource) {}
         });
 
-        if (params.schemasDir != null) {
+        if (configuration.getSchemasDir() != null) {
+            LOG.info("Loading models from directory.");
             final FilesystemSchemaSourceCache<YangTextSchemaSource> cache = new FilesystemSchemaSourceCache<>(
-                consumer, YangTextSchemaSource.class, params.schemasDir);
+                consumer, YangTextSchemaSource.class, configuration.getSchemasDir());
             consumer.registerSchemaSourceListener(cache);
+        } else if (configuration.getModels() != null) {
+            LOG.info("Loading models from classpath.");
+            final SchemaSourceCache<YangTextSchemaSource> cache = new SchemaSourceCache<>(
+                    consumer, YangTextSchemaSource.class, configuration.getModels());
+            consumer.registerSchemaSourceListener(cache);
+        } else {
+            LOG.info("Custom module loading skipped.");
         }
 
         addDefaultSchemas(consumer);
@@ -399,6 +411,6 @@ public class NetconfDeviceSimulator implements Closeable {
         nettyThreadgroup.shutdownGracefully();
         minaTimerExecutor.shutdownNow();
         nioExecutor.shutdownNow();
-        // close Everything
     }
+
 }
