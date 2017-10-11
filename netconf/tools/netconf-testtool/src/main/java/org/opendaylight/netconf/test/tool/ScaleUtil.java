@@ -32,6 +32,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
+import org.opendaylight.netconf.test.tool.config.Configuration;
+import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,9 +62,10 @@ public class ScaleUtil {
         while (true) {
             root.warn("Starting scale test with {} devices", params.deviceCount);
             final ScheduledFuture timeoutGuardFuture = EXECUTOR.schedule(new TimeoutGuard(), TIMEOUT, TimeUnit.MINUTES);
-            final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(params.threadAmount);
+            final Configuration configuration = new ConfigurationBuilder().from(params).build();
+            final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(configuration);
             try {
-                final List<Integer> openDevices = netconfDeviceSimulator.start(params);
+                final List<Integer> openDevices = netconfDeviceSimulator.start();
                 if (openDevices.size() == 0) {
                     root.error("Failed to start any simulated devices, exiting...");
                     System.exit(1);

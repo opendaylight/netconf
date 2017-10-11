@@ -37,6 +37,8 @@ import org.apache.karaf.features.internal.model.ConfigFile;
 import org.apache.karaf.features.internal.model.Feature;
 import org.apache.karaf.features.internal.model.Features;
 import org.apache.karaf.features.internal.model.JaxbUtil;
+import org.opendaylight.netconf.test.tool.config.Configuration;
+import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,10 +54,11 @@ public final class Main {
             .getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
 
-        final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(params.threadPoolSize);
+        final Configuration configuration = new ConfigurationBuilder().from(params).build();
+        final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(configuration);
         try {
             LOG.debug("Trying to start netconf test-tool with parameters {}", params);
-            final List<Integer> openDevices = netconfDeviceSimulator.start(params);
+            final List<Integer> openDevices = netconfDeviceSimulator.start();
             if (openDevices.size() == 0) {
                 LOG.error("Failed to start any simulated devices, exiting...");
                 System.exit(1);
