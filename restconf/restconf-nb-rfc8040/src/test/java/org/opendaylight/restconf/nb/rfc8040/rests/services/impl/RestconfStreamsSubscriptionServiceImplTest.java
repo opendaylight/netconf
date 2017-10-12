@@ -102,7 +102,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         Mockito.when(map.entrySet()).thenReturn(set);
         Mockito.when(this.uriInfo.getQueryParameters()).thenReturn(map);
         this.schemaHandler.onGlobalContextUpdated(
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/notifications")));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications")));
     }
 
     @BeforeClass
