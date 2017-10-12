@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.model.api.AugmentationSchema;
+import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 
 public class NodeContainerProxyTest {
@@ -27,9 +27,9 @@ public class NodeContainerProxyTest {
     private static final QName NODE_1_QNAME = QName.create(QNAME, "node-1");
     private static final QName NODE_2_QNAME = QName.create(QNAME, "node-2");
     @Mock
-    private AugmentationSchema augSchema1;
+    private AugmentationSchemaNode augSchema1;
     @Mock
-    private AugmentationSchema augSchema2;
+    private AugmentationSchemaNode augSchema2;
     @Mock
     private DataSchemaNode schemaNode1;
     @Mock
@@ -42,7 +42,7 @@ public class NodeContainerProxyTest {
         final Map<QName, DataSchemaNode> childNodes = new HashMap<>();
         childNodes.put(NODE_1_QNAME, schemaNode1);
         childNodes.put(NODE_2_QNAME, schemaNode2);
-        final Set<AugmentationSchema> augmentations = new HashSet<>();
+        final Set<AugmentationSchemaNode> augmentations = new HashSet<>();
         augmentations.add(augSchema1);
         augmentations.add(augSchema2);
         proxy = new NodeContainerProxy(QNAME, childNodes, augmentations);
@@ -60,7 +60,7 @@ public class NodeContainerProxyTest {
 
     @Test
     public void testGetAvailableAugmentations() throws Exception {
-        final Set<AugmentationSchema> augmentations = proxy.getAvailableAugmentations();
+        final Set<AugmentationSchemaNode> augmentations = proxy.getAvailableAugmentations();
         Assert.assertEquals(2, augmentations.size());
         Assert.assertTrue(augmentations.contains(augSchema1));
         Assert.assertTrue(augmentations.contains(augSchema2));
@@ -110,11 +110,6 @@ public class NodeContainerProxyTest {
     @Test(expected = UnsupportedOperationException.class)
     public void testIsConfiguration() throws Exception {
         proxy.isConfiguration();
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testGetConstraints() throws Exception {
-        proxy.getConstraints();
     }
 
     @Test(expected = UnsupportedOperationException.class)

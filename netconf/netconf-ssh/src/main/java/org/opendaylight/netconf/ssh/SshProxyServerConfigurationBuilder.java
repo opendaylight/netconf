@@ -5,13 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.ssh;
 
 import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
-import org.apache.sshd.common.KeyPairProvider;
-import org.apache.sshd.server.PublickeyAuthenticator;
+import org.apache.sshd.common.keyprovider.KeyPairProvider;
+import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.opendaylight.netconf.auth.AuthProvider;
 
 public final class SshProxyServerConfigurationBuilder {

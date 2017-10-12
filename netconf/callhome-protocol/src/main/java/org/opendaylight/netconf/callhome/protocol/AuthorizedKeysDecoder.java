@@ -11,9 +11,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.interfaces.DSAParams;
 import java.security.interfaces.DSAPublicKey;
@@ -21,13 +20,12 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
-import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.sshd.common.util.Base64;
-import org.apache.sshd.common.util.SecurityUtils;
+import org.apache.sshd.common.util.security.SecurityUtils;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.ECPointUtil;
@@ -61,12 +59,11 @@ public class AuthorizedKeysDecoder {
     private byte[] bytes = new byte[0];
     private int pos = 0;
 
-    public PublicKey decodePublicKey(String keyLine)
-            throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
+    public PublicKey decodePublicKey(final String keyLine) throws GeneralSecurityException {
 
         // look for the Base64 encoded part of the line to decode
         // both ssh-rsa and ssh-dss begin with "AAAA" due to the length bytes
-        bytes = Base64.decodeBase64(keyLine.getBytes());
+        bytes = Base64.getDecoder().decode(keyLine.getBytes());
         if (bytes.length == 0) {
             throw new IllegalArgumentException("No Base64 part to decode in " + keyLine);
         }
@@ -89,8 +86,7 @@ public class AuthorizedKeysDecoder {
         throw new IllegalArgumentException("Unknown decode key type " + type + " in " + keyLine);
     }
 
-    private PublicKey decodeAsEcDSA()
-            throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
+    private PublicKey decodeAsEcDSA() throws GeneralSecurityException {
         KeyFactory ecdsaFactory = SecurityUtils.getKeyFactory(KEY_FACTORY_TYPE_ECDSA);
 
         ECNamedCurveParameterSpec spec256r1 = ECNamedCurveTable.getParameterSpec(ECDSA_SUPPORTED_CURVE_NAME_SPEC);
@@ -103,7 +99,7 @@ public class AuthorizedKeysDecoder {
         return ecdsaFactory.generatePublic(pubKeySpec);
     }
 
-    private PublicKey decodeAsDSA() throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
+    private PublicKey decodeAsDSA() throws GeneralSecurityException {
         KeyFactory dsaFactory = SecurityUtils.getKeyFactory(KEY_FACTORY_TYPE_DSA);
         BigInteger prime = decodeBigInt();
         BigInteger subPrime = decodeBigInt();
@@ -114,7 +110,7 @@ public class AuthorizedKeysDecoder {
         return dsaFactory.generatePublic(spec);
     }
 
-    private PublicKey decodeAsRSA() throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
+    private PublicKey decodeAsRSA() throws GeneralSecurityException {
         KeyFactory rsaFactory = SecurityUtils.getKeyFactory(KEY_FACTORY_TYPE_RSA);
         BigInteger exponent = decodeBigInt();
         BigInteger modulus = decodeBigInt();
@@ -131,8 +127,8 @@ public class AuthorizedKeysDecoder {
     }
 
     private int decodeInt() {
-        return ((bytes[pos++] & 0xFF) << 24) | ((bytes[pos++] & 0xFF) << 16)
-                | ((bytes[pos++] & 0xFF) << 8) | (bytes[pos++] & 0xFF);
+        return (bytes[pos++] & 0xFF) << 24 | (bytes[pos++] & 0xFF) << 16
+                | (bytes[pos++] & 0xFF) << 8 | bytes[pos++] & 0xFF;
     }
 
     private BigInteger decodeBigInt() {
@@ -143,7 +139,7 @@ public class AuthorizedKeysDecoder {
         return new BigInteger(bigIntBytes);
     }
 
-    public static String encodePublicKey(PublicKey publicKey) throws IOException {
+    public static String encodePublicKey(final PublicKey publicKey) throws IOException {
         String publicKeyEncoded;
         ByteArrayOutputStream byteOs = new ByteArrayOutputStream();
         if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_RSA)) {
@@ -186,7 +182,7 @@ public class AuthorizedKeysDecoder {
         } else {
             throw new IllegalArgumentException("Unknown public key encoding: " + publicKey.getAlgorithm());
         }
-        publicKeyEncoded = new String(Base64.encodeBase64(byteOs.toByteArray()));
+        publicKeyEncoded = new String(Base64.getEncoder().encodeToString(byteOs.toByteArray()));
         return publicKeyEncoded;
     }
 }

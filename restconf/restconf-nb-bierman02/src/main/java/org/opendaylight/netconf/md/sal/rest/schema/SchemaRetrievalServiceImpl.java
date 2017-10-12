@@ -9,8 +9,7 @@ package org.opendaylight.netconf.md.sal.rest.schema;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import java.text.ParseException;
-import java.util.Date;
+import java.time.format.DateTimeParseException;
 import java.util.Iterator;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -20,7 +19,7 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.common.validation.RestconfValidationUtils;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
@@ -76,13 +75,11 @@ public class SchemaRetrievalServiceImpl implements SchemaRetrievalService {
              final String moduleName, final String revisionStr,
              final DOMYangTextSourceProvider yangTextSourceProvider) {
         try {
-            final Date revision = SimpleDateFormatUtil.getRevisionFormat().parse(revisionStr);
-            final Module module = schemaContext.findModuleByName(moduleName, revision);
-
+            final Module module = schemaContext.findModule(moduleName, Revision.of(revisionStr)).orElse(null);
             return new SchemaExportContext(
                     schemaContext, RestconfValidationUtils.checkNotNullDocumented(module, moduleName),
                     yangTextSourceProvider);
-        } catch (final ParseException e) {
+        } catch (final DateTimeParseException e) {
             throw new RestconfDocumentedException("Supplied revision is not in expected date format YYYY-mm-dd", e);
         }
     }

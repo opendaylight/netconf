@@ -3,10 +3,10 @@ module identityref-module {
 
   prefix "iderefmod";
   
-  import identity-module {prefix idemo; revision-date 2013-12-2;}
+  import identity-module {prefix idemo; revision-date 2013-12-02;}
   import general-module {prefix gmo; revision-date 2013-12-12;}
    
-  revision 2013-12-2 {    
+  revision 2013-12-02 {    
   }
   
 	augment "/gmo:cont/gmo:cont1" {

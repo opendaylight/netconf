@@ -10,8 +10,8 @@ package org.opendaylight.netconf.sal.connect.netconf.schema;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
-import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -41,15 +41,14 @@ public final class YangLibrarySchemaYangSourceProvider implements SchemaSourcePr
     }
 
     @Override
-    public CheckedFuture<? extends YangTextSchemaSource, SchemaSourceException> getSource(
+    public ListenableFuture<? extends YangTextSchemaSource> getSource(
             final SourceIdentifier sourceIdentifier) {
         Preconditions.checkNotNull(sourceIdentifier);
         Preconditions.checkArgument(availableSources.containsKey(sourceIdentifier));
         return download(sourceIdentifier);
     }
 
-    private CheckedFuture<? extends YangTextSchemaSource, SchemaSourceException> download(
-            final SourceIdentifier sourceIdentifier) {
+    private ListenableFuture<? extends YangTextSchemaSource> download(final SourceIdentifier sourceIdentifier) {
         final URL url = availableSources.get(sourceIdentifier);
         try (InputStream in = url.openStream()) {
             final String schemaContent = new String(ByteStreams.toByteArray(in));
@@ -57,12 +56,11 @@ public final class YangLibrarySchemaYangSourceProvider implements SchemaSourcePr
                     new NetconfRemoteSchemaYangSourceProvider
                             .NetconfYangTextSchemaSource(id, sourceIdentifier, Optional.of(schemaContent));
             LOG.debug("Source {} downloaded from a yang library's url {}", sourceIdentifier, url);
-            return Futures.immediateCheckedFuture(yangSource);
+            return Futures.immediateFuture(yangSource);
         } catch (IOException e) {
             LOG.warn("Unable to download source {} from a yang library's url {}", sourceIdentifier, url, e);
-            return Futures.immediateFailedCheckedFuture(
-                    new SchemaSourceException(
-                            "Unable to download remote schema for " + sourceIdentifier + " from " + url, e));
+            return Futures.immediateFailedFuture(new SchemaSourceException(
+                "Unable to download remote schema for " + sourceIdentifier + " from " + url, e));
         }
     }
 }

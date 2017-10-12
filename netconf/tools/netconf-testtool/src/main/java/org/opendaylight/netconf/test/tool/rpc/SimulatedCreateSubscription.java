@@ -69,7 +69,7 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
 
     }
 
-    private Notifications loadNotifications(final File file) {
+    private static Notifications loadNotifications(final File file) {
         try {
             final JAXBContext jaxbContext = JAXBContext.newInstance(Notifications.class);
             final Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -99,12 +99,9 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
 
                 delayAggregator += notification.getKey().getDelayInSeconds();
 
-                scheduledExecutorService.schedule(new Runnable() {
-                    @Override
-                    public void run() {
-                        Preconditions.checkState(session != null, "Session is not set, cannot process notifications");
-                        session.sendMessage(notification.getValue());
-                    }
+                scheduledExecutorService.schedule(() -> {
+                    Preconditions.checkState(session != null, "Session is not set, cannot process notifications");
+                    session.sendMessage(notification.getValue());
                 }, delayAggregator, TimeUnit.SECONDS);
             }
         }

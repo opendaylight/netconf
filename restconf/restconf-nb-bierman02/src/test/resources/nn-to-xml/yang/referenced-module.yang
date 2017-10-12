@@ -2,7 +2,7 @@ module referenced-module {
   namespace "referenced:module";  
 
   prefix "refmod";
-  revision 2013-12-2 {    
+  revision 2013-12-02 {    
   }
   
 	identity iden {		

@@ -18,9 +18,9 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class Bug3595Test {
 
@@ -32,7 +32,7 @@ public class Bug3595Test {
     private static ControllerContext controllerContext = ControllerContext.getInstance();
 
     @BeforeClass
-    public static void initialize() throws FileNotFoundException, ReactorException {
+    public static void initialize() throws FileNotFoundException {
         final SchemaContext schemaContext = TestUtils.loadSchemaContext("/leafref/yang");
         Module module = TestUtils.findModule(schemaContext.getModules(), "leafref-module");
         assertNotNull(module);
@@ -45,7 +45,7 @@ public class Bug3595Test {
     @Test
     public void testLeafrefListKeyDeserializtion() {
         final YangInstanceIdentifier node1IIexpected = YangInstanceIdentifier.of(CONT_QNAME)
-                .node(LST_WITH_LFREF_KEY_QNAME).node(new YangInstanceIdentifier.NodeIdentifierWithPredicates(
+                .node(LST_WITH_LFREF_KEY_QNAME).node(new NodeIdentifierWithPredicates(
                         LST_WITH_LFREF_KEY_QNAME, LFREF_KEY_QNAME, "node1"));
         final InstanceIdentifierContext<?> iiContext =
                 controllerContext.toInstanceIdentifier("leafref-module:cont/lst-with-lfref-key/node1");
