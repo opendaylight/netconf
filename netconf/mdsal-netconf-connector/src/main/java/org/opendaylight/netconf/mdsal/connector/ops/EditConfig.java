@@ -15,9 +15,11 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
@@ -27,7 +29,6 @@ import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -129,14 +130,14 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             case CREATE:
                 try {
                     final Optional<NormalizedNode<?, ?>> readResult =
-                            rwtx.read(LogicalDatastoreType.CONFIGURATION, path).checkedGet();
+                            rwtx.read(LogicalDatastoreType.CONFIGURATION, path).get();
                     if (readResult.isPresent()) {
                         throw new DocumentedException("Data already exists, cannot execute CREATE operation",
                             ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, ErrorSeverity.ERROR);
                     }
                     mergeParentMixin(rwtx, path, changeData);
                     rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
-                } catch (final ReadFailedException e) {
+                } catch (final InterruptedException | ExecutionException e) {
                     LOG.warn("Read from datastore failed when trying to read data for create operation", change, e);
                 }
                 break;
@@ -147,13 +148,13 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
             case DELETE:
                 try {
                     final Optional<NormalizedNode<?, ?>> readResult =
-                            rwtx.read(LogicalDatastoreType.CONFIGURATION, path).checkedGet();
+                            rwtx.read(LogicalDatastoreType.CONFIGURATION, path).get();
                     if (!readResult.isPresent()) {
                         throw new DocumentedException("Data is missing, cannot execute DELETE operation",
                             ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
                     }
                     rwtx.delete(LogicalDatastoreType.CONFIGURATION, path);
-                } catch (final ReadFailedException e) {
+                } catch (final InterruptedException | ExecutionException e) {
                     LOG.warn("Read from datastore failed when trying to read data for delete operation", change, e);
                 }
                 break;
@@ -166,7 +167,7 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
     }
 
     private void mergeParentMixin(final DOMDataReadWriteTransaction rwtx, final YangInstanceIdentifier path,
-                                final NormalizedNode change) {
+                                final NormalizedNode<?, ?> change) {
         final YangInstanceIdentifier parentNodeYid = path.getParent();
         if (change instanceof MapEntryNode) {
             final SchemaNode schemaNode = SchemaContextUtil.findNodeInSchemaContext(
@@ -232,33 +233,36 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
 
     private Optional<DataSchemaNode> getSchemaNodeFromNamespace(final String namespace, final XmlElement element)
             throws DocumentedException {
-        Optional<DataSchemaNode> dataSchemaNode = Optional.absent();
+        final Iterator<Module> it;
         try {
             // returns module with newest revision since findModuleByNamespace returns a set of modules and we only
             // need the newest one
-            final Module module =
-                    schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(new URI(namespace), null);
-            if (module == null) {
-                // no module is present with this namespace
-                throw new NetconfDocumentedException("Unable to find module by namespace: " + namespace,
-                        ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
-            }
-            final DataSchemaNode schemaNode =
-                    module.getDataChildByName(QName.create(module.getQNameModule(), element.getName()));
-            if (schemaNode != null) {
-                dataSchemaNode = Optional.of(schemaNode);
-            } else {
-                throw new DocumentedException(
-                        "Unable to find node with namespace: " + namespace + "in module: " + module.toString(),
-                        ErrorType.APPLICATION,
-                        ErrorTag.UNKNOWN_NAMESPACE,
-                        ErrorSeverity.ERROR);
-            }
+            it = schemaContext.getCurrentContext().findModules(new URI(namespace)).iterator();
         } catch (final URISyntaxException e) {
             LOG.debug("Unable to create URI for namespace : {}", namespace);
+            return Optional.absent();
         }
 
-        return dataSchemaNode;
+        if (!it.hasNext()) {
+            // no module is present with this namespace
+            throw new NetconfDocumentedException("Unable to find module by namespace: " + namespace,
+                ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
+        }
+
+        final Module module = it.next();
+        final java.util.Optional<DataSchemaNode> schemaNode =
+                module.findDataChildByName(QName.create(module.getQNameModule(), element.getName()));
+        if (!schemaNode.isPresent()) {
+            if (schemaNode != null) {
+                throw new DocumentedException(
+                    "Unable to find node with namespace: " + namespace + "in module: " + module.toString(),
+                    ErrorType.APPLICATION,
+                    ErrorTag.UNKNOWN_NAMESPACE,
+                    ErrorSeverity.ERROR);
+            }
+        }
+
+        return Optional.fromJavaUtil(schemaNode);
     }
 
     private static Datastore extractTargetParameter(final XmlElement operationElement) throws DocumentedException {

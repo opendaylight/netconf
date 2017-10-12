@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNo
 
 final class EditOperationNormalizedNodeStreamWriter extends ImmutableNormalizedNodeStreamWriter
         implements NormalizedNodeStreamAttributeWriter {
-    private static final QName OPERATION_ATTRIBUTE = QName.create(EditConfigInput.QNAME.getNamespace(), null,
+    private static final QName OPERATION_ATTRIBUTE = QName.create(EditConfigInput.QNAME.getNamespace(),
             XmlNetconfConstants.OPERATION_ATTR_KEY);
 
     private final DataTreeChangeTracker dataTreeChangeTracker;

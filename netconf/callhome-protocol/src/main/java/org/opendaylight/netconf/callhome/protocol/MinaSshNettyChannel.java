@@ -20,8 +20,8 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.DefaultChannelConfig;
 import io.netty.channel.EventLoop;
 import java.net.SocketAddress;
-import org.apache.sshd.ClientChannel;
-import org.apache.sshd.ClientSession;
+import org.apache.sshd.client.channel.ClientChannel;
+import org.apache.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerReader;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerReader.ReadMsgHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerWriter;
@@ -41,7 +41,8 @@ class MinaSshNettyChannel extends AbstractServerChannel {
 
     private volatile boolean nettyClosed = false;
 
-    MinaSshNettyChannel(CallHomeSessionContext context, ClientSession session, ClientChannel sshChannel) {
+    MinaSshNettyChannel(final CallHomeSessionContext context, final ClientSession session,
+        final ClientChannel sshChannel) {
         this.context = Preconditions.checkNotNull(context);
         this.session = Preconditions.checkNotNull(session);
         this.sshChannel = Preconditions.checkNotNull(sshChannel);
@@ -55,7 +56,7 @@ class MinaSshNettyChannel extends AbstractServerChannel {
         return new ChannelOutboundHandlerAdapter() {
 
             @Override
-            public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+            public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) throws Exception {
                 sshWriteAsyncHandler.write(ctx, msg, promise);
             }
 
@@ -67,7 +68,7 @@ class MinaSshNettyChannel extends AbstractServerChannel {
         return config;
     }
 
-    private boolean notClosing(org.apache.sshd.common.Closeable sshCloseable) {
+    private static boolean notClosing(final org.apache.sshd.common.Closeable sshCloseable) {
         return !sshCloseable.isClosing() && !sshCloseable.isClosed();
     }
 
@@ -92,7 +93,7 @@ class MinaSshNettyChannel extends AbstractServerChannel {
     }
 
     @Override
-    protected boolean isCompatible(EventLoop loop) {
+    protected boolean isCompatible(final EventLoop loop) {
         return true;
     }
 
@@ -107,11 +108,11 @@ class MinaSshNettyChannel extends AbstractServerChannel {
     }
 
     @Override
-    protected void doBind(SocketAddress localAddress) throws Exception {
+    protected void doBind(final SocketAddress localAddress) throws Exception {
         throw new UnsupportedOperationException("Bind not supported.");
     }
 
-    void doMinaDisconnect(boolean blocking) {
+    void doMinaDisconnect(final boolean blocking) {
         if (notClosing(session)) {
             sshChannel.close(blocking);
             session.close(blocking);
@@ -149,13 +150,13 @@ class MinaSshNettyChannel extends AbstractServerChannel {
     }
 
     @Override
-    protected void doWrite(ChannelOutboundBuffer in) throws Exception {
+    protected void doWrite(final ChannelOutboundBuffer in) throws Exception {
         throw new IllegalStateException("Outbound writes to SSH should be done by SSH Write handler");
     }
 
     private final class FireReadMessage implements ReadMsgHandler {
         @Override
-        public void onMessageRead(ByteBuf msg) {
+        public void onMessageRead(final ByteBuf msg) {
             pipeline().fireChannelRead(msg);
         }
     }
@@ -174,7 +175,7 @@ class MinaSshNettyChannel extends AbstractServerChannel {
     private class SshUnsafe extends AbstractUnsafe {
 
         @Override
-        public void connect(SocketAddress remoteAddress, SocketAddress localAddress, ChannelPromise promise) {
+        public void connect(final SocketAddress remoteAddress, final SocketAddress localAddress, final ChannelPromise promise) {
             throw new UnsupportedOperationException("Unsafe is not supported.");
         }
     }

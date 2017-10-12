@@ -78,7 +78,7 @@ public class NetconfTopologyRPCProviderTest {
         assertEquals(TEST_PWD, loginPw.getLoginPasswordUnencrypted().getPassword());
     }
 
-    private CreateDeviceInput getInput(boolean encrypt) {
+    private static CreateDeviceInput getInput(final boolean encrypt) {
         CreateDeviceInputBuilder builder = new CreateDeviceInputBuilder();
         final Credentials credentials;
         if (encrypt) {
@@ -92,7 +92,7 @@ public class NetconfTopologyRPCProviderTest {
         builder.setCredentials(credentials);
         builder.setHost(new Host(new IpAddress(new Ipv4Address("10.18.16.188"))));
         builder.setPort(new PortNumber(830));
-        builder.setTcpOnly(false);
+        builder.setTcpOnly(Boolean.FALSE);
         builder.setNodeId(NODE_ID.toString());
         return builder.build();
     }

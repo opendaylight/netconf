@@ -35,8 +35,8 @@ public class NetconfHelloMessageAdditionalHeaderTest {
 
     @Test
     public void testStaticConstructor() throws Exception {
-        NetconfHelloMessageAdditionalHeader header = NetconfHelloMessageAdditionalHeader.fromString(customHeader);
-        assertEquals(header.toString(), this.header.toString());
-        assertEquals(header.toFormattedString(), this.header.toFormattedString());
+        NetconfHelloMessageAdditionalHeader hdr = NetconfHelloMessageAdditionalHeader.fromString(customHeader);
+        assertEquals(hdr.toString(), this.header.toString());
+        assertEquals(hdr.toFormattedString(), this.header.toFormattedString());
     }
 }

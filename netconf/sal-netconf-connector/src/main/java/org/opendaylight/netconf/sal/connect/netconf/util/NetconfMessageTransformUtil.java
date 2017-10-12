@@ -312,8 +312,8 @@ public class NetconfMessageTransformUtil {
         } else {
             final Entry<QName, ModifyAction> modifyOperation = operation.isPresent()
                     ? new AbstractMap.SimpleEntry<>(NETCONF_OPERATION_QNAME, operation.get()) : null;
-            configContent = ImmutableNodes
-                    .fromInstanceId(ctx, dataPath, lastChildOverride, Optional.fromNullable(modifyOperation));
+            configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride.toJavaUtil(),
+                java.util.Optional.ofNullable(modifyOperation));
         }
 
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME.getLocalName(),
