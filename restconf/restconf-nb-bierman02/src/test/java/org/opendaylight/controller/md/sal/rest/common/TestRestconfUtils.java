@@ -55,9 +55,9 @@ public class TestRestconfUtils {
     public static SchemaContext loadSchemaContext(final String yangPath, final SchemaContext schemaContext) {
         try {
             Preconditions.checkArgument(yangPath != null, "Path can not be null.");
-            Preconditions.checkArgument((!yangPath.isEmpty()), "Path can not be empty.");
+            Preconditions.checkArgument(!yangPath.isEmpty(), "Path can not be empty.");
             if (schemaContext == null) {
-                return YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles(yangPath));
+                return YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(yangPath));
             } else {
                 throw new UnsupportedOperationException("Unable to add new yang sources to existing schema context.");
             }

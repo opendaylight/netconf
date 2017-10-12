@@ -88,7 +88,7 @@ public class PatchDataTransactionUtilTest {
         PatchDataTransactionUtilTest.broker.set(RestConnectorProvider.class, mock(DOMDataBroker.class));
 
         this.refSchemaCtx = new SchemaContextRef(
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
         final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
         final QName containerPlayerQName = QName.create(baseQName, "player");
         final QName leafGapQName = QName.create(baseQName, "gap");

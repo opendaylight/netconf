@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import java.io.File;
 import java.io.InputStream;
@@ -74,7 +73,7 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
         testFiles.addAll(TestRestconfUtils.loadFiles("/foo-xml-test/yang"));
-        schemaContext = YangParserTestUtils.parseYangSources(testFiles);
+        schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
         CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
@@ -216,14 +215,14 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
         checkNormalizedNodeContext(returnValue);
         final ContainerNode contNode = (ContainerNode) returnValue.getData();
         final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(QName.create(contNode.getNodeType(), "cont"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> contDataNodePotential = contNode.getChild(yangCont
-                .getLastPathArgument());
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> contDataNodePotential = contNode
+                .getChild(yangCont.getLastPathArgument());
         assertTrue(contDataNodePotential.isPresent());
         final ContainerNode contDataNode = (ContainerNode) contDataNodePotential.get();
         final YangInstanceIdentifier yangLeaf =
                 YangInstanceIdentifier.of(QName.create(contDataNode.getNodeType(), "lf"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = contDataNode.getChild(yangLeaf
-                .getLastPathArgument());
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = contDataNode.getChild(
+            yangLeaf.getLastPathArgument());
         assertTrue(leafDataNode.isPresent());
         assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue().toString()));
     }
