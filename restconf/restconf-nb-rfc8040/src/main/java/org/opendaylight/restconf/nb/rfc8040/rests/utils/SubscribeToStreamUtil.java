@@ -113,7 +113,7 @@ public final class SubscribeToStreamUtil {
         } else {
             listeners = pickSpecificListenerByOutput(listeners, NotificationOutputType.XML.getName());
         }
-        if ((listeners == null) || listeners.isEmpty()) {
+        if (listeners == null || listeners.isEmpty()) {
             throw new RestconfDocumentedException("Stream was not found.", ErrorType.PROTOCOL,
                     ErrorTag.UNKNOWN_ELEMENT);
         }
@@ -163,7 +163,7 @@ public final class SubscribeToStreamUtil {
     public static InstanceIdentifierContext<?> prepareIIDSubsStreamOutput(final SchemaContextHandler schemaHandler) {
         final QName qnameBase = QName.create("subscribe:to:notification", "2016-10-28", "notifi");
         final DataSchemaNode location = ((ContainerSchemaNode) schemaHandler.get()
-                .findModuleByNamespaceAndRevision(qnameBase.getNamespace(), qnameBase.getRevision())
+                .findModule(qnameBase.getModule()).get()
                 .getDataChildByName(qnameBase)).getDataChildByName(QName.create(qnameBase, "location"));
         final List<PathArgument> path = new ArrayList<>();
         path.add(NodeIdentifier.create(qnameBase));
@@ -238,9 +238,7 @@ public final class SubscribeToStreamUtil {
     }
 
     public static Module getMonitoringModule(final SchemaContext schemaContext) {
-        final Module monitoringModule =
-                schemaContext.findModuleByNamespaceAndRevision(MonitoringModule.URI_MODULE, MonitoringModule.DATE);
-        return monitoringModule;
+        return schemaContext.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
     }
 
     /**
@@ -393,7 +391,7 @@ public final class SubscribeToStreamUtil {
      * @return enum
      */
     private static <T> T parseURIEnum(final Class<T> clazz, final String value) {
-        if ((value == null) || value.equals("")) {
+        if (value == null || value.equals("")) {
             return null;
         }
         return ResolveEnumUtil.resolveEnum(clazz, value);

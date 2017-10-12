@@ -42,6 +42,7 @@ import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -132,8 +133,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                     ? schemaNode.getQName().getNamespace().toString() : firstValueElement.getNamespaceURI();
 
             // find module according to namespace
-            final Module module = pathContext.getSchemaContext().findModuleByNamespace(
-                    URI.create(namespace)).iterator().next();
+            final Module module = pathContext.getSchemaContext().findModules(URI.create(namespace)).iterator().next();
 
             // initialize codec + set default prefix derived from module name
             final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
@@ -149,7 +149,8 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
             } else {
                 targetII = codec.deserialize(codec.serialize(pathContext.getInstanceIdentifier())
                         .concat(prepareNonCondXpath(schemaNode, target.replaceFirst("/", ""), firstValueElement,
-                                namespace, module.getQNameModule().getFormattedRevision())));
+                                namespace,
+                                module.getQNameModule().getRevision().map(Revision::toString).orElse(null))));
 
                 targetNode = SchemaContextUtil.findDataSchemaNode(pathContext.getSchemaContext(),
                         codec.getDataContextTree().getChild(targetII).getDataSchemaNode().getPath().getParent());

@@ -17,13 +17,11 @@ import com.google.common.base.Optional;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -44,7 +42,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
 public class NetconfCapabilityMonitoringServiceTest {
@@ -55,8 +53,8 @@ public class NetconfCapabilityMonitoringServiceTest {
     private static final String TEST_MODULE_REV2 = "1970-01-02";
     private static final Uri TEST_MODULE_NAMESPACE = new Uri("testModuleNamespace");
     private static final String TEST_MODULE_NAME = "testModule";
-    private static Date TEST_MODULE_DATE;
-    private static Date TEST_MODULE_DATE2;
+    private static final Revision  TEST_MODULE_DATE = Revision.of(TEST_MODULE_REV);
+    private static final Revision TEST_MODULE_DATE2 = Revision.of(TEST_MODULE_REV2);
 
     private YangModuleCapability moduleCapability1;
     private YangModuleCapability moduleCapability2;
@@ -84,26 +82,20 @@ public class NetconfCapabilityMonitoringServiceTest {
 
     private NetconfCapabilityMonitoringService monitoringService;
 
-    @BeforeClass
-    public static void suiteSetUp() throws Exception {
-        TEST_MODULE_DATE = SimpleDateFormatUtil.getRevisionFormat().parse(TEST_MODULE_REV);
-        TEST_MODULE_DATE2 = SimpleDateFormatUtil.getRevisionFormat().parse(TEST_MODULE_REV2);
-    }
-
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
         doReturn(new URI(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock).getNamespace();
         doReturn(TEST_MODULE_NAME).when(moduleMock).getName();
-        doReturn(TEST_MODULE_DATE).when(moduleMock).getRevision();
+        doReturn(java.util.Optional.of(TEST_MODULE_DATE)).when(moduleMock).getRevision();
         moduleCapability1 = new YangModuleCapability(moduleMock, TEST_MODULE_CONTENT);
 
         capabilities.add(moduleCapability1);
 
         doReturn(new URI(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock2).getNamespace();
         doReturn(TEST_MODULE_NAME).when(moduleMock2).getName();
-        doReturn(TEST_MODULE_DATE2).when(moduleMock2).getRevision();
+        doReturn(java.util.Optional.of(TEST_MODULE_DATE2)).when(moduleMock2).getRevision();
         moduleCapability2 = new YangModuleCapability(moduleMock2, TEST_MODULE_CONTENT2);
 
         capabilities.add(new BasicCapability("urn:ietf:params:netconf:base:1.0"));
@@ -200,7 +192,7 @@ public class NetconfCapabilityMonitoringServiceTest {
         //remove capability
         monitoringService.onCapabilitiesChanged(Collections.emptySet(), testCaps);
 
-        verify(listener, times(3)).onCapabilitiesChanged((monitoringListenerCaptor.capture()));
+        verify(listener, times(3)).onCapabilitiesChanged(monitoringListenerCaptor.capture());
         verify(notificationPublisher, times(2)).onCapabilityChanged(capabilityChangeCaptor.capture());
 
         //verify listener calls

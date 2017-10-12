@@ -15,12 +15,11 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import org.junit.Test;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
+import org.opendaylight.yangtools.yang.common.Revision;
 
 /**
  * Unit test for {@link RestconfValidation}.
@@ -34,15 +33,9 @@ public class RestconfValidationTest {
      */
     @Test
     public void validateAndGetRevisionTest() {
-        final Date revision = RestconfValidation.validateAndGetRevision(REVISIONS.iterator());
+        final Revision revision = RestconfValidation.validateAndGetRevision(REVISIONS.iterator());
         assertNotNull("Correct module revision should be validated", revision);
-
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setTime(revision);
-
-        assertEquals(2014, calendar.get(Calendar.YEAR));
-        assertEquals(0, calendar.get(Calendar.MONTH));
-        assertEquals(1, calendar.get(Calendar.DAY_OF_MONTH));
+        assertEquals(Revision.of("2014-01-01"), revision);
     }
 
     /**
