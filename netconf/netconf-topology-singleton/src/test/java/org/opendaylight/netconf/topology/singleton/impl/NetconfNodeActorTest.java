@@ -29,12 +29,12 @@ import akka.testkit.JavaTestKit;
 import akka.testkit.TestActorRef;
 import akka.util.Timeout;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.net.InetAddresses;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -81,6 +81,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
@@ -166,7 +167,7 @@ public class NetconfNodeActorTest {
 
         final DOMDataBroker domDataBroker = mock(DOMDataBroker.class);
         final List<SourceIdentifier> sourceIdentifiers =
-                Lists.newArrayList(RevisionSourceIdentifier.create("testID", Optional.absent()));
+                Lists.newArrayList(RevisionSourceIdentifier.create("testID"));
 
         // init master data
 
@@ -198,12 +199,12 @@ public class NetconfNodeActorTest {
         final RevisionSourceIdentifier yang2 = RevisionSourceIdentifier.create("yang2");
         final SchemaSourceRegistry registry = mock(SchemaSourceRegistry.class);
         final SchemaRepository schemaRepository = mock(SchemaRepository.class);
-        final SchemaSourceRegistration regYang1 = mock(SchemaSourceRegistration.class);
-        final SchemaSourceRegistration regYang2 = mock(SchemaSourceRegistration.class);
+        final SchemaSourceRegistration<?> regYang1 = mock(SchemaSourceRegistration.class);
+        final SchemaSourceRegistration<?> regYang2 = mock(SchemaSourceRegistration.class);
         doReturn(regYang1).when(registry).registerSchemaSource(any(), withSourceId(yang1));
         doReturn(regYang2).when(registry).registerSchemaSource(any(), withSourceId(yang2));
         final SchemaContextFactory schemaContextFactory = mock(SchemaContextFactory.class);
-        doReturn(schemaContextFactory).when(schemaRepository).createSchemaContextFactory(any());
+        doReturn(schemaContextFactory).when(schemaRepository).createSchemaContextFactory(any(SchemaSourceFilter.class));
         final SettableFuture<SchemaContext> schemaContextFuture = SettableFuture.create();
         final CheckedFuture<SchemaContext, SchemaResolutionException> checkedFuture =
                 Futures.makeChecked(schemaContextFuture, e -> new SchemaResolutionException("fail", e));
@@ -227,7 +228,7 @@ public class NetconfNodeActorTest {
     @Test
     public void testYangTextSchemaSourceRequestMessage() throws Exception {
         final SchemaRepository schemaRepository = mock(SchemaRepository.class);
-        final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("testID", Optional.absent());
+        final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("testID");
         final Props props = NetconfNodeActor.props(mock(NetconfTopologySetup.class), remoteDeviceId,
                 DEFAULT_SCHEMA_REPOSITORY, schemaRepository, TIMEOUT, mountPointService);
 
@@ -253,8 +254,7 @@ public class NetconfNodeActorTest {
         };
 
 
-        final CheckedFuture<YangTextSchemaSource, SchemaSourceException> result =
-                Futures.immediateCheckedFuture(yangTextSchemaSource);
+        final ListenableFuture<YangTextSchemaSource> result = Futures.immediateFuture(yangTextSchemaSource);
 
         doReturn(result).when(schemaRepository).getSchemaSource(sourceIdentifier, YangTextSchemaSource.class);
 
@@ -290,7 +290,7 @@ public class NetconfNodeActorTest {
 
         final DOMDataBroker domDataBroker = mock(DOMDataBroker.class);
         final List<SourceIdentifier> sourceIdentifiers =
-                Lists.newArrayList(RevisionSourceIdentifier.create("testID", Optional.absent()));
+                Lists.newArrayList(RevisionSourceIdentifier.create("testID"));
 
         // init master data
 
@@ -307,10 +307,11 @@ public class NetconfNodeActorTest {
         final ProxyDOMRpcService slaveDomRPCService =
                 new ProxyDOMRpcService(system, masterRef, remoteDeviceId, TIMEOUT);
 
-        final SchemaPath schemaPath = SchemaPath.create(true, QName.create("TestQname"));
+        final QName testQName = QName.create("", "TestQname");
+        final SchemaPath schemaPath = SchemaPath.create(true, testQName);
         final NormalizedNode<?, ?> outputNode = ImmutableContainerNodeBuilder.create()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("TestQname")))
-                .withChild(ImmutableNodes.leafNode(QName.create("NodeQname"), "foo")).build();
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(testQName))
+                .withChild(ImmutableNodes.leafNode(testQName, "foo")).build();
         final RpcError rpcError = RpcResultBuilder.newError(RpcError.ErrorType.RPC, null, "Rpc invocation failed.");
         // EmptyResultResponse message
 

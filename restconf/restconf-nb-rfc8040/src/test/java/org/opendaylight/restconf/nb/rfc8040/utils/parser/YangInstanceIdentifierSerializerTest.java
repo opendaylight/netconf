@@ -41,7 +41,7 @@ public class YangInstanceIdentifierSerializerTest {
     @Before
     public void init() throws Exception {
         this.schemaContext =
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/restconf/parser/serializer"));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/restconf/parser/serializer"));
     }
 
     /**

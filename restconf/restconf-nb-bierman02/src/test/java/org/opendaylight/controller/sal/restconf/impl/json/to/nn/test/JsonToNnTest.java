@@ -101,7 +101,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         final String dataTree = NormalizedNodes.toStringTree(normalizedNodeContext
                 .getData());
         assertTrue(dataTree.contains("lf"));
-        assertTrue(dataTree.contains("null"));
+        assertTrue(dataTree.contains("empty"));
     }
 
     @Test
@@ -126,7 +126,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         }
         assertNotNull(exception);
         assertEquals(
-                "Error parsing input: Schema node with name cont wasn't found under "
+                "Error parsing input: Schema node with name cont was not found under "
                         + "(urn:ietf:params:xml:ns:netconf:base:1.0)data.",
                 exception.getErrors().get(0).getErrorMessage());
 
@@ -142,7 +142,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         }
         assertNotNull(exception);
         assertEquals(
-                "Error parsing input: Schema node with name lst1 wasn't found under "
+                "Error parsing input: Schema node with name lst1 was not found under "
                         + "(urn:ietf:params:xml:ns:netconf:base:1.0)data.",
                 exception.getErrors().get(0).getErrorMessage());
 
@@ -158,7 +158,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         }
         assertNotNull(exception);
         assertEquals(
-                "Error parsing input: Schema node with name lf wasn't found under "
+                "Error parsing input: Schema node with name lf was not found under "
                         + "(urn:ietf:params:xml:ns:netconf:base:1.0)data.",
                 exception.getErrors().get(0).getErrorMessage());
         assertEquals(3, countExceptions);

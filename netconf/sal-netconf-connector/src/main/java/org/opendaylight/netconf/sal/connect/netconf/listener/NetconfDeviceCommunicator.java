@@ -59,7 +59,7 @@ public class NetconfDeviceCommunicator
     private final int concurentRpcMsgs;
 
     private final Queue<Request> requests = new ArrayDeque<>();
-    private NetconfClientSession session;
+    private NetconfClientSession currentSession;
 
     private Future<?> initFuture;
     private final SettableFuture<NetconfDeviceCapabilities> firstConnectionFuture;
@@ -106,7 +106,7 @@ public class NetconfDeviceCommunicator
         sessionLock.lock();
         try {
             LOG.debug("{}: Session established", id);
-            this.session = session;
+            currentSession = session;
 
             NetconfSessionPreferences netconfSessionPreferences =
                                              NetconfSessionPreferences.fromNetconfSession(session);
@@ -167,8 +167,8 @@ public class NetconfDeviceCommunicator
 
     public void disconnect() {
         // If session is already in closing, no need to close it again
-        if (session != null && isSessionClosing.compareAndSet(false, true)) {
-            session.close();
+        if (currentSession != null && isSessionClosing.compareAndSet(false, true)) {
+            currentSession.close();
         }
     }
 
@@ -180,8 +180,8 @@ public class NetconfDeviceCommunicator
         final List<UncancellableFuture<RpcResult<NetconfMessage>>> futuresToCancel = Lists.newArrayList();
         sessionLock.lock();
         try {
-            if (session != null) {
-                session = null;
+            if (currentSession != null) {
+                currentSession = null;
                 /*
                  * Walk all requests, check if they have been executing
                  * or cancelled and remove them from the queue.
@@ -367,7 +367,7 @@ public class NetconfDeviceCommunicator
             LOG.trace("{}: Sending message {}", id, msgToS(message));
         }
 
-        if (session == null) {
+        if (currentSession == null) {
             LOG.warn("{}: Session is disconnected, failing RPC request {}",
                     id, message);
             return Futures.immediateFuture(createSessionDownRpcResult());
@@ -376,7 +376,7 @@ public class NetconfDeviceCommunicator
         final Request req = new Request(new UncancellableFuture<>(true), message);
         requests.add(req);
 
-        session.sendMessage(req.request).addListener(future -> {
+        currentSession.sendMessage(req.request).addListener(future -> {
             if (!future.isSuccess()) {
                 // We expect that a session down will occur at this point
                 LOG.debug("{}: Failed to send request {}", id,

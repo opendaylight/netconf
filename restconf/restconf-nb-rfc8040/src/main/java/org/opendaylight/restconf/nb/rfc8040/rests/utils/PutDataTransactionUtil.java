@@ -53,6 +53,10 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
  */
 public final class PutDataTransactionUtil {
 
+    private PutDataTransactionUtil() {
+
+    }
+
     /**
      * Valid input data with {@link SchemaNode}.
      *

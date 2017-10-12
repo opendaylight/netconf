@@ -11,17 +11,17 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
-import java.text.ParseException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.yangtools.concepts.SemVer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangVersion;
-import org.opendaylight.yangtools.yang.model.api.AugmentationSchema;
+import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Deviation;
@@ -44,17 +44,8 @@ import org.opendaylight.yangtools.yang.model.api.UsesNode;
  */
 final class FakeRestconfModule implements Module {
 
-    static final QNameModule QNAME;
-
-    static {
-        Date date;
-        try {
-            date = SimpleDateFormatUtil.getRevisionFormat().parse("2016-06-28");
-        } catch (final ParseException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-        QNAME = QNameModule.create(URI.create("urn:ietf:params:xml:ns:yang:ietf-restconf"), date).intern();
-    }
+    static final QNameModule QNAME = QNameModule.create(URI.create("urn:ietf:params:xml:ns:yang:ietf-restconf"),
+        Revision.of("2016-06-28")).intern();
 
     private final Collection<DataSchemaNode> children;
     private final ImmutableSet<ModuleImport> imports;
@@ -86,10 +77,10 @@ final class FakeRestconfModule implements Module {
     }
 
     @Override
-    public DataSchemaNode getDataChildByName(final QName name) {
+    public Optional<DataSchemaNode> findDataChildByName(final QName name) {
         for (final DataSchemaNode node : this.children) {
             if (node.getQName().equals(name)) {
-                return node;
+                return Optional.of(node);
             }
         }
         throw new RestconfDocumentedException(name + " is not in child of " + FakeRestconfModule.QNAME);
@@ -97,11 +88,6 @@ final class FakeRestconfModule implements Module {
 
     @Override
     public Set<UsesNode> getUses() {
-        throw new UnsupportedOperationException("Not supported operations.");
-    }
-
-    @Override
-    public String getModuleSourcePath() {
         throw new UnsupportedOperationException("Not supported operations.");
     }
 
@@ -121,7 +107,7 @@ final class FakeRestconfModule implements Module {
     }
 
     @Override
-    public Date getRevision() {
+    public Optional<Revision> getRevision() {
         return QNAME.getRevision();
     }
 
@@ -131,27 +117,27 @@ final class FakeRestconfModule implements Module {
     }
 
     @Override
-    public String getYangVersion() {
-        return YangVersion.VERSION_1.toString();
+    public YangVersion getYangVersion() {
+        return YangVersion.VERSION_1;
     }
 
     @Override
-    public String getDescription() {
+    public Optional<String> getDescription() {
         throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
-    public String getReference() {
+    public Optional<String> getReference() {
         throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
-    public String getOrganization() {
+    public Optional<String> getOrganization() {
         throw new UnsupportedOperationException("Operation not implemented.");
     }
 
     @Override
-    public String getContact() {
+    public Optional<String> getContact() {
         throw new UnsupportedOperationException("Operation not implemented.");
     }
 
@@ -176,7 +162,7 @@ final class FakeRestconfModule implements Module {
     }
 
     @Override
-    public Set<AugmentationSchema> getAugmentations() {
+    public Set<AugmentationSchemaNode> getAugmentations() {
         throw new UnsupportedOperationException("Operation not implemented.");
     }
 
@@ -206,7 +192,7 @@ final class FakeRestconfModule implements Module {
     }
 
     @Override
-    public String getSource() {
+    public Optional<SemVer> getSemanticVersion() {
         throw new UnsupportedOperationException("Operation not implemented.");
     }
 }

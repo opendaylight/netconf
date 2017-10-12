@@ -17,7 +17,7 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 
-public class StatisticsRestconfServiceWrapper implements RestconfService {
+public final class StatisticsRestconfServiceWrapper implements RestconfService {
 
     AtomicLong operationalGet = new AtomicLong();
     AtomicLong configGet = new AtomicLong();

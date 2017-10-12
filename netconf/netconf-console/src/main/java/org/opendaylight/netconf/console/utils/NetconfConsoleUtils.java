@@ -23,7 +23,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfConsoleUtils {
+public final class NetconfConsoleUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfConsoleUtils.class);
 

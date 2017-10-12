@@ -11,5 +11,7 @@
         <configfile finalname="etc/org.opendaylight.restconf.cfg">
             mvn:org.opendaylight.netconf/sal-rest-connector-config/${project.version}/cfg/restconf
         </configfile>
+        <feature version="[3.0.0,4)">odl-karaf-feat-jetty</feature>
+        <feature version="[3.0.0,4)">odl-netty-4</feature>
     </feature>
 </features>

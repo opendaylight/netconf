@@ -13,7 +13,7 @@ import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 
-public class QueryParametersParser {
+public final class QueryParametersParser {
 
     private enum UriParameters {
         PRETTY_PRINT("prettyPrint"),
@@ -29,6 +29,10 @@ public class QueryParametersParser {
         public String toString() {
             return this.uriParameterName;
         }
+    }
+
+    private QueryParametersParser() {
+
     }
 
     public static WriterParameters parseWriterParameters(final UriInfo info) {
@@ -58,7 +62,7 @@ public class QueryParametersParser {
                 }
                 wpBuilder.setDepth(depth);
             } catch (final NumberFormatException e) {
-                throw new RestconfDocumentedException(new RestconfError(
+                throw new RestconfDocumentedException(e, new RestconfError(
                         RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                         "Invalid depth parameter: " + e.getMessage(), null,
                         "The depth parameter must be an integer > 1 or \"unbounded\""));

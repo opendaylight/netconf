@@ -37,11 +37,8 @@ public final class StringModuleInstanceIdentifierCodec extends AbstractModuleStr
 
     @Override
     protected Module moduleForPrefix(@Nonnull final String prefix) {
-        if (prefix.isEmpty() && !this.defaultPrefix.isEmpty()) {
-            return this.context.findModuleByName(this.defaultPrefix, null);
-        } else {
-            return this.context.findModuleByName(prefix, null);
-        }
+        final String moduleName = prefix.isEmpty() && !defaultPrefix.isEmpty() ? defaultPrefix : prefix;
+        return context.findModules(moduleName).stream().findFirst().orElse(null);
     }
 
     @Nonnull
@@ -53,7 +50,6 @@ public final class StringModuleInstanceIdentifierCodec extends AbstractModuleStr
     @Nullable
     @Override
     protected String prefixForNamespace(@Nonnull final URI namespace) {
-        final Module module = this.context.findModuleByNamespaceAndRevision(namespace, null);
-        return module == null ? null : module.getName();
+        return this.context.findModules(namespace).stream().findFirst().map(Module::getName).orElse(null);
     }
 }

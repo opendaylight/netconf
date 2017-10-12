@@ -43,8 +43,8 @@ public class NetconfDeviceNotificationServiceTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        final SchemaPath path1 = SchemaPath.create(true, new QName(new URI("namespace1"), "path1"));
-        final SchemaPath path2 = SchemaPath.create(true, new QName(new URI("namespace2"), "path2"));
+        final SchemaPath path1 = SchemaPath.create(true, QName.create(new URI("namespace1"), "path1"));
+        final SchemaPath path2 = SchemaPath.create(true, QName.create(new URI("namespace2"), "path2"));
         service = new NetconfDeviceNotificationService();
         service.registerNotificationListener(listener1, path1);
         registration = service.registerNotificationListener(listener2, path2);

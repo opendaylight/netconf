@@ -25,7 +25,7 @@ import org.opendaylight.netconf.test.tool.rpc.SimulatedGetConfig;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedLock;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedUnLock;
 
-public class DefaultOperationsCreator implements OperationsCreator {
+public final class DefaultOperationsCreator implements OperationsCreator {
 
     private final SimulatedOperationService simulatedOperationService;
 

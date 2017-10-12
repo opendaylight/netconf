@@ -12,13 +12,17 @@ import com.google.common.base.Strings;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NetconfCommandUtils {
+public final class NetconfCommandUtils {
 
     private static final Pattern IP_PATTERN = Pattern.compile(
             "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
                     + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
                     + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\."
                     + "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+
+    private NetconfCommandUtils() {
+
+    }
 
     public static boolean isPortValid(final String devicePort) {
         if (Strings.isNullOrEmpty(devicePort)) {

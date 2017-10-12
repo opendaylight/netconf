@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import org.apache.sshd.ClientSession;
+import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.client.session.ClientSessionImpl;
 import org.junit.Test;
 

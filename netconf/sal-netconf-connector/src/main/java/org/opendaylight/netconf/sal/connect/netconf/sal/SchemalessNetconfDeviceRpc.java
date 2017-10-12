@@ -11,6 +11,7 @@ import com.google.common.base.Function;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcAvailabilityListener;
@@ -82,7 +83,7 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
                 } else {
                     return new DefaultDOMRpcResult(input1.getErrors());
                 }
-            });
+            }, MoreExecutors.directExecutor());
 
         return Futures.makeChecked(transformed,
             e -> new DOMRpcImplementationNotAvailableException(e,
@@ -95,8 +96,7 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
 
     @Nonnull
     @Override
-    public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
-            @Nonnull final T listener) {
+    public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull final T lsnr) {
         throw new UnsupportedOperationException("Not available for netconf 1.0");
     }
 

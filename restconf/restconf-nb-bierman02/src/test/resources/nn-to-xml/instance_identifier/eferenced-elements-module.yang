@@ -3,7 +3,7 @@ module referenced-elements-module {
 
   prefix "refelmo";
    
-  revision 2013-12-3 {    
+  revision 2013-12-03 {    
   }
   
 	container cont {

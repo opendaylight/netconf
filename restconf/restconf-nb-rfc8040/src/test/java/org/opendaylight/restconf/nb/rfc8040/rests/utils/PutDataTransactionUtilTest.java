@@ -72,7 +72,7 @@ public class PutDataTransactionUtilTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         this.refSchemaCtx = new SchemaContextRef(
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
         this.schema = this.refSchemaCtx.get();
 
         final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");

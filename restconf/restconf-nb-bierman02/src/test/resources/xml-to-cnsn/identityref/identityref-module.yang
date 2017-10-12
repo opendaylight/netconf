@@ -3,9 +3,9 @@ module identityref-module {
 
   prefix "iderefmod";
   
-  import identity-module {prefix idemo; revision-date 2013-12-2;}
+  import identity-module {prefix idemo; revision-date 2013-12-02;}
    
-  revision 2013-12-2 {    
+  revision 2013-12-02 {    
   }
   
 	container cont {

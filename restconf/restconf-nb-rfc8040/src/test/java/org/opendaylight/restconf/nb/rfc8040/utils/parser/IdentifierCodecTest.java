@@ -11,6 +11,7 @@ package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.FileNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
@@ -30,8 +31,8 @@ public class IdentifierCodecTest {
     private SchemaContext schemaContext;
 
     @Before
-    public void init() throws Exception {
-        this.schemaContext = YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/restconf/parser"));
+    public void init() throws FileNotFoundException {
+        this.schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/restconf/parser"));
     }
 
     /**

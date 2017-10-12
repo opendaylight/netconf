@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-public class TestRestconfUtils {
+public final class TestRestconfUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestRestconfUtils.class);
 
@@ -55,14 +55,14 @@ public class TestRestconfUtils {
     public static SchemaContext loadSchemaContext(final String yangPath, final SchemaContext schemaContext) {
         try {
             Preconditions.checkArgument(yangPath != null, "Path can not be null.");
-            Preconditions.checkArgument((!yangPath.isEmpty()), "Path can not be empty.");
+            Preconditions.checkArgument(!yangPath.isEmpty(), "Path can not be empty.");
             if (schemaContext == null) {
-                return YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles(yangPath));
+                return YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(yangPath));
             } else {
                 throw new UnsupportedOperationException("Unable to add new yang sources to existing schema context.");
             }
         } catch (final Exception e) {
-            LOG.error("Yang files at path: " + yangPath + " weren't loaded.");
+            LOG.error("Yang files at path: " + yangPath + " weren't loaded.", e);
         }
         return schemaContext;
     }

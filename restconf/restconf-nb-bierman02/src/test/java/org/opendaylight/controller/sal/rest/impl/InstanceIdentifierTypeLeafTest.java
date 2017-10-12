@@ -24,7 +24,7 @@ public class InstanceIdentifierTypeLeafTest {
     @Test
     public void stringToInstanceIdentifierTest() throws Exception {
         final SchemaContext schemaContext =
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/instanceidentifier"));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/instanceidentifier"));
         ControllerContext.getInstance().setGlobalSchema(schemaContext);
         final InstanceIdentifierContext<?> instanceIdentifier =
                 ControllerContext.getInstance().toInstanceIdentifier(

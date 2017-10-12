@@ -21,7 +21,7 @@ import scala.concurrent.duration.Duration;
 /**
  * WriteTransactionActor is an interface to device's {@link DOMDataReadOnlyTransaction} for cluster nodes.
  */
-public class WriteTransactionActor extends UntypedActor {
+public final class WriteTransactionActor extends UntypedActor {
 
     private static final Logger LOG = LoggerFactory.getLogger(WriteTransactionActor.class);
 

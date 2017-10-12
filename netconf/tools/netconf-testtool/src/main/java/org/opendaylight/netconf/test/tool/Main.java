@@ -42,9 +42,12 @@ import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public final class Main {
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
+
+    private Main() {
+
+    }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     public static void main(final String[] args) {
