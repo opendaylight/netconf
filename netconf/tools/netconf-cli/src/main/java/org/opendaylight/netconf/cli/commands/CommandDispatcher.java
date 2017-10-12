@@ -7,16 +7,11 @@
  */
 package org.opendaylight.netconf.cli.commands;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -32,7 +27,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
@@ -62,7 +56,7 @@ public class CommandDispatcher {
         return mergeMaps(nameToQNameRemote, nameToQNameLocal);
     }
 
-    private <K, V> Map<K, V> mergeMaps(final Map<K, V> remoteMap, final Map<K, V> localMap) {
+    private static <K, V> Map<K, V> mergeMaps(final Map<K, V> remoteMap, final Map<K, V> localMap) {
         final Map<K, V> mergedCommands = Maps.newHashMap();
         mergedCommands.putAll(remoteMap);
         mergedCommands.putAll(localMap);
@@ -171,27 +165,6 @@ public class CommandDispatcher {
     }
 
     public static SchemaContext parseSchema(final Collection<String> yangPath) {
-        final List<InputStream> streams = loadYangs(yangPath);
-        final SchemaContext schemaContext;
-        try {
-            schemaContext = YangParserTestUtils.parseYangStreams(streams);
-        } catch (ReactorException e) {
-            throw new RuntimeException("Unable to build schema context from " + streams, e);
-        }
-        return schemaContext;
-    }
-
-    private static List<InputStream> loadYangs(final Collection<String> yangPaths) {
-
-        return Lists.newArrayList(Collections2.transform(Lists.newArrayList(yangPaths),
-                new Function<String, InputStream>() {
-                    @Override
-                    public InputStream apply(final String input) {
-                        final InputStream resourceAsStream = NetconfDeviceConnectionHandler.class
-                            .getResourceAsStream(input);
-                        Preconditions.checkNotNull(resourceAsStream, "File %s was null", input);
-                        return resourceAsStream;
-                    }
-                }));
+        return YangParserTestUtils.parseYangResources(NetconfDeviceConnectionHandler.class, yangPath);
     }
 }

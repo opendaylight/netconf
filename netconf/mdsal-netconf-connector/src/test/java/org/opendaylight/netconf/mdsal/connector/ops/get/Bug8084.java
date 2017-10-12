@@ -11,12 +11,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.XmlElement;
@@ -35,11 +32,9 @@ public class Bug8084 {
 
     @Test
     public void testValidateTypes() throws Exception {
-        final List<InputStream> sources = new ArrayList<>();
-        sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-mod-0.yang"));
-        sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-augment.yang"));
-        sources.add(getClass().getResourceAsStream("/yang/mdsal-netconf-mapping-test.yang"));
-        final SchemaContext context = YangParserTestUtils.parseYangStreams(sources);
+        final SchemaContext context = YangParserTestUtils.parseYangResources(Bug8084.class,
+            "/yang/filter-validator-test-mod-0.yang", "/yang/filter-validator-test-augment.yang",
+            "/yang/mdsal-netconf-mapping-test.yang");
         final CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
         doReturn(context).when(currentContext).getCurrentContext();
         final FilterContentValidator validator = new FilterContentValidator(currentContext);

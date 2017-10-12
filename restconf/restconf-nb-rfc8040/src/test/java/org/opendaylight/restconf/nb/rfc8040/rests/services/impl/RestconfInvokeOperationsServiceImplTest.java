@@ -52,7 +52,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
         final SchemaContextRef contextRef = new SchemaContextRef(
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
         final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
         final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
         Mockito.when(txHandler.get()).thenReturn(domTx);

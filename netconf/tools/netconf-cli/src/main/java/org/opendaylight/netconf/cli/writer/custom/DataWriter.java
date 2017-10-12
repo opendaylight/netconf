@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.cli.writer.custom;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.opendaylight.netconf.cli.io.ConsoleIO;
 import org.opendaylight.netconf.cli.writer.OutFormatter;
 import org.opendaylight.netconf.cli.writer.WriteException;
@@ -48,7 +48,7 @@ public class DataWriter extends AbstractWriter<DataSchemaNode> {
             output, dataSchemaNode.getQName().getLocalName()).openComposite(output);
         console.writeLn(output.toString());
 
-        for (final Object childNodeObject : ((DataContainerNode) dataNode).getValue()) {
+        for (final Object childNodeObject : ((DataContainerNode<?>) dataNode).getValue()) {
             final NormalizedNode<?, ?> childNode = (NormalizedNode<?, ?>) childNodeObject;
             final Optional<DataSchemaNode> schemaNode = SchemaUtils.findFirstSchema(childNode.getNodeType(),
                 remoteSchemaContext.getDataDefinitions());

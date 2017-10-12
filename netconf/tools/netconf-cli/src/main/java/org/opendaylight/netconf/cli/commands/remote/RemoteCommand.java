@@ -7,12 +7,11 @@
  */
 package org.opendaylight.netconf.cli.commands.remote;
 
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.cli.commands.AbstractCommand;
@@ -45,7 +44,7 @@ public class RemoteCommand extends AbstractCommand {
 
     @Override
     public Output invoke(final Input inputArgs) throws CommandInvocationException {
-        final CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc = rpcService.invokeRpc(
+        final ListenableFuture<DOMRpcResult> invokeRpc = rpcService.invokeRpc(
             SchemaPath.create(Collections.singletonList(getCommandId()), true), inputArgs.wrap(getCommandId()));
 
         try {
@@ -65,6 +64,7 @@ public class RemoteCommand extends AbstractCommand {
         final InputDefinition args = getInputDefinition(rpcDefinition);
         final OutputDefinition retVal = getOutputDefinition(rpcDefinition);
 
-        return new RemoteCommand(rpcDefinition.getQName(), args, retVal, rpcDefinition.getDescription(), rpcService);
+        return new RemoteCommand(rpcDefinition.getQName(), args, retVal, rpcDefinition.getDescription().orElse(null),
+            rpcService);
     }
 }

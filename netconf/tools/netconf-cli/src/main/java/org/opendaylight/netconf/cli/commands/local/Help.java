@@ -77,6 +77,6 @@ public class Help extends AbstractCommand {
 
     public static Command create(final RpcDefinition rpcDefinition, final CommandDispatcher commandDispatcher) {
         return new Help(rpcDefinition.getQName(), getInputDefinition(rpcDefinition), getOutputDefinition(rpcDefinition),
-            rpcDefinition.getDescription(), commandDispatcher);
+            rpcDefinition.getDescription().orElse(null), commandDispatcher);
     }
 }

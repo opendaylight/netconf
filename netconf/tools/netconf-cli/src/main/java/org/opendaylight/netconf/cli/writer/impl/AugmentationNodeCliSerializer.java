@@ -13,7 +13,7 @@ import org.opendaylight.netconf.cli.writer.OutFormatter;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.base.serializer.AugmentationNodeBaseSerializer;
 import org.opendaylight.yangtools.yang.data.impl.schema.transform.base.serializer.NodeSerializerDispatcher;
-import org.opendaylight.yangtools.yang.model.api.AugmentationSchema;
+import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 
 final class AugmentationNodeCliSerializer extends AugmentationNodeBaseSerializer<String> {
 
@@ -26,7 +26,7 @@ final class AugmentationNodeCliSerializer extends AugmentationNodeBaseSerializer
     }
 
     @Override
-    public Iterable<String> serialize(final AugmentationSchema schema, final AugmentationNode node) {
+    public Iterable<String> serialize(final AugmentationSchemaNode schema, final AugmentationNode node) {
         final StringBuilder output = new StringBuilder();
         out.increaseIndent();
         out.addStringWithIndent(output, "augment");

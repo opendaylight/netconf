@@ -36,7 +36,7 @@ public class Close extends AbstractCommand {
 
     public static Command create(final RpcDefinition rpcDefinition) {
         return new Close(rpcDefinition.getQName(), getInputDefinition(rpcDefinition),
-                getOutputDefinition(rpcDefinition), rpcDefinition.getDescription());
+                getOutputDefinition(rpcDefinition), rpcDefinition.getDescription().orElse(null));
     }
 
 }

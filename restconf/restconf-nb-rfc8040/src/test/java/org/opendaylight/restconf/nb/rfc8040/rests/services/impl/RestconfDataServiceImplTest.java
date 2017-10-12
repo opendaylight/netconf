@@ -175,7 +175,7 @@ public class RestconfDataServiceImplTest {
                 .build();
 
         this.contextRef = new SchemaContextRef(
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
         this.schemaNode = DataSchemaContextTree.from(this.contextRef.get()).getChild(this.iidBase).getDataSchemaNode();
 
         final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);

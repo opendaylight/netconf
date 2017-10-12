@@ -80,7 +80,7 @@ public class ChoiceReader extends AbstractReader<ChoiceSchemaNode> {
         return Collections.<NormalizedNode<?, ?>>singletonList(
                 ImmutableChoiceNodeBuilder.create()
                         .withNodeIdentifier(new NodeIdentifier(choiceNode.getQName()))
-                        .withValue(((Collection) readSelectedCase(selectedCase))).build());
+                        .withValue((Collection) readSelectedCase(selectedCase)).build());
     }
 
     protected List<NormalizedNode<?, ?>> readSelectedCase(final ChoiceCaseNode selectedCase) throws ReadingException {
@@ -125,12 +125,7 @@ public class ChoiceReader extends AbstractReader<ChoiceSchemaNode> {
     }
 
     private static Map<String, ChoiceCaseNode> collectAllCases(final ChoiceSchemaNode schemaNode) {
-        return Maps.uniqueIndex(schemaNode.getCases(), new Function<ChoiceCaseNode, String>() {
-            @Override
-            public String apply(final ChoiceCaseNode input) {
-                return input.getQName().getLocalName();
-            }
-        });
+        return Maps.uniqueIndex(schemaNode.getCases().values(), (Function<ChoiceCaseNode, String>) input -> input.getQName().getLocalName());
     }
 
     @Override

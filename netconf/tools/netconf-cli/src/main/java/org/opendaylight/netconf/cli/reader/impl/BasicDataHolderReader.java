@@ -10,7 +10,6 @@ package org.opendaylight.netconf.cli.reader.impl;
 import static org.opendaylight.netconf.cli.io.IOUtil.isSkipInput;
 import static org.opendaylight.netconf.cli.io.IOUtil.listType;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.Collections2;
@@ -240,13 +239,9 @@ public abstract class BasicDataHolderReader<T extends DataSchemaNode> extends Ab
         @Override
         public int complete(final String buffer, final int cursor, final List<CharSequence> candidates) {
 
-            return new StringsCompleter(Collections2.transform(((IdentityrefTypeDefinition) getType()).getIdentity()
-                    .getDerivedIdentities(), new Function<IdentitySchemaNode, String>() {
-                        @Override
-                        public String apply(final IdentitySchemaNode input) {
-                            return identityMap.inverse().get(input.getQName());
-                        }
-                    })).complete(buffer, cursor, candidates);
+            return new StringsCompleter(Collections2.transform(((IdentityrefTypeDefinition) getType()).getIdentities()
+                .iterator().next().getDerivedIdentities(), input -> identityMap.inverse().get(input.getQName())))
+                    .complete(buffer, cursor, candidates);
         }
     }
 }
