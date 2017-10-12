@@ -8,12 +8,11 @@
 
 package org.opendaylight.netconf.test.tool;
 
-import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.channel.Channel;
@@ -62,8 +61,6 @@ import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -92,7 +89,7 @@ public class NetconfDeviceSimulator implements Closeable {
 
     private boolean sendFakeSchema = false;
 
-    public NetconfDeviceSimulator(Configuration configuration) {
+    public NetconfDeviceSimulator(final Configuration configuration) {
         this.configuration = configuration;
         this.nettyThreadgroup = new NioEventLoopGroup();
         this.hashedWheelTimer = new HashedWheelTimer();
@@ -267,7 +264,7 @@ public class NetconfDeviceSimulator implements Closeable {
         return openDevices;
     }
 
-    private SshProxyServerConfiguration getSshConfiguration(final InetSocketAddress bindingAddress,
+    private static SshProxyServerConfiguration getSshConfiguration(final InetSocketAddress bindingAddress,
             final LocalAddress tcpLocalAddress, final PEMGeneratorHostKeyProvider keyPairProvider) throws IOException {
         return new SshProxyServerConfigurationBuilder()
                 .setBindingAddress(bindingAddress)
@@ -282,7 +279,7 @@ public class NetconfDeviceSimulator implements Closeable {
                 .createSshProxyServerConfiguration();
     }
 
-    private PEMGeneratorHostKeyProvider getPemGeneratorHostKeyProvider() {
+    private static PEMGeneratorHostKeyProvider getPemGeneratorHostKeyProvider() {
         try {
             final Path tempFile = Files.createTempFile("tempKeyNetconfTest", "suffix");
             return new PEMGeneratorHostKeyProvider(tempFile.toAbsolutePath().toString(), "RSA", 4096);
@@ -330,8 +327,8 @@ public class NetconfDeviceSimulator implements Closeable {
             //necessary for creating mdsal data stores and operations
             this.schemaContext = consumer.createSchemaContextFactory(
                 SchemaSourceFilter.ALWAYS_ACCEPT)
-                .createSchemaContext(loadedSources).checkedGet();
-        } catch (final SchemaResolutionException e) {
+                .createSchemaContext(loadedSources).get();
+        } catch (final InterruptedException | ExecutionException e) {
             throw new RuntimeException("Cannot parse schema context", e);
         }
 
@@ -346,23 +343,23 @@ public class NetconfDeviceSimulator implements Closeable {
         return capabilities;
     }
 
-    private void addModuleCapability(final SharedSchemaRepository consumer, final Set<Capability> capabilities,
+    private static void addModuleCapability(final SharedSchemaRepository consumer, final Set<Capability> capabilities,
                                      final Module module) {
         final SourceIdentifier moduleSourceIdentifier = SourceIdentifier.create(module.getName(),
-                (SimpleDateFormatUtil.DEFAULT_DATE_REV == module.getRevision() ? Optional.absent() :
-                        Optional.of(module.getQNameModule().getFormattedRevision())));
+                SimpleDateFormatUtil.DEFAULT_DATE_REV == module.getRevision() ? java.util.Optional.empty() :
+                        java.util.Optional.of(module.getQNameModule().getFormattedRevision()));
         try {
             final String moduleContent = new String(
-                consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class).checkedGet().read());
+                consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class).get().read());
             capabilities.add(new YangModuleCapability(module, moduleContent));
             //IOException would be thrown in creating SchemaContext already
-        } catch (SchemaSourceException | IOException e) {
+        } catch (ExecutionException | InterruptedException | IOException e) {
             throw new RuntimeException("Cannot retrieve schema source for module "
                 + moduleSourceIdentifier.toString() + " from schema repository", e);
         }
     }
 
-    private void addDefaultSchemas(final SharedSchemaRepository consumer) {
+    private static void addDefaultSchemas(final SharedSchemaRepository consumer) {
         SourceIdentifier srcId = RevisionSourceIdentifier.create("ietf-netconf-monitoring", "2010-10-04");
         registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring.yang", srcId);
 
@@ -376,27 +373,20 @@ public class NetconfDeviceSimulator implements Closeable {
         registerSource(consumer, "/META-INF/yang/ietf-inet-types@2013-07-15.yang", srcId);
     }
 
-    private void registerSource(final SharedSchemaRepository consumer, final String resource,
+    private static void registerSource(final SharedSchemaRepository consumer, final String resource,
                                 final SourceIdentifier sourceId) {
-        consumer.registerSchemaSource(new SchemaSourceProvider<SchemaSourceRepresentation>() {
+        consumer.registerSchemaSource(sourceIdentifier -> Futures.immediateFuture(new YangTextSchemaSource(sourceId) {
             @Override
-            public CheckedFuture<? extends SchemaSourceRepresentation, SchemaSourceException> getSource(
-                    final SourceIdentifier sourceIdentifier) {
-                return Futures.immediateCheckedFuture(new YangTextSchemaSource(sourceId) {
-                    @Override
-                    protected MoreObjects.ToStringHelper addToStringAttributes(
-                            final MoreObjects.ToStringHelper toStringHelper) {
-                        return toStringHelper;
-                    }
-
-                    @Override
-                    public InputStream openStream() throws IOException {
-                        return getClass().getResourceAsStream(resource);
-                    }
-                });
+            protected ToStringHelper addToStringAttributes(final ToStringHelper toStringHelper) {
+                return toStringHelper;
             }
-        }, PotentialSchemaSource.create(
-            sourceId, YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
+
+            @Override
+            public InputStream openStream() throws IOException {
+                return getClass().getResourceAsStream(resource);
+            }
+        }), PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class,
+            PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
     }
 
     private static InetSocketAddress getAddress(final String ip, final int port) {

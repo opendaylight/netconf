@@ -71,11 +71,6 @@ final class FakeImportedModule extends ForwardingObject implements Module {
     }
 
     @Override
-    public String getModuleSourcePath() {
-        return null;
-    }
-
-    @Override
     public QNameModule getQNameModule() {
         return delegate.getQNameModule();
     }

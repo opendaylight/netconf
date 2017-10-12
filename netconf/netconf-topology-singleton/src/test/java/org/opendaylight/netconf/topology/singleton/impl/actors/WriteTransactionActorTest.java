@@ -65,7 +65,7 @@ public class WriteTransactionActorTest {
         system = ActorSystem.apply();
         probe = TestProbe.apply(system);
         node = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("cont")))
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont")))
                 .build();
         actorRef = TestActorRef.create(system, WriteTransactionActor.props(deviceWriteTx,
                 Duration.apply(2, TimeUnit.SECONDS)), "testA");

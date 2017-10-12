@@ -72,7 +72,7 @@ public class ReadWriteTransactionActorTest {
         system = ActorSystem.apply();
         probe = TestProbe.apply(system);
         node = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("cont")))
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont")))
                 .build();
         actorRef = TestActorRef.create(system, ReadWriteTransactionActor.props(deviceReadWriteTx,
                 Duration.apply(2, TimeUnit.SECONDS)), "testA");
@@ -86,7 +86,7 @@ public class ReadWriteTransactionActorTest {
     @Test
     public void testRead() throws Exception {
         final ContainerNode node = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("cont")))
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont")))
                 .build();
         when(deviceReadWriteTx.read(STORE, PATH)).thenReturn(Futures.immediateCheckedFuture(Optional.of(node)));
         actorRef.tell(new ReadRequest(STORE, PATH), probe.ref());
