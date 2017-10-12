@@ -8,15 +8,15 @@
 
 package org.opendaylight.yanglib.impl;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import org.opendaylight.yanglib.api.YangLibService;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.slf4j.Logger;
@@ -43,17 +43,17 @@ public class YangLibServiceImpl implements YangLibService {
     public String getSchema(final String name, final String revision) {
         Preconditions.checkNotNull(schemaRepository, "Schema repository is not initialized");
         LOG.debug("Attempting load for schema source {}:{}", name, revision);
-        final SourceIdentifier sourceId =
-                RevisionSourceIdentifier.create(name, Optional.fromNullable(revision.equals("") ? null : revision));
+        final SourceIdentifier sourceId = RevisionSourceIdentifier.create(name,
+            revision.isEmpty() ? null : Revision.of(revision));
 
-        final CheckedFuture<YangTextSchemaSource, SchemaSourceException> sourceFuture =
-                schemaRepository.getSchemaSource(sourceId, YangTextSchemaSource.class);
+        final ListenableFuture<YangTextSchemaSource> sourceFuture = schemaRepository.getSchemaSource(sourceId,
+            YangTextSchemaSource.class);
 
         try {
-            final YangTextSchemaSource source = sourceFuture.checkedGet();
+            final YangTextSchemaSource source = sourceFuture.get();
             return new String(ByteStreams.toByteArray(source.openStream()));
-        } catch (SchemaSourceException | IOException e) {
-            throw new IllegalStateException("Unable to get schema" + sourceId, e);
+        } catch (InterruptedException | ExecutionException | IOException e) {
+            throw new IllegalStateException("Unable to get schema " + sourceId, e);
         }
     }
 }

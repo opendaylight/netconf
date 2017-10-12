@@ -75,7 +75,7 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
     public static void initialization() throws Exception {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
-        schemaContext = YangParserTestUtils.parseYangSources(testFiles);
+        schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
 
         final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
@@ -140,13 +140,13 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         checkNormalizedNodeContext(returnValue);
         final ContainerNode contNode = (ContainerNode) returnValue.getData();
         final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(QName.create(contNode.getNodeType(), "cont"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> contDataNodePotential = contNode.getChild(
-                yangCont.getLastPathArgument());
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> contDataNodePotential = contNode
+                .getChild(yangCont.getLastPathArgument());
         assertTrue(contDataNodePotential.isPresent());
         final ContainerNode contDataNode = (ContainerNode) contDataNodePotential.get();
         final YangInstanceIdentifier yangLeaf =
                 YangInstanceIdentifier.of(QName.create(contDataNode.getNodeType(), "lf"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = contDataNode.getChild(
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = contDataNode.getChild(
                 yangLeaf.getLastPathArgument());
         assertTrue(leafDataNode.isPresent());
         assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue().toString()));
@@ -168,7 +168,7 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
                 .getSchemaContext().getDataChildByName(
                         dataSchemaNode.getQName());
         assertNotNull(mountDataSchemaNode);
-        if ((qualifiedName != null) && (dataSchemaNode instanceof DataNodeContainer)) {
+        if (qualifiedName != null && dataSchemaNode instanceof DataNodeContainer) {
             final DataSchemaNode child = ((DataNodeContainer) dataSchemaNode)
                     .getDataChildByName(qualifiedName);
             dataNodeIdent = YangInstanceIdentifier.builder(dataNodeIdent)

@@ -104,9 +104,9 @@ public class ParserIdentifierTest {
     @Before
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
-        this.schemaContext = YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/parser-identifier"));
+        this.schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/parser-identifier"));
         this.schemaContextOnMountPoint =
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/parser-identifier"));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/parser-identifier"));
 
         // create and register mount point
         this.mountPoint = SimpleDOMMountPoint.create(
