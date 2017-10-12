@@ -12,13 +12,14 @@ import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
+import org.opendaylight.mdsal.common.api.MappingCheckedFuture;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.util.concurrent.MappingCheckedFuture;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
@@ -62,28 +63,23 @@ public final class ReadOnlyTx implements DOMDataReadOnlyTransaction {
     public CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> read(
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         switch (store) {
-            case CONFIGURATION: {
+            case CONFIGURATION:
                 return readConfigurationData(path);
-            }
-            case OPERATIONAL: {
+            case OPERATIONAL:
                 return readOperationalData(path);
-            }
-            default: {
+            default:
                 LOG.info("Unknown datastore type: {}.", store);
-            }
+                throw new IllegalArgumentException(String.format(
+                    "%s, Cannot read data %s for %s datastore, unknown datastore type", id, path, store));
         }
 
-        throw new IllegalArgumentException(String.format(
-                "%s, Cannot read data %s for %s datastore, unknown datastore type", id, path, store));
     }
 
     @Override
     public CheckedFuture<Boolean, ReadFailedException> exists(final LogicalDatastoreType store,
                                                               final YangInstanceIdentifier path) {
-        final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> data = read(store, path);
-        final ListenableFuture<Boolean> result =
-                Futures.transform(data, (Optional<NormalizedNode<?, ?>> optionalNode) ->
-                        optionalNode != null && optionalNode.isPresent());
+        final ListenableFuture<Boolean> result = Futures.transform(read(store, path),
+            optionalNode -> optionalNode != null && optionalNode.isPresent(), MoreExecutors.directExecutor());
         return MappingCheckedFuture.create(result, ReadFailedException.MAPPER);
     }
 
