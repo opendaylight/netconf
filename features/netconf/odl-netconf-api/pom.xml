@@ -14,7 +14,7 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>single-feature-parent</artifactId>
-        <version>2.0.5</version>
+        <version>3.0.2</version>
         <relativePath/>
     </parent>
 
@@ -37,7 +37,7 @@
             <dependency>
                 <groupId>org.opendaylight.yangtools</groupId>
                 <artifactId>yangtools-artifacts</artifactId>
-                <version>1.2.0</version>
+                <version>2.0.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -53,7 +53,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>odl-yangtools-yang-data</artifactId>
+            <artifactId>odl-yangtools-data</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
