@@ -22,7 +22,6 @@ import java.io.StringReader;
 import java.util.Map;
 import org.junit.BeforeClass;
 import org.opendaylight.controller.sal.restconf.impl.test.YangAndXmlAndDataSchemaLoader;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader {
 
@@ -178,7 +177,7 @@ public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader 
     }
 
     @BeforeClass
-    public static void initialize() throws FileNotFoundException, ReactorException {
+    public static void initialize() throws FileNotFoundException {
         dataLoad("/cnsn-to-json/simple-data-types");
     }
 

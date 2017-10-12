@@ -41,7 +41,7 @@ public class WriteCandidateTxTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         final SchemaContext schemaContext =
-                YangParserTestUtils.parseYangStreams(getClass().getResourceAsStream("/schemas/test-module.yang"));
+                YangParserTestUtils.parseYangResource("/schemas/test-module.yang");
         doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult())).when(rpc).invokeRpc(any(), any());
         netconfOps = new NetconfBaseOps(rpc, schemaContext);
         id = new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830));

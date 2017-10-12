@@ -50,7 +50,7 @@ public class CreateStreamUtilTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         this.refSchemaCtx = new SchemaContextRef(
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
     }
 
     @Test
@@ -111,8 +111,8 @@ public class CreateStreamUtilTest {
         } else {
             o = toasterValue;
         }
-        final LeafNode<Object> lfNode = (Builders.leafBuilder((LeafSchemaNode) lfSchemaNode)
-                .withValue(o)).build();
+        final LeafNode<Object> lfNode = Builders.leafBuilder((LeafSchemaNode) lfSchemaNode)
+                .withValue(o).build();
         container.withChild(lfNode);
 
         return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpcInputSchemaNode, null, schema),

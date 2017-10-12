@@ -27,7 +27,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
@@ -41,6 +40,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.SchemalessNetconfDeviceR
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.config.input.source.ConfigSource;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -66,8 +66,8 @@ public final class NetconfBaseOps {
         this.rpc = rpc;
         this.schemaContext = schemaContext;
 
-        if ((rpc instanceof KeepaliveDOMRpcService)
-                && (((KeepaliveDOMRpcService) rpc).getDeviceRpc() instanceof SchemalessNetconfDeviceRpc)) {
+        if (rpc instanceof KeepaliveDOMRpcService
+                && ((KeepaliveDOMRpcService) rpc).getDeviceRpc() instanceof SchemalessNetconfDeviceRpc) {
             this.transformer = new SchemalessRpcStructureTransformer();
         } else {
             this.transformer = new NetconfRpcStructureTransformer(schemaContext);
@@ -208,14 +208,14 @@ public final class NetconfBaseOps {
 
     private ListenableFuture<Optional<NormalizedNode<?, ?>>> extractData(
             final Optional<YangInstanceIdentifier> path, final ListenableFuture<DOMRpcResult> configRunning) {
-        return Futures.transform(configRunning, (Function<DOMRpcResult, Optional<NormalizedNode<?, ?>>>) result -> {
+        return Futures.transform(configRunning, result -> {
             Preconditions.checkArgument(
                     result.getErrors().isEmpty(), "Unable to read data: %s, errors: %s", path, result.getErrors());
             final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> dataNode =
                     ((ContainerNode) result.getResult()).getChild(
                             NetconfMessageTransformUtil.toId(NetconfMessageTransformUtil.NETCONF_DATA_QNAME)).get();
             return transformer.selectFromDataStructure(dataNode, path.get());
-        });
+        }, MoreExecutors.directExecutor());
     }
 
     public ListenableFuture<DOMRpcResult> getConfigRunning(final FutureCallback<DOMRpcResult> callback,
@@ -239,7 +239,7 @@ public final class NetconfBaseOps {
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_QNAME, toFilterStructure(filterPath.get(), schemaContext)))
                 : rpc.invokeRpc(toPath(NETCONF_GET_QNAME), NetconfMessageTransformUtil.GET_RPC_CONTENT);
 
-        Futures.addCallback(future, callback);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
@@ -322,10 +322,9 @@ public final class NetconfBaseOps {
 
     public static DataContainerChild<?, ?> getSourceNode(final QName datastore) {
         return Builders.containerBuilder().withNodeIdentifier(toId(NETCONF_SOURCE_QNAME))
-                .withChild(
-                        Builders.choiceBuilder().withNodeIdentifier(toId(ConfigSource.QNAME)).withChild(
-                                Builders.leafBuilder().withNodeIdentifier(toId(datastore)).build()).build()
-                ).build();
+                .withChild(Builders.choiceBuilder().withNodeIdentifier(toId(ConfigSource.QNAME)).withChild(
+                    Builders.leafBuilder().withNodeIdentifier(toId(datastore)).withValue(Empty.getInstance()).build())
+                    .build()).build();
     }
 
     public static ContainerNode getLockContent(final QName datastore) {
@@ -335,10 +334,9 @@ public final class NetconfBaseOps {
 
     public static DataContainerChild<?, ?> getTargetNode(final QName datastore) {
         return Builders.containerBuilder().withNodeIdentifier(toId(NETCONF_TARGET_QNAME))
-                .withChild(
-                        Builders.choiceBuilder().withNodeIdentifier(toId(ConfigTarget.QNAME)).withChild(
-                                Builders.leafBuilder().withNodeIdentifier(toId(datastore)).build()).build()
-                ).build();
+                .withChild(Builders.choiceBuilder().withNodeIdentifier(toId(ConfigTarget.QNAME)).withChild(
+                    Builders.leafBuilder().withNodeIdentifier(toId(datastore)).withValue(Empty.getInstance()).build())
+                    .build()).build();
     }
 
     public static NormalizedNode<?, ?> getCopyConfigContent(final QName source, final QName target) {
