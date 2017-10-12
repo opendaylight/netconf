@@ -98,6 +98,7 @@ public class NetconfEventSourceTest {
         final Node nodeId1 = NetconfTestUtils.getNetconfNode("NodeId1", "node.test.local", ConnectionStatus
                 .Connected, NetconfTestUtils.NOTIFICATION_CAPABILITY_PREFIX);
         doReturn(nodeId1).when(mount).getNode();
+        doReturn(nodeId1.getNodeId().getValue()).when(mount).getNodeId();
 
         Map<String, String> streamMap = new HashMap<>();
         streamMap.put(NOTIFICATION_1_PATH.getLastComponent().getNamespace().toString(), "stream-1");
@@ -126,8 +127,7 @@ public class NetconfEventSourceTest {
         final TopicDOMNotification value = (TopicDOMNotification) captor.getValue();
         final QName qname = TopicNotification.QNAME;
         final YangInstanceIdentifier.NodeIdentifier topicIdNode =
-                new YangInstanceIdentifier.NodeIdentifier(QName.create(qname.getNamespace().toString(), qname
-                        .getFormattedRevision(), "topic-id"));
+                new YangInstanceIdentifier.NodeIdentifier(QName.create(qname, "topic-id"));
         final Object actualTopicId = value.getBody().getChild(topicIdNode).get().getValue();
         Assert.assertEquals(topic1.getTopicId(), actualTopicId);
     }
@@ -151,14 +151,14 @@ public class NetconfEventSourceTest {
         verify(domNotificationPublishServiceMock, only()).putNotification(any());
     }
 
-    private Stream createStream(String name) {
+    private static Stream createStream(final String name) {
         return new StreamBuilder()
                 .setName(new StreamNameType(name))
                 .setReplaySupport(true)
                 .build();
     }
 
-    private NotificationDefinition getNotificationDefinitionMock(QName qualifiedName) {
+    private static NotificationDefinition getNotificationDefinitionMock(final QName qualifiedName) {
         NotificationDefinition notification = mock(NotificationDefinition.class);
         doReturn(qualifiedName).when(notification).getQName();
         doReturn(SchemaPath.create(true, qualifiedName)).when(notification).getPath();

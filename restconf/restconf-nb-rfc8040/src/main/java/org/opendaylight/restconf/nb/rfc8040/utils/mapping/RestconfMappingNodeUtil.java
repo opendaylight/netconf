@@ -22,6 +22,7 @@ import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule.QueryParams
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module.ConformanceType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -119,19 +120,20 @@ public final class RestconfMappingNodeUtil {
         addCommonLeafs(module, mapEntryBuilder, ietfYangLibraryModule);
         addChildOfModuleBySpecificModuleInternal(
                 IetfYangLibrary.SPECIFIC_MODULE_SCHEMA_LEAF_QNAME, mapEntryBuilder, IetfYangLibrary.BASE_URI_OF_SCHEMA
-                        + module.getName() + "/" + module.getQNameModule().getFormattedRevision(),
+                        + module.getName() + "/"
+                        + module.getQNameModule().getRevision().map(Revision::toString).orElse(null),
                 ietfYangLibraryModule);
         if (!isSubmodule) {
             addChildOfModuleBySpecificModuleOfListChild(IetfYangLibrary.SPECIFIC_MODULE_NAMESPACE_LEAF_QNAME,
                     mapEntryBuilder, module.getNamespace().toString(), ietfYangLibraryModule);
 
             // features - not mandatory
-            if ((module.getFeatures() != null) && !module.getFeatures().isEmpty()) {
+            if (module.getFeatures() != null && !module.getFeatures().isEmpty()) {
                 addFeatureLeafList(IetfYangLibrary.SPECIFIC_MODULE_FEATURE_LEAF_LIST_QNAME, mapEntryBuilder,
                         module.getFeatures(), ietfYangLibraryModule);
             }
             // deviations - not mandatory
-            if ((module.getDeviations() != null) && !module.getDeviations().isEmpty()) {
+            if (module.getDeviations() != null && !module.getDeviations().isEmpty()) {
                 addDeviationList(module, mapEntryBuilder, ietfYangLibraryModule, context);
                 addChildOfModuleBySpecificModuleOfListChild(IetfYangLibrary.SPECIFIC_MODULE_CONFORMANCE_LEAF_QNAME,
                         mapEntryBuilder, ConformanceType.Implement.getName(), ietfYangLibraryModule);
@@ -140,7 +142,7 @@ public final class RestconfMappingNodeUtil {
                         mapEntryBuilder, ConformanceType.Import.getName(), ietfYangLibraryModule);
             }
             // submodules - not mandatory
-            if ((module.getSubmodules() != null) && !module.getSubmodules().isEmpty()) {
+            if (module.getSubmodules() != null && !module.getSubmodules().isEmpty()) {
                 addSubmodules(module, mapEntryBuilder, ietfYangLibraryModule, context);
             }
         }
@@ -196,8 +198,7 @@ public final class RestconfMappingNodeUtil {
                     Builders.mapEntryBuilder((ListSchemaNode) deviationsSchema);
             final QName lastComponent = deviation.getTargetPath().getLastComponent();
             addChildOfModuleBySpecificModule(IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF_QNAME, deviationEntryNode,
-                    context.findModuleByNamespaceAndRevision(lastComponent.getNamespace(), lastComponent.getRevision())
-                            .getName(),
+                    context.findModule(lastComponent.getModule()).get().getName(),
                     ietfYangLibraryModule);
             addChildOfModuleBySpecificModule(IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF_QNAME, deviationEntryNode,
                     lastComponent.getRevision(), ietfYangLibraryModule);
@@ -249,7 +250,7 @@ public final class RestconfMappingNodeUtil {
         addChildOfModuleBySpecificModuleInternal(IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF_QNAME, mapEntryBuilder,
                 module.getName(), ietfYangLibraryModule);
         addChildOfModuleBySpecificModuleInternal(IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF_QNAME, mapEntryBuilder,
-                module.getQNameModule().getFormattedRevision(), ietfYangLibraryModule);
+                module.getQNameModule().getRevision().map(Revision::toString).orElse(null), ietfYangLibraryModule);
     }
 
     /**
@@ -486,12 +487,12 @@ public final class RestconfMappingNodeUtil {
                 final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
                         Builders.mapEntryBuilder((ListSchemaNode) streamListSchema);
 
-                final ListSchemaNode listSchema = ((ListSchemaNode) streamListSchema);
+                final ListSchemaNode listSchema = (ListSchemaNode) streamListSchema;
                 prepareLeafAndFillEntryBuilder(streamEntry,
                         listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME),
                         notificationDefinition.getQName().getLocalName());
-                if ((notificationDefinition.getDescription() != null)
-                        && !notificationDefinition.getDescription().equals("")) {
+                if (notificationDefinition.getDescription().isPresent()
+                        && !notificationDefinition.getDescription().get().equals("")) {
                     prepareLeafAndFillEntryBuilder(streamEntry,
                             listSchema.getDataChildByName(MonitoringModule.LEAF_DESCR_STREAM_QNAME),
                             notificationDefinition.getDescription());
@@ -589,11 +590,11 @@ public final class RestconfMappingNodeUtil {
         final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
                 Builders.mapEntryBuilder((ListSchemaNode) streamListSchema);
 
-        final ListSchemaNode listSchema = ((ListSchemaNode) streamListSchema);
+        final ListSchemaNode listSchema = (ListSchemaNode) streamListSchema;
         prepareLeafAndFillEntryBuilder(streamEntry,
                 listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME),
                 schemaNode.getQName().getLocalName());
-        if ((schemaNode.getDescription() != null) && !schemaNode.getDescription().equals("")) {
+        if (schemaNode.getDescription() != null && !schemaNode.getDescription().equals("")) {
             prepareLeafAndFillEntryBuilder(streamEntry,
                     listSchema.getDataChildByName(MonitoringModule.LEAF_DESCR_STREAM_QNAME),
                     schemaNode.getDescription());

@@ -225,7 +225,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     public void nnAsYangEmptyToXmlTest() throws Exception {
         final String elName = "lfEmpty";
         final NormalizedNodeContext normalizedNodeContext = prepareNNC(
-                TypeDefinitionAwareCodec.from(BaseTypes.emptyType()).deserialize(null), elName);
+                TypeDefinitionAwareCodec.from(BaseTypes.emptyType()).deserialize(""), elName);
         nnToXml(normalizedNodeContext, "<" + elName + "></" + elName + ">");
     }
 
@@ -288,8 +288,8 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     }
 
     private static NormalizedNodeContext prepareNNC(final Object object, final String name) {
-        final QName cont = QName.create("basic:module", "2013-12-2", "cont");
-        final QName lf = QName.create("basic:module", "2013-12-2", name);
+        final QName cont = QName.create("basic:module", "2013-12-02", "cont");
+        final QName lf = QName.create("basic:module", "2013-12-02", name);
 
         final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
 
@@ -319,9 +319,9 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     }
 
     private static NormalizedNodeContext prepareLeafrefData() {
-        final QName cont = QName.create("basic:module", "2013-12-2", "cont");
-        final QName lfBoolean = QName.create("basic:module", "2013-12-2", "lfBoolean");
-        final QName lfLfref = QName.create("basic:module", "2013-12-2", "lfLfref");
+        final QName cont = QName.create("basic:module", "2013-12-02", "cont");
+        final QName lfBoolean = QName.create("basic:module", "2013-12-02", "lfBoolean");
+        final QName lfLfref = QName.create("basic:module", "2013-12-02", "lfLfref");
 
         final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
 
@@ -347,8 +347,8 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     }
 
     private static NormalizedNodeContext prepareLeafrefNegativeData() {
-        final QName cont = QName.create("basic:module", "2013-12-2", "cont");
-        final QName lfLfref = QName.create("basic:module", "2013-12-2", "lfLfrefNegative");
+        final QName cont = QName.create("basic:module", "2013-12-02", "cont");
+        final QName lfLfref = QName.create("basic:module", "2013-12-02", "lfLfrefNegative");
 
         final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
         final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> contData = Builders
@@ -365,9 +365,9 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     }
 
     private static NormalizedNodeContext prepareIdrefData(final String prefix, final boolean valueAsQName) {
-        final QName cont = QName.create("basic:module", "2013-12-2", "cont");
-        final QName cont1 = QName.create("basic:module", "2013-12-2", "cont1");
-        final QName lf11 = QName.create("basic:module", "2013-12-2", "lf11");
+        final QName cont = QName.create("basic:module", "2013-12-02", "cont");
+        final QName cont1 = QName.create("basic:module", "2013-12-02", "cont1");
+        final QName lf11 = QName.create("basic:module", "2013-12-02", "lf11");
 
         final DataSchemaNode contSchema = schemaContext.getDataChildByName(cont);
 
@@ -381,7 +381,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
 
         Object value = null;
         if (valueAsQName) {
-            value = QName.create("referenced:module", "2013-12-2", "iden");
+            value = QName.create("referenced:module", "2013-12-02", "iden");
         } else {
             value = "no qname value";
         }

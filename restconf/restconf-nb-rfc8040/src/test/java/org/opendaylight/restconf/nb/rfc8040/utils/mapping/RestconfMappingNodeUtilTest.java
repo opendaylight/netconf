@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,7 +38,6 @@ import org.opendaylight.restconf.nb.rfc8040.Rfc8040.RestconfModule;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -83,11 +83,11 @@ public class RestconfMappingNodeUtilTest {
     @BeforeClass
     public static void loadTestSchemaContextAndModules() throws Exception {
         schemaContext =
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/modules/restconf-module-testing"));
-        schemaContextMonitoring = YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/modules"));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules/restconf-module-testing"));
+        schemaContextMonitoring = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
         modules = schemaContextMonitoring.getModules();
         modulesRest = YangParserTestUtils
-                .parseYangSources(TestRestconfUtils.loadFiles("/modules/restconf-module-testing")).getModules();
+                .parseYangFiles(TestRestconfUtils.loadFiles("/modules/restconf-module-testing")).getModules();
     }
 
     @Before
@@ -98,7 +98,7 @@ public class RestconfMappingNodeUtilTest {
         when(this.leafDescription.getQName()).thenReturn(QName.create("", RestconfMappingNodeConstants.DESCRIPTION));
         when(this.leafReplaySupport.getQName()).thenReturn(
                 QName.create("", RestconfMappingNodeConstants.REPLAY_SUPPORT));
-        when(this.leafReplayLog.getQName()).thenReturn(QName.create(RestconfMappingNodeConstants.REPLAY_LOG));
+        when(this.leafReplayLog.getQName()).thenReturn(QName.create("", RestconfMappingNodeConstants.REPLAY_LOG));
         when(this.leafEvents.getQName()).thenReturn(QName.create("", RestconfMappingNodeConstants.EVENTS));
     }
 
@@ -109,8 +109,7 @@ public class RestconfMappingNodeUtilTest {
     @Test
     public void restconfMappingNodeTest() {
         // write modules into list module in Restconf
-        final Module ietfYangLibMod =
-                schemaContext.findModuleByNamespaceAndRevision(IetfYangLibrary.URI_MODULE, IetfYangLibrary.DATE);
+        final Module ietfYangLibMod = schemaContext.findModule(IetfYangLibrary.MODULE_QNAME).get();
         final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> modules =
                 RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(RestconfMappingNodeUtilTest.modules,
                         ietfYangLibMod, schemaContext, "1");
@@ -121,8 +120,7 @@ public class RestconfMappingNodeUtilTest {
 
     @Test
     public void restconfStateCapabilitesTest() {
-        final Module monitoringModule = schemaContextMonitoring
-                .findModuleByNamespaceAndRevision(MonitoringModule.URI_MODULE, MonitoringModule.DATE);
+        final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).get();
         final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
                 RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
         assertNotNull(normNode);
@@ -152,8 +150,7 @@ public class RestconfMappingNodeUtilTest {
         final Instant start = Instant.now();
         final String outputType = "XML";
         final URI uri = new URI("uri");
-        final Module monitoringModule = schemaContextMonitoring
-                .findModuleByNamespaceAndRevision(MonitoringModule.URI_MODULE, MonitoringModule.DATE);
+        final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
         final boolean exist = true;
 
         final Map<QName, Object> map =
@@ -171,14 +168,13 @@ public class RestconfMappingNodeUtilTest {
         final Instant start = Instant.now();
         final String outputType = "JSON";
         final URI uri = new URI("uri");
-        final Module monitoringModule = schemaContextMonitoring
-                .findModuleByNamespaceAndRevision(MonitoringModule.URI_MODULE, MonitoringModule.DATE);
+        final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
         final boolean exist = true;
 
         final Map<QName, Object> map = prepareMap("notifi", uri, start, outputType);
         map.put(MonitoringModule.LEAF_DESCR_STREAM_QNAME, "Notifi");
 
-        final QName notifiQName = QName.create("urn:nested:module", "2014-06-3", "notifi");
+        final QName notifiQName = QName.create("urn:nested:module", "2014-06-03", "notifi");
         final NormalizedNode<?, ?> mappedData =
                 RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(notifiQName,
                     schemaContextMonitoring.getNotifications(), start, outputType, uri, monitoringModule, exist);
@@ -264,8 +260,7 @@ public class RestconfMappingNodeUtilTest {
 
             final String revision = loadedModules.get(name);
             assertNotNull("Expected module not found", revision);
-            assertEquals("Not correct revision of loaded module",
-                    SimpleDateFormatUtil.getRevisionFormat().format(m.getRevision()), revision);
+            assertEquals("Incorrect revision of loaded module", Optional.of(revision), m.getRevision());
 
             loadedModules.remove(name);
         }

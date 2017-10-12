@@ -50,7 +50,7 @@ public class CreateStreamUtilTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         this.refSchemaCtx = new SchemaContextRef(
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
     }
 
     @Test
@@ -82,8 +82,7 @@ public class CreateStreamUtilTest {
     private NormalizedNodeContext prepareDomPayload(final String rpcName, final String inputOutput,
             final String toasterValue, final String inputOutputName) {
         final SchemaContext schema = this.refSchemaCtx.get();
-        final Module rpcModule = schema.findModuleByName("sal-remote", null);
-        assertNotNull(rpcModule);
+        final Module rpcModule = schema.findModule("sal-remote").get();
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), rpcName);
         final QName rpcInputQName = QName.create(rpcModule.getQNameModule(), inputOutput);
         final Set<RpcDefinition> setRpcs = rpcModule.getRpcs();
@@ -111,8 +110,8 @@ public class CreateStreamUtilTest {
         } else {
             o = toasterValue;
         }
-        final LeafNode<Object> lfNode = (Builders.leafBuilder((LeafSchemaNode) lfSchemaNode)
-                .withValue(o)).build();
+        final LeafNode<Object> lfNode = Builders.leafBuilder((LeafSchemaNode) lfSchemaNode)
+                .withValue(o).build();
         container.withChild(lfNode);
 
         return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpcInputSchemaNode, null, schema),

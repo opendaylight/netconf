@@ -14,6 +14,7 @@ import static org.junit.Assert.fail;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import java.io.FileNotFoundException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -42,9 +43,9 @@ public class YangInstanceIdentifierDeserializerTest {
     private SchemaContext schemaContext;
 
     @Before
-    public void init() throws Exception {
+    public void init() throws FileNotFoundException {
         this.schemaContext =
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/restconf/parser/deserializer"));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/restconf/parser/deserializer"));
     }
 
     /**

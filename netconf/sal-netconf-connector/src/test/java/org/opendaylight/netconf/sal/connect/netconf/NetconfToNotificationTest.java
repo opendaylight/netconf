@@ -14,8 +14,6 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Iterables;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,19 +45,16 @@ public class NetconfToNotificationTest {
         userNotification = new NetconfMessage(doc);
     }
 
-    static SchemaContext getNotificationSchemaContext(final Class<?> loadClass,
-                                                      final boolean getExceptionTest) throws Exception {
-        final List<InputStream> modelsToParse = new ArrayList<>();
-
+    static SchemaContext getNotificationSchemaContext(final Class<?> loadClass, final boolean getExceptionTest) {
+        final SchemaContext context;
         if (getExceptionTest) {
-            modelsToParse.add(loadClass.getResourceAsStream("/schemas/user-notification4.yang"));
-            modelsToParse.add(loadClass.getResourceAsStream("/schemas/user-notification3.yang"));
+            context = YangParserTestUtils.parseYangResources(loadClass, "/schemas/user-notification4.yang",
+                    "/schemas/user-notification3.yang");
         } else {
-            modelsToParse.add(loadClass.getResourceAsStream("/schemas/user-notification.yang"));
-            modelsToParse.add(loadClass.getResourceAsStream("/schemas/user-notification2.yang"));
+            context = YangParserTestUtils.parseYangResources(loadClass, "/schemas/user-notification.yang",
+                "/schemas/user-notification2.yang");
         }
 
-        final SchemaContext context = YangParserTestUtils.parseYangStreams(modelsToParse);
         final Set<Module> modules = context.getModules();
         assertTrue(!modules.isEmpty());
         assertNotNull(context);

@@ -54,7 +54,7 @@ public class RestconfOperationsServiceTest {
     @Before
     public void init() throws Exception {
         MockitoAnnotations.initMocks(this);
-        this.schemaContext = YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/modules"));
+        this.schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
 
         final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
         final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
@@ -67,8 +67,8 @@ public class RestconfOperationsServiceTest {
 
         this.domMountPointServiceHandler = new DOMMountPointServiceHandler(this.domMountPointService);
 
-        final QNameModule module1 = QNameModule.create(new URI("module:1"), null);
-        final QNameModule module2 = QNameModule.create(new URI("module:2"), null);
+        final QNameModule module1 = QNameModule.create(URI.create("module:1"));
+        final QNameModule module2 = QNameModule.create(URI.create("module:2"));
 
         this.listOfRpcsNames = ImmutableSet.of(QName.create(module1, "dummy-rpc1-module1"),
                 QName.create(module1, "dummy-rpc2-module1"), QName.create(module2, "dummy-rpc1-module2"),
