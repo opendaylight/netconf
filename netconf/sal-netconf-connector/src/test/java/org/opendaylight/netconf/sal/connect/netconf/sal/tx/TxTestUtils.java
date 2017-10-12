@@ -14,10 +14,14 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 
-class TxTestUtils {
+final class TxTestUtils {
 
     private static final QName Q_NAME_1 = QName.create("test:namespace", "2013-07-22", "c");
     private static final QName Q_NAME_2 = QName.create(Q_NAME_1, "a");
+
+    private TxTestUtils() {
+
+    }
 
     static YangInstanceIdentifier getContainerId() {
         return YangInstanceIdentifier.builder()

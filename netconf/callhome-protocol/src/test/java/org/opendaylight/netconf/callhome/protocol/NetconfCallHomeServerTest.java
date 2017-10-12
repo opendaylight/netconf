@@ -20,16 +20,16 @@ import java.net.SocketAddress;
 import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.sshd.ClientSession;
-import org.apache.sshd.SshClient;
+import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.future.AuthFuture;
+import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.client.session.ClientSessionImpl;
-import org.apache.sshd.common.Session;
-import org.apache.sshd.common.SessionListener;
 import org.apache.sshd.common.future.SshFutureListener;
 import org.apache.sshd.common.io.IoAcceptor;
 import org.apache.sshd.common.io.IoHandler;
 import org.apache.sshd.common.io.IoServiceFactory;
+import org.apache.sshd.common.session.Session;
+import org.apache.sshd.common.session.SessionListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -137,22 +137,22 @@ public class NetconfCallHomeServerTest {
     static class TestableCallHomeServer extends NetconfCallHomeServer {
         static IoServiceFactory minaServiceFactory;
 
-        static SshClient factoryHook(SshClient client, IoServiceFactory minaFactory) {
+        static SshClient factoryHook(final SshClient client, final IoServiceFactory minaFactory) {
             minaServiceFactory = minaFactory;
             return client;
         }
 
         SshClient client;
 
-        TestableCallHomeServer(SshClient sshClient, CallHomeAuthorizationProvider authProvider,
-                               CallHomeSessionContext.Factory factory, InetSocketAddress socketAddress,
-                               IoServiceFactory minaFactory, StatusRecorder recorder) {
+        TestableCallHomeServer(final SshClient sshClient, final CallHomeAuthorizationProvider authProvider,
+                               final CallHomeSessionContext.Factory factory, final InetSocketAddress socketAddress,
+                               final IoServiceFactory minaFactory, final StatusRecorder recorder) {
             super(factoryHook(sshClient, minaFactory), authProvider, factory, socketAddress, recorder);
             client = sshClient;
         }
 
         @Override
-        protected IoServiceFactory createMinaServiceFactory(SshClient sshClient) {
+        protected IoServiceFactory createMinaServiceFactory(final SshClient sshClient) {
             return minaServiceFactory;
         }
     }

@@ -37,11 +37,11 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import org.opendaylight.yangtools.yang.parser.util.TextToASTTransformer;
+import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToASTTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfTopologyUtils {
+public final class NetconfTopologyUtils {
     private static Logger LOG = LoggerFactory.getLogger(NetconfTopologyUtils.class);
 
     private static final String DEFAULT_SCHEMA_REPOSITORY_NAME = "sal-netconf-connector";
@@ -100,6 +100,10 @@ public class NetconfTopologyUtils {
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_CACHE);
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(
                 TextToASTTransformer.create(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY));
+    }
+
+    private NetconfTopologyUtils() {
+
     }
 
     public static NetconfDevice.SchemaResourcesDTO setupSchemaCacheDTO(final Node node) {

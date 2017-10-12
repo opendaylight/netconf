@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.services.simple.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableSet;
@@ -29,6 +28,7 @@ import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -54,7 +54,7 @@ public class RestconfOperationsServiceTest {
     @Before
     public void init() throws Exception {
         MockitoAnnotations.initMocks(this);
-        this.schemaContext = YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/modules"));
+        this.schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
 
         final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
         final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
@@ -67,8 +67,8 @@ public class RestconfOperationsServiceTest {
 
         this.domMountPointServiceHandler = new DOMMountPointServiceHandler(this.domMountPointService);
 
-        final QNameModule module1 = QNameModule.create(new URI("module:1"), null);
-        final QNameModule module2 = QNameModule.create(new URI("module:2"), null);
+        final QNameModule module1 = QNameModule.create(URI.create("module:1"));
+        final QNameModule module2 = QNameModule.create(URI.create("module:2"));
 
         this.listOfRpcsNames = ImmutableSet.of(QName.create(module1, "dummy-rpc1-module1"),
                 QName.create(module1, "dummy-rpc2-module1"), QName.create(module2, "dummy-rpc1-module2"),
@@ -87,7 +87,7 @@ public class RestconfOperationsServiceTest {
         assertEquals(4, data.getValue().size());
 
         for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
-            assertNull(child.getValue());
+            assertEquals(Empty.getInstance(), child.getValue());
 
             final QName qname = child.getNodeType().withoutRevision();
             assertTrue(this.listOfRpcsNames.contains(qname));
