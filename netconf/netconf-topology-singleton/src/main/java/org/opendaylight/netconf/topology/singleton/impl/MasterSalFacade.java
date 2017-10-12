@@ -14,7 +14,6 @@ import akka.cluster.Cluster;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,10 +30,10 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificatio
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
@@ -135,11 +134,9 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
     private Future<Object> sendInitialDataToActor() {
         final List<SourceIdentifier> sourceIdentifiers =
-                remoteSchemaContext.getAllModuleIdentifiers().stream().map(mi ->
-                        RevisionSourceIdentifier.create(mi.getName(),
-                                (SimpleDateFormatUtil.DEFAULT_DATE_REV == mi.getRevision() ? Optional.<String>absent() :
-                                    Optional.of(mi.getQNameModule().getFormattedRevision()))))
-                        .collect(Collectors.toList());
+                SchemaContextUtil.getConstituentModuleIdentifiers(remoteSchemaContext).stream()
+                .map(mi -> RevisionSourceIdentifier.create(mi.getName(), mi.getRevision()))
+                .collect(Collectors.toList());
 
         // send initial data to master actor and create actor for providing it
         return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, sourceIdentifiers,

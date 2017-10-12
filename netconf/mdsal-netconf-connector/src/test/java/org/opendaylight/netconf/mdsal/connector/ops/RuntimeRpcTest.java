@@ -20,12 +20,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.ByteSource;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
-import java.io.InputStream;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.custommonkey.xmlunit.DetailedDiff;
@@ -129,8 +126,7 @@ public class RuntimeRpcTest {
                 @Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
             final Collection<DataContainerChild<? extends PathArgument, ?>> children =
                     (Collection<DataContainerChild<? extends PathArgument, ?>>) input.getValue();
-            final Module module = schemaContext.findModuleByNamespaceAndRevision(
-                type.getLastComponent().getNamespace(), null);
+            final Module module = schemaContext.findModule(type.getLastComponent().getNamespace()).orElse(null);
             final RpcDefinition rpcDefinition = getRpcDefinitionFromModule(
                 module, module.getNamespace(), type.getLastComponent().getLocalName());
             final ContainerSchemaNode outputSchemaNode = rpcDefinition.getOutput();
@@ -186,7 +182,7 @@ public class RuntimeRpcTest {
 
         }).when(sourceProvider).getSource(any(SourceIdentifier.class));
 
-        this.schemaContext = YangParserTestUtils.parseYangStreams(getYangSchemas());
+        this.schemaContext = YangParserTestUtils.parseYangResource("/yang/mdsal-netconf-rpc-test.yang");
         this.currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
     }
 
@@ -293,17 +289,5 @@ public class RuntimeRpcTest {
         }
 
         return null;
-    }
-
-    private List<InputStream> getYangSchemas() {
-        final List<String> schemaPaths = Collections.singletonList("/yang/mdsal-netconf-rpc-test.yang");
-        final List<InputStream> schemas = new ArrayList<>();
-
-        for (final String schemaPath : schemaPaths) {
-            final InputStream resourceAsStream = getClass().getResourceAsStream(schemaPath);
-            schemas.add(resourceAsStream);
-        }
-
-        return schemas;
     }
 }
