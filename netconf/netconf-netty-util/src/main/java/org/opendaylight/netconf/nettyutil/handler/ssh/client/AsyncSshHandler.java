@@ -149,12 +149,12 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         }
     }
 
-    private synchronized void handleSshAuthenticated(final ClientSession session, final ChannelHandlerContext ctx) {
+    private synchronized void handleSshAuthenticated(final ClientSession newSession, final ChannelHandlerContext ctx) {
         try {
             LOG.debug("SSH session authenticated on channel: {}, server version: {}", ctx.channel(),
-                    session.getServerVersion());
+                    newSession.getServerVersion());
 
-            channel = session.createSubsystemChannel(SUBSYSTEM);
+            channel = newSession.createSubsystemChannel(SUBSYSTEM);
             channel.setStreaming(ClientChannel.Streaming.Async);
             channel.open().addListener(new SshFutureListener<OpenFuture>() {
                 @Override
