@@ -1241,17 +1241,13 @@ public class RestconfImpl implements RestconfService {
         }
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
-        int notificationPort = NOTIFICATION_PORT;
-        try {
-            final WebSocketServer webSocketServerInstance = WebSocketServer.getInstance();
-            notificationPort = webSocketServerInstance.getPort();
-        } catch (final NullPointerException e) {
-            WebSocketServer.createInstance(NOTIFICATION_PORT);
-        }
-        final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
-        final URI uriToWebsocketServer = uriToWebsocketServerBuilder.replacePath(streamName).build();
 
-        return uriToWebsocketServer;
+        final WebSocketServer webSocketServerInstance = WebSocketServer.getInstance(NOTIFICATION_PORT);
+        final int notificationPort = webSocketServerInstance.getPort();
+
+        final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
+
+        return uriToWebsocketServerBuilder.replacePath(streamName).build();
     }
 
     /**
@@ -1301,17 +1297,13 @@ public class RestconfImpl implements RestconfService {
         this.broker.registerToListenDataChanges(datastore, scope, listener);
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
-        int notificationPort = NOTIFICATION_PORT;
-        try {
-            final WebSocketServer webSocketServerInstance = WebSocketServer.getInstance();
-            notificationPort = webSocketServerInstance.getPort();
-        } catch (final NullPointerException e) {
-            WebSocketServer.createInstance(NOTIFICATION_PORT);
-        }
-        final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
-        final URI uriToWebsocketServer = uriToWebsocketServerBuilder.replacePath(streamName).build();
 
-        return uriToWebsocketServer;
+        final WebSocketServer webSocketServerInstance = WebSocketServer.getInstance(NOTIFICATION_PORT);
+        final int notificationPort = webSocketServerInstance.getPort();
+
+        final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
+
+        return uriToWebsocketServerBuilder.replacePath(streamName).build();
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
