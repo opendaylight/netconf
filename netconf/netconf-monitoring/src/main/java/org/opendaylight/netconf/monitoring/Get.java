@@ -77,7 +77,7 @@ public class Get extends AbstractNetconfOperation {
             final String errorMessage = "Get operation for netconf-state subtree failed";
             LOG.warn(errorMessage, e);
 
-            throw new DocumentedException(errorMessage, DocumentedException.ErrorType.APPLICATION,
+            throw new DocumentedException(errorMessage, e, DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED,
                     DocumentedException.ErrorSeverity.ERROR,
                     Collections.singletonMap(DocumentedException.ErrorSeverity.ERROR.toString(), e.getMessage()));

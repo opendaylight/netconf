@@ -31,6 +31,7 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransform
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -38,7 +39,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableAnyXmlNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.w3c.dom.Document;
@@ -65,14 +66,13 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
 
     @Test
     public void testGetSource() throws Exception {
-        final SourceIdentifier identifier = SourceIdentifier.create("test", Optional.of("2016-02-08"));
-        final CheckedFuture<YangTextSchemaSource, SchemaSourceException> module = provider.getSource(identifier);
-        final YangTextSchemaSource source = module.checkedGet();
+        final SourceIdentifier identifier = RevisionSourceIdentifier.create("test", Revision.of("2016-02-08"));
+        final YangTextSchemaSource source = provider.getSource(identifier).get();
         Assert.assertEquals(identifier, source.getIdentifier());
         verify(service).invokeRpc(
                 SchemaPath.create(true, NetconfMessageTransformUtil.GET_SCHEMA_QNAME),
-                NetconfRemoteSchemaYangSourceProvider
-                        .createGetSchemaRequest(identifier.getName(), Optional.of(identifier.getRevision()))
+                NetconfRemoteSchemaYangSourceProvider.createGetSchemaRequest(identifier.getName(),
+                    Optional.fromJavaUtil(identifier.getRevision().map(Revision::toString)))
         );
     }
 

@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.io.IOException;
 import java.net.URI;
@@ -107,8 +106,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
     //this returns module with the newest revision if more then 1 module with same namespace is found
     private Optional<Module> getModule(final URI namespaceURI) {
-        return Optional.fromNullable(
-                schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(namespaceURI, null));
+        return Optional.fromJavaUtil(schemaContext.getCurrentContext().findModule(namespaceURI));
     }
 
     private static Optional<RpcDefinition> getRpcDefinitionFromModule(final Module module, final URI namespaceURI,
@@ -132,7 +130,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
             netconfOperationNamespace = operationElement.getNamespace();
         } catch (final DocumentedException e) {
             LOG.debug("Cannot retrieve netconf operation namespace from message due to ", e);
-            throw new DocumentedException("Cannot retrieve netconf operation namespace from message",
+            throw new DocumentedException("Cannot retrieve netconf operation namespace from message", e,
                     ErrorType.PROTOCOL, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
         }
 
@@ -246,7 +244,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
             nnWriter.flush();
             xmlWriter.flush();
         } catch (XMLStreamException | IOException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 

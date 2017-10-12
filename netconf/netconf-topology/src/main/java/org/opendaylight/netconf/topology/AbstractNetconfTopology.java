@@ -82,7 +82,7 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import org.opendaylight.yangtools.yang.parser.util.TextToASTTransformer;
+import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToASTTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -416,14 +416,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     /**
      * Sets the private key path from location specified in configuration file using blueprint.
      */
-    public void setPrivateKeyPath(String privateKeyPath) {
+    public void setPrivateKeyPath(final String privateKeyPath) {
         this.privateKeyPath = privateKeyPath;
     }
 
     /**
      * Sets the private key passphrase from location specified in configuration file using blueprint.
      */
-    public void setPrivateKeyPassphrase(String privateKeyPassphrase) {
+    public void setPrivateKeyPassphrase(final String privateKeyPassphrase) {
         this.privateKeyPassphrase = privateKeyPassphrase;
     }
 

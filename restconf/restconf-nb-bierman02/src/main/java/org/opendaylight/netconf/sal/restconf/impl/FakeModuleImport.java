@@ -8,12 +8,14 @@
 package org.opendaylight.netconf.sal.restconf.impl;
 
 import com.google.common.base.Preconditions;
-import java.util.Date;
+import java.util.Optional;
+import org.opendaylight.yangtools.concepts.SemVer;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.ModuleImport;
 
 /**
- * Fake {@link ModuleImport} implementation used to attach corrent prefix mapping to fake RPCs.
+ * Fake {@link ModuleImport} implementation used to attach current prefix mapping to fake RPCs.
  *
  * @author Robert Varga
  */
@@ -30,12 +32,27 @@ final class FakeModuleImport implements ModuleImport {
     }
 
     @Override
-    public Date getRevision() {
+    public Optional<Revision> getRevision() {
         return module.getRevision();
     }
 
     @Override
     public String getPrefix() {
         return module.getName();
+    }
+
+    @Override
+    public Optional<String> getDescription() {
+        return module.getDescription();
+    }
+
+    @Override
+    public Optional<String> getReference() {
+        return module.getReference();
+    }
+
+    @Override
+    public Optional<SemVer> getSemanticVersion() {
+        return module.getSemanticVersion();
     }
 }

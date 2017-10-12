@@ -24,20 +24,20 @@ import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.PublicKey;
-import org.apache.sshd.ClientChannel;
-import org.apache.sshd.ClientChannel.Streaming;
-import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.channel.ChannelSubsystem;
+import org.apache.sshd.client.channel.ClientChannel;
+import org.apache.sshd.client.channel.ClientChannel.Streaming;
 import org.apache.sshd.client.future.OpenFuture;
+import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.client.session.ClientSessionImpl;
-import org.apache.sshd.common.KeyExchange;
-import org.apache.sshd.common.Session.AttributeKey;
+import org.apache.sshd.common.AttributeStore.AttributeKey;
 import org.apache.sshd.common.future.SshFutureListener;
 import org.apache.sshd.common.io.IoInputStream;
 import org.apache.sshd.common.io.IoOutputStream;
 import org.apache.sshd.common.io.IoReadFuture;
 import org.apache.sshd.common.io.IoSession;
-import org.apache.sshd.common.util.Buffer;
+import org.apache.sshd.common.kex.KeyExchange;
+import org.apache.sshd.common.util.buffer.Buffer;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -137,15 +137,15 @@ public class CallHomeSessionContextTest {
     static class TestableContext extends CallHomeSessionContext {
         MinaSshNettyChannel minaMock;
 
-        TestableContext(ClientSession sshSession, CallHomeAuthorization authorization,
-                        InetSocketAddress address, CallHomeSessionContext.Factory factory,
-                        MinaSshNettyChannel minaMock) {
+        TestableContext(final ClientSession sshSession, final CallHomeAuthorization authorization,
+                        final InetSocketAddress address, final CallHomeSessionContext.Factory factory,
+                        final MinaSshNettyChannel minaMock) {
             super(sshSession, authorization, address, factory);
             this.minaMock = minaMock;
         }
 
         @Override
-        protected MinaSshNettyChannel newMinaSshNettyChannel(ClientChannel netconfChannel) {
+        protected MinaSshNettyChannel newMinaSshNettyChannel(final ClientChannel netconfChannel) {
             return minaMock;
         }
     }

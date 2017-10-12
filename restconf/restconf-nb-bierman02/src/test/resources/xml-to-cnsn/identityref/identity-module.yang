@@ -2,7 +2,7 @@ module identity-module {
   namespace "identity:module";  
 
   prefix "idemod";
-  revision 2013-12-2 {    
+  revision 2013-12-02 {    
   }
   
 	identity iden {		

@@ -63,6 +63,7 @@ public class PatchDataTransactionUtilTest {
     private DOMDataReadWriteTransaction rwTransaction;
 
     private SchemaContextRef refSchemaCtx;
+    private YangInstanceIdentifier instanceIdContainer;
     private YangInstanceIdentifier instanceIdCreateAndDelete;
     private YangInstanceIdentifier instanceIdMerge;
     private ContainerNode buildBaseContainerForTests;
@@ -88,7 +89,7 @@ public class PatchDataTransactionUtilTest {
         PatchDataTransactionUtilTest.broker.set(RestConnectorProvider.class, mock(DOMDataBroker.class));
 
         this.refSchemaCtx = new SchemaContextRef(
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
         final QName baseQName = QName.create("http://example.com/ns/example-jukebox", "2015-04-04", "jukebox");
         final QName containerPlayerQName = QName.create(baseQName, "player");
         final QName leafGapQName = QName.create(baseQName, "gap");
@@ -98,12 +99,14 @@ public class PatchDataTransactionUtilTest {
         final YangInstanceIdentifier.NodeIdentifierWithPredicates nodeWithKey =
             new YangInstanceIdentifier.NodeIdentifierWithPredicates(listArtistQName, leafNameQName, "name of artist");
 
-        /* instance identifier for accessing leaf node "gap" */
-        this.instanceIdCreateAndDelete = YangInstanceIdentifier.builder()
+        /* instance identifier for accessing container node "player" */
+        this.instanceIdContainer = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .node(containerPlayerQName)
-                .node(leafGapQName)
                 .build();
+
+        /* instance identifier for accessing leaf node "gap" */
+        this.instanceIdCreateAndDelete = instanceIdContainer.node(leafGapQName);
 
         /* values that are used for creating leaf for testPatchDataCreateAndDelete test */
         final LeafNode<?> buildGapLeaf = Builders.leafBuilder()
@@ -199,11 +202,13 @@ public class PatchDataTransactionUtilTest {
 
     @Test
     public void testPatchDataCreateAndDelete() throws Exception {
-        doReturn(Futures.immediateCheckedFuture(false)).doReturn(Futures.immediateCheckedFuture(true))
-                .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
+        doReturn(Futures.immediateCheckedFuture(false))
+                .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.instanceIdContainer);
+        doReturn(Futures.immediateCheckedFuture(true))
+        .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
         final PatchEntity entityCreate =
-                new PatchEntity("edit1", CREATE, this.targetNodeForCreateAndDelete, this.buildBaseContainerForTests);
+                new PatchEntity("edit1", CREATE, this.instanceIdContainer, this.buildBaseContainerForTests);
         final PatchEntity entityDelete =
                 new PatchEntity("edit2", DELETE, this.targetNodeForCreateAndDelete);
         final List<PatchEntity> entities = new ArrayList<>();
@@ -219,7 +224,7 @@ public class PatchDataTransactionUtilTest {
                 PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
         for (final PatchStatusEntity entity : patchStatusContext.getEditCollection()) {
-            assertTrue(entity.isOk());
+            assertTrue("Edit " + entity.getEditId() + " failed", entity.isOk());
         }
         assertTrue(patchStatusContext.isOk());
     }
@@ -255,7 +260,7 @@ public class PatchDataTransactionUtilTest {
                 .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
         final PatchEntity entityMerge =
-                new PatchEntity("edit1", MERGE, this.targetNodeForCreateAndDelete, this.buildBaseContainerForTests);
+                new PatchEntity("edit1", MERGE, this.instanceIdContainer, this.buildBaseContainerForTests);
         final List<PatchEntity> entities = new ArrayList<>();
 
         entities.add(entityMerge);

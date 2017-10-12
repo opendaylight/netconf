@@ -12,8 +12,8 @@ import com.google.common.base.Preconditions;
 import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
 import java.util.Optional;
-import org.apache.sshd.common.KeyPairProvider;
-import org.apache.sshd.server.PublickeyAuthenticator;
+import org.apache.sshd.common.keyprovider.KeyPairProvider;
+import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.opendaylight.netconf.auth.AuthProvider;
 
 public final class SshProxyServerConfiguration {

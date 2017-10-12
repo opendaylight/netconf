@@ -102,8 +102,8 @@ public class ParserFieldsParameter {
             switch (currentChar) {
                 case COLON :
                     // new namespace and revision found
-                    currentQNameModule = context.findModuleByName(
-                            input.substring(startPosition, currentPosition), null).getQNameModule();
+                    currentQNameModule = context.findModules(
+                            input.substring(startPosition, currentPosition)).iterator().next().getQNameModule();
                     currentPosition++;
                     break;
                 case STARTING_PARENTHESIS:
@@ -180,10 +180,7 @@ public class ParserFieldsParameter {
             @Nonnull final String identifier,
             @Nonnull final QNameModule currentQNameModule,
             @Nonnull final Set<QName> level) {
-        final QName childQName = QName.create(
-                currentQNameModule.getNamespace().toString(),
-                identifier,
-                currentQNameModule.getRevision());
+        final QName childQName = QName.create(currentQNameModule, identifier);
 
         // resolve parent node
         final DataSchemaContextNode<?> parentNode = resolveMixinNode(

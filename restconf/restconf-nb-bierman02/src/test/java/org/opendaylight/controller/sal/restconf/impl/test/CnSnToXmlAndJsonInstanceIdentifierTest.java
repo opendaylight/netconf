@@ -124,27 +124,28 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
 
     private static YangInstanceIdentifier createInstanceIdentifier() throws URISyntaxException {
         final List<PathArgument> pathArguments = new ArrayList<>();
-        pathArguments.add(new NodeIdentifier(new QName(new URI("instance:identifier:module"), "cont")));
-        pathArguments.add(new NodeIdentifier(new QName(new URI("instance:identifier:module"), "cont1")));
+        pathArguments.add(new NodeIdentifier(QName.create(new URI("instance:identifier:module"), "cont")));
+        pathArguments.add(new NodeIdentifier(QName.create(new URI("instance:identifier:module"), "cont1")));
 
-        final QName qName = new QName(new URI("augment:module"), "lst11");
+        final QName qName = QName.create(new URI("augment:module"), "lst11");
         final Map<QName, Object> keyValues = new HashMap<>();
-        keyValues.put(new QName(new URI("augment:module"), "keyvalue111"), "value1");
-        keyValues.put(new QName(new URI("augment:module"), "keyvalue112"), "value2");
+        keyValues.put(QName.create(new URI("augment:module"), "keyvalue111"), "value1");
+        keyValues.put(QName.create(new URI("augment:module"), "keyvalue112"), "value2");
         final NodeIdentifierWithPredicates nodeIdentifierWithPredicates =
                 new NodeIdentifierWithPredicates(qName, keyValues);
         pathArguments.add(nodeIdentifierWithPredicates);
 
-        pathArguments.add(new NodeIdentifier(new QName(new URI("augment:augment:module"), "lf112")));
+        pathArguments.add(new NodeIdentifier(QName.create(new URI("augment:augment:module"), "lf112")));
 
         return YangInstanceIdentifier.create(pathArguments);
     }
 
     private static YangInstanceIdentifier createInstanceIdentifierWithLeafList() throws URISyntaxException {
         final List<PathArgument> pathArguments = new ArrayList<>();
-        pathArguments.add(new NodeIdentifier(new QName(new URI("instance:identifier:module"), "cont")));
-        pathArguments.add(new NodeIdentifier(new QName(new URI("instance:identifier:module"), "cont1")));
-        pathArguments.add(new NodeWithValue<>(new QName(new URI("augment:module:leaf:list"), "lflst11"), "lflst11_1"));
+        pathArguments.add(new NodeIdentifier(QName.create(new URI("instance:identifier:module"), "cont")));
+        pathArguments.add(new NodeIdentifier(QName.create(new URI("instance:identifier:module"), "cont1")));
+        pathArguments.add(new NodeWithValue<>(QName.create(new URI("augment:module:leaf:list"), "lflst11"),
+                "lflst11_1"));
 
         return YangInstanceIdentifier.create(pathArguments);
     }

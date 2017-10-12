@@ -12,16 +12,15 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import java.net.URI;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
@@ -31,7 +30,7 @@ import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev14070
 import org.opendaylight.yangtools.util.SingletonSet;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -46,16 +45,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 public class NotificationListenerTest {
-    private static final QNameModule MODULE;
-
-    static {
-        try {
-            MODULE = QNameModule.create(URI.create("notifi:mod"),
-                SimpleDateFormatUtil.getRevisionFormat().parse("2016-11-23"));
-        } catch (final ParseException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-    }
+    private static final QNameModule MODULE = QNameModule.create(URI.create("notifi:mod"), Revision.of("2016-11-23"));
 
     private SchemaContext schmeaCtx;
 

@@ -9,8 +9,7 @@ package org.opendaylight.netconf.test.tool.config;
 
 import java.io.File;
 import java.util.Set;
-
-import org.apache.sshd.server.PublickeyAuthenticator;
+import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.test.tool.TesttoolParameters;
 import org.opendaylight.netconf.test.tool.operations.OperationsCreator;
@@ -18,102 +17,102 @@ import org.opendaylight.netconf.test.tool.rpchandler.RpcHandler;
 
 public class ConfigurationBuilder {
 
-    private Configuration configuration;
+    private final Configuration configuration;
 
     public ConfigurationBuilder() {
         this.configuration = new Configuration();
     }
 
-    public ConfigurationBuilder setPublickeyAuthenticator(PublickeyAuthenticator publickeyAuthenticator) {
+    public ConfigurationBuilder setPublickeyAuthenticator(final PublickeyAuthenticator publickeyAuthenticator) {
         this.configuration.setPublickeyAuthenticator(publickeyAuthenticator);
         return this;
     }
 
-    public ConfigurationBuilder setAuthProvider(AuthProvider authProvider) {
+    public ConfigurationBuilder setAuthProvider(final AuthProvider authProvider) {
         this.configuration.setAuthProvider(authProvider);
         return this;
     }
 
-    public ConfigurationBuilder setGetDefaultYangResources(Set<YangResource> defaultYangResources) {
+    public ConfigurationBuilder setGetDefaultYangResources(final Set<YangResource> defaultYangResources) {
         this.configuration.setDefaultYangResources(defaultYangResources);
         return this;
     }
 
-    public ConfigurationBuilder setThreadPoolSize(int threadPoolSize) {
+    public ConfigurationBuilder setThreadPoolSize(final int threadPoolSize) {
         this.configuration.setThreadPoolSize(threadPoolSize);
         return this;
     }
 
-    public ConfigurationBuilder setGenerateConfigsTimeout(int generateConfigsTimeout) {
+    public ConfigurationBuilder setGenerateConfigsTimeout(final int generateConfigsTimeout) {
         this.configuration.setGenerateConfigsTimeout(generateConfigsTimeout);
         return this;
     }
 
-    public ConfigurationBuilder setModels(Set<String> models) {
+    public ConfigurationBuilder setModels(final Set<String> models) {
         this.configuration.setModels(models);
         return this;
     }
 
-    public ConfigurationBuilder setCapabilities(Set<String> capabilities) {
+    public ConfigurationBuilder setCapabilities(final Set<String> capabilities) {
         this.configuration.setCapabilities(capabilities);
         return this;
     }
 
-    public ConfigurationBuilder setStartingPort(int startingPort) {
+    public ConfigurationBuilder setStartingPort(final int startingPort) {
         this.configuration.setStartingPort(startingPort);
         return this;
     }
 
-    public ConfigurationBuilder setDeviceCount(int deviceCount) {
+    public ConfigurationBuilder setDeviceCount(final int deviceCount) {
         this.configuration.setDeviceCount(deviceCount);
         return this;
     }
 
-    public ConfigurationBuilder setSsh(boolean ssh) {
+    public ConfigurationBuilder setSsh(final boolean ssh) {
         this.configuration.setSsh(ssh);
         return this;
     }
 
-    public ConfigurationBuilder setIp(String ip) {
+    public ConfigurationBuilder setIp(final String ip) {
         this.configuration.setIp(ip);
         return this;
     }
 
-    public ConfigurationBuilder setRpcMapping(RpcHandler rpcHandler) {
+    public ConfigurationBuilder setRpcMapping(final RpcHandler rpcHandler) {
         this.configuration.setRpcHandler(rpcHandler);
         return this;
     }
 
     @Deprecated
-    public ConfigurationBuilder setMdSal(boolean mdSal) {
+    public ConfigurationBuilder setMdSal(final boolean mdSal) {
         this.configuration.setMdSal(mdSal);
         return this;
     }
 
     @Deprecated
-    public ConfigurationBuilder setRpcConfigFile(File rpcConfigFile) {
+    public ConfigurationBuilder setRpcConfigFile(final File rpcConfigFile) {
         this.configuration.setRpcConfigFile(rpcConfigFile);
         return this;
     }
 
     @Deprecated
-    public ConfigurationBuilder setInitialConfigXMLFile(File initialConfigXMLFile) {
+    public ConfigurationBuilder setInitialConfigXMLFile(final File initialConfigXMLFile) {
         this.configuration.setInitialConfigXMLFile(initialConfigXMLFile);
         return this;
     }
 
     @Deprecated
-    public ConfigurationBuilder setNotificationFile(File notificationFile) {
+    public ConfigurationBuilder setNotificationFile(final File notificationFile) {
         this.configuration.setNotificationFile(notificationFile);
         return this;
     }
 
-    public ConfigurationBuilder setOperationsCreator(OperationsCreator operationsCreator) {
+    public ConfigurationBuilder setOperationsCreator(final OperationsCreator operationsCreator) {
         this.configuration.setOperationsCreator(operationsCreator);
         return this;
     }
 
-    public ConfigurationBuilder from(Configuration configuration) {
+    public ConfigurationBuilder from(final Configuration configuration) {
         this.configuration.setThreadPoolSize(configuration.getThreadPoolSize());
         this.configuration.setGenerateConfigsTimeout(configuration.getGenerateConfigsTimeout());
         this.configuration.setModels(configuration.getModels());
@@ -135,7 +134,7 @@ public class ConfigurationBuilder {
         return this;
     }
 
-    public ConfigurationBuilder from(TesttoolParameters testtoolParameters) {
+    public ConfigurationBuilder from(final TesttoolParameters testtoolParameters) {
         this.configuration.setGenerateConfigsTimeout(testtoolParameters.generateConfigsTimeout);
         this.configuration.setStartingPort(testtoolParameters.startingPort);
         this.configuration.setDeviceCount(testtoolParameters.deviceCount);

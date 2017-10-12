@@ -63,11 +63,13 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:hiddenField")
     public void setIoInputStream(final IoInputStream in) {
         this.in = in;
     }
 
     @Override
+    @SuppressWarnings("checkstyle:hiddenField")
     public void setIoOutputStream(final IoOutputStream out) {
         this.out = out;
     }
@@ -78,11 +80,13 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:hiddenField")
     public void setInputStream(final InputStream in) {
         throw new UnsupportedOperationException("Synchronous IO is unsupported");
     }
 
     @Override
+    @SuppressWarnings("checkstyle:hiddenField")
     public void setOutputStream(final OutputStream out) {
         throw new UnsupportedOperationException("Synchronous IO is unsupported");
 
@@ -95,6 +99,7 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:hiddenField")
     public void setExitCallback(final ExitCallback callback) {
         this.callback = callback;
     }
