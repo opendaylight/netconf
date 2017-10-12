@@ -42,9 +42,9 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaUtils;
-import org.opendaylight.yangtools.yang.model.api.AugmentationSchema;
+import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AugmentationTarget;
-import org.opendaylight.yangtools.yang.model.api.ChoiceCaseNode;
+import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
@@ -106,8 +106,8 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
             }
             while (!foundSchemaNodes.isEmpty()) {
                 final Object child = foundSchemaNodes.pop();
-                if (child instanceof AugmentationSchema) {
-                    final AugmentationSchema augmentSchemaNode = (AugmentationSchema) child;
+                if (child instanceof AugmentationSchemaNode) {
+                    final AugmentationSchemaNode augmentSchemaNode = (AugmentationSchemaNode) child;
                     iiToDataList.add(SchemaUtils.getNodeIdentifierForAugmentation(augmentSchemaNode));
                 } else if (child instanceof DataSchemaNode) {
                     schemaNode = (DataSchemaNode) child;
@@ -177,7 +177,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
 
                 // find augmentation
                 if (child.isAugmenting()) {
-                    final AugmentationSchema augment = findCorrespondingAugment(schemaNode, child);
+                    final AugmentationSchemaNode augment = findCorrespondingAugment(schemaNode, child);
                     if (augment != null) {
                         result.push(augment);
                     }
@@ -189,12 +189,12 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         }
 
         for (final ChoiceSchemaNode choiceNode : choiceSchemaNodes) {
-            for (final ChoiceCaseNode caseNode : choiceNode.getCases()) {
+            for (final CaseSchemaNode caseNode : choiceNode.getCases().values()) {
                 final Deque<Object> resultFromRecursion = findPathToSchemaNodeByName(caseNode, elementName, namespace);
                 if (!resultFromRecursion.isEmpty()) {
                     resultFromRecursion.push(choiceNode);
                     if (choiceNode.isAugmenting()) {
-                        final AugmentationSchema augment = findCorrespondingAugment(schemaNode, choiceNode);
+                        final AugmentationSchemaNode augment = findCorrespondingAugment(schemaNode, choiceNode);
                         if (augment != null) {
                             resultFromRecursion.push(augment);
                         }
@@ -206,10 +206,11 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
         return result;
     }
 
-    private static AugmentationSchema findCorrespondingAugment(final DataSchemaNode parent,
+    private static AugmentationSchemaNode findCorrespondingAugment(final DataSchemaNode parent,
                                                                final DataSchemaNode child) {
         if (parent instanceof AugmentationTarget && !(parent instanceof ChoiceSchemaNode)) {
-            for (final AugmentationSchema augmentation : ((AugmentationTarget) parent).getAvailableAugmentations()) {
+            for (final AugmentationSchemaNode augmentation
+                    : ((AugmentationTarget) parent).getAvailableAugmentations()) {
                 final DataSchemaNode childInAugmentation = augmentation.getDataChildByName(child.getQName());
                 if (childInAugmentation != null) {
                     return augmentation;

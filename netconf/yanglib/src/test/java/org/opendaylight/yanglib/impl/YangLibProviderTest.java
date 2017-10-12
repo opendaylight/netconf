@@ -45,11 +45,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YinSchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
-import org.opendaylight.yangtools.yang.parser.util.ASTSchemaSource;
+import org.opendaylight.yangtools.yang.parser.rfc7950.repo.ASTSchemaSource;
 
 public class YangLibProviderTest {
     private static final File CACHE_DIR = new File("target/yanglib");
@@ -106,7 +107,7 @@ public class YangLibProviderTest {
 
         list.add(
                 PotentialSchemaSource.create(
-                        RevisionSourceIdentifier.create("with-revision", "2016-04-28"),
+                        RevisionSourceIdentifier.create("with-revision", Revision.of("2016-04-28")),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         when(writeTransaction.submit()).thenReturn(Futures.immediateCheckedFuture(null));
@@ -224,7 +225,7 @@ public class YangLibProviderTest {
 
         yangUnregistererSource =
                 PotentialSchemaSource.create(
-                        RevisionSourceIdentifier.create("unregistered-yang-with-revision", "2016-04-28"),
+                        RevisionSourceIdentifier.create("unregistered-yang-with-revision", Revision.of("2016-04-28")),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.LOCAL_IO.getValue());
 
         yangLibProvider.schemaSourceUnregistered(yangUnregistererSource);

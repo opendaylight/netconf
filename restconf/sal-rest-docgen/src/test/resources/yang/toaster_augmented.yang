@@ -8,7 +8,7 @@ module toaster-augmented {
     prefix toast;
     import toaster2 {prefix tst; revision-date 2009-11-20;}
 
-    revision "2014-7-14" {
+    revision "2014-07-14" {
     }
 
     augment "/tst:toaster/tst:toasterSlot" {

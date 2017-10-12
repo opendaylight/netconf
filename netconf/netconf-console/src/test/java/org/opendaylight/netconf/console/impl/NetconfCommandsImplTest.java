@@ -15,9 +15,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.google.common.collect.ImmutableList;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -90,7 +88,9 @@ public class NetconfCommandsImplTest {
 
     @Before
     public void setUp() throws Exception {
-        schemaContext = YangParserTestUtils.parseYangStreams(getYangSchemas());
+        schemaContext = YangParserTestUtils.parseYangResources(NetconfCommandsImplTest.class,
+            "/schemas/network-topology@2013-10-21.yang", "/schemas/ietf-inet-types@2013-07-15.yang",
+            "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang");
         schemaContext.getModules();
         final SchemaService schemaService = createSchemaService();
 
@@ -102,7 +102,7 @@ public class NetconfCommandsImplTest {
         datastores.put(LogicalDatastoreType.OPERATIONAL, operStore);
 
         final ExecutorService listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(
-                16, 16, "CommitFutures");
+                16, 16, "CommitFutures", NetconfCommandsImplTest.class);
 
         final ConcurrentDOMDataBroker cDOMDataBroker =
                 new ConcurrentDOMDataBroker(datastores, listenableFutureExecutor);
@@ -127,11 +127,11 @@ public class NetconfCommandsImplTest {
     public void testListDevice() throws TimeoutException, TransactionCommitFailedException {
         createTopology(LogicalDatastoreType.OPERATIONAL);
 
-        final Map map = netconfCommands.listDevices();
+        final Map<?, ?> map = netconfCommands.listDevices();
         map.containsKey(NetconfConsoleConstants.NETCONF_ID);
         assertTrue(map.containsKey(NODE_ID));
 
-        final Map mapNode = (Map) map.get(NODE_ID);
+        final Map<?, ?> mapNode = (Map<?, ?>) map.get(NODE_ID);
         assertBaseNodeAttributes(mapNode);
     }
 
@@ -139,19 +139,19 @@ public class NetconfCommandsImplTest {
     public void testShowDevice() throws TimeoutException, TransactionCommitFailedException {
         createTopology(LogicalDatastoreType.OPERATIONAL);
 
-        final Map mapCorrect = netconfCommands.showDevice(IP, String.valueOf(PORT));
+        final Map<?, ?> mapCorrect = netconfCommands.showDevice(IP, String.valueOf(PORT));
         mapCorrect.containsKey(NetconfConsoleConstants.NETCONF_ID);
         assertTrue(mapCorrect.containsKey(NODE_ID));
 
-        assertBaseNodeAttributesImmutableList((Map) mapCorrect.get(NODE_ID));
+        assertBaseNodeAttributesImmutableList((Map<?, ?>) mapCorrect.get(NODE_ID));
 
-        final Map mapWrongPort = netconfCommands.showDevice(IP, "1");
+        final Map<?, ?> mapWrongPort = netconfCommands.showDevice(IP, "1");
         assertFalse(mapWrongPort.containsKey(NODE_ID));
 
-        final Map mapWrongIP = netconfCommands.showDevice("1.1.1.1", String.valueOf(PORT));
+        final Map<?, ?> mapWrongIP = netconfCommands.showDevice("1.1.1.1", String.valueOf(PORT));
         assertFalse(mapWrongIP.containsKey(NODE_ID));
 
-        final Map mapId = netconfCommands.showDevice(NODE_ID);
+        final Map<?, ?> mapId = netconfCommands.showDevice(NODE_ID);
         assertTrue(mapId.containsKey(NODE_ID));
         assertBaseNodeAttributesImmutableList((Map) mapId.get(NODE_ID));
     }
@@ -230,7 +230,7 @@ public class NetconfCommandsImplTest {
         assertEquals(1, nodes.size());
     }
 
-    private void createTopology(LogicalDatastoreType dataStoreType)
+    private void createTopology(final LogicalDatastoreType dataStoreType)
             throws TransactionCommitFailedException, TimeoutException {
         final List<Node> nodes = new ArrayList<>();
         final Node node = getNetconfNode(NODE_ID, IP, PORT, CONN_STATUS, CAP_PREFIX);
@@ -245,8 +245,8 @@ public class NetconfCommandsImplTest {
         writeTransaction.submit().checkedGet(2, TimeUnit.SECONDS);
     }
 
-    private Node getNetconfNode(String nodeIdent, String ip, int portNumber,
-                                NetconfNodeConnectionStatus.ConnectionStatus cs, String notificationCapabilityPrefix) {
+    private static Node getNetconfNode(final String nodeIdent, final String ip, final int portNumber,
+            final NetconfNodeConnectionStatus.ConnectionStatus cs, final String notificationCapabilityPrefix) {
 
         final Host host = HostBuilder.getDefaultInstance(ip);
         final PortNumber port = new PortNumber(portNumber);
@@ -269,8 +269,7 @@ public class NetconfCommandsImplTest {
         return nb.build();
     }
 
-    private void assertBaseNodeAttributes(Map mapNode) {
-
+    private static void assertBaseNodeAttributes(final Map<?, ?> mapNode) {
         assertTrue(mapNode.containsKey(NetconfConsoleConstants.NETCONF_ID));
         assertTrue(mapNode.containsKey(NetconfConsoleConstants.NETCONF_IP));
         assertTrue(mapNode.containsKey(NetconfConsoleConstants.NETCONF_PORT));
@@ -282,7 +281,7 @@ public class NetconfCommandsImplTest {
         assertEquals(CONN_STATUS.name().toLowerCase(), mapNode.get(NetconfConsoleConstants.STATUS));
     }
 
-    private void assertBaseNodeAttributesImmutableList(Map mapNode) {
+    private static void assertBaseNodeAttributesImmutableList(final Map<?, ?> mapNode) {
         assertTrue(mapNode.containsKey(NetconfConsoleConstants.NETCONF_ID));
         assertTrue(mapNode.containsKey(NetconfConsoleConstants.NETCONF_IP));
         assertTrue(mapNode.containsKey(NetconfConsoleConstants.NETCONF_PORT));
@@ -294,28 +293,15 @@ public class NetconfCommandsImplTest {
         assertEquals(ImmutableList.of(CONN_STATUS.name()), mapNode.get(NetconfConsoleConstants.STATUS));
     }
 
-    private List<InputStream> getYangSchemas() {
-        final List<String> schemaPaths = Arrays.asList("/schemas/network-topology@2013-10-21.yang",
-                "/schemas/ietf-inet-types@2013-07-15.yang", "/schemas/yang-ext.yang",
-                "/schemas/netconf-node-topology.yang");
-
-        final List<InputStream> schemas = new ArrayList<>();
-        for (String schemaPath : schemaPaths) {
-            final InputStream resourceAsStream = getClass().getResourceAsStream(schemaPath);
-            schemas.add(resourceAsStream);
-        }
-        return schemas;
-    }
-
     private SchemaService createSchemaService() {
         return new SchemaService() {
 
             @Override
-            public void addModule(Module module) {
+            public void addModule(final Module module) {
             }
 
             @Override
-            public void removeModule(Module module) {
+            public void removeModule(final Module module) {
 
             }
 
