@@ -8,21 +8,20 @@
 package org.opendaylight.netconf.test.tool.schemacache;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opendaylight.netconf.test.tool.TestToolUtils;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -40,8 +39,7 @@ public final class SchemaSourceCache<T extends SchemaSourceRepresentation>
 
     private static final Logger LOG = LoggerFactory.getLogger(SchemaSourceCache.class);
 
-    public static final Pattern CACHED_FILE_PATTERN =
-            Pattern.compile(
+    public static final Pattern CACHED_FILE_PATTERN = Pattern.compile(
                     ".*/(?<moduleName>[^@]+)" + "(@(?<revision>" + SourceIdentifier.REVISION_PATTERN + "))?.yang");
 
     private final Class<T> representation;
@@ -77,17 +75,15 @@ public final class SchemaSourceCache<T extends SchemaSourceRepresentation>
     }
 
     @Override
-    public synchronized CheckedFuture<? extends T, SchemaSourceException> getSource(
-            final SourceIdentifier sourceIdentifier) {
+    public synchronized ListenableFuture<? extends T> getSource(final SourceIdentifier sourceIdentifier) {
         ModelData modelData = cachedSchemas.get(sourceIdentifier.toYangFilename());
         if (modelData != null) {
             final SchemaSourceRepresentation restored = restoreAsType(modelData.getId(), modelData.getPath());
-            return Futures.immediateCheckedFuture(representation.cast(restored));
-        } else {
-            LOG.debug("Source {} not found in cache as {}", sourceIdentifier);
-            return Futures.immediateFailedCheckedFuture(new MissingSchemaSourceException("Source not found",
-                    sourceIdentifier));
+            return Futures.immediateFuture(representation.cast(restored));
         }
+
+        LOG.debug("Source {} not found in cache as {}", sourceIdentifier);
+        return Futures.immediateFailedFuture(new MissingSchemaSourceException("Source not found", sourceIdentifier));
     }
 
     @Override
@@ -95,7 +91,8 @@ public final class SchemaSourceCache<T extends SchemaSourceRepresentation>
         LOG.trace("Source {} offered to cache", source.getIdentifier());
     }
 
-    private YangTextSchemaSource restoreAsType(final SourceIdentifier sourceIdentifier, final String cachedSource) {
+    private static YangTextSchemaSource restoreAsType(final SourceIdentifier sourceIdentifier,
+            final String cachedSource) {
         return new YangTextSchemaSource(sourceIdentifier) {
 
             @Override
@@ -115,9 +112,8 @@ public final class SchemaSourceCache<T extends SchemaSourceRepresentation>
         if (matcher.matches()) {
             final String moduleName = matcher.group("moduleName");
             final String revision = matcher.group("revision");
-            return Optional.of(RevisionSourceIdentifier.create(moduleName, Optional.fromNullable(revision)));
+            return Optional.of(RevisionSourceIdentifier.create(moduleName, Optional.ofNullable(revision)));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
-
 }

@@ -49,6 +49,6 @@ public class Disconnect extends AbstractCommand {
     public static Command create(final RpcDefinition rpcDefinition,
             final NetconfDeviceConnectionManager commandDispatcher) {
         return new Disconnect(rpcDefinition.getQName(), getInputDefinition(rpcDefinition),
-                getOutputDefinition(rpcDefinition), commandDispatcher, rpcDefinition.getDescription());
+                getOutputDefinition(rpcDefinition), commandDispatcher, rpcDefinition.getDescription().orElse(null));
     }
 }

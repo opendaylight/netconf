@@ -8,8 +8,8 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
-import com.google.common.base.Optional;
 import java.io.InputStream;
+import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -24,6 +24,7 @@ import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.target.config.target.Candidate;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
@@ -87,7 +88,8 @@ public class BaseRpcSchemalessTransformerTest {
         final ChoiceNode candidate = Builders.choiceBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(ConfigTarget.QNAME))
                 .withChild(Builders.leafBuilder().withNodeIdentifier(
-                        new YangInstanceIdentifier.NodeIdentifier(Candidate.QNAME)).build())
+                        new YangInstanceIdentifier.NodeIdentifier(Candidate.QNAME))
+                    .withValue(Empty.getInstance()).build())
                 .build();
         final DataContainerChild<?, ?> target = Builders.containerBuilder()
                 .withNodeIdentifier(
@@ -120,7 +122,7 @@ public class BaseRpcSchemalessTransformerTest {
         Assert.assertNotNull(result.getResult());
         final ContainerNode rpcReply = (ContainerNode) result.getResult();
         Assert.assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.getNodeType());
-        final Optional dataOpt = rpcReply.getChild(
+        final Optional<?> dataOpt = rpcReply.getChild(
                 new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_QNAME));
         Assert.assertTrue(dataOpt.isPresent());
         final AnyXmlNode data = (AnyXmlNode) dataOpt.get();

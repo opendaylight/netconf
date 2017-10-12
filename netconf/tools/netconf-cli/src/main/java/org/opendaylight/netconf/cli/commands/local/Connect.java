@@ -147,6 +147,7 @@ public class Connect extends AbstractCommand {
     public static Command create(final RpcDefinition rpcDefinition, final NetconfDeviceConnectionManager connectManager,
                                  final Integer connectionTimeout) {
         return new Connect(rpcDefinition.getQName(), getInputDefinition(rpcDefinition),
-                getOutputDefinition(rpcDefinition), connectManager, rpcDefinition.getDescription(), connectionTimeout);
+                getOutputDefinition(rpcDefinition), connectManager, rpcDefinition.getDescription().orElse(null),
+                connectionTimeout);
     }
 }

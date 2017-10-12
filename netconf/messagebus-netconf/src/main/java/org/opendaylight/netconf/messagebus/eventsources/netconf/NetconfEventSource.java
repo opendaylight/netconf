@@ -12,7 +12,6 @@ import static com.google.common.util.concurrent.Futures.immediateFuture;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -235,7 +234,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
         try {
             domPublish.putNotification(new TopicDOMNotification(topicNotification));
         } catch (final InterruptedException e) {
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -254,7 +253,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
             return Builders.anyXmlBuilder().withNodeIdentifier(PAYLOAD_ARG).withValue(new DOMSource(element)).build();
         } catch (IOException | XMLStreamException e) {
             LOG.error("Unable to encapsulate notification.", e);
-            throw Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
