@@ -7,13 +7,13 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema;
 
-import com.google.common.base.Optional;
 import com.google.common.io.ByteStreams;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,7 +32,7 @@ public class YangLibrarySchemaYangSourceProviderTest {
     @Before
     public void setUp() throws Exception {
         final URL url = getClass().getResource("/schemas/config-test-rpc.yang");
-        workingSid = RevisionSourceIdentifier.create("abc", Optional.<String>absent());
+        workingSid = RevisionSourceIdentifier.create("abc", Optional.empty());
         final Map<SourceIdentifier, URL> sourceIdentifierURLMap = Collections.singletonMap(workingSid, url);
         final RemoteDeviceId id = new RemoteDeviceId("id", new InetSocketAddress("localhost", 22));
         yangLibrarySchemaYangSourceProvider = new YangLibrarySchemaYangSourceProvider(id, sourceIdentifierURLMap);
@@ -40,9 +40,9 @@ public class YangLibrarySchemaYangSourceProviderTest {
 
     @Test
     public void testGetSource() throws Exception {
-        CheckedFuture<? extends YangTextSchemaSource, SchemaSourceException> source =
-                yangLibrarySchemaYangSourceProvider.getSource(workingSid);
-        final String x = new String(ByteStreams.toByteArray(source.checkedGet().openStream()));
+        ListenableFuture<? extends YangTextSchemaSource> source = yangLibrarySchemaYangSourceProvider
+                .getSource(workingSid);
+        final String x = new String(ByteStreams.toByteArray(source.get().openStream()));
         Assert.assertThat(x, CoreMatchers.containsString("module config-test-rpc"));
     }
 
@@ -54,9 +54,7 @@ public class YangLibrarySchemaYangSourceProviderTest {
         final YangLibrarySchemaYangSourceProvider failingYangLibrarySchemaYangSourceProvider =
                 new YangLibrarySchemaYangSourceProvider(id, sourceIdentifierURLMap);
 
-        CheckedFuture<? extends YangTextSchemaSource, SchemaSourceException> source =
-                failingYangLibrarySchemaYangSourceProvider.getSource(workingSid);
-        source.checkedGet();
+        failingYangLibrarySchemaYangSourceProvider.getSource(workingSid).get();
     }
 
     @Test(expected = IllegalArgumentException.class)
