@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.security.KeyPair;
 import java.util.Optional;
-import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.future.AuthFuture;
+import org.apache.sshd.client.session.ClientSession;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.aaa.encrypt.PKIUtil;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
@@ -52,7 +52,7 @@ public class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
     }
 
     @Override
-    public AuthFuture authenticate(ClientSession session) throws IOException {
+    public AuthFuture authenticate(final ClientSession session) throws IOException {
         // if we have keypair set the identity, otherwise retry the retrieval from the adapter
         // if successful set the identity.
         if (keyPair.isPresent() || tryToSetKeyPair()) {

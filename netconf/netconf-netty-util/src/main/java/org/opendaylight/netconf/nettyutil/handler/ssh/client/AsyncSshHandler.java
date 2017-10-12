@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
 import com.google.common.base.Preconditions;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -17,16 +16,11 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.sshd.ClientChannel;
-import org.apache.sshd.ClientSession;
-import org.apache.sshd.SshClient;
+import org.apache.sshd.client.SshClient;
+import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
-import org.apache.sshd.client.future.OpenFuture;
-import org.apache.sshd.common.future.CloseFuture;
-import org.apache.sshd.common.future.SshFutureListener;
+import org.apache.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,13 +40,10 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     public static final SshClient DEFAULT_CLIENT;
 
     static {
-        final Map<String, String> props = new HashMap<>();
-        props.put(SshClient.AUTH_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
-        props.put(SshClient.IDLE_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
-
         final SshClient c = SshClient.setUpDefaultClient();
+        c.getProperties().put(SshClient.AUTH_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
+        c.getProperties().put(SshClient.IDLE_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
 
-        c.setProperties(props);
         // TODO make configurable, or somehow reuse netty threadpool
         c.setNioWorkers(SSH_DEFAULT_NIO_WORKERS);
         c.start();
@@ -109,18 +100,15 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT, negotiationFuture);
     }
 
-    private void startSsh(final ChannelHandlerContext ctx, final SocketAddress address) {
+    private void startSsh(final ChannelHandlerContext ctx, final SocketAddress address) throws IOException {
         LOG.debug("Starting SSH to {} on channel: {}", address, ctx.channel());
 
         final ConnectFuture sshConnectionFuture = sshClient.connect(authenticationHandler.getUsername(), address);
-        sshConnectionFuture.addListener(new SshFutureListener<ConnectFuture>() {
-            @Override
-            public void operationComplete(final ConnectFuture future) {
-                if (future.isConnected()) {
-                    handleSshSessionCreated(future, ctx);
-                } else {
-                    handleSshSetupFailure(ctx, future.getException());
-                }
+        sshConnectionFuture.addListener(future -> {
+            if (future.isConnected()) {
+                handleSshSessionCreated(future, ctx);
+            } else {
+                handleSshSetupFailure(ctx, future.getException());
             }
         });
     }
@@ -131,17 +119,14 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
             session = future.getSession();
             final AuthFuture authenticateFuture = authenticationHandler.authenticate(session);
-            authenticateFuture.addListener(new SshFutureListener<AuthFuture>() {
-                @Override
-                public void operationComplete(final AuthFuture future) {
-                    if (future.isSuccess()) {
-                        handleSshAuthenticated(session, ctx);
-                    } else {
-                        // Exception does not have to be set in the future, add simple exception in such case
-                        final Throwable exception = future.getException() == null
-                                ? new IllegalStateException("Authentication failed") : future.getException();
-                        handleSshSetupFailure(ctx, exception);
-                    }
+            authenticateFuture.addListener(future1 -> {
+                if (future1.isSuccess()) {
+                    handleSshAuthenticated(session, ctx);
+                } else {
+                    // Exception does not have to be set in the future, add simple exception in such case
+                    final Throwable exception = future1.getException() == null
+                            ? new IllegalStateException("Authentication failed") : future1.getException();
+                    handleSshSetupFailure(ctx, exception);
                 }
             });
         } catch (final IOException e) {
@@ -149,21 +134,18 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         }
     }
 
-    private synchronized void handleSshAuthenticated(final ClientSession session, final ChannelHandlerContext ctx) {
+    private synchronized void handleSshAuthenticated(final ClientSession newSession, final ChannelHandlerContext ctx) {
         try {
             LOG.debug("SSH session authenticated on channel: {}, server version: {}", ctx.channel(),
-                    session.getServerVersion());
+                    newSession.getServerVersion());
 
-            channel = session.createSubsystemChannel(SUBSYSTEM);
+            channel = newSession.createSubsystemChannel(SUBSYSTEM);
             channel.setStreaming(ClientChannel.Streaming.Async);
-            channel.open().addListener(new SshFutureListener<OpenFuture>() {
-                @Override
-                public void operationComplete(final OpenFuture future) {
-                    if (future.isOpened()) {
-                        handleSshChanelOpened(ctx);
-                    } else {
-                        handleSshSetupFailure(ctx, future.getException());
-                    }
+            channel.open().addListener(future -> {
+                if (future.isOpened()) {
+                    handleSshChanelOpened(ctx);
+                } else {
+                    handleSshSetupFailure(ctx, future.getException());
                 }
             });
 
@@ -182,17 +164,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
         // TODO we should also read from error stream and at least log from that
 
-        sshReadAsyncListener = new AsyncSshHandlerReader(new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-                AsyncSshHandler.this.disconnect(ctx, ctx.newPromise());
-            }
-        }, new AsyncSshHandlerReader.ReadMsgHandler() {
-            @Override
-            public void onMessageRead(final ByteBuf msg) {
-                ctx.fireChannelRead(msg);
-            }
-        }, channel.toString(), channel.getAsyncOut());
+        sshReadAsyncListener = new AsyncSshHandlerReader(() -> AsyncSshHandler.this.disconnect(ctx, ctx.newPromise()), msg -> ctx.fireChannelRead(msg), channel.toString(), channel.getAsyncOut());
 
         // if readAsyncListener receives immediate close,
         // it will close this handler and closing this handler sets channel variable to null
@@ -226,12 +198,9 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
         if (negotiationFuture != null) {
 
-            negotiationFutureListener = new GenericFutureListener<Future<?>>() {
-                @Override
-                public void operationComplete(final Future<?> future) {
-                    if (future.isSuccess()) {
-                        connectPromise.setSuccess();
-                    }
+            negotiationFutureListener = future -> {
+                if (future.isSuccess()) {
+                    connectPromise.setSuccess();
                 }
             };
             //complete connection promise with netconf negotiation future
@@ -278,14 +247,11 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         }
 
         if (session != null && !session.isClosed() && !session.isClosing()) {
-            session.close(false).addListener(new SshFutureListener<CloseFuture>() {
-                @Override
-                public void operationComplete(final CloseFuture future) {
-                    if (!future.isClosed()) {
-                        session.close(true);
-                    }
-                    session = null;
+            session.close(false).addListener(future -> {
+                if (!future.isClosed()) {
+                    session.close(true);
                 }
+                session = null;
             });
         }
 

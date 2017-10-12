@@ -117,6 +117,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
 
         timeout = this.timer.newTimeout(new TimerTask() {
             @Override
+            @SuppressWarnings("checkstyle:hiddenField")
             public void run(final Timeout timeout) {
                 synchronized (this) {
                     if (state != State.ESTABLISHED) {
@@ -226,6 +227,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         return channel.pipeline().replace(handlerKey, handlerKey, decoder);
     }
 
+    @SuppressWarnings("checkstyle:hiddenField")
     protected abstract S getSession(L sessionListener, Channel channel, NetconfHelloMessage message)
             throws NetconfDocumentedException;
 

@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import com.google.common.base.Preconditions;
-import java.net.URI;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
@@ -170,9 +169,7 @@ public final class YangInstanceIdentifierSerializer {
      * @return {@link String}
      */
     private static String prefixForNamespace(final QName qname, final SchemaContext schemaContext) {
-        final URI namespace = qname.getNamespace();
-        Preconditions.checkArgument(namespace != null, "Failed to map QName {}", qname);
-        final Module module = schemaContext.findModuleByNamespaceAndRevision(namespace, qname.getRevision());
+        final Module module = schemaContext.findModule(qname.getModule()).orElse(null);
         return module.getName();
     }
 

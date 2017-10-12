@@ -18,18 +18,17 @@ import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.net.URI;
-import java.text.ParseException;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -76,7 +75,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -148,19 +147,11 @@ public class RestconfImpl implements RestconfService {
 
     private static final String NETCONF_BASE_PAYLOAD_NAME = "data";
 
-    private static final QName NETCONF_BASE_QNAME = QName.create(QNameModule.create(URI.create(NETCONF_BASE), null),
+    private static final QName NETCONF_BASE_QNAME = QName.create(QNameModule.create(URI.create(NETCONF_BASE)),
         NETCONF_BASE_PAYLOAD_NAME).intern();
 
-    private static final QNameModule SAL_REMOTE_AUGMENT;
-
-    static {
-        try {
-            SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT,
-                SimpleDateFormatUtil.getRevisionFormat().parse("2014-07-08"));
-        } catch (final ParseException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-    }
+    private static final QNameModule SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT,
+        Revision.of("2014-07-08"));
 
     private static final AugmentationIdentifier SAL_REMOTE_AUG_IDENTIFIER =
             new AugmentationIdentifier(ImmutableSet.of(
@@ -259,7 +250,7 @@ public class RestconfImpl implements RestconfService {
     @Override
     public NormalizedNodeContext getModule(final String identifier, final UriInfo uriInfo) {
         Preconditions.checkNotNull(identifier);
-        final QName moduleNameAndRevision = getModuleNameAndRevision(identifier);
+        final Entry<String, Revision> nameRev = getModuleNameAndRevision(identifier);
         Module module = null;
         DOMMountPoint mountPoint = null;
         final SchemaContext schemaContext;
@@ -267,16 +258,17 @@ public class RestconfImpl implements RestconfService {
             final InstanceIdentifierContext<?> mountPointIdentifier =
                     this.controllerContext.toMountPointIdentifier(identifier);
             mountPoint = mountPointIdentifier.getMountPoint();
-            module = this.controllerContext.findModuleByNameAndRevision(mountPoint, moduleNameAndRevision);
+            module = this.controllerContext.findModuleByNameAndRevision(mountPoint, nameRev.getKey(),
+                nameRev.getValue());
             schemaContext = mountPoint.getSchemaContext();
         } else {
-            module = this.controllerContext.findModuleByNameAndRevision(moduleNameAndRevision);
+            module = this.controllerContext.findModuleByNameAndRevision(nameRev.getKey(), nameRev.getValue());
             schemaContext = this.controllerContext.getGlobalSchema();
         }
 
         if (module == null) {
-            final String errMsg = "Module with name '" + moduleNameAndRevision.getLocalName() + "' and revision '"
-                    + moduleNameAndRevision.getRevision() + "' was not found.";
+            final String errMsg = "Module with name '" + nameRev.getKey() + "' and revision '"
+                    + nameRev.getValue() + "' was not found.";
             LOG.debug(errMsg);
             throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
         }
@@ -407,7 +399,7 @@ public class RestconfImpl implements RestconfService {
         return restconfModule;
     }
 
-    private static QName getModuleNameAndRevision(final String identifier) {
+    private static Entry<String, Revision> getModuleNameAndRevision(final String identifier) {
         final int mountIndex = identifier.indexOf(ControllerContext.MOUNT);
         String moduleNameAndRevision = "";
         if (mountIndex >= 0) {
@@ -416,9 +408,8 @@ public class RestconfImpl implements RestconfService {
             moduleNameAndRevision = identifier;
         }
 
-        final Splitter splitter = Splitter.on("/").omitEmptyStrings();
-        final Iterable<String> split = splitter.split(moduleNameAndRevision);
-        final List<String> pathArgs = Lists.<String>newArrayList(split);
+        final Splitter splitter = Splitter.on('/').omitEmptyStrings();
+        final List<String> pathArgs = splitter.splitToList(moduleNameAndRevision);
         if (pathArgs.size() < 2) {
             LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' " + identifier);
             throw new RestconfDocumentedException(
@@ -427,10 +418,8 @@ public class RestconfImpl implements RestconfService {
         }
 
         try {
-            final String moduleName = pathArgs.get(0);
-            final String revision = pathArgs.get(1);
-            return QName.create(null, SimpleDateFormatUtil.getRevisionFormat().parse(revision), moduleName);
-        } catch (final ParseException e) {
+            return new SimpleImmutableEntry<>(pathArgs.get(0), Revision.of(pathArgs.get(1)));
+        } catch (final DateTimeParseException e) {
             LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' " + identifier);
             throw new RestconfDocumentedException("URI has bad format. It should be \'moduleName/yyyy-MM-dd\'",
                     ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -524,7 +513,7 @@ public class RestconfImpl implements RestconfService {
 
         RpcDefinition rpc = null;
         if (mountPoint == null) {
-            rpc = this.controllerContext.getRpcDefinition(identifierDecoded, null);
+            rpc = this.controllerContext.getRpcDefinition(identifierDecoded);
         } else {
             rpc = findRpc(mountPoint.getSchemaContext(), identifierDecoded);
         }
@@ -614,8 +603,9 @@ public class RestconfImpl implements RestconfService {
             invokeSalRemoteRpcSubscribeRPC(final NormalizedNodeContext payload) {
         final ContainerNode value = (ContainerNode) payload.getData();
         final QName rpcQName = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
-        final Optional<DataContainerChild<? extends PathArgument, ?>> path = value.getChild(new NodeIdentifier(
-                QName.create(payload.getInstanceIdentifierContext().getSchemaNode().getQName(), "path")));
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> path = value.getChild(
+            new NodeIdentifier(QName.create(payload.getInstanceIdentifierContext().getSchemaNode().getQName(),
+                "path")));
         final Object pathValue = path.isPresent() ? path.get().getValue() : null;
 
         if (!(pathValue instanceof YangInstanceIdentifier)) {
@@ -1197,7 +1187,7 @@ public class RestconfImpl implements RestconfService {
         final QName qnameBase = QName.create("subscribe:to:notification", "2016-10-28", "notifi");
         final SchemaContext schemaCtx = ControllerContext.getInstance().getGlobalSchema();
         final DataSchemaNode location = ((ContainerSchemaNode) schemaCtx
-                .findModuleByNamespaceAndRevision(qnameBase.getNamespace(), qnameBase.getRevision())
+                .findModule(qnameBase.getModule()).orElse(null)
                 .getDataChildByName(qnameBase)).getDataChildByName(QName.create(qnameBase, "location"));
         final List<PathArgument> path = new ArrayList<>();
         path.add(NodeIdentifier.create(qnameBase));
@@ -1347,7 +1337,7 @@ public class RestconfImpl implements RestconfService {
      */
     private static <T> T parseEnumTypeParameter(final ContainerNode value, final Class<T> classDescriptor,
             final String paramName) {
-        final Optional<DataContainerChild<? extends PathArgument, ?>> optAugNode = value.getChild(
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> optAugNode = value.getChild(
             SAL_REMOTE_AUG_IDENTIFIER);
         if (!optAugNode.isPresent()) {
             return null;
@@ -1356,8 +1346,8 @@ public class RestconfImpl implements RestconfService {
         if (!(augNode instanceof AugmentationNode)) {
             return null;
         }
-        final Optional<DataContainerChild<? extends PathArgument, ?>> enumNode = ((AugmentationNode) augNode).getChild(
-            new NodeIdentifier(QName.create(SAL_REMOTE_AUGMENT, paramName)));
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> enumNode = ((AugmentationNode) augNode)
+            .getChild(new NodeIdentifier(QName.create(SAL_REMOTE_AUGMENT, paramName)));
         if (!enumNode.isPresent()) {
             return null;
         }
@@ -1441,9 +1431,11 @@ public class RestconfImpl implements RestconfService {
                 ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "revision");
         final DataSchemaNode revisionSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(revisionSchemaNode instanceof LeafSchemaNode);
-        final String revision = module.getQNameModule().getFormattedRevision();
-        moduleNodeValues
-                .withChild(Builders.leafBuilder((LeafSchemaNode) revisionSchemaNode).withValue(revision).build());
+        final java.util.Optional<Revision> revision = module.getQNameModule().getRevision();
+        if (revision.isPresent()) {
+            moduleNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) revisionSchemaNode)
+                .withValue(revision.get().toString()).build());
+        }
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "namespace");

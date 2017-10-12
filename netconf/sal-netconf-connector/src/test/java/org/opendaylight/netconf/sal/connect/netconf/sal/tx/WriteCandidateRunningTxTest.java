@@ -31,6 +31,7 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -50,7 +51,7 @@ public class WriteCandidateRunningTxTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         final SchemaContext schemaContext =
-                YangParserTestUtils.parseYangStreams(getClass().getResourceAsStream("/schemas/test-module.yang"));
+                YangParserTestUtils.parseYangResource("/schemas/test-module.yang");
         doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult())).when(rpc).invokeRpc(any(), any());
         netconfOps = new NetconfBaseOps(rpc, schemaContext);
         id = new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830));
@@ -84,7 +85,8 @@ public class WriteCandidateRunningTxTest {
     }
 
     private static ContainerNode getLockContent(final QName op, final QName datastore) {
-        final LeafNode<Object> datastoreLeaf = Builders.leafBuilder().withNodeIdentifier(toId(datastore)).build();
+        final LeafNode<Object> datastoreLeaf = Builders.leafBuilder().withNodeIdentifier(toId(datastore))
+                .withValue(Empty.getInstance()).build();
         final ChoiceNode choice = Builders.choiceBuilder()
                 .withNodeIdentifier(toId(ConfigTarget.QNAME))
                 .withChild(datastoreLeaf)

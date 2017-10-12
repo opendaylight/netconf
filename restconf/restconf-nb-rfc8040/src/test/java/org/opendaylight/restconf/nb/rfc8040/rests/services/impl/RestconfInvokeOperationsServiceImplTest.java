@@ -52,7 +52,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
         final SchemaContextRef contextRef = new SchemaContextRef(
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
         final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
         final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
         Mockito.when(txHandler.get()).thenReturn(domTx);
@@ -82,7 +82,7 @@ public class RestconfInvokeOperationsServiceImplTest {
     private NormalizedNodeContext prepNNC(final NormalizedNode result) {
         final InstanceIdentifierContext context = Mockito.mock(InstanceIdentifierContext.class);
         final RpcDefinition schemaNode = Mockito.mock(RpcDefinition.class);
-        final QName qname = QName.create("invoke:rpc:module", "2013-12-3", "rpcTest");
+        final QName qname = QName.create("invoke:rpc:module", "2013-12-03", "rpcTest");
         final SchemaPath schemaPath = SchemaPath.create(true, qname);
         Mockito.when(schemaNode.getPath()).thenReturn(schemaPath);
         Mockito.when(schemaNode.getQName()).thenReturn(qname);

@@ -11,10 +11,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO.IdentityValue;
@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.yang.data.api.codec.InstanceIdentifierCodec;
 import org.opendaylight.yangtools.yang.data.api.codec.LeafrefCodec;
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
 import org.opendaylight.yangtools.yang.model.api.AnyXmlSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ChoiceCaseNode;
+import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
@@ -345,9 +345,9 @@ public class RestCodec {
         final URI validNamespace = resolveValidNamespace(namespace, mountPoint, schemaContext);
         Module module = null;
         if (mountPoint != null) {
-            module = mountPoint.getSchemaContext().findModuleByNamespace(validNamespace).iterator().next();
+            module = mountPoint.getSchemaContext().findModules(validNamespace).iterator().next();
         } else {
-            module = schemaContext.findModuleByNamespace(validNamespace).iterator().next();
+            module = schemaContext.findModules(validNamespace).iterator().next();
         }
         if (module == null) {
             LOG.info("Module for namespace " + validNamespace + " wasn't found.");
@@ -415,15 +415,16 @@ public class RestCodec {
 
         final Iterable<ChoiceSchemaNode> choiceNodes =
                 Iterables.filter(container.getChildNodes(), ChoiceSchemaNode.class);
-        final Iterable<Set<ChoiceCaseNode>> map = Iterables.transform(choiceNodes, ChoiceSchemaNode::getCases);
-        for (final ChoiceCaseNode caze : Iterables.concat(map)) {
+        final Iterable<Collection<CaseSchemaNode>> map = Iterables.transform(choiceNodes,
+            choice -> choice.getCases().values());
+        for (final CaseSchemaNode caze : Iterables.concat(map)) {
             collectInstanceDataNodeContainers(potentialSchemaNodes, caze, name);
         }
     }
 
     private static boolean isInstantiatedDataSchema(final DataSchemaNode node) {
-        return (node instanceof LeafSchemaNode) || (node instanceof LeafListSchemaNode)
-                || (node instanceof ContainerSchemaNode) || (node instanceof ListSchemaNode)
-                || (node instanceof AnyXmlSchemaNode);
+        return node instanceof LeafSchemaNode || node instanceof LeafListSchemaNode
+                || node instanceof ContainerSchemaNode || node instanceof ListSchemaNode
+                || node instanceof AnyXmlSchemaNode;
     }
 }
