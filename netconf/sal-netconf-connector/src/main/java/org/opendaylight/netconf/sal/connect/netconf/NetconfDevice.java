@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import javax.annotation.concurrent.GuardedBy;
@@ -60,7 +61,6 @@ import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -432,7 +432,7 @@ public class NetconfDevice
 
         private static SourceIdentifier toSourceId(final QName input) {
             return RevisionSourceIdentifier.create(input.getLocalName(),
-                Optional.fromNullable(input.getFormattedRevision()));
+                java.util.Optional.ofNullable(input.getFormattedRevision()));
         }
     }
 
@@ -467,15 +467,13 @@ public class NetconfDevice
         }
 
         private Collection<SourceIdentifier> filterMissingSources(final Collection<SourceIdentifier> requiredSources) {
-
             return requiredSources.parallelStream().filter(sourceIdentifier -> {
-                boolean remove = false;
                 try {
-                    schemaRepository.getSchemaSource(sourceIdentifier, ASTSchemaSource.class).checkedGet();
-                } catch (SchemaSourceException e) {
-                    remove = true;
+                    schemaRepository.getSchemaSource(sourceIdentifier, ASTSchemaSource.class).get();
+                    return false;
+                } catch (InterruptedException | ExecutionException e) {
+                    return true;
                 }
-                return remove;
             }).collect(Collectors.toList());
         }
 
@@ -487,9 +485,9 @@ public class NetconfDevice
             while (!requiredSources.isEmpty()) {
                 LOG.trace("{}: Trying to build schema context from {}", id, requiredSources);
                 try {
-                    final CheckedFuture<SchemaContext, SchemaResolutionException> schemaBuilderFuture =
-                            schemaContextFactory.createSchemaContext(requiredSources);
-                    final SchemaContext result = schemaBuilderFuture.checkedGet();
+                    final ListenableFuture<SchemaContext> schemaBuilderFuture = schemaContextFactory
+                            .createSchemaContext(requiredSources);
+                    final SchemaContext result = schemaBuilderFuture.get();
                     LOG.debug("{}: Schema context built successfully from {}", id, requiredSources);
                     final Collection<QName> filteredQNames = Sets.difference(deviceSources.getRequiredSourcesQName(),
                             capabilities.getUnresolvedCapabilites().keySet());
@@ -506,7 +504,7 @@ public class NetconfDevice
 
                     handleSalInitializationSuccess(result, remoteSessionCapabilities, getDeviceSpecificRpc(result));
                     return;
-                } catch (final SchemaResolutionException e) {
+                } catch (final ExecutionException | InterruptedException e) {
                     // schemaBuilderFuture.checkedGet() throws only SchemaResolutionException
                     // that might be wrapping a MissingSchemaSourceException so we need to look
                     // at the cause of the exception to make sure we don't misinterpret it.

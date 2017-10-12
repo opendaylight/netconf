@@ -73,7 +73,7 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
     public static void initialization() throws Exception {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
-        schemaContext = YangParserTestUtils.parseYangSources(testFiles);
+        schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
 
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContext);
@@ -140,14 +140,14 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
         final ContainerNode inputNode = (ContainerNode) returnValue.getData();
         final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(QName
                 .create(inputNode.getNodeType(), "cont"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> contDataNode = inputNode
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> contDataNode = inputNode
                 .getChild(yangCont.getLastPathArgument());
         assertTrue(contDataNode.isPresent());
         assertTrue(contDataNode.get() instanceof ContainerNode);
         final YangInstanceIdentifier yangleaf = YangInstanceIdentifier.of(QName
                 .create(inputNode.getNodeType(), "lf"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = ((ContainerNode) contDataNode
-                .get()).getChild(yangleaf.getLastPathArgument());
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode =
+                ((ContainerNode) contDataNode.get()).getChild(yangleaf.getLastPathArgument());
         assertTrue(leafDataNode.isPresent());
         assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue()
                 .toString()));
@@ -170,7 +170,7 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
                 .getSchemaContext().getDataChildByName(
                         dataSchemaNode.getQName());
         assertNotNull(mountDataSchemaNode);
-        if ((qualifiedName != null) && (dataSchemaNode instanceof DataNodeContainer)) {
+        if (qualifiedName != null && dataSchemaNode instanceof DataNodeContainer) {
             final DataSchemaNode child = ((DataNodeContainer) dataSchemaNode)
                     .getDataChildByName(qualifiedName);
             dataNodeIdent = YangInstanceIdentifier.builder(dataNodeIdent)

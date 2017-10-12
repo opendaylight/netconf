@@ -7,11 +7,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -151,7 +151,7 @@ public final class CreateStreamUtil {
     private static <T> T parseEnum(final ContainerNode data, final Class<T> clazz, final String paramName) {
         final Optional<DataContainerChild<? extends PathArgument, ?>> augNode = data
                 .getChild(RestconfStreamsConstants.SAL_REMOTE_AUG_IDENTIFIER);
-        if (!augNode.isPresent() && !(augNode instanceof AugmentationNode)) {
+        if (!augNode.isPresent() || !(augNode.get() instanceof AugmentationNode)) {
             return null;
         }
         final Optional<DataContainerChild<? extends PathArgument, ?>> enumNode =
