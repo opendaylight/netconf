@@ -71,6 +71,7 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      * @param leafNodesOnly
      *            if true, notifications will contain changes to leaf nodes only
      */
+    @SuppressWarnings("checkstyle:hiddenField")
     public void setQueryParams(final Instant start, final Optional<Instant> stop, final Optional<String> filter,
                                final boolean leafNodesOnly) {
         this.start = Preconditions.checkNotNull(start);

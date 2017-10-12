@@ -17,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Optional;
-
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,7 +61,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     public void setUp() throws Exception {
         dataBroker = getDataBroker();
         domDataBroker = getDomBroker();
-        SchemaContext sc = YangParserTestUtils.parseYangSource(
+        SchemaContext sc = YangParserTestUtils.parseYangResource(
                 "/instanceidentifier/yang/instance-identifier-patch-module.yang");
         ControllerContext.getInstance().setGlobalSchema(sc);
     }
@@ -71,8 +70,9 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
         private String lastNotification = null;
 
-        ListenerAdapterTester(YangInstanceIdentifier path, String streamName,
-                              NotificationOutputTypeGrouping.NotificationOutputType outputType, boolean leafNodesOnly) {
+        ListenerAdapterTester(final YangInstanceIdentifier path, final String streamName,
+                              final NotificationOutputTypeGrouping.NotificationOutputType outputType,
+                              final boolean leafNodesOnly) {
             super(path, streamName, outputType);
             setQueryParams(EPOCH, Optional.empty(), Optional.empty(), leafNodesOnly);
         }
@@ -82,7 +82,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
             this.lastNotification = event.getData();
         }
 
-        public void assertGot(String json) throws Exception {
+        public void assertGot(final String json) throws Exception {
             long start = System.currentTimeMillis();
             while (true) {
                 if (lastNotification != null) {
@@ -91,7 +91,8 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
                 if (System.currentTimeMillis() - start > 1000) {
                     throw new Exception("TIMED OUT waiting for notification with " + json);
                 }
-                Thread.currentThread().sleep(200);
+                Thread.currentThread();
+                Thread.sleep(200);
             }
             LOG.debug("Comparing {} {}", json, lastNotification);
             JSONAssert.assertEquals(json, withFakeDate(lastNotification), false);
@@ -99,7 +100,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         }
     }
 
-    static String withFakeDate(String in) {
+    static String withFakeDate(final String in) {
         JSONObject doc = new JSONObject(in);
         JSONObject notification = doc.getJSONObject("notification");
         if (notification == null) {
@@ -109,7 +110,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         return doc.toString();
     }
 
-    private String getNotifJson(String path) throws IOException, URISyntaxException {
+    private String getNotifJson(final String path) throws IOException, URISyntaxException {
         URL url = getClass().getResource(path);
         byte[] bytes = Files.readAllBytes(Paths.get(url.toURI()));
         return withFakeDate(new String(bytes, StandardCharsets.UTF_8));

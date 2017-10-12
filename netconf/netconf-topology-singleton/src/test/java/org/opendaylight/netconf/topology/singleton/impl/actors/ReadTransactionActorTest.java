@@ -61,7 +61,7 @@ public class ReadTransactionActorTest {
     @Test
     public void testRead() throws Exception {
         final ContainerNode node = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("cont")))
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont")))
                 .build();
         when(deviceReadTx.read(STORE, PATH)).thenReturn(Futures.immediateCheckedFuture(Optional.of(node)));
         actorRef.tell(new ReadRequest(STORE, PATH), probe.ref());

@@ -101,7 +101,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
                 Preconditions.checkArgument(input.isSuccessful() && input.getErrors().isEmpty(),
                         "Submit failed with errors: %s", input.getErrors());
                 return null;
-            });
+            }, MoreExecutors.directExecutor());
 
         return Futures.makeChecked(commitFutureAsVoid, input -> new TransactionCommitFailedException(
                 "Submit of transaction " + getIdentifier() + " failed", input));

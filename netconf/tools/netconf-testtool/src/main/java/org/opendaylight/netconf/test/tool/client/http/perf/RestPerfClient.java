@@ -25,7 +25,7 @@ import org.opendaylight.netconf.test.tool.TestToolUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RestPerfClient {
+public final class RestPerfClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestPerfClient.class);
 
@@ -63,6 +63,10 @@ public class RestPerfClient {
         }
     }
 
+    private RestPerfClient() {
+
+    }
+
     public static void main(String[] args) throws IOException {
 
         Parameters parameters = parseArgs(args, Parameters.getParser());
@@ -77,7 +81,7 @@ public class RestPerfClient {
         try {
             editContentString = Files.toString(parameters.editContent, StandardCharsets.UTF_8);
         } catch (final IOException e) {
-            throw new IllegalArgumentException("Cannot read content of " + parameters.editContent);
+            throw new IllegalArgumentException("Cannot read content of " + parameters.editContent, e);
         }
 
         final int threadAmount = parameters.threadAmount;

@@ -28,7 +28,7 @@ public class RestconfImplTest {
     @Test
     public void restImplTest() throws Exception {
         final SchemaContext schemaContext =
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/restconf/impl"));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/restconf/impl"));
 
         final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
         final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);

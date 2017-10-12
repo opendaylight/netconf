@@ -20,7 +20,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-public class XmlFileLoader {
+public final class XmlFileLoader {
+
+    private XmlFileLoader() {
+
+    }
 
     public static NetconfMessage xmlFileToNetconfMessage(final String fileName) throws IOException, SAXException,
             ParserConfigurationException {

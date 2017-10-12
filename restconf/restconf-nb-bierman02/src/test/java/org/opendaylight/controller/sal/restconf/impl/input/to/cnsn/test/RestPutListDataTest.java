@@ -51,7 +51,6 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class RestPutListDataTest {
 
@@ -68,7 +67,7 @@ public class RestPutListDataTest {
     }
 
     @Before
-    public void initialize() throws FileNotFoundException, ReactorException {
+    public void initialize() throws FileNotFoundException {
         final ControllerContext controllerContext = ControllerContext.getInstance();
         schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
         controllerContext.setSchemas(schemaContextTestModule);

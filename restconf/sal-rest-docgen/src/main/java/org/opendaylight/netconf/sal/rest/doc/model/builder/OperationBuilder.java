@@ -29,6 +29,10 @@ public final class OperationBuilder {
         CONSUMES_PUT_POST.add("application/xml");
     }
 
+    private OperationBuilder() {
+
+    }
+
     public static class Get {
 
         protected Operation spec;
@@ -41,7 +45,7 @@ public final class OperationBuilder {
             spec.setMethod(METHOD_NAME);
             spec.setNickname(METHOD_NAME + "-" + node.getQName().getLocalName());
             spec.setType((isConfig ? CONFIG : OPERATIONAL) + node.getQName().getLocalName());
-            spec.setNotes(node.getDescription());
+            spec.setNotes(node.getDescription().orElse(null));
         }
 
         public Get pathParams(final List<Parameter> params) {

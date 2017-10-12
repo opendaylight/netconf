@@ -15,7 +15,7 @@ import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 
-public class ConfigurableClientDispatcher extends NetconfClientDispatcherImpl {
+public final class ConfigurableClientDispatcher extends NetconfClientDispatcherImpl {
 
     private final Set<String> capabilities;
 

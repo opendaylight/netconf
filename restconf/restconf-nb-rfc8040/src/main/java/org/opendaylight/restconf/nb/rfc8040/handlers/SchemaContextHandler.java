@@ -54,6 +54,7 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:hiddenField")
     public void onGlobalContextUpdated(final SchemaContext context) {
         Preconditions.checkNotNull(context);
         this.context = null;
@@ -63,14 +64,14 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
 
         this.moduleSetId++;
         final Module ietfYangLibraryModule =
-                context.findModuleByNamespaceAndRevision(IetfYangLibrary.URI_MODULE, IetfYangLibrary.DATE);
+                context.findModule(IetfYangLibrary.MODULE_QNAME).orElse(null);
         NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
                 RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(context.getModules(), ietfYangLibraryModule,
                         context, String.valueOf(this.moduleSetId));
         putData(normNode);
 
         final Module monitoringModule =
-                this.context.findModuleByNamespaceAndRevision(MonitoringModule.URI_MODULE, MonitoringModule.DATE);
+                this.context.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
         normNode = RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
         putData(normNode);
     }

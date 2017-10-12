@@ -349,7 +349,7 @@ public class TesttoolParameters {
                 editContentString = CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8));
             }
         } catch (final IOException e) {
-            throw new IllegalArgumentException("Cannot read content of " + editContent);
+            throw new IllegalArgumentException("Cannot read content of " + editContent, e);
         }
 
         int from;

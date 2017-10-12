@@ -3,9 +3,9 @@ module basic-module {
 
     prefix "basmod";
 
-    import referenced-module {prefix refmo; revision-date 2013-12-2;}
+    import referenced-module {prefix refmo; revision-date 2013-12-02;}
 
-    revision 2013-12-2 {
+    revision 2013-12-02 {
     }
 
     container cont {

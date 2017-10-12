@@ -21,13 +21,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
-import org.apache.sshd.ClientChannel;
-import org.apache.sshd.ClientSession;
+import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.OpenFuture;
+import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.client.session.ClientSessionImpl;
-import org.apache.sshd.common.Session;
 import org.apache.sshd.common.future.SshFutureListener;
+import org.apache.sshd.common.session.Session;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
@@ -51,8 +51,8 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
     private final InetSocketAddress remoteAddress;
     private final PublicKey serverKey;
 
-    CallHomeSessionContext(ClientSession sshSession, CallHomeAuthorization authorization,
-                           SocketAddress remoteAddress, Factory factory) {
+    CallHomeSessionContext(final ClientSession sshSession, final CallHomeAuthorization authorization,
+                           final SocketAddress remoteAddress, final Factory factory) {
         this.authorization = Preconditions.checkNotNull(authorization, "authorization");
         Preconditions.checkArgument(this.authorization.isServerAllowed(), "Server was not allowed.");
         Preconditions.checkArgument(sshSession instanceof ClientSessionImpl,
@@ -64,7 +64,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         this.serverKey = this.sshSession.getKex().getServerKey();
     }
 
-    static CallHomeSessionContext getFrom(ClientSession sshSession) {
+    static CallHomeSessionContext getFrom(final ClientSession sshSession) {
         return sshSession.getAttribute(SESSION_KEY);
     }
 
@@ -94,19 +94,19 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         };
     }
 
-    private void channelOpenFailed(Throwable throwable) {
+    private void channelOpenFailed(final Throwable throwable) {
         LOG.error("Unable to open netconf subsystem, disconnecting.", throwable);
         sshSession.close(false);
     }
 
-    private void netconfChannelOpened(ClientChannel netconfChannel) {
+    private void netconfChannelOpened(final ClientChannel netconfChannel) {
         nettyChannel = newMinaSshNettyChannel(netconfChannel);
         factory.getChannelOpenListener().onNetconfSubsystemOpened(
             CallHomeSessionContext.this, this::doActivate);
     }
 
     @GuardedBy("this")
-    private synchronized Promise<NetconfClientSession> doActivate(NetconfClientSessionListener listener) {
+    private synchronized Promise<NetconfClientSession> doActivate(final NetconfClientSessionListener listener) {
         if (activated) {
             return newSessionPromise().setFailure(new IllegalStateException("Session already activated."));
         }
@@ -118,11 +118,11 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         return activationPromise;
     }
 
-    protected MinaSshNettyChannel newMinaSshNettyChannel(ClientChannel netconfChannel) {
+    protected MinaSshNettyChannel newMinaSshNettyChannel(final ClientChannel netconfChannel) {
         return new MinaSshNettyChannel(this, sshSession, netconfChannel);
     }
 
-    private Promise<NetconfClientSession> newSessionPromise() {
+    private static Promise<NetconfClientSession> newSessionPromise() {
         return GlobalEventExecutor.INSTANCE.newPromise();
     }
 
@@ -157,18 +157,18 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         private final CallHomeNetconfSubsystemListener subsystemListener;
         private final ConcurrentMap<String, CallHomeSessionContext> sessions = new ConcurrentHashMap<>();
 
-        Factory(EventLoopGroup nettyGroup, NetconfClientSessionNegotiatorFactory negotiatorFactory,
-                CallHomeNetconfSubsystemListener subsystemListener) {
+        Factory(final EventLoopGroup nettyGroup, final NetconfClientSessionNegotiatorFactory negotiatorFactory,
+                final CallHomeNetconfSubsystemListener subsystemListener) {
             this.nettyGroup = Preconditions.checkNotNull(nettyGroup, "nettyGroup");
             this.negotiatorFactory = Preconditions.checkNotNull(negotiatorFactory, "negotiatorFactory");
             this.subsystemListener = Preconditions.checkNotNull(subsystemListener);
         }
 
-        void remove(CallHomeSessionContext session) {
+        void remove(final CallHomeSessionContext session) {
             sessions.remove(session.getSessionName(), session);
         }
 
-        ReverseSshChannelInitializer getChannelInitializer(NetconfClientSessionListener listener) {
+        ReverseSshChannelInitializer getChannelInitializer(final NetconfClientSessionListener listener) {
             return ReverseSshChannelInitializer.create(negotiatorFactory, listener);
         }
 
@@ -177,8 +177,8 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         }
 
         @Nullable
-        CallHomeSessionContext createIfNotExists(ClientSession sshSession, CallHomeAuthorization authorization,
-                                                 SocketAddress remoteAddress) {
+        CallHomeSessionContext createIfNotExists(final ClientSession sshSession,
+                final CallHomeAuthorization authorization, final SocketAddress remoteAddress) {
             CallHomeSessionContext session = new CallHomeSessionContext(sshSession, authorization,
                     remoteAddress, this);
             CallHomeSessionContext preexisting = sessions.putIfAbsent(session.getSessionName(), session);

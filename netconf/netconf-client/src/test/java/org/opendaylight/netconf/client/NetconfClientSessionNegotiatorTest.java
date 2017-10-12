@@ -80,17 +80,17 @@ public class NetconfClientSessionNegotiatorTest {
     }
 
     private Channel mockChannel() {
-        Channel channel = mock(Channel.class);
+        Channel ret = mock(Channel.class);
         ChannelHandler channelHandler = mockChannelHandler();
-        doReturn("").when(channel).toString();
-        doReturn(future).when(channel).close();
-        doReturn(future).when(channel).writeAndFlush(anyObject());
-        doReturn(true).when(channel).isOpen();
-        doReturn(pipeline).when(channel).pipeline();
+        doReturn("").when(ret).toString();
+        doReturn(future).when(ret).close();
+        doReturn(future).when(ret).writeAndFlush(anyObject());
+        doReturn(true).when(ret).isOpen();
+        doReturn(pipeline).when(ret).pipeline();
         doReturn("").when(pipeline).toString();
         doReturn(pipeline).when(pipeline).remove(any(ChannelHandler.class));
         doReturn(channelHandler).when(pipeline).remove(anyString());
-        return channel;
+        return ret;
     }
 
     private static ChannelFuture mockChannelFuture() {
@@ -178,7 +178,7 @@ public class NetconfClientSessionNegotiatorTest {
 
         negotiator.channelActive(null);
         Set<String> caps = Sets.newSet("exi:1.0");
-        NetconfHelloMessage helloMessage = NetconfHelloMessage.createServerHello(caps, 10);
+        NetconfHelloMessage message = NetconfHelloMessage.createServerHello(caps, 10);
 
         doAnswer(new Answer<Object>() {
             @Override
@@ -190,7 +190,7 @@ public class NetconfClientSessionNegotiatorTest {
 
         ChannelHandlerContext handlerContext = mock(ChannelHandlerContext.class);
         doReturn(pipeline).when(handlerContext).pipeline();
-        negotiator.handleMessage(helloMessage);
+        negotiator.handleMessage(message);
         Document expectedResult = XmlFileLoader.xmlFileToDocument("netconfMessages/rpc-reply_ok.xml");
         channelInboundHandlerAdapter.channelRead(handlerContext, new NetconfMessage(expectedResult));
 

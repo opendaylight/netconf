@@ -219,8 +219,6 @@ public class RemoteDeviceConnectorImplTest {
                 .setKeepaliveDelay(1L)
                 .build();
 
-        final RemoteDeviceId remoteDeviceId = new RemoteDeviceId(TOPOLOGY_ID,
-                new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
         final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(NetconfNode.class, netconfNode).build();
         builder.setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node));
 

@@ -17,7 +17,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 
-class ParametersUtil {
+final class ParametersUtil {
 
     private ParametersUtil() {
         throw new UnsupportedOperationException("Util class.");

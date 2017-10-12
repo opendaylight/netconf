@@ -101,6 +101,10 @@ public final class StressClient {
 
     private static Parameters params;
 
+    private StressClient() {
+
+    }
+
     public static void main(final String[] args) {
 
         params = parseArgs(args, Parameters.getParser());
@@ -134,7 +138,7 @@ public final class StressClient {
         try {
             editContentString = Files.toString(params.editContent, StandardCharsets.UTF_8);
         } catch (final IOException e) {
-            throw new IllegalArgumentException("Cannot read content of " + params.editContent);
+            throw new IllegalArgumentException("Cannot read content of " + params.editContent, e);
         }
 
         for (int i = 0; i < threadAmount; i++) {
@@ -152,7 +156,7 @@ public final class StressClient {
         final NioEventLoopGroup nioGroup = new NioEventLoopGroup();
         final Timer timer = new HashedWheelTimer();
 
-        final NetconfClientDispatcherImpl netconfClientDispatcher = configureClientDispatcher(params, nioGroup, timer);
+        final NetconfClientDispatcherImpl netconfClientDispatcher = configureClientDispatcher(nioGroup, timer);
 
         final List<StressClientCallable> callables = new ArrayList<>(threadAmount);
         for (final List<NetconfMessage> messages : allPreparedMessages) {
@@ -224,8 +228,8 @@ public final class StressClient {
         return netconfMessage;
     }
 
-    private static NetconfClientDispatcherImpl configureClientDispatcher(final Parameters params,
-            final NioEventLoopGroup nioGroup, final Timer timer) {
+    private static NetconfClientDispatcherImpl configureClientDispatcher(final NioEventLoopGroup nioGroup,
+            final Timer timer) {
         final NetconfClientDispatcherImpl netconfClientDispatcher;
         if (params.exi) {
             if (params.legacyFraming) {
