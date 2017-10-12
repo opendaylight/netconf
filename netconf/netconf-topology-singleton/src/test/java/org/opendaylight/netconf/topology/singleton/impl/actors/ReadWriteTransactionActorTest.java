@@ -47,7 +47,6 @@ import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
@@ -64,7 +63,7 @@ public class ReadWriteTransactionActorTest {
     private TestProbe probe;
     private ActorSystem system;
     private TestActorRef<WriteTransactionActor> actorRef;
-    private NormalizedNode<?, ?> node;
+    private ContainerNode node;
 
     @Before
     public void setUp() throws Exception {
@@ -72,7 +71,7 @@ public class ReadWriteTransactionActorTest {
         system = ActorSystem.apply();
         probe = TestProbe.apply(system);
         node = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("cont")))
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont")))
                 .build();
         actorRef = TestActorRef.create(system, ReadWriteTransactionActor.props(deviceReadWriteTx,
                 Duration.apply(2, TimeUnit.SECONDS)), "testA");
@@ -85,9 +84,6 @@ public class ReadWriteTransactionActorTest {
 
     @Test
     public void testRead() throws Exception {
-        final ContainerNode node = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("cont")))
-                .build();
         when(deviceReadWriteTx.read(STORE, PATH)).thenReturn(Futures.immediateCheckedFuture(Optional.of(node)));
         actorRef.tell(new ReadRequest(STORE, PATH), probe.ref());
         verify(deviceReadWriteTx).read(STORE, PATH);
@@ -182,9 +178,9 @@ public class ReadWriteTransactionActorTest {
 
     @Test
     public void testIdleTimeout() throws Exception {
-        final TestProbe probe = new TestProbe(system);
-        probe.watch(actorRef);
+        final TestProbe testProbe = new TestProbe(system);
+        testProbe.watch(actorRef);
         verify(deviceReadWriteTx, timeout(3000)).cancel();
-        probe.expectTerminated(actorRef, TIMEOUT.duration());
+        testProbe.expectTerminated(actorRef, TIMEOUT.duration());
     }
 }

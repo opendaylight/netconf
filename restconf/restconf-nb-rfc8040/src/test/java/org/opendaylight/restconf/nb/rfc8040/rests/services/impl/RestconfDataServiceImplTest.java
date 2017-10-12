@@ -175,7 +175,7 @@ public class RestconfDataServiceImplTest {
                 .build();
 
         this.contextRef = new SchemaContextRef(
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
         this.schemaNode = DataSchemaContextTree.from(this.contextRef.get()).getChild(this.iidBase).getDataSchemaNode();
 
         final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
@@ -334,7 +334,6 @@ public class RestconfDataServiceImplTest {
     @Test
     public void testPutDataWithMountPoint() {
         final DOMDataBroker dataBroker = Mockito.mock(DOMDataBroker.class);
-        final DOMMountPoint mountPoint = Mockito.mock(DOMMountPoint.class);
         doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
         doReturn(this.transactionChainHandler.get()).when(dataBroker)
                 .createTransactionChain(RestConnectorProvider.TRANSACTION_CHAIN_LISTENER);

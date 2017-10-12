@@ -46,7 +46,7 @@ import org.opendaylight.restconf.nb.rfc8040.services.simple.impl.RestconfSchemaS
  *
  */
 @Path("/")
-public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServicesWrapper, ServiceWrapper {
+public final class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServicesWrapper, ServiceWrapper {
 
     private RestconfDataService delegRestconfDataService;
     private RestconfInvokeOperationsService delegRestconfInvokeOpsService;

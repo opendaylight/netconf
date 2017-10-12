@@ -14,7 +14,7 @@ import io.netty.channel.local.LocalEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
-import org.apache.sshd.SshClient;
+import org.apache.sshd.client.SshClient;
 import org.opendaylight.netconf.callhome.protocol.CallHomeSessionContext.Factory;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.yangtools.concepts.Builder;
@@ -33,8 +33,8 @@ public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServ
     private final CallHomeNetconfSubsystemListener subsystemListener;
     private final StatusRecorder recorder;
 
-    public NetconfCallHomeServerBuilder(CallHomeAuthorizationProvider authProvider,
-                                        CallHomeNetconfSubsystemListener subsystemListener, StatusRecorder recorder) {
+    public NetconfCallHomeServerBuilder(final CallHomeAuthorizationProvider authProvider,
+            final CallHomeNetconfSubsystemListener subsystemListener, final StatusRecorder recorder) {
         this.authProvider = authProvider;
         this.subsystemListener = subsystemListener;
         this.recorder = recorder;
@@ -51,7 +51,7 @@ public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServ
         return sshClient;
     }
 
-    public void setSshClient(SshClient sshClient) {
+    public void setSshClient(final SshClient sshClient) {
         this.sshClient = sshClient;
     }
 
@@ -59,7 +59,7 @@ public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServ
         return nettyGroup;
     }
 
-    public void setNettyGroup(EventLoopGroup nettyGroup) {
+    public void setNettyGroup(final EventLoopGroup nettyGroup) {
         this.nettyGroup = nettyGroup;
     }
 
@@ -67,7 +67,7 @@ public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServ
         return negotiationFactory;
     }
 
-    public void setNegotiationFactory(NetconfClientSessionNegotiatorFactory negotiationFactory) {
+    public void setNegotiationFactory(final NetconfClientSessionNegotiatorFactory negotiationFactory) {
         this.negotiationFactory = negotiationFactory;
     }
 
@@ -75,7 +75,7 @@ public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServ
         return bindAddress;
     }
 
-    public void setBindAddress(InetSocketAddress bindAddress) {
+    public void setBindAddress(final InetSocketAddress bindAddress) {
         this.bindAddress = bindAddress;
     }
 
@@ -107,20 +107,20 @@ public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServ
         return sshClient != null ? sshClient : defaultSshClient();
     }
 
-    private SshClient defaultSshClient() {
+    private static SshClient defaultSshClient() {
         return SshClient.setUpDefaultClient();
     }
 
-    private NetconfClientSessionNegotiatorFactory defaultNegotiationFactory() {
+    private static NetconfClientSessionNegotiatorFactory defaultNegotiationFactory() {
         return new NetconfClientSessionNegotiatorFactory(new HashedWheelTimer(),
                                                          Optional.absent(), DEFAULT_SESSION_TIMEOUT_MILLIS);
     }
 
-    private EventLoopGroup defaultNettyGroup() {
+    private static EventLoopGroup defaultNettyGroup() {
         return new LocalEventLoopGroup();
     }
 
-    private InetSocketAddress defaultBindAddress() {
+    private static InetSocketAddress defaultBindAddress() {
         return new InetSocketAddress(DEFAULT_CALL_HOME_PORT);
     }
 }

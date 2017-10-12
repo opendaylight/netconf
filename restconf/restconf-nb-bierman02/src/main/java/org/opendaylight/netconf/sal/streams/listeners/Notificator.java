@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * {@link Notificator} is responsible to create, remove and find
  * {@link ListenerAdapter} listener.
  */
-public class Notificator {
+public final class Notificator {
 
     private static Map<String, ListenerAdapter> dataChangeListener = new ConcurrentHashMap<>();
     private static Map<String, List<NotificationListenerAdapter>> notificationListenersByStreamName =

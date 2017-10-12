@@ -16,7 +16,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWrit
 /**
  * This class just delegates all of the functionality to Yangtools normalized node writer.
  */
-public class RestconfDelegatingNormalizedNodeWriter implements RestconfNormalizedNodeWriter {
+public final class RestconfDelegatingNormalizedNodeWriter implements RestconfNormalizedNodeWriter {
     private NormalizedNodeWriter delegNNWriter;
 
     private RestconfDelegatingNormalizedNodeWriter(NormalizedNodeStreamWriter streamWriter, final boolean

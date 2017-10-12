@@ -1,7 +1,7 @@
 module nested-module {
     namespace "urn:nested:module";
     prefix "nested";
-    revision "2014-06-3";
+    revision "2014-06-03";
 
     container depth1-cont {
         list depth2-cont1 {

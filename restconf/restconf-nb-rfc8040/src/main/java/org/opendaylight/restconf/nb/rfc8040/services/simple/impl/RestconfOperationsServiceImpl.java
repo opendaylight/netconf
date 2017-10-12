@@ -25,6 +25,7 @@ import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.services.simple.api.RestconfOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -132,7 +133,7 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
                 Builders.containerBuilder(fakeCont);
 
         for (final LeafSchemaNode leaf : fakeRpcSchema) {
-            containerBuilder.withChild(Builders.leafBuilder(leaf).build());
+            containerBuilder.withChild(Builders.leafBuilder(leaf).withValue(Empty.getInstance()).build());
         }
 
         final Collection<Module> fakeModules = new ArrayList<>(neededModules.size() + 1);

@@ -84,6 +84,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     }
 
     @Override
+    @SuppressWarnings("checkstyle:hiddenField")
     public void onNotification(final DOMNotification notification) {
         this.schemaContext = ControllerContext.getInstance().getGlobalSchema();
         this.notification = notification;
@@ -173,18 +174,13 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
 
         final Element notificationEventElement = doc.createElementNS(
                 "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "create-notification-stream");
-        addValuesToNotificationEventElement(doc, notificationEventElement, this.notification, this.schemaContext);
+        addValuesToNotificationEventElement(doc, notificationEventElement);
         notificationElement.appendChild(notificationEventElement);
 
         return transformDoc(doc);
     }
 
-    private void addValuesToNotificationEventElement(final Document doc, final Element element,
-            final DOMNotification notification, final SchemaContext schemaContext) {
-        if (notification == null) {
-            return;
-        }
-
+    private void addValuesToNotificationEventElement(final Document doc, final Element element) {
         final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> body =
                 notification.getBody();
         try {

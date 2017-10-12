@@ -14,13 +14,14 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.Test;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
@@ -38,11 +39,11 @@ public class YangLibServiceImplTest {
         final YangLibServiceImpl yangLibService = new YangLibServiceImpl();
         yangLibService.setSchemaRepository(schemaRepository);
 
-        final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("name", "2016-01-01");
+        final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("name", Revision.of("2016-01-01"));
 
         final YangTextSchemaSource yangTextSchemaSource = new YangTextSchemaSource(sourceIdentifier) {
             @Override
-            protected MoreObjects.ToStringHelper addToStringAttributes(MoreObjects.ToStringHelper toStringHelper) {
+            protected ToStringHelper addToStringAttributes(final ToStringHelper toStringHelper) {
                 return null;
             }
 
@@ -52,8 +53,7 @@ public class YangLibServiceImplTest {
             }
         };
 
-        final CheckedFuture<YangTextSchemaSource, SchemaSourceException> sourceFuture =
-                Futures.immediateCheckedFuture(yangTextSchemaSource);
+        final ListenableFuture<YangTextSchemaSource> sourceFuture = Futures.immediateFuture(yangTextSchemaSource);
         doReturn(sourceFuture).when(schemaRepository).getSchemaSource(any(SourceIdentifier.class),
                 eq(YangTextSchemaSource.class));
 

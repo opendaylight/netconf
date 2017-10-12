@@ -116,8 +116,8 @@ public class WriteOnlyTransactionTest {
                 new ProxyDOMDataBroker(system, remoteDeviceId, masterRef, Timeout.apply(5, TimeUnit.SECONDS));
         initializeDataTest();
         testNode = ImmutableContainerNodeBuilder.create()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("TestQname")))
-                .withChild(ImmutableNodes.leafNode(QName.create("NodeQname"), "foo")).build();
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "TestQname")))
+                .withChild(ImmutableNodes.leafNode(QName.create("", "NodeQname"), "foo")).build();
         instanceIdentifier = YangInstanceIdentifier.EMPTY;
         storeType = LogicalDatastoreType.CONFIGURATION;
     }
@@ -152,15 +152,12 @@ public class WriteOnlyTransactionTest {
 
     @Test
     public void testDelete() throws Exception {
-        final YangInstanceIdentifier instanceIdentifier = YangInstanceIdentifier.EMPTY;
-        final LogicalDatastoreType storeType = LogicalDatastoreType.CONFIGURATION;
-
         // Test of invoking delete on master through slave proxy
         final DOMDataWriteTransaction wTx = slaveDataBroker.newWriteOnlyTransaction();
-        wTx.delete(storeType, instanceIdentifier);
+        wTx.delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.EMPTY);
         wTx.cancel();
 
-        verify(writeTx, timeout(2000)).delete(storeType, instanceIdentifier);
+        verify(writeTx, timeout(2000)).delete(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.EMPTY);
     }
 
     @Test

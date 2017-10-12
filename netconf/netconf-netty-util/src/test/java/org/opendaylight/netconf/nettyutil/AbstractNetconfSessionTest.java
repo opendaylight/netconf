@@ -159,10 +159,10 @@ public class AbstractNetconfSessionTest {
     @Test
     public void testSendMessage() throws Exception {
         final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
-        final NetconfHelloMessage clientHello = NetconfHelloMessage.createClientHello(Collections.<String>emptySet(),
+        final NetconfHelloMessage hello = NetconfHelloMessage.createClientHello(Collections.<String>emptySet(),
                 Optional.<NetconfHelloMessageAdditionalHeader>absent());
-        testingNetconfSession.sendMessage(clientHello);
-        verify(channel).writeAndFlush(clientHello);
+        testingNetconfSession.sendMessage(hello);
+        verify(channel).writeAndFlush(hello);
     }
 
 }

@@ -111,7 +111,6 @@ public class TxChainTest {
     @Test
     public void testChainFail() throws Exception {
         final AbstractWriteTx writeTx = chain.newWriteOnlyTransaction();
-        final ArgumentCaptor<TxListener> captor = ArgumentCaptor.forClass(TxListener.class);
         verify(writeOnlyTx1).addListener(captor.capture());
         writeTx.submit();
         final TransactionCommitFailedException cause = new TransactionCommitFailedException("fail");

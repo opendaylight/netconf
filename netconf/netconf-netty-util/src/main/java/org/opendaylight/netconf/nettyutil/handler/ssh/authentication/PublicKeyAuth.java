@@ -10,8 +10,8 @@ package org.opendaylight.netconf.nettyutil.handler.ssh.authentication;
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.security.KeyPair;
-import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.future.AuthFuture;
+import org.apache.sshd.client.session.ClientSession;
 import org.opendaylight.aaa.encrypt.PKIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ public class PublicKeyAuth extends LoginPasswordHandler {
     private KeyPair keyPair = null;
     private static final Logger LOG = LoggerFactory.getLogger(PublicKeyAuth.class);
 
-    public PublicKeyAuth(String username, String password, String keyPath,
+    public PublicKeyAuth(final String username, final String password, final String keyPath,
                          String passPhrase) {
         super(username, password);
         try {
