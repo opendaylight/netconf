@@ -101,11 +101,6 @@ final class FakeRestconfModule implements Module {
     }
 
     @Override
-    public String getModuleSourcePath() {
-        throw new UnsupportedOperationException("Not supported operations.");
-    }
-
-    @Override
     public QNameModule getQNameModule() {
         return QNAME;
     }

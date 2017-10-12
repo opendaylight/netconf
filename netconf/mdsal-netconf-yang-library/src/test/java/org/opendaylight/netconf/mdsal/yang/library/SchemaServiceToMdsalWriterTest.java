@@ -16,8 +16,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
-import java.io.InputStream;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -91,15 +89,12 @@ public class SchemaServiceToMdsalWriterTest {
                 eq(MODULES_STATE_INSTANCE_IDENTIFIER), eq(createTestModuleState()));
     }
 
-    private SchemaContext getSchema() throws Exception {
-        final List<InputStream> modelsToParse = Lists.newArrayList(
-                SchemaServiceToMdsalWriterTest.class.getResourceAsStream("/test-module.yang"),
-                SchemaServiceToMdsalWriterTest.class.getResourceAsStream("/test-submodule.yang")
-        );
-        return YangParserTestUtils.parseYangStreams(modelsToParse);
+    private static SchemaContext getSchema() {
+        return YangParserTestUtils.parseYangResources(SchemaServiceToMdsalWriterTest.class, "/test-module.yang",
+            "/test-submodule.yang");
     }
 
-    private ModulesState createTestModuleState() {
+    private static ModulesState createTestModuleState() {
         Submodule sub = new SubmoduleBuilder().setName(new YangIdentifier("test-submodule"))
                 .setRevision(new OptionalRevision("1970-01-01"))
                 .build();

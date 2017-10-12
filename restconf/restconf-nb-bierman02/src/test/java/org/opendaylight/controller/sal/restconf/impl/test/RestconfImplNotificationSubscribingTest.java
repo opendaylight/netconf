@@ -60,7 +60,7 @@ public class RestconfImplNotificationSubscribingTest {
         this.broker.setDomDataBroker(this.domDataBroker);
         RestconfImpl.getInstance().setBroker(this.broker);
         ControllerContext.getInstance()
-                .setGlobalSchema(YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/notifications")));
+                .setGlobalSchema(YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications")));
 
         final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
         final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-14-12", "localName"));

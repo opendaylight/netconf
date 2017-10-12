@@ -135,7 +135,7 @@ public class NetconfEventSourceMountTest {
         final List<String> streamNames = Lists.transform(availableStreams, new Function<Stream, String>() {
             @Nullable
             @Override
-            public String apply(@Nullable Stream input) {
+            public String apply(@Nullable final Stream input) {
                 return input.getName().getValue();
             }
         });
@@ -143,15 +143,15 @@ public class NetconfEventSourceMountTest {
         streamNames.contains(STREAM_2);
     }
 
-    private String getStreamName(ContainerNode value) {
+    private static String getStreamName(final ContainerNode value) {
         YangInstanceIdentifier.NodeIdentifier stream =
                 new YangInstanceIdentifier.NodeIdentifier(QName.create(CreateSubscriptionInput.QNAME, "stream"));
         return (String) value.getChild(stream).get().getValue();
     }
 
-    private Optional<?> getDate(ContainerNode value) {
+    private static Optional<?> getDate(final ContainerNode value) {
         YangInstanceIdentifier.NodeIdentifier startTime =
                 new YangInstanceIdentifier.NodeIdentifier(QName.create(CreateSubscriptionInput.QNAME, "startTime"));
-        return value.getChild(startTime);
+        return Optional.fromJavaUtil(value.getChild(startTime));
     }
 }

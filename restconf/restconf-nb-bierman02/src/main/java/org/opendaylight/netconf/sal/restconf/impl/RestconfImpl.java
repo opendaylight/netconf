@@ -614,8 +614,9 @@ public class RestconfImpl implements RestconfService {
             invokeSalRemoteRpcSubscribeRPC(final NormalizedNodeContext payload) {
         final ContainerNode value = (ContainerNode) payload.getData();
         final QName rpcQName = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
-        final Optional<DataContainerChild<? extends PathArgument, ?>> path = value.getChild(new NodeIdentifier(
-                QName.create(payload.getInstanceIdentifierContext().getSchemaNode().getQName(), "path")));
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> path = value.getChild(
+            new NodeIdentifier(QName.create(payload.getInstanceIdentifierContext().getSchemaNode().getQName(),
+                "path")));
         final Object pathValue = path.isPresent() ? path.get().getValue() : null;
 
         if (!(pathValue instanceof YangInstanceIdentifier)) {
@@ -1347,13 +1348,14 @@ public class RestconfImpl implements RestconfService {
      */
     private static <T> T parseEnumTypeParameter(final ContainerNode value, final Class<T> classDescriptor,
             final String paramName) {
-        final Optional<DataContainerChild<? extends PathArgument, ?>> augNode =
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> augNode =
                 value.getChild(SAL_REMOTE_AUG_IDENTIFIER);
-        if (!augNode.isPresent() && !(augNode instanceof AugmentationNode)) {
+        if (!augNode.isPresent() && !(augNode.get() instanceof AugmentationNode)) {
             return null;
         }
-        final Optional<DataContainerChild<? extends PathArgument, ?>> enumNode = ((AugmentationNode) augNode.get())
-                .getChild(new NodeIdentifier(QName.create(SAL_REMOTE_AUGMENT, paramName)));
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> enumNode =
+                ((AugmentationNode) augNode.get()).getChild(new NodeIdentifier(QName.create(SAL_REMOTE_AUGMENT,
+                    paramName)));
         if (!enumNode.isPresent()) {
             return null;
         }
