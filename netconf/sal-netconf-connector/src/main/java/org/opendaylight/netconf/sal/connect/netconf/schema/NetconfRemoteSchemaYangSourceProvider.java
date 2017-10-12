@@ -15,9 +15,9 @@ import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +28,6 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
-import org.opendaylight.yangtools.util.concurrent.ExceptionMapper;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -40,7 +39,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
@@ -51,14 +49,6 @@ import org.w3c.dom.Element;
 public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSourceProvider<YangTextSchemaSource> {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfRemoteSchemaYangSourceProvider.class);
-
-    private static final ExceptionMapper<SchemaSourceException> MAPPER = new ExceptionMapper<SchemaSourceException>(
-            "schemaDownload", SchemaSourceException.class) {
-        @Override
-        protected SchemaSourceException newWithCause(final String message, final Throwable throwable) {
-            return new SchemaSourceException(message, throwable);
-        }
-    };
 
     private final DOMRpcService rpc;
     private final RemoteDeviceId id;
@@ -103,7 +93,7 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
             return Optional.absent();
         }
 
-        final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> child =
+        final java.util.Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> child =
                 ((ContainerNode) result).getChild(NETCONF_DATA_PATHARG);
 
         Preconditions.checkState(child.isPresent() && child.get() instanceof AnyXmlNode,
@@ -118,8 +108,7 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
     }
 
     @Override
-    public CheckedFuture<YangTextSchemaSource, SchemaSourceException> getSource(
-            final SourceIdentifier sourceIdentifier) {
+    public ListenableFuture<YangTextSchemaSource> getSource(final SourceIdentifier sourceIdentifier) {
         final String moduleName = sourceIdentifier.getName();
 
         // If formatted revision is SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION, we have to omit it from request
@@ -131,14 +120,10 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         LOG.trace("{}: Loading YANG schema source for {}:{}", id, moduleName,
                 revision);
 
-        final ListenableFuture<YangTextSchemaSource> transformed = Futures.transform(
-                rpc.invokeRpc(SchemaPath.create(true, NetconfMessageTransformUtil.GET_SCHEMA_QNAME), getSchemaRequest),
-                new ResultToYangSourceTransformer(id, sourceIdentifier, moduleName, revision));
-
-        final CheckedFuture<YangTextSchemaSource, SchemaSourceException> checked =
-                Futures.makeChecked(transformed, MAPPER);
-
-        return checked;
+        return Futures.transform(
+            rpc.invokeRpc(SchemaPath.create(true, NetconfMessageTransformUtil.GET_SCHEMA_QNAME), getSchemaRequest),
+                new ResultToYangSourceTransformer(id, sourceIdentifier, moduleName, revision),
+                MoreExecutors.directExecutor());
     }
 
     /**

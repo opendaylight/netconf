@@ -17,7 +17,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import javax.ws.rs.core.UriInfo;
 import org.apache.maven.project.MavenProject;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGenerator;
@@ -41,35 +43,27 @@ public class StaticDocGenerator extends ApiDocGenerator implements BasicCodeGene
     private Map<String, String> additionalConfig;
     private File resourceBaseDir;
 
-    /**
-     * Generate sources.
-     *
-     * @param context schema context
-     * @param outputDir output directory
-     * @param yangModules modules
-     * @return {@link Collection} of resource files
-     * @throws IOException when file operation fails
-     */
     @Override
-    public Collection<File> generateSources(final SchemaContext context, final File outputDir,
-            final Set<Module> yangModules) throws IOException {
+    public Collection<File> generateSources(final SchemaContext context, final File outputBaseDir,
+            final Set<Module> currentModules, final Function<Module, Optional<String>> moduleResourcePathResolver)
+                    throws IOException {
         List<File> result = new ArrayList<>();
 
         // Create Base Directory
-        final File outputBaseDir;
-        if (outputDir == null) {
-            outputBaseDir = new File(DEFAULT_OUTPUT_BASE_DIR_PATH);
+        final File outputDir;
+        if (outputBaseDir == null) {
+            outputDir = new File(DEFAULT_OUTPUT_BASE_DIR_PATH);
         } else {
-            outputBaseDir = outputDir;
+            outputDir = outputBaseDir;
         }
-        outputBaseDir.mkdirs();
+        outputDir.mkdirs();
 
         // Create Resources directory
-        File resourcesDir = new File(outputBaseDir, "resources");
+        File resourcesDir = new File(outputDir, "resources");
         resourcesDir.mkdirs();
 
         // Create JS file
-        File resourcesJsFile = new File(outputBaseDir, "resources.js");
+        File resourcesJsFile = new File(outputDir, "resources.js");
         resourcesJsFile.createNewFile();
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(resourcesJsFile));
         ObjectMapper mapper = new ObjectMapper();
