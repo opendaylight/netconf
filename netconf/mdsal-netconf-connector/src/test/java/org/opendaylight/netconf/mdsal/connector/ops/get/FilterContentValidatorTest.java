@@ -11,7 +11,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import com.google.common.base.Preconditions;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -73,11 +72,10 @@ public class FilterContentValidatorTest {
 
     @Before
     public void setUp() throws Exception {
-        final List<InputStream> sources = new ArrayList<>();
-        sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-mod-0.yang"));
-        sources.add(getClass().getResourceAsStream("/yang/filter-validator-test-augment.yang"));
-        sources.add(getClass().getResourceAsStream("/yang/mdsal-netconf-mapping-test.yang"));
-        final SchemaContext context = YangParserTestUtils.parseYangStreams(sources);
+        final SchemaContext context = YangParserTestUtils.parseYangResources(FilterContentValidatorTest.class,
+            "/yang/filter-validator-test-mod-0.yang", "/yang/filter-validator-test-augment.yang",
+            "/yang/mdsal-netconf-mapping-test.yang");
+
         final CurrentSchemaContext currentContext = mock(CurrentSchemaContext.class);
         doReturn(context).when(currentContext).getCurrentContext();
         validator = new FilterContentValidator(currentContext);

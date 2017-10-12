@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.util.Set;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public abstract class YangAndXmlAndDataSchemaLoader {
 
@@ -24,12 +23,12 @@ public abstract class YangAndXmlAndDataSchemaLoader {
     protected static String searchedDataSchemaName;
     protected static String schemaNodePath;
 
-    protected static void dataLoad(final String yangPath) throws FileNotFoundException, ReactorException {
+    protected static void dataLoad(final String yangPath) throws FileNotFoundException {
         dataLoad(yangPath, 1, null, null);
     }
 
     protected static void dataLoad(final String yangPath, final int modulesNumber, final String moduleName,
-            final String dataSchemaName) throws FileNotFoundException, ReactorException {
+            final String dataSchemaName) throws FileNotFoundException {
         modules = TestUtils.loadSchemaContext(yangPath).getModules();
         assertEquals(modulesNumber, modules.size());
         final Module module = TestUtils.resolveModule(moduleName, modules);
