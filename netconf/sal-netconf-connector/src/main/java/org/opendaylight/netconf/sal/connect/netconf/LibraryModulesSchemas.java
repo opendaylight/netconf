@@ -13,7 +13,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -30,6 +29,7 @@ import java.net.URLConnection;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
@@ -45,6 +45,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.Module;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -106,7 +107,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
         final Map<SourceIdentifier, URL> result = Maps.newHashMap();
         for (final Map.Entry<QName, URL> entry : availableModels.entrySet()) {
             final SourceIdentifier sId = RevisionSourceIdentifier
-                .create(entry.getKey().getLocalName(), Optional.fromNullable(entry.getKey().getFormattedRevision()));
+                .create(entry.getKey().getLocalName(), entry.getKey().getRevision());
             result.put(sId, entry.getValue());
         }
 
@@ -170,11 +171,11 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
         if (modulesStateNode.isPresent()) {
             Preconditions.checkState(modulesStateNode.get() instanceof ContainerNode,
                     "Expecting container containing schemas, but was %s", modulesStateNode.get());
-            return create(((ContainerNode) modulesStateNode.get()));
-        } else {
-            LOG.warn("{}: Unable to detect available schemas, get to {} was empty", deviceId, toId(ModulesState.QNAME));
-            return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
+            return create((ContainerNode) modulesStateNode.get());
         }
+
+        LOG.warn("{}: Unable to detect available schemas, get to {} was empty", deviceId, toId(ModulesState.QNAME));
+        return new LibraryModulesSchemas(Collections.<QName, URL>emptyMap());
     }
 
     private static LibraryModulesSchemas create(final ContainerNode modulesStateNode) {
@@ -224,12 +225,12 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
     private static Optional<? extends NormalizedNode<?, ?>> findModulesStateNode(final NormalizedNode<?, ?> result) {
         if (result == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
         final Optional<DataContainerChild<?, ?>> dataNode =
                 ((DataContainerNode<?>) result).getChild(toId(NETCONF_DATA_QNAME));
         if (dataNode.isPresent() == false) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         return ((DataContainerNode<?>) dataNode.get()).getChild(toId(ModulesState.QNAME));
@@ -305,8 +306,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         jsonParser.parse(reader);
 
-        return resultHolder.isFinished()
-                ? Optional.of(resultHolder.getResult()) : Optional.<NormalizedNode<?, ?>>absent();
+        return resultHolder.isFinished() ? Optional.of(resultHolder.getResult()) : Optional.empty();
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
@@ -342,7 +342,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
             LOG.warn("Unable to parse yang library xml content", e);
         }
 
-        return Optional.<NormalizedNode<?, ?>>absent();
+        return Optional.empty();
     }
 
     private static Optional<Map.Entry<QName, URL>> createFromEntry(final MapEntryNode moduleNode) {
@@ -356,9 +356,9 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
         childNodeId = new YangInstanceIdentifier.NodeIdentifier(QName.create(Module.QNAME, "revision"));
         final Optional<String> revision = getSingleChildNodeValue(moduleNode, childNodeId);
         if (revision.isPresent()) {
-            if (!SourceIdentifier.REVISION_PATTERN.matcher(revision.get()).matches()) {
+            if (!Revision.STRING_FORMAT_PATTERN.matcher(revision.get()).matches()) {
                 LOG.warn("Skipping library schema for {}. Revision {} is in wrong format.", moduleNode, revision.get());
-                return Optional.<Map.Entry<QName, URL>>absent();
+                return Optional.empty();
             }
         }
 
@@ -372,7 +372,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         final QName moduleQName = revision.isPresent()
                 ? QName.create(moduleNameSpace, revision.get(), moduleName)
-                : QName.create(URI.create(moduleNameSpace), null, moduleName);
+                : QName.create(URI.create(moduleNameSpace), moduleName);
 
         try {
             return Optional.<Map.Entry<QName, URL>>of(new AbstractMap.SimpleImmutableEntry<>(
@@ -380,7 +380,7 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
         } catch (final MalformedURLException e) {
             LOG.warn("Skipping library schema for {}. URL {} representing yang schema resource is not valid",
                     moduleNode, schemaUriAsString.get());
-            return Optional.<Map.Entry<QName, URL>>absent();
+            return Optional.empty();
         }
     }
 
@@ -395,8 +395,8 @@ public class LibraryModulesSchemas implements NetconfDeviceSchemas {
     private static Optional<String> getValueOfSimpleNode(
             final NormalizedNode<? extends YangInstanceIdentifier.PathArgument, ?> node) {
         final Object value = node.getValue();
-        return value == null || Strings.isNullOrEmpty(value.toString())
-                ? Optional.<String>absent() : Optional.of(value.toString().trim());
+        return value == null || Strings.isNullOrEmpty(value.toString()) ? Optional.empty()
+                : Optional.of(value.toString().trim());
     }
 
     @Override

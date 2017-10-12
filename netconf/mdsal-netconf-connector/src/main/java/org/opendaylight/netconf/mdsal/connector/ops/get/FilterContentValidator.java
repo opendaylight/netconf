@@ -65,7 +65,7 @@ public class FilterContentValidator {
     public YangInstanceIdentifier validate(final XmlElement filterContent) throws DocumentedException {
         try {
             final URI namespace = new URI(filterContent.getNamespace());
-            final Module module = schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(namespace, null);
+            final Module module = schemaContext.getCurrentContext().findModules(namespace).iterator().next();
             final DataSchemaNode schema = getRootDataSchemaNode(module, namespace, filterContent.getName());
             final FilterTree filterTree = validateNode(
                     filterContent, schema, new FilterTree(schema.getQName(), Type.OTHER, schema));
