@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 
@@ -41,15 +42,15 @@ public class LibraryModulesSchemasTest {
         Assert.assertThat(resolvedModulesSchema.size(), is(3));
 
         Assert.assertTrue(resolvedModulesSchema.containsKey(RevisionSourceIdentifier.create("module-with-revision",
-                "2014-04-08")));
+                Revision.of("2014-04-08"))));
         Assert.assertThat(resolvedModulesSchema.get(
-                RevisionSourceIdentifier.create("module-with-revision", "2014-04-08")),
+                RevisionSourceIdentifier.create("module-with-revision", Revision.of("2014-04-08"))),
                 is(new URL("http://localhost:8181/yanglib/schemas/module-with-revision/2014-04-08")));
 
         Assert.assertTrue(resolvedModulesSchema.containsKey(
-                RevisionSourceIdentifier.create("another-module-with-revision", "2013-10-21")));
+                RevisionSourceIdentifier.create("another-module-with-revision", Revision.of("2013-10-21"))));
         Assert.assertThat(resolvedModulesSchema.get(
-                RevisionSourceIdentifier.create("another-module-with-revision", "2013-10-21")),
+                RevisionSourceIdentifier.create("another-module-with-revision", Revision.of("2013-10-21"))),
                 is(new URL("http://localhost:8181/yanglib/schemas/another-module-with-revision/2013-10-21")));
 
         Assert.assertTrue(resolvedModulesSchema.containsKey(

@@ -92,7 +92,7 @@ public class NetconfBaseOpsTest {
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME)))
                 .thenReturn(RpcResultBuilder.success(ok).buildFuture());
         final SchemaContext schemaContext =
-                YangParserTestUtils.parseYangStreams(getClass().getResourceAsStream("/schemas/test-module.yang"));
+                YangParserTestUtils.parseYangResource("/schemas/test-module.yang");
         final MessageTransformer<NetconfMessage> transformer = new NetconfMessageTransformer(schemaContext, true);
         final DOMRpcService rpc = new NetconfDeviceRpc(schemaContext, listener, transformer);
         final RemoteDeviceId id =

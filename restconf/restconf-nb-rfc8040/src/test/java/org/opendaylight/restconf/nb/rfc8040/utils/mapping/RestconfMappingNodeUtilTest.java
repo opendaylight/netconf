@@ -83,11 +83,11 @@ public class RestconfMappingNodeUtilTest {
     @BeforeClass
     public static void loadTestSchemaContextAndModules() throws Exception {
         schemaContext =
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/modules/restconf-module-testing"));
-        schemaContextMonitoring = YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/modules"));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules/restconf-module-testing"));
+        schemaContextMonitoring = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
         modules = schemaContextMonitoring.getModules();
         modulesRest = YangParserTestUtils
-                .parseYangSources(TestRestconfUtils.loadFiles("/modules/restconf-module-testing")).getModules();
+                .parseYangFiles(TestRestconfUtils.loadFiles("/modules/restconf-module-testing")).getModules();
     }
 
     @Before
