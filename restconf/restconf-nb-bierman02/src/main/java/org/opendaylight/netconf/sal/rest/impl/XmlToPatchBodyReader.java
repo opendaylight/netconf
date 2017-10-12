@@ -132,8 +132,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
                     ? schemaNode.getQName().getNamespace().toString() : firstValueElement.getNamespaceURI();
 
             // find module according to namespace
-            final Module module = pathContext.getSchemaContext().findModuleByNamespace(
-                    URI.create(namespace)).iterator().next();
+            final Module module = pathContext.getSchemaContext().findModules(URI.create(namespace)).iterator().next();
 
             // initialize codec + set default prefix derived from module name
             final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(

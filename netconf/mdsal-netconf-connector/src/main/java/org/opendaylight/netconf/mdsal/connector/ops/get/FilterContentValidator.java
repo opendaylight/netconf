@@ -32,7 +32,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceI
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
 import org.opendaylight.yangtools.yang.data.util.codec.TypeAwareCodec;
-import org.opendaylight.yangtools.yang.model.api.ChoiceCaseNode;
+import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -65,7 +65,7 @@ public class FilterContentValidator {
     public YangInstanceIdentifier validate(final XmlElement filterContent) throws DocumentedException {
         try {
             final URI namespace = new URI(filterContent.getNamespace());
-            final Module module = schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(namespace, null);
+            final Module module = schemaContext.getCurrentContext().findModules(namespace).iterator().next();
             final DataSchemaNode schema = getRootDataSchemaNode(module, namespace, filterContent.getName());
             final FilterTree filterTree = validateNode(
                     filterContent, schema, new FilterTree(schema.getQName(), Type.OTHER, schema));
@@ -250,7 +250,7 @@ public class FilterContentValidator {
 
         FilterTree addChild(final DataSchemaNode data) {
             final Type type;
-            if (data instanceof ChoiceCaseNode) {
+            if (data instanceof CaseSchemaNode) {
                 type = Type.CHOICE_CASE;
             } else if (data instanceof ListSchemaNode) {
                 type = Type.LIST;
