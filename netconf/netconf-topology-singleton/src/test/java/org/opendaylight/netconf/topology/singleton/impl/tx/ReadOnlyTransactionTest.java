@@ -119,8 +119,8 @@ public class ReadOnlyTransactionTest {
     public void testRead() throws Exception {
         // Message: NormalizedNodeMessage
         final NormalizedNode<?, ?> outputNode = ImmutableContainerNodeBuilder.create()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("TestQname")))
-                .withChild(ImmutableNodes.leafNode(QName.create("NodeQname"), "foo")).build();
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "TestQname")))
+                .withChild(ImmutableNodes.leafNode(QName.create("", "NodeQname"), "foo")).build();
         final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> resultNormalizedNodeMessage =
                 Futures.immediateCheckedFuture(Optional.of(outputNode));
         doReturn(resultNormalizedNodeMessage).when(readTx).read(storeType, instanceIdentifier);
@@ -147,7 +147,7 @@ public class ReadOnlyTransactionTest {
                         instanceIdentifier);
 
         final Optional<NormalizedNode<?, ?>> resultEmptyMessage =
-                resultEmptyResponse.checkedGet(TIMEOUT_SEC, TimeUnit.SECONDS);
+                resultEmptyResponse.get(TIMEOUT_SEC, TimeUnit.SECONDS);
 
         assertEquals(resultEmptyMessage, Optional.absent());
     }

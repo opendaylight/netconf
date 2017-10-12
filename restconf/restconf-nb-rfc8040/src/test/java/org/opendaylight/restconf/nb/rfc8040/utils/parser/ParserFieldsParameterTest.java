@@ -28,7 +28,7 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
@@ -77,10 +77,10 @@ public class ParserFieldsParameterTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         final SchemaContext schemaContext =
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/jukebox"));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/jukebox"));
 
         final QNameModule qNameModule = QNameModule.create(URI.create("http://example.com/ns/example-jukebox"),
-            SimpleDateFormatUtil.getRevisionFormat().parse("2015-04-04"));
+            Revision.of("2015-04-04"));
 
         this.jukeboxQName = QName.create(qNameModule, "jukebox");
         this.playerQName = QName.create(qNameModule, "player");
@@ -88,7 +88,7 @@ public class ParserFieldsParameterTest {
         this.augmentedLibraryQName = QName.create(
                 QNameModule.create(
                         URI.create("http://example.com/ns/augmented-jukebox"),
-                        SimpleDateFormatUtil.getRevisionFormat().parse("2016-05-05")),
+                        Revision.of("2016-05-05")),
                 "augmented-library");
         this.albumQName = QName.create(qNameModule, "album");
         this.nameQName = QName.create(qNameModule, "name");

@@ -3,9 +3,9 @@ module cont-augment-module {
 
   prefix "cntaugmod";
 
-  import main-module {prefix mamo; revision-date 2013-12-2;}
+  import main-module {prefix mamo; revision-date 2013-12-02;}
 
-  revision 2013-12-2 {
+  revision 2013-12-02 {
 
   }
 

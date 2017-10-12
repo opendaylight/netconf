@@ -37,12 +37,7 @@ public final class NetconfSessionPreferences {
         private final int skipLength;
 
         ParameterMatcher(final String name) {
-            predicate = new Predicate<String>() {
-                @Override
-                public boolean apply(final String input) {
-                    return input.startsWith(name);
-                }
-            };
+            predicate = input -> input.startsWith(name);
 
             this.skipLength = name.length();
         }
@@ -62,12 +57,7 @@ public final class NetconfSessionPreferences {
     private static final ParameterMatcher REVISION_PARAM = new ParameterMatcher("revision=");
     private static final ParameterMatcher BROKEN_REVISON_PARAM = new ParameterMatcher("amp;revision=");
     private static final Splitter AMP_SPLITTER = Splitter.on('&');
-    private static final Predicate<String> CONTAINS_REVISION = new Predicate<String>() {
-        @Override
-        public boolean apply(final String input) {
-            return input.contains("revision=");
-        }
-    };
+    private static final Predicate<String> CONTAINS_REVISION = input -> input.contains("revision=");
 
     private final Map<QName, CapabilityOrigin> moduleBasedCaps;
     private final Map<String, CapabilityOrigin> nonModuleCaps;
@@ -218,7 +208,7 @@ public final class NetconfSessionPreferences {
     }
 
     private static QName cachedQName(final String namespace, final String moduleName) {
-        return QName.create(URI.create(namespace), null, moduleName).withoutRevision().intern();
+        return QName.create(URI.create(namespace), moduleName).withoutRevision().intern();
     }
 
     public static NetconfSessionPreferences fromStrings(final Collection<String> capabilities) {

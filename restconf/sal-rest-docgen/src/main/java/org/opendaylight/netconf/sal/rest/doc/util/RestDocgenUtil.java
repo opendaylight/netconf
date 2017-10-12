@@ -8,11 +8,12 @@
 package org.opendaylight.netconf.sal.rest.doc.util;
 
 import java.net.URI;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -22,7 +23,7 @@ public class RestDocgenUtil {
     private RestDocgenUtil() {
     }
 
-    private static final Map<URI, Map<Date, Module>> NAMESPACE_AND_REVISION_TO_MODULE = new HashMap<>();
+    private static final Map<URI, Map<Optional<Revision>, Module>> NAMESPACE_AND_REVISION_TO_MODULE = new HashMap<>();
 
     /**
      * Resolve path argument name for {@code node}.
@@ -52,16 +53,16 @@ public class RestDocgenUtil {
     private static synchronized String resolveFullNameFromNode(final SchemaNode node,
             final SchemaContext schemaContext) {
         final URI namespace = node.getQName().getNamespace();
-        final Date revision = node.getQName().getRevision();
+        final Optional<Revision> revision = node.getQName().getRevision();
 
-        Map<Date, Module> revisionToModule = NAMESPACE_AND_REVISION_TO_MODULE.get(namespace);
+        Map<Optional<Revision>, Module> revisionToModule = NAMESPACE_AND_REVISION_TO_MODULE.get(namespace);
         if (revisionToModule == null) {
             revisionToModule = new HashMap<>();
             NAMESPACE_AND_REVISION_TO_MODULE.put(namespace, revisionToModule);
         }
         Module module = revisionToModule.get(revision);
         if (module == null) {
-            module = schemaContext.findModuleByNamespaceAndRevision(namespace, revision);
+            module = schemaContext.findModule(namespace, revision).orElse(null);
             revisionToModule.put(revision, module);
         }
         if (module != null) {

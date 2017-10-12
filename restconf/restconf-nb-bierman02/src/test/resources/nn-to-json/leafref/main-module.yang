@@ -2,7 +2,7 @@ module main-module {
     namespace "main:module";
 
     prefix "mainmod";
-    revision 2013-12-2 {
+    revision 2013-12-02 {
     }
 
     container cont {
