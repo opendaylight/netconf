@@ -5,13 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.ssh;
 
 import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
-import org.apache.sshd.common.KeyPairProvider;
-import org.apache.sshd.server.PublickeyAuthenticator;
+import org.apache.sshd.common.keyprovider.KeyPairProvider;
+import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.opendaylight.netconf.auth.AuthProvider;
 
 public final class SshProxyServerConfigurationBuilder {
@@ -20,7 +19,7 @@ public final class SshProxyServerConfigurationBuilder {
     private AuthProvider authenticator;
     private KeyPairProvider keyPairProvider;
     private int idleTimeout;
-    private PublickeyAuthenticator publicKeyAuthenticator = null;
+    private PublickeyAuthenticator publickeyAuthenticator = null;
 
     public SshProxyServerConfigurationBuilder setBindingAddress(final InetSocketAddress bindingAddress) {
         this.bindingAddress = bindingAddress;
@@ -37,8 +36,9 @@ public final class SshProxyServerConfigurationBuilder {
         return this;
     }
 
-    public SshProxyServerConfigurationBuilder setPublickeyAuthenticator(final PublickeyAuthenticator authenticator) {
-        this.publicKeyAuthenticator = authenticator;
+    public SshProxyServerConfigurationBuilder setPublickeyAuthenticator(
+            final PublickeyAuthenticator publickeyAuthenticator) {
+        this.publickeyAuthenticator = publickeyAuthenticator;
         return this;
     }
 
@@ -53,7 +53,7 @@ public final class SshProxyServerConfigurationBuilder {
     }
 
     public SshProxyServerConfiguration createSshProxyServerConfiguration() {
-        return new SshProxyServerConfiguration(bindingAddress, localAddress, authenticator, publicKeyAuthenticator,
+        return new SshProxyServerConfiguration(bindingAddress, localAddress, authenticator, publickeyAuthenticator,
                 keyPairProvider, idleTimeout);
     }
 

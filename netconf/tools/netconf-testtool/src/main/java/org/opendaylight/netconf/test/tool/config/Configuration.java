@@ -12,8 +12,7 @@ import java.io.File;
 import java.security.PublicKey;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.sshd.server.PublickeyAuthenticator;
+import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.apache.sshd.server.session.ServerSession;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.auth.AuthProvider;
@@ -49,17 +48,14 @@ public class Configuration {
                     "/META-INF/yang/ietf-inet-types@2013-07-15.yang")
     );
 
-    public static final AuthProvider DEFAULT_AUTH_PROVIDER = new AuthProvider() {
-        @Override
-        public boolean authenticated(String username, String password) {
-            LOG.info("Auth with username and password: {}", username);
-            return true;
-        }
+    public static final AuthProvider DEFAULT_AUTH_PROVIDER = (username, password) -> {
+        LOG.info("Auth with username and password: {}", username);
+        return true;
     };
 
     public static final PublickeyAuthenticator DEFAULT_PUBLIC_KEY_AUTHENTICATOR = new PublickeyAuthenticator() {
         @Override
-        public boolean authenticate(String username, PublicKey key, ServerSession session) {
+        public boolean authenticate(final String username, final PublicKey key, final ServerSession session) {
             LOG.info("Auth with public key: {}", key);
             return true;
         }
@@ -102,7 +98,7 @@ public class Configuration {
         return publickeyAuthenticator;
     }
 
-    public void setPublickeyAuthenticator(PublickeyAuthenticator publickeyAuthenticator) {
+    public void setPublickeyAuthenticator(final PublickeyAuthenticator publickeyAuthenticator) {
         this.publickeyAuthenticator = publickeyAuthenticator;
     }
 
@@ -110,7 +106,7 @@ public class Configuration {
         return authProvider;
     }
 
-    public void setAuthProvider(AuthProvider authProvider) {
+    public void setAuthProvider(final AuthProvider authProvider) {
         this.authProvider = authProvider;
     }
 
@@ -118,7 +114,7 @@ public class Configuration {
         return defaultYangResources;
     }
 
-    public void setDefaultYangResources(Set<YangResource> defaultYangResources) {
+    public void setDefaultYangResources(final Set<YangResource> defaultYangResources) {
         this.defaultYangResources = defaultYangResources;
     }
 
@@ -126,7 +122,7 @@ public class Configuration {
         return threadPoolSize;
     }
 
-    public void setThreadPoolSize(int threadPoolSize) {
+    public void setThreadPoolSize(final int threadPoolSize) {
         this.threadPoolSize = threadPoolSize;
     }
 
@@ -134,7 +130,7 @@ public class Configuration {
         return startingPort;
     }
 
-    public void setStartingPort(int startingPort) {
+    public void setStartingPort(final int startingPort) {
         this.startingPort = startingPort;
     }
 
@@ -142,7 +138,7 @@ public class Configuration {
         return deviceCount;
     }
 
-    public void setDeviceCount(int deviceCount) {
+    public void setDeviceCount(final int deviceCount) {
         this.deviceCount = deviceCount;
     }
 
@@ -150,7 +146,7 @@ public class Configuration {
         return generateConfigsTimeout;
     }
 
-    public void setGenerateConfigsTimeout(int generateConfigsTimeout) {
+    public void setGenerateConfigsTimeout(final int generateConfigsTimeout) {
         this.generateConfigsTimeout = generateConfigsTimeout;
     }
 
@@ -158,7 +154,7 @@ public class Configuration {
         return ssh;
     }
 
-    public void setSsh(boolean ssh) {
+    public void setSsh(final boolean ssh) {
         this.ssh = ssh;
     }
 
@@ -166,7 +162,7 @@ public class Configuration {
         return ip;
     }
 
-    public void setIp(String ip) {
+    public void setIp(final String ip) {
         this.ip = ip;
     }
 
@@ -174,7 +170,7 @@ public class Configuration {
         return models;
     }
 
-    public void setModels(Set<String> models) {
+    public void setModels(final Set<String> models) {
         this.models = models;
     }
 
@@ -182,7 +178,7 @@ public class Configuration {
         return capabilities;
     }
 
-    public void setCapabilities(Set<String> capabilities) {
+    public void setCapabilities(final Set<String> capabilities) {
         this.capabilities = capabilities;
     }
 
@@ -190,7 +186,7 @@ public class Configuration {
         return rpcHandler;
     }
 
-    public void setRpcHandler(RpcHandler rpcHandler) {
+    public void setRpcHandler(final RpcHandler rpcHandler) {
         this.rpcHandler = rpcHandler;
     }
 
@@ -198,7 +194,7 @@ public class Configuration {
         return operationsCreator;
     }
 
-    public void setOperationsCreator(OperationsCreator operationsCreator) {
+    public void setOperationsCreator(final OperationsCreator operationsCreator) {
         this.operationsCreator = operationsCreator;
     }
 
@@ -208,7 +204,7 @@ public class Configuration {
     }
 
     @Deprecated
-    public void setMdSal(boolean mdSal) {
+    public void setMdSal(final boolean mdSal) {
         this.mdSal = mdSal;
     }
 
@@ -218,7 +214,7 @@ public class Configuration {
     }
 
     @Deprecated
-    public void setRpcConfigFile(File rpcConfigFile) {
+    public void setRpcConfigFile(final File rpcConfigFile) {
         this.rpcConfigFile = rpcConfigFile;
     }
 
@@ -228,7 +224,7 @@ public class Configuration {
     }
 
     @Deprecated
-    public void setNotificationFile(File notificationFile) {
+    public void setNotificationFile(final File notificationFile) {
         this.notificationFile = notificationFile;
     }
 
@@ -238,7 +234,7 @@ public class Configuration {
     }
 
     @Deprecated
-    public void setInitialConfigXMLFile(File initialConfigXMLFile) {
+    public void setInitialConfigXMLFile(final File initialConfigXMLFile) {
         this.initialConfigXMLFile = initialConfigXMLFile;
     }
 
@@ -253,7 +249,7 @@ public class Configuration {
     }
 
     @Deprecated
-    public void setSchemasDir(File schemasDir) {
+    public void setSchemasDir(final File schemasDir) {
         this.schemasDir = schemasDir;
     }
 }

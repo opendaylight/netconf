@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * {@link WebSocketServer} is the singleton responsible for starting and stopping the
  * web socket server.
  */
-public class WebSocketServer implements Runnable {
+public final class WebSocketServer implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketServer.class);
 

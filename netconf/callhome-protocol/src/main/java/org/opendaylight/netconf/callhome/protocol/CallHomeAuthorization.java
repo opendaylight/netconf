@@ -13,7 +13,7 @@ import java.security.KeyPair;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import org.apache.sshd.ClientSession;
+import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.client.session.ClientSessionImpl;
 
 /**
@@ -35,7 +35,7 @@ public abstract class CallHomeAuthorization {
         }
 
         @Override
-        protected void applyTo(ClientSession session) {
+        protected void applyTo(final ClientSession session) {
             throw new IllegalStateException("Server is not allowed.");
         }
     };
@@ -69,7 +69,7 @@ public abstract class CallHomeAuthorization {
      * @param username    Username to be used for authorization
      * @return Builder which allows to specify credentials.
      */
-    public static final Builder serverAccepted(String sessionName, String username) {
+    public static final Builder serverAccepted(final String sessionName, final String username) {
         return new Builder(sessionName, username);
     }
 
@@ -103,7 +103,7 @@ public abstract class CallHomeAuthorization {
         private final Set<String> passwords = new HashSet<>();
         private final Set<KeyPair> clientKeys = new HashSet<>();
 
-        private Builder(String nodeId, String username) {
+        Builder(final String nodeId, final String username) {
             this.nodeId = Preconditions.checkNotNull(nodeId);
             this.username = Preconditions.checkNotNull(username);
         }
@@ -114,7 +114,7 @@ public abstract class CallHomeAuthorization {
          * @param password Password to be used for password-based authorization.
          * @return this builder.
          */
-        public Builder addPassword(String password) {
+        public Builder addPassword(final String password) {
             this.passwords.add(password);
             return this;
         }
@@ -125,7 +125,7 @@ public abstract class CallHomeAuthorization {
          * @param clientKey Keys to be used for authorization.
          * @return this builder.
          */
-        public Builder addClientKeys(KeyPair clientKey) {
+        public Builder addClientKeys(final KeyPair clientKey) {
             this.clientKeys.add(clientKey);
             return this;
         }
@@ -144,8 +144,8 @@ public abstract class CallHomeAuthorization {
         private final Set<String> passwords;
         private final Set<KeyPair> clientKeyPair;
 
-        ServerAllowed(String nodeId, String username, Collection<String> passwords,
-                      Collection<KeyPair> clientKeyPairs) {
+        ServerAllowed(final String nodeId, final String username, final Collection<String> passwords,
+                      final Collection<KeyPair> clientKeyPairs) {
             this.username = Preconditions.checkNotNull(username);
             this.passwords = ImmutableSet.copyOf(passwords);
             this.clientKeyPair = ImmutableSet.copyOf(clientKeyPairs);
@@ -163,7 +163,7 @@ public abstract class CallHomeAuthorization {
         }
 
         @Override
-        protected void applyTo(ClientSession session) {
+        protected void applyTo(final ClientSession session) {
             Preconditions.checkArgument(session instanceof ClientSessionImpl);
             ((ClientSessionImpl) session).setUsername(username);
 

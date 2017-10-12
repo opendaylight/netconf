@@ -43,7 +43,7 @@ public class SimulatedGetConfig extends AbstractConfigNetconfOperation {
         }
     }
 
-    private DataList loadInitialConfigXMLFile(final File file) {
+    private static DataList loadInitialConfigXMLFile(final File file) {
         LOG.info("Loading initial config xml file: {}", file.getName());
         DataList configData = new DataList();
         List<XmlElement> xmlElementList = Collections.emptyList();

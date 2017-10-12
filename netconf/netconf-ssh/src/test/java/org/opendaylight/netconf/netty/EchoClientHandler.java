@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 public class EchoClientHandler extends ChannelInboundHandlerAdapter implements ChannelFutureListener {
     private static final Logger LOG = LoggerFactory.getLogger(EchoClientHandler.class);
 
-    private ChannelHandlerContext ctx;
+    private ChannelHandlerContext context;
     private final StringBuilder fromServer = new StringBuilder();
 
     public enum State {
@@ -40,9 +40,9 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter implements C
 
     @Override
     public synchronized void channelActive(ChannelHandlerContext ctx) {
-        checkState(this.ctx == null);
+        checkState(context == null);
         LOG.info("channelActive");
-        this.ctx = ctx;
+        context = ctx;
         state = State.CONNECTED;
     }
 
@@ -64,14 +64,14 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter implements C
     public synchronized void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         // Close the connection when an exception is raised.
         LOG.warn("Unexpected exception from downstream.", cause);
-        checkState(this.ctx.equals(ctx));
+        checkState(context.equals(ctx));
         ctx.close();
-        this.ctx = null;
+        context = null;
     }
 
     public synchronized void write(String message) {
         ByteBuf byteBuf = Unpooled.copiedBuffer(message.getBytes());
-        ctx.writeAndFlush(byteBuf);
+        context.writeAndFlush(byteBuf);
     }
 
     public synchronized boolean isConnected() {

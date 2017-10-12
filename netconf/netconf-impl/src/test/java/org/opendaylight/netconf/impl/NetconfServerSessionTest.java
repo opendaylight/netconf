@@ -92,12 +92,12 @@ public class NetconfServerSessionTest {
     public void testSendNotification() throws Exception {
         doNothing().when(listener).onNotification(any(), any());
         final Document msgDoc = XmlUtil.readXmlToDocument("<notification></notification>");
-        final NetconfNotification msg = new NetconfNotification(msgDoc);
-        session.sendMessage(msg);
+        final NetconfNotification notif = new NetconfNotification(msgDoc);
+        session.sendMessage(notif);
         channel.runPendingTasks();
         final Object o = channel.readOutbound();
-        Assert.assertEquals(msg, o);
-        verify(listener).onNotification(session, msg);
+        Assert.assertEquals(notif, o);
+        verify(listener).onNotification(session, notif);
     }
 
     @Test
@@ -134,8 +134,8 @@ public class NetconfServerSessionTest {
     public void testToManagementSession() throws Exception {
         final NetconfHelloMessageAdditionalHeader header =
                 new NetconfHelloMessageAdditionalHeader(USER, HOST, PORT, TCP_TRANSPORT, SESSION_ID);
-        final EmbeddedChannel channel = new EmbeddedChannel();
-        final NetconfServerSession tcpSession = new NetconfServerSession(listener, channel, 1L, header);
+        final EmbeddedChannel ch = new EmbeddedChannel();
+        final NetconfServerSession tcpSession = new NetconfServerSession(listener, ch, 1L, header);
         tcpSession.sessionUp();
         final Session managementSession = tcpSession.toManagementSession();
         Assert.assertEquals(new String(managementSession.getSourceHost().getValue()), HOST);
@@ -148,8 +148,8 @@ public class NetconfServerSessionTest {
     public void testToManagementSessionUnknownTransport() throws Exception {
         final NetconfHelloMessageAdditionalHeader header =
                 new NetconfHelloMessageAdditionalHeader(USER, HOST, PORT, "http", SESSION_ID);
-        final EmbeddedChannel channel = new EmbeddedChannel();
-        final NetconfServerSession tcpSession = new NetconfServerSession(listener, channel, 1L, header);
+        final EmbeddedChannel ch = new EmbeddedChannel();
+        final NetconfServerSession tcpSession = new NetconfServerSession(listener, ch, 1L, header);
         tcpSession.sessionUp();
         tcpSession.toManagementSession();
     }
@@ -158,8 +158,8 @@ public class NetconfServerSessionTest {
     public void testToManagementSessionIpv6() throws Exception {
         final NetconfHelloMessageAdditionalHeader header =
                 new NetconfHelloMessageAdditionalHeader(USER, "::1", PORT, SSH_TRANSPORT, SESSION_ID);
-        final EmbeddedChannel channel = new EmbeddedChannel();
-        final NetconfServerSession tcpSession = new NetconfServerSession(listener, channel, 1L, header);
+        final EmbeddedChannel ch = new EmbeddedChannel();
+        final NetconfServerSession tcpSession = new NetconfServerSession(listener, ch, 1L, header);
         tcpSession.sessionUp();
         final Session managementSession = tcpSession.toManagementSession();
         Assert.assertEquals(new String(managementSession.getSourceHost().getValue()), "::1");

@@ -49,18 +49,18 @@ public class DummyRpcResult<T> implements RpcResult<T> {
         private T result;
         private Collection<RpcError> errors;
 
-        public Builder<T> isSuccessful(final boolean isSuccessful) {
-            this.isSuccessful = isSuccessful;
+        public Builder<T> isSuccessful(final boolean successful) {
+            this.isSuccessful = successful;
             return this;
         }
 
-        public Builder<T> result(final T result) {
-            this.result = result;
+        public Builder<T> result(final T newResult) {
+            this.result = newResult;
             return this;
         }
 
-        public Builder<T> errors(final Collection<RpcError> errors) {
-            this.errors = errors;
+        public Builder<T> errors(final Collection<RpcError> newErrors) {
+            this.errors = newErrors;
             return this;
         }
 

@@ -170,7 +170,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
             try {
                 textContent = key.get(0).getTextContent();
             } catch (DocumentedException e) {
-                throw new IllegalStateException("Key value not present in key element");
+                throw new IllegalStateException("Key value not present in key element", e);
             }
             if (!keyValues.get(qualifiedName).equals(textContent)) {
                 throw new IllegalStateException("Key value in path not equal to key value in xml");

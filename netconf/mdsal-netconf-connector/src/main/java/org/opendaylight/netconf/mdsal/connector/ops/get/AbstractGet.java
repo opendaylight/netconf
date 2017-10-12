@@ -161,7 +161,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
             try {
                 validateInputRpc(xml, operationName);
             } catch (final DocumentedException e) {
-                throw new DocumentedException("Incorrect RPC: " + e.getMessage(), e.getErrorType(), e.getErrorTag(),
+                throw new DocumentedException("Incorrect RPC: " + e.getMessage(), e, e.getErrorType(), e.getErrorTag(),
                         e.getErrorSeverity(), e.getErrorInfo());
             }
 
@@ -169,8 +169,8 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
             try {
                 sourceDatastore = parseSource(xml);
             } catch (final DocumentedException e) {
-                throw new DocumentedException("Get-config source attribute error: " + e.getMessage(), e.getErrorType(),
-                        e.getErrorTag(), e.getErrorSeverity(), e.getErrorInfo());
+                throw new DocumentedException("Get-config source attribute error: " + e.getMessage(), e,
+                        e.getErrorType(), e.getErrorTag(), e.getErrorSeverity(), e.getErrorInfo());
             }
 
             return new GetConfigExecution(sourceDatastore);

@@ -27,7 +27,7 @@ class SettableRpc implements NetconfOperation {
 
     private final RpcHandler rpcHandler;
 
-    SettableRpc(RpcHandler rpcHandler) {
+    SettableRpc(final RpcHandler rpcHandler) {
         this.rpcHandler = rpcHandler;
     }
 
@@ -57,7 +57,7 @@ class SettableRpc implements NetconfOperation {
         }
     }
 
-    private void checkForError(final Document document) throws DocumentedException {
+    private static void checkForError(final Document document) throws DocumentedException {
         final XmlElement rpcReply = XmlElement.fromDomDocument(document);
         if (rpcReply.getOnlyChildElementOptionally("rpc-error").isPresent()) {
             throw DocumentedException.fromXMLDocument(document);

@@ -108,7 +108,7 @@ public class NetconfTopologyManager
 
     // Blueprint init method
     public void init() {
-        dataChangeListenerRegistration = registerDataTreeChangeListener(topologyId);
+        dataChangeListenerRegistration = registerDataTreeChangeListener();
     }
 
     @Override
@@ -242,10 +242,10 @@ public class NetconfTopologyManager
         this.privateKeyPassphrase = privateKeyPassphrase;
     }
 
-    private ListenerRegistration<NetconfTopologyManager> registerDataTreeChangeListener(final String topologyId) {
+    private ListenerRegistration<NetconfTopologyManager> registerDataTreeChangeListener() {
         final WriteTransaction wtx = dataBroker.newWriteOnlyTransaction();
-        initTopology(wtx, LogicalDatastoreType.CONFIGURATION, topologyId);
-        initTopology(wtx, LogicalDatastoreType.OPERATIONAL, topologyId);
+        initTopology(wtx, LogicalDatastoreType.CONFIGURATION);
+        initTopology(wtx, LogicalDatastoreType.OPERATIONAL);
         Futures.addCallback(wtx.submit(), new FutureCallback<Void>() {
             @Override
             public void onSuccess(final Void result) {
@@ -264,8 +264,7 @@ public class NetconfTopologyManager
                         NetconfTopologyUtils.createTopologyListPath(topologyId).child(Node.class)), this);
     }
 
-    private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType,
-                              final String topologyId) {
+    private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType) {
         final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
         final InstanceIdentifier<NetworkTopology> networkTopologyId =
                 InstanceIdentifier.builder(NetworkTopology.class).build();

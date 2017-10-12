@@ -64,11 +64,11 @@ public final class TransactionVarsWrapper {
     /**
      * Set {@link LogicalDatastoreType} of data for transaction.
      *
-     * @param configuration
+     * @param datastoreType
      *             {@link LogicalDatastoreType}
      */
-    public void setLogicalDatastoreType(final LogicalDatastoreType configuration) {
-        this.configuration = configuration;
+    public void setLogicalDatastoreType(final LogicalDatastoreType datastoreType) {
+        this.configuration = datastoreType;
 
     }
 
