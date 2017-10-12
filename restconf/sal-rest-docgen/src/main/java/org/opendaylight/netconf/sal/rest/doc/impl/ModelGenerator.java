@@ -223,9 +223,8 @@ public class ModelGenerator {
             putIfNonNull(identityObj, DESCRIPTION_KEY, idNode.getDescription());
 
             final ObjectNode props = JsonNodeFactory.instance.objectNode();
-            final IdentitySchemaNode baseId = idNode.getBaseIdentity();
 
-            if (baseId == null) {
+            if (idNode.getBaseIdentities().isEmpty()) {
                 /*
                  * This is a base identity. So lets see if it has sub types. If it does, then add them to the model
                  * definition.
@@ -244,7 +243,7 @@ public class ModelGenerator {
                 /*
                  * This is a derived entity. Add it's base type & move on.
                  */
-                props.put(TYPE_KEY, baseId.getQName().getLocalName());
+                props.put(TYPE_KEY, idNode.getBaseIdentities().iterator().next().getQName().getLocalName());
             }
 
             // Add the properties. For a base type, this will be an empty object as required by the Swagger spec.
@@ -621,7 +620,7 @@ public class ModelGenerator {
         return schemaJSON;
     }
 
-    private static void putIfNonNull(ObjectNode property, String key, Number number) {
+    private static void putIfNonNull(final ObjectNode property, final String key, final Number number) {
         if (key != null && number != null) {
             if (number instanceof Double) {
                 property.put(key, (Double) number);
@@ -637,7 +636,7 @@ public class ModelGenerator {
         }
     }
 
-    private static void putIfNonNull(ObjectNode property, String key, String value) {
+    private static void putIfNonNull(final ObjectNode property, final String key, final String value) {
         if (key != null && value != null) {
             property.put(key, value);
         }

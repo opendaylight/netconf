@@ -14,13 +14,13 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import java.net.URI;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -154,18 +154,18 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
     private static Optional<? extends NormalizedNode<?, ?>> findSchemasNode(final NormalizedNode<?, ?> result) {
         if (result == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
         final Optional<DataContainerChild<?, ?>> dataNode =
                 ((DataContainerNode<?>) result).getChild(toId(NETCONF_DATA_QNAME));
         if (!dataNode.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> nStateNode =
                 ((DataContainerNode<?>) dataNode.get()).getChild(toId(NetconfState.QNAME));
         if (!nStateNode.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         return ((DataContainerNode<?>) nStateNode.get()).getChild(toId(Schemas.QNAME));
@@ -193,21 +193,21 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
             if (!formatAsString.equals(Yang.QNAME.toString())) {
                 LOG.debug("{}: Ignoring schema due to unsupported format: {}", id, formatAsString);
-                return Optional.absent();
+                return Optional.empty();
             }
 
             childNode = NetconfMessageTransformUtil.IETF_NETCONF_MONITORING_SCHEMA_LOCATION;
             final Set<String> locationsAsString = getAllChildNodeValues(schemaNode, childNode);
             if (!locationsAsString.contains(Schema.Location.Enumeration.NETCONF.toString())) {
                 LOG.debug("{}: Ignoring schema due to unsupported location: {}", id, locationsAsString);
-                return Optional.absent();
+                return Optional.empty();
             }
 
             childNode = NetconfMessageTransformUtil.IETF_NETCONF_MONITORING_SCHEMA_NAMESPACE;
             final Optional<String> namespaceValue = getSingleChildNodeValue(schemaNode, childNode);
             if (!namespaceValue.isPresent()) {
                 LOG.warn("{}: Ignoring schema due to missing namespace", id);
-                return Optional.absent();
+                return Optional.empty();
             }
             final String namespaceAsString = namespaceValue.get();
 
@@ -250,7 +250,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
                 return getValueOfSimpleNode(node.get());
             } else {
                 LOG.debug("Child node {} not present", childNode);
-                return Optional.absent();
+                return Optional.empty();
             }
         }
 
@@ -258,7 +258,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
                 final NormalizedNode<? extends YangInstanceIdentifier.PathArgument, ?> node) {
             final Object value = node.getValue();
             return value == null || Strings.isNullOrEmpty(value.toString())
-                    ? Optional.<String>absent() : Optional.of(value.toString().trim());
+                    ? Optional.empty() : Optional.of(value.toString().trim());
         }
 
         @Override

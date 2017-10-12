@@ -8,8 +8,8 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
-import com.google.common.base.Optional;
 import java.io.InputStream;
+import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -120,7 +120,7 @@ public class BaseRpcSchemalessTransformerTest {
         Assert.assertNotNull(result.getResult());
         final ContainerNode rpcReply = (ContainerNode) result.getResult();
         Assert.assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.getNodeType());
-        final Optional dataOpt = rpcReply.getChild(
+        final Optional<?> dataOpt = rpcReply.getChild(
                 new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_QNAME));
         Assert.assertTrue(dataOpt.isPresent());
         final AnyXmlNode data = (AnyXmlNode) dataOpt.get();

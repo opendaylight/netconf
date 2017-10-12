@@ -48,7 +48,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableMa
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +59,7 @@ public final class TestUtils {
     private static final Logger LOG = LoggerFactory.getLogger(TestUtils.class);
 
     public static SchemaContext loadSchemaContext(final String... yangPath)
-            throws FileNotFoundException, ReactorException {
+            throws FileNotFoundException {
         final List<File> files = new ArrayList<>();
         for (final String path : yangPath) {
             final String pathToFile = TestUtils.class.getResource(path).getPath();
@@ -78,7 +77,7 @@ public final class TestUtils {
             }
         }
 
-        return YangParserTestUtils.parseYangSources(files);
+        return YangParserTestUtils.parseYangFiles(files);
     }
 
     public static Module findModule(final Set<Module> modules, final String moduleName) {
