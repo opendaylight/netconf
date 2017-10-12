@@ -3,7 +3,7 @@ module instance-identifier-module {
 
   prefix "inidmod";
    
-  revision 2013-12-3 {    
+  revision 2013-12-03 {    
   }
   
 	container cont {

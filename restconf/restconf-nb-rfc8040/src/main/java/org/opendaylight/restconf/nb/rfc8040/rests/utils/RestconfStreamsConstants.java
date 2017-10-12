@@ -9,50 +9,28 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
-import java.text.ParseException;
-import java.util.Date;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
-import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Constants for streams.
  *
  */
 public final class RestconfStreamsConstants {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsConstants.class);
-
     public static final String SAL_REMOTE_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote";
 
     public static final String DATASTORE_PARAM_NAME = "datastore";
 
     private static final URI NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT = URI.create("urn:sal:restconf:event:subscription");
 
-    public static final QNameModule SAL_REMOTE_AUGMENT;
-
-    static {
-        final Date eventSubscriptionAugRevision;
-        try {
-            eventSubscriptionAugRevision = SimpleDateFormatUtil.getRevisionFormat().parse("2014-07-08");
-        } catch (final ParseException e) {
-            final String errMsg = "It wasn't possible to convert revision date of sal-remote-augment to date";
-            LOG.debug(errMsg);
-            throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
-        }
-        SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT, eventSubscriptionAugRevision)
-                .intern();
-    }
+    public static final QNameModule SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT,
+        Revision.of("2014-07-08")).intern();
 
     public static final AugmentationIdentifier SAL_REMOTE_AUG_IDENTIFIER = new AugmentationIdentifier(
         ImmutableSet.of(QName.create(SAL_REMOTE_AUGMENT, "scope"), QName.create(SAL_REMOTE_AUGMENT, "datastore"),
