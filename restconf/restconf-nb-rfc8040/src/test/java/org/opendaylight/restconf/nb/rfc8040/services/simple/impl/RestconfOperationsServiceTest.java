@@ -54,7 +54,7 @@ public class RestconfOperationsServiceTest {
     @Before
     public void init() throws Exception {
         MockitoAnnotations.initMocks(this);
-        this.schemaContext = YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/modules"));
+        this.schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
 
         final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
         final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);

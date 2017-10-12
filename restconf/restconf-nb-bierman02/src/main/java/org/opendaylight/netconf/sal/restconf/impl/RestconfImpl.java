@@ -76,6 +76,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
@@ -148,19 +149,11 @@ public class RestconfImpl implements RestconfService {
 
     private static final String NETCONF_BASE_PAYLOAD_NAME = "data";
 
-    private static final QName NETCONF_BASE_QNAME = QName.create(QNameModule.create(URI.create(NETCONF_BASE), null),
+    private static final QName NETCONF_BASE_QNAME = QName.create(QNameModule.create(URI.create(NETCONF_BASE)),
         NETCONF_BASE_PAYLOAD_NAME).intern();
 
-    private static final QNameModule SAL_REMOTE_AUGMENT;
-
-    static {
-        try {
-            SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT,
-                SimpleDateFormatUtil.getRevisionFormat().parse("2014-07-08"));
-        } catch (final ParseException e) {
-            throw new ExceptionInInitializerError(e);
-        }
-    }
+    private static final QNameModule SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT,
+        Revision.of("2014-07-08"));
 
     private static final AugmentationIdentifier SAL_REMOTE_AUG_IDENTIFIER =
             new AugmentationIdentifier(ImmutableSet.of(
@@ -614,8 +607,9 @@ public class RestconfImpl implements RestconfService {
             invokeSalRemoteRpcSubscribeRPC(final NormalizedNodeContext payload) {
         final ContainerNode value = (ContainerNode) payload.getData();
         final QName rpcQName = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
-        final Optional<DataContainerChild<? extends PathArgument, ?>> path = value.getChild(new NodeIdentifier(
-                QName.create(payload.getInstanceIdentifierContext().getSchemaNode().getQName(), "path")));
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> path = value.getChild(
+            new NodeIdentifier(QName.create(payload.getInstanceIdentifierContext().getSchemaNode().getQName(),
+                "path")));
         final Object pathValue = path.isPresent() ? path.get().getValue() : null;
 
         if (!(pathValue instanceof YangInstanceIdentifier)) {
@@ -1347,7 +1341,7 @@ public class RestconfImpl implements RestconfService {
      */
     private static <T> T parseEnumTypeParameter(final ContainerNode value, final Class<T> classDescriptor,
             final String paramName) {
-        final Optional<DataContainerChild<? extends PathArgument, ?>> optAugNode = value.getChild(
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> optAugNode = value.getChild(
             SAL_REMOTE_AUG_IDENTIFIER);
         if (!optAugNode.isPresent()) {
             return null;
@@ -1356,8 +1350,8 @@ public class RestconfImpl implements RestconfService {
         if (!(augNode instanceof AugmentationNode)) {
             return null;
         }
-        final Optional<DataContainerChild<? extends PathArgument, ?>> enumNode = ((AugmentationNode) augNode).getChild(
-            new NodeIdentifier(QName.create(SAL_REMOTE_AUGMENT, paramName)));
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> enumNode = ((AugmentationNode) augNode)
+            .getChild(new NodeIdentifier(QName.create(SAL_REMOTE_AUGMENT, paramName)));
         if (!enumNode.isPresent()) {
             return null;
         }
@@ -1441,9 +1435,11 @@ public class RestconfImpl implements RestconfService {
                 ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "revision");
         final DataSchemaNode revisionSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(revisionSchemaNode instanceof LeafSchemaNode);
-        final String revision = module.getQNameModule().getFormattedRevision();
-        moduleNodeValues
-                .withChild(Builders.leafBuilder((LeafSchemaNode) revisionSchemaNode).withValue(revision).build());
+        final java.util.Optional<Revision> revision = module.getQNameModule().getRevision();
+        if (revision.isPresent()) {
+            moduleNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) revisionSchemaNode)
+                .withValue(revision.get().toString()).build());
+        }
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "namespace");
