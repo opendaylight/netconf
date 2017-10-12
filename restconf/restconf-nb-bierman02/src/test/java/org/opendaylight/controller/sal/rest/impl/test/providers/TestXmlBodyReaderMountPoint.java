@@ -19,7 +19,6 @@ import com.google.common.base.Optional;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
-import java.text.ParseException;
 import java.util.Collection;
 import javax.ws.rs.core.MediaType;
 import org.junit.Assert;
@@ -35,7 +34,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -50,16 +49,8 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
     private final XmlNormalizedNodeBodyReader xmlBodyReader;
     private static SchemaContext schemaContext;
 
-    private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = initializeInstanceIdentifierModule();
-
-    private static QNameModule initializeInstanceIdentifierModule() {
-        try {
-            return QNameModule.create(URI.create("instance:identifier:module"),
-                SimpleDateFormatUtil.getRevisionFormat().parse("2014-01-17"));
-        } catch (final ParseException e) {
-            throw new Error(e);
-        }
-    }
+    private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
+        URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
 
     public TestXmlBodyReaderMountPoint() throws Exception {
         this.xmlBodyReader = new XmlNormalizedNodeBodyReader();
@@ -74,7 +65,7 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
     public static void initialization() throws Exception {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
-        schemaContext = YangParserTestUtils.parseYangSources(testFiles);
+        schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
 
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContext);
@@ -140,14 +131,14 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
         checkNormalizedNodeContext(returnValue);
         final ContainerNode contNode = (ContainerNode) returnValue.getData();
         final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(QName.create(contNode.getNodeType(), "cont"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> contDataNodePotential = contNode.getChild(yangCont
-                .getLastPathArgument());
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> contDataNodePotential = contNode
+                .getChild(yangCont.getLastPathArgument());
         assertTrue(contDataNodePotential.isPresent());
         final ContainerNode contDataNode = (ContainerNode) contDataNodePotential.get();
         final YangInstanceIdentifier yangLeaf =
                 YangInstanceIdentifier.of(QName.create(contDataNode.getNodeType(), "lf"));
-        final Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = contDataNode.getChild(yangLeaf
-                .getLastPathArgument());
+        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = contDataNode.getChild(
+            yangLeaf.getLastPathArgument());
         assertTrue(leafDataNode.isPresent());
         assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue().toString()));
     }
@@ -169,7 +160,7 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
                 .getSchemaContext().getDataChildByName(
                         dataSchemaNode.getQName());
         assertNotNull(mountDataSchemaNode);
-        if ((qualifiedName != null) && (dataSchemaNode instanceof DataNodeContainer)) {
+        if (qualifiedName != null && dataSchemaNode instanceof DataNodeContainer) {
             final DataSchemaNode child = ((DataNodeContainer) dataSchemaNode)
                     .getDataChildByName(qualifiedName);
             dataNodeIdent = YangInstanceIdentifier.builder(dataNodeIdent)

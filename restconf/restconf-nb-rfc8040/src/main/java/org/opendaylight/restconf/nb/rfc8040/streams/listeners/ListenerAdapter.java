@@ -71,7 +71,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
 
         this.outputType = Preconditions.checkNotNull(outputType);
         this.path = Preconditions.checkNotNull(path);
-        Preconditions.checkArgument((streamName != null) && !streamName.isEmpty());
+        Preconditions.checkArgument(streamName != null && !streamName.isEmpty());
         this.streamName = streamName;
     }
 
@@ -197,7 +197,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
     private void addValuesFromDataToElement(final Document doc, final Set<YangInstanceIdentifier> data,
             final Element element, final Operation operation, final SchemaContext schemaContext,
             final DataSchemaContextTree dataSchemaContextTree) {
-        if ((data == null) || data.isEmpty()) {
+        if (data == null || data.isEmpty()) {
             return;
         }
         for (final YangInstanceIdentifier path : data) {
@@ -212,7 +212,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
             final Set<Entry<YangInstanceIdentifier, NormalizedNode<?, ?>>> data, final Element element,
             final Operation operation, final SchemaContext schemaContext,
             final DataSchemaContextTree dataSchemaContextTree) {
-        if ((data == null) || data.isEmpty()) {
+        if (data == null || data.isEmpty()) {
             return;
         }
         for (final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry : data) {
@@ -268,7 +268,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
         try {
             SchemaPath nodePath;
             final NormalizedNode<?, ?> normalized = entry.getValue();
-            if ((normalized instanceof MapEntryNode) || (normalized instanceof UnkeyedListEntryNode)) {
+            if (normalized instanceof MapEntryNode || normalized instanceof UnkeyedListEntryNode) {
                 nodePath = dataSchemaContextTree.getChild(path).getDataSchemaNode().getPath();
             } else {
                 nodePath = dataSchemaContextTree.getChild(path).getDataSchemaNode().getPath().getParent();
@@ -343,8 +343,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
      */
     private static void writeIdentifierWithNamespacePrefix(final Element element, final StringBuilder textContent,
             final QName qualifiedName, final SchemaContext schemaContext) {
-        final Module module = schemaContext.findModuleByNamespaceAndRevision(qualifiedName.getNamespace(),
-                qualifiedName.getRevision());
+        final Module module = schemaContext.findModule(qualifiedName.getModule()).get();
 
         textContent.append(module.getName());
         textContent.append(":");

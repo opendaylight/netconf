@@ -9,13 +9,11 @@
 package org.opendaylight.restconf.common.util;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 /**
@@ -47,7 +45,7 @@ public class RestconfSchemaUtilTest {
     private static SchemaNode mockSchemaNode(final String origKey) {
         final SchemaNode mockSchNode = Mockito.mock(SchemaNode.class);
         Mockito.when(mockSchNode.getQName())
-                .thenReturn(QName.create("ns", SimpleDateFormatUtil.getRevisionFormat().format(new Date()), origKey));
+                .thenReturn(QName.create("ns", "2016-10-10", origKey));
         return mockSchNode;
     }
 }

@@ -104,9 +104,8 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
                 Collections.singletonMap(DocumentedException.ErrorSeverity.ERROR.toString(), exception.toString()));
     }
 
-    private Document executeOperationWithHighestPriority(final Document message,
-                                                         final NetconfOperationExecution netconfOperationExecution)
-            throws DocumentedException {
+    private static Document executeOperationWithHighestPriority(final Document message,
+            final NetconfOperationExecution netconfOperationExecution) throws DocumentedException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Forwarding netconf message {} to {}", XmlUtil.toString(message), netconfOperationExecution
                     .netconfOperation);

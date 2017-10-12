@@ -16,11 +16,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Queue;
-import org.apache.sshd.common.future.SshFutureListener;
 import org.apache.sshd.common.io.IoOutputStream;
-import org.apache.sshd.common.io.IoWriteFuture;
 import org.apache.sshd.common.io.WritePendingException;
-import org.apache.sshd.common.util.Buffer;
+import org.apache.sshd.common.util.buffer.Buffer;
+import org.apache.sshd.common.util.buffer.ByteArrayBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,45 +85,41 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Writing request on channel: {}, message: {}", ctx.channel(), byteBufToString(byteBufMsg));
             }
-            asyncIn.write(toBuffer(byteBufMsg)).addListener(new SshFutureListener<IoWriteFuture>() {
-
-                @Override
-                public void operationComplete(final IoWriteFuture future) {
-                    // synchronized block due to deadlock that happens on ssh window resize
-                    // writes and pending writes would lock the underlyinch channel session
-                    // window resize write would try to write the message on an already locked channelSession,
-                    // while the pending write was in progress from the write callback
-                    synchronized (asyncInLock) {
-                        if (LOG.isTraceEnabled()) {
-                            LOG.trace(
-                                "Ssh write request finished on channel: {} with result: {}: and ex:{}, message: {}",
-                                ctx.channel(), future.isWritten(), future.getException(), byteBufToString(byteBufMsg));
-                        }
-
-                        // Notify success or failure
-                        if (future.isWritten()) {
-                            promise.setSuccess();
-                        } else {
-                            LOG.warn("Ssh write request failed on channel: {} for message: {}", ctx.channel(),
-                                    byteBufToString(byteBufMsg), future.getException());
-                            promise.setFailure(future.getException());
-                        }
-
-                        // Not needed anymore, release
-                        byteBufMsg.release();
-
-                        //rescheduling message from queue after successfully sent
-                        if (wasPending) {
-                            byteBufMsg.resetReaderIndex();
-                            pending.remove();
-                        }
+            asyncIn.write(toBuffer(byteBufMsg)).addListener(future -> {
+                // synchronized block due to deadlock that happens on ssh window resize
+                // writes and pending writes would lock the underlyinch channel session
+                // window resize write would try to write the message on an already locked channelSession,
+                // while the pending write was in progress from the write callback
+                synchronized (asyncInLock) {
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace(
+                            "Ssh write request finished on channel: {} with result: {}: and ex:{}, message: {}",
+                            ctx.channel(), future.isWritten(), future.getException(), byteBufToString(byteBufMsg));
                     }
 
-                    // Check pending queue and schedule next
-                    // At this time we are guaranteed that we are not in pending state anymore
-                    // so the next request should succeed
-                    writePendingIfAny();
+                    // Notify success or failure
+                    if (future.isWritten()) {
+                        promise.setSuccess();
+                    } else {
+                        LOG.warn("Ssh write request failed on channel: {} for message: {}", ctx.channel(),
+                                byteBufToString(byteBufMsg), future.getException());
+                        promise.setFailure(future.getException());
+                    }
+
+                    // Not needed anymore, release
+                    byteBufMsg.release();
+
+                    //rescheduling message from queue after successfully sent
+                    if (wasPending) {
+                        byteBufMsg.resetReaderIndex();
+                        pending.remove();
+                    }
                 }
+
+                // Check pending queue and schedule next
+                // At this time we are guaranteed that we are not in pending state anymore
+                // so the next request should succeed
+                writePendingIfAny();
             });
 
         } catch (final WritePendingException e) {
@@ -183,7 +178,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
         msg.resetReaderIndex();
         final byte[] temp = new byte[msg.readableBytes()];
         msg.readBytes(temp, 0, msg.readableBytes());
-        return new Buffer(temp);
+        return new ByteArrayBuffer(temp);
     }
 
     private static final class PendingWriteRequest {

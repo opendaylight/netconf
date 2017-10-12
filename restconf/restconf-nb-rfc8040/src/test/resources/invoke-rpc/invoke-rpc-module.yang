@@ -3,7 +3,7 @@ module invoke-rpc-module {
 
   prefix "inrpcmod";
 
-  revision 2013-12-3 {
+  revision 2013-12-03 {
 
   }
 

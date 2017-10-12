@@ -21,11 +21,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import org.apache.sshd.ClientSession;
-import org.apache.sshd.SshClient;
+import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
-import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
+import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.common.util.security.SecurityUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -74,8 +74,7 @@ public class SSHServerTest {
         server.bind(new SshProxyServerConfigurationBuilder()
                 .setBindingAddress(addr).setLocalAddress(NetconfConfiguration.NETCONF_LOCAL_ADDRESS)
                 .setAuthenticator((username, password) -> true)
-                .setKeyPairProvider(new PEMGeneratorHostKeyProvider(sshKeyPair.toPath().toAbsolutePath().toString(),
-                        "RSA", 4096))
+                .setKeyPairProvider(SecurityUtils.createGeneratorHostKeyProvider(sshKeyPair.toPath()))
                 .setIdleTimeout(Integer.MAX_VALUE).createSshProxyServerConfiguration());
         LOG.info("SSH server started on {}", PORT);
     }

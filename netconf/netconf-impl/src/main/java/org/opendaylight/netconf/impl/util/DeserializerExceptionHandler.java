@@ -37,7 +37,7 @@ public final class DeserializerExceptionHandler implements ChannelHandler {
         handleDeserializerException(ctx, cause);
     }
 
-    private void handleDeserializerException(final ChannelHandlerContext ctx, final Throwable cause) {
+    private static void handleDeserializerException(final ChannelHandlerContext ctx, final Throwable cause) {
 
         final Map<String, String> info = Maps.newHashMap();
         info.put("cause", cause.getMessage());

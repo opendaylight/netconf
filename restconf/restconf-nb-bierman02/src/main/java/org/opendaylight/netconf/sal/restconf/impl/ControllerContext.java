@@ -23,8 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +36,7 @@ import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizer
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
+import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.Draft02.RestConfModule;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -44,6 +45,7 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.yangtools.concepts.Codec;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder;
@@ -51,7 +53,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.api.AnyXmlSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ChoiceCaseNode;
+import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
@@ -168,15 +170,15 @@ public class ControllerContext implements SchemaContextListener {
         }
 
         final InstanceIdentifierBuilder builder = YangInstanceIdentifier.builder();
-        final Module latestModule = this.globalSchema.findModuleByName(startModule, null);
+        final Set<Module> latestModule = this.globalSchema.findModules(startModule);
 
-        if (latestModule == null) {
+        if (latestModule.isEmpty()) {
             throw new RestconfDocumentedException("The module named '" + startModule + "' does not exist.",
                     ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
         }
 
         final InstanceIdentifierContext<?> iiWithSchemaNode =
-                collectPathArguments(builder, pathArgs, latestModule, null, toMountPointIdentifier);
+                collectPathArguments(builder, pathArgs, latestModule.iterator().next(), null, toMountPointIdentifier);
 
         if (iiWithSchemaNode == null) {
             throw new RestconfDocumentedException("URI has bad format", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -209,55 +211,52 @@ public class ControllerContext implements SchemaContextListener {
 
     public Module findModuleByName(final String moduleName) {
         checkPreconditions();
-        Preconditions.checkArgument((moduleName != null) && !moduleName.isEmpty());
-        return this.globalSchema.findModuleByName(moduleName, null);
+        Preconditions.checkArgument(moduleName != null && !moduleName.isEmpty());
+        return this.globalSchema.findModules(moduleName).stream().findFirst().orElse(null);
     }
 
     public Module findModuleByName(final DOMMountPoint mountPoint, final String moduleName) {
-        Preconditions.checkArgument((moduleName != null) && (mountPoint != null));
+        Preconditions.checkArgument(moduleName != null && mountPoint != null);
 
         final SchemaContext mountPointSchema = mountPoint.getSchemaContext();
         if (mountPointSchema == null) {
             return null;
         }
 
-        return mountPointSchema.findModuleByName(moduleName, null);
+        return mountPointSchema.findModules(moduleName).stream().findFirst().orElse(null);
     }
 
     public Module findModuleByNamespace(final URI namespace) {
         checkPreconditions();
         Preconditions.checkArgument(namespace != null);
-        return this.globalSchema.findModuleByNamespaceAndRevision(namespace, null);
+        return this.globalSchema.findModules(namespace).stream().findFirst().orElse(null);
     }
 
     public Module findModuleByNamespace(final DOMMountPoint mountPoint, final URI namespace) {
-        Preconditions.checkArgument((namespace != null) && (mountPoint != null));
+        Preconditions.checkArgument(namespace != null && mountPoint != null);
 
         final SchemaContext mountPointSchema = mountPoint.getSchemaContext();
         if (mountPointSchema == null) {
             return null;
         }
 
-        return mountPointSchema.findModuleByNamespaceAndRevision(namespace, null);
+        return mountPointSchema.findModules(namespace).stream().findFirst().orElse(null);
     }
 
-    public Module findModuleByNameAndRevision(final QName module) {
+    public Module findModuleByNameAndRevision(final String name, final Revision revision) {
         checkPreconditions();
-        Preconditions
-                .checkArgument((module != null) && (module.getLocalName() != null) && (module.getRevision() != null));
+        Preconditions.checkArgument(name != null && revision != null);
 
-        return this.globalSchema.findModuleByName(module.getLocalName(), module.getRevision());
+        return this.globalSchema.findModule(name, revision).orElse(null);
     }
 
-    public Module findModuleByNameAndRevision(final DOMMountPoint mountPoint, final QName module) {
+    public Module findModuleByNameAndRevision(final DOMMountPoint mountPoint, final String name,
+            final Revision revision) {
         checkPreconditions();
-        Preconditions
-                .checkArgument((module != null) && (module.getLocalName() != null) && (module.getRevision() != null)
-                && (mountPoint != null));
+        Preconditions.checkArgument(name != null && revision != null && mountPoint != null);
 
         final SchemaContext schemaContext = mountPoint.getSchemaContext();
-        return schemaContext == null ? null : schemaContext.findModuleByName(module.getLocalName(),
-                module.getRevision());
+        return schemaContext == null ? null : schemaContext.findModule(name, revision).orElse(null);
     }
 
     public DataNodeContainer getDataNodeContainerFor(final YangInstanceIdentifier path) {
@@ -266,13 +265,12 @@ public class ControllerContext implements SchemaContextListener {
         final Iterable<PathArgument> elements = path.getPathArguments();
         final PathArgument head = elements.iterator().next();
         final QName startQName = head.getNodeType();
-        final Module initialModule = this.globalSchema.findModuleByNamespaceAndRevision(startQName.getNamespace(),
-                startQName.getRevision());
+        final Module initialModule = this.globalSchema.findModule(startQName.getModule()).orElse(null);
         DataNodeContainer node = initialModule;
         for (final PathArgument element : elements) {
             final QName _nodeType = element.getNodeType();
             final DataSchemaNode potentialNode = childByQName(node, _nodeType);
-            if ((potentialNode == null) || !isListOrContainer(potentialNode)) {
+            if (potentialNode == null || !isListOrContainer(potentialNode)) {
                 return null;
             }
             node = (DataNodeContainer) potentialNode;
@@ -294,14 +292,13 @@ public class ControllerContext implements SchemaContextListener {
         } else {
             schemaContext = this.globalSchema;
         }
-        final Module initialModule = schemaContext.findModuleByNamespaceAndRevision(startQName.getNamespace(),
-                startQName.getRevision());
+        final Module initialModule = schemaContext.findModule(startQName.getModule()).orElse(null);
         DataNodeContainer node = initialModule;
         for (final PathArgument element : elements) {
             if (!(element instanceof AugmentationIdentifier)) {
                 final QName _nodeType = element.getNodeType();
                 final DataSchemaNode potentialNode = childByQName(node, _nodeType);
-                if (!((element instanceof NodeIdentifier) && (potentialNode instanceof ListSchemaNode))
+                if (!(element instanceof NodeIdentifier && potentialNode instanceof ListSchemaNode)
                         && !(potentialNode instanceof ChoiceSchemaNode)) {
                     builder.append(convertToRestconfIdentifier(element, potentialNode, mount));
                     if (potentialNode instanceof DataNodeContainer) {
@@ -349,7 +346,7 @@ public class ControllerContext implements SchemaContextListener {
     }
 
     private static CharSequence toRestconfIdentifier(final SchemaContext context, final QName qname) {
-        final Module schema = context.findModuleByNamespaceAndRevision(qname.getNamespace(), qname.getRevision());
+        final Module schema = context.findModule(qname.getModule()).orElse(null);
         return schema == null ? null : schema.getName() + ':' + qname.getLocalName();
     }
 
@@ -380,7 +377,7 @@ public class ControllerContext implements SchemaContextListener {
     }
 
     public Module getRestconfModule() {
-        return findModuleByNameAndRevision(RestConfModule.IETF_RESTCONF_QNAME);
+        return findModuleByNameAndRevision(Draft02.RestConfModule.NAME, Revision.of(Draft02.RestConfModule.REVISION));
     }
 
     public DataSchemaNode getRestconfModuleErrorsSchemaNode() {
@@ -423,33 +420,33 @@ public class ControllerContext implements SchemaContextListener {
 
         if (RestConfModule.OPERATIONS_CONTAINER_SCHEMA_NODE.equals(schemaNodeName)) {
             final List<DataSchemaNode> instances = findInstanceDataChildrenByName(
-                    ((DataNodeContainer) restconfContainer), RestConfModule.OPERATIONS_CONTAINER_SCHEMA_NODE);
+                    (DataNodeContainer) restconfContainer, RestConfModule.OPERATIONS_CONTAINER_SCHEMA_NODE);
             return Iterables.getFirst(instances, null);
         } else if (RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE.equals(schemaNodeName)) {
             final List<DataSchemaNode> instances = findInstanceDataChildrenByName(
-                    ((DataNodeContainer) restconfContainer), RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
+                    (DataNodeContainer) restconfContainer, RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
             return Iterables.getFirst(instances, null);
         } else if (RestConfModule.STREAM_LIST_SCHEMA_NODE.equals(schemaNodeName)) {
             List<DataSchemaNode> instances = findInstanceDataChildrenByName(
-                    ((DataNodeContainer) restconfContainer), RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
+                    (DataNodeContainer) restconfContainer, RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
             final DataSchemaNode modules = Iterables.getFirst(instances, null);
-            instances = findInstanceDataChildrenByName(((DataNodeContainer) modules),
+            instances = findInstanceDataChildrenByName((DataNodeContainer) modules,
                     RestConfModule.STREAM_LIST_SCHEMA_NODE);
             return Iterables.getFirst(instances, null);
         } else if (RestConfModule.MODULES_CONTAINER_SCHEMA_NODE.equals(schemaNodeName)) {
             final List<DataSchemaNode> instances = findInstanceDataChildrenByName(
-                    ((DataNodeContainer) restconfContainer), RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
+                    (DataNodeContainer) restconfContainer, RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
             return Iterables.getFirst(instances, null);
         } else if (RestConfModule.MODULE_LIST_SCHEMA_NODE.equals(schemaNodeName)) {
             List<DataSchemaNode> instances = findInstanceDataChildrenByName(
-                    ((DataNodeContainer) restconfContainer), RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
+                    (DataNodeContainer) restconfContainer, RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
             final DataSchemaNode modules = Iterables.getFirst(instances, null);
-            instances = findInstanceDataChildrenByName(((DataNodeContainer) modules),
+            instances = findInstanceDataChildrenByName((DataNodeContainer) modules,
                     RestConfModule.MODULE_LIST_SCHEMA_NODE);
             return Iterables.getFirst(instances, null);
         } else if (RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE.equals(schemaNodeName)) {
             final List<DataSchemaNode> instances = findInstanceDataChildrenByName(
-                    ((DataNodeContainer) restconfContainer), RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
+                    (DataNodeContainer) restconfContainer, RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
             return Iterables.getFirst(instances, null);
         }
 
@@ -457,7 +454,7 @@ public class ControllerContext implements SchemaContextListener {
     }
 
     private static DataSchemaNode childByQName(final ChoiceSchemaNode container, final QName name) {
-        for (final ChoiceCaseNode caze : container.getCases()) {
+        for (final CaseSchemaNode caze : container.getCases().values()) {
             final DataSchemaNode ret = childByQName(caze, name);
             if (ret != null) {
                 return ret;
@@ -467,7 +464,7 @@ public class ControllerContext implements SchemaContextListener {
         return null;
     }
 
-    private static DataSchemaNode childByQName(final ChoiceCaseNode container, final QName name) {
+    private static DataSchemaNode childByQName(final CaseSchemaNode container, final QName name) {
         return container.getDataChildByName(name);
     }
 
@@ -489,8 +486,8 @@ public class ControllerContext implements SchemaContextListener {
 
 
     private static DataSchemaNode childByQName(final Object container, final QName name) {
-        if (container instanceof ChoiceCaseNode) {
-            return childByQName((ChoiceCaseNode) container, name);
+        if (container instanceof CaseSchemaNode) {
+            return childByQName((CaseSchemaNode) container, name);
         } else if (container instanceof ChoiceSchemaNode) {
             return childByQName((ChoiceSchemaNode) container, name);
         } else if (container instanceof ContainerSchemaNode) {
@@ -511,8 +508,8 @@ public class ControllerContext implements SchemaContextListener {
         final DataSchemaNode ret = container.getDataChildByName(name);
         if (ret == null) {
             for (final DataSchemaNode node : container.getChildNodes()) {
-                if ((node instanceof ChoiceSchemaNode)) {
-                    final ChoiceSchemaNode choiceNode = ((ChoiceSchemaNode) node);
+                if (node instanceof ChoiceSchemaNode) {
+                    final ChoiceSchemaNode choiceNode = (ChoiceSchemaNode) node;
                     final DataSchemaNode childByQName = childByQName(choiceNode, name);
                     if (childByQName != null) {
                         return childByQName;
@@ -540,7 +537,7 @@ public class ControllerContext implements SchemaContextListener {
         }
 
         if (strings.isEmpty()) {
-            return createContext(builder.build(), ((DataSchemaNode) parentNode),
+            return createContext(builder.build(), (DataSchemaNode) parentNode,
                 mountPoint,mountPoint != null ? mountPoint.getSchemaContext() : this.globalSchema);
         }
 
@@ -577,7 +574,7 @@ public class ControllerContext implements SchemaContextListener {
                             ErrorType.APPLICATION, ErrorTag.UNKNOWN_ELEMENT);
                 }
 
-                if (returnJustMountPoint || (strings.size() == 1)) {
+                if (returnJustMountPoint || strings.size() == 1) {
                     final YangInstanceIdentifier instance = YangInstanceIdentifier.builder().build();
                     return new InstanceIdentifierContext<>(instance, mountPointSchema, mount,mountPointSchema);
                 }
@@ -589,22 +586,21 @@ public class ControllerContext implements SchemaContextListener {
                             ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
                 }
 
-                final Module moduleBehindMountPoint =
-                        mountPointSchema.findModuleByName(moduleNameBehindMountPoint, null);
-                if (moduleBehindMountPoint == null) {
+                final Iterator<Module> it = mountPointSchema.findModules(moduleNameBehindMountPoint).iterator();
+                if (!it.hasNext()) {
                     throw new RestconfDocumentedException("\"" + moduleNameBehindMountPoint
                             + "\" module does not exist in mount point.", ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
                 }
 
                 final List<String> subList = strings.subList(1, strings.size());
-                return collectPathArguments(YangInstanceIdentifier.builder(), subList, moduleBehindMountPoint, mount,
+                return collectPathArguments(YangInstanceIdentifier.builder(), subList, it.next(), mount,
                         returnJustMountPoint);
             }
 
             Module module = null;
             if (mountPoint == null) {
                 checkPreconditions();
-                module = this.globalSchema.findModuleByName(moduleName, null);
+                module = this.globalSchema.findModules(moduleName).stream().findFirst().orElse(null);
                 if (module == null) {
                     throw new RestconfDocumentedException("\"" + moduleName + "\" module does not exist.",
                             ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
@@ -612,7 +608,7 @@ public class ControllerContext implements SchemaContextListener {
             } else {
                 final SchemaContext schemaContext = mountPoint.getSchemaContext();
                 if (schemaContext != null) {
-                    module = schemaContext.findModuleByName(moduleName, null);
+                    module = schemaContext.findModules(moduleName).stream().findFirst().orElse(null);
                 } else {
                     module = null;
                 }
@@ -624,7 +620,7 @@ public class ControllerContext implements SchemaContextListener {
 
             targetNode = findInstanceDataChildByNameAndNamespace(parentNode, nodeName, module.getNamespace());
 
-            if ((targetNode == null) && (parentNode instanceof Module)) {
+            if (targetNode == null && parentNode instanceof Module) {
                 final RpcDefinition rpc;
                 if (mountPoint == null) {
                     rpc = ControllerContext.getInstance().getRpcDefinition(head, module.getRevision());
@@ -676,10 +672,10 @@ public class ControllerContext implements SchemaContextListener {
         }
 
         int consumed = 1;
-        if ((targetNode instanceof ListSchemaNode)) {
-            final ListSchemaNode listNode = ((ListSchemaNode) targetNode);
+        if (targetNode instanceof ListSchemaNode) {
+            final ListSchemaNode listNode = (ListSchemaNode) targetNode;
             final int keysSize = listNode.getKeyDefinition().size();
-            if ((strings.size() - consumed) < keysSize) {
+            if (strings.size() - consumed < keysSize) {
                 throw new RestconfDocumentedException("Missing key for list \"" + listNode.getQName().getLocalName()
                         + "\".", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
             }
@@ -707,9 +703,9 @@ public class ControllerContext implements SchemaContextListener {
             builder.node(targetNode.getQName());
         }
 
-        if ((targetNode instanceof DataNodeContainer)) {
+        if (targetNode instanceof DataNodeContainer) {
             final List<String> remaining = strings.subList(consumed, strings.size());
-            return collectPathArguments(builder, remaining, ((DataNodeContainer) targetNode), mountPoint,
+            return collectPathArguments(builder, remaining, (DataNodeContainer) targetNode, mountPoint,
                     returnJustMountPoint);
         }
 
@@ -758,22 +754,23 @@ public class ControllerContext implements SchemaContextListener {
 
         final Iterable<ChoiceSchemaNode> choiceNodes = Iterables.filter(container.getChildNodes(),
             ChoiceSchemaNode.class);
-        final Iterable<Set<ChoiceCaseNode>> map = Iterables.transform(choiceNodes, ChoiceSchemaNode::getCases);
-        for (final ChoiceCaseNode caze : Iterables.concat(map)) {
+        final Iterable<Collection<CaseSchemaNode>> map = Iterables.transform(choiceNodes,
+            choice -> choice.getCases().values());
+        for (final CaseSchemaNode caze : Iterables.concat(map)) {
             collectInstanceDataNodeContainers(potentialSchemaNodes, caze, name);
         }
     }
 
     public static boolean isInstantiatedDataSchema(final DataSchemaNode node) {
-        return (node instanceof LeafSchemaNode) || (node instanceof LeafListSchemaNode)
-                || (node instanceof ContainerSchemaNode) || (node instanceof ListSchemaNode)
-                || (node instanceof AnyXmlSchemaNode);
+        return node instanceof LeafSchemaNode || node instanceof LeafListSchemaNode
+                || node instanceof ContainerSchemaNode || node instanceof ListSchemaNode
+                || node instanceof AnyXmlSchemaNode;
     }
 
     private void addKeyValue(final HashMap<QName, Object> map, final DataSchemaNode node, final String uriValue,
             final DOMMountPoint mountPoint) {
         Preconditions.checkNotNull(uriValue);
-        Preconditions.checkArgument((node instanceof LeafSchemaNode));
+        Preconditions.checkArgument(node instanceof LeafSchemaNode);
 
         final String urlDecoded = urlPathArgDecode(uriValue);
         TypeDefinition<?> typedef = ((LeafSchemaNode) node).getType();
@@ -786,10 +783,10 @@ public class ControllerContext implements SchemaContextListener {
         Object decoded = codec.deserialize(urlDecoded);
         String additionalInfo = "";
         if (decoded == null) {
-            if ((typedef instanceof IdentityrefTypeDefinition)) {
+            if (typedef instanceof IdentityrefTypeDefinition) {
                 final SchemaContext schemaContext =
                         mountPoint == null ? this.globalSchema : mountPoint.getSchemaContext();
-                decoded = toQName(schemaContext, urlDecoded, null);
+                decoded = toQName(schemaContext, urlDecoded);
                 additionalInfo =
                         "For key which is of type identityref it should be in format module_name:identity_name.";
             }
@@ -831,20 +828,33 @@ public class ControllerContext implements SchemaContextListener {
         return str.substring(idx + 1);
     }
 
-    private QName toQName(final SchemaContext schemaContext, final String name, final Date revisionDate) {
+    private QName toQName(final SchemaContext schemaContext, final String name,
+            final java.util.Optional<Revision> revisionDate) {
         checkPreconditions();
         final String module = toModuleName(name);
         final String node = toNodeName(name);
-        final Module m = schemaContext.findModuleByName(module, revisionDate);
+        final Module m = schemaContext.findModule(module, revisionDate).orElse(null);
         return m == null ? null : QName.create(m.getQNameModule(), node);
     }
 
+    private QName toQName(final SchemaContext schemaContext, final String name) {
+        checkPreconditions();
+        final String module = toModuleName(name);
+        final String node = toNodeName(name);
+        final Set<Module> modules = schemaContext.findModules(module);
+        return modules.isEmpty() ? null : QName.create(modules.iterator().next().getQNameModule(), node);
+    }
     private static boolean isListOrContainer(final DataSchemaNode node) {
-        return (node instanceof ListSchemaNode) || (node instanceof ContainerSchemaNode);
+        return node instanceof ListSchemaNode || node instanceof ContainerSchemaNode;
     }
 
-    public RpcDefinition getRpcDefinition(final String name, final Date revisionDate) {
+    public RpcDefinition getRpcDefinition(final String name, final java.util.Optional<Revision> revisionDate) {
         final QName validName = toQName(this.globalSchema, name, revisionDate);
+        return validName == null ? null : this.qnameToRpc.get().get(validName);
+    }
+
+    public RpcDefinition getRpcDefinition(final String name) {
+        final QName validName = toQName(this.globalSchema, name);
         return validName == null ? null : this.qnameToRpc.get().get(validName);
     }
 
@@ -905,10 +915,10 @@ public class ControllerContext implements SchemaContextListener {
             final DOMMountPoint mount) {
         if (argument instanceof NodeIdentifier) {
             return convertToRestconfIdentifier((NodeIdentifier) argument, mount);
-        } else if ((argument instanceof NodeIdentifierWithPredicates) && (node instanceof ListSchemaNode)) {
+        } else if (argument instanceof NodeIdentifierWithPredicates && node instanceof ListSchemaNode) {
             return convertToRestconfIdentifierWithPredicates((NodeIdentifierWithPredicates) argument,
                 (ListSchemaNode) node, mount);
-        } else if ((argument != null) && (node != null)) {
+        } else if (argument != null && node != null) {
             throw new IllegalArgumentException("Conversion of generic path argument is not supported");
         } else {
             throw new IllegalArgumentException("Unhandled parameter types: " + Arrays.asList(argument, node));

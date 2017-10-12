@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.yanglib.impl;
 
 import com.google.common.base.Preconditions;
@@ -33,6 +32,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -46,7 +46,6 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Listens on new schema sources registered event. For each new source
@@ -186,14 +185,12 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
     }
 
     private static String revString(final SourceIdentifier id) {
-        final String rev = id.getRevision();
-        return rev == null || SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION.equals(rev) ? "" : rev;
+        return id.getRevision().map(Revision::toString).orElse("");
     }
 
     private static OptionalRevision getRevisionForModule(final SourceIdentifier sourceIdentifier) {
-        final String rev = sourceIdentifier.getRevision();
-        return rev == null || SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION.equals(rev) ? NO_REVISION
-                : new OptionalRevision(new RevisionIdentifier(rev));
+        return sourceIdentifier.getRevision().map(rev -> new OptionalRevision(new RevisionIdentifier(rev.toString())))
+                .orElse(NO_REVISION);
     }
 
     private <T> T getObjectFromBundleContext(final Class<T> type, final String serviceRefName) {
