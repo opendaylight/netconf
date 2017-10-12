@@ -70,7 +70,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
             throws NoSuchFieldException, SecurityException, FileNotFoundException, SourceException, ReactorException {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
-        schemaContext = YangParserTestUtils.parseYangSources(testFiles);
+        schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
         when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mock(DOMMountPointService.class));
     }
 

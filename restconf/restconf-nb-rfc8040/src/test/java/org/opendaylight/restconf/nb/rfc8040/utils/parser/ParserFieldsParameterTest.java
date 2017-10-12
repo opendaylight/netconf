@@ -77,7 +77,7 @@ public class ParserFieldsParameterTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         final SchemaContext schemaContext =
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/jukebox"));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/jukebox"));
 
         final QNameModule qNameModule = QNameModule.create(URI.create("http://example.com/ns/example-jukebox"),
             SimpleDateFormatUtil.getRevisionFormat().parse("2015-04-04"));
