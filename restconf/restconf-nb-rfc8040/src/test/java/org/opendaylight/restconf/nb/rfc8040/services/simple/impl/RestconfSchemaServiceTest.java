@@ -82,11 +82,11 @@ public class RestconfSchemaServiceTest {
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        this.schemaContext = YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/modules"));
+        this.schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
         this.schemaContextBehindMountPoint = YangParserTestUtils
-                .parseYangSources(TestRestconfUtils.loadFiles("/modules/modules-behind-mount-point"));
+                .parseYangFiles(TestRestconfUtils.loadFiles("/modules/modules-behind-mount-point"));
         this.schemaContextWithMountPoints =
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/modules/mount-points"));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules/mount-points"));
 
         // create and register mount points
         this.mountPoint = SimpleDOMMountPoint.create(

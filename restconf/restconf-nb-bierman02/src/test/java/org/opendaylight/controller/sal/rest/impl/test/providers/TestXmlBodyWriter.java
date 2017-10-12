@@ -42,7 +42,7 @@ public class TestXmlBodyWriter extends AbstractBodyReaderTest {
     public static void initialization() throws Exception {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
-        schemaContext = YangParserTestUtils.parseYangSources(testFiles);
+        schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
         CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 

@@ -278,14 +278,15 @@ public class JSONRestconfServiceRfc8040ImplTest {
         final ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
         assertEquals("ContainerNode node type", INTERFACES_QNAME, actualNode.getNodeType());
 
-        final Optional<DataContainerChild<?, ?>> mapChild = actualNode.getChild(new NodeIdentifier(INTERFACE_QNAME));
+        final java.util.Optional<DataContainerChild<?, ?>> mapChild = actualNode.getChild(
+            new NodeIdentifier(INTERFACE_QNAME));
         assertEquals(INTERFACE_QNAME.toString() + " present", true, mapChild.isPresent());
         assertTrue("Expected MapNode. Actual " + mapChild.get().getClass(), mapChild.get() instanceof MapNode);
         final MapNode mapNode = (MapNode)mapChild.get();
 
         final NodeIdentifierWithPredicates entryNodeID = new NodeIdentifierWithPredicates(
                 INTERFACE_QNAME, NAME_QNAME, "eth0");
-        final Optional<MapEntryNode> entryChild = mapNode.getChild(entryNodeID);
+        final java.util.Optional<MapEntryNode> entryChild = mapNode.getChild(entryNodeID);
         assertEquals(entryNodeID.toString() + " present", true, entryChild.isPresent());
         final MapEntryNode entryNode = entryChild.get();
         verifyLeafNode(entryNode, NAME_QNAME, "eth0");
@@ -505,7 +506,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
     }
 
     void verifyLeafNode(final DataContainerNode<?> parent, final QName leafType, final Object leafValue) {
-        final Optional<DataContainerChild<?, ?>> leafChild = parent.getChild(new NodeIdentifier(leafType));
+        final java.util.Optional<DataContainerChild<?, ?>> leafChild = parent.getChild(new NodeIdentifier(leafType));
         assertEquals(leafType.toString() + " present", true, leafChild.isPresent());
         assertEquals(leafType.toString() + " value", leafValue, leafChild.get().getValue());
     }
