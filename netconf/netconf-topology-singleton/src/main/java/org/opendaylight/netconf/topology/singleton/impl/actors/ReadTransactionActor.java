@@ -16,7 +16,7 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadAct
 /**
  * ReadTransactionActor is an interface to device's {@link DOMDataReadOnlyTransaction} for cluster nodes.
  */
-public class ReadTransactionActor extends UntypedActor {
+public final class ReadTransactionActor extends UntypedActor {
 
     private final ReadAdapter readAdapter;
 

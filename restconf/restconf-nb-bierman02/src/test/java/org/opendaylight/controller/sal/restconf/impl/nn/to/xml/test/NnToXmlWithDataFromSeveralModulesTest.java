@@ -73,13 +73,13 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
         assertTrue(outputString.contains(
                 "<cont_m2 xmlns=" + '"' + "module:two" + '"' + '>'));
         assertTrue(outputString.contains("<lf1_m2>lf1 m2 value</lf1_m2>"));
-        assertTrue(outputString.contains("<contB_m2></contB_m2>"));
+        assertTrue(outputString.contains("<contB_m2/>"));
         assertTrue(outputString.contains("</cont_m2>"));
 
         // cont m1
         assertTrue(outputString.contains(
                 "<cont_m1 xmlns=" + '"' + "module:one" + '"' + '>'));
-        assertTrue(outputString.contains("<contB_m1></contB_m1>"));
+        assertTrue(outputString.contains("<contB_m1/>"));
         assertTrue(outputString.contains("<lf1_m1>lf1 m1 value</lf1_m1>"));
         assertTrue(outputString.contains("</cont_m1>"));
 

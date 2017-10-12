@@ -14,7 +14,6 @@ import akka.cluster.Cluster;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,10 +30,10 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificatio
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
@@ -49,7 +48,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     private final ActorRef masterActorRef;
     private final ActorSystem actorSystem;
 
-    private SchemaContext remoteSchemaContext = null;
+    private SchemaContext currentSchemaContext = null;
     private NetconfSessionPreferences netconfSessionPreferences = null;
     private DOMRpcService deviceRpc = null;
     private DOMDataBroker deviceDataBroker = null;
@@ -68,10 +67,11 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     }
 
     @Override
+    @SuppressWarnings("checkstyle:hiddenField")
     public void onDeviceConnected(final SchemaContext remoteSchemaContext,
                                   final NetconfSessionPreferences netconfSessionPreferences,
                                   final DOMRpcService deviceRpc) {
-        this.remoteSchemaContext = remoteSchemaContext;
+        this.currentSchemaContext = remoteSchemaContext;
         this.netconfSessionPreferences = netconfSessionPreferences;
         this.deviceRpc = deviceRpc;
 
@@ -115,7 +115,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
     private void registerMasterMountPoint() {
         Preconditions.checkNotNull(id);
-        Preconditions.checkNotNull(remoteSchemaContext,
+        Preconditions.checkNotNull(currentSchemaContext,
                 "Device has no remote schema context yet. Probably not fully connected.");
         Preconditions.checkNotNull(netconfSessionPreferences,
                 "Device has no capabilities yet. Probably not fully connected.");
@@ -124,22 +124,20 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
         LOG.info("{}: Creating master data broker for device", id);
 
-        deviceDataBroker = new NetconfDeviceDataBroker(id, remoteSchemaContext, deviceRpc, netconfSessionPreferences);
+        deviceDataBroker = new NetconfDeviceDataBroker(id, currentSchemaContext, deviceRpc, netconfSessionPreferences);
         // We need to create ProxyDOMDataBroker so accessing mountpoint
         // on leader node would be same as on follower node
         final ProxyDOMDataBroker proxyDataBroker =
                 new ProxyDOMDataBroker(actorSystem, id, masterActorRef, actorResponseWaitTime);
         salProvider.getMountInstance()
-                .onTopologyDeviceConnected(remoteSchemaContext, proxyDataBroker, deviceRpc, notificationService);
+                .onTopologyDeviceConnected(currentSchemaContext, proxyDataBroker, deviceRpc, notificationService);
     }
 
     private Future<Object> sendInitialDataToActor() {
         final List<SourceIdentifier> sourceIdentifiers =
-                remoteSchemaContext.getAllModuleIdentifiers().stream().map(mi ->
-                        RevisionSourceIdentifier.create(mi.getName(),
-                                (SimpleDateFormatUtil.DEFAULT_DATE_REV == mi.getRevision() ? Optional.<String>absent() :
-                                    Optional.of(mi.getQNameModule().getFormattedRevision()))))
-                        .collect(Collectors.toList());
+                SchemaContextUtil.getConstituentModuleIdentifiers(currentSchemaContext).stream()
+                .map(mi -> RevisionSourceIdentifier.create(mi.getName(), mi.getRevision()))
+                .collect(Collectors.toList());
 
         // send initial data to master actor and create actor for providing it
         return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, sourceIdentifiers,

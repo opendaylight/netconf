@@ -83,7 +83,7 @@ public class TransactionProvider implements AutoCloseable {
             LOG.debug("Transaction {} failed on", candidateTransaction, e);
             final String cause = e.getCause() != null ? (" Cause: " + e.getCause().getMessage()) : "";
             throw new DocumentedException(
-                    "Transaction commit failed on " + e.getMessage() + " " + netconfSessionIdForReporting + cause,
+                    "Transaction commit failed on " + e.getMessage() + " " + netconfSessionIdForReporting + cause, e,
                     ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         } finally {
             allOpenReadWriteTransactions.remove(candidateTransaction);

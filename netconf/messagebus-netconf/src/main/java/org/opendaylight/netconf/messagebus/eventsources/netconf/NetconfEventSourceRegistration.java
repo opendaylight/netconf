@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Helper class to keep connection status of netconf node  and event source registration object.
  */
-public class NetconfEventSourceRegistration implements AutoCloseable {
+public final class NetconfEventSourceRegistration implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEventSourceRegistration.class);
     private static final YangInstanceIdentifier NETCONF_DEVICE_DOM_PATH = YangInstanceIdentifier.builder()

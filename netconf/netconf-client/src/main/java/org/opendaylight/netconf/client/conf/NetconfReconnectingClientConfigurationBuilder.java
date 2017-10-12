@@ -14,7 +14,7 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.Authenticat
 import org.opendaylight.protocol.framework.ReconnectStrategy;
 import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
 
-public class NetconfReconnectingClientConfigurationBuilder extends NetconfClientConfigurationBuilder {
+public final class NetconfReconnectingClientConfigurationBuilder extends NetconfClientConfigurationBuilder {
 
     private ReconnectStrategyFactory connectStrategyFactory;
 
@@ -25,7 +25,7 @@ public class NetconfReconnectingClientConfigurationBuilder extends NetconfClient
         return new NetconfReconnectingClientConfigurationBuilder();
     }
 
-
+    @SuppressWarnings("checkstyle:hiddenField")
     public NetconfReconnectingClientConfigurationBuilder withConnectStrategyFactory(
             final ReconnectStrategyFactory connectStrategyFactory) {
         this.connectStrategyFactory = connectStrategyFactory;

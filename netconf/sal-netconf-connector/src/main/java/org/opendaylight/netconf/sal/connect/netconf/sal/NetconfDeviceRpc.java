@@ -37,13 +37,14 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
  */
 public final class NetconfDeviceRpc implements DOMRpcService {
 
-    private final RemoteDeviceCommunicator<NetconfMessage> listener;
+    private final RemoteDeviceCommunicator<NetconfMessage> communicator;
     private final MessageTransformer<NetconfMessage> transformer;
     private final Collection<DOMRpcIdentifier> availableRpcs;
 
-    public NetconfDeviceRpc(final SchemaContext schemaContext, final RemoteDeviceCommunicator<NetconfMessage> listener,
-                            final MessageTransformer<NetconfMessage> transformer) {
-        this.listener = listener;
+    public NetconfDeviceRpc(final SchemaContext schemaContext,
+            final RemoteDeviceCommunicator<NetconfMessage> communicator,
+            final MessageTransformer<NetconfMessage> transformer) {
+        this.communicator = communicator;
         this.transformer = transformer;
 
         availableRpcs = Collections2.transform(schemaContext.getOperations(),
@@ -56,7 +57,7 @@ public final class NetconfDeviceRpc implements DOMRpcService {
                                                                   @Nullable final NormalizedNode<?, ?> input) {
         final NetconfMessage message = transformer.toRpcRequest(type, input);
         final ListenableFuture<RpcResult<NetconfMessage>> delegateFutureWithPureResult =
-                listener.sendRequest(message, type.getLastComponent());
+                communicator.sendRequest(message, type.getLastComponent());
 
         final ListenableFuture<DOMRpcResult> transformed =
             Futures.transform(delegateFutureWithPureResult, input1 -> {

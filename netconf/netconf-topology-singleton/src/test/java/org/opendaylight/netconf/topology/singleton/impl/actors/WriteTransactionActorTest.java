@@ -65,7 +65,7 @@ public class WriteTransactionActorTest {
         system = ActorSystem.apply();
         probe = TestProbe.apply(system);
         node = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("cont")))
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont")))
                 .build();
         actorRef = TestActorRef.create(system, WriteTransactionActor.props(deviceWriteTx,
                 Duration.apply(2, TimeUnit.SECONDS)), "testA");
@@ -130,10 +130,10 @@ public class WriteTransactionActorTest {
 
     @Test
     public void testIdleTimeout() throws Exception {
-        final TestProbe probe = new TestProbe(system);
-        probe.watch(actorRef);
+        final TestProbe testProbe = new TestProbe(system);
+        testProbe.watch(actorRef);
         verify(deviceWriteTx, timeout(3000)).cancel();
-        probe.expectTerminated(actorRef, TIMEOUT.duration());
+        testProbe.expectTerminated(actorRef, TIMEOUT.duration());
     }
 
 }

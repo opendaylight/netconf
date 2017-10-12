@@ -15,12 +15,14 @@ import akka.util.Timeout;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
@@ -60,8 +62,6 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -72,7 +72,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.Duration;
 
-public class NetconfNodeActor extends UntypedActor {
+public final class NetconfNodeActor extends UntypedActor {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeActor.class);
 
@@ -168,7 +168,7 @@ public class NetconfNodeActor extends UntypedActor {
             }
         } else if (message instanceof InvokeRpcMessage) { // master
 
-            final InvokeRpcMessage invokeRpcMessage = ((InvokeRpcMessage) message);
+            final InvokeRpcMessage invokeRpcMessage = (InvokeRpcMessage) message;
             invokeSlaveRpc(invokeRpcMessage.getSchemaPath(), invokeRpcMessage.getNormalizedNodeMessage(), sender());
 
         } else if (message instanceof RegisterMountPoint) { //slaves
@@ -198,7 +198,7 @@ public class NetconfNodeActor extends UntypedActor {
     }
 
     private void sendYangTextSchemaSourceProxy(final SourceIdentifier sourceIdentifier, final ActorRef sender) {
-        final CheckedFuture<YangTextSchemaSource, SchemaSourceException> yangTextSchemaSource =
+        final ListenableFuture<@NonNull YangTextSchemaSource> yangTextSchemaSource =
                 schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class);
 
         Futures.addCallback(yangTextSchemaSource, new FutureCallback<YangTextSchemaSource>() {
@@ -254,15 +254,14 @@ public class NetconfNodeActor extends UntypedActor {
         slaveSalManager = new SlaveSalFacade(id, setup.getActorSystem(), actorResponseWaitTime,
                 mountPointService);
 
-        final CheckedFuture<SchemaContext, SchemaResolutionException> remoteSchemaContext =
-                getSchemaContext(masterReference);
-        final DOMRpcService deviceRpc = getDOMRpcService(masterReference);
+        final ListenableFuture<SchemaContext> remoteSchemaContext = getSchemaContext(masterReference);
+        final DOMRpcService deviceRpcService = getDOMRpcService(masterReference);
 
         Futures.addCallback(remoteSchemaContext, new FutureCallback<SchemaContext>() {
             @Override
             public void onSuccess(final SchemaContext result) {
                 LOG.info("{}: Schema context resolved: {}", id, result.getModules());
-                slaveSalManager.registerSlaveMountPoint(result, deviceRpc, masterReference);
+                slaveSalManager.registerSlaveMountPoint(result, deviceRpcService, masterReference);
             }
 
             @Override
@@ -276,7 +275,7 @@ public class NetconfNodeActor extends UntypedActor {
         return new ProxyDOMRpcService(setup.getActorSystem(), masterReference, id, actorResponseWaitTime);
     }
 
-    private CheckedFuture<SchemaContext, SchemaResolutionException> getSchemaContext(final ActorRef masterReference) {
+    private ListenableFuture<SchemaContext> getSchemaContext(final ActorRef masterReference) {
 
         final RemoteYangTextSourceProvider remoteYangTextSourceProvider =
                 new ProxyYangTextSourceProvider(masterReference, getContext(), actorResponseWaitTime);

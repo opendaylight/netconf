@@ -34,38 +34,45 @@ public class NetconfClientConfigurationBuilder {
         return new NetconfClientConfigurationBuilder();
     }
 
+    @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withAddress(final InetSocketAddress address) {
         this.address = address;
         return this;
     }
 
+    @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withConnectionTimeoutMillis(final long connectionTimeoutMillis) {
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         return this;
     }
 
+    @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withProtocol(
             final NetconfClientConfiguration.NetconfClientProtocol clientProtocol) {
         this.clientProtocol = clientProtocol;
         return this;
     }
 
+    @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withAdditionalHeader(
             final NetconfHelloMessageAdditionalHeader additionalHeader) {
         this.additionalHeader = additionalHeader;
         return this;
     }
 
+    @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withSessionListener(final NetconfClientSessionListener sessionListener) {
         this.sessionListener = sessionListener;
         return this;
     }
 
+    @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withReconnectStrategy(final ReconnectStrategy reconnectStrategy) {
         this.reconnectStrategy = reconnectStrategy;
         return this;
     }
 
+    @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withAuthHandler(final AuthenticationHandler authHandler) {
         this.authHandler = authHandler;
         return this;

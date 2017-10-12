@@ -109,7 +109,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         Mockito.when(uriInfo.getBaseUri()).thenReturn(baseUriBuilder.build());
         Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(baseUriBuilder);
         this.schemaHandler.onGlobalContextUpdated(
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/notifications")));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications")));
     }
 
     private static class LocalUriInfo extends SimpleUriInfo {

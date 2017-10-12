@@ -16,17 +16,17 @@ import java.util.Properties;
 
 public class Configuration {
     public abstract static class ConfigurationException extends RuntimeException {
-        ConfigurationException(String msg) {
+        ConfigurationException(final String msg) {
             super(msg);
         }
 
-        ConfigurationException(String msg, Exception cause) {
+        ConfigurationException(final String msg, final Exception cause) {
             super(msg, cause);
         }
     }
 
     public static class ReadException extends ConfigurationException {
-        ReadException(String msg, Exception exc) {
+        ReadException(final String msg, final Exception exc) {
             super(msg, exc);
         }
     }
@@ -34,7 +34,7 @@ public class Configuration {
     public static class MissingException extends ConfigurationException {
         private final String key;
 
-        MissingException(String key) {
+        MissingException(final String key) {
             super("Key not found: " + key);
             this.key = key;
         }
@@ -48,8 +48,14 @@ public class Configuration {
         private final String key;
         private final String value;
 
-        IllegalValueException(String key, String value) {
+        IllegalValueException(final String key, final String value) {
             super("Key has an illegal value. Key: " + key + ", Value: " + value);
+            this.key = key;
+            this.value = value;
+        }
+
+        IllegalValueException(final String key, final String value, final Exception cause) {
+            super("Key has an illegal value. Key: " + key + ", Value: " + value, cause);
             this.key = key;
             this.value = value;
         }
@@ -71,7 +77,7 @@ public class Configuration {
         properties = new Properties();
     }
 
-    public Configuration(String path) throws ConfigurationException {
+    public Configuration(final String path) throws ConfigurationException {
         this.path = path;
         try {
             this.properties = readFromPath(path);
@@ -80,27 +86,27 @@ public class Configuration {
         }
     }
 
-    private Properties readFromPath(String path) throws IOException {
-        return readFromFile(new File(path));
+    private Properties readFromPath(final String filePath) throws IOException {
+        return readFromFile(new File(filePath));
     }
 
-    private Properties readFromFile(File file) throws IOException {
+    private Properties readFromFile(final File file) throws IOException {
         FileInputStream stream = new FileInputStream(file);
         properties = readFrom(stream);
         return properties;
     }
 
-    private Properties readFrom(InputStream stream) throws IOException {
+    private static Properties readFrom(final InputStream stream) throws IOException {
         Properties properties = new Properties();
         properties.load(stream);
         return properties;
     }
 
-    public void set(String key, String value) {
+    public void set(final String key, final String value) {
         properties.setProperty(key, value);
     }
 
-    String get(String key) {
+    String get(final String key) {
         String result = (String) properties.get(key);
         if (result == null) {
             throw new MissingException(key);
@@ -108,7 +114,7 @@ public class Configuration {
         return result;
     }
 
-    public int getAsPort(String key) {
+    public int getAsPort(final String key) {
         String keyValue = get(key);
         try {
             int newPort = Integer.parseInt(keyValue);
@@ -117,7 +123,7 @@ public class Configuration {
             }
             return newPort;
         } catch (NumberFormatException e) {
-            throw new IllegalValueException(key, keyValue);
+            throw new IllegalValueException(key, keyValue, e);
         }
     }
 }

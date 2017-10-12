@@ -59,7 +59,7 @@ public class GetSchema extends AbstractSingletonNetconfOperation {
             final Map<String, String> errorInfo = Maps.newHashMap();
             errorInfo.put(DocumentedException.ErrorTag.OPERATION_FAILED.toString(), e.getMessage());
             LOG.warn("Rpc error: {}", DocumentedException.ErrorTag.OPERATION_FAILED, e);
-            throw new DocumentedException(e.getMessage(), DocumentedException.ErrorType.APPLICATION,
+            throw new DocumentedException(e.getMessage(), e, DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED,
                     DocumentedException.ErrorSeverity.ERROR, errorInfo);
         }

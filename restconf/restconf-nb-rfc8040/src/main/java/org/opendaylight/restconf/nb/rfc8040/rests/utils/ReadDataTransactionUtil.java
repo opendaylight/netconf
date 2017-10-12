@@ -171,9 +171,9 @@ public final class ReadDataTransactionUtil {
         if (!depth.get(0).equals(RestconfDataServiceConstant.ReadData.UNBOUNDED)) {
             final Integer value = Ints.tryParse(depth.get(0));
 
-            if ((value == null)
-                    || (!((value >= RestconfDataServiceConstant.ReadData.MIN_DEPTH)
-                        && (value <= RestconfDataServiceConstant.ReadData.MAX_DEPTH)))) {
+            if (value == null
+                    || !(value >= RestconfDataServiceConstant.ReadData.MIN_DEPTH
+                        && value <= RestconfDataServiceConstant.ReadData.MAX_DEPTH)) {
                 throw new RestconfDocumentedException(
                         new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                                 "Invalid depth parameter: " + depth, null,
@@ -347,8 +347,8 @@ public final class ReadDataTransactionUtil {
                         ((ListSchemaNode) childSchema).getKeyDefinition());
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
-                final String defaultVal = ((LeafSchemaNode) childSchema).getDefault();
-                final String nodeVal = ((LeafNode<String>) child).getValue();
+                final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
+                final Object nodeVal = ((LeafNode<?>) child).getValue();
                 final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (keys.contains(child.getNodeType())) {
@@ -356,12 +356,12 @@ public final class ReadDataTransactionUtil {
                     builder.withChild(leafBuilder.build());
                 } else {
                     if (trim) {
-                        if ((defaultVal == null) || !defaultVal.equals(nodeVal)) {
+                        if (defaultVal == null || !defaultVal.equals(nodeVal)) {
                             leafBuilder.withValue(((LeafNode) child).getValue());
                             builder.withChild(leafBuilder.build());
                         }
                     } else {
-                        if ((defaultVal != null) && defaultVal.equals(nodeVal)) {
+                        if (defaultVal != null && defaultVal.equals(nodeVal)) {
                             leafBuilder.withValue(((LeafNode) child).getValue());
                             builder.withChild(leafBuilder.build());
                         }
@@ -402,17 +402,17 @@ public final class ReadDataTransactionUtil {
                         ((ListSchemaNode) childSchema).getKeyDefinition());
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
-                final String defaultVal = ((LeafSchemaNode) childSchema).getDefault();
-                final String nodeVal = ((LeafNode<String>) child).getValue();
+                final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
+                final Object nodeVal = ((LeafNode<?>) child).getValue();
                 final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (trim) {
-                    if ((defaultVal == null) || !defaultVal.equals(nodeVal)) {
+                    if (defaultVal == null || !defaultVal.equals(nodeVal)) {
                         leafBuilder.withValue(((LeafNode) child).getValue());
                         builder.withChild(leafBuilder.build());
                     }
                 } else {
-                    if ((defaultVal != null) && defaultVal.equals(nodeVal)) {
+                    if (defaultVal != null && defaultVal.equals(nodeVal)) {
                         leafBuilder.withValue(((LeafNode) child).getValue());
                         builder.withChild(leafBuilder.build());
                     }
@@ -473,7 +473,7 @@ public final class ReadDataTransactionUtil {
         }
 
         // if no data exists
-        if ((stateDataNode == null) && (configDataNode == null)) {
+        if (stateDataNode == null && configDataNode == null) {
             return null;
         }
 

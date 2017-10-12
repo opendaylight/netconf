@@ -14,8 +14,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.future.AuthFuture;
+import org.apache.sshd.client.session.ClientSession;
 import org.junit.Test;
 
 public class LoginPasswordHandlerTest {

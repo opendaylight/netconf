@@ -159,7 +159,7 @@ public class NetconfStateSchemasTest {
         Assert.assertTrue(availableYangSchemasQNames.isEmpty());
     }
 
-    @SuppressWarnings("checkstyle:IllegalThrows")
+    @SuppressWarnings({ "checkstyle:IllegalThrows", "checkstyle:avoidHidingCauseException" })
     @Test(expected = RuntimeException.class)
     public void testCreateInterrupted() throws Throwable {
         //NetconfStateSchemas.create calls Thread.currentThread().interrupt(), so it must run in its own thread

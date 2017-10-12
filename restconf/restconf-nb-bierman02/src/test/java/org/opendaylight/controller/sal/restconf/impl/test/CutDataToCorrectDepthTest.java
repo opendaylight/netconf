@@ -303,16 +303,16 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
     }
 
     private static NodeIdentifier toIdentifier(final String localName) {
-        return new NodeIdentifier(QName.create("urn:nested:module", "2014-06-3", localName));
+        return new NodeIdentifier(QName.create("urn:nested:module", "2014-06-03", localName));
     }
 
     private static NodeIdentifierWithPredicates toIdentifier(final String localName, final Map<QName, Object> keys) {
-        return new NodeIdentifierWithPredicates(QName.create("urn:nested:module", "2014-06-3", localName),
+        return new NodeIdentifierWithPredicates(QName.create("urn:nested:module", "2014-06-03", localName),
                 keys);
     }
 
     private static NodeWithValue<?> toIdentifier(final String localName, final Object value) {
-        return new NodeWithValue<>(QName.create("urn:nested:module", "2014-06-3", localName), value);
+        return new NodeWithValue<>(QName.create("urn:nested:module", "2014-06-03", localName), value);
     }
 
     private static UnkeyedListEntryNode nodeDataDepth3Operational() {
