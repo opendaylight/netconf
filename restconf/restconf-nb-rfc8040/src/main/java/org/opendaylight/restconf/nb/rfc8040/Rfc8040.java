@@ -8,11 +8,9 @@
 package org.opendaylight.restconf.nb.rfc8040;
 
 import java.net.URI;
-import java.text.ParseException;
-import java.util.Date;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
+import org.opendaylight.yangtools.yang.common.Revision;
 
 /**
  * Base Draft for Restconf project.
@@ -57,24 +55,13 @@ public final class Rfc8040 {
             throw new UnsupportedOperationException("Util class");
         }
 
-        public static final String REVISION = "2017-01-26";
+        public static final Revision REVISION = Revision.of("2017-01-26");
         public static final String NAME = "ietf-restconf";
         public static final String NAMESPACE = "urn:ietf:params:xml:ns:yang:ietf-restconf";
-
-        public static final QName IETF_RESTCONF_QNAME = QName.create(Rfc8040.RestconfModule.NAMESPACE,
-                Rfc8040.RestconfModule.REVISION, Rfc8040.RestconfModule.NAME).intern();
-
-        public static final Date DATE;
-
-        static {
-            try {
-                DATE = SimpleDateFormatUtil.getRevisionFormat().parse(REVISION);
-            } catch (final ParseException e) {
-                throw new ExceptionInInitializerError(e);
-            }
-        }
-
         public static final URI URI_MODULE = URI.create(NAMESPACE);
+
+        public static final QName IETF_RESTCONF_QNAME = QName.create(URI_MODULE,
+                Rfc8040.RestconfModule.REVISION, Rfc8040.RestconfModule.NAME).intern();
 
         // RESTCONF
         public static final String RESTCONF_GROUPING_SCHEMA_NODE = "restconf";
@@ -117,21 +104,10 @@ public final class Rfc8040 {
 
         public static final String NAME = "ietf-yang-library";
         public static final String NAMESPACE = "urn:ietf:params:xml:ns:yang:ietf-yang-library";
-        public static final String REVISION = "2016-06-21";
-
-        public static final Date DATE;
-
-        static {
-            try {
-                DATE = SimpleDateFormatUtil.getRevisionFormat().parse(REVISION);
-            } catch (final ParseException e) {
-                throw new ExceptionInInitializerError(e);
-            }
-        }
-
         public static final URI URI_MODULE = URI.create(NAMESPACE);
+        public static final Revision REVISION =  Revision.of("2016-06-21");
 
-        public static final QNameModule MODULE_QNAME = QNameModule.create(URI_MODULE, DATE).intern();
+        public static final QNameModule MODULE_QNAME = QNameModule.create(URI_MODULE, REVISION).intern();
 
         public static final String MODULE_SET_ID_LEAF = "module-set-id";
         public static final QName MODULE_SET_ID_LEAF_QNAME = QName.create(MODULE_QNAME, MODULE_SET_ID_LEAF).intern();
@@ -192,24 +168,14 @@ public final class Rfc8040 {
 
         public static final String NAME = "ietf-restconf-monitoring";
         public static final String NAMESPACE = "urn:ietf:params:xml:ns:yang:ietf-restconf-monitoring";
-        public static final String REVISION = "2017-01-26";
+        public static final Revision REVISION = Revision.of("2017-01-26");
         public static final String PATH_TO_STREAM_WITHOUT_KEY =
                 "ietf-restconf-monitoring:restconf-state/streams/stream=";
         public static final String PATH_TO_STREAMS = "ietf-restconf-monitoring:restconf-state/streams";
 
-        public static final Date DATE;
-
-        static {
-            try {
-                DATE = SimpleDateFormatUtil.getRevisionFormat().parse(REVISION);
-            } catch (final ParseException e) {
-                throw new ExceptionInInitializerError(e);
-            }
-        }
-
         public static final URI URI_MODULE = URI.create(NAMESPACE);
 
-        public static final QNameModule MODULE_QNAME = QNameModule.create(URI_MODULE, DATE).intern();
+        public static final QNameModule MODULE_QNAME = QNameModule.create(URI_MODULE, REVISION).intern();
 
         public static final String CONT_RESTCONF_STATE_NAME = "restconf-state";
         public static final QName CONT_RESTCONF_STATE_QNAME = QName.create(MODULE_QNAME, CONT_RESTCONF_STATE_NAME)

@@ -33,7 +33,7 @@ public class InstanceIdentifierCodecImplTest {
     @Before
     public void setUp() throws Exception {
         this.schemaContext =
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/restconf/parser/deserializer"));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/restconf/parser/deserializer"));
         this.instanceIdentifierDTO = new InstanceIdentifierCodecImpl(null);
         ControllerContext.getInstance().setGlobalSchema(this.schemaContext);
 

@@ -15,15 +15,13 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.net.URI;
-import java.text.ParseException;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -40,7 +38,7 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.Parameter;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -49,7 +47,6 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +85,7 @@ public class BaseYangSwaggerGenerator {
         LOG.info("Modules found [{}]", modules.size());
 
         for (final Module module : modules) {
-            final String revisionString = module.getQNameModule().getFormattedRevision();
+            final String revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
             final Resource resource = new Resource();
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
             final ApiDeclaration doc =
@@ -121,34 +118,22 @@ public class BaseYangSwaggerGenerator {
 
     public ApiDeclaration getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
             final SchemaContext schemaContext, final String context) {
-        Date rev = null;
+        final Optional<Revision> rev;
 
         try {
-            if (revision != null && !SourceIdentifier.NOT_PRESENT_FORMATTED_REVISION.equals(revision)) {
-                rev = SimpleDateFormatUtil.getRevisionFormat().parse(revision);
-            }
-        } catch (final ParseException e) {
+            rev = Revision.ofNullable(revision);
+        } catch (final DateTimeParseException e) {
             throw new IllegalArgumentException(e);
         }
 
-        if (rev != null) {
-            final Calendar cal = new GregorianCalendar();
-
-            cal.setTime(rev);
-
-            if (cal.get(Calendar.YEAR) < 1970) {
-                rev = null;
-            }
-        }
-
-        final Module module = schemaContext.findModuleByName(moduleName, rev);
+        final Module module = schemaContext.findModule(moduleName, rev).orElse(null);
         Preconditions.checkArgument(module != null,
                 "Could not find module by name,revision: " + moduleName + "," + revision);
 
-        return getApiDeclaration(module, rev, uriInfo, context, schemaContext);
+        return getApiDeclaration(module, uriInfo, context, schemaContext);
     }
 
-    public ApiDeclaration getApiDeclaration(final Module module, final Date revision, final UriInfo uriInfo,
+    public ApiDeclaration getApiDeclaration(final Module module, final UriInfo uriInfo,
             final String context, final SchemaContext schemaContext) {
         final String basePath = createBasePathFromUriInfo(uriInfo);
 
@@ -181,7 +166,7 @@ public class BaseYangSwaggerGenerator {
         final Collection<DataSchemaNode> dataSchemaNodes = module.getChildNodes();
         LOG.debug("child nodes size [{}]", dataSchemaNodes.size());
         for (final DataSchemaNode node : dataSchemaNodes) {
-            if ((node instanceof ListSchemaNode) || (node instanceof ContainerSchemaNode)) {
+            if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
                 LOG.debug("Is Configuration node [{}] [{}]", node.isConfiguration(), node.getQName().getLocalName());
 
                 List<Parameter> pathParams = new ArrayList<>();
@@ -251,7 +236,7 @@ public class BaseYangSwaggerGenerator {
             final Api apiForRootPostUri = new Api();
             apiForRootPostUri.setPath(resourcePath.concat(getContent(dataStore)));
             apiForRootPostUri.setOperations(operationPost(module.getName() + MODULE_NAME_SUFFIX,
-                    module.getDescription(), module, pathParams, true, ""));
+                    module.getDescription().orElse(null), module, pathParams, true, ""));
             apis.add(apiForRootPostUri);
         }
     }
@@ -291,7 +276,7 @@ public class BaseYangSwaggerGenerator {
         api.setPath(resourcePath.concat(getContent(dataStore)));
 
         Iterable<DataSchemaNode> childSchemaNodes = Collections.<DataSchemaNode>emptySet();
-        if ((node instanceof ListSchemaNode) || (node instanceof ContainerSchemaNode)) {
+        if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
             final DataNodeContainer dataNodeContainer = (DataNodeContainer) node;
             childSchemaNodes = dataNodeContainer.getChildNodes();
         }
@@ -299,7 +284,7 @@ public class BaseYangSwaggerGenerator {
         apis.add(api);
 
         for (final DataSchemaNode childNode : childSchemaNodes) {
-            if ((childNode instanceof ListSchemaNode) || (childNode instanceof ContainerSchemaNode)) {
+            if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
                 // keep config and operation attributes separate.
                 if (childNode.isConfiguration() == addConfigApi) {
                     final String newParent = parentName + "/" + node.getQName().getLocalName();
@@ -341,14 +326,15 @@ public class BaseYangSwaggerGenerator {
         operations.add(getBuilder.pathParams(pathParams).build());
 
         if (isConfig) {
-            final Put putBuilder = new Put(node.getQName().getLocalName(), node.getDescription(), parentName);
+            final Put putBuilder = new Put(node.getQName().getLocalName(), node.getDescription().orElse(null),
+                parentName);
             operations.add(putBuilder.pathParams(pathParams).build());
 
             final Delete deleteBuilder = new Delete(node);
             operations.add(deleteBuilder.pathParams(pathParams).build());
 
             if (containsListOrContainer(childSchemaNodes)) {
-                operations.addAll(operationPost(node.getQName().getLocalName(), node.getDescription(),
+                operations.addAll(operationPost(node.getQName().getLocalName(), node.getDescription().orElse(null),
                         (DataNodeContainer) node, pathParams, isConfig, parentName + "/"));
             }
         }
@@ -373,7 +359,7 @@ public class BaseYangSwaggerGenerator {
         final String localName = resolvePathArgumentsName(schemaNode, schemaContext);
         path.append(localName);
 
-        if ((schemaNode instanceof ListSchemaNode)) {
+        if (schemaNode instanceof ListSchemaNode) {
             final List<QName> listKeys = ((ListSchemaNode) schemaNode).getKeyDefinition();
             StringBuilder keyBuilder = null;
             if (newDraft) {
@@ -382,7 +368,7 @@ public class BaseYangSwaggerGenerator {
 
             for (final QName listKey : listKeys) {
                 final DataSchemaNode dataChildByName = ((DataNodeContainer) schemaNode).getDataChildByName(listKey);
-                pathListParams.add(((LeafSchemaNode) dataChildByName));
+                pathListParams.add((LeafSchemaNode) dataChildByName);
                 final String pathParamIdentifier;
                 if (newDraft) {
                     pathParamIdentifier = keyBuilder.append("{").append(listKey.getLocalName()).append("}").toString();
@@ -393,7 +379,7 @@ public class BaseYangSwaggerGenerator {
 
                 final Parameter pathParam = new Parameter();
                 pathParam.setName(listKey.getLocalName());
-                pathParam.setDescription(dataChildByName.getDescription());
+                pathParam.setDescription(dataChildByName.getDescription().orElse(null));
                 pathParam.setType("string");
                 pathParam.setParamType("path");
 
@@ -414,7 +400,7 @@ public class BaseYangSwaggerGenerator {
 
         final Operation operationSpec = new Operation();
         operationSpec.setMethod("POST");
-        operationSpec.setNotes(rpcDefn.getDescription());
+        operationSpec.setNotes(rpcDefn.getDescription().orElse(null));
         operationSpec.setNickname(rpcDefn.getQName().getLocalName());
         if (!rpcDefn.getOutput().getChildNodes().isEmpty()) {
             operationSpec.setType("(" + rpcDefn.getQName().getLocalName() + ")output" + OperationBuilder.TOP);
@@ -442,9 +428,7 @@ public class BaseYangSwaggerGenerator {
         final SortedSet<Module> sortedModules = new TreeSet<>((module1, module2) -> {
             int result = module1.getName().compareTo(module2.getName());
             if (result == 0) {
-                final Date module1Revision = module1.getRevision() != null ? module1.getRevision() : new Date(0);
-                final Date module2Revision = module2.getRevision() != null ? module2.getRevision() : new Date(0);
-                result = module1Revision.compareTo(module2Revision);
+                result = Revision.compare(module1.getRevision(), module2.getRevision());
             }
             if (result == 0) {
                 result = module1.getNamespace().compareTo(module2.getNamespace());

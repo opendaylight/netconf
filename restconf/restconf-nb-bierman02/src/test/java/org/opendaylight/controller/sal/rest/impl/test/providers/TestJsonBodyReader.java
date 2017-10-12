@@ -12,13 +12,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
-import java.text.ParseException;
 import java.util.Collection;
+import java.util.Optional;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,7 +26,7 @@ import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -39,23 +38,13 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-
 public class TestJsonBodyReader extends AbstractBodyReaderTest {
 
     private final JsonNormalizedNodeBodyReader jsonBodyReader;
     private static SchemaContext schemaContext;
 
-    private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = initializeInstanceIdentifierModule();
-
-    private static QNameModule initializeInstanceIdentifierModule() {
-        try {
-            return QNameModule.create(URI.create("instance:identifier:module"),
-                SimpleDateFormatUtil.getRevisionFormat().parse("2014-01-17"));
-        } catch (final ParseException e) {
-            throw new Error(e);
-        }
-    }
-
+    private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
+        URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
 
     public TestJsonBodyReader() throws NoSuchFieldException, SecurityException {
         this.jsonBodyReader = new JsonNormalizedNodeBodyReader();
@@ -71,7 +60,7 @@ public class TestJsonBodyReader extends AbstractBodyReaderTest {
             throws Exception {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
-        schemaContext = YangParserTestUtils.parseYangSources(testFiles);
+        schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
         CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
@@ -127,7 +116,7 @@ public class TestJsonBodyReader extends AbstractBodyReaderTest {
     public void moduleSubContainerAugmentDataPostTest() throws Exception {
         final DataSchemaNode dataSchemaNode =
                 schemaContext.getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
-        final Module augmentModule = schemaContext.findModuleByNamespace(new URI("augment:module")).iterator().next();
+        final Module augmentModule = schemaContext.findModules(new URI("augment:module")).iterator().next();
         final QName contAugmentQName = QName.create(augmentModule.getQNameModule(), "cont-augment");
         final YangInstanceIdentifier.AugmentationIdentifier augII = new YangInstanceIdentifier.AugmentationIdentifier(
                 Sets.newHashSet(contAugmentQName));
@@ -148,7 +137,7 @@ public class TestJsonBodyReader extends AbstractBodyReaderTest {
     public void moduleSubContainerChoiceAugmentDataPostTest() throws Exception {
         final DataSchemaNode dataSchemaNode =
                 schemaContext.getDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
-        final Module augmentModule = schemaContext.findModuleByNamespace(new URI("augment:module")).iterator().next();
+        final Module augmentModule = schemaContext.findModules(new URI("augment:module")).iterator().next();
         final QName augmentChoice1QName = QName.create(augmentModule.getQNameModule(), "augment-choice1");
         final QName augmentChoice2QName = QName.create(augmentChoice1QName, "augment-choice2");
         final QName containerQName = QName.create(augmentChoice1QName, "case-choice-case-container1");

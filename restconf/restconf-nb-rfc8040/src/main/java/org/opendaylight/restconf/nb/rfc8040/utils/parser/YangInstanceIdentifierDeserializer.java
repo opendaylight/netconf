@@ -75,7 +75,7 @@ public final class YangInstanceIdentifierDeserializer {
 
             // this is the last identifier (input is consumed) or end of identifier (slash)
             if (allCharsConsumed(variables)
-                    || (currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH)) {
+                    || currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH) {
                 prepareIdentifier(qname, path, variables);
                 if (variables.getCurrent() == null) {
                     path.add(NodeIdentifier.create(qname));
@@ -103,7 +103,7 @@ public final class YangInstanceIdentifierDeserializer {
                                                   final MainVarsWrapper variables) {
 
         final DataSchemaNode dataSchemaNode = variables.getCurrent().getDataSchemaNode();
-        checkValid((dataSchemaNode != null), "Data schema node is null", variables.getData(), variables.getOffset());
+        checkValid(dataSchemaNode != null, "Data schema node is null", variables.getData(), variables.getOffset());
 
         final Iterator<QName> keys = ((ListSchemaNode) dataSchemaNode).getKeyDefinition().iterator();
         final ImmutableMap.Builder<QName, Object> values = ImmutableMap.builder();
@@ -112,8 +112,8 @@ public final class YangInstanceIdentifierDeserializer {
         skipCurrentChar(variables);
 
         // read key value separated by comma
-        while (keys.hasNext() && !allCharsConsumed(variables) && (currentChar(variables.getOffset(),
-                variables.getData()) != RestconfConstants.SLASH)) {
+        while (keys.hasNext() && !allCharsConsumed(variables) && currentChar(variables.getOffset(),
+                variables.getData()) != RestconfConstants.SLASH) {
 
             // empty key value
             if (currentChar(variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.COMMA) {
@@ -146,8 +146,8 @@ public final class YangInstanceIdentifierDeserializer {
 
 
             // skip comma
-            if (keys.hasNext() && !allCharsConsumed(variables) && (currentChar(
-                    variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.COMMA)) {
+            if (keys.hasNext() && !allCharsConsumed(variables) && currentChar(
+                    variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.COMMA) {
                 skipCurrentChar(variables);
             }
         }
@@ -155,7 +155,7 @@ public final class YangInstanceIdentifierDeserializer {
         // the last key is considered to be empty
         if (keys.hasNext()) {
             if (allCharsConsumed(variables)
-                    || (currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH)) {
+                    || currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH) {
                 values.put(keys.next(), ParserBuilderConstants.Deserializer.EMPTY_STRING);
             }
 
@@ -189,7 +189,7 @@ public final class YangInstanceIdentifierDeserializer {
         final Codec<Object, Object> codec = RestCodec.from(typedef, null, vars.getSchemaContext());
         decoded = codec.deserialize(value);
         if (decoded == null) {
-            if ((baseType instanceof IdentityrefTypeDefinition)) {
+            if (baseType instanceof IdentityrefTypeDefinition) {
                 decoded = toQName(value, schemaNode, vars.getSchemaContext());
             }
         }
@@ -200,7 +200,7 @@ public final class YangInstanceIdentifierDeserializer {
             final SchemaContext schemaContext) {
         final String moduleName = toModuleName(value);
         final String nodeName = toNodeName(value);
-        final Module module = schemaContext.findModuleByName(moduleName, null);
+        final Module module = schemaContext.findModules(moduleName).iterator().next();
         for (final IdentitySchemaNode identitySchemaNode : module.getIdentities()) {
             final QName qName = identitySchemaNode.getQName();
             if (qName.getLocalName().equals(nodeName)) {
@@ -264,8 +264,8 @@ public final class YangInstanceIdentifierDeserializer {
                         variables.getOffset());
                 localName = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
 
-                if (!allCharsConsumed(variables) && (currentChar(
-                        variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL)) {
+                if (!allCharsConsumed(variables) && currentChar(
+                        variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL) {
                     return getQNameOfDataSchemaNode(localName, variables);
                 } else {
                     final Module module = moduleForPrefix(prefix, variables.getSchemaContext());
@@ -327,7 +327,7 @@ public final class YangInstanceIdentifierDeserializer {
         DataSchemaContextNode<?> current = variables.getCurrent();
         if (current == null) {
             for (final RpcDefinition rpcDefinition : variables.getSchemaContext()
-                    .findModuleByNamespaceAndRevision(qname.getNamespace(), qname.getRevision()).getRpcs()) {
+                    .findModule(qname.getModule()).orElse(null).getRpcs()) {
                 if (rpcDefinition.getQName().getLocalName().equals(qname.getLocalName())) {
                     return null;
                 }
@@ -382,7 +382,7 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private static Module moduleForPrefix(final String prefix, final SchemaContext schemaContext) {
-        return schemaContext.findModuleByName(prefix, null);
+        return schemaContext.findModules(prefix).stream().findFirst().orElse(null);
     }
 
     private static void validArg(final MainVarsWrapper variables) {

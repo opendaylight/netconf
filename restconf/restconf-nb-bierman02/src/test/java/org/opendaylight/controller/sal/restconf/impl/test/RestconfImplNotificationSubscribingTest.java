@@ -59,10 +59,10 @@ public class RestconfImplNotificationSubscribingTest {
         this.broker.setDomDataBroker(this.domDataBroker);
         RestconfImpl.getInstance().setBroker(this.broker);
         ControllerContext.getInstance()
-                .setGlobalSchema(YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/notifications")));
+                .setGlobalSchema(YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications")));
 
         final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
-        final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-14-12", "localName"));
+        final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-12-14", "localName"));
         Mockito.when(path.getLastPathArgument()).thenReturn(pathValue);
         Notificator.createListener(path, this.identifier, NotificationOutputType.XML);
     }
@@ -196,7 +196,7 @@ public class RestconfImplNotificationSubscribingTest {
     @Test
     public void onNotifiTest() throws Exception {
         final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
-        final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-14-12", "localName"));
+        final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-12-14", "localName"));
         Mockito.when(path.getLastPathArgument()).thenReturn(pathValue);
         final ListenerAdapter listener = Notificator.createListener(path, this.identifier, NotificationOutputType.XML);
 

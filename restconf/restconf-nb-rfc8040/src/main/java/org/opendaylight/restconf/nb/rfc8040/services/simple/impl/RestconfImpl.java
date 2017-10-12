@@ -36,7 +36,7 @@ public class RestconfImpl implements RestconfService {
         final SchemaContext context = this.schemaContextHandler.get();
         SchemaNode schemaNode = null;
         for (final GroupingDefinition groupingDefinition : context
-                .findModuleByNamespaceAndRevision(RestconfModule.URI_MODULE, RestconfModule.DATE).getGroupings()) {
+                .findModule(RestconfModule.IETF_RESTCONF_QNAME.getModule()).get().getGroupings()) {
             if (groupingDefinition.getQName().equals(RestconfModule.RESTCONF_GROUPING_QNAME)) {
                 schemaNode = ((ContainerSchemaNode) groupingDefinition
                         .getDataChildByName(RestconfModule.RESTCONF_CONTAINER_QNAME))
@@ -44,9 +44,9 @@ public class RestconfImpl implements RestconfService {
             }
         }
         final YangInstanceIdentifier yangIId = YangInstanceIdentifier.of(
-                QName.create(RestconfModule.NAME, RestconfModule.REVISION, RestconfModule.LIB_VER_LEAF_SCHEMA_NODE));
+                QName.create(RestconfModule.IETF_RESTCONF_QNAME, RestconfModule.LIB_VER_LEAF_SCHEMA_NODE));
         final InstanceIdentifierContext<? extends SchemaNode> iid =
-                new InstanceIdentifierContext<SchemaNode>(yangIId, schemaNode, null, context);
+                new InstanceIdentifierContext<>(yangIId, schemaNode, null, context);
         final NormalizedNode<?, ?> data =
                 Builders.leafBuilder((LeafSchemaNode) schemaNode).withValue(IetfYangLibrary.REVISION).build();
         return new NormalizedNodeContext(iid, data);
