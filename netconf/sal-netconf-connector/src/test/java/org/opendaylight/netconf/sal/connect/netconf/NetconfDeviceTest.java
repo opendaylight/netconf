@@ -21,7 +21,6 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -29,14 +28,13 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.Test;
@@ -132,9 +130,9 @@ public class NetconfDeviceTest {
                 new SchemaResolutionException("fail first", TEST_SID, new Throwable("YangTools parser fail"));
         doAnswer(invocation -> {
             if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
-                return Futures.immediateFailedCheckedFuture(schemaResolutionException);
+                return Futures.immediateFailedFuture(schemaResolutionException);
             } else {
-                return Futures.immediateCheckedFuture(schema);
+                return Futures.immediateFuture(schema);
             }
         }).when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
 
@@ -181,8 +179,7 @@ public class NetconfDeviceTest {
         final SchemaResolutionException schemaResolutionException
                 = new SchemaResolutionException("fail first",
                 Collections.<SourceIdentifier>emptyList(), HashMultimap.<SourceIdentifier, ModuleImport>create());
-        doReturn(Futures.immediateFailedCheckedFuture(
-                schemaResolutionException))
+        doReturn(Futures.immediateFailedFuture(schemaResolutionException))
                 .when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice
@@ -216,13 +213,13 @@ public class NetconfDeviceTest {
         // Make fallback attempt to fail due to empty resolved sources
         final MissingSchemaSourceException schemaResolutionException =
                 new MissingSchemaSourceException("fail first", TEST_SID);
-        doReturn(Futures.immediateFailedCheckedFuture(schemaResolutionException))
+        doReturn(Futures.immediateFailedFuture(schemaResolutionException))
                 .when(schemaRepository).getSchemaSource(eq(TEST_SID), eq(ASTSchemaSource.class));
         doAnswer(invocation -> {
             if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
-                return Futures.immediateFailedCheckedFuture(schemaResolutionException);
+                return Futures.immediateFailedFuture(schemaResolutionException);
             } else {
-                return Futures.immediateCheckedFuture(schema);
+                return Futures.immediateFuture(schema);
             }
         }).when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
 
@@ -268,7 +265,7 @@ public class NetconfDeviceTest {
     private static SchemaRepository getSchemaRepository() {
         final SchemaRepository mock = mock(SchemaRepository.class);
         final SchemaSourceRepresentation mockRep = mock(SchemaSourceRepresentation.class);
-        doReturn(Futures.immediateCheckedFuture(mockRep))
+        doReturn(Futures.immediateFuture(mockRep))
                 .when(mock).getSchemaSource(any(SourceIdentifier.class), eq(ASTSchemaSource.class));
         return mock;
     }
@@ -279,8 +276,7 @@ public class NetconfDeviceTest {
         final NetconfDeviceCommunicator listener = getListener();
         final SchemaContextFactory schemaContextProviderFactory = mock(SchemaContextFactory.class);
         final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
-        doReturn(Futures.makeChecked(schemaFuture, e -> new SchemaResolutionException("fail")))
-                .when(schemaContextProviderFactory).createSchemaContext(any(Collection.class));
+        doReturn(schemaFuture).when(schemaContextProviderFactory).createSchemaContext(any(Collection.class));
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO =
                 new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(),
                         schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
@@ -348,8 +344,7 @@ public class NetconfDeviceTest {
         final NetconfDeviceCommunicator listener = getListener();
         final SchemaContextFactory schemaContextProviderFactory = mock(SchemaContextFactory.class);
         final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
-        doReturn(Futures.makeChecked(schemaFuture, e -> new SchemaResolutionException("fail")))
-                .when(schemaContextProviderFactory).createSchemaContext(any(Collection.class));
+        doReturn(schemaFuture).when(schemaContextProviderFactory).createSchemaContext(any(Collection.class));
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
                 = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(),
                 schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
@@ -414,16 +409,13 @@ public class NetconfDeviceTest {
 
     private static SchemaContextFactory getSchemaFactory() throws Exception {
         final SchemaContextFactory schemaFactory = mockClass(SchemaContextFactory.class);
-        doReturn(Futures.immediateCheckedFuture(getSchema()))
+        doReturn(Futures.immediateFuture(getSchema()))
                 .when(schemaFactory).createSchemaContext(any(Collection.class));
         return schemaFactory;
     }
 
-    public static SchemaContext getSchema() throws Exception {
-        final List<InputStream> modelsToParse = Lists.newArrayList(
-                NetconfDeviceTest.class.getResourceAsStream("/schemas/test-module.yang")
-        );
-        return YangParserTestUtils.parseYangStreams(modelsToParse);
+    public static SchemaContext getSchema() {
+        return YangParserTestUtils.parseYangResource("/schemas/test-module.yang");
     }
 
     private static RemoteDeviceHandler<NetconfSessionPreferences> getFacade() throws Exception {

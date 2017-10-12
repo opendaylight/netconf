@@ -15,6 +15,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -236,13 +237,15 @@ public class EditConfig extends AbstractSingletonNetconfOperation {
         try {
             // returns module with newest revision since findModuleByNamespace returns a set of modules and we only
             // need the newest one
-            final Module module =
-                    schemaContext.getCurrentContext().findModuleByNamespaceAndRevision(new URI(namespace), null);
-            if (module == null) {
+            final Iterator<Module> it = schemaContext.getCurrentContext().findModules(
+                new URI(namespace)).iterator();
+            if (!it.hasNext()) {
                 // no module is present with this namespace
                 throw new NetconfDocumentedException("Unable to find module by namespace: " + namespace,
                         ErrorType.APPLICATION, ErrorTag.UNKNOWN_NAMESPACE, ErrorSeverity.ERROR);
             }
+
+            final Module module = it.next();
             final DataSchemaNode schemaNode =
                     module.getDataChildByName(QName.create(module.getQNameModule(), element.getName()));
             if (schemaNode != null) {
