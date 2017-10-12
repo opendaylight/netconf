@@ -39,7 +39,8 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
     // TODO maybe we should move this somewhere else as this
     // might be used in applications using schemaless mountpoints
     public static final YangInstanceIdentifier.NodeIdentifier SCHEMALESS_NOTIFICATION_PAYLOAD =
-            new YangInstanceIdentifier.NodeIdentifier(QName.create("schemaless-notification-payload"));
+            // FIXME: assign proper namespace
+            new YangInstanceIdentifier.NodeIdentifier(QName.create("", "schemaless-notification-payload"));
 
     private final MessageCounter counter;
 
@@ -76,7 +77,7 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
     public NetconfMessage toRpcRequest(final SchemaPath rpc, final NormalizedNode<?, ?> input) {
         final DOMSource payload = (DOMSource) input.getValue();
         wrapPayload((Document) payload.getNode());
-        return new NetconfMessage(((Document) ((AnyXmlNode) input).getValue().getNode()));
+        return new NetconfMessage((Document) ((AnyXmlNode) input).getValue().getNode());
     }
 
     /**

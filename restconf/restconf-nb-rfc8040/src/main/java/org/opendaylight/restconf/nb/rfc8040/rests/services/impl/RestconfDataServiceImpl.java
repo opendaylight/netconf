@@ -48,6 +48,8 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.slf4j.Logger;
@@ -161,12 +163,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                     RestconfError.ErrorTag.DATA_MISSING);
         }
 
-        if ((parameters.getContent().equals(RestconfDataServiceConstant.ReadData.ALL))
+        if (parameters.getContent().equals(RestconfDataServiceConstant.ReadData.ALL)
                     || parameters.getContent().equals(RestconfDataServiceConstant.ReadData.CONFIG)) {
+            final QName type = node.getNodeType();
             return Response.status(200)
                     .entity(new NormalizedNodeContext(instanceIdentifier, node, parameters))
-                    .header("ETag", '"' + node.getNodeType().getModule().getFormattedRevision()
-                        + node.getNodeType().getLocalName() + '"')
+                    .header("ETag", '"' + type.getModule().getRevision().map(Revision::toString).orElse(null)
+                        + type.getLocalName() + '"')
                     .header("Last-Modified", FORMATTER.format(LocalDateTime.now(Clock.systemUTC())))
                     .build();
         }

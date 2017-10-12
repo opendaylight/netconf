@@ -25,7 +25,6 @@ import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Post
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.AnyXmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ConstraintDefinition;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -39,7 +38,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.TypedSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.TypedDataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.type.BinaryTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition.Bit;
@@ -49,13 +48,11 @@ import org.opendaylight.yangtools.yang.model.api.type.EmptyTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.EnumTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.EnumTypeDefinition.EnumPair;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.IntegerTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LengthConstraint;
 import org.opendaylight.yangtools.yang.model.api.type.PatternConstraint;
 import org.opendaylight.yangtools.yang.model.api.type.StringTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.UnionTypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.type.UnsignedIntegerTypeDefinition;
 import org.opendaylight.yangtools.yang.model.util.RevisionAwareXPathImpl;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
@@ -190,7 +187,7 @@ public class ModelGenerator {
         dataNodeProperties.put(TYPE_KEY, schemaNode instanceof ListSchemaNode ? ARRAY_TYPE : OBJECT_TYPE);
         dataNodeProperties.put(ITEMS_KEY, items);
 
-        putIfNonNull(dataNodeProperties, DESCRIPTION_KEY, schemaNode.getDescription());
+        putIfNonNull(dataNodeProperties, DESCRIPTION_KEY, schemaNode.getDescription().orElse(null));
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         properties.put(topLevelModule.getName() + ":" + schemaNode.getQName().getLocalName(), dataNodeProperties);
         final ObjectNode finalChildSchema = getSchemaTemplate();
@@ -220,12 +217,11 @@ public class ModelGenerator {
             LOG.debug("Processing Identity: {}", identityName);
 
             identityObj.put(ID_KEY, identityName);
-            putIfNonNull(identityObj, DESCRIPTION_KEY, idNode.getDescription());
+            putIfNonNull(identityObj, DESCRIPTION_KEY, idNode.getDescription().orElse(null));
 
             final ObjectNode props = JsonNodeFactory.instance.objectNode();
-            final IdentitySchemaNode baseId = idNode.getBaseIdentity();
 
-            if (baseId == null) {
+            if (idNode.getBaseIdentities().isEmpty()) {
                 /*
                  * This is a base identity. So lets see if it has sub types. If it does, then add them to the model
                  * definition.
@@ -244,7 +240,7 @@ public class ModelGenerator {
                 /*
                  * This is a derived entity. Add it's base type & move on.
                  */
-                props.put(TYPE_KEY, baseId.getQName().getLocalName());
+                props.put(TYPE_KEY, idNode.getBaseIdentities().iterator().next().getQName().getLocalName());
             }
 
             // Add the properties. For a base type, this will be an empty object as required by the Swagger spec.
@@ -332,9 +328,9 @@ public class ModelGenerator {
                     property = processLeafListNode((LeafListSchemaNode) node, schemaContext);
 
                 } else if (node instanceof ChoiceSchemaNode) {
-                    if (((ChoiceSchemaNode) node).getCases().iterator().hasNext()) {
-                        processChoiceNode(((ChoiceSchemaNode) node).getCases().iterator().next().getChildNodes(),
-                                parentName, models, schemaContext, isConfig, properties);
+                    if (((ChoiceSchemaNode) node).getCases().values().iterator().hasNext()) {
+                        processChoiceNode(((ChoiceSchemaNode) node).getCases().values().iterator().next()
+                            .getChildNodes(), parentName, models, schemaContext, isConfig, properties);
                     }
                     continue;
 
@@ -348,7 +344,7 @@ public class ModelGenerator {
                 } else {
                     throw new IllegalArgumentException("Unknown DataSchemaNode type: " + node.getClass());
                 }
-                putIfNonNull(property, DESCRIPTION_KEY, node.getDescription());
+                putIfNonNull(property, DESCRIPTION_KEY, node.getDescription().orElse(null));
                 properties.put(topLevelModule.getName() + ":" + name, property);
             }
         }
@@ -396,8 +392,8 @@ public class ModelGenerator {
                 property = processLeafListNode((LeafListSchemaNode) node, schemaContext);
 
             } else if (node instanceof ChoiceSchemaNode) {
-                if (((ChoiceSchemaNode) node).getCases().iterator().hasNext()) {
-                    processChoiceNode(((ChoiceSchemaNode) node).getCases().iterator().next().getChildNodes(),
+                if (((ChoiceSchemaNode) node).getCases().values().iterator().hasNext()) {
+                    processChoiceNode(((ChoiceSchemaNode) node).getCases().values().iterator().next().getChildNodes(),
                             moduleName, models, schemaContext, isConfig, properties);
                 }
                 continue;
@@ -413,7 +409,7 @@ public class ModelGenerator {
                 throw new IllegalArgumentException("Unknown DataSchemaNode type: " + node.getClass());
             }
 
-            putIfNonNull(property, DESCRIPTION_KEY, node.getDescription());
+            putIfNonNull(property, DESCRIPTION_KEY, node.getDescription().orElse(null));
             properties.put(name, property);
         }
     }
@@ -437,7 +433,7 @@ public class ModelGenerator {
                                        final SchemaContext schemaContext) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
-        final String leafDescription = leafNode.getDescription();
+        final String leafDescription = leafNode.getDescription().orElse(null);
         putIfNonNull(property, DESCRIPTION_KEY, leafDescription);
         processConstraints(leafNode.getConstraints(), property);
         processTypeDef(leafNode.getType(), leafNode, property, schemaContext);
@@ -448,7 +444,7 @@ public class ModelGenerator {
     private static ObjectNode processAnyXMLNode(final AnyXmlSchemaNode leafNode) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
-        final String leafDescription = leafNode.getDescription();
+        final String leafDescription = leafNode.getDescription().orElse(null);
         putIfNonNull(property, DESCRIPTION_KEY, leafDescription);
 
         processConstraints(leafNode.getConstraints(), property);
@@ -473,8 +469,8 @@ public class ModelGenerator {
 
             } else if (leafTypeDef instanceof IdentityrefTypeDefinition) {
                 final String name = topLevelModule.getName();
-                jsonType =
-                        name + ":" + ((IdentityrefTypeDefinition) leafTypeDef).getIdentity().getQName().getLocalName();
+                jsonType = name + ":" + ((IdentityrefTypeDefinition) leafTypeDef).getIdentities().iterator().next()
+                        .getQName().getLocalName();
 
             } else if (leafTypeDef instanceof StringTypeDefinition) {
                 jsonType = processStringType(leafTypeDef, property, node.getQName().getLocalName());
@@ -531,13 +527,12 @@ public class ModelGenerator {
             schemaNode = SchemaContextUtil.findDataSchemaNodeForRelativeXPath(schemaContext, module, node, xpath);
         }
 
-        return processTypeDef(((TypedSchemaNode) schemaNode).getType(), (DataSchemaNode) schemaNode,
+        return processTypeDef(((TypedDataSchemaNode) schemaNode).getType(), (DataSchemaNode) schemaNode,
                 property, schemaContext);
     }
 
     private static Module findModule(final SchemaContext schemaContext, final QName qualifiedName) {
-        return schemaContext
-                .findModuleByNamespaceAndRevision(qualifiedName.getNamespace(), qualifiedName.getRevision());
+        return schemaContext.findModule(qualifiedName.getNamespace(), qualifiedName.getRevision()).orElse(null);
     }
 
     private static String processBinaryType(final ObjectNode property) {
@@ -592,7 +587,7 @@ public class ModelGenerator {
         }
         if (type.getPatternConstraints().iterator().hasNext()) {
             final PatternConstraint pattern = type.getPatternConstraints().iterator().next();
-            String regex = pattern.getRegularExpression();
+            String regex = pattern.getJavaPatternString();
             regex = regex.substring(1, regex.length() - 1);
             final Generex generex = new Generex(regex);
             return generex.random();
@@ -621,7 +616,7 @@ public class ModelGenerator {
         return schemaJSON;
     }
 
-    private static void putIfNonNull(ObjectNode property, String key, Number number) {
+    private static void putIfNonNull(final ObjectNode property, final String key, final Number number) {
         if (key != null && number != null) {
             if (number instanceof Double) {
                 property.put(key, (Double) number);
@@ -637,7 +632,7 @@ public class ModelGenerator {
         }
     }
 
-    private static void putIfNonNull(ObjectNode property, String key, String value) {
+    private static void putIfNonNull(final ObjectNode property, final String key, final String value) {
         if (key != null && value != null) {
             property.put(key, value);
         }

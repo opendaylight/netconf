@@ -620,8 +620,8 @@ public class BrokerFacade {
                         ((ListSchemaNode) childSchema).getKeyDefinition());
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
-                final String defaultVal = ((LeafSchemaNode) childSchema).getDefault();
-                final String nodeVal = ((LeafNode<String>) child).getValue();
+                final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
+                final Object nodeVal = ((LeafNode<?>) child).getValue();
                 final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (keys.contains(child.getNodeType())) {
@@ -675,8 +675,8 @@ public class BrokerFacade {
                         ((ListSchemaNode) childSchema).getKeyDefinition());
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
-                final String defaultVal = ((LeafSchemaNode) childSchema).getDefault();
-                final String nodeVal = ((LeafNode<String>) child).getValue();
+                final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
+                final Object nodeVal = ((LeafNode<?>) child).getValue();
                 final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (trim) {
