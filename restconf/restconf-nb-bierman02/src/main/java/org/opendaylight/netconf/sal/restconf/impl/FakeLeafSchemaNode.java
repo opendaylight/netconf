@@ -7,10 +7,13 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.model.api.ConstraintDefinition;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.MustDefinition;
+import org.opendaylight.yangtools.yang.model.api.RevisionAwareXPath;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.Status;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
@@ -52,11 +55,6 @@ final class FakeLeafSchemaNode implements LeafSchemaNode {
     }
 
     @Override
-    public ConstraintDefinition getConstraints() {
-        throw new UnsupportedOperationException("Not supported.");
-    }
-
-    @Override
     public QName getQName() {
         return path.getLastComponent();
     }
@@ -72,12 +70,12 @@ final class FakeLeafSchemaNode implements LeafSchemaNode {
     }
 
     @Override
-    public String getDescription() {
+    public Optional<String> getDescription() {
         throw new UnsupportedOperationException("Not supported operations.");
     }
 
     @Override
-    public String getReference() {
+    public Optional<String> getReference() {
         throw new UnsupportedOperationException("Not supported.");
     }
 
@@ -92,13 +90,17 @@ final class FakeLeafSchemaNode implements LeafSchemaNode {
     }
 
     @Override
-    public String getDefault() {
+    public Optional<RevisionAwareXPath> getWhenCondition() {
         throw new UnsupportedOperationException("Not supported.");
     }
 
     @Override
-    public String getUnits() {
+    public boolean isMandatory() {
         throw new UnsupportedOperationException("Not supported.");
     }
 
+    @Override
+    public Collection<MustDefinition> getMustConstraints() {
+        throw new UnsupportedOperationException("Not supported.");
+    }
 }

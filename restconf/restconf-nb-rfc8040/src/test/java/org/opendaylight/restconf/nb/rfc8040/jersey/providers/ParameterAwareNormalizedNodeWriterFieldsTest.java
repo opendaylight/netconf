@@ -8,12 +8,12 @@
 
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;

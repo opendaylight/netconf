@@ -9,5 +9,6 @@
 <features name="odl-netconf-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
     <feature name="odl-netconf-netty-util" version="${project.version}">
         <feature version="${karaf.version}">ssh</feature>
+        <feature version="[3.0.0,4)">odl-netty-4</feature>
     </feature>
 </features>

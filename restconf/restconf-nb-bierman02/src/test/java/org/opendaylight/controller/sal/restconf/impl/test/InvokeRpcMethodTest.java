@@ -128,7 +128,7 @@ public class InvokeRpcMethodTest {
 
     private static NormalizedNodeContext prepareDomPayload() {
         final SchemaContext schema = controllerContext.getGlobalSchema();
-        final Module rpcModule = schema.findModuleByName("invoke-rpc-module", null);
+        final Module rpcModule = schema.findModules("invoke-rpc-module").iterator().next();
         assertNotNull(rpcModule);
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), "rpc-test");
         final QName rpcInputQName = QName.create(rpcModule.getQNameModule(),"input");
@@ -290,7 +290,7 @@ public class InvokeRpcMethodTest {
                 QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)make-toast"));
 
         final SchemaContext schemaContext = controllerContext.getGlobalSchema();
-        final Module rpcModule = schemaContext.findModuleByName("toaster", null);
+        final Module rpcModule = schemaContext.findModules("toaster").iterator().next();
         assertNotNull(rpcModule);
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), "make-toast");
         final QName rpcInputQName = QName.create(rpcModule.getQNameModule(),"input");
@@ -341,7 +341,7 @@ public class InvokeRpcMethodTest {
     @Test
     public void testInvokeRpcWithNoPayloadWithOutput_Success() {
         final SchemaContext schema = controllerContext.getGlobalSchema();
-        final Module rpcModule = schema.findModuleByName("toaster", null);
+        final Module rpcModule = schema.findModules("toaster").iterator().next();
         assertNotNull(rpcModule);
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), "testOutput");
         final QName rpcOutputQName = QName.create(rpcModule.getQNameModule(),"output");

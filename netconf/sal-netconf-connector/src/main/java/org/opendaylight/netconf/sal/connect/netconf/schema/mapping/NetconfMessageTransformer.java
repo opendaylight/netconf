@@ -18,7 +18,6 @@ import com.google.common.collect.Multimaps;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Map;
 import javax.annotation.Nonnull;
@@ -36,6 +35,7 @@ import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -121,10 +121,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     private static NotificationDefinition getMostRecentNotification(
             final Collection<NotificationDefinition> notificationDefinitions) {
-        Comparator<NotificationDefinition> cmp = (o1, o2) ->
-                o1.getQName().getRevision().compareTo(o2.getQName().getRevision());
-
-        return Collections.max(notificationDefinitions, cmp);
+        return Collections.max(notificationDefinitions, (o1, o2) ->
+            Revision.compare(o1.getQName().getRevision(), o2.getQName().getRevision()));
     }
 
     @Override
