@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.Maps;
+import java.util.Map.Entry;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +39,7 @@ import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -110,9 +111,9 @@ public class ParserIdentifierTest {
     @Before
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
-        this.schemaContext = YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/parser-identifier"));
+        this.schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/parser-identifier"));
         this.schemaContextOnMountPoint =
-                YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/parser-identifier"));
+                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/parser-identifier"));
 
         // create and register mount point
         this.mountPoint = SimpleDOMMountPoint.create(
@@ -286,13 +287,12 @@ public class ParserIdentifierTest {
      */
     @Test
     public void makeQNameFromIdentifierTest() {
-        final QName qName = ParserIdentifier.makeQNameFromIdentifier(TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION);
+        final Entry<String, Revision> qName = ParserIdentifier.makeQNameFromIdentifier(
+            TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION);
 
         assertNotNull("QName should be created", qName);
-        assertEquals("Returned not expected module name",
-                TEST_MODULE_NAME, qName.getLocalName());
-        assertEquals("Returned not expected module revision",
-                TEST_MODULE_REVISION, qName.getFormattedRevision());
+        assertEquals("Returned not expected module name", TEST_MODULE_NAME, qName.getKey());
+        assertEquals("Returned not expected module revision", Revision.of(TEST_MODULE_REVISION), qName.getValue());
     }
 
     /**
@@ -341,7 +341,7 @@ public class ParserIdentifierTest {
      */
     @Test
     public void makeQNameFromIdentifierMountTest() {
-        final QName qName = ParserIdentifier.makeQNameFromIdentifier(
+        final Entry<String, Revision> qName = ParserIdentifier.makeQNameFromIdentifier(
                 MOUNT_POINT_IDENT
                 + "/"
                 + TEST_MODULE_NAME
@@ -349,10 +349,8 @@ public class ParserIdentifierTest {
                 + TEST_MODULE_REVISION);
 
         assertNotNull("QName should be created", qName);
-        assertEquals("Returned not expected module name",
-                TEST_MODULE_NAME, qName.getLocalName());
-        assertEquals("Returned not expected module revision",
-                TEST_MODULE_REVISION, qName.getFormattedRevision());
+        assertEquals("Returned not expected module name", TEST_MODULE_NAME, qName.getKey());
+        assertEquals("Returned not expected module revision", Revision.of(TEST_MODULE_REVISION), qName.getValue());
     }
 
     /**
@@ -477,7 +475,7 @@ public class ParserIdentifierTest {
         assertEquals("Returned not expected module name",
                 TEST_MODULE_NAME, module.getName());
         assertEquals("Returned not expected module revision",
-                TEST_MODULE_REVISION, SimpleDateFormatUtil.getRevisionFormat().format(module.getRevision()));
+                Revision.ofNullable(TEST_MODULE_REVISION), module.getRevision());
         assertEquals("Returned not expected module namespace",
                 TEST_MODULE_NAMESPACE, module.getNamespace().toString());
     }
@@ -535,7 +533,7 @@ public class ParserIdentifierTest {
         assertEquals("Returned not expected module name",
                 TEST_MODULE_NAME, module.getName());
         assertEquals("Returned not expected module revision",
-                TEST_MODULE_REVISION, SimpleDateFormatUtil.getRevisionFormat().format(module.getRevision()));
+                Revision.ofNullable(TEST_MODULE_REVISION), module.getRevision());
         assertEquals("Returned not expected module namespace",
                 TEST_MODULE_NAMESPACE, module.getNamespace().toString());
     }
