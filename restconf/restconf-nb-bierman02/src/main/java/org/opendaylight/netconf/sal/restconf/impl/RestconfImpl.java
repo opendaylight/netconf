@@ -1347,13 +1347,17 @@ public class RestconfImpl implements RestconfService {
      */
     private static <T> T parseEnumTypeParameter(final ContainerNode value, final Class<T> classDescriptor,
             final String paramName) {
-        final Optional<DataContainerChild<? extends PathArgument, ?>> augNode =
-                value.getChild(SAL_REMOTE_AUG_IDENTIFIER);
-        if (!augNode.isPresent() && !(augNode instanceof AugmentationNode)) {
+        final Optional<DataContainerChild<? extends PathArgument, ?>> optAugNode = value.getChild(
+            SAL_REMOTE_AUG_IDENTIFIER);
+        if (!optAugNode.isPresent()) {
             return null;
         }
-        final Optional<DataContainerChild<? extends PathArgument, ?>> enumNode = ((AugmentationNode) augNode.get())
-                .getChild(new NodeIdentifier(QName.create(SAL_REMOTE_AUGMENT, paramName)));
+        final DataContainerChild<? extends PathArgument, ?> augNode = optAugNode.get();
+        if (!(augNode instanceof AugmentationNode)) {
+            return null;
+        }
+        final Optional<DataContainerChild<? extends PathArgument, ?>> enumNode = ((AugmentationNode) augNode).getChild(
+            new NodeIdentifier(QName.create(SAL_REMOTE_AUGMENT, paramName)));
         if (!enumNode.isPresent()) {
             return null;
         }
