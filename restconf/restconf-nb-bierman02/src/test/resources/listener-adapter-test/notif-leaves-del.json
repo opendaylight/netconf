@@ -1,0 +1,23 @@
+{
+    "notification": {
+        "data-changed-notification": {
+            "data-change-event": [
+                {
+                    "operation": "deleted",
+                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf11"
+                },
+                {
+                    "operation": "deleted",
+                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:name"
+                },
+                {
+                    "operation": "deleted",
+                    "path": "/instance-identifier-patch-module:patch-cont/instance-identifier-patch-module:my-list1[instance-identifier-patch-module:name='Althea']/instance-identifier-patch-module:my-leaf12"
+                }
+            ],
+            "xmlns": "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote"
+        },
+        "eventTime": "2017-09-18T15:30:16.099+03:00",
+        "xmlns": "urn:ietf:params:xml:ns:netconf:notification:1.0"
+    }
+}
