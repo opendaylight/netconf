@@ -11,19 +11,19 @@
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
     <artifactId>karaf4-parent</artifactId>
-    <version>1.8.2-SNAPSHOT</version>
+    <version>1.8.3-SNAPSHOT</version>
     <relativePath/>
   </parent>
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>netconf-karaf</artifactId>
-  <version>1.5.2-SNAPSHOT</version>
+  <version>1.5.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <prerequisites>
     <maven>3.1.1</maven>
   </prerequisites>
   <properties>
-    <netconf.version>1.2.2-SNAPSHOT</netconf.version>
-    <restconf.version>1.5.2-SNAPSHOT</restconf.version>
+    <netconf.version>1.2.3-SNAPSHOT</netconf.version>
+    <restconf.version>1.5.3-SNAPSHOT</restconf.version>
   </properties>
 
   <dependencies>

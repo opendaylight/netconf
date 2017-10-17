@@ -13,14 +13,14 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>bundle-parent</artifactId>
-        <version>1.8.2-SNAPSHOT</version>
+        <version>1.8.3-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-connector-config</artifactId>
     <description>Configuration files for netconf-connector</description>
-    <version>1.2.2-SNAPSHOT</version>
+    <version>1.2.3-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <dependencyManagement>

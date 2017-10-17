@@ -14,13 +14,13 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>single-feature-parent</artifactId>
-        <version>1.8.2-SNAPSHOT</version>
+        <version>1.8.3-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-config-netconf-connector</artifactId>
-    <version>1.2.2-SNAPSHOT</version>
+    <version>1.2.3-SNAPSHOT</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Netconf :: Connector</name>
@@ -29,17 +29,17 @@
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>yang-jmx-generator</artifactId>
-            <version>0.6.2-SNAPSHOT</version>
+            <version>0.6.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>config-manager-facade-xml</artifactId>
-            <version>0.6.2-SNAPSHOT</version>
+            <version>0.6.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-config-manager</artifactId>
-            <version>0.6.2-SNAPSHOT</version>
+            <version>0.6.3-SNAPSHOT</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -65,7 +65,7 @@
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-config-netty</artifactId>
-            <version>0.6.2-SNAPSHOT</version>
+            <version>0.6.3-SNAPSHOT</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

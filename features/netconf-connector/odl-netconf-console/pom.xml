@@ -14,13 +14,13 @@
     <parent>
         <groupId>org.opendaylight.odlparent</groupId>
         <artifactId>single-feature-parent</artifactId>
-        <version>1.8.2-SNAPSHOT</version>
+        <version>1.8.3-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-console</artifactId>
-    <version>1.2.2-SNAPSHOT</version>
+    <version>1.2.3-SNAPSHOT</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Netconf Console + Karaf CLI for netconf CRUD operations</name>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>odl-netconf-mdsal</artifactId>
-            <version>1.5.2-SNAPSHOT</version>
+            <version>1.5.3-SNAPSHOT</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
