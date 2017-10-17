@@ -48,8 +48,8 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
     private volatile MinaSshNettyChannel nettyChannel = null;
     private volatile boolean activated;
 
-    private InetSocketAddress remoteAddress;
-    private PublicKey serverKey;
+    private final InetSocketAddress remoteAddress;
+    private final PublicKey serverKey;
 
     CallHomeSessionContext(ClientSession sshSession, CallHomeAuthorization authorization,
                            SocketAddress remoteAddress, Factory factory) {

@@ -100,8 +100,8 @@ public abstract class CallHomeAuthorization {
 
         private final String nodeId;
         private final String username;
-        private Set<String> passwords = new HashSet<>();
-        private Set<KeyPair> clientKeys = new HashSet<>();
+        private final Set<String> passwords = new HashSet<>();
+        private final Set<KeyPair> clientKeys = new HashSet<>();
 
         private Builder(String nodeId, String username) {
             this.nodeId = Preconditions.checkNotNull(nodeId);
