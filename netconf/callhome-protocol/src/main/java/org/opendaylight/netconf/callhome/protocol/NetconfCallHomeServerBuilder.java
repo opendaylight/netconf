@@ -114,7 +114,7 @@ public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServ
 
     private NetconfClientSessionNegotiatorFactory defaultNegotiationFactory() {
         return new NetconfClientSessionNegotiatorFactory(new HashedWheelTimer(),
-                Optional.<NetconfHelloMessageAdditionalHeader>absent(), DEFAULT_SESSION_TIMEOUT_MILLIS);
+                                                         Optional.absent(), DEFAULT_SESSION_TIMEOUT_MILLIS);
     }
 
     private EventLoopGroup defaultNettyGroup() {

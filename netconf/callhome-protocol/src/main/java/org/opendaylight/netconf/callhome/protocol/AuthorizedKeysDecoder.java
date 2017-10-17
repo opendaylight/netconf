@@ -43,7 +43,7 @@ public class AuthorizedKeysDecoder {
     private static final String KEY_FACTORY_TYPE_DSA = "DSA";
     private static final String KEY_FACTORY_TYPE_ECDSA = "EC";
 
-    private static Map<String, String> ECDSA_CURVES = new HashMap<>();
+    private static final Map<String, String> ECDSA_CURVES = new HashMap<>();
 
     static {
         ECDSA_CURVES.put("nistp256", "secp256r1");
@@ -51,8 +51,8 @@ public class AuthorizedKeysDecoder {
         ECDSA_CURVES.put("nistp512", "secp512r1");
     }
 
-    private static String ECDSA_SUPPORTED_CURVE_NAME = "nistp256";
-    private static String ECDSA_SUPPORTED_CURVE_NAME_SPEC = ECDSA_CURVES.get(ECDSA_SUPPORTED_CURVE_NAME);
+    private static final String ECDSA_SUPPORTED_CURVE_NAME = "nistp256";
+    private static final String ECDSA_SUPPORTED_CURVE_NAME_SPEC = ECDSA_CURVES.get(ECDSA_SUPPORTED_CURVE_NAME);
 
     private static final String KEY_TYPE_RSA = "ssh-rsa";
     private static final String KEY_TYPE_DSA = "ssh-dss";
