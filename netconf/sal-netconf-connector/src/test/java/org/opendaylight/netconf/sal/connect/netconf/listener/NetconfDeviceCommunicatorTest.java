@@ -58,7 +58,7 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -397,7 +397,7 @@ public class NetconfDeviceCommunicatorTest {
                     .withAddress(new InetSocketAddress("localhost", 65000))
                     .withReconnectStrategy(reconnectStrategy)
                     .withConnectStrategyFactory(() -> reconnectStrategy)
-                    .withAuthHandler(new LoginPassword("admin", "admin"))
+                    .withAuthHandler(new LoginPasswordHandler("admin", "admin"))
                     .withConnectionTimeoutMillis(10000)
                     .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
                     .withSessionListener(listener)

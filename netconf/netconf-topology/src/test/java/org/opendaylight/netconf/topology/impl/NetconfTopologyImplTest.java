@@ -49,7 +49,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordDeprecatedBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -161,7 +161,8 @@ public class NetconfTopologyImplTest {
                 .setBetweenAttemptsTimeoutMillis(100)
                 .setKeepaliveDelay(1000L)
                 .setTcpOnly(true)
-                .setCredentials(new LoginPasswordBuilder().setUsername("testuser").setPassword("testpassword").build())
+                .setCredentials(new LoginPasswordDeprecatedBuilder()
+                        .setUsername("testuser").setPassword("testpassword").build())
                 .build();
 
         final NodeBuilder nn = new NodeBuilder().addAugmentation(NetconfNode.class, testingNode);

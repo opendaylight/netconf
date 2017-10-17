@@ -23,7 +23,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPwBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -58,9 +59,12 @@ public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
 
         final NodeId nodeId = new NodeId(instanceName);
         final NodeKey nodeKey = new NodeKey(nodeId);
-        final Credentials credentials = new LoginPasswordBuilder()
-                .setUsername(username)
-                .setPassword(password)
+        final Credentials credentials = new LoginPwBuilder()
+                .setLoginPassword(
+                        new LoginPasswordBuilder()
+                                .setUsername(username)
+                                .setPassword(password)
+                                .build())
                 .build();
         final Host host = HostBuilder.getDefaultInstance(address);
         final PortNumber portNumber = new PortNumber(port);

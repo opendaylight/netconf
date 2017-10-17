@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.connect.util;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
@@ -23,8 +24,11 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeTopologyService;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPw;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPwBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.LoginPassword;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
@@ -61,21 +65,31 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
         return futureResult;
     }
 
-    private NetconfNode encryptPassword(AddNetconfNodeInput input) {
+    @VisibleForTesting
+    public NetconfNode encryptPassword(AddNetconfNodeInput input) {
         NetconfNodeBuilder builder = new NetconfNodeBuilder();
         builder.fieldsFrom(input);
 
-        boolean encrypt = input.isEncrypt();
-        LoginPassword loginPassword = (LoginPassword) input.getCredentials();
-        if (encrypt) {
-            String encryptedPassword = encryptionService.encrypt(loginPassword.getPassword());
-            LoginPassword newCreds = new LoginPasswordBuilder().setPassword(encryptedPassword)
-                    .setUsername(loginPassword.getUsername()).build();
-            builder.setCredentials(newCreds);
-        }
+        final Credentials credentials = handleEncryption(input.getCredentials());
+        builder.setCredentials(credentials);
 
         NetconfNode node = builder.build();
         return node;
+    }
+
+    private Credentials handleEncryption(final Credentials credentials) {
+        if (credentials instanceof LoginPw) {
+            final LoginPassword loginPassword = ((LoginPw) credentials).getLoginPassword();
+            final String encryptedPassword =
+                    encryptionService.encrypt(loginPassword.getPassword());
+
+            return new LoginPwBuilder().setLoginPassword(new LoginPasswordBuilder()
+                    .setPassword(encryptedPassword)
+                    .setUsername(loginPassword.getUsername()).build()).build();
+        }
+
+        // anything else doesnt need to be encrypted
+        return credentials;
     }
 
     private void writeToConfigDS(NetconfNode node, NodeId nodeId, String topologyId,

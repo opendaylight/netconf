@@ -18,17 +18,17 @@ import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.future.AuthFuture;
 import org.junit.Test;
 
-public class LoginPasswordTest {
+public class LoginPasswordHandlerTest {
 
     @Test
     public void testLoginPassword() throws Exception {
-        final LoginPassword loginPassword = new LoginPassword("user", "pwd");
-        assertEquals("user", loginPassword.getUsername());
+        final LoginPasswordHandler loginPasswordHandler = new LoginPasswordHandler("user", "pwd");
+        assertEquals("user", loginPasswordHandler.getUsername());
 
         final ClientSession session = mock(ClientSession.class);
         doNothing().when(session).addPasswordIdentity("pwd");
         doReturn(mock(AuthFuture.class)).when(session).auth();
-        loginPassword.authenticate(session);
+        loginPasswordHandler.authenticate(session);
 
         verify(session).addPasswordIdentity("pwd");
         verify(session).auth();

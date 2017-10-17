@@ -21,7 +21,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordDeprecatedBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
@@ -67,7 +67,7 @@ class CallHomeMountSessionContext {
         node.setHost(new Host(key.getIpAddress()));
         node.setPort(key.getPort());
         node.setTcpOnly(Boolean.FALSE);
-        node.setCredentials(new LoginPasswordBuilder().setUsername("ommited").setPassword("ommited").build());
+        node.setCredentials(new LoginPasswordDeprecatedBuilder().setUsername("ommited").setPassword("ommited").build());
         node.setSchemaless(Boolean.FALSE);
         return node.build();
     }

@@ -31,7 +31,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.netconf.netty.EchoClientHandler.State;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
@@ -109,7 +109,7 @@ public class SSHTest {
         final ChannelInitializer<NioSocketChannel> channelInitializer = new ChannelInitializer<NioSocketChannel>() {
             @Override
             public void initChannel(final NioSocketChannel ch) throws Exception {
-                ch.pipeline().addFirst(AsyncSshHandler.createForNetconfSubsystem(new LoginPassword("a", "a")));
+                ch.pipeline().addFirst(AsyncSshHandler.createForNetconfSubsystem(new LoginPasswordHandler("a", "a")));
                 ch.pipeline().addLast(echoClientHandler);
             }
         };

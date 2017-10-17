@@ -30,7 +30,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration.NetconfClientProtocol;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.protocol.framework.NeverReconnectStrategy;
 
 
@@ -108,7 +108,7 @@ public class TestingNetconfClient implements Closeable {
         NioEventLoopGroup nettyGroup = new NioEventLoopGroup();
         NetconfClientDispatcherImpl netconfClientDispatcher = new NetconfClientDispatcherImpl(nettyGroup, nettyGroup,
                 hashedWheelTimer);
-        LoginPassword authHandler = new LoginPassword("admin", "admin");
+        LoginPasswordHandler authHandler = new LoginPasswordHandler("admin", "admin");
         TestingNetconfClient client = new TestingNetconfClient("client", netconfClientDispatcher,
                 getClientConfig("127.0.0.1", 1830, true, Optional.of(authHandler)));
         System.console().writer().println(client.getCapabilities());
