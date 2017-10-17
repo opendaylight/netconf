@@ -9,7 +9,7 @@
 package org.opendaylight.netconf.callhome.mount;
 
 import com.google.common.base.Optional;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -18,6 +18,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
@@ -28,7 +29,6 @@ import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.binding.api.ReadWriteTransaction;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.netconf.callhome.protocol.AuthorizedKeysDecoder;
 import org.opendaylight.netconf.callhome.protocol.StatusRecorder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.callhome.device.status.rev170112.Device1;
@@ -70,7 +70,7 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
     }
 
     @Override
-    public void onDataTreeChanged(Collection<DataTreeModification<Node>> changes) {
+    public void onDataTreeChanged(@Nonnull Collection<DataTreeModification<Node>> changes) {
         for (DataTreeModification<Node> change: changes) {
             final DataObjectModification<Node> rootNode = change.getRootNode();
             final InstanceIdentifier<Node> identifier = change.getRootPath().getRootIdentifier();
@@ -215,12 +215,10 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
         ReadOnlyTransaction opTx = dataBroker.newReadOnlyTransaction();
 
         InstanceIdentifier<Device> deviceIID = buildDeviceInstanceIdentifier(nodeId);
-        CheckedFuture<Optional<Device>, ReadFailedException> devFuture =
-                opTx.read(LogicalDatastoreType.OPERATIONAL, deviceIID);
-
+        ListenableFuture<Optional<Device>> devFuture = opTx.read(LogicalDatastoreType.OPERATIONAL, deviceIID);
         try {
-            return devFuture.checkedGet();
-        } catch (ReadFailedException e) {
+            return devFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
             return Optional.absent();
         }
     }
@@ -274,20 +272,14 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
 
     private AllowedDevices getDevices() {
         ReadOnlyTransaction rxTransaction = dataBroker.newReadOnlyTransaction();
-        CheckedFuture<Optional<AllowedDevices>, ReadFailedException> devicesFuture =
+        ListenableFuture<Optional<AllowedDevices>> devicesFuture =
                 rxTransaction.read(LogicalDatastoreType.OPERATIONAL, IetfZeroTouchCallHomeServerProvider.ALL_DEVICES);
-
         try {
-            Optional<AllowedDevices> opt = devicesFuture.checkedGet();
-            if (opt.isPresent()) {
-                AllowedDevices devices = opt.get();
-                return devices;
-            }
-        } catch (ReadFailedException e) {
+            return devicesFuture.get().orNull();
+        } catch (ExecutionException | InterruptedException e) {
             LOG.error("Error trying to read the whitelist devices: {}", e);
+            return null;
         }
-
-        return null;
     }
 
     private List<Device> getDevicesAsList() {

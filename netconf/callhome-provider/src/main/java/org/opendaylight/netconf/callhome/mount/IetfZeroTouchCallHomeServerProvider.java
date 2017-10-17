@@ -10,15 +10,16 @@ package org.opendaylight.netconf.callhome.mount;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeChangeListener;
@@ -27,7 +28,6 @@ import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.binding.api.ReadWriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.netconf.callhome.protocol.CallHomeAuthorizationProvider;
 import org.opendaylight.netconf.callhome.protocol.NetconfCallHomeServer;
 import org.opendaylight.netconf.callhome.protocol.NetconfCallHomeServerBuilder;
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataTreeChangeListener<AllowedDevices> {
     private static final String APPNAME = "CallHomeServer";
     static final InstanceIdentifier<AllowedDevices> ALL_DEVICES = InstanceIdentifier.create(NetconfCallhomeServer.class)
-        .child(AllowedDevices.class);
+            .child(AllowedDevices.class);
 
     private static final Logger LOG = LoggerFactory.getLogger(IetfZeroTouchCallHomeServerProvider.class);
 
@@ -74,8 +74,8 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         try {
             LOG.info("Initializing provider for {}", APPNAME);
             initializeServer();
-            listenerReg = dataBroker.registerDataTreeChangeListener(new DataTreeIdentifier<>(
-                    LogicalDatastoreType.CONFIGURATION, ALL_DEVICES), this);
+            listenerReg = dataBroker.registerDataTreeChangeListener(
+                    new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, ALL_DEVICES), this);
             LOG.info("Initialization complete for {}", APPNAME);
         } catch (IOException | Configuration.ConfigurationException e) {
             LOG.error("Unable to successfully initialize", e);
@@ -100,8 +100,8 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
     private void initializeServer() throws IOException {
         LOG.info("Initializing Call Home server instance");
         CallHomeAuthorizationProvider provider = this.getCallHomeAuthorization();
-        NetconfCallHomeServerBuilder builder = new NetconfCallHomeServerBuilder(
-                provider, mountDispacher, statusReporter);
+        NetconfCallHomeServerBuilder builder = new NetconfCallHomeServerBuilder(provider, mountDispacher,
+                                                                                statusReporter);
         if (port > 0) {
             builder.setBindAddress(new InetSocketAddress(port));
         }
@@ -115,7 +115,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
     void assertValid(Object obj, String description) {
         if (obj == null) {
             throw new RuntimeException(
-                String.format("Failed to find %s in IetfZeroTouchCallHomeProvider.initialize()", description));
+                    String.format("Failed to find %s in IetfZeroTouchCallHomeProvider.initialize()", description));
         }
     }
 
@@ -136,18 +136,18 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
     }
 
     @Override
-    public void onDataTreeChanged(Collection<DataTreeModification<AllowedDevices>> changes) {
+    public void onDataTreeChanged(@Nonnull Collection<DataTreeModification<AllowedDevices>> changes) {
         // In case of any changes to the devices datatree, register the changed values with callhome server
         // As of now, no way to add a new callhome client key to the CallHomeAuthorization instance since
         // its created under CallHomeAuthorizationProvider.
         // Will have to redesign a bit here.
         // CallHomeAuthorization.
         ReadOnlyTransaction roConfigTx = dataBroker.newReadOnlyTransaction();
-        CheckedFuture<Optional<AllowedDevices>, ReadFailedException> devicesFuture =
-                roConfigTx.read(LogicalDatastoreType.CONFIGURATION, IetfZeroTouchCallHomeServerProvider.ALL_DEVICES);
+        ListenableFuture<Optional<AllowedDevices>> devicesFuture = roConfigTx
+                .read(LogicalDatastoreType.CONFIGURATION, IetfZeroTouchCallHomeServerProvider.ALL_DEVICES);
 
         Set<InstanceIdentifier<?>> deletedDevices = new HashSet<>();
-        for (DataTreeModification<AllowedDevices> change: changes) {
+        for (DataTreeModification<AllowedDevices> change : changes) {
             DataObjectModification<AllowedDevices> rootNode = change.getRootNode();
             switch (rootNode.getModificationType()) {
                 case DELETE:
@@ -164,7 +164,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
             for (Device confDevice : getReadDevices(devicesFuture)) {
                 readAndUpdateStatus(confDevice);
             }
-        } catch (ReadFailedException e) {
+        } catch (ExecutionException | InterruptedException e) {
             LOG.error("Error trying to read the whitelist devices: {}", e);
         }
     }
@@ -178,9 +178,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
 
         int numRemoved = deletedDevices.size();
 
-        Iterator<InstanceIdentifier<?>> iterator = deletedDevices.iterator();
-        while (iterator.hasNext()) {
-            InstanceIdentifier<?> removedIID = iterator.next();
+        for (InstanceIdentifier<?> removedIID : deletedDevices) {
             LOG.info("Deleting the entry for callhome device {}", removedIID);
             opTx.delete(LogicalDatastoreType.OPERATIONAL, removedIID);
         }
@@ -190,43 +188,28 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         }
     }
 
-    private List<Device> getReadDevices(CheckedFuture<Optional<AllowedDevices>, ReadFailedException> devicesFuture)
-            throws ReadFailedException {
-        Optional<AllowedDevices> opt = devicesFuture.checkedGet();
-        if (opt.isPresent()) {
-            AllowedDevices confDevices = opt.get();
-            if (confDevices != null) {
-                LOG.debug("Read {} devices", confDevices.getDevice().size());
-                return confDevices.getDevice();
-            }
-        }
-
-        LOG.debug("Failed to read devices");
-        return new ArrayList<>();
+    private List<Device> getReadDevices(
+            ListenableFuture<Optional<AllowedDevices>> devicesFuture) throws InterruptedException, ExecutionException {
+        Optional<AllowedDevices> opt = devicesFuture.get();
+        return opt.isPresent() ? opt.get().getDevice() : Collections.emptyList();
     }
 
-    private void readAndUpdateStatus(Device cfgDevice) throws ReadFailedException {
+    private void readAndUpdateStatus(Device cfgDevice) throws InterruptedException, ExecutionException {
         InstanceIdentifier<Device> deviceIID = InstanceIdentifier.create(NetconfCallhomeServer.class)
-                .child(AllowedDevices.class)
-                .child(Device.class, new DeviceKey(cfgDevice.getUniqueId()));
+                .child(AllowedDevices.class).child(Device.class, new DeviceKey(cfgDevice.getUniqueId()));
 
         ReadWriteTransaction tx = dataBroker.newReadWriteTransaction();
-        CheckedFuture<Optional<Device>, ReadFailedException> deviceFuture = tx.read(
-            LogicalDatastoreType.OPERATIONAL, deviceIID);
+        ListenableFuture<Optional<Device>> deviceFuture = tx.read(LogicalDatastoreType.OPERATIONAL, deviceIID);
 
-        Optional<Device> opDevGet = deviceFuture.checkedGet();
+        Optional<Device> opDevGet = deviceFuture.get();
         Device1 devStatus = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.DISCONNECTED).build();
         if (opDevGet.isPresent()) {
             Device opDevice = opDevGet.get();
             devStatus = opDevice.getAugmentation(Device1.class);
         }
 
-        Device newOpDevice = new DeviceBuilder()
-                .addAugmentation(Device1.class, devStatus)
-                .setSshHostKey(cfgDevice.getSshHostKey())
-                .setUniqueId(cfgDevice.getUniqueId()).build();
-
-        cfgDevice = newOpDevice;
+        cfgDevice = new DeviceBuilder().addAugmentation(Device1.class, devStatus)
+                .setSshHostKey(cfgDevice.getSshHostKey()).setUniqueId(cfgDevice.getUniqueId()).build();
 
         tx.merge(LogicalDatastoreType.OPERATIONAL, deviceIID, cfgDevice);
         tx.submit();

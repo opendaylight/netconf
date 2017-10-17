@@ -63,7 +63,7 @@ public class Configuration {
         }
     }
 
-    private String path;
+    private final String path;
     private Properties properties;
 
     public Configuration() {

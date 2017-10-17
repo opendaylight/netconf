@@ -73,7 +73,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
     @Nonnull
     @Override
-    public CallHomeAuthorization provideAuth(SocketAddress remoteAddress, PublicKey serverKey) {
+    public CallHomeAuthorization provideAuth(@Nonnull SocketAddress remoteAddress, @Nonnull PublicKey serverKey) {
         Device deviceSpecific = deviceConfig.get(serverKey);
         String sessionName;
         Credentials deviceCred;
@@ -131,10 +131,10 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
         private final AuthorizedKeysDecoder keyDecoder = new AuthorizedKeysDecoder();
 
-        private ConcurrentMap<PublicKey, Device> byPublicKey = new ConcurrentHashMap<PublicKey, Device>();
+        private final ConcurrentMap<PublicKey, Device> byPublicKey = new ConcurrentHashMap<>();
 
         @Override
-        public void onDataTreeChanged(Collection<DataTreeModification<Device>> mods) {
+        public void onDataTreeChanged(@Nonnull Collection<DataTreeModification<Device>> mods) {
             for (DataTreeModification<Device> dataTreeModification : mods) {
                 DataObjectModification<Device> rootNode = dataTreeModification.getRootNode();
                 process(rootNode);
@@ -192,10 +192,10 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
     private class DeviceOp implements DataTreeChangeListener<Device> {
 
-        private ConcurrentMap<String, Device> byPublicKey = new ConcurrentHashMap<>();
+        private final ConcurrentMap<String, Device> byPublicKey = new ConcurrentHashMap<>();
 
         @Override
-        public void onDataTreeChanged(Collection<DataTreeModification<Device>> mods) {
+        public void onDataTreeChanged(@Nonnull Collection<DataTreeModification<Device>> mods) {
             for (DataTreeModification<Device> dataTreeModification : mods) {
                 DataObjectModification<Device> rootNode = dataTreeModification.getRootNode();
                 process(rootNode);
@@ -248,7 +248,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         private volatile Global current = null;
 
         @Override
-        public void onDataTreeChanged(Collection<DataTreeModification<Global>> mods) {
+        public void onDataTreeChanged(@Nonnull Collection<DataTreeModification<Global>> mods) {
             for (DataTreeModification<Global> dataTreeModification : mods) {
                 current = dataTreeModification.getRootNode().getDataAfter();
             }
