@@ -26,7 +26,6 @@ public class JsonLeafrefToNnTest extends AbstractBodyReaderTest {
     private static SchemaContext schemaContext;
 
     public JsonLeafrefToNnTest() throws NoSuchFieldException, SecurityException {
-        super();
         this.jsonBodyReader = new JsonNormalizedNodeBodyReader();
     }
 

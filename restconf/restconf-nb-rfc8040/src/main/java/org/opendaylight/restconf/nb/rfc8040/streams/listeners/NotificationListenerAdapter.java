@@ -65,7 +65,6 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      *             type of output on notification (JSON, XML)
      */
     NotificationListenerAdapter(final SchemaPath path, final String streamName, final String outputType) {
-        super();
         register(this);
         setLocalNameOfPath(path.getLastComponent().getLocalName());
 

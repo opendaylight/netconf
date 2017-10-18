@@ -32,7 +32,6 @@ public class TestJsonBodyWriter extends AbstractBodyReaderTest {
     private static SchemaContext schemaContext;
 
     public TestJsonBodyWriter() throws NoSuchFieldException, SecurityException {
-        super();
         this.jsonBodyWriter = new NormalizedNodeJsonBodyWriter();
         this.jsonBodyReader = new JsonNormalizedNodeBodyReader();
     }

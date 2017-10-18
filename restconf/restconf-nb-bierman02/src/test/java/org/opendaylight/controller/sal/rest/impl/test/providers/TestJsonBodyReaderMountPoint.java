@@ -60,7 +60,6 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
 
     public TestJsonBodyReaderMountPoint() throws NoSuchFieldException,
             SecurityException {
-        super();
         this.jsonBodyReader = new JsonNormalizedNodeBodyReader();
     }
 

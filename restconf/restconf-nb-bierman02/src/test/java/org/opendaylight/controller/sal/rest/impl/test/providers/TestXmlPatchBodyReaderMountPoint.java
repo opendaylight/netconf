@@ -34,7 +34,6 @@ public class TestXmlPatchBodyReaderMountPoint extends AbstractBodyReaderTest {
     private static final String MOUNT_POINT = "instance-identifier-module:cont/yang-ext:mount";
 
     public TestXmlPatchBodyReaderMountPoint() throws NoSuchFieldException, SecurityException {
-        super();
         xmlToPatchBodyReader = new XmlToPatchBodyReader();
     }
 

@@ -53,7 +53,6 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     private static SchemaContext schemaContext;
 
     public NnToXmlTest() throws NoSuchFieldException, SecurityException {
-        super();
         this.xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
     }
 

@@ -60,7 +60,6 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
     }
 
     public TestXmlBodyReader() throws Exception {
-        super();
         this.xmlBodyReader = new XmlNormalizedNodeBodyReader();
     }
 

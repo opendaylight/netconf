@@ -66,7 +66,6 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
      */
     ListenerAdapter(final YangInstanceIdentifier path, final String streamName,
             final NotificationOutputType outputType) {
-        super();
         register(this);
         setLocalNameOfPath(path.getLastPathArgument().getNodeType().getLocalName());
 

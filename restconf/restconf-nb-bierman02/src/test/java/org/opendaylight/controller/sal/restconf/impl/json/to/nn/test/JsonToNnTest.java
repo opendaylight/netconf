@@ -35,7 +35,6 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
     private SchemaContext schemaContext;
 
     public JsonToNnTest() throws NoSuchFieldException, SecurityException {
-        super();
     }
 
     public static void initialize(final String path, SchemaContext schemaContext) {

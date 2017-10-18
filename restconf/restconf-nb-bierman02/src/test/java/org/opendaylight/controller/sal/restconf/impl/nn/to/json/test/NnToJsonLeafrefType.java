@@ -29,7 +29,6 @@ public class NnToJsonLeafrefType extends AbstractBodyReaderTest {
     private final NormalizedNodeJsonBodyWriter jsonBodyWriter;
 
     public NnToJsonLeafrefType() throws NoSuchFieldException, SecurityException {
-        super();
         jsonBodyWriter = new NormalizedNodeJsonBodyWriter();
     }
 

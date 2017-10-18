@@ -42,7 +42,6 @@ public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
 
     public NnToXmlWithChoiceTest() throws NoSuchFieldException,
             SecurityException {
-        super();
         xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
     }
 

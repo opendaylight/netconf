@@ -28,7 +28,6 @@ public class NnJsonChoiceCaseTest extends AbstractBodyReaderTest {
 
     public NnJsonChoiceCaseTest() throws NoSuchFieldException,
             SecurityException {
-        super();
         jsonBodyWriter = new NormalizedNodeJsonBodyWriter();
     }
 

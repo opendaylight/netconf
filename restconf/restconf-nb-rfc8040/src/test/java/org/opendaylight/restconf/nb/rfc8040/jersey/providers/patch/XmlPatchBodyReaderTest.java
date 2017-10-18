@@ -31,7 +31,6 @@ public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
     private static SchemaContext schemaContext;
 
     public XmlPatchBodyReaderTest() throws Exception {
-        super();
         xmlToPatchBodyReader = new XmlToPatchBodyReader();
     }
 

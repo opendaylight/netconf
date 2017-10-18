@@ -22,7 +22,6 @@ public class ConsoleIOTestImpl extends ConsoleIOImpl {
 
     public ConsoleIOTestImpl(final Map<String, Deque<String>> inputValues,
                              final List<ValueForMessage> valuesForMessages) throws IOException {
-        super();
         this.inputValues = inputValues;
         this.valuesForMessages = valuesForMessages;
     }

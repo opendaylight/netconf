@@ -109,7 +109,6 @@ public final class IdentityValuesDTO {
         private final String value;
 
         public Predicate(final IdentityValue name, final String value) {
-            super();
             this.name = name;
             this.value = value;
         }

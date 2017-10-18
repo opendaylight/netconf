@@ -31,7 +31,6 @@ public class NnToJsonWithAugmentTest extends AbstractBodyReaderTest {
 
     public NnToJsonWithAugmentTest() throws NoSuchFieldException,
             SecurityException {
-        super();
         xmlBodyWriter = new NormalizedNodeJsonBodyWriter();
     }
 

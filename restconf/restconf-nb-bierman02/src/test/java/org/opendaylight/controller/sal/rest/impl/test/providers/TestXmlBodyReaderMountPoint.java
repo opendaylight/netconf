@@ -62,7 +62,6 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
     }
 
     public TestXmlBodyReaderMountPoint() throws Exception {
-        super();
         this.xmlBodyReader = new XmlNormalizedNodeBodyReader();
     }
 

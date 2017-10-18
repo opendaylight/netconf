@@ -57,7 +57,6 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
     }
 
     public JsonBodyReaderTest() throws Exception {
-        super();
         this.jsonBodyReader = new JsonNormalizedNodeBodyReader();
     }
 

@@ -67,7 +67,6 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      */
     ListenerAdapter(final YangInstanceIdentifier path, final String streamName,
             final NotificationOutputType outputType) {
-        super();
         register(this);
         this.outputType = Preconditions.checkNotNull(outputType);
         this.path = Preconditions.checkNotNull(path);

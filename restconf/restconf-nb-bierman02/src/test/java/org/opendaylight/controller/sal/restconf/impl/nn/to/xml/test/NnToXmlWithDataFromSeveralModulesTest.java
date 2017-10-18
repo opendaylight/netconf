@@ -44,7 +44,6 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
 
     public NnToXmlWithDataFromSeveralModulesTest() throws NoSuchFieldException,
             SecurityException {
-        super();
         xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
     }
 

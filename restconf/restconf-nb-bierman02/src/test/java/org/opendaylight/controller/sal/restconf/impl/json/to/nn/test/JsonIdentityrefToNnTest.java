@@ -27,7 +27,6 @@ public class JsonIdentityrefToNnTest extends AbstractBodyReaderTest {
 
     public JsonIdentityrefToNnTest() throws NoSuchFieldException,
             SecurityException {
-        super();
         this.jsonBodyReader = new JsonNormalizedNodeBodyReader();
     }
 

@@ -26,7 +26,6 @@ public class TestXmlPatchBodyReader extends AbstractBodyReaderTest {
     private static SchemaContext schemaContext;
 
     public TestXmlPatchBodyReader() throws NoSuchFieldException, SecurityException {
-        super();
         xmlToPatchBodyReader = new XmlToPatchBodyReader();
     }
 

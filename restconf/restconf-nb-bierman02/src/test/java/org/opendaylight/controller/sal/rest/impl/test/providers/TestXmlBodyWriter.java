@@ -29,7 +29,6 @@ public class TestXmlBodyWriter extends AbstractBodyReaderTest {
     private static SchemaContext schemaContext;
 
     public TestXmlBodyWriter() throws NoSuchFieldException, SecurityException {
-        super();
         this.xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
     }
 

@@ -50,7 +50,6 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
 
     public NnInstanceIdentifierToXmlTest() throws NoSuchFieldException,
             SecurityException {
-        super();
         xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
     }
 

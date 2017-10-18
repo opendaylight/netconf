@@ -37,7 +37,7 @@ import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ScaleUtil {
+public final class ScaleUtil {
     private static final ScheduledExecutorService EXECUTOR = new LoggingWrapperExecutor(4);
     private static final Semaphore SEMAPHORE = new Semaphore(0);
     private static final Stopwatch STOPWATCH = Stopwatch.createUnstarted();
@@ -48,6 +48,9 @@ public class ScaleUtil {
 
     private static ch.qos.logback.classic.Logger root;
     private static Logger resultsLog;
+
+    private ScaleUtil() {
+    }
 
     @SuppressWarnings("checkstyle:illegalCatch")
     public static void main(final String[] args) {
@@ -288,7 +291,6 @@ public class ScaleUtil {
             private Callable theCallable;
 
             LogOnExceptionCallable(Callable theCallable) {
-                super();
                 this.theCallable = theCallable;
             }
 

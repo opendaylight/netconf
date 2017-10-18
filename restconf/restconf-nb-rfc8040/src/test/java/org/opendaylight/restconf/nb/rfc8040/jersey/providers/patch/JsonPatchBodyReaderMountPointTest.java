@@ -37,7 +37,6 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
     private final JsonToPatchBodyReader jsonToPatchBodyReader;
 
     public JsonPatchBodyReaderMountPointTest() throws Exception {
-        super();
         jsonToPatchBodyReader = new JsonToPatchBodyReader();
     }
 

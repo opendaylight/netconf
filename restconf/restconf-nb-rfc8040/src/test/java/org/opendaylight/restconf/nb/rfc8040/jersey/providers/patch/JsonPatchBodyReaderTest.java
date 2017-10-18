@@ -32,7 +32,6 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
     private static SchemaContext schemaContext;
 
     public JsonPatchBodyReaderTest() throws Exception {
-        super();
         jsonToPatchBodyReader = new JsonToPatchBodyReader();
     }
 

@@ -27,7 +27,6 @@ public class TestJsonPatchBodyReader extends AbstractBodyReaderTest {
     private static SchemaContext schemaContext;
 
     public TestJsonPatchBodyReader() throws NoSuchFieldException, SecurityException {
-        super();
         jsonToPatchBodyReader = new JsonToPatchBodyReader();
     }
 

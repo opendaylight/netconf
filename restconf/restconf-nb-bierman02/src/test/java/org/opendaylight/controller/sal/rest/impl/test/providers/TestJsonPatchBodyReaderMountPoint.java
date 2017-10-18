@@ -35,7 +35,6 @@ public class TestJsonPatchBodyReaderMountPoint extends AbstractBodyReaderTest {
     private static final String MOUNT_POINT = "instance-identifier-module:cont/yang-ext:mount";
 
     public TestJsonPatchBodyReaderMountPoint() throws NoSuchFieldException, SecurityException {
-        super();
         jsonToPatchBodyReader = new JsonToPatchBodyReader();
     }
 
