@@ -16,7 +16,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.protocol.framework.SessionListenerFactory;
 
-class ReverseSshChannelInitializer extends AbstractChannelInitializer<NetconfClientSession>
+final class ReverseSshChannelInitializer extends AbstractChannelInitializer<NetconfClientSession>
         implements SessionListenerFactory<NetconfClientSessionListener> {
 
     private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
@@ -24,7 +24,6 @@ class ReverseSshChannelInitializer extends AbstractChannelInitializer<NetconfCli
 
     private ReverseSshChannelInitializer(NetconfClientSessionNegotiatorFactory negotiatorFactory,
                                          NetconfClientSessionListener sessionListener) {
-        super();
         this.negotiatorFactory = negotiatorFactory;
         this.sessionListener = sessionListener;
     }

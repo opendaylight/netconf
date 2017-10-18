@@ -40,7 +40,7 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
     private final CallHomeAuthorizationProvider authProvider;
     private final CallHomeSessionContext.Factory sessionFactory;
     private final InetSocketAddress bindAddress;
-    private StatusRecorder recorder;
+    private final StatusRecorder recorder;
 
     NetconfCallHomeServer(SshClient sshClient, CallHomeAuthorizationProvider authProvider, Factory factory,
                           InetSocketAddress socketAddress, StatusRecorder recorder) {
