@@ -45,11 +45,13 @@ import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDeviceBuilder;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverImpl;
 import org.opendaylight.netconf.sal.connect.netconf.SchemalessNetconfDevice;
+import org.opendaylight.netconf.sal.connect.netconf.auth.DatastoreBackedPublicKeyAuth;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
+import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.api.NetconfTopology;
@@ -62,6 +64,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.KeyBased;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordDeprecated;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPw;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPwUnencrypted;
@@ -168,6 +171,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected final SharedSchemaRepository sharedSchemaRepository;
     protected final DataBroker dataBroker;
     protected final DOMMountPointService mountPointService;
+    private final NetconfKeystoreAdapter keystoreAdapter;
     protected SchemaSourceRegistry schemaRegistry = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaRepository schemaRepository = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaContextFactory schemaContextFactory = DEFAULT_SCHEMA_CONTEXT_FACTORY;
@@ -191,6 +195,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.dataBroker = dataBroker;
         this.mountPointService = mountPointService;
         this.encryptionService = encryptionService;
+
+        this.keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
     }
 
     public void setSchemaRegistry(final SchemaSourceRegistry schemaRegistry) {
@@ -469,8 +475,10 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             return new LoginPasswordHandler(loginPassword.getUsername(),
                     encryptionService.decrypt(loginPassword.getPassword()));
         }
-        if (credentials instanceof KeyPair) {
-            throw new UnsupportedOperationException("Not implemented yet");
+        if (credentials instanceof KeyBased) {
+            final KeyPair keyPair = ((KeyBased) credentials).getKeyPair();
+            return new DatastoreBackedPublicKeyAuth(keyPair.getUsername(), keyPair.getPairId(),
+                    keystoreAdapter, encryptionService);
         }
         throw new IllegalStateException("Unsupported credential type: " + credentials.getClass());
     }
