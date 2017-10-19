@@ -92,7 +92,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
     @Override
     public void onDeviceDisconnected() {
-        salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
+        salProvider.getTopologyDatastoreAdapter().updateOwnDeviceData(false, new NetconfDeviceCapabilities());
         unregisterMasterMountPoint();
     }
 
@@ -148,7 +148,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
     private void updateDeviceData() {
         final Cluster cluster = Cluster.get(actorSystem);
-        salProvider.getTopologyDatastoreAdapter().updateClusteredDeviceData(true, cluster.selfAddress().toString(),
+        salProvider.getTopologyDatastoreAdapter().overwriteClusteredDeviceData(true, cluster.selfAddress().toString(),
                 netconfSessionPreferences.getNetconfDeviceCapabilities());
     }
 
