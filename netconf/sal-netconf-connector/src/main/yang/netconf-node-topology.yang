@@ -56,6 +56,10 @@ module netconf-node-topology {
                     leaf pair-id {
                         type string;
                     }
+
+                    leaf username {
+                        type string;
+                    }
                 }
             }
         }
