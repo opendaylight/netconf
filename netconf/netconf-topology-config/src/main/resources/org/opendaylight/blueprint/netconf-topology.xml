@@ -73,4 +73,12 @@
 
     <odl:rpc-implementation ref="netconfNodeRegisterEncryptedRPC"/>
 
+    <bean id="netconfKeystoreProvider"
+          class="org.opendaylight.netconf.sal.connect.util.NetconfSalKeystoreService">
+        <argument ref="dataBroker"/>
+        <argument ref="encryptionService"/>
+    </bean>
+
+    <odl:rpc-implementation ref="netconfKeystoreProvider"/>
+
 </blueprint>
