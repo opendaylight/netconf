@@ -12,6 +12,7 @@ import java.io.File;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.test.tool.operations.OperationsCreator;
 import org.opendaylight.netconf.test.tool.rpchandler.RpcHandler;
 import org.opendaylight.netconf.test.tool.rpchandler.RpcHandlerDefault;
 
@@ -39,6 +40,7 @@ public class Configuration {
     private Set<String> models;
     private Set<String> capabilities = DEFAULT_BASE_CAPABILITIES_EXI;
     private RpcHandler rpcHandler = new RpcHandlerDefault();
+    private OperationsCreator operationsCreator;
 
     @Deprecated
     private boolean mdSal = false;
@@ -130,6 +132,14 @@ public class Configuration {
         this.rpcHandler = rpcHandler;
     }
 
+    public OperationsCreator getOperationsCreator() {
+        return operationsCreator;
+    }
+
+    public void setOperationsCreator(OperationsCreator operationsCreator) {
+        this.operationsCreator = operationsCreator;
+    }
+
     @Deprecated
     public boolean isMdSal() {
         return mdSal;
@@ -184,5 +194,4 @@ public class Configuration {
     public void setSchemasDir(File schemasDir) {
         this.schemasDir = schemasDir;
     }
-
 }

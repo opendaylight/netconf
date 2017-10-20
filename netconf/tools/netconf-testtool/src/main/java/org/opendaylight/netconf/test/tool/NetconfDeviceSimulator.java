@@ -54,6 +54,7 @@ import org.opendaylight.netconf.ssh.SshProxyServerConfiguration;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.customrpc.SettableOperationProvider;
+import org.opendaylight.netconf.test.tool.operations.DefaultOperationsCreator;
 import org.opendaylight.netconf.test.tool.operations.OperationsProvider;
 import org.opendaylight.netconf.test.tool.rpchandler.SettableOperationRpcProvider;
 import org.opendaylight.netconf.test.tool.schemacache.SchemaSourceCache;
@@ -150,7 +151,9 @@ public class NetconfDeviceSimulator implements Closeable {
                     Optional.fromNullable(configuration.getInitialConfigXMLFile()));
         } else {
             LOG.info("using OperationsProvider.");
-            operationProvider = new OperationsProvider(idProvider, transformedCapabilities);
+            operationProvider = new OperationsProvider(idProvider, transformedCapabilities,
+                configuration.getOperationsCreator() != null ? configuration.getOperationsCreator()
+                    : DefaultOperationsCreator.getDefaultOperationServiceCreator(idProvider.getCurrentSessionId()));
         }
 
 

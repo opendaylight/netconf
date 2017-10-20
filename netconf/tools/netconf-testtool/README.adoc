@@ -53,6 +53,19 @@ public class RpcHandlerImpl implements RpcHandler {
 }
 
 ----
+* Override operations creator org.opendaylight.netconf.test.tool.operations.OperationsCreator
+  in order to inject custom simulated behavior.
+----
+public class OperationsCreatorImpl implements OperationsCreator {
+    @Override
+    public NetconfOperationService getNetconfOperationService(Set<Capability> capabilities,
+            SessionIdProvider idProvider,
+            String netconfSessionIdForReporting) {
+            ...
+            return netconfOperationService;
+    }
+}
+----
 * Start NetConf device simulator in your code
 ----
 public class Main {
@@ -62,6 +75,7 @@ public class Main {
                 .setModels(models)
                 .setCapabilities(capabilities)
                 .setRpcHandler(new RpcHandlerImpl())
+                .setOperationsCreator(new OperationsCreatorImpl());
                 .build();
         NetConfDeviceSimulator netConfDeviceSimulator =
                 new NetConfDeviceSimulator(configuration);

@@ -10,6 +10,7 @@ package org.opendaylight.netconf.test.tool.config;
 import java.io.File;
 import java.util.Set;
 import org.opendaylight.netconf.test.tool.TesttoolParameters;
+import org.opendaylight.netconf.test.tool.operations.OperationsCreator;
 import org.opendaylight.netconf.test.tool.rpchandler.RpcHandler;
 
 public class ConfigurationBuilder {
@@ -89,6 +90,11 @@ public class ConfigurationBuilder {
         return this;
     }
 
+    public ConfigurationBuilder setOperationsCreator(OperationsCreator operationsCreator) {
+        this.configuration.setOperationsCreator(operationsCreator);
+        return this;
+    }
+
     public ConfigurationBuilder from(Configuration configuration) {
         this.configuration.setThreadPoolSize(configuration.getThreadPoolSize());
         this.configuration.setGenerateConfigsTimeout(configuration.getGenerateConfigsTimeout());
@@ -99,6 +105,7 @@ public class ConfigurationBuilder {
         this.configuration.setSsh(configuration.isSsh());
         this.configuration.setIp(configuration.getIp());
         this.configuration.setRpcHandler(configuration.getRpcHandler());
+        this.configuration.setOperationsCreator(configuration.getOperationsCreator());
         this.configuration.setMdSal(configuration.isMdSal());
         this.configuration.setRpcConfigFile(configuration.getRpcConfigFile());
         this.configuration.setInitialConfigXMLFile(configuration.getInitialConfigXMLFile());
