@@ -1233,7 +1233,7 @@ public class RestconfImpl implements RestconfService {
             final WebSocketServer webSocketServerInstance = WebSocketServer.getInstance();
             notificationPort = webSocketServerInstance.getPort();
         } catch (final NullPointerException e) {
-            WebSocketServer.createInstance(NOTIFICATION_PORT);
+            throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
         final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
         final URI uriToWebsocketServer = uriToWebsocketServerBuilder.replacePath(streamName).build();
@@ -1292,7 +1292,7 @@ public class RestconfImpl implements RestconfService {
             final WebSocketServer webSocketServerInstance = WebSocketServer.getInstance();
             notificationPort = webSocketServerInstance.getPort();
         } catch (final NullPointerException e) {
-            WebSocketServer.createInstance(NOTIFICATION_PORT);
+            throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
         final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
         final URI uriToWebsocketServer = uriToWebsocketServerBuilder.replacePath(streamName).build();
