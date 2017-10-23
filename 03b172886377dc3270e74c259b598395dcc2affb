@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a245df4_0764a9e3",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/websockets/WebSocketServer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2017-10-23T17:49:18Z",
+      "side": 1,
+      "message": "Why are we creating a default instance here? Looking at the callers, they expect an NPE which is no longer thrown from this method. I don\u0027t think that\u0027s the intent.",
+      "revId": "03b172886377dc3270e74c259b598395dcc2affb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
