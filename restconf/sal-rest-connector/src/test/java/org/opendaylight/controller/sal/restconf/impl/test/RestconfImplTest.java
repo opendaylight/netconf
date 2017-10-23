@@ -52,6 +52,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorType;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
+import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -234,6 +235,9 @@ public class RestconfImplTest {
         this.restconfImpl.setBroker(brokerFacade);
 
         // subscribe to stream and verify response
+        if (WebSocketServer.getInstance() == null) {
+            WebSocketServer.createInstance(8185);
+        }
         final NormalizedNodeContext response = this.restconfImpl.subscribeToStream(identifier, uriInfo);
 
         // remove test notification stream

@@ -13,6 +13,7 @@ import org.opendaylight.controller.sal.core.api.Broker;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfProviderImpl;
 import org.opendaylight.restconf.RestConnectorProvider;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 
 /**
@@ -36,10 +37,11 @@ public class RestconfWrapperProviders implements AutoCloseable, RestConnector {
      * @param port
      *            - port for web sockets in provider for draft02
      */
-    public RestconfWrapperProviders(final PortNumber port) {
+    public RestconfWrapperProviders(final Ipv4Address ip, final PortNumber port) {
         // Init draft02 provider
         this.providerDraft02 = new RestconfProviderImpl();
         this.providerDraft02.setWebsocketPort(port);
+        this.providerDraft02.setWebsocketAddress(ip);
 
         this.providerDraft18 = new RestConnectorProvider();
     }
