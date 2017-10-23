@@ -27,6 +27,7 @@ import org.opendaylight.controller.sal.core.api.Provider;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
@@ -35,11 +36,16 @@ public class RestconfProviderImpl implements Provider, AutoCloseable, RestConnec
 
     private final StatisticsRestconfServiceWrapper stats = StatisticsRestconfServiceWrapper.getInstance();
     private ListenerRegistration<SchemaContextListener> listenerRegistration;
+    private Ipv4Address ip;
     private PortNumber port;
     private Thread webSocketServerThread;
 
     public void setWebsocketPort(final PortNumber port) {
         this.port = port;
+    }
+
+    public void setWebsocketAddress(final Ipv4Address ip) {
+        this.ip = ip;
     }
 
     @Override
@@ -56,7 +62,8 @@ public class RestconfProviderImpl implements Provider, AutoCloseable, RestConnec
         ControllerContext.getInstance().setSchemas(schemaService.getGlobalContext());
         ControllerContext.getInstance().setMountService(session.getService(DOMMountPointService.class));
 
-        this.webSocketServerThread = new Thread(WebSocketServer.createInstance(this.port.getValue().intValue()));
+        this.webSocketServerThread = new Thread(WebSocketServer.createInstance(this.ip.getValue(),
+                                                                            this.port.getValue().intValue()));
         this.webSocketServerThread.setName("Web socket server on port " + this.port);
         this.webSocketServerThread.start();
     }

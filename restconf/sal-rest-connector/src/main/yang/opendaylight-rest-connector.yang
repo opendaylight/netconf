@@ -44,6 +44,10 @@ module opendaylight-rest-connector {
     augment "/config:modules/config:module/config:configuration" {
         case rest-connector-impl {
             when "/config:modules/config:module/config:type = 'rest-connector-impl'";
+            leaf websocket-address {
+                mandatory true;
+                type inet:ipv4-address;
+            }
             leaf websocket-port {
                 mandatory true;
                 type inet:port-number;

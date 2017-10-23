@@ -40,7 +40,8 @@ public class RestConnectorModule extends org.opendaylight.controller.config.yang
                 WaitingServiceTracker.create(AAAService.class, bundleContext);
         aaaServiceWaitingServiceTracker.waitForService(WaitingServiceTracker.FIVE_MINUTES);
 
-        final RestconfWrapperProviders wrapperProviders = new RestconfWrapperProviders(getWebsocketPort());
+        final RestconfWrapperProviders wrapperProviders = new RestconfWrapperProviders(
+                                                                getWebsocketAddress(), getWebsocketPort());
         wrapperProviders.registerProviders(getDomBrokerDependency());
 
         if(runtimeRegistration != null){
