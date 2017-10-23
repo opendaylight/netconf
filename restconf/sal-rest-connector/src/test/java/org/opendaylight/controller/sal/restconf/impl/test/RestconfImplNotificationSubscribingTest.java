@@ -30,6 +30,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
+import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -250,6 +251,11 @@ public class RestconfImplNotificationSubscribingTest {
             set.add(entry);
         }
         Mockito.when(map.entrySet()).thenReturn(set);
+        try {
+            WebSocketServer.getInstance();
+        } catch (NullPointerException e) {
+            WebSocketServer.createInstance(8185);
+        }
         RestconfImpl.getInstance().subscribeToStream(this.identifier, this.uriInfo);
     }
 
