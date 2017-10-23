@@ -116,11 +116,6 @@ public class RestconfImpl implements RestconfService {
 
     private static final RestconfImpl INSTANCE = new RestconfImpl();
 
-    /**
-     * Notifications are served on port 8181.
-     */
-    private static final int NOTIFICATION_PORT = 8181;
-
     private static final int CHAR_NOT_FOUND = -1;
 
     private static final String SAL_REMOTE_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote";
@@ -1228,12 +1223,12 @@ public class RestconfImpl implements RestconfService {
         }
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
-        int notificationPort = NOTIFICATION_PORT;
+        int notificationPort;
         try {
             final WebSocketServer webSocketServerInstance = WebSocketServer.getInstance();
             notificationPort = webSocketServerInstance.getPort();
         } catch (final NullPointerException e) {
-            WebSocketServer.createInstance(NOTIFICATION_PORT);
+            throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
         final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
         final URI uriToWebsocketServer = uriToWebsocketServerBuilder.replacePath(streamName).build();
@@ -1287,12 +1282,12 @@ public class RestconfImpl implements RestconfService {
         this.broker.registerToListenDataChanges(datastore, scope, listener);
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
-        int notificationPort = NOTIFICATION_PORT;
+        int notificationPort;
         try {
             final WebSocketServer webSocketServerInstance = WebSocketServer.getInstance();
             notificationPort = webSocketServerInstance.getPort();
         } catch (final NullPointerException e) {
-            WebSocketServer.createInstance(NOTIFICATION_PORT);
+            throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
         final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
         final URI uriToWebsocketServer = uriToWebsocketServerBuilder.replacePath(streamName).build();

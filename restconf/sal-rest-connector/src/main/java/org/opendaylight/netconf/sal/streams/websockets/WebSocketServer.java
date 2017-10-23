@@ -26,33 +26,44 @@ public class WebSocketServer implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketServer.class);
 
+    private static final String DEFAULT_ADDRESS = "0.0.0.0";
+
     private static WebSocketServer instance = null;
 
+    private final String address;
     private final int port;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
-
-    private WebSocketServer(final int port) {
+    private WebSocketServer(final String address, final int port) {
+        this.address = address;
         this.port = port;
     }
 
     /**
-     * Create singleton instance of {@link WebSocketServer}
+     * Create singleton instance of {@link WebSocketServer}.
      *
      * @param port TCP port used for this server
      * @return instance of {@link WebSocketServer}
      */
     public static WebSocketServer createInstance(final int port) {
+        instance = createInstance(DEFAULT_ADDRESS, port);
+        return instance;
+    }
+
+    public static WebSocketServer createInstance(final String address, final int port) {
         Preconditions.checkState(instance == null, "createInstance() has already been called");
+        Preconditions.checkNotNull(address, "Address cannot be null.");
         Preconditions.checkArgument(port >= 1024, "Privileged port (below 1024) is not allowed");
 
-        instance = new WebSocketServer(port);
+        instance = new WebSocketServer(address, port);
         return instance;
     }
 
     /**
+     * Get the websocket of TCP port.
+     *
      * @return websocket TCP port
      */
     public int getPort() {
@@ -60,7 +71,7 @@ public class WebSocketServer implements Runnable {
     }
 
     /**
-     * Get instance of {@link WebSocketServer} created by {@link #createInstance(int)}
+     * Get instance of {@link WebSocketServer} created by {@link #createInstance(int)}.
      *
      * @return instance of {@link WebSocketServer}
      */
@@ -70,7 +81,7 @@ public class WebSocketServer implements Runnable {
     }
 
     /**
-     * Destroy the existing instance
+     * Destroy the existing instance.
      */
     public static void destroyInstance() {
         Preconditions.checkState(instance != null, "createInstance() must be called prior to destroyInstance()");
@@ -88,8 +99,8 @@ public class WebSocketServer implements Runnable {
             serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                     .childHandler(new WebSocketServerInitializer());
 
-            final Channel channel = serverBootstrap.bind(port).sync().channel();
-            LOG.info("Web socket server started at port {}.", port);
+            final Channel channel = serverBootstrap.bind(address, port).sync().channel();
+            LOG.info("Web socket server started at address {}, port {}.", address, port);
 
             channel.closeFuture().sync();
         } catch (final InterruptedException e) {
@@ -103,7 +114,7 @@ public class WebSocketServer implements Runnable {
      * Stops the web socket server and removes all listeners.
      */
     private void stop() {
-        LOG.debug("Stopping the web socket server instance on port {}", port);
+        LOG.info("Stopping the web socket server instance on port {}", port);
         Notificator.removeAllListeners();
         if (bossGroup != null) {
             bossGroup.shutdownGracefully();
