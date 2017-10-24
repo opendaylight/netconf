@@ -273,6 +273,10 @@ public class NetconfDeviceSimulator implements Closeable {
                 .setBindingAddress(bindingAddress)
                 .setLocalAddress(tcpLocalAddress)
                 .setAuthenticator((username, password) -> true)
+                .setPublickeyAuthenticator(((username, key, session) -> {
+                    LOG.info("Auth with public key: {}", key);
+                    return true;
+                }))
                 .setKeyPairProvider(keyPairProvider)
                 .setIdleTimeout(Integer.MAX_VALUE)
                 .createSshProxyServerConfiguration();

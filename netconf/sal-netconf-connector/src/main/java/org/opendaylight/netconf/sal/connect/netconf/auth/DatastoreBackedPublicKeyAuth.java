@@ -32,7 +32,7 @@ public class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
     private final NetconfKeystoreAdapter keystoreAdapter;
     private final AAAEncryptionService encryptionService;
 
-    private Optional<KeyPair> keyPair;
+    private Optional<KeyPair> keyPair = Optional.empty();
 
     public DatastoreBackedPublicKeyAuth(final String username, final String pairId,
                                         final NetconfKeystoreAdapter keystoreAdapter,
