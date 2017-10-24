@@ -16,6 +16,24 @@
       "revId": "03b172886377dc3270e74c259b598395dcc2affb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_9d0626cd",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/websockets/WebSocketServer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5357
+      },
+      "writtenOn": "2017-10-24T05:41:44Z",
+      "side": 1,
+      "message": "Yeah. Method\u0027s not called from anywhere anyway so I removed it.",
+      "parentUuid": "9a245df4_0764a9e3",
+      "revId": "03b172886377dc3270e74c259b598395dcc2affb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
