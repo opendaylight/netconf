@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.util.osgi;
+package org.opendaylight.netconf.util;
 
 import java.net.InetSocketAddress;
 

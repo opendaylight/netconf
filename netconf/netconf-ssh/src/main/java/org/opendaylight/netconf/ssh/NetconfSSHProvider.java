@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.ssh.osgi;
+package org.opendaylight.netconf.ssh;
 
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -16,48 +16,51 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.apache.sshd.common.util.ThreadUtils;
 import org.apache.sshd.server.keyprovider.PEMGeneratorHostKeyProvider;
-import org.opendaylight.netconf.ssh.SshProxyServer;
-import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
-import org.opendaylight.netconf.util.osgi.NetconfConfigUtil;
-import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
+import org.opendaylight.netconf.auth.AuthProvider;
+import org.opendaylight.netconf.util.NetconfConfiguration;
 import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfSSHActivator implements BundleActivator {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfSSHActivator.class);
+public class NetconfSSHProvider {
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfSSHProvider.class);
 
     private static final java.lang.String ALGORITHM = "RSA";
     private static final int KEY_SIZE = 4096;
     public static final int POOL_SIZE = 8;
     private static final int DEFAULT_IDLE_TIMEOUT = Integer.MAX_VALUE;
 
+    private final AuthProvider authProvider;
+    private final NetconfConfiguration netconfConfiguration;
+
     private ScheduledExecutorService minaTimerExecutor;
     private NioEventLoopGroup clientGroup;
     private ExecutorService nioExecutor;
-    private AuthProviderTracker authProviderTracker;
 
     private SshProxyServer server;
 
-    @Override
-    public void start(final BundleContext bundleContext) throws IOException, InvalidSyntaxException {
+    public NetconfSSHProvider(final AuthProvider authProvider,
+                              final NetconfConfiguration netconfConfiguration) {
+
+        this.authProvider = authProvider;
+        this.netconfConfiguration = netconfConfiguration;
+    }
+
+    // Called via blueprint
+    @SuppressWarnings("unused")
+    public void init() throws IOException, InvalidSyntaxException {
         minaTimerExecutor = Executors.newScheduledThreadPool(POOL_SIZE,
             runnable -> new Thread(runnable, "netconf-ssh-server-mina-timers"));
         clientGroup = new NioEventLoopGroup();
         nioExecutor = ThreadUtils.newFixedThreadPool("netconf-ssh-server-nio-group", POOL_SIZE);
-        server = startSSHServer(bundleContext);
+        server = startSSHServer();
     }
 
-    @Override
-    public void stop(final BundleContext context) throws IOException {
+    // Called via blueprint
+    @SuppressWarnings("unused")
+    public void destroy() throws IOException {
         if (server != null) {
             server.close();
-        }
-
-        if (authProviderTracker != null) {
-            authProviderTracker.stop();
         }
 
         if (nioExecutor != null) {
@@ -73,16 +76,13 @@ public class NetconfSSHActivator implements BundleActivator {
         }
     }
 
-    private SshProxyServer startSSHServer(final BundleContext bundleContext)
+    private SshProxyServer startSSHServer()
             throws IOException, InvalidSyntaxException {
-        final NetconfConfiguration netconfConfiguration =
-                NetconfConfigUtil.getNetconfConfigurationService(bundleContext);
 
         final InetSocketAddress sshSocketAddress = netconfConfiguration.getSshServerAddress();
         LOG.info("Starting netconf SSH server at {}", sshSocketAddress);
 
         final LocalAddress localAddress = NetconfConfiguration.NETCONF_LOCAL_ADDRESS;
-        authProviderTracker = new AuthProviderTracker(bundleContext);
 
         final String path = netconfConfiguration.getPrivateKeyPath();
         LOG.trace("Starting netconf SSH server with path to ssh private key {}", path);
@@ -92,7 +92,7 @@ public class NetconfSSHActivator implements BundleActivator {
                 new SshProxyServerConfigurationBuilder()
                         .setBindingAddress(sshSocketAddress)
                         .setLocalAddress(localAddress)
-                        .setAuthenticator(authProviderTracker)
+                        .setAuthenticator(authProvider)
                         .setKeyPairProvider(new PEMGeneratorHostKeyProvider(path, ALGORITHM, KEY_SIZE))
                         .setIdleTimeout(DEFAULT_IDLE_TIMEOUT)
                         .createSshProxyServerConfiguration());
