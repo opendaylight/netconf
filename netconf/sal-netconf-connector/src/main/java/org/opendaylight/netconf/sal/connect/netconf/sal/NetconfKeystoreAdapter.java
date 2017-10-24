@@ -38,7 +38,7 @@ public class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<K
         this.dataBroker = dataBroker;
 
         dataBroker.registerDataTreeChangeListener(
-                new DataTreeIdentifier<>(LogicalDatastoreType.OPERATIONAL, keystoreIid), this);
+                new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, keystoreIid), this);
     }
 
     public Optional<KeyCredential> getKeypairFromId(final String keyId) {
