@@ -61,7 +61,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
         final Keystore keystore = new KeystoreBuilder().build();
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        writeTransaction.merge(LogicalDatastoreType.OPERATIONAL, keystoreIid, keystore);
+        writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, keystoreIid, keystore);
 
         final CheckedFuture<Void, TransactionCommitFailedException> submit = writeTransaction.submit();
 
@@ -81,7 +81,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
         final List<String> ids = input.getKeyId();
 
         for (final String id : ids) {
-            writeTransaction.delete(LogicalDatastoreType.OPERATIONAL,
+            writeTransaction.delete(LogicalDatastoreType.CONFIGURATION,
                     keystoreIid.child(Keypair.class, new KeypairKey(id)));
         }
 
@@ -118,7 +118,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
                         .build()).collect(Collectors.toList());
 
         for (Keypair keypair : keypairs) {
-            writeTransaction.merge(LogicalDatastoreType.OPERATIONAL,
+            writeTransaction.merge(LogicalDatastoreType.CONFIGURATION,
                     keystoreIid.child(Keypair.class, keypair.getKey()), keypair);
         }
 
