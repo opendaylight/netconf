@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Tomas Cere <tcere@cisco.com>
+Submitted-by: Tomas Cere <tcere@cisco.com>
+Submitted-at: Tue, 24 Oct 2017 13:03:21 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/64602
+Project: netconf
+Branch: refs/heads/stable/carbon
