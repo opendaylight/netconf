@@ -32,7 +32,7 @@ public class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
     private final NetconfKeystoreAdapter keystoreAdapter;
     private final AAAEncryptionService encryptionService;
 
-    private Optional<KeyPair> keyPair;
+    private Optional<KeyPair> keyPair = Optional.empty();
 
     public DatastoreBackedPublicKeyAuth(final String username, final String pairId,
                                         final NetconfKeystoreAdapter keystoreAdapter,
@@ -56,6 +56,7 @@ public class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
         // if we have keypair set the identity, otherwise retry the retrieval from the adapter
         // if successful set the identity.
         if (keyPair.isPresent() || tryToSetKeyPair()) {
+            LOG.warn("Adding public key identity: {}", keyPair.get().getPrivate());
             session.addPublicKeyIdentity(keyPair.get());
         }
         return session.auth();
@@ -69,10 +70,15 @@ public class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
             final Keypair dsKeypair = keypairOptional.get();
             final String passPhrase = Strings.isNullOrEmpty(dsKeypair.getPassphrase()) ? "" : dsKeypair.getPassphrase();
 
-            this.keyPair = Optional.of(
-                    new PKIUtil().decodePrivateKey(
-                            new StringReader(encryptionService.decrypt(dsKeypair.getPrivateKey())),
-                            encryptionService.decrypt(passPhrase)));
+            try {
+                this.keyPair = Optional.of(
+                        new PKIUtil().decodePrivateKey(
+                                new StringReader(encryptionService.decrypt(dsKeypair.getPrivateKey())),
+                                encryptionService.decrypt(passPhrase)));
+            } catch (IOException exception) {
+                LOG.warn("Unable to decode private key, id={}", pairId, exception);
+                return false;
+            }
             return true;
         }
         LOG.debug("Unable to retrieve keypair for: {}", pairId);

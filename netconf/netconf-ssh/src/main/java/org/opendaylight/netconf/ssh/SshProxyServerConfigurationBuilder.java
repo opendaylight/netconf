@@ -11,6 +11,7 @@ package org.opendaylight.netconf.ssh;
 import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
 import org.apache.sshd.common.KeyPairProvider;
+import org.apache.sshd.server.PublickeyAuthenticator;
 import org.opendaylight.netconf.auth.AuthProvider;
 
 public final class SshProxyServerConfigurationBuilder {
@@ -19,6 +20,7 @@ public final class SshProxyServerConfigurationBuilder {
     private AuthProvider authenticator;
     private KeyPairProvider keyPairProvider;
     private int idleTimeout;
+    private PublickeyAuthenticator publicKeyAuthenticator = null;
 
     public SshProxyServerConfigurationBuilder setBindingAddress(final InetSocketAddress bindingAddress) {
         this.bindingAddress = bindingAddress;
@@ -35,6 +37,11 @@ public final class SshProxyServerConfigurationBuilder {
         return this;
     }
 
+    public SshProxyServerConfigurationBuilder setPublickeyAuthenticator(final PublickeyAuthenticator authenticator) {
+        this.publicKeyAuthenticator = authenticator;
+        return this;
+    }
+
     public SshProxyServerConfigurationBuilder setKeyPairProvider(final KeyPairProvider keyPairProvider) {
         this.keyPairProvider = keyPairProvider;
         return this;
@@ -46,7 +53,7 @@ public final class SshProxyServerConfigurationBuilder {
     }
 
     public SshProxyServerConfiguration createSshProxyServerConfiguration() {
-        return new SshProxyServerConfiguration(bindingAddress, localAddress, authenticator,
+        return new SshProxyServerConfiguration(bindingAddress, localAddress, authenticator, publicKeyAuthenticator,
                 keyPairProvider, idleTimeout);
     }
 

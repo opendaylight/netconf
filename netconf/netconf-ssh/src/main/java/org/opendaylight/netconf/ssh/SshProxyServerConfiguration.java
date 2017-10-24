@@ -11,7 +11,9 @@ package org.opendaylight.netconf.ssh;
 import com.google.common.base.Preconditions;
 import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
+import java.util.Optional;
 import org.apache.sshd.common.KeyPairProvider;
+import org.apache.sshd.server.PublickeyAuthenticator;
 import org.opendaylight.netconf.auth.AuthProvider;
 
 public final class SshProxyServerConfiguration {
@@ -20,9 +22,16 @@ public final class SshProxyServerConfiguration {
     private final AuthProvider authenticator;
     private final KeyPairProvider keyPairProvider;
     private final int idleTimeout;
+    private final Optional<PublickeyAuthenticator> publickeyAuthenticator;
 
     SshProxyServerConfiguration(final InetSocketAddress bindingAddress, final LocalAddress localAddress,
                     final AuthProvider authenticator, final KeyPairProvider keyPairProvider, final int idleTimeout) {
+        this(bindingAddress, localAddress, authenticator, null, keyPairProvider, idleTimeout);
+    }
+
+    SshProxyServerConfiguration(final InetSocketAddress bindingAddress, final LocalAddress localAddress,
+                                final AuthProvider authenticator, final PublickeyAuthenticator publickeyAuthenticator,
+                                final KeyPairProvider keyPairProvider, final int idleTimeout) {
         this.bindingAddress = Preconditions.checkNotNull(bindingAddress);
         this.localAddress = Preconditions.checkNotNull(localAddress);
         this.authenticator = Preconditions.checkNotNull(authenticator);
@@ -30,6 +39,7 @@ public final class SshProxyServerConfiguration {
         // Idle timeout cannot be disabled in the sshd by using =< 0 value
         Preconditions.checkArgument(idleTimeout > 0, "Idle timeout has to be > 0");
         this.idleTimeout = idleTimeout;
+        this.publickeyAuthenticator = Optional.ofNullable(publickeyAuthenticator);
     }
 
     public InetSocketAddress getBindingAddress() {
@@ -52,5 +62,7 @@ public final class SshProxyServerConfiguration {
         return idleTimeout;
     }
 
-
+    public Optional<PublickeyAuthenticator> getPublickeyAuthenticator() {
+        return publickeyAuthenticator;
+    }
 }
