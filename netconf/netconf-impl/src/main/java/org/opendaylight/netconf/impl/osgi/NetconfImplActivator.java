@@ -23,7 +23,7 @@ import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
-import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
+import org.opendaylight.netconf.util.NetconfConfigurationImpl;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -54,7 +54,7 @@ public class NetconfImplActivator implements BundleActivator {
             SessionIdProvider idProvider = new SessionIdProvider();
             timer = new HashedWheelTimer();
 
-            long connectionTimeoutMillis = NetconfConfiguration.DEFAULT_TIMEOUT_MILLIS;
+            long connectionTimeoutMillis = NetconfConfigurationImpl.DEFAULT_TIMEOUT_MILLIS;
 
             final NetconfMonitoringServiceImpl monitoringService = startMonitoringService(context, factoriesListener);
 
@@ -74,7 +74,7 @@ public class NetconfImplActivator implements BundleActivator {
             NetconfServerDispatcherImpl dispatch = new NetconfServerDispatcherImpl(serverChannelInitializer,
                     eventLoopGroup, eventLoopGroup);
 
-            LocalAddress address = NetconfConfiguration.NETCONF_LOCAL_ADDRESS;
+            LocalAddress address = NetconfConfigurationImpl.NETCONF_LOCAL_ADDRESS;
             LOG.trace("Starting local netconf server at {}", address);
             dispatch.createLocalServer(address);
 

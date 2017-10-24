@@ -6,20 +6,22 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.util.osgi;
+package org.opendaylight.netconf.util;
 
 import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
 import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.concurrent.TimeUnit;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfConfiguration implements ManagedService {
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfConfiguration.class);
+public class NetconfConfigurationImpl implements NetconfConfiguration, ManagedService {
 
-    /**
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfConfigurationImpl.class);
+
+    /*
      * Props to access information within the dictionary.
      */
 
@@ -29,30 +31,34 @@ public class NetconfConfiguration implements ManagedService {
     private static final String TCP_PORT_PROP = "tcp-port";
     private static final String SSH_PK_PATH_PROP = "ssh-pk-path";
 
-    /**
+    /*
      * Default values used if no dictionary is provided.
      */
 
     public static final LocalAddress NETCONF_LOCAL_ADDRESS = new LocalAddress("netconf");
     public static final long DEFAULT_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(30);
 
-    private static final String LOCAL_HOST = "127.0.0.1";
-    private static final String INADDR_ANY = "0.0.0.0";
-    private static final String DEFAULT_PRIVATE_KEY_PATH = "./configuration/RSA.pk";
-    private static final InetSocketAddress DEFAULT_TCP_SERVER_ADRESS = new InetSocketAddress(LOCAL_HOST, 8383);
-    private static final InetSocketAddress DEFAULT_SSH_SERVER_ADRESS = new InetSocketAddress(INADDR_ANY, 1830);
-
     private NetconfConfigurationHolder netconfConfiguration;
 
-    NetconfConfiguration() {
-        netconfConfiguration = new NetconfConfigurationHolder(DEFAULT_TCP_SERVER_ADRESS,
-                DEFAULT_SSH_SERVER_ADRESS, DEFAULT_PRIVATE_KEY_PATH);
+    public NetconfConfigurationImpl(final String tcpServerAddress, final String tcpServerPort,
+                                    final String sshServerAddress, final String sshServerPort,
+                                    final String privateKeyPath) throws NumberFormatException {
+
+        // isolate configuration to "updated(...)" instead of repeating logic here
+        final Dictionary<String, String> dictionaryConfig = new Hashtable<>();
+        dictionaryConfig.put(TCP_ADDRESS_PROP, tcpServerAddress);
+        dictionaryConfig.put(TCP_PORT_PROP, tcpServerPort);
+        dictionaryConfig.put(SSH_ADDRESS_PROP, sshServerAddress);
+        dictionaryConfig.put(SSH_PORT_PROP, sshServerPort);
+        dictionaryConfig.put(SSH_PK_PATH_PROP, privateKeyPath);
+
+        updated(dictionaryConfig);
     }
 
     @Override
     public void updated(final Dictionary<String, ?> dictionaryConfig) {
         if (dictionaryConfig == null) {
-            LOG.debug("CSS netconf server configuration cannot be updated as passed dictionary is null");
+            LOG.debug("CSS NETCONF server configuration cannot be updated as passed dictionary is null");
             return;
         }
         final InetSocketAddress sshServerAddress =
@@ -69,14 +75,17 @@ public class NetconfConfiguration implements ManagedService {
         LOG.debug("CSS netconf server configuration was updated: {}", dictionaryConfig.toString());
     }
 
+    @Override
     public InetSocketAddress getSshServerAddress() {
         return netconfConfiguration.getSshServerAddress();
     }
 
+    @Override
     public InetSocketAddress getTcpServerAddress() {
         return netconfConfiguration.getTcpServerAddress();
     }
 
+    @Override
     public String getPrivateKeyPath() {
         return netconfConfiguration.getPrivateKeyPath();
     }

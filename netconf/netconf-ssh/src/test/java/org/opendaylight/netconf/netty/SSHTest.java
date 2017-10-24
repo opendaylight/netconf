@@ -35,7 +35,7 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswo
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
-import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
+import org.opendaylight.netconf.util.NetconfConfigurationImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +73,7 @@ public class SSHTest {
         final InetSocketAddress addr = new InetSocketAddress("127.0.0.1", 10831);
         final SshProxyServer sshProxyServer = new SshProxyServer(minaTimerEx, nettyGroup, nioExec);
         sshProxyServer.bind(new SshProxyServerConfigurationBuilder()
-                .setBindingAddress(addr).setLocalAddress(NetconfConfiguration.NETCONF_LOCAL_ADDRESS)
+                .setBindingAddress(addr).setLocalAddress(NetconfConfigurationImpl.NETCONF_LOCAL_ADDRESS)
                 .setAuthenticator((username, password) -> true)
                 .setKeyPairProvider(new PEMGeneratorHostKeyProvider(sshKeyPair.toPath().toAbsolutePath().toString(),
                         "RSA", 4096))

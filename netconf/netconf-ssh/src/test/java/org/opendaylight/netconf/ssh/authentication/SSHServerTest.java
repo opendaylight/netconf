@@ -32,7 +32,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
-import org.opendaylight.netconf.util.osgi.NetconfConfiguration;
+import org.opendaylight.netconf.util.NetconfConfigurationImpl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
@@ -72,7 +72,7 @@ public class SSHServerTest {
         final InetSocketAddress addr = InetSocketAddress.createUnresolved(HOST, PORT);
         server = new SshProxyServer(minaTimerEx, clientGroup, nioExec);
         server.bind(new SshProxyServerConfigurationBuilder()
-                .setBindingAddress(addr).setLocalAddress(NetconfConfiguration.NETCONF_LOCAL_ADDRESS)
+                .setBindingAddress(addr).setLocalAddress(NetconfConfigurationImpl.NETCONF_LOCAL_ADDRESS)
                 .setAuthenticator((username, password) -> true)
                 .setKeyPairProvider(new PEMGeneratorHostKeyProvider(sshKeyPair.toPath().toAbsolutePath().toString(),
                         "RSA", 4096))

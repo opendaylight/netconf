@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.util.osgi;
+package org.opendaylight.netconf.util;
 
 import java.net.InetSocketAddress;
 import java.util.Dictionary;
@@ -14,11 +14,13 @@ import java.util.Hashtable;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class NetconfConfigurationTest {
+public class NetconfConfigurationImplTest {
 
     @Test
     public void testUpdated() throws Exception {
-        final NetconfConfiguration config = new NetconfConfiguration();
+        final NetconfConfigurationImpl config = new NetconfConfigurationImpl("127.0.0.1", "8383",
+                "0.0.0.0", "1830",
+                "./configuration/RSA.pk");
         Assert.assertEquals(new InetSocketAddress("0.0.0.0", 1830), config.getSshServerAddress());
         Assert.assertEquals(new InetSocketAddress("127.0.0.1", 8383), config.getTcpServerAddress());
         Assert.assertEquals("./configuration/RSA.pk", config.getPrivateKeyPath());
@@ -41,7 +43,9 @@ public class NetconfConfigurationTest {
 
     @Test
     public void testUpdatedNull() throws Exception {
-        final NetconfConfiguration config = new NetconfConfiguration();
+        final NetconfConfigurationImpl config = new NetconfConfigurationImpl("127.0.0.1", "8383",
+                "0.0.0.0", "1830",
+                "./configuration/RSA.pk");
         Assert.assertEquals(new InetSocketAddress("0.0.0.0", 1830), config.getSshServerAddress());
         Assert.assertEquals(new InetSocketAddress("127.0.0.1", 8383), config.getTcpServerAddress());
         Assert.assertEquals("./configuration/RSA.pk", config.getPrivateKeyPath());
