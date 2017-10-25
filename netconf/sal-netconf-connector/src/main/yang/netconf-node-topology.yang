@@ -306,15 +306,19 @@ module netconf-node-topology {
 
     }
 
-    rpc add-netconf-node {
+    rpc create-device {
         input {
             uses netconf-node-fields;
             leaf node-id {
                 type string;
             }
-            leaf encrypt {
-                type boolean;
-                default false;
+        }
+    }
+
+    rpc delete-device {
+        input {
+            leaf node-id {
+                type string;
             }
         }
     }

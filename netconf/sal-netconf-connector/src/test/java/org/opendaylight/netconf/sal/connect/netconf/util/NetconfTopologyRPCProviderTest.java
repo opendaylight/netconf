@@ -22,8 +22,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.AddNetconfNodeInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.AddNetconfNodeInputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.CreateDeviceInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.CreateDeviceInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPw;
@@ -78,8 +78,8 @@ public class NetconfTopologyRPCProviderTest {
         assertEquals(TEST_PWD, loginPw.getLoginPasswordUnencrypted().getPassword());
     }
 
-    private AddNetconfNodeInput getInput(boolean encrypt) {
-        AddNetconfNodeInputBuilder builder = new AddNetconfNodeInputBuilder();
+    private CreateDeviceInput getInput(boolean encrypt) {
+        CreateDeviceInputBuilder builder = new CreateDeviceInputBuilder();
         final Credentials credentials;
         if (encrypt) {
             credentials = new LoginPwBuilder().setLoginPassword(
