@@ -16,6 +16,24 @@
       "revId": "2f56d833a2c66223759dbfdc3885b556a0584639",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_959efa52",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/NetconfConfigurationImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-10-25T14:39:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a245df4_3538ee9f",
+      "revId": "2f56d833a2c66223759dbfdc3885b556a0584639",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
