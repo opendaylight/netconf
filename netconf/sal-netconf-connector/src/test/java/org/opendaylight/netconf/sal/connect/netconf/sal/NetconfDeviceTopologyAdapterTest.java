@@ -14,6 +14,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Futures;
@@ -33,6 +34,7 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.cluster.databroker.ConcurrentDOMDataBroker;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
+import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.binding.impl.BindingDOMDataBrokerAdapter;
 import org.opendaylight.controller.md.sal.binding.impl.BindingToNormalizedNodeCodec;
@@ -78,6 +80,8 @@ public class NetconfDeviceTopologyAdapterTest {
     private DataBroker broker;
     @Mock
     private WriteTransaction writeTx;
+    @Mock
+    private ReadOnlyTransaction readTx;
     @Mock
     private BindingTransactionChain txChain;
     @Mock
@@ -154,6 +158,10 @@ public class NetconfDeviceTopologyAdapterTest {
     public void testFailedDevice() throws Exception {
 
         doReturn(Futures.immediateCheckedFuture(null)).when(writeTx).submit();
+        // TODO: Split up tests which test presence of previous master (both same and different one).
+        when(txChain.newReadOnlyTransaction()).thenReturn(readTx);
+        when(readTx.read(any(), any()))
+                .thenReturn(Futures.immediateCheckedFuture(Optional.absent()));
         NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
         adapter.setDeviceAsFailed(null);
 
@@ -287,6 +295,10 @@ public class NetconfDeviceTopologyAdapterTest {
     @Test
     public void testRemoveDeviceConfiguration() throws Exception {
         doReturn(Futures.immediateCheckedFuture(null)).when(writeTx).submit();
+        // TODO: Split up tests which test presence of previous master (both same and different one).
+        when(txChain.newReadOnlyTransaction()).thenReturn(readTx);
+        when(readTx.read(any(), any()))
+                .thenReturn(Futures.immediateCheckedFuture(Optional.absent()));
 
         NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
         adapter.close();
