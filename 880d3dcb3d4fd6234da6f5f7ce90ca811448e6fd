@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a245df4_7b27f564",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/util/NetconfSalKeystoreService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2017-10-25T10:27:05Z",
+      "side": 1,
+      "message": "confusing log message. put this below sbmit.checkedGet()",
+      "range": {
+        "startLine": 73,
+        "startChar": 8,
+        "endLine": 73,
+        "endChar": 39
+      },
+      "revId": "880d3dcb3d4fd6234da6f5f7ce90ca811448e6fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_bbce8d81",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-keystore.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2017-10-25T10:27:05Z",
+      "side": 1,
+      "message": "I don\u0027d see public key. I can see only private key.\nis this key-pair ?",
+      "range": {
+        "startLine": 14,
+        "startChar": 13,
+        "endLine": 14,
+        "endChar": 20
+      },
+      "revId": "880d3dcb3d4fd6234da6f5f7ce90ca811448e6fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_fbf125ce",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-keystore.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2017-10-25T10:27:05Z",
+      "side": 1,
+      "message": "please add desription what is the keyformat in the string\nis it base-64 encoded binary what ?",
+      "range": {
+        "startLine": 26,
+        "startChar": 17,
+        "endLine": 26,
+        "endChar": 28
+      },
+      "revId": "880d3dcb3d4fd6234da6f5f7ce90ca811448e6fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_7bb535ed",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-keystore.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2017-10-25T10:27:05Z",
+      "side": 1,
+      "message": "is this passphrase for opening the keypair data ?",
+      "range": {
+        "startLine": 30,
+        "startChar": 17,
+        "endLine": 30,
+        "endChar": 27
+      },
+      "revId": "880d3dcb3d4fd6234da6f5f7ce90ca811448e6fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
