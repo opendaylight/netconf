@@ -95,11 +95,12 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
     @Override
     public ListenableFuture<?> closeServiceInstance() {
 
+        stopDeviceConnectorAndActor();
+        // The previous line has removed the master mount point, only now it is safe to create the slave mount point.
         if (!closed.get()) {
-            // in case that master changes role to slave, new NodeDeviceManager must be created and listener registered
+        // in case that master changes role to slave, new NodeDeviceManager must be created and listener registered
             netconfNodeManager = createNodeDeviceManager();
         }
-        stopDeviceConnectorAndActor();
 
         return FluentFutures.immediateNullFluentFuture();
     }
