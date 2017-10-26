@@ -16,6 +16,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import org.junit.Before;
@@ -25,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
+import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
@@ -51,6 +53,8 @@ public class NetconfDeviceSalProviderTest {
     private DOMMountPointService mountPointService;
     @Mock
     private WriteTransaction writeTx;
+    @Mock
+    private ReadOnlyTransaction readTx;
     private NetconfDeviceSalProvider provider;
 
     @Before
@@ -68,6 +72,10 @@ public class NetconfDeviceSalProviderTest {
         when(chain.newWriteOnlyTransaction()).thenReturn(tx);
         when(tx.submit()).thenReturn(Futures.immediateCheckedFuture(null));
         when(tx.getIdentifier()).thenReturn(tx);
+        // TODO: Split up tests which test presence of previous master (both same and different one).
+        when(chain.newReadOnlyTransaction()).thenReturn(readTx);
+        when(readTx.read(any(), any()))
+                .thenReturn(Futures.immediateCheckedFuture(Optional.absent()));
     }
 
     @Test
