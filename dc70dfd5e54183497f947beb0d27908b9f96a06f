@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a245df4_d90c2445",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/NetconfConfigurationImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2017-10-26T15:34:04Z",
+      "side": 1,
+      "message": "Prior, this instance was advertised as a ManageService so this method would be invoked when the cfg changed. This is not longer the case. We would have to use \u003ccm:managed-properties\u003e in BP. The next question is how users (eg NetconfSSHProvider) would be notified of changes. From what I can tell from the previous code, there was no mechanism for this so we\u0027re not regressing there. But we should retain the ability for this instance to be updated. See my comments in the BP xml file. Also the signature of this method would have to be a Map and not Dictionary.",
+      "revId": "dc70dfd5e54183497f947beb0d27908b9f96a06f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_3451070f",
+        "filename": "netconf/netconf-util/src/main/resources/org/opendaylight/blueprint/netconf-util-blueprint.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2017-10-26T15:34:04Z",
+      "side": 1,
+      "message": "This will restart the BP container which we wouldn\u0027t need if we use \u003ccm:managed-properties\u003e below.  We could use reload if we wanted to also restart dependent bundles but that would be risky as dependent bundles would need to be prepared for that.",
+      "range": {
+        "startLine": 16,
+        "startChar": 70,
+        "endLine": 16,
+        "endChar": 76
+      },
+      "revId": "dc70dfd5e54183497f947beb0d27908b9f96a06f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_544e3b70",
+        "filename": "netconf/netconf-util/src/main/resources/org/opendaylight/blueprint/netconf-util-blueprint.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2017-10-26T15:34:04Z",
+      "side": 1,
+      "message": "Based on the comment in NetconfConfigurationImpl, this would become:\n\n  \u003cbean id\u003d\"netconfConfiguration\" class\u003d\"...\"\u003e\n    \u003ccm:managed-properties persistent-id\u003d\"netconf\" update-strategy\u003d\"component-managed\" update-method\u003d\"update\"/\u003e\n  \u003c/bean\u003e\n\nTo get the initial properties, with \u003cmanaged-properties\u003e, you would need to add setters and \u003cproperty\u003e tags for property. But I think using using \u003cproperty-placeholder\u003e is better so we can provide defaults as before. Another option is \u003ccm:cm-properties\u003e which provides the whole cfg as a java.util.Properties that can be injected (and can referenced as a Map) although the defaults would have to be provided in code (as before).",
+      "revId": "dc70dfd5e54183497f947beb0d27908b9f96a06f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
