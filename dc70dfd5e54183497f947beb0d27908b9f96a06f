@@ -56,6 +56,24 @@
       "revId": "dc70dfd5e54183497f947beb0d27908b9f96a06f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_74a9bfde",
+        "filename": "netconf/netconf-util/src/main/resources/org/opendaylight/blueprint/netconf-util-blueprint.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2017-10-26T15:38:02Z",
+      "side": 1,
+      "message": "I should clarify - the xml snippet doesn\u0027t include the initial property injection which would remain as you had it with \u003ccm:property-placeholder\u003e.",
+      "parentUuid": "9a245df4_544e3b70",
+      "revId": "dc70dfd5e54183497f947beb0d27908b9f96a06f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
