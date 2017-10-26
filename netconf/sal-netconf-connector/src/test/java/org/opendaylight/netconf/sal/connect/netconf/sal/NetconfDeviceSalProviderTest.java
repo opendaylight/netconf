@@ -24,6 +24,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.ReadTransaction;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
 import org.opendaylight.mdsal.binding.api.TransactionChainListener;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
@@ -44,6 +45,8 @@ public class NetconfDeviceSalProviderTest {
     private DOMMountPointService mountPointService;
     @Mock
     private WriteTransaction writeTx;
+    @Mock
+    private ReadTransaction readTx;
 
     private NetconfDeviceSalProvider provider;
 
@@ -59,6 +62,9 @@ public class NetconfDeviceSalProviderTest {
         when(chain.newWriteOnlyTransaction()).thenReturn(tx);
         doReturn(emptyFluentFuture()).when(tx).commit();
         when(tx.getIdentifier()).thenReturn(tx);
+        // TODO: Split up tests which test presence of previous master (both same and different one).
+        doReturn(readTx).when(chain).newReadOnlyTransaction();
+        doReturn(emptyFluentFuture()).when(readTx).read(any(), any());
     }
 
     @Test

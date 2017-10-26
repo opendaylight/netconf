@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.ReadTransaction;
 import org.opendaylight.mdsal.binding.api.Transaction;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
 import org.opendaylight.mdsal.binding.api.TransactionChainListener;
@@ -61,6 +62,8 @@ public class NetconfDeviceTopologyAdapterTest {
     private WriteTransaction writeTx;
     @Mock
     private TransactionChain txChain;
+    @Mock
+    private ReadTransaction readTx;
 
     private final String txIdent = "test transaction";
 
@@ -112,8 +115,11 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @Test
     public void testFailedDevice() throws Exception {
-
         doReturn(emptyFluentFuture()).when(writeTx).commit();
+        // TODO: Split up tests which test presence of previous master (both same and different one).
+        doReturn(readTx).when(txChain).newReadOnlyTransaction();
+        doReturn(emptyFluentFuture()).when(readTx).read(any(), any());
+
         NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
         adapter.setDeviceAsFailed(null);
 
@@ -191,6 +197,9 @@ public class NetconfDeviceTopologyAdapterTest {
     @Test
     public void testRemoveDeviceConfiguration() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
+        // TODO: Split up tests which test presence of previous master (both same and different one).
+        doReturn(readTx).when(txChain).newReadOnlyTransaction();
+        doReturn(emptyFluentFuture()).when(readTx).read(any(), any());
 
         NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
         adapter.close();
