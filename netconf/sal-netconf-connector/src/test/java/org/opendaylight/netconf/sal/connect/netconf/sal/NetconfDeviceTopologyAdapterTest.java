@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.ReadTransaction;
 import org.opendaylight.mdsal.binding.api.Transaction;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
 import org.opendaylight.mdsal.binding.api.TransactionChainListener;
@@ -45,6 +46,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -61,6 +63,8 @@ public class NetconfDeviceTopologyAdapterTest {
     private WriteTransaction writeTx;
     @Mock
     private TransactionChain txChain;
+    @Mock
+    private ReadTransaction readTx;
 
     private final String txIdent = "test transaction";
 
@@ -112,8 +116,11 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @Test
     public void testFailedDevice() throws Exception {
-
         doReturn(emptyFluentFuture()).when(writeTx).commit();
+        // TODO: Split up tests which test presence of previous master (both same and different one).
+        doReturn(readTx).when(txChain).newReadOnlyTransaction();
+        doReturn(FluentFutures.immediateFluentFuture(Optional.empty())).when(readTx).read(any(), any());
+
         NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
         adapter.setDeviceAsFailed(null);
 
@@ -191,6 +198,9 @@ public class NetconfDeviceTopologyAdapterTest {
     @Test
     public void testRemoveDeviceConfiguration() throws Exception {
         doReturn(emptyFluentFuture()).when(writeTx).commit();
+        // TODO: Split up tests which test presence of previous master (both same and different one).
+        doReturn(readTx).when(txChain).newReadOnlyTransaction();
+        doReturn(FluentFutures.immediateFluentFuture(Optional.empty())).when(readTx).read(any(), any());
 
         NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
         adapter.close();
