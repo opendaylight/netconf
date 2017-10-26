@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9a245df4_cf41f63a",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/NetconfConfigurationImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2017-10-26T19:56:32Z",
+      "side": 1,
+      "message": "This needs to be volatile if it can change dynamically.",
+      "revId": "dc70dfd5e54183497f947beb0d27908b9f96a06f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a245df4_d90c2445",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/NetconfConfigurationImpl.java",
         "patchSetId": 6
