@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
@@ -28,6 +30,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilitiesBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.ClusteredConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.ClusteredConnectionStatusBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.UnavailableCapabilities;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.UnavailableCapabilitiesBuilder;
@@ -60,6 +63,7 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
 
     private final InstanceIdentifier<NetworkTopology> networkTopologyPath;
     private final KeyedInstanceIdentifier<Topology, TopologyKey> topologyListPath;
+    private String lastMaster;
     private static final String UNKNOWN_REASON = "Unknown reason";
 
     NetconfDeviceTopologyAdapter(final RemoteDeviceId id, final BindingTransactionChain txChain) {
@@ -69,6 +73,8 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         this.networkTopologyPath = InstanceIdentifier.builder(NetworkTopology.class).build();
         this.topologyListPath = networkTopologyPath
                 .child(Topology.class, new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())));
+        // Most methods provide masterAddress, but close() does not, so we need to remember last one.
+        this.lastMaster = null;
 
         initDeviceData();
     }
@@ -112,8 +118,8 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "update");
     }
 
-    public void updateClusteredDeviceData(final boolean up, final String masterAddress,
-                                          final NetconfDeviceCapabilities capabilities) {
+    public void overwriteClusteredDeviceData(final boolean up, final String masterAddress,
+                                             final NetconfDeviceCapabilities capabilities) {
         final NetconfNode data = buildDataForNetconfClusteredNode(up, masterAddress, capabilities);
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
@@ -125,6 +131,41 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
                 id, writeTx.getIdentifier());
 
         commitTransaction(writeTx, "update");
+        lastMaster = masterAddress;
+    }
+
+    private boolean masterDiffers(final String masterAddress) {
+        LOG.trace("{}: Device state master check started.", id);
+        // We hope the new master had enough time to finish writing and txChain has picked that up.
+        ClusteredConnectionStatus ccs = null;
+        try {
+            ccs = txChain.newReadOnlyTransaction().read(LogicalDatastoreType.OPERATIONAL,
+                        id.getTopologyBindingPath().augmentation(NetconfNode.class)
+                        .child(ClusteredConnectionStatus.class)).get(1, TimeUnit.SECONDS).orNull();
+        } catch (InterruptedException | ExecutionException | TimeoutException exc) {
+            LOG.warn("Failure reading clustered connection status for {}, assume a new master is present.", id, exc);
+            return true;
+        }
+        final String currentMasterAddress = ccs == null ? null : ccs.getNetconfMasterNode();
+        // masterAddress could be null, if we are closing before initial write (e.g. in a simple unit test).
+        if (currentMasterAddress != null && !currentMasterAddress.equals(masterAddress)) {
+            LOG.trace("{}: Device has new master {}", id, currentMasterAddress);
+            return true;
+        }
+        LOG.trace("{}: Device owned by us or unowned.", id);
+        return false;
+    }
+
+    public void updateOwnDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities) {
+        updateOwnDeviceData(up, lastMaster, capabilities);
+    }
+
+    public void updateOwnDeviceData(final boolean up, final String masterAddress,
+                                    final NetconfDeviceCapabilities capabilities) {
+        // Bug 8999 workaround: Refuse to update device state if another member is already master.
+        if (!masterDiffers(masterAddress)) {
+            overwriteClusteredDeviceData(up, masterAddress, capabilities);
+        }
     }
 
     public void setDeviceAsFailed(final Throwable throwable) {
@@ -191,6 +232,11 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
     }
 
     public void removeDeviceConfiguration() {
+        // Bug 8999 workaround: Refuse to delete device state if another member is already master.
+        if (masterDiffers(lastMaster)) {
+            return;
+        }
+
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
 
         LOG.trace(
