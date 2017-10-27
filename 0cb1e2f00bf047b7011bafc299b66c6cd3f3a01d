@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a245df4_14331e15",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 2039
+      },
+      "writtenOn": "2017-10-27T18:56:21Z",
+      "side": 1,
+      "message": "This isnt how fields are supposed to be depracated. It has caused downstream build breakages.",
+      "range": {
+        "startLine": 31,
+        "startChar": 32,
+        "endLine": 31,
+        "endChar": 42
+      },
+      "revId": "0cb1e2f00bf047b7011bafc299b66c6cd3f3a01d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
