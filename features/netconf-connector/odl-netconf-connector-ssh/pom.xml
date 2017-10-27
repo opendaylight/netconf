@@ -23,7 +23,7 @@
     <version>1.4.0-SNAPSHOT</version>
     <packaging>feature</packaging>
 
-    <name>OpenDaylight :: Netconf Connector :: Netconf Connector + Netconf SSH Server + loopback connection configuration</name>
+    <name>!!!DEPRECATED!!! OpenDaylight :: Netconf Connector :: Netconf Connector + Netconf SSH Server</name>
 
     <dependencies>
         <dependency>
@@ -32,11 +32,6 @@
             <version>${project.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>netconf-connector-config</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
