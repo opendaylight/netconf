@@ -22,6 +22,30 @@
       "revId": "0cb1e2f00bf047b7011bafc299b66c6cd3f3a01d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_74089a2d",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2017-10-27T19:20:42Z",
+      "side": 1,
+      "message": "I assume this yang is stored/persisted in the config datastore. That will blow up on upgrade. This patch needs to be reverted.",
+      "parentUuid": "9a245df4_14331e15",
+      "range": {
+        "startLine": 31,
+        "startChar": 32,
+        "endLine": 31,
+        "endChar": 42
+      },
+      "revId": "0cb1e2f00bf047b7011bafc299b66c6cd3f3a01d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
