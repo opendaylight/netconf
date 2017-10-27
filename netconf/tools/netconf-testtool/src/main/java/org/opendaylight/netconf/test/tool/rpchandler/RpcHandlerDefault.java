@@ -20,7 +20,7 @@ public class RpcHandlerDefault implements RpcHandler {
     @Override
     public Optional<Document> getResponse(XmlElement rpcElement) {
         LOG.info("getResponse: {}", rpcElement.toString());
-        return null;
+        return Optional.empty();
     }
 
 }

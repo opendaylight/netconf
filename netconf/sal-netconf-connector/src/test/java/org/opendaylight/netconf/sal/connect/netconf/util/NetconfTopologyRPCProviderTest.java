@@ -8,10 +8,9 @@
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Method;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -23,11 +22,16 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.AddNetconfNodeInput;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.AddNetconfNodeInputBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.CreateDeviceInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.CreateDeviceInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPassword;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPw;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPwBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPwUnencrypted;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 
 public class NetconfTopologyRPCProviderTest {
@@ -42,7 +46,7 @@ public class NetconfTopologyRPCProviderTest {
     @Mock
     private AAAEncryptionService encryptionService;
 
-    NetconfTopologyRPCProvider rpcProvider ;
+    private NetconfTopologyRPCProvider rpcProvider ;
 
     @Before
     public void setUp() {
@@ -54,34 +58,42 @@ public class NetconfTopologyRPCProviderTest {
     @Test
     public void testEncryptPassword() throws Exception {
 
-        NetconfNode node = invokeEncryption(true);
-        assertNotEquals(TEST_PWD, ((LoginPassword)node.getCredentials()).getPassword());
+        final NetconfNode encryptedPwNode = rpcProvider.encryptPassword(getInput(true));
 
-        node = invokeEncryption(false);
-        assertEquals(TEST_PWD, ((LoginPassword)node.getCredentials()).getPassword());
+        final Credentials credentials = encryptedPwNode.getCredentials();
+        assertTrue(credentials instanceof LoginPw);
+        final LoginPw loginPw = (LoginPw) credentials;
+
+        assertEquals(ENC_PWD, loginPw.getLoginPassword().getPassword());
     }
 
-    private NetconfNode invokeEncryption(boolean encrypt) throws Exception {
-        Method method = null;
+    @Test
+    public void testNoEncryption() throws Exception {
+        final NetconfNode encryptedPwNode = rpcProvider.encryptPassword(getInput(false));
 
-        method = NetconfTopologyRPCProvider.class.getDeclaredMethod("encryptPassword", AddNetconfNodeInput.class);
+        final Credentials credentials = encryptedPwNode.getCredentials();
+        assertTrue(credentials instanceof LoginPwUnencrypted);
+        final LoginPwUnencrypted loginPw = (LoginPwUnencrypted) credentials;
 
-        method.setAccessible(true);
-        NetconfNode node = null;
-
-        node = (NetconfNode)method.invoke(rpcProvider, getInput(encrypt));
-
-        return node;
+        assertEquals(TEST_PWD, loginPw.getLoginPasswordUnencrypted().getPassword());
     }
 
-    private AddNetconfNodeInput getInput(boolean encrypt) {
-        AddNetconfNodeInputBuilder builder = new AddNetconfNodeInputBuilder();
-        builder.setCredentials(new LoginPasswordBuilder().setPassword(TEST_PWD).setUsername("test").build());
+    private CreateDeviceInput getInput(boolean encrypt) {
+        CreateDeviceInputBuilder builder = new CreateDeviceInputBuilder();
+        final Credentials credentials;
+        if (encrypt) {
+            credentials = new LoginPwBuilder().setLoginPassword(
+                    new LoginPasswordBuilder().setUsername("test").setPassword(TEST_PWD).build()).build();
+        } else {
+            credentials = new LoginPwUnencryptedBuilder().setLoginPasswordUnencrypted(
+                    new LoginPasswordUnencryptedBuilder().setUsername("test").setPassword(TEST_PWD).build()).build();
+        }
+
+        builder.setCredentials(credentials);
         builder.setHost(new Host(new IpAddress(new Ipv4Address("10.18.16.188"))));
         builder.setPort(new PortNumber(830));
         builder.setTcpOnly(false);
         builder.setNodeId(NODE_ID.toString());
-        builder.setEncrypt(encrypt);
         return builder.build();
     }
 

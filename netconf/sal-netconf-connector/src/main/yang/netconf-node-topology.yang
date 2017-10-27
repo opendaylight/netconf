@@ -15,17 +15,51 @@ module netconf-node-topology {
         }
     }
 
-    grouping netconf-node-credentials {
+    grouping username-password {
+        leaf username {
+            type string;
+        }
 
+        leaf password {
+            type string;
+        }
+    }
+
+    grouping netconf-node-credentials {
         choice credentials {
             config true;
-            case login-password {
-                leaf username {
-                    type string;
-                }
+            case login-password-deprecated {
+                description "Deprecated way of storing credentials, unencrypted.";
 
-                leaf password {
-                    type string;
+                status deprecated;
+                uses username-password;
+            }
+            case login-pw {
+                description "login-password credentials, encrypted.";
+
+
+                container login-password {
+                    uses username-password;
+                }
+            }
+            case login-pw-unencrypted {
+                description "login-password credentials, not encrypted.";
+
+                container login-password-unencrypted {
+                    uses username-password;
+                }
+            }
+            case key-auth {
+                description "key-based authentication, use the id for the pair thats stored in the keystore.";
+
+                container key-based {
+                    leaf key-id {
+                        type string;
+                    }
+
+                    leaf username {
+                        type string;
+                    }
                 }
             }
         }
@@ -272,15 +306,19 @@ module netconf-node-topology {
 
     }
 
-    rpc add-netconf-node {
+    rpc create-device {
         input {
             uses netconf-node-fields;
             leaf node-id {
                 type string;
             }
-            leaf encrypt {
-                type boolean;
-                default false;
+        }
+    }
+
+    rpc delete-device {
+        input {
+            leaf node-id {
+                type string;
             }
         }
     }

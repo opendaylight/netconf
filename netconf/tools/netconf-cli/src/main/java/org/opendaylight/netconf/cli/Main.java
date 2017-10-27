@@ -25,7 +25,7 @@ import org.opendaylight.netconf.cli.io.ConsoleIO;
 import org.opendaylight.netconf.cli.io.ConsoleIOImpl;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
@@ -214,8 +214,8 @@ public class Main {
             return parsed.getString(key);
         }
 
-        public LoginPassword getCredentials() {
-            return new LoginPassword(getUsername(), getPassword());
+        public LoginPasswordHandler getCredentials() {
+            return new LoginPasswordHandler(getUsername(), getPassword());
         }
 
         public String getPassword() {

@@ -19,7 +19,7 @@ import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -101,7 +101,7 @@ public class StressClientCallable implements Callable<Boolean> {
         }
         netconfClientConfigurationBuilder.withProtocol(params.ssh ? NetconfClientConfiguration.NetconfClientProtocol.SSH
             : NetconfClientConfiguration.NetconfClientProtocol.TCP);
-        netconfClientConfigurationBuilder.withAuthHandler(new LoginPassword(params.username, params.password));
+        netconfClientConfigurationBuilder.withAuthHandler(new LoginPasswordHandler(params.username, params.password));
         netconfClientConfigurationBuilder.withConnectionTimeoutMillis(20000L);
         netconfClientConfigurationBuilder.withReconnectStrategy(
             new NeverReconnectStrategy(GlobalEventExecutor.INSTANCE, 5000));

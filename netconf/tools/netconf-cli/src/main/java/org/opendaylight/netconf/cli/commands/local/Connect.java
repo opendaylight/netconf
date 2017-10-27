@@ -25,7 +25,7 @@ import org.opendaylight.netconf.cli.commands.output.Output;
 import org.opendaylight.netconf.cli.commands.output.OutputDefinition;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
-import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPassword;
+import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.protocol.framework.NeverReconnectStrategy;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -102,7 +102,7 @@ public class Connect extends AbstractCommand {
         return NetconfClientConfigurationBuilder.create().withAddress(inetAddress)
                 .withConnectionTimeoutMillis(connectionTimeout)
                 .withReconnectStrategy(strategy)
-                .withAuthHandler(new LoginPassword(username, passwd))
+                .withAuthHandler(new LoginPasswordHandler(username, passwd))
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH);
     }
 

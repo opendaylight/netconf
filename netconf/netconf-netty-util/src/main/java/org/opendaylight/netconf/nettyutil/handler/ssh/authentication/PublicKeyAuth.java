@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.security.KeyPair;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.future.AuthFuture;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.aaa.encrypt.PKIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +19,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Represents Auth information for the public key based authentication for netconf.
  */
-public class PublicKeyAuth extends LoginPassword {
+public class PublicKeyAuth extends LoginPasswordHandler {
     private KeyPair keyPair = null;
     private static final Logger LOG = LoggerFactory.getLogger(PublicKeyAuth.class);
 
     public PublicKeyAuth(String username, String password, String keyPath,
-            String passPhrase, AAAEncryptionService encryptionService) {
-        super(username, password, encryptionService);
+                         String passPhrase) {
+        super(username, password);
         try {
             boolean isKeyPathAbsent = Strings.isNullOrEmpty(keyPath);
             passPhrase = Strings.isNullOrEmpty(passPhrase) ? "" : passPhrase;

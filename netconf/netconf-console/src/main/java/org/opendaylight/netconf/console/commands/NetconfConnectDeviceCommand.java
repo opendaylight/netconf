@@ -20,7 +20,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordDeprecatedBuilder;
 
 @Command(name = "netconf:connect-device", scope = "netconf", description = "Connect to a netconf device.")
 public class NetconfConnectDeviceCommand extends AbstractAction {
@@ -95,7 +95,8 @@ public class NetconfConnectDeviceCommand extends AbstractAction {
 
         final boolean isTcpOnly = connectionType.equals("true");
         final boolean isSchemaless = schemaless.equals("true");
-        final Credentials credentials = new LoginPasswordBuilder().setPassword(password).setUsername(username).build();
+        final Credentials credentials =
+                new LoginPasswordDeprecatedBuilder().setPassword(password).setUsername(username).build();
 
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                                         .setHost(new Host(new IpAddress(new Ipv4Address(deviceIp))))

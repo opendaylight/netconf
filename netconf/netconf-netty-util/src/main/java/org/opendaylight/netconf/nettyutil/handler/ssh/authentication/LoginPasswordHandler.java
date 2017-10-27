@@ -11,25 +11,18 @@ package org.opendaylight.netconf.nettyutil.handler.ssh.authentication;
 import java.io.IOException;
 import org.apache.sshd.ClientSession;
 import org.apache.sshd.client.future.AuthFuture;
-import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 
 /**
  * Class Providing username/password authentication option to
  * {@link org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler}.
  */
-public class LoginPassword extends AuthenticationHandler {
+public class LoginPasswordHandler extends AuthenticationHandler {
     protected final String username;
     protected final String password;
-    protected final AAAEncryptionService encryptionService;
 
-    public LoginPassword(String username, String password) {
-        this(username, password, null);
-    }
-
-    public LoginPassword(final String username, final String password, final AAAEncryptionService encryptionService) {
+    public LoginPasswordHandler(final String username, final String password) {
         this.username = username;
         this.password = password;
-        this.encryptionService = encryptionService;
     }
 
     @Override
@@ -39,12 +32,7 @@ public class LoginPassword extends AuthenticationHandler {
 
     @Override
     public AuthFuture authenticate(final ClientSession session) throws IOException {
-        if (encryptionService != null) {
-            String decryptedPassword = encryptionService.decrypt(password);
-            session.addPasswordIdentity(decryptedPassword);
-        } else {
-            session.addPasswordIdentity(password);
-        }
+        session.addPasswordIdentity(password);
         return session.auth();
     }
 }
