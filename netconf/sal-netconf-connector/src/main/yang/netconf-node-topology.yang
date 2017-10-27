@@ -49,11 +49,11 @@ module netconf-node-topology {
                     uses username-password;
                 }
             }
-            case key-based {
-                description "key-pair based authentication, use the id for the pair thats stored in the keystore.";
+            case key-auth {
+                description "key-based authentication, use the id for the pair thats stored in the keystore.";
 
-                container key-pair {
-                    leaf pair-id {
+                container key-based {
+                    leaf key-id {
                         type string;
                     }
 
