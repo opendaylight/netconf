@@ -65,7 +65,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.KeyAuth;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordDeprecated;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPw;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPwUnencrypted;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.key.auth.KeyBased;
@@ -461,8 +460,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     private AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {
-        if (credentials instanceof LoginPasswordDeprecated) {
-            final LoginPasswordDeprecated loginPassword = (LoginPasswordDeprecated) credentials;
+        if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
+                .rev150114.netconf.node.credentials.credentials.LoginPassword) {
+            final org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
+                    .rev150114.netconf.node.credentials.credentials.LoginPassword loginPassword
+                    = (org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
+                    .rev150114.netconf.node.credentials.credentials.LoginPassword) credentials;
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         }
         if (credentials instanceof LoginPwUnencrypted) {

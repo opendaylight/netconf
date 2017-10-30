@@ -28,7 +28,7 @@ module netconf-node-topology {
     grouping netconf-node-credentials {
         choice credentials {
             config true;
-            case login-password-deprecated {
+            case login-password {
                 description "Deprecated way of storing credentials, unencrypted.";
 
                 status deprecated;
@@ -36,7 +36,6 @@ module netconf-node-topology {
             }
             case login-pw {
                 description "login-password credentials, encrypted.";
-
 
                 container login-password {
                     uses username-password;

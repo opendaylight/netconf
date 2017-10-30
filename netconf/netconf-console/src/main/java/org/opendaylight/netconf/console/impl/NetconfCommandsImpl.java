@@ -37,7 +37,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordDeprecatedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -223,7 +223,7 @@ public class NetconfCommandsImpl implements NetconfCommands {
                     ? updated.get(NetconfConsoleConstants.PASSWORD) : password;
 
             final Credentials credentials =
-                    new LoginPasswordDeprecatedBuilder().setPassword(newPassword).setUsername(newUsername).build();
+                    new LoginPasswordBuilder().setPassword(newPassword).setUsername(newUsername).build();
             final NetconfNode updatedNetconfNode = new NetconfNodeBuilder()
                     .setHost(new Host(new IpAddress(new Ipv4Address(deviceIp))))
                     .setPort(new PortNumber(Integer.decode(devicePort)))
