@@ -28,7 +28,7 @@ module netconf-node-topology {
     grouping netconf-node-credentials {
         choice credentials {
             config true;
-            case login-password-deprecated {
+            case login-password {
                 description "Deprecated way of storing credentials, unencrypted.";
 
                 status deprecated;
@@ -36,7 +36,6 @@ module netconf-node-topology {
             }
             case login-pw {
                 description "login-password credentials, encrypted.";
-
 
                 container login-password {
                     uses username-password;
@@ -49,11 +48,17 @@ module netconf-node-topology {
                     uses username-password;
                 }
             }
-            case key-based {
-                description "key-pair based authentication, use the id for the pair thats stored in the keystore.";
+            case key-auth {
+                description "key-based authentication, use the id for the pair thats stored in the keystore.";
 
-                leaf pair-id {
-                    type string;
+                container key-based {
+                    leaf key-id {
+                        type string;
+                    }
+
+                    leaf username {
+                        type string;
+                    }
                 }
             }
         }
@@ -300,9 +305,17 @@ module netconf-node-topology {
 
     }
 
-    rpc add-netconf-node {
+    rpc create-device {
         input {
             uses netconf-node-fields;
+            leaf node-id {
+                type string;
+            }
+        }
+    }
+
+    rpc delete-device {
+        input {
             leaf node-id {
                 type string;
             }

@@ -60,7 +60,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordDeprecatedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
@@ -134,7 +134,7 @@ public class RemoteDeviceConnectorImplTest {
 
     @Test
     public void testStopRemoteDeviceConnection() {
-        final Credentials credentials = new LoginPasswordDeprecatedBuilder()
+        final Credentials credentials = new LoginPasswordBuilder()
                 .setPassword("admin").setUsername("admin").build();
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
@@ -174,7 +174,7 @@ public class RemoteDeviceConnectorImplTest {
         final ExecutorService executorService = mock(ExecutorService.class);
         doReturn(executorService).when(processingExecutor).getExecutor();
 
-        final Credentials credentials = new LoginPasswordDeprecatedBuilder()
+        final Credentials credentials = new LoginPasswordBuilder()
                 .setPassword("admin").setUsername("admin").build();
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
@@ -205,7 +205,7 @@ public class RemoteDeviceConnectorImplTest {
         final ExecutorService executorService = mock(ExecutorService.class);
         doReturn(executorService).when(processingExecutor).getExecutor();
 
-        final Credentials credentials = new LoginPasswordDeprecatedBuilder()
+        final Credentials credentials = new LoginPasswordBuilder()
                 .setPassword("admin").setUsername("admin").build();
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
@@ -245,7 +245,7 @@ public class RemoteDeviceConnectorImplTest {
                 .setDefaultRequestTimeoutMillis(2000L)
                 .setHost(host)
                 .setPort(portNumber)
-                .setCredentials(new LoginPasswordDeprecatedBuilder()
+                .setCredentials(new LoginPasswordBuilder()
                         .setUsername("testuser")
                         .setPassword("testpassword").build())
                 .setTcpOnly(true)
