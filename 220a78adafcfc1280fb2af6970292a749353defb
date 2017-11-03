@@ -46,6 +46,30 @@
       "revId": "220a78adafcfc1280fb2af6970292a749353defb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_fae575dc",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceTopologyAdapter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-11-03T14:01:06Z",
+      "side": 1,
+      "message": "Increasing the timeout should be fine, but if we were on ask protocol wouldnt this fail after heal anyway?",
+      "parentUuid": "9a245df4_993c6ce4",
+      "range": {
+        "startLine": 144,
+        "startChar": 69,
+        "endLine": 144,
+        "endChar": 88
+      },
+      "revId": "220a78adafcfc1280fb2af6970292a749353defb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
