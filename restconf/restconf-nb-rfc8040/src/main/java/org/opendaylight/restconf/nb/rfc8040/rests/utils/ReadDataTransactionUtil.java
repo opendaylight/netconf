@@ -248,26 +248,28 @@ public final class ReadDataTransactionUtil {
     }
 
     /**
-     * Read specific type of data from data store via transaction and if identifier read data from
-     * streams then put streams from actual schema context to datastore.
+     * Read specific type of data from data store via transaction and if identifier read data from streams then put
+     * streams from actual schema context to datastore.
      *
      * @param identifier
-     *             identifier of data to read
+     *            identifier of data to read
      * @param content
-     *             type of data to read (config, state, all)
+     *            type of data to read (config, state, all)
      * @param transactionNode
-     *             {@link TransactionVarsWrapper} - wrapper for variables
+     *            {@link TransactionVarsWrapper} - wrapper for variables
      * @param withDefa
-     *             vaule of with-defaults parameter
+     *            vaule of with-defaults parameter
      * @param schemaContextRef
-     *             schema context
+     *            schema context
      * @param uriInfo
-     *             uri info
+     *            uri info
+     * @param schema
+     *            notifications schema
      * @return {@link NormalizedNode}
      */
     public static NormalizedNode<?, ?> readData(final String identifier, final String content,
                                                 final TransactionVarsWrapper transactionNode, final String withDefa,
-                                                final SchemaContextRef schemaContextRef, final UriInfo uriInfo) {
+            final SchemaContextRef schemaContextRef, final UriInfo uriInfo, final String schema) {
         final SchemaContext schemaContext = schemaContextRef.get();
         if (identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
             final DOMDataReadWriteTransaction wTx = transactionNode.getTransactionChain().newReadWriteTransaction();
@@ -283,7 +285,8 @@ public final class ReadDataTransactionUtil {
                 notifiStreamJSON.addAll(notifiStreamXML);
 
                 for (final NotificationListenerAdapter listener : notifiStreamJSON) {
-                    final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName());
+                    final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName(),
+                            schema);
                     final NormalizedNode mapToStreams =
                             RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                                     listener.getSchemaPath().getLastComponent(), schemaContext.getNotifications(),

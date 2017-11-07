@@ -86,23 +86,25 @@ public final class SubscribeToStreamUtil {
     }
 
     /**
-     * Register listeners by streamName in identifier to listen to yang
-     * notifications, put or delete info about listener to DS according to
-     * ietf-restconf-monitoring.
+     * Register listeners by streamName in identifier to listen to yang notifications, put or delete info about listener
+     * to DS according to ietf-restconf-monitoring.
      *
      * @param identifier
-     *             identifier as stream name
+     *            identifier as stream name
      * @param uriInfo
-     *             for getting base URI information
+     *            for getting base URI information
      * @param notificationQueryParams
-     *             query parameters of notification
+     *            query parameters of notification
      * @param handlersHolder
-     *             holder of handlers for notifications
+     *            holder of handlers for notifications
+     * @param schema
+     *            notification schema
      * @return location for listening
      */
     @SuppressWarnings("rawtypes")
     public static URI notifYangStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder,
+            final String schema) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -123,7 +125,7 @@ public final class SubscribeToStreamUtil {
         final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
         final boolean exist = checkExist(schemaContext, wTx);
 
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
+        final URI uri = prepareUriByStreamName(uriInfo, streamName, schema);
         for (final NotificationListenerAdapter listener : listeners) {
             registerToListenNotification(listener, handlersHolder.getNotificationServiceHandler());
             listener.setQueryParams(notificationQueryParams.getStart(), notificationQueryParams.getStop(),
@@ -174,23 +176,25 @@ public final class SubscribeToStreamUtil {
     }
 
     /**
-     * Register listener by streamName in identifier to listen to data change
-     * notifications, put or delete info about listener to DS according to
-     * ietf-restconf-monitoring.
+     * Register listener by streamName in identifier to listen to data change notifications, put or delete info about
+     * listener to DS according to ietf-restconf-monitoring.
      *
      * @param identifier
-     *             identifier as stream name
+     *            identifier as stream name
      * @param uriInfo
-     *             for getting base URI information
+     *            for getting base URI information
      * @param notificationQueryParams
-     *             query parameters of notification
+     *            query parameters of notification
      * @param handlersHolder
-     *             holder of handlers for notifications
+     *            holder of handlers for notifications
+     * @param schema
+     *            notification schema
      * @return location for listening
      */
     @SuppressWarnings("rawtypes")
     public static URI notifiDataStream(final String identifier, final UriInfo uriInfo,
-            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
+            final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder,
+            final String schema) {
         final Map<String, String> mapOfValues = SubscribeToStreamUtil.mapValuesFromUri(identifier);
 
         final LogicalDatastoreType ds = SubscribeToStreamUtil.parseURIEnum(LogicalDatastoreType.class,
@@ -220,7 +224,7 @@ public final class SubscribeToStreamUtil {
 
         registration(ds, scope, listener, handlersHolder.getDomDataBrokerHandler().get());
 
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
+        final URI uri = prepareUriByStreamName(uriInfo, streamName, schema);
 
         final DOMDataReadWriteTransaction wTx =
                 handlersHolder.getTransactionChainHandler().get().newReadWriteTransaction();
@@ -305,12 +309,12 @@ public final class SubscribeToStreamUtil {
         return result;
     }
 
-    static URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
+    static URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName, final String schema) {
         final int port = SubscribeToStreamUtil.prepareNotificationPort();
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
         final UriBuilder uriToWebSocketServer =
-                uriBuilder.port(port).scheme(RestconfStreamsConstants.SCHEMA_SUBSCIBRE_URI);
+                uriBuilder.port(port).scheme(schema);
         final URI uri = uriToWebSocketServer.replacePath(streamName).build();
         return uri;
     }

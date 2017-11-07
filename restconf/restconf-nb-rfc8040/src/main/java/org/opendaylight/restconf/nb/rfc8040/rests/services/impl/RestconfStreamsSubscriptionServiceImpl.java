@@ -47,6 +47,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsSubscriptionServiceImpl.class);
 
     private final HandlersHolder handlersHolder;
+    private final String schema;
 
     /**
      * Initialize holder of handlers with holders as parameters.
@@ -62,9 +63,10 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBrokerHandler domDataBrokerHandler,
             final NotificationServiceHandler notificationServiceHandler, final SchemaContextHandler schemaHandler,
-            final TransactionChainHandler transactionChainHandler) {
+            final TransactionChainHandler transactionChainHandler, final String schema) {
         this.handlersHolder = new HandlersHolder(domDataBrokerHandler, notificationServiceHandler,
                 transactionChainHandler, schemaHandler);
+        this.schema = schema;
     }
 
     @Override
@@ -74,10 +76,10 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         URI response = null;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCR)) {
             response = SubscribeToStreamUtil.notifiDataStream(identifier, uriInfo, notificationQueryParams,
-                    this.handlersHolder);
+                    this.handlersHolder, schema);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
             response = SubscribeToStreamUtil.notifYangStream(identifier, uriInfo, notificationQueryParams,
-                    this.handlersHolder);
+                    this.handlersHolder, schema);
         }
 
         if (response != null) {

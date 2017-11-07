@@ -66,15 +66,17 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private final DOMMountPointServiceHandler mountPointServiceHandler;
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
+    private final String schema;
 
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
                                    final TransactionChainHandler transactionChainHandler,
             final DOMMountPointServiceHandler mountPointServiceHandler,
-            final RestconfStreamsSubscriptionService delegRestconfSubscrService) {
+            final RestconfStreamsSubscriptionService delegRestconfSubscrService, final String schema) {
         this.schemaContextHandler = schemaContextHandler;
         this.transactionChainHandler = transactionChainHandler;
         this.mountPointServiceHandler = mountPointServiceHandler;
         this.delegRestconfSubscrService = delegRestconfSubscrService;
+        this.schema = schema;
     }
 
     @Override
@@ -132,7 +134,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 instanceIdentifier, mountPoint, transactionChain);
         final NormalizedNode<?, ?> node =
                 ReadDataTransactionUtil.readData(identifier, parameters.getContent(), transactionNode, withDefa,
-                        schemaContextRef, uriInfo);
+                        schemaContextRef, uriInfo, schema);
         if (identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();

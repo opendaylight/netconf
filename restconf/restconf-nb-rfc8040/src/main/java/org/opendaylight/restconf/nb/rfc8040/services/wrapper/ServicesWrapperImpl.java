@@ -44,7 +44,7 @@ import org.opendaylight.restconf.nb.rfc8040.services.simple.impl.RestconfSchemaS
  *
  */
 @Path("/")
-public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServicesWrapper {
+public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServicesWrapper, ServiceWrapper {
 
     private RestconfDataService delegRestconfDataService;
     private RestconfInvokeOperationsService delegRestconfInvokeOpsService;
@@ -135,17 +135,19 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
         return this.delegRestService.getLibraryVersion();
     }
 
+    @Override
     public void setHandlers(final SchemaContextHandler schemaCtxHandler,
             final DOMMountPointServiceHandler domMountPointServiceHandler,
             final TransactionChainHandler transactionChainHandler, final DOMDataBrokerHandler domDataBrokerHandler,
-            final RpcServiceHandler rpcServiceHandler, final NotificationServiceHandler notificationServiceHandler) {
+            final RpcServiceHandler rpcServiceHandler, final NotificationServiceHandler notificationServiceHandler,
+            final String schema) {
         this.delegRestOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         this.delegRestSchService = new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         this.delegRestconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(domDataBrokerHandler,
-                notificationServiceHandler, schemaCtxHandler, transactionChainHandler);
+                notificationServiceHandler, schemaCtxHandler, transactionChainHandler, schema);
         this.delegRestconfDataService =
                 new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler, domMountPointServiceHandler,
-                        this.delegRestconfSubscrService);
+                        this.delegRestconfSubscrService, schema);
         this.delegRestconfInvokeOpsService =
                 new RestconfInvokeOperationsServiceImpl(rpcServiceHandler, schemaCtxHandler);
         this.delegRestService = new RestconfImpl(schemaCtxHandler);

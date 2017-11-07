@@ -20,7 +20,6 @@ import static org.opendaylight.restconf.common.patch.PatchEditOperation.CREATE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.DELETE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REMOVE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REPLACE;
-
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
@@ -62,6 +61,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -190,7 +190,8 @@ public class RestconfDataServiceImplTest {
 
         schemaContextHandler.onGlobalContextUpdated(this.contextRef.get());
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,
-                this.mountPointServiceHandler, this.delegRestconfSubscrService);
+                this.mountPointServiceHandler, this.delegRestconfSubscrService,
+                RestconfStreamsConstants.SCHEMA_SUBSCIBRE_URI);
         doReturn(this.domTransactionChain).when(this.transactionChainHandler).get();
         doReturn(this.read).when(this.domTransactionChain).newReadOnlyTransaction();
         doReturn(this.readWrite).when(this.domTransactionChain).newReadWriteTransaction();
