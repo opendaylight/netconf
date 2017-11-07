@@ -36,6 +36,9 @@
   <reference id="domDataBroker" interface="org.opendaylight.controller.md.sal.dom.api.DOMDataBroker"
           ext:filter="(type=@{databroker-service-type})"/>
 
+  <bean id="wrapper" class="org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl"
+          factory-method="getInstance" />
+
   <bean id="restconfProvider" class="org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider"
           init-method="start" destroy-method="close">
     <argument ref="domDataBroker"/>
@@ -43,6 +46,7 @@
     <argument ref="domRpcService"/>
     <argument ref="domNotificationService"/>
     <argument ref="domMountPointService"/>
+    <argument ref="wrapper"/>
   </bean>
 
   <service ref="restconfProvider"
@@ -52,10 +56,7 @@
   <bean id="jsonRestconfService" depends-on="restconfProvider"
       class="org.opendaylight.restconf.nb.rfc8040.rests.services.impl.JSONRestconfServiceRfc8040Impl"
       destroy-method="close">
-    <argument>
-      <bean class="org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl"
-          factory-method="getInstance" />
-    </argument>
+    <argument ref="wrapper"/>
     <argument>
       <bean factory-ref="restconfProvider" factory-method="getMountPointServiceHandler" />
     </argument>

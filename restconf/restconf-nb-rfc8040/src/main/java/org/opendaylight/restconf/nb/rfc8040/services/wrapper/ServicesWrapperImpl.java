@@ -44,7 +44,7 @@ import org.opendaylight.restconf.nb.rfc8040.services.simple.impl.RestconfSchemaS
  *
  */
 @Path("/")
-public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServicesWrapper {
+public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServicesWrapper, ServiceWrapper {
 
     private RestconfDataService delegRestconfDataService;
     private RestconfInvokeOperationsService delegRestconfInvokeOpsService;
@@ -135,6 +135,7 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
         return this.delegRestService.getLibraryVersion();
     }
 
+    @Override
     public void setHandlers(final SchemaContextHandler schemaCtxHandler,
             final DOMMountPointServiceHandler domMountPointServiceHandler,
             final TransactionChainHandler transactionChainHandler, final DOMDataBrokerHandler domDataBrokerHandler,
