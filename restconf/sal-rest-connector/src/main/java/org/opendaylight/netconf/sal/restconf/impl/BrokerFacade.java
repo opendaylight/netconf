@@ -89,6 +89,8 @@ public class BrokerFacade {
     private DOMDataBroker domDataBroker;
     private DOMNotificationService domNotification;
 
+    private ThreadLocal<Boolean> isMounted = new ThreadLocal<>();
+
     private BrokerFacade() {}
 
     public void setRpcService(final DOMRpcService router) {
@@ -238,12 +240,13 @@ public class BrokerFacade {
         Preconditions.checkNotNull(payload);
 
         checkPreconditions();
-
+        isMounted.set(false);
         final DOMDataReadWriteTransaction newReadWriteTransaction = this.domDataBroker.newReadWriteTransaction();
         final Status status = readDataViaTransaction(newReadWriteTransaction, CONFIGURATION, path) != null ? Status.OK
                 : Status.CREATED;
         final CheckedFuture<Void, TransactionCommitFailedException> future = putDataViaTransaction(
                 newReadWriteTransaction, CONFIGURATION, path, payload, globalSchema, insert, point);
+        isMounted.remove();
         return new PutResult(status, future);
     }
 
@@ -270,7 +273,7 @@ public class BrokerFacade {
         Preconditions.checkNotNull(mountPoint);
         Preconditions.checkNotNull(path);
         Preconditions.checkNotNull(payload);
-
+        isMounted.set(true);
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
             final DOMDataReadWriteTransaction newReadWriteTransaction = domDataBrokerService.get().newReadWriteTransaction();
@@ -279,9 +282,11 @@ public class BrokerFacade {
             final CheckedFuture<Void, TransactionCommitFailedException> future = putDataViaTransaction(
                     newReadWriteTransaction, CONFIGURATION, path, payload, mountPoint.getSchemaContext(), insert,
                     point);
+            isMounted.remove();
             return new PutResult(status, future);
         }
         final String errMsg = "DOM data broker service isn't available for mount point " + path;
+        isMounted.remove();
         LOG.warn(errMsg);
         throw new RestconfDocumentedException(errMsg);
     }
@@ -463,20 +468,29 @@ public class BrokerFacade {
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPost(
             final SchemaContext globalSchema, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final String insert, final String point) {
+        isMounted.set(false);
         checkPreconditions();
-        return postDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload,
+        CheckedFuture<Void, TransactionCommitFailedException> future =
+                postDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload,
                 globalSchema, insert, point);
+        isMounted.remove();
+        return future;
     }
 
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPost(
             final DOMMountPoint mountPoint, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final String insert, final String point) {
+        isMounted.set(true);
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            return postDataViaTransaction(domDataBrokerService.get().newReadWriteTransaction(), CONFIGURATION, path,
+            CheckedFuture<Void, TransactionCommitFailedException> future =
+                    postDataViaTransaction(domDataBrokerService.get().newReadWriteTransaction(), CONFIGURATION, path,
                     payload, mountPoint.getSchemaContext(), insert, point);
+            isMounted.remove();
+            return future;
         }
         final String errMsg = "DOM data broker service isn't available for mount point " + path;
+        isMounted.remove();
         LOG.warn(errMsg);
         throw new RestconfDocumentedException(errMsg);
     }
@@ -793,7 +807,7 @@ public class BrokerFacade {
         }
     }
 
-    private static void insertWithPointLeafListPost(final DOMDataReadWriteTransaction rWTransaction,
+    private void insertWithPointLeafListPost(final DOMDataReadWriteTransaction rWTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
             final boolean before) {
@@ -826,7 +840,7 @@ public class BrokerFacade {
         }
     }
 
-    private static void insertWithPointListPost(final DOMDataReadWriteTransaction rWTransaction,
+    private void insertWithPointListPost(final DOMDataReadWriteTransaction rWTransaction,
             final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
             final String point, final MapNode readList, final boolean before) {
@@ -880,7 +894,7 @@ public class BrokerFacade {
         throw new RestconfDocumentedException("Insert parameter can be used only with list or leaf-list");
     }
 
-    private static void makeNormalPost(final DOMDataReadWriteTransaction rWTransaction,
+    private void makeNormalPost(final DOMDataReadWriteTransaction rWTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext) {
         final Collection<? extends NormalizedNode<?, ?>> children;
@@ -895,8 +909,11 @@ public class BrokerFacade {
 
         final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
         if (children.isEmpty()) {
-            rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+            if (isMounted != null && !isMounted.get()) {
+                rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()),
+                                    emptySubtree);
+                ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+            }
             return;
         }
 
@@ -905,8 +922,10 @@ public class BrokerFacade {
 
         // ... now enqueue modifications. This relies on proper ordering of requests, i.e. these will not affect the
         // result of the existence checks...
-        rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-        ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+        if (isMounted != null && !isMounted.get()) {
+            rWTransaction.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+        }
         for (final NormalizedNode<?, ?> child : children) {
             // FIXME: we really want a create(YangInstanceIdentifier, NormalizedNode) method in the transaction,
             //        as that would allow us to skip the existence checks
@@ -935,11 +954,13 @@ public class BrokerFacade {
         }
     }
 
-    private static void simplePostPut(final DOMDataReadWriteTransaction rWTransaction,
+    private void simplePostPut(final DOMDataReadWriteTransaction rWTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext) {
         checkItemDoesNotExists(rWTransaction, datastore, path);
-        ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+        if (isMounted != null && !isMounted.get()) {
+            ensureParentsByMerge(datastore, path, rWTransaction, schemaContext);
+        }
         rWTransaction.put(datastore, path, payload);
     }
 
@@ -1104,7 +1125,7 @@ public class BrokerFacade {
         }
     }
 
-    private static void insertWithPointLeafListPut(final DOMDataWriteTransaction tx,
+    private void insertWithPointLeafListPut(final DOMDataWriteTransaction tx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
             final boolean before) {
@@ -1135,7 +1156,7 @@ public class BrokerFacade {
         }
     }
 
-    private static void insertWithPointListPut(final DOMDataWriteTransaction tx, final LogicalDatastoreType datastore,
+    private void insertWithPointListPut(final DOMDataWriteTransaction tx, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
             final String point, final OrderedMapNode readList, final boolean before) {
         tx.delete(datastore, path.getParent());
@@ -1165,12 +1186,15 @@ public class BrokerFacade {
         }
     }
 
-    private static void makePut(final DOMDataWriteTransaction tx, final LogicalDatastoreType datastore,
+    private void makePut(final DOMDataWriteTransaction tx, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         if (payload instanceof MapNode) {
             final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
-            tx.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
-            ensureParentsByMerge(datastore, path, tx, schemaContext);
+
+            if (isMounted != null && !isMounted.get()) {
+                tx.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
+                ensureParentsByMerge(datastore, path, tx, schemaContext);
+            }
             for (final MapEntryNode child : ((MapNode) payload).getValue()) {
                 final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
                 tx.put(datastore, childPath, child);
@@ -1180,9 +1204,11 @@ public class BrokerFacade {
         }
     }
 
-    private static void simplePut(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
+    private void simplePut(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
             final DOMDataWriteTransaction tx, final SchemaContext schemaContext, final NormalizedNode<?, ?> payload) {
-        ensureParentsByMerge(datastore, path, tx, schemaContext);
+        if (isMounted != null && !isMounted.get()) {
+            ensureParentsByMerge(datastore, path, tx, schemaContext);
+        }
         tx.put(datastore, path, payload);
     }
 
