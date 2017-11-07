@@ -23,7 +23,6 @@
   <name>${project.artifactId}</name>
 
   <modules>
-    <module>netconf-cli</module>
     <module>netconf-testtool</module>
   </modules>
 </project>
