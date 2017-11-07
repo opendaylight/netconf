@@ -25,6 +25,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 
@@ -55,7 +56,7 @@ public class RestConnectorProviderTest {
                 Mockito.any(SchemaContextHandler.class));
 
         this.connectorProvider = new RestConnectorProvider(mockDataBroker, mockSchemaService, mockRpcService,
-                mockNotificationService, mockMountPointService);
+                mockNotificationService, mockMountPointService, ServicesWrapperImpl.getInstance());
     }
 
     /**
