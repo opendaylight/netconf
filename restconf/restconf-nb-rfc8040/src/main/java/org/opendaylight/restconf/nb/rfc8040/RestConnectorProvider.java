@@ -24,7 +24,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl;
+import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServiceWrapper;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.slf4j.Logger;
@@ -33,8 +33,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Provider for restconf draft18.
  *
+ * @param <T>
+ *
  */
-public class RestConnectorProvider implements RestconfConnector, AutoCloseable {
+public class RestConnectorProvider<T extends ServiceWrapper> implements RestconfConnector, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestConnectorProvider.class);
 
@@ -61,13 +63,16 @@ public class RestConnectorProvider implements RestconfConnector, AutoCloseable {
     private final DOMRpcService rpcService;
     private final DOMNotificationService notificationService;
     private final DOMMountPointService mountPointService;
-    private ListenerRegistration<SchemaContextListener> listenerRegistration;
+    private final T wrapperServices;
 
+    private ListenerRegistration<SchemaContextListener> listenerRegistration;
     private SchemaContextHandler schemaCtxHandler;
 
-    public RestConnectorProvider(final DOMDataBroker domDataBroker, final SchemaService schemaService,
-            final DOMRpcService rpcService, final DOMNotificationService notificationService,
-            final DOMMountPointService mountPointService) {
+    public RestConnectorProvider(final DOMDataBroker domDataBroker,
+            final SchemaService schemaService, final DOMRpcService rpcService,
+            final DOMNotificationService notificationService, final DOMMountPointService mountPointService,
+            final T wrapperServices) {
+        this.wrapperServices = wrapperServices;
         this.schemaService = Preconditions.checkNotNull(schemaService);
         this.rpcService = Preconditions.checkNotNull(rpcService);
         this.notificationService = Preconditions.checkNotNull(notificationService);
@@ -77,8 +82,6 @@ public class RestConnectorProvider implements RestconfConnector, AutoCloseable {
     }
 
     public void start() {
-        final ServicesWrapperImpl wrapperServices = ServicesWrapperImpl.getInstance();
-
         mountPointServiceHandler = new DOMMountPointServiceHandler(mountPointService);
 
         final DOMDataBrokerHandler brokerHandler = new DOMDataBrokerHandler(dataBroker);
