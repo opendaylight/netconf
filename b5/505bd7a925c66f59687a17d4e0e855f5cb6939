@@ -1,0 +1,8 @@
+Code-Review+1: Balaji Varadaraju <bvaradar@luminanetworks.com>
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Tomas Cere <tcere@cisco.com>
+Submitted-by: Anil Belur <abelur@linuxfoundation.org>
+Submitted-at: Thu, 09 Nov 2017 12:55:33 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/65281
+Project: netconf
+Branch: refs/heads/stable/nitrogen
