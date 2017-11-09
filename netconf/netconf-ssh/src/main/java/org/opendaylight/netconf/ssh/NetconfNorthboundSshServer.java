@@ -28,7 +28,8 @@ public class NetconfNorthboundSshServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNorthboundSshServer.class);
 
-    private static final String DEFAULT_PRIVATE_KEY_PATH = "./configuration/netconf-mdsal-nb/RSA.pk";
+    // Do not store unencrypted private key
+    private static final String DEFAULT_PRIVATE_KEY_PATH = null;
     private static final String DEFAULT_ALGORITHM = "RSA";
     private static final int DEFAULT_KEY_SIZE = 4096;
 
