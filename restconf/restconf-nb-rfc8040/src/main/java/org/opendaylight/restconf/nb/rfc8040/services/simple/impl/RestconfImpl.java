@@ -25,7 +25,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public class RestconfImpl implements RestconfService {
 
-    private final SchemaContextHandler schemaContextHandler;
+    private SchemaContextHandler schemaContextHandler;
 
     public RestconfImpl(final SchemaContextHandler schemaContextHandler) {
         this.schemaContextHandler = schemaContextHandler;
@@ -50,5 +50,18 @@ public class RestconfImpl implements RestconfService {
         final NormalizedNode<?, ?> data =
                 Builders.leafBuilder((LeafSchemaNode) schemaNode).withValue(IetfYangLibrary.REVISION).build();
         return new NormalizedNodeContext(iid, data);
+    }
+
+    public void updateHandlers(final SchemaContextHandler schemaContextHandler) {
+        this.schemaContextHandler = schemaContextHandler;
+    }
+
+    @Override
+    public void updateHandlers(final Object... handlers) {
+        for (final Object object : handlers) {
+            if (object instanceof SchemaContextHandler) {
+                schemaContextHandler = (SchemaContextHandler) object;
+            }
+        }
     }
 }
