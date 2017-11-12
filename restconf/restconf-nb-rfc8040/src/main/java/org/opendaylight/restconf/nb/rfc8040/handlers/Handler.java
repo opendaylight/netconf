@@ -14,7 +14,7 @@ package org.opendaylight.restconf.nb.rfc8040.handlers;
  * @param <T>
  *             specific type go object for handling it
  */
-interface Handler<T> {
+public interface Handler<T> {
 
     /**
      * Get prepared object.
@@ -29,5 +29,5 @@ interface Handler<T> {
      * @param object
      *             new object to update old object
      */
-    default void update(T object) {}
+    default void update(final T object) {}
 }
