@@ -61,9 +61,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
 
-    private final SchemaContextHandler schemaContextHandler;
-    private final TransactionChainHandler transactionChainHandler;
-    private final DOMMountPointServiceHandler mountPointServiceHandler;
+    private SchemaContextHandler schemaContextHandler;
+    private TransactionChainHandler transactionChainHandler;
+    private DOMMountPointServiceHandler mountPointServiceHandler;
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
 
@@ -75,6 +75,19 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         this.transactionChainHandler = transactionChainHandler;
         this.mountPointServiceHandler = mountPointServiceHandler;
         this.delegRestconfSubscrService = delegRestconfSubscrService;
+    }
+
+    @Override
+    public synchronized void updateHandlers(final Object... handlers) {
+        for (final Object object : handlers) {
+            if (object instanceof SchemaContextHandler) {
+                schemaContextHandler = (SchemaContextHandler) object;
+            } else if (object instanceof DOMMountPointServiceHandler) {
+                mountPointServiceHandler = (DOMMountPointServiceHandler) object;
+            } else if (object instanceof TransactionChainHandler) {
+                transactionChainHandler = (TransactionChainHandler) object;
+            }
+        }
     }
 
     @Override
