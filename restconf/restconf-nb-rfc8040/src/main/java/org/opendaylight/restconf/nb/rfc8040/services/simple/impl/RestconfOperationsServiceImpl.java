@@ -46,8 +46,8 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfOperationsServiceImpl.class);
 
-    private final SchemaContextHandler schemaContextHandler;
-    private final DOMMountPointServiceHandler domMountPointServiceHandler;
+    private SchemaContextHandler schemaContextHandler;
+    private DOMMountPointServiceHandler domMountPointServiceHandler;
 
     /**
      * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}.
@@ -61,6 +61,17 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
             final DOMMountPointServiceHandler domMountPointServiceHandler) {
         this.schemaContextHandler = schemaContextHandler;
         this.domMountPointServiceHandler = domMountPointServiceHandler;
+    }
+
+    @Override
+    public void updateHandlers(final Object... handlers) {
+        for (final Object object : handlers) {
+            if (object instanceof SchemaContextHandler) {
+                schemaContextHandler = (SchemaContextHandler) object;
+            } else if (object instanceof DOMMountPointServiceHandler) {
+                domMountPointServiceHandler = (DOMMountPointServiceHandler) object;
+            }
+        }
     }
 
     @Override

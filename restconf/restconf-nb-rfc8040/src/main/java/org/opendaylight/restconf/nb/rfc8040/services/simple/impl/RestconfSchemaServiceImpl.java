@@ -21,8 +21,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  */
 public class RestconfSchemaServiceImpl implements RestconfSchemaService {
 
-    private final SchemaContextHandler schemaContextHandler;
-    private final DOMMountPointServiceHandler domMountPointServiceHandler;
+    private SchemaContextHandler schemaContextHandler;
+    private DOMMountPointServiceHandler domMountPointServiceHandler;
 
     /**
      * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}
@@ -44,5 +44,16 @@ public class RestconfSchemaServiceImpl implements RestconfSchemaService {
         final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
         return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaContextRef.get(), identifier,
                 this.domMountPointServiceHandler.get());
+    }
+
+    @Override
+    public void updateHandlers(final Object... handlers) {
+        for (final Object object : handlers) {
+            if (object instanceof SchemaContextHandler) {
+                schemaContextHandler = (SchemaContextHandler) object;
+            } else if (object instanceof DOMMountPointServiceHandler) {
+                domMountPointServiceHandler = (DOMMountPointServiceHandler) object;
+            }
+        }
     }
 }

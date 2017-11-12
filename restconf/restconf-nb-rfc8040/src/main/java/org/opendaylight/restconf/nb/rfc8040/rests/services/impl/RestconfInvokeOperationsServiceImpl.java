@@ -33,13 +33,24 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
  */
 public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
 
-    private final RpcServiceHandler rpcServiceHandler;
-    private final SchemaContextHandler schemaContextHandler;
+    private RpcServiceHandler rpcServiceHandler;
+    private SchemaContextHandler schemaContextHandler;
 
     public RestconfInvokeOperationsServiceImpl(final RpcServiceHandler rpcServiceHandler,
             final SchemaContextHandler schemaContextHandler) {
         this.rpcServiceHandler = rpcServiceHandler;
         this.schemaContextHandler = schemaContextHandler;
+    }
+
+    @Override
+    public void updateHandlers(final Object... handlers) {
+        for (final Object object : handlers) {
+            if (object instanceof SchemaContextHandler) {
+                schemaContextHandler = (SchemaContextHandler) object;
+            } else if (object instanceof RpcServiceHandler) {
+                rpcServiceHandler = (RpcServiceHandler) object;
+            }
+        }
     }
 
     @Override

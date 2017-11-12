@@ -46,7 +46,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsSubscriptionServiceImpl.class);
 
-    private final HandlersHolder handlersHolder;
+    private HandlersHolder handlersHolder;
 
     /**
      * Initialize holder of handlers with holders as parameters.
@@ -65,6 +65,15 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
             final TransactionChainHandler transactionChainHandler) {
         this.handlersHolder = new HandlersHolder(domDataBrokerHandler, notificationServiceHandler,
                 transactionChainHandler, schemaHandler);
+    }
+
+    @Override
+    public void updateHandlers(final Object... handlers) {
+        for (final Object object : handlers) {
+            if (object instanceof HandlersHolder) {
+                handlersHolder = (HandlersHolder) object;
+            }
+        }
     }
 
     @Override
