@@ -29,6 +29,7 @@ import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response.Status;
@@ -48,6 +49,9 @@ import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.JSONRestconfServiceImpl;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusContext;
+import org.opendaylight.netconf.sal.restconf.impl.PATCHStatusEntity;
 import org.opendaylight.netconf.sal.restconf.impl.PutResult;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
@@ -281,6 +285,74 @@ public class JSONRestconfServiceImplTest {
             assertNotNull(e.getCause());
             throw e.getCause();
         }
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void testPatch() throws Exception {
+        final PATCHStatusContext result = mock(PATCHStatusContext.class);
+        when(brokerFacade.patchConfigurationDataWithinTransaction(notNull(PATCHContext.class)))
+            .thenReturn(result);
+
+        List<PATCHStatusEntity> patchSTatus = new ArrayList<>();
+
+        PATCHStatusEntity entity = new PATCHStatusEntity("edit1", true, null);
+
+        patchSTatus.add(entity);
+
+        when(result.getEditCollection())
+                .thenReturn(patchSTatus);
+        when(result.getGlobalErrors()).thenReturn(new ArrayList<>());
+        when(result.getPatchId()).thenReturn("1");
+        final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
+        final String payload = loadData("/parts/ietf-interfaces_interfaces_patch.json");
+        final Optional<String> patchResult = this.service.patch(uriPath, payload);
+
+        assertTrue(patchResult.get().contains("\"ok\":[null]"));
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void testPatchBehindMountPoint() throws Exception {
+    	final DOMMountPoint mockMountPoint = setupTestMountPoint();
+        final PATCHStatusContext result = mock(PATCHStatusContext.class);
+        when(brokerFacade.patchConfigurationDataWithinTransaction(notNull(PATCHContext.class)))
+            .thenReturn(result);
+
+        List<PATCHStatusEntity> patchSTatus = new ArrayList<>();
+
+        PATCHStatusEntity entity = new PATCHStatusEntity("edit1", true, null);
+
+        patchSTatus.add(entity);
+
+        when(result.getEditCollection())
+                .thenReturn(patchSTatus);
+        when(result.getGlobalErrors()).thenReturn(new ArrayList<>());
+        when(result.getPatchId()).thenReturn("1");
+
+        final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont/cont1";
+        final String payload = loadData("/full-versions/testCont1DataPatch.json");
+
+        final Optional<String> patchResult = this.service.patch(uriPath, payload);
+
+        assertTrue(patchResult.get().contains("\"ok\":[null]"));
+    }
+
+    @Test(expected = OperationFailedException.class)
+    @SuppressWarnings("checkstyle:IllegalThrows")
+    public void testPatchFailure() throws Throwable {
+        final PATCHStatusContext result = mock(PATCHStatusContext.class);
+        when(brokerFacade.patchConfigurationDataWithinTransaction(notNull(PATCHContext.class)))
+            .thenThrow(new TransactionCommitFailedException("Transaction failed"));
+
+        final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
+        final String payload = loadData("/parts/ietf-interfaces_interfaces_patch.json");
+
+        final Optional<String> patchResult = this.service.patch(uriPath, payload);
+
+        assertTrue("Patch output is not null", patchResult.isPresent());
+        String patch = patchResult.get();
+        assertTrue(patch.contains("TransactionCommitFailedException"));
     }
 
     @Test
