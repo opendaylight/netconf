@@ -8,7 +8,9 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.api;
 
 import com.google.common.base.Optional;
+
 import javax.annotation.Nonnull;
+
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 
@@ -73,4 +75,15 @@ public interface JSONRestconfService {
      * @throws OperationFailedException if the request fails.
      */
     Optional<String> invokeRpc(@Nonnull String uriPath, Optional<String> input) throws OperationFailedException;
+
+    /**
+     * Issues a restconf PATCH request to the configuration data store.
+     *
+     * @param uriPath the yang instance identifier path, eg "opendaylight-inventory:nodes/node/device-id".
+     *       To specify the root, use {@link ROOT_PATH}.
+     * @param payload the payload data in JSON format.
+     * @return an Optional containing the patch response data in JSON format.
+     * @throws OperationFailedException if the request fails.
+     */
+    Optional<String> patch(String uriPath, @Nonnull String payload) throws OperationFailedException;
 }
