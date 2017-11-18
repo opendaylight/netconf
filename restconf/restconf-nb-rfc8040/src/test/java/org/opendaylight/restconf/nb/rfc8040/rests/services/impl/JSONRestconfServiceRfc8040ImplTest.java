@@ -24,11 +24,13 @@ import static org.mockito.Mockito.verify;
 import com.google.common.base.Optional;
 import com.google.common.io.Resources;
 import com.google.common.util.concurrent.Futures;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -335,6 +337,78 @@ public class JSONRestconfServiceRfc8040ImplTest {
             assertNotNull(e.getCause());
             throw e.getCause();
         }
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void testPatch() throws Exception {
+        final String uriPath = "ietf-interfaces:interfaces/interface=eth0";
+        final String payload = loadData("/parts/ietf-interfaces_interfaces_patch.json");
+
+        final Optional<String> patchResult = this.service.patch(uriPath, payload);
+
+        final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
+                ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
+
+        verify(mockReadWriteTx).put(eq(LogicalDatastoreType.CONFIGURATION), capturedPath.capture(),
+                capturedNode.capture());
+
+        verifyPath(capturedPath.getValue(), INTERFACES_QNAME, INTERFACE_QNAME,
+                new Object[]{INTERFACE_QNAME, NAME_QNAME, "eth0"});
+
+        assertTrue("Expected MapEntryNode. Actual " + capturedNode.getValue().getClass(),
+                capturedNode.getValue() instanceof MapEntryNode);
+        final MapEntryNode actualNode = (MapEntryNode) capturedNode.getValue();
+        assertEquals("MapEntryNode node type", INTERFACE_QNAME, actualNode.getNodeType());
+        verifyLeafNode(actualNode, NAME_QNAME, "eth0");
+        verifyLeafNode(actualNode, TYPE_QNAME, "ethernetCsmacd");
+        verifyLeafNode(actualNode, ENABLED_QNAME, Boolean.FALSE);
+        verifyLeafNode(actualNode, DESC_QNAME, "some interface");
+        assertTrue(patchResult.get().contains("\"ok\":[null]"));
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Test
+    public void testPatchBehindMountPoint() throws Exception {
+        setupTestMountPoint();
+
+        final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont/cont1";
+        final String payload = loadData("/full-versions/testCont1DataPatch.json");
+
+        final Optional<String> patchResult = this.service.patch(uriPath, payload);
+
+        final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
+                ArgumentCaptor.forClass(YangInstanceIdentifier.class);
+        final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
+
+        verify(mockReadWriteTx).put(eq(LogicalDatastoreType.CONFIGURATION), capturedPath.capture(),
+                capturedNode.capture());
+
+        verifyPath(capturedPath.getValue(), TEST_CONT_QNAME, TEST_CONT1_QNAME);
+
+        assertTrue("Expected ContainerNode", capturedNode.getValue() instanceof ContainerNode);
+        final ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
+        assertEquals("ContainerNode node type", TEST_CONT1_QNAME, actualNode.getNodeType());
+        verifyLeafNode(actualNode, TEST_LF11_QNAME, "lf11 data");
+        verifyLeafNode(actualNode, TEST_LF12_QNAME, "lf12 data");
+        assertTrue(patchResult.get().contains("\"ok\":[null]"));
+    }
+
+    @Test
+    @SuppressWarnings("checkstyle:IllegalThrows")
+    public void testPatchFailure() throws Throwable {
+        doReturn(Futures.immediateFailedCheckedFuture(new TransactionCommitFailedException("mock")))
+                .when(mockReadWriteTx).submit();
+
+        final String uriPath = "ietf-interfaces:interfaces/interface=eth0";
+
+        final String payload = loadData("/parts/ietf-interfaces_interfaces_patch.json");
+
+        final Optional<String> patchResult = this.service.patch(uriPath, payload);
+        assertTrue("Patch output is not null", patchResult.isPresent());
+        String patch = patchResult.get();
+        assertTrue(patch.contains("TransactionCommitFailedException"));
     }
 
     @Test
