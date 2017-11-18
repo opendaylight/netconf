@@ -26,12 +26,16 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
+import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.util.MultivaluedHashMap;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeJsonBodyWriter;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.JsonToPatchBodyReader;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.PatchJsonBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.JSONRestconfService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.TransactionServicesWrapper;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
@@ -174,6 +178,33 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
         return Optional.fromNullable(output);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    @Override
+    public Optional<String> patch(final String uriPath, final String payload)
+            throws OperationFailedException {
+
+        String output = null;
+        Preconditions.checkNotNull(payload, "payload can't be null");
+
+        LOG.debug("patch: uriPath: {}, payload: {}", uriPath, payload);
+
+        final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
+
+        JsonToPatchBodyReader jsonToPatchBodyReader = new JsonToPatchBodyReader();
+        final PatchContext context = jsonToPatchBodyReader.readFrom(uriPath, entityStream);
+
+        LOG.debug("Parsed YangInstanceIdentifier: {}", context.getInstanceIdentifierContext().getInstanceIdentifier());
+        LOG.debug("Parsed NormalizedNode: {}", context.getData());
+
+        try {
+            PatchStatusContext patchStatusContext = services.patchData(context, new SimpleUriInfo(uriPath));
+            output = toJson(patchStatusContext);
+        } catch (final Exception e) {
+            propagateExceptionAs(uriPath, e, "PATCH");
+        }
+        return Optional.fromNullable(output);
+    }
+
     @Override
     public void close() {
     }
@@ -195,6 +226,14 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
             propagateExceptionAs(uriPath, e, "GET");
             return null;
         }
+    }
+
+    private  String toJson(final PatchStatusContext patchStatusContext) throws IOException {
+        final PatchJsonBodyWriter writer = new PatchJsonBodyWriter();
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        writer.writeTo(patchStatusContext, PatchStatusContext.class, null, EMPTY_ANNOTATIONS,
+                MediaType.APPLICATION_JSON_TYPE, null, outputStream);
+        return outputStream.toString(StandardCharsets.UTF_8.name());
     }
 
     private static String toJson(final NormalizedNodeContext readData) throws IOException {
