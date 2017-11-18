@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9a245df4_228688db",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/api/JSONRestconfService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-11-18T17:54:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a245df4_c2c32c36",
+      "range": {
+        "startLine": 86,
+        "startChar": 34,
+        "endLine": 86,
+        "endChar": 41
+      },
+      "revId": "6bdb0c3c451b7d0850bd4f55f687ac3653d62b6f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a245df4_a2bef8ab",
         "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/JSONRestconfServiceImpl.java",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "9a245df4_8270140c",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/JSONRestconfServiceImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-11-18T17:54:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a245df4_a2bef8ab",
+      "range": {
+        "startLine": 175,
+        "startChar": 52,
+        "endLine": 175,
+        "endChar": 63
+      },
+      "revId": "6bdb0c3c451b7d0850bd4f55f687ac3653d62b6f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a245df4_02e1c4d0",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/JSONRestconfService.java",
         "patchSetId": 1
@@ -59,6 +107,30 @@
       "writtenOn": "2017-11-18T03:09:18Z",
       "side": 1,
       "message": "@Nonnull",
+      "range": {
+        "startLine": 88,
+        "startChar": 34,
+        "endLine": 88,
+        "endChar": 41
+      },
+      "revId": "6bdb0c3c451b7d0850bd4f55f687ac3653d62b6f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_626b601e",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/JSONRestconfService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-11-18T17:54:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a245df4_02e1c4d0",
       "range": {
         "startLine": 88,
         "startChar": 34,
