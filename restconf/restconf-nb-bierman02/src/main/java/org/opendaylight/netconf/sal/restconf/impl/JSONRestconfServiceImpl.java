@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,15 +17,21 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
+
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
+import org.opendaylight.netconf.sal.rest.impl.JsonToPatchBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
+import org.opendaylight.netconf.sal.rest.impl.PatchJsonBodyWriter;
 import org.opendaylight.netconf.sal.restconf.api.JSONRestconfService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
+import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -165,8 +172,44 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         return Optional.fromNullable(output);
     }
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    @Override
+    public Optional<String> patch(final String uriPath, final String payload)
+            throws OperationFailedException {
+
+        String output = null;
+        Preconditions.checkNotNull(payload, "payload can't be null");
+
+        LOG.debug("patch: uriPath: {}, payload: {}", uriPath, payload);
+
+        final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
+
+        JsonToPatchBodyReader jsonToPatchBodyReader = new JsonToPatchBodyReader();
+        final PatchContext context = jsonToPatchBodyReader.readFrom(uriPath, entityStream);
+
+        LOG.debug("Parsed YangInstanceIdentifier: {}", context.getInstanceIdentifierContext().getInstanceIdentifier());
+        LOG.debug("Parsed NormalizedNode: {}", context.getData());
+
+        try {
+            PatchStatusContext patchStatusContext = RestconfImpl.getInstance()
+                .patchConfigurationData(context, new SimpleUriInfo(uriPath));
+            output = toJson(patchStatusContext);
+        } catch (final Exception e) {
+            propagateExceptionAs(uriPath, e, "PATCH");
+        }
+        return Optional.fromNullable(output);
+    }
+
     @Override
     public void close() {
+    }
+
+    private  String toJson(final PatchStatusContext patchStatusContext) throws IOException {
+        final PatchJsonBodyWriter writer = new PatchJsonBodyWriter();
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        writer.writeTo(patchStatusContext, PatchStatusContext.class, null, EMPTY_ANNOTATIONS,
+                MediaType.APPLICATION_JSON_TYPE, null, outputStream);
+        return outputStream.toString(StandardCharsets.UTF_8.name());
     }
 
     private static String toJson(final NormalizedNodeContext readData) throws IOException {
