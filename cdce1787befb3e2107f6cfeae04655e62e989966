@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a245df4_34ea3eac",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/JSONRestconfServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 6995
+      },
+      "writtenOn": "2017-11-20T19:40:36Z",
+      "side": 1,
+      "message": "This is suppressing warning to general exception catch. Suppression should be removed and exception should be specifically handled.",
+      "revId": "cdce1787befb3e2107f6cfeae04655e62e989966",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_94d4caec",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/restconf/impl/test/JSONRestconfServiceImplTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 6995
+      },
+      "writtenOn": "2017-11-20T19:40:36Z",
+      "side": 1,
+      "message": "Should be an easy fix to this. If not, thats okay.",
+      "revId": "cdce1787befb3e2107f6cfeae04655e62e989966",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_74cf9656",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/restconf/impl/test/JSONRestconfServiceImplTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 6995
+      },
+      "writtenOn": "2017-11-20T19:40:36Z",
+      "side": 1,
+      "message": "I think you can just throw TransactionCommitFailedException instead of Throwable and dont need to suppress the warning.",
+      "revId": "cdce1787befb3e2107f6cfeae04655e62e989966",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
