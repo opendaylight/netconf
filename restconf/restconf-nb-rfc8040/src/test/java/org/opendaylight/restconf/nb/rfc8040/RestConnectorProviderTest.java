@@ -24,6 +24,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
@@ -43,6 +44,8 @@ public class RestConnectorProviderTest {
     @Mock private DOMNotificationService mockNotificationService;
     @Mock DOMTransactionChain mockTransactionChain;
     @Mock private ListenerRegistration<SchemaContextListener> mockRegistration;
+    @Mock
+    private DOMSchemaService domSchemaService;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -56,7 +59,7 @@ public class RestConnectorProviderTest {
                 Mockito.any(SchemaContextHandler.class));
 
         this.connectorProvider = new RestConnectorProvider(mockDataBroker, mockSchemaService, mockRpcService,
-                mockNotificationService, mockMountPointService, ServicesWrapperImpl.getInstance());
+                mockNotificationService, mockMountPointService, domSchemaService, ServicesWrapperImpl.getInstance());
     }
 
     /**

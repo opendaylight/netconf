@@ -9,7 +9,6 @@ package org.opendaylight.netconf.md.sal.rest.schema;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.Produces;
@@ -19,6 +18,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
+import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
+import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 
 @Provider
 @Produces({ SchemaRetrievalService.YANG_MEDIA_TYPE })
@@ -41,8 +43,14 @@ public class SchemaExportContentYangBodyWriter implements MessageBodyWriter<Sche
             final Annotation[] annotations, final MediaType mediaType,
             final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException,
             WebApplicationException {
-        final PrintWriter writer = new PrintWriter(entityStream);
-        writer.write(context.getModule().getSource());
-
+        final RevisionSourceIdentifier sourceId = RevisionSourceIdentifier.create(context.getModule().getName(),
+                context.getModule().getQNameModule().getFormattedRevision());
+        final YangTextSchemaSource yangTextSchemaSource;
+        try {
+            yangTextSchemaSource = context.getSourceProvider().getSource(sourceId).checkedGet();
+        } catch (SchemaSourceException e) {
+            throw new WebApplicationException("Unable to retrieve source from SourceProvider.", e);
+        }
+        yangTextSchemaSource.copyTo(entityStream);
     }
 }

@@ -27,6 +27,8 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.broker.impl.mount.DOMMountPointServiceImpl;
 import org.opendaylight.controller.md.sal.dom.broker.spi.mount.SimpleDOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -97,6 +99,10 @@ public class ParserIdentifierTest {
     private DOMMountPoint mockMountPoint;
     @Mock
     private DOMMountPointService mockMountPointService;
+    @Mock
+    private DOMSchemaService domSchemaService;
+    @Mock
+    private DOMYangTextSourceProvider sourceProvider;
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
@@ -461,7 +467,7 @@ public class ParserIdentifierTest {
     @Test
     public void toSchemaExportContextFromIdentifierTest() {
         final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
-                this.schemaContext, TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null);
+                this.schemaContext, TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null, sourceProvider);
 
         assertNotNull("Export context should be parsed", exportContext);
 
@@ -485,7 +491,7 @@ public class ParserIdentifierTest {
         final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
                 this.schemaContext,
                 "not-existing-module" + "/" + "2016-01-01",
-                null);
+                null, sourceProvider);
 
         assertNotNull("Export context should be parsed", exportContext);
         assertNull("Not-existing module should be null", exportContext.getModule());
@@ -500,7 +506,7 @@ public class ParserIdentifierTest {
     public void toSchemaExportContextFromIdentifierInvalidIdentifierNegativeTest() {
         try {
             ParserIdentifier.toSchemaExportContextFromIdentifier(
-                    this.schemaContext, TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME, null);
+                    this.schemaContext, TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME, null, sourceProvider);
             fail("Test should fail due to invalid identifier supplied");
         } catch (final RestconfDocumentedException e) {
             assertEquals("Not expected error type",
@@ -521,7 +527,7 @@ public class ParserIdentifierTest {
         final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
                 this.schemaContext,
                 MOUNT_POINT_IDENT + "/" + TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION,
-                this.mountPointService);
+                this.mountPointService, sourceProvider);
 
         final Module module = exportContext.getModule();
         assertNotNull("Export context should contains test module", module);
@@ -543,7 +549,7 @@ public class ParserIdentifierTest {
         final SchemaExportContext exportContext = ParserIdentifier.toSchemaExportContextFromIdentifier(
                 this.schemaContext,
                 MOUNT_POINT_IDENT + "/" + "not-existing-module" + "/" + "2016-01-01",
-                this.mountPointService);
+                this.mountPointService, sourceProvider);
 
         assertNotNull("Export context should be parsed", exportContext);
         assertNull("Not-existing module should be null", exportContext.getModule());
@@ -560,7 +566,7 @@ public class ParserIdentifierTest {
             ParserIdentifier.toSchemaExportContextFromIdentifier(
                     this.schemaContext,
                     MOUNT_POINT_IDENT + "/" + TEST_MODULE_REVISION + "/" + TEST_MODULE_NAME,
-                    this.mountPointService);
+                    this.mountPointService, sourceProvider);
 
             fail("Test should fail due to invalid identifier supplied");
         } catch (final RestconfDocumentedException e) {
@@ -580,7 +586,7 @@ public class ParserIdentifierTest {
     @Test
     public void toSchemaExportContextFromIdentifierNullIdentifierNegativeTest() {
         this.thrown.expect(NullPointerException.class);
-        ParserIdentifier.toSchemaExportContextFromIdentifier(this.schemaContext, null, null);
+        ParserIdentifier.toSchemaExportContextFromIdentifier(this.schemaContext, null, null, sourceProvider);
     }
 
     /**
@@ -590,7 +596,8 @@ public class ParserIdentifierTest {
     @Test
     public void toSchemaExportContextFromIdentifierNullSchemaContextNegativeTest() {
         this.thrown.expect(NullPointerException.class);
-        ParserIdentifier.toSchemaExportContextFromIdentifier(null, TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null);
+        ParserIdentifier.toSchemaExportContextFromIdentifier(null, TEST_MODULE_NAME + "/" + TEST_MODULE_REVISION, null,
+                sourceProvider);
     }
 
     /**
@@ -608,7 +615,8 @@ public class ParserIdentifierTest {
                 + TEST_MODULE_NAME
                 + "/"
                 + TEST_MODULE_REVISION,
-                this.mountPointService);
+                this.mountPointService,
+                sourceProvider);
     }
 
     /**
@@ -626,7 +634,8 @@ public class ParserIdentifierTest {
                 + TEST_MODULE_NAME
                 + "/"
                 + TEST_MODULE_REVISION,
-                null);
+                null,
+                sourceProvider);
     }
 
     /**
@@ -644,7 +653,8 @@ public class ParserIdentifierTest {
                 + TEST_MODULE_NAME
                 + "/"
                 + TEST_MODULE_REVISION,
-                this.mockMountPointService);
+                this.mockMountPointService,
+                sourceProvider);
     }
 
     /**
