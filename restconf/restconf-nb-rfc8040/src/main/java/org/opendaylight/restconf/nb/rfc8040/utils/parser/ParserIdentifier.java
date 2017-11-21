@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -204,14 +205,16 @@ public final class ParserIdentifier {
      * @return {@link SchemaExportContext}
      */
     public static SchemaExportContext toSchemaExportContextFromIdentifier(final SchemaContext schemaContext,
-            final String identifier, final DOMMountPointService domMountPointService) {
+            final String identifier, final DOMMountPointService domMountPointService,
+            final DOMYangTextSourceProvider sourceProvider) {
         final Iterable<String> pathComponents = RestconfConstants.SLASH_SPLITTER.split(identifier);
         final Iterator<String> componentIter = pathComponents.iterator();
         if (!Iterables.contains(pathComponents, RestconfConstants.MOUNT)) {
             final String moduleName = RestconfValidation.validateAndGetModulName(componentIter);
             final Date revision = RestconfValidation.validateAndGetRevision(componentIter);
             final Module module = schemaContext.findModuleByName(moduleName, revision);
-            return new SchemaExportContext(schemaContext, module);
+
+            return new SchemaExportContext(schemaContext, module, sourceProvider);
         } else {
             final StringBuilder pathBuilder = new StringBuilder();
             while (componentIter.hasNext()) {
@@ -234,7 +237,7 @@ public final class ParserIdentifier {
             final String moduleName = RestconfValidation.validateAndGetModulName(componentIter);
             final Date revision = RestconfValidation.validateAndGetRevision(componentIter);
             final Module module = point.getMountPoint().getSchemaContext().findModuleByName(moduleName, revision);
-            return new SchemaExportContext(point.getMountPoint().getSchemaContext(), module);
+            return new SchemaExportContext(point.getMountPoint().getSchemaContext(), module, sourceProvider);
         }
     }
 }

@@ -35,6 +35,7 @@
   <reference id="domNotificationService" interface="org.opendaylight.controller.md.sal.dom.api.DOMNotificationService"/>
   <reference id="domDataBroker" interface="org.opendaylight.controller.md.sal.dom.api.DOMDataBroker"
           ext:filter="(type=@{databroker-service-type})"/>
+  <reference id="domSchemaService" interface="org.opendaylight.mdsal.dom.api.DOMSchemaService"/>
 
   <bean id="wrapper" class="org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl"
           factory-method="getInstance" />
@@ -46,6 +47,7 @@
     <argument ref="domRpcService"/>
     <argument ref="domNotificationService"/>
     <argument ref="domMountPointService"/>
+    <argument ref="domSchemaService"/>
     <argument ref="wrapper"/>
   </bean>
 

@@ -17,6 +17,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
@@ -62,19 +63,21 @@ public class RestConnectorProvider<T extends ServiceWrapper> implements Restconf
     private final DOMNotificationService notificationService;
     private final DOMMountPointService mountPointService;
     private final T wrapperServices;
+    private final DOMSchemaService domSchemaService;
 
     private ListenerRegistration<SchemaContextListener> listenerRegistration;
     private SchemaContextHandler schemaCtxHandler;
 
     public RestConnectorProvider(final DOMDataBroker domDataBroker,
-            final SchemaService schemaService, final DOMRpcService rpcService,
-            final DOMNotificationService notificationService, final DOMMountPointService mountPointService,
-            final T wrapperServices) {
+             final SchemaService schemaService, final DOMRpcService rpcService,
+             final DOMNotificationService notificationService, final DOMMountPointService mountPointService,
+             final DOMSchemaService domSchemaService, final T wrapperServices) {
         this.wrapperServices = Preconditions.checkNotNull(wrapperServices);
         this.schemaService = Preconditions.checkNotNull(schemaService);
         this.rpcService = Preconditions.checkNotNull(rpcService);
         this.notificationService = Preconditions.checkNotNull(notificationService);
         this.mountPointService = Preconditions.checkNotNull(mountPointService);
+        this.domSchemaService = Preconditions.checkNotNull(domSchemaService);
 
         RestConnectorProvider.dataBroker = Preconditions.checkNotNull(domDataBroker);
     }
@@ -97,7 +100,7 @@ public class RestConnectorProvider<T extends ServiceWrapper> implements Restconf
 
         wrapperServices.setHandlers(this.schemaCtxHandler, RestConnectorProvider.mountPointServiceHandler,
                 RestConnectorProvider.transactionChainHandler, brokerHandler, rpcServiceHandler,
-                notificationServiceHandler);
+                notificationServiceHandler, domSchemaService);
     }
 
     public DOMMountPointServiceHandler getMountPointServiceHandler() {

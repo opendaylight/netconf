@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.services.simple.impl;
 
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
@@ -23,6 +24,7 @@ public class RestconfSchemaServiceImpl implements RestconfSchemaService {
 
     private final SchemaContextHandler schemaContextHandler;
     private final DOMMountPointServiceHandler domMountPointServiceHandler;
+    private final DOMYangTextSourceProvider sourceProvider;
 
     /**
      * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}
@@ -34,15 +36,17 @@ public class RestconfSchemaServiceImpl implements RestconfSchemaService {
      *             handling dom mount point service
      */
     public RestconfSchemaServiceImpl(final SchemaContextHandler schemaContextHandler,
-            final DOMMountPointServiceHandler domMountPointServiceHandler) {
+                                     final DOMMountPointServiceHandler domMountPointServiceHandler,
+                                     final DOMYangTextSourceProvider sourceProvider) {
         this.schemaContextHandler = schemaContextHandler;
         this.domMountPointServiceHandler = domMountPointServiceHandler;
+        this.sourceProvider = sourceProvider;
     }
 
     @Override
     public SchemaExportContext getSchema(final String identifier) {
         final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
         return ParserIdentifier.toSchemaExportContextFromIdentifier(schemaContextRef.get(), identifier,
-                this.domMountPointServiceHandler.get());
+                this.domMountPointServiceHandler.get(), sourceProvider);
     }
 }
