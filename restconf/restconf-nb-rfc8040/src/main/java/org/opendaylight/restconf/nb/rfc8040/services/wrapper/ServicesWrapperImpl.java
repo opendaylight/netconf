@@ -10,6 +10,8 @@ package org.opendaylight.restconf.nb.rfc8040.services.wrapper;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
@@ -139,9 +141,14 @@ public class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServ
     public void setHandlers(final SchemaContextHandler schemaCtxHandler,
             final DOMMountPointServiceHandler domMountPointServiceHandler,
             final TransactionChainHandler transactionChainHandler, final DOMDataBrokerHandler domDataBrokerHandler,
-            final RpcServiceHandler rpcServiceHandler, final NotificationServiceHandler notificationServiceHandler) {
+            final RpcServiceHandler rpcServiceHandler, final NotificationServiceHandler notificationServiceHandler,
+            final DOMSchemaService domSchemaService) {
         this.delegRestOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
-        this.delegRestSchService = new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
+        final DOMYangTextSourceProvider yangTextSourceProvider =
+                (DOMYangTextSourceProvider) domSchemaService.getSupportedExtensions()
+                        .get(DOMYangTextSourceProvider.class);
+        this.delegRestSchService = new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler,
+                yangTextSourceProvider);
         this.delegRestconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(domDataBrokerHandler,
                 notificationServiceHandler, schemaCtxHandler, transactionChainHandler);
         this.delegRestconfDataService =

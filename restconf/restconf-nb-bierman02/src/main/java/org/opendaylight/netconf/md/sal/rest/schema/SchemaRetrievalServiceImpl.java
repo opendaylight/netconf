@@ -75,8 +75,9 @@ public class SchemaRetrievalServiceImpl implements SchemaRetrievalService {
         try {
             final Date revision = SimpleDateFormatUtil.getRevisionFormat().parse(revisionStr);
             final Module module = schemaContext.findModuleByName(moduleName, revision);
+            // TODO remove the null provider, schema retrieval needs to be fixed in the old impl aswell
             return new SchemaExportContext(
-                    schemaContext, RestconfValidationUtils.checkNotNullDocumented(module, moduleName));
+                    schemaContext, RestconfValidationUtils.checkNotNullDocumented(module, moduleName), null);
         } catch (final ParseException e) {
             throw new RestconfDocumentedException("Supplied revision is not in expected date format YYYY-mm-dd", e);
         }

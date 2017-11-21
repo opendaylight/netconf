@@ -26,6 +26,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.broker.impl.mount.DOMMountPointServiceImpl;
 import org.opendaylight.controller.md.sal.dom.broker.spi.mount.SimpleDOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
@@ -63,6 +64,8 @@ public class RestconfSchemaServiceTest {
     private SchemaContextHandler mockContextHandler;
     @Mock
     private DOMMountPointServiceHandler mockMountPointHandler;
+    @Mock
+    private DOMYangTextSourceProvider sourceProvider;
 
     // schema context with modules
     private SchemaContext schemaContext;
@@ -106,7 +109,8 @@ public class RestconfSchemaServiceTest {
         ((DOMMountPointServiceImpl) this.mountPointService).registerMountPoint(this.mountPointWithNullSchemaContext);
         when(this.mockMountPointHandler.get()).thenReturn(this.mountPointService);
 
-        this.schemaService = new RestconfSchemaServiceImpl(this.mockContextHandler, this.mockMountPointHandler);
+        this.schemaService = new RestconfSchemaServiceImpl(this.mockContextHandler, this.mockMountPointHandler,
+                sourceProvider);
     }
 
     /**

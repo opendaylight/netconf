@@ -50,6 +50,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
@@ -135,6 +136,9 @@ public class JSONRestconfServiceRfc8040ImplTest {
     @Mock
     private DOMRpcService mockRpcService;
 
+    @Mock
+    private DOMSchemaService domSchemaService;
+
     private JSONRestconfServiceRfc8040Impl service;
 
     @BeforeClass
@@ -181,7 +185,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         ServicesWrapperImpl.getInstance().setHandlers(mockSchemaContextHandler, mountPointServiceHandler,
                 txChainHandler, new DOMDataBrokerHandler(mockDOMDataBroker),
                 new RpcServiceHandler(mockRpcService),
-                new NotificationServiceHandler(mock(DOMNotificationService.class)));
+                new NotificationServiceHandler(mock(DOMNotificationService.class)), domSchemaService);
 
         service = new JSONRestconfServiceRfc8040Impl(ServicesWrapperImpl.getInstance(), mountPointServiceHandler);
     }
