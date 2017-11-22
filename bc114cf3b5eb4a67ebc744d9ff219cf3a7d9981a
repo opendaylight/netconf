@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a245df4_056edcc8",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/JSONRestconfServiceImpl.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 4705
+      },
+      "writtenOn": "2017-11-22T22:30:18Z",
+      "side": 1,
+      "message": "[Query] is it required to create an instance per request? Better make it class instance variable.",
+      "range": {
+        "startLine": 187,
+        "startChar": 8,
+        "endLine": 187,
+        "endChar": 82
+      },
+      "revId": "bc114cf3b5eb4a67ebc744d9ff219cf3a7d9981a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_e570e8a5",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/JSONRestconfServiceImpl.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 4705
+      },
+      "writtenOn": "2017-11-22T22:30:18Z",
+      "side": 1,
+      "message": "[Query] is it required to create an instance per request? Better make it class instance variable.",
+      "range": {
+        "startLine": 208,
+        "startChar": 8,
+        "endLine": 208,
+        "endChar": 69
+      },
+      "revId": "bc114cf3b5eb4a67ebc744d9ff219cf3a7d9981a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
