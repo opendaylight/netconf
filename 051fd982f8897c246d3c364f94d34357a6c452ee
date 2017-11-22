@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9a245df4_c550440d",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/JSONRestconfServiceImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-11-22T21:57:35Z",
+      "side": 1,
+      "message": "The resource are released by the API in JSONToPatchBodYReader. SO we don\u0027t have to close it here.",
+      "parentUuid": "9a245df4_ba50cb32",
+      "range": {
+        "startLine": 185,
+        "startChar": 26,
+        "endLine": 185,
+        "endChar": 38
+      },
+      "revId": "051fd982f8897c246d3c364f94d34357a6c452ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a245df4_da349ffd",
         "filename": "restconf/restconf-nb-bierman02/src/test/resources/full-versions/testCont1DataPatch.json",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2017-11-22T19:53:47Z",
       "side": 1,
       "message": "remove space",
+      "range": {
+        "startLine": 9,
+        "startChar": 17,
+        "endLine": 9,
+        "endChar": 18
+      },
+      "revId": "051fd982f8897c246d3c364f94d34357a6c452ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_8533ecf4",
+        "filename": "restconf/restconf-nb-bierman02/src/test/resources/full-versions/testCont1DataPatch.json",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-11-22T21:57:35Z",
+      "side": 1,
+      "message": "I will address, but hoe does it matter if there are spaces in a JSON file? It\u0027s perfectly legal to have spaces in JSON which we must handle.",
+      "parentUuid": "9a245df4_da349ffd",
       "range": {
         "startLine": 9,
         "startChar": 17,
@@ -65,6 +113,24 @@
     },
     {
       "key": {
+        "uuid": "9a245df4_652eb88d",
+        "filename": "restconf/restconf-nb-bierman02/src/test/resources/full-versions/testCont1DataPatch.json",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-11-22T21:57:35Z",
+      "side": 1,
+      "message": "I will address, but hoe does it matter if there are spaces in a JSON file? It\u0027s perfectly legal to have spaces in JSON which we must handle.",
+      "parentUuid": "9a245df4_ba372bfe",
+      "revId": "051fd982f8897c246d3c364f94d34357a6c452ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a245df4_da4dbf9b",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/JSONRestconfServiceRfc8040Impl.java",
         "patchSetId": 3
@@ -76,6 +142,30 @@
       "writtenOn": "2017-11-22T19:33:35Z",
       "side": 1,
       "message": "I think you forget to release the resources. entityStream.close()",
+      "range": {
+        "startLine": 194,
+        "startChar": 26,
+        "endLine": 194,
+        "endChar": 38
+      },
+      "revId": "051fd982f8897c246d3c364f94d34357a6c452ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_a5539015",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/JSONRestconfServiceRfc8040Impl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2017-11-22T21:57:35Z",
+      "side": 1,
+      "message": "The resource are released by the API in JSONToPatchBodYReader. SO we don\u0027t have to close it here.",
+      "parentUuid": "9a245df4_da4dbf9b",
       "range": {
         "startLine": 194,
         "startChar": 26,
