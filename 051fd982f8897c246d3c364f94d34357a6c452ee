@@ -25,6 +25,46 @@
     },
     {
       "key": {
+        "uuid": "9a245df4_da349ffd",
+        "filename": "restconf/restconf-nb-bierman02/src/test/resources/full-versions/testCont1DataPatch.json",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2017-11-22T19:53:47Z",
+      "side": 1,
+      "message": "remove space",
+      "range": {
+        "startLine": 9,
+        "startChar": 17,
+        "endLine": 9,
+        "endChar": 18
+      },
+      "revId": "051fd982f8897c246d3c364f94d34357a6c452ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_ba372bfe",
+        "filename": "restconf/restconf-nb-bierman02/src/test/resources/full-versions/testCont1DataPatch.json",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2017-11-22T19:53:47Z",
+      "side": 1,
+      "message": "same here",
+      "revId": "051fd982f8897c246d3c364f94d34357a6c452ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a245df4_da4dbf9b",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/JSONRestconfServiceRfc8040Impl.java",
         "patchSetId": 3
@@ -42,6 +82,23 @@
         "endLine": 194,
         "endChar": 38
       },
+      "revId": "051fd982f8897c246d3c364f94d34357a6c452ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_3a233bbe",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/resources/full-versions/testCont1DataPatch.json",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2017-11-22T19:53:47Z",
+      "side": 1,
+      "message": "remove spaces",
       "revId": "051fd982f8897c246d3c364f94d34357a6c452ee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
