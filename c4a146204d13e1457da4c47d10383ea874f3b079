@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a245df4_744f8c34",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/md/sal/rest/schema/SchemaExportContentYangBodyWriter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-11-22T10:06:16Z",
+      "side": 1,
+      "message": "yangTextSchemaSource.copyTo(entityStream);",
+      "range": {
+        "startLine": 57,
+        "startChar": 8,
+        "endLine": 57,
+        "endChar": 87
+      },
+      "revId": "c4a146204d13e1457da4c47d10383ea874f3b079",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
