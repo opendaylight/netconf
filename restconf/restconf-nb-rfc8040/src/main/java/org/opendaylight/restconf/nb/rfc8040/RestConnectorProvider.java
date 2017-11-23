@@ -19,7 +19,6 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
@@ -61,7 +60,6 @@ public class RestConnectorProvider<T extends ServiceWrapper> implements Restconf
     private static DOMDataBroker dataBroker;
     private static DOMMountPointServiceHandler mountPointServiceHandler;
 
-    private final SchemaService schemaService;
     private final DOMRpcService rpcService;
     private final DOMNotificationService notificationService;
     private final DOMMountPointService mountPointService;
@@ -75,25 +73,20 @@ public class RestConnectorProvider<T extends ServiceWrapper> implements Restconf
     // FIXME: refactor this class and its users to interact via builder pattern, where individual
     // services are injected and then the provider is created
     public RestConnectorProvider(final DOMDataBroker domDataBroker,
-             final SchemaService schemaService, final DOMRpcService rpcService,
-             final DOMNotificationService notificationService, final DOMMountPointService mountPointService,
-             final DOMSchemaService domSchemaService) {
-        this(domDataBroker, schemaService, rpcService, notificationService, mountPointService, domSchemaService, null);
-
+            final DOMSchemaService domSchemaService, final DOMRpcService rpcService,
+            final DOMNotificationService notificationService, final DOMMountPointService mountPointService) {
+        this(domDataBroker, domSchemaService, rpcService, notificationService, mountPointService, null);
     }
 
-    public RestConnectorProvider(final DOMDataBroker domDataBroker, final SchemaService schemaService,
-                                 final DOMRpcService rpcService,
-                                 final DOMNotificationService notificationService,
-                                 final DOMMountPointService mountPointService,
-                                 final DOMSchemaService domSchemaService, final T wrapperServices) {
+    public RestConnectorProvider(final DOMDataBroker domDataBroker, final DOMSchemaService domSchemaService,
+            final DOMRpcService rpcService, final DOMNotificationService notificationService,
+            final DOMMountPointService mountPointService, final T wrapperServices) {
         this.servicesProperties = ImmutableSet.<Object>builder();
         this.wrapperServices = wrapperServices;
-        this.schemaService = Preconditions.checkNotNull(schemaService);
+        this.domSchemaService = Preconditions.checkNotNull(domSchemaService);
         this.rpcService = Preconditions.checkNotNull(rpcService);
         this.notificationService = Preconditions.checkNotNull(notificationService);
         this.mountPointService = Preconditions.checkNotNull(mountPointService);
-        this.domSchemaService = Preconditions.checkNotNull(domSchemaService);
 
         RestConnectorProvider.dataBroker = Preconditions.checkNotNull(domDataBroker);
     }
@@ -111,7 +104,7 @@ public class RestConnectorProvider<T extends ServiceWrapper> implements Restconf
 
         this.schemaCtxHandler = new SchemaContextHandler(transactionChainHandler);
         servicesProperties.add(schemaCtxHandler);
-        this.listenerRegistration = schemaService.registerSchemaContextListener(this.schemaCtxHandler);
+        this.listenerRegistration = domSchemaService.registerSchemaContextListener(this.schemaCtxHandler);
 
         final RpcServiceHandler rpcServiceHandler = new RpcServiceHandler(rpcService);
         servicesProperties.add(rpcServiceHandler);

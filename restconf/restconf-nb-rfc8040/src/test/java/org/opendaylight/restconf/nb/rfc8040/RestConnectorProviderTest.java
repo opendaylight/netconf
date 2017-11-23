@@ -23,7 +23,6 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl;
@@ -37,7 +36,6 @@ public class RestConnectorProviderTest {
     // service under test
     private RestConnectorProvider connectorProvider;
 
-    @Mock private SchemaService mockSchemaService;
     @Mock private DOMMountPointService mockMountPointService;
     @Mock private DOMDataBroker mockDataBroker;
     @Mock private DOMRpcService mockRpcService;
@@ -55,11 +53,11 @@ public class RestConnectorProviderTest {
         MockitoAnnotations.initMocks(this);
 
         doReturn(mockTransactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
-        doReturn(mockRegistration).when(mockSchemaService).registerSchemaContextListener(
+        doReturn(mockRegistration).when(domSchemaService).registerSchemaContextListener(
                 Mockito.any(SchemaContextHandler.class));
 
-        this.connectorProvider = new RestConnectorProvider(mockDataBroker, mockSchemaService, mockRpcService,
-                mockNotificationService, mockMountPointService, domSchemaService, ServicesWrapperImpl.getInstance());
+        this.connectorProvider = new RestConnectorProvider(mockDataBroker, domSchemaService, mockRpcService,
+                mockNotificationService, mockMountPointService, ServicesWrapperImpl.getInstance());
     }
 
     /**
@@ -72,7 +70,7 @@ public class RestConnectorProviderTest {
 
         // verify interactions
         verify(mockDataBroker).createTransactionChain(Mockito.any());
-        verify(mockSchemaService).registerSchemaContextListener(Mockito.any(SchemaContextHandler.class));
+        verify(domSchemaService).registerSchemaContextListener(Mockito.any(SchemaContextHandler.class));
     }
 
     /**

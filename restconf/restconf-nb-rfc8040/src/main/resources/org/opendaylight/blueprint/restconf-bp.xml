@@ -29,7 +29,6 @@
   <!-- We need the AAAService available even though we don't use it -->
   <reference interface="org.opendaylight.aaa.api.AAAService"/>
 
-  <reference id="schemaService" interface="org.opendaylight.controller.sal.core.api.model.SchemaService"/>
   <reference id="domRpcService" interface="org.opendaylight.controller.md.sal.dom.api.DOMRpcService"/>
   <reference id="domMountPointService" interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"/>
   <reference id="domNotificationService" interface="org.opendaylight.controller.md.sal.dom.api.DOMNotificationService"/>
@@ -43,11 +42,10 @@
   <bean id="restconfProvider" class="org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider"
           init-method="start" destroy-method="close">
     <argument ref="domDataBroker"/>
-    <argument ref="schemaService"/>
+    <argument ref="domSchemaService"/>
     <argument ref="domRpcService"/>
     <argument ref="domNotificationService"/>
     <argument ref="domMountPointService"/>
-    <argument ref="domSchemaService"/>
     <argument ref="wrapper"/>
   </bean>
 
