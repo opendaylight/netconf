@@ -20,7 +20,7 @@
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>features-netconf</artifactId>
-  <version>1.3.1-SNAPSHOT</version>
+  <version>1.3.1</version>
   <packaging>feature</packaging>
 
   <dependencyManagement>
@@ -35,7 +35,7 @@
       <dependency>
         <groupId>org.opendaylight.aaa</groupId>
         <artifactId>aaa-artifacts</artifactId>
-        <version>0.6.1-SNAPSHOT</version>
+        <version>0.6.1</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>

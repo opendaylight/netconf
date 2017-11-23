@@ -20,7 +20,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-restconf-noauth</artifactId>
-    <version>1.6.1-SNAPSHOT</version>
+    <version>1.6.1</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Restconf</name>
@@ -37,28 +37,28 @@
             <dependency>
                 <groupId>org.opendaylight.yangtools</groupId>
                 <artifactId>yangtools-artifacts</artifactId>
-                <version>1.2.1-SNAPSHOT</version>
+                <version>1.2.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.aaa</groupId>
                 <artifactId>aaa-artifacts</artifactId>
-                <version>0.6.1-SNAPSHOT</version>
+                <version>0.6.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>netconf-artifacts</artifactId>
-                <version>1.3.1-SNAPSHOT</version>
+                <version>1.3.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>restconf-artifacts</artifactId>
-                <version>1.6.1-SNAPSHOT</version>
+                <version>1.6.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -69,14 +69,14 @@
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>odl-aaa-shiro</artifactId>
-            <version>0.6.1-SNAPSHOT</version>
+            <version>0.6.1</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-mdsal-broker</artifactId>
-            <version>1.6.1-SNAPSHOT</version>
+            <version>1.6.1</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
