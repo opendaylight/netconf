@@ -50,7 +50,7 @@ import org.w3c.dom.Element;
 abstract class AbstractNotificationsData {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNotificationsData.class);
     private static final TransformerFactory TF = TransformerFactory.newInstance();
-    private static final XMLOutputFactory OF = XMLOutputFactory.newFactory();
+    private static final XMLOutputFactory OF = XMLOutputFactory.newInstance();
 
     private TransactionChainHandler transactionChainHandler;
     protected SchemaContextHandler schemaHandler;

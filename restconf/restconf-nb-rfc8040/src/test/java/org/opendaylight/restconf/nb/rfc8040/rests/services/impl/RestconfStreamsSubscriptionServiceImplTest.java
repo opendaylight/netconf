@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.lang.reflect.Field;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.util.SimpleUriInfo;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
@@ -54,6 +56,7 @@ import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev14070
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
+@SuppressWarnings("deprecation")
 public class RestconfStreamsSubscriptionServiceImplTest {
 
     private static final String URI = "/restconf/18/data/ietf-restconf-monitoring:restconf-state/streams/stream/"
@@ -71,6 +74,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
     private SchemaContextHandler schemaHandler;
 
+    @SuppressWarnings("unchecked")
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -101,8 +105,23 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         final Set<Entry<String, List<String>>> set = new HashSet<>();
         Mockito.when(map.entrySet()).thenReturn(set);
         Mockito.when(this.uriInfo.getQueryParameters()).thenReturn(map);
+        final UriBuilder baseUriBuilder = new LocalUriInfo().getBaseUriBuilder();
+        Mockito.when(uriInfo.getBaseUri()).thenReturn(baseUriBuilder.build());
+        Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(baseUriBuilder);
         this.schemaHandler.onGlobalContextUpdated(
                 YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/notifications")));
+    }
+
+    private static class LocalUriInfo extends SimpleUriInfo {
+
+        LocalUriInfo() {
+            super("/");
+        }
+
+        @Override
+        public URI getBaseUri() {
+            return UriBuilder.fromUri("http://localhost:8181").build();
+        }
     }
 
     @BeforeClass
@@ -128,7 +147,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     @Test
     public void testSubscribeToStream() throws Exception {
         final UriBuilder uriBuilder = UriBuilder.fromUri(URI);
-        final ListenerAdapter createListener = Notificator.createListener(
+        Notificator.createListener(
                 IdentifierCodec.deserialize("toaster:toaster/toasterStatus", this.schemaHandler.get()),
                 "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                 NotificationOutputType.XML);
@@ -141,7 +160,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                         this.uriInfo);
         assertEquals(
-            "ws://:8181/data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
+                "ws://localhost:8181/data-change-event-subscription"
+                        + "/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
             response.getNewHeaders().get("Location").toString());
     }
 
