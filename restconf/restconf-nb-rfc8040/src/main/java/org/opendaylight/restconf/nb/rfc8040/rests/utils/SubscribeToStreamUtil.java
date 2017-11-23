@@ -306,13 +306,11 @@ public final class SubscribeToStreamUtil {
     }
 
     static URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
-        final int port = SubscribeToStreamUtil.prepareNotificationPort();
+        final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
 
-        final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
-        final UriBuilder uriToWebSocketServer =
-                uriBuilder.port(port).scheme(RestconfStreamsConstants.SCHEMA_SUBSCIBRE_URI);
-        final URI uri = uriToWebSocketServer.replacePath(streamName).build();
-        return uri;
+        prepareNotificationPort(uriInfo.getBaseUri().getPort());
+        uriBuilder.scheme(RestconfStreamsConstants.SCHEMA_SUBSCIBRE_URI);
+        return uriBuilder.replacePath(streamName).build();
     }
 
     /**
@@ -345,17 +343,15 @@ public final class SubscribeToStreamUtil {
     /**
      * Get port from web socket server. If doesn't exit, create it.
      *
-     * @return port
+     * @param port
+     *            - port
      */
-    private static int prepareNotificationPort() {
-        int port = RestconfStreamsConstants.NOTIFICATION_PORT;
+    private static void prepareNotificationPort(final int port) {
         try {
-            final WebSocketServer webSocketServer = WebSocketServer.getInstance();
-            port = webSocketServer.getPort();
+            WebSocketServer.getInstance();
         } catch (final NullPointerException e) {
-            WebSocketServer.createInstance(RestconfStreamsConstants.NOTIFICATION_PORT);
+            WebSocketServer.createInstance(port);
         }
-        return port;
     }
 
     static boolean checkExist(final SchemaContext schemaContext,
