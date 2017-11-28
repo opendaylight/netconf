@@ -18,7 +18,7 @@
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>restconf-models</artifactId>
-  <version>1.3.1-SNAPSHOT</version>
+  <version>1.3.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>${project.artifactId}</name>
 

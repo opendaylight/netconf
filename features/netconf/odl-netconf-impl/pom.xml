@@ -20,7 +20,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-impl</artifactId>
-    <version>1.3.1-SNAPSHOT</version>
+    <version>1.3.2-SNAPSHOT</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Netconf :: Impl</name>
@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>yang-jmx-generator</artifactId>
-            <version>0.7.1-SNAPSHOT</version>
+            <version>0.7.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -62,7 +62,7 @@
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-config-netty</artifactId>
-            <version>0.7.1-SNAPSHOT</version>
+            <version>0.7.2-SNAPSHOT</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -78,7 +78,7 @@
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>config-manager-facade-xml</artifactId>
-            <version>0.7.1-SNAPSHOT</version>
+            <version>0.7.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
