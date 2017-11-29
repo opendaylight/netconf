@@ -175,7 +175,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
             }
             return;
         } else if (frame instanceof PingWebSocketFrame) {
-            ctx.channel().write(new PongWebSocketFrame(frame.content().retain()));
+            ctx.channel().writeAndFlush(new PongWebSocketFrame(frame.content().retain()));
             return;
         }
     }
