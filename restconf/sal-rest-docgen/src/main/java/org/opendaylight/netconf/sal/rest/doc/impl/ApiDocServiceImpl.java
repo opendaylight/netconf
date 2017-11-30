@@ -97,6 +97,7 @@ public class ApiDocServiceImpl implements ApiDocService {
                 writer.writeEndObject();
             }
             writer.writeEndArray();
+            writer.flush();
         } catch (final Exception e) {
             return Response.status(500).entity(e.getMessage()).build();
         }
