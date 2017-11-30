@@ -73,4 +73,15 @@ public interface JSONRestconfService {
      * @throws OperationFailedException if the request fails.
      */
     Optional<String> invokeRpc(@Nonnull String uriPath, Optional<String> input) throws OperationFailedException;
+
+    /**
+     * Issues a restconf PATCH request to the configuration data store.
+     *
+     * @param uriPath the yang instance identifier path, eg "opendaylight-inventory:nodes/node/device-id".
+     *       To specify the root, use {@link ROOT_PATH}.
+     * @param payload the payload data in JSON format.
+     * @return an Optional containing the patch response data in JSON format.
+     * @throws OperationFailedException if the request fails.
+     */
+    Optional<String> patch(@Nonnull String uriPath, @Nonnull String payload) throws OperationFailedException;
 }

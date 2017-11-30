@@ -1,0 +1,22 @@
+{
+  "ietf-restconf:yang-patch" : {
+    "patch-id" : "0",
+    "edit" : [
+      {
+        "edit-id" : "edit1",
+        "operation" : "create",
+        "target" : "",
+        "value" : {
+         "interface":[
+         {
+            "name":"eth0",
+            "type":"ethernetCsmacd",
+            "enabled":false,
+            "description": "some interface"
+         }
+        ]
+      }
+     }
+    ]
+  }
+}
