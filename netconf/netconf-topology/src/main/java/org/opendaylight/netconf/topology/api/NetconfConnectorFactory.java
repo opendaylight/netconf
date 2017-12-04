@@ -32,6 +32,7 @@ public interface NetconfConnectorFactory {
      * @param username The username of the netconf session
      * @param password The password of the netconf session
      * @param tcpOnly Whether to create a TCP or SSH session
+     * @param protocol Which kind of session to be created, TCP, SSH or TLS
      * @param reconnectOnSchemaChange Whether to enable ietf-netconf-monitoring and register the NETCONF stream.
      * @return The created {@link Node}
      */
@@ -42,5 +43,6 @@ public interface NetconfConnectorFactory {
                      String username,
                      String password,
                      Boolean tcpOnly,
+                     String protocol,
                      Boolean reconnectOnSchemaChange);
 }

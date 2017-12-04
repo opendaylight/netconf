@@ -79,6 +79,14 @@ module netconf-node-topology {
             type boolean;
         }
 
+        leaf protocol {
+            type enumeration {
+            	enum SSH;
+            	enum TLS;
+            }
+            default SSH;
+        }
+
         leaf schemaless {
             type boolean;
             default false;
