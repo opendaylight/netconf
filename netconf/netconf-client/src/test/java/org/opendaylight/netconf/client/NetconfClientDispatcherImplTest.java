@@ -95,5 +95,19 @@ public class NetconfClientDispatcherImplTest {
         assertNotNull(sshReconn);
         assertNotNull(tcpReconn);
 
+        NetconfReconnectingClientConfiguration cfg3 = NetconfReconnectingClientConfigurationBuilder.create()
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS)
+                .withAddress(address)
+                .withConnectionTimeoutMillis(timeout)
+                .withReconnectStrategy(reconnect)
+                .withAdditionalHeader(header)
+                .withSessionListener(listener)
+                .withConnectStrategyFactory(reconnectStrategyFactory)
+                .build();
+        Future<NetconfClientSession> tlsSession = dispatcher.createClient(cfg3);
+        Future<Void> tlsReconn = dispatcher.createReconnectingClient(cfg3);
+
+        assertNotNull(tlsSession);
+        assertNotNull(tlsReconn);
     }
 }

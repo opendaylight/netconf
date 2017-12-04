@@ -42,6 +42,8 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
                 return createTcpClient(clientConfiguration);
             case SSH:
                 return createSshClient(clientConfiguration);
+            case TLS:
+                return createTlsClient(clientConfiguration);
             default:
                 throw new IllegalArgumentException("Unknown client protocol " + clientConfiguration.getProtocol());
         }
@@ -54,6 +56,8 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
                 return createReconnectingTcpClient(clientConfiguration);
             case SSH:
                 return createReconnectingSshClient(clientConfiguration);
+            case TLS:
+                return createReconnectingTlsClient(clientConfiguration);
             default:
                 throw new IllegalArgumentException("Unknown client protocol " + clientConfiguration.getProtocol());
         }
@@ -91,6 +95,25 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
             final NetconfReconnectingClientConfiguration currentConfiguration) {
         LOG.debug("Creating reconnecting SSH client with configuration: {}", currentConfiguration);
         final SshClientChannelInitializer init = new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
+                getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener());
+
+        return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration
+                .getConnectStrategyFactory(), currentConfiguration.getReconnectStrategy(),
+                init::initialize);
+    }
+
+    private Future<NetconfClientSession> createTlsClient(final NetconfClientConfiguration currentConfiguration) {
+        LOG.debug("Creating TLS client with configuration: {}", currentConfiguration);
+        return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
+            (ch, sessionPromise) -> new TlsClientChannelInitializer(getNegotiatorFactory(currentConfiguration),
+                    currentConfiguration.getSessionListener())
+                    .initialize(ch, sessionPromise));
+    }
+
+    private Future<Void> createReconnectingTlsClient(
+            final NetconfReconnectingClientConfiguration currentConfiguration) {
+        LOG.debug("Creating reconnecting TLS client with configuration: {}", currentConfiguration);
+        final TlsClientChannelInitializer init = new TlsClientChannelInitializer(
                 getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener());
 
         return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration

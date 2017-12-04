@@ -134,6 +134,11 @@
                   <type>cfg</type>
                   <classifier>config</classifier>
                 </artifact>
+                <artifact>
+                  <file>${project.build.directory}/classes/netconfclient.jks</file>
+                  <type>jks</type>
+                  <classifier>client</classifier>
+                </artifact>
               </artifacts>
             </configuration>
           </execution>

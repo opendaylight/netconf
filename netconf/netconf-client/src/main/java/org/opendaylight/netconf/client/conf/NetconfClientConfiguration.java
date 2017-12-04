@@ -81,9 +81,14 @@ public class NetconfClientConfiguration {
     private void validateConfiguration() {
         Preconditions.checkNotNull(clientProtocol, " ");
         switch (clientProtocol) {
+            case TLS:
             case SSH:
-                validateSshConfiguration();
-                // Fall through intentional (ssh validation is a superset of tcp validation)
+                if (clientProtocol == NetconfClientProtocol.SSH) {
+                    validateSshConfiguration();
+                } else {
+                    validateTlsConfiguration();
+                }
+                // Fall through intentional (ssh & tls validation is a superset of tcp validation)
             case TCP:
                 validateTcpConfiguration();
                 break;
@@ -104,6 +109,10 @@ public class NetconfClientConfiguration {
         Preconditions.checkNotNull(reconnectStrategy, "reconnectStrategy");
     }
 
+    protected void validateTlsConfiguration() {
+        // Nothing to be validated at present
+    }
+
     @Override
     public final String toString() {
         return buildToStringHelper().toString();
@@ -121,6 +130,6 @@ public class NetconfClientConfiguration {
     }
 
     public enum NetconfClientProtocol {
-        TCP, SSH
+        TCP, SSH, TLS
     }
 }

@@ -45,5 +45,22 @@ public class NetconfClientConfigurationTest {
         Assert.assertEquals(strategy, cfg.getReconnectStrategy());
         Assert.assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, cfg.getProtocol());
         Assert.assertEquals(address, cfg.getAddress());
+
+        NetconfClientConfiguration cfg1 = NetconfClientConfigurationBuilder.create()
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS)
+                .withAddress(address)
+                .withConnectionTimeoutMillis(timeout)
+                .withReconnectStrategy(strategy)
+                .withAdditionalHeader(header)
+                .withSessionListener(listener)
+                .build();
+
+        Assert.assertEquals(timeout, cfg1.getConnectionTimeoutMillis());
+        Assert.assertEquals(Optional.fromNullable(header), cfg1.getAdditionalHeader());
+        Assert.assertEquals(listener, cfg1.getSessionListener());
+        Assert.assertEquals(strategy, cfg1.getReconnectStrategy());
+        Assert.assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TLS, cfg1.getProtocol());
+        Assert.assertEquals(address, cfg1.getAddress());
+        Assert.assertNull(cfg1.getAuthHandler());
     }
 }
