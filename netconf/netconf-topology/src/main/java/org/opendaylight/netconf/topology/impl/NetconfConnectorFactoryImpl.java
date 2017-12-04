@@ -22,6 +22,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionParameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPwBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.LoginPasswordBuilder;
@@ -55,6 +56,7 @@ public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
                             final String username,
                             final String password,
                             final Boolean tcpOnly,
+                            final String protocol,
                             final Boolean reconnectOnSchemaChange) {
 
         final NodeId nodeId = new NodeId(instanceName);
@@ -73,6 +75,7 @@ public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
                 .setPort(portNumber)
                 .setCredentials(credentials)
                 .setTcpOnly(tcpOnly)
+                .setProtocol(Protocol.valueOf(protocol.toUpperCase()))
                 .setReconnectOnChangedSchema(reconnectOnSchemaChange)
                 .build();
         final Node node =  new NodeBuilder()

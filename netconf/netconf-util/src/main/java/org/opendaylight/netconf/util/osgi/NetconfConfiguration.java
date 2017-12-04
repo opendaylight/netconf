@@ -28,6 +28,10 @@ public class NetconfConfiguration implements ManagedService {
     private static final String TCP_ADDRESS_PROP = "tcp-address";
     private static final String TCP_PORT_PROP = "tcp-port";
     private static final String SSH_PK_PATH_PROP = "ssh-pk-path";
+    private static final String KEY_STORE_FILE_PROP = "key-store-file";
+    private static final String KEY_STORE_PASSWORD_PROP = "key-store-password";
+    private static final String TRUST_STORE_FILE_PROP = "trust-store-file";
+    private static final String TRUST_STORE_PASSWORD_PROP = "trust-store-password";
 
     /**
      * Default values used if no dictionary is provided.
@@ -41,12 +45,23 @@ public class NetconfConfiguration implements ManagedService {
     private static final String DEFAULT_PRIVATE_KEY_PATH = "./configuration/RSA.pk";
     private static final InetSocketAddress DEFAULT_TCP_SERVER_ADRESS = new InetSocketAddress(LOCAL_HOST, 8383);
     private static final InetSocketAddress DEFAULT_SSH_SERVER_ADRESS = new InetSocketAddress(INADDR_ANY, 1830);
+    private static final String DEFAULT_KEY_STORE_FILE = "./configuration/netconfclient.jks";
+    private static final String DEFAULT_KEY_STORE_PASSWORD = "netconf";
+    private static final String DEFAULT_TRUST_STORE_FILE = "./configuration/netconfclient.jks";
+    private static final String DEFAULT_TRUST_STORE_PASSWORD = "netconf";
 
     private NetconfConfigurationHolder netconfConfiguration;
 
     NetconfConfiguration() {
-        netconfConfiguration = new NetconfConfigurationHolder(DEFAULT_TCP_SERVER_ADRESS,
-                DEFAULT_SSH_SERVER_ADRESS, DEFAULT_PRIVATE_KEY_PATH);
+        netconfConfiguration = NetconfConfigurationHolderBuilder.create()
+                                    .withTcpServerAddress(DEFAULT_TCP_SERVER_ADRESS)
+                                    .withSshServerAddress(DEFAULT_SSH_SERVER_ADRESS)
+                                    .withPrivateKeyPath(DEFAULT_PRIVATE_KEY_PATH)
+                                    .withKeyStoreFile(DEFAULT_KEY_STORE_FILE)
+                                    .withKeyStorePassword(DEFAULT_KEY_STORE_PASSWORD)
+                                    .withTrustStoreFile(DEFAULT_TRUST_STORE_FILE)
+                                    .withTrustStorePassword(DEFAULT_TRUST_STORE_PASSWORD)
+                                    .build();
     }
 
     @Override
@@ -62,9 +77,15 @@ public class NetconfConfiguration implements ManagedService {
                 new InetSocketAddress((String) dictionaryConfig.get(TCP_ADDRESS_PROP),
                 Integer.parseInt((String) dictionaryConfig.get(TCP_PORT_PROP)));
 
-        netconfConfiguration = new NetconfConfigurationHolder(tcpServerAddress,
-                sshServerAddress,
-                (String) dictionaryConfig.get(SSH_PK_PATH_PROP));
+        netconfConfiguration = NetconfConfigurationHolderBuilder.create()
+                                    .withTcpServerAddress(tcpServerAddress)
+                                    .withSshServerAddress(sshServerAddress)
+                                    .withPrivateKeyPath((String)dictionaryConfig.get(SSH_PK_PATH_PROP))
+                                    .withKeyStoreFile((String)dictionaryConfig.get(KEY_STORE_FILE_PROP))
+                                    .withKeyStorePassword((String)dictionaryConfig.get(KEY_STORE_PASSWORD_PROP))
+                                    .withTrustStoreFile((String)dictionaryConfig.get(TRUST_STORE_FILE_PROP))
+                                    .withTrustStorePassword((String)dictionaryConfig.get(TRUST_STORE_PASSWORD_PROP))
+                                    .build();
 
         LOG.debug("CSS netconf server configuration was updated: {}", dictionaryConfig.toString());
     }
@@ -79,5 +100,21 @@ public class NetconfConfiguration implements ManagedService {
 
     public String getPrivateKeyPath() {
         return netconfConfiguration.getPrivateKeyPath();
+    }
+
+    public String getKeyStoreFile() {
+        return netconfConfiguration.getKeyStoreFile();
+    }
+
+    public String getKeyStorePassword() {
+        return netconfConfiguration.getKeyStorePassword();
+    }
+
+    public String getTrustStoreFile() {
+        return netconfConfiguration.getTrustStoreFile();
+    }
+
+    public String getTrustStorePassword() {
+        return netconfConfiguration.getTrustStorePassword();
     }
 }

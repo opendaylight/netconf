@@ -62,6 +62,7 @@ import org.opendaylight.protocol.framework.TimedReconnectStrategy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionParameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.KeyAuth;
@@ -445,15 +446,18 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 maxConnectionAttempts, betweenAttemptsTimeoutMillis, sleepFactor);
         final ReconnectStrategy strategy = sf.createReconnectStrategy();
 
-        final AuthenticationHandler authHandler = getHandlerFromCredentials(node.getCredentials());
-
+        AuthenticationHandler authHandler = null;
+        /* TLS authentication doesn't need user name and password */
+        if (node.isTcpOnly() || node.getProtocol() == Protocol.SSH) {
+            authHandler = getHandlerFromCredentials(node.getCredentials());
+        }
         return NetconfReconnectingClientConfigurationBuilder.create()
                 .withAddress(socketAddress)
                 .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
                 .withReconnectStrategy(strategy)
                 .withAuthHandler(authHandler)
                 .withProtocol(node.isTcpOnly() ? NetconfClientConfiguration.NetconfClientProtocol.TCP :
-                        NetconfClientConfiguration.NetconfClientProtocol.SSH)
+                        NetconfClientConfiguration.NetconfClientProtocol.valueOf(node.getProtocol().name()))
                 .withConnectStrategyFactory(sf)
                 .withSessionListener(listener)
                 .build();
