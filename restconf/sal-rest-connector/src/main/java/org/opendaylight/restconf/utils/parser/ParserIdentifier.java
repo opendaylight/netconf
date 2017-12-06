@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
@@ -192,27 +193,29 @@ public final class ParserIdentifier {
     }
 
     /**
-     * Parsing {@link Module} module by {@link String} module name and
-     * {@link Date} revision and from the parsed module create
-     * {@link SchemaExportContext}.
+     * Parsing {@link Module} module by {@link String} module name and {@link Date} revision and from the parsed module
+     * create {@link SchemaExportContext}.
      *
      * @param schemaContext
-     *             {@link SchemaContext}
+     *            {@link SchemaContext}
      * @param identifier
-     *             path parameter
+     *            path parameter
      * @param domMountPointService
-     *             {@link DOMMountPointService}
+     *            {@link DOMMountPointService}
+     * @param sourceProvider
+     *            - source provider
      * @return {@link SchemaExportContext}
      */
     public static SchemaExportContext toSchemaExportContextFromIdentifier(final SchemaContext schemaContext,
-            final String identifier, final DOMMountPointService domMountPointService) {
+            final String identifier, final DOMMountPointService domMountPointService,
+            final DOMYangTextSourceProvider sourceProvider) {
         final Iterable<String> pathComponents = RestconfConstants.SLASH_SPLITTER.split(identifier);
         final Iterator<String> componentIter = pathComponents.iterator();
         if (!Iterables.contains(pathComponents, RestconfConstants.MOUNT)) {
             final String moduleName = RestconfValidation.validateAndGetModulName(componentIter);
             final Date revision = RestconfValidation.validateAndGetRevision(componentIter);
             final Module module = schemaContext.findModuleByName(moduleName, revision);
-            return new SchemaExportContext(schemaContext, module);
+            return new SchemaExportContext(schemaContext, module, sourceProvider);
         } else {
             final StringBuilder pathBuilder = new StringBuilder();
             while (componentIter.hasNext()) {
@@ -235,7 +238,7 @@ public final class ParserIdentifier {
             final String moduleName = RestconfValidation.validateAndGetModulName(componentIter);
             final Date revision = RestconfValidation.validateAndGetRevision(componentIter);
             final Module module = point.getMountPoint().getSchemaContext().findModuleByName(moduleName, revision);
-            return new SchemaExportContext(point.getMountPoint().getSchemaContext(), module);
+            return new SchemaExportContext(point.getMountPoint().getSchemaContext(), module, sourceProvider);
         }
     }
 }

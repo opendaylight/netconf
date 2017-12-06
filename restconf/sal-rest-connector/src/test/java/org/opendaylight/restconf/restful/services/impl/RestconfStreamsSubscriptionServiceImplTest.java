@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.lang.reflect.Field;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -44,6 +45,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.netconf.sal.restconf.impl.SimpleUriInfo;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
 import org.opendaylight.restconf.handlers.DOMDataBrokerHandler;
@@ -98,18 +100,33 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         final ListenerRegistration<DOMDataChangeListener> listener = mock(ListenerRegistration.class);
         doReturn(dataBroker).when(this.dataBrokerHandler).get();
         doReturn(listener).when(dataBroker).registerDataChangeListener(any(), any(), any(), any());
-        DOMDataTreeChangeService changeService = Mockito.mock(DOMDataTreeChangeService.class);
+        final DOMDataTreeChangeService changeService = Mockito.mock(DOMDataTreeChangeService.class);
         Mockito.when(changeService.registerDataTreeChangeListener(any(), any()))
                                                             .thenReturn(Mockito.mock(ListenerRegistration.class));
-        HashMap extensions = new HashMap();
+        final HashMap extensions = new HashMap();
         extensions.put(DOMDataTreeChangeService.class, Mockito.mock(DOMDataTreeChangeService.class));
         Mockito.when(dataBroker.getSupportedExtensions()).thenReturn(extensions);
         final MultivaluedMap<String, String> map = Mockito.mock(MultivaluedMap.class);
         final Set<Entry<String, List<String>>> set = new HashSet<>();
         Mockito.when(map.entrySet()).thenReturn(set);
         Mockito.when(this.uriInfo.getQueryParameters()).thenReturn(map);
+        final UriBuilder baseUriBuilder = new LocalUriInfo().getBaseUriBuilder();
+        Mockito.when(uriInfo.getBaseUri()).thenReturn(baseUriBuilder.build());
+        Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(baseUriBuilder);
         this.schemaHandler.onGlobalContextUpdated(
                 YangParserTestUtils.parseYangSources(TestRestconfUtils.loadFiles("/notifications")));
+    }
+
+    private static class LocalUriInfo extends SimpleUriInfo {
+
+        LocalUriInfo() {
+            super("/");
+        }
+
+        @Override
+        public URI getBaseUri() {
+            return UriBuilder.fromUri("http://localhost:8181").build();
+        }
     }
 
     @BeforeClass
@@ -148,7 +165,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                         this.uriInfo);
         assertEquals(
-            "ws://:8181/data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
+                "ws://localhost:8181/data-change-event-subscription/toaster:toaster/toasterStatus/"
+                        + "datastore=OPERATIONAL/scope=ONE",
             response.getNewHeaders().get("Location").toString());
     }
 

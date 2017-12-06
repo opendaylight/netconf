@@ -21,7 +21,6 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
-import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
 import org.opendaylight.restconf.RestConnectorProvider;
@@ -30,7 +29,6 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 abstract class AbstractBodyReaderTest {
 
-    protected static final ControllerContext CONTROLLER_CONTEXT = ControllerContext.getInstance();
     protected static final DOMMountPointServiceHandler MOUNT_POINT_SERVICE_HANDLER =
             mock(DOMMountPointServiceHandler.class);
 

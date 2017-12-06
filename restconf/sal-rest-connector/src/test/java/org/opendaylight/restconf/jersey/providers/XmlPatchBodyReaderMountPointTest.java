@@ -24,6 +24,8 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.rest.impl.test.providers.TestXmlBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
+import org.opendaylight.restconf.RestConnectorProvider;
+import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
@@ -54,7 +56,9 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
         when(mountPointService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountPoint));
         when(mountPoint.getSchemaContext()).thenReturn(schemaContext);
 
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
+        final SchemaContextHandler schemaContextHandler = mock(SchemaContextHandler.class);
+        when(schemaContextHandler.get()).thenReturn(schemaContext);
+        RestConnectorProvider.setSchemaContextHandler(schemaContextHandler);
     }
 
     @Test

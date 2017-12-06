@@ -14,12 +14,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
+import org.opendaylight.restconf.base.services.api.UpdateHandlers;
 
 /**
  * Subscribing to streams.
  *
  */
-public interface RestconfStreamsSubscriptionService {
+public interface RestconfStreamsSubscriptionService extends UpdateHandlers {
 
     /**
      * Subscribing to receive notification from stream support.

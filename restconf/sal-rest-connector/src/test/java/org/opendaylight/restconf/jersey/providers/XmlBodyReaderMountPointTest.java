@@ -32,6 +32,8 @@ import org.opendaylight.controller.sal.rest.impl.test.providers.TestXmlBodyReade
 import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError;
+import org.opendaylight.restconf.RestConnectorProvider;
+import org.opendaylight.restconf.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.SimpleDateFormatUtil;
@@ -83,7 +85,9 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         when(mountPointService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountPoint));
         when(mountPoint.getSchemaContext()).thenReturn(schemaContext);
 
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
+        final SchemaContextHandler schemaContextHandler = mock(SchemaContextHandler.class);
+        when(schemaContextHandler.get()).thenReturn(schemaContext);
+        RestConnectorProvider.setSchemaContextHandler(schemaContextHandler);
     }
 
     @Test

@@ -20,7 +20,7 @@ import org.opendaylight.restconf.utils.RestconfConstants;
  *
  */
 @Path("/")
-public interface RestconfSchemaService {
+public interface RestconfSchemaService extends UpdateHandlers {
 
     /**
      * Get schema of specific module.

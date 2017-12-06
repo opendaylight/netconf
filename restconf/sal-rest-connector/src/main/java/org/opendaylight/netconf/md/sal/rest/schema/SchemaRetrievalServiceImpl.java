@@ -12,6 +12,7 @@ import com.google.common.collect.Iterables;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.md.sal.rest.common.RestconfValidationUtils;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
@@ -66,16 +67,18 @@ public class SchemaRetrievalServiceImpl implements SchemaRetrievalService {
         RestconfValidationUtils.checkDocumentedError(componentIter.hasNext(),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, "Revision date must be supplied.");
         final String revisionString = componentIter.next();
-        return getExportUsingNameAndRevision(schemaContext, moduleName, revisionString);
+        return getExportUsingNameAndRevision(schemaContext, moduleName, revisionString,
+                salContext.getYangTextSourceProvider());
     }
 
     private static SchemaExportContext getExportUsingNameAndRevision(final SchemaContext schemaContext,
-            final String moduleName, final String revisionStr) {
+            final String moduleName, final String revisionStr, final DOMYangTextSourceProvider yangTextSourceProvide) {
         try {
             final Date revision = SimpleDateFormatUtil.getRevisionFormat().parse(revisionStr);
             final Module module = schemaContext.findModuleByName(moduleName, revision);
             return new SchemaExportContext(
-                    schemaContext, RestconfValidationUtils.checkNotNullDocumented(module, moduleName));
+                    schemaContext, RestconfValidationUtils.checkNotNullDocumented(module, moduleName),
+                    yangTextSourceProvide);
         } catch (final ParseException e) {
             throw new RestconfDocumentedException("Supplied revision is not in expected date format YYYY-mm-dd", e);
         }

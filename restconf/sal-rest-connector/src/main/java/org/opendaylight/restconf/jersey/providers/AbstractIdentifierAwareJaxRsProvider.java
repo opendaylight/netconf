@@ -23,7 +23,6 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
-import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.InstanceIdentifierContext;
 import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.utils.parser.ParserIdentifier;
@@ -51,7 +50,7 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
 
         final PushbackInputStream pushbackInputStream = new PushbackInputStream(entityStream);
 
-        int firstByte = pushbackInputStream.read();
+        final int firstByte = pushbackInputStream.read();
         if (firstByte == -1) {
             return emptyBody(path);
         } else {
@@ -80,7 +79,7 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
     private InstanceIdentifierContext<?> getInstanceIdentifierContext() {
         return ParserIdentifier.toInstanceIdentifier(
                 getIdentifier(),
-                ControllerContext.getInstance().getGlobalSchema(),
+                RestConnectorProvider.getActualSchemaContext(),
                 Optional.of(RestConnectorProvider.getMountPointService()));
     }
 

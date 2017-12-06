@@ -37,12 +37,12 @@
   <!-- We need the AAAService available even though we don't use it -->
   <reference interface="org.opendaylight.aaa.api.AAAService"/>
 
-  <reference id="schemaService" interface="org.opendaylight.controller.sal.core.api.model.SchemaService"/>
   <reference id="domRpcService" interface="org.opendaylight.controller.md.sal.dom.api.DOMRpcService"/>
   <reference id="domMountPointService" interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"/>
   <reference id="domNotificationService" interface="org.opendaylight.controller.md.sal.dom.api.DOMNotificationService"/>
   <reference id="domDataBroker" interface="org.opendaylight.controller.md.sal.dom.api.DOMDataBroker"
           ext:filter="(type=@{databroker-service-type})"/>
+  <reference id="domSchemaService" interface="org.opendaylight.mdsal.dom.api.DOMSchemaService"/>
 
   <bean id="webSocketPort" class="org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber">
     <argument value="${websocket-port}"/>
@@ -55,7 +55,7 @@
   <bean id="restconfProviderDraft02" class="org.opendaylight.netconf.sal.restconf.impl.RestconfProviderImpl"
           init-method="start" destroy-method="close">
     <argument ref="domDataBroker"/>
-    <argument ref="schemaService"/>
+    <argument ref="domSchemaService"/>
     <argument ref="domRpcService"/>
     <argument ref="domNotificationService"/>
     <argument ref="domMountPointService"/>
@@ -66,7 +66,7 @@
   <bean id="restconfProviderDraft18" class="org.opendaylight.restconf.RestConnectorProvider"
           init-method="start" destroy-method="close">
     <argument ref="domDataBroker"/>
-    <argument ref="schemaService"/>
+    <argument ref="domSchemaService"/>
     <argument ref="domRpcService"/>
     <argument ref="domNotificationService"/>
     <argument ref="domMountPointService"/>

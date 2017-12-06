@@ -50,6 +50,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.JSONRestconfServiceDraft18;
 import org.opendaylight.restconf.common.wrapper.services.ServicesWrapperImpl;
@@ -131,6 +132,9 @@ public class JSONRestconfServiceDraft18Test {
     private SchemaContextHandler mockSchemaContextHandler;
 
     @Mock
+    private DOMSchemaService domSchemaService;
+
+    @Mock
     private DOMDataBroker mockDOMDataBroker;
 
     @Mock
@@ -174,7 +178,7 @@ public class JSONRestconfServiceDraft18Test {
 
         doReturn(schemaContext).when(mockSchemaContextHandler).get();
 
-        TransactionChainHandler txChainHandler = new TransactionChainHandler(mockTxChain);
+        final TransactionChainHandler txChainHandler = new TransactionChainHandler(mockTxChain);
 
         final DOMMountPointServiceHandler mountPointServiceHandler =
                 new DOMMountPointServiceHandler(mockMountPointService);
@@ -182,7 +186,7 @@ public class JSONRestconfServiceDraft18Test {
         ServicesWrapperImpl.getInstance().setHandlers(mockSchemaContextHandler, mountPointServiceHandler,
                 txChainHandler, new DOMDataBrokerHandler(mockDOMDataBroker),
                 new RpcServiceHandler(mockRpcService),
-                new NotificationServiceHandler(mock(DOMNotificationService.class)));
+                new NotificationServiceHandler(mock(DOMNotificationService.class)), domSchemaService);
 
         service = new JSONRestconfServiceDraft18(ServicesWrapperImpl.getInstance(), mountPointServiceHandler);
     }

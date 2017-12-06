@@ -35,6 +35,7 @@ import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizat
 import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizer;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.sal.rest.api.Draft02.RestConfModule;
 import org.opendaylight.netconf.sal.rest.impl.RestUtil;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfError.ErrorTag;
@@ -92,6 +93,7 @@ public class ControllerContext implements SchemaContextListener {
     // FIXME; these three should be final
     private volatile SchemaContext globalSchema;
     private volatile DOMMountPointService mountService;
+    private volatile DOMYangTextSourceProvider yangTextSourceProvider;
     private DataNormalizer dataNormalizer;
 
 
@@ -102,6 +104,14 @@ public class ControllerContext implements SchemaContextListener {
 
     public void setMountService(final DOMMountPointService mountService) {
         this.mountService = mountService;
+    }
+
+    public DOMYangTextSourceProvider getYangTextSourceProvider() {
+        return yangTextSourceProvider;
+    }
+
+    public void setYangTextSourceProvider(final DOMYangTextSourceProvider yangTextSourceProvider) {
+        this.yangTextSourceProvider = yangTextSourceProvider;
     }
 
     private ControllerContext() {

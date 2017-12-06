@@ -261,7 +261,7 @@ public final class SubscribeToStreamUtil {
         final TemporalAccessor p;
         try {
             p = FORMATTER.parse(value);
-        } catch (DateTimeParseException e) {
+        } catch (final DateTimeParseException e) {
             throw new RestconfDocumentedException("Cannot parse of value in date: " + value, e);
         }
         return Instant.from(p);
@@ -309,13 +309,11 @@ public final class SubscribeToStreamUtil {
     }
 
     static URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
-        final int port = SubscribeToStreamUtil.prepareNotificationPort();
+        final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
 
-        final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
-        final UriBuilder uriToWebSocketServer =
-                uriBuilder.port(port).scheme(RestconfStreamsConstants.SCHEMA_SUBSCIBRE_URI);
-        final URI uri = uriToWebSocketServer.replacePath(streamName).build();
-        return uri;
+        prepareNotificationPort(uriInfo.getBaseUri().getPort());
+        uriBuilder.scheme(RestconfStreamsConstants.SCHEMA_SUBSCIBRE_URI);
+        return uriBuilder.replacePath(streamName).build();
     }
 
     /**
@@ -339,12 +337,12 @@ public final class SubscribeToStreamUtil {
         }
 
         final YangInstanceIdentifier path = listener.getPath();
-        DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)
+        final DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)
                         domDataBroker.getSupportedExtensions().get(DOMDataTreeChangeService.class);
         if (changeService == null) {
             throw new UnsupportedOperationException("DOMDataTreeChangeService not supported by DOMDataBroker");
         }
-        DOMDataTreeIdentifier loc = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, path);
+        final DOMDataTreeIdentifier loc = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, path);
         listener.setRegistration(changeService.registerDataTreeChangeListener(loc, listener));
 
     }
@@ -354,9 +352,9 @@ public final class SubscribeToStreamUtil {
      *
      * @return port
      */
-    private static int prepareNotificationPort() {
+    private static int prepareNotificationPort(final int port) {
         final WebSocketServer webSocketServer =
-                WebSocketServer.getInstance(RestconfStreamsConstants.NOTIFICATION_PORT);
+                WebSocketServer.getInstance(port);
         return webSocketServer.getPort();
     }
 

@@ -25,6 +25,7 @@ import org.opendaylight.netconf.sal.restconf.impl.NormalizedNodeContext;
 import org.opendaylight.netconf.sal.restconf.impl.PatchContext;
 import org.opendaylight.netconf.sal.restconf.impl.PatchStatusContext;
 import org.opendaylight.restconf.Rfc8040;
+import org.opendaylight.restconf.base.services.api.UpdateHandlers;
 import org.opendaylight.restconf.utils.RestconfConstants;
 
 /**
@@ -32,7 +33,7 @@ import org.opendaylight.restconf.utils.RestconfConstants;
  * is a collection of configuration data and state data nodes.
  *
  */
-public interface RestconfDataService {
+public interface RestconfDataService extends UpdateHandlers {
 
     /**
      * Get target data resource.

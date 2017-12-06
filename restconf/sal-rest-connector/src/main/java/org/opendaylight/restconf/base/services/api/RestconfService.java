@@ -19,7 +19,7 @@ import org.opendaylight.restconf.utils.RestconfConstants;
  * Service for getting yang library version.
  *
  */
-public interface RestconfService {
+public interface RestconfService extends UpdateHandlers {
 
     /**
      * Get yang library version.

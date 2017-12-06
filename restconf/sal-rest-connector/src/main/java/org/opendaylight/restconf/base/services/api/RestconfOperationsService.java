@@ -23,7 +23,7 @@ import org.opendaylight.restconf.utils.RestconfConstants;
  * supported by the server.
  *
  */
-public interface RestconfOperationsService {
+public interface RestconfOperationsService extends UpdateHandlers {
 
     /**
      * List of rpc or action operations supported by the server.
