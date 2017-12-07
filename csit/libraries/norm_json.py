@@ -154,7 +154,31 @@ def sort_bits(obj, keys_with_bits=[]):
     return obj
 
 
-def normalize_json_text(text, strict=False, indent=1, keys_with_bits=[], jmes_path=None):
+def hide_volatile(obj, keys_with_volatiles=[]):
+    """
+    Takes list of keys with volatile values, and replaces them with generic "*"
+
+    :param obj: python dict from json
+    :param keys_with_volatiles: list of volatile keys
+    :return: corrected
+    """
+    if isinstance(obj, dict):
+        for key, value in obj.iteritems():
+            # Unicode is not str and vice versa, isinstance has to check for both.
+            # Luckily, "in" recognizes equivalent strings in different encodings.
+            # Type "bytes" is added for Python 3 compatibility.
+            if key in keys_with_volatiles and isinstance(value, (unicode, str, bytes, int)):
+                obj[key] = "*"
+            else:
+                hide_volatile(value, keys_with_volatiles)
+    # A string is not a list, so there is no risk of recursion over characters.
+    elif isinstance(obj, list):
+        for item in obj:
+            hide_volatile(item, keys_with_volatiles)
+    return obj
+
+
+def normalize_json_text(text, strict=False, indent=1, keys_with_bits=[], keys_with_volatiles=[], jmes_path=None):
     """
     Attempt to return sorted indented JSON string.
 
@@ -187,6 +211,8 @@ def normalize_json_text(text, strict=False, indent=1, keys_with_bits=[], jmes_pa
             return str(err) + '\n' + text
     if keys_with_bits:
         sort_bits(object_decoded, keys_with_bits)
+    if keys_with_volatiles:
+        hide_volatile(object_decoded, keys_with_volatiles)
 
     pretty_json = dumps_indented(object_decoded, indent=indent)
 
