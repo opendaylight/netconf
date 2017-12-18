@@ -272,11 +272,8 @@ public class NetconfDeviceSimulator implements Closeable {
         return new SshProxyServerConfigurationBuilder()
                 .setBindingAddress(bindingAddress)
                 .setLocalAddress(tcpLocalAddress)
-                .setAuthenticator((username, password) -> true)
-                .setPublickeyAuthenticator(((username, key, session) -> {
-                    LOG.info("Auth with public key: {}", key);
-                    return true;
-                }))
+                .setAuthenticator(configuration.getAuthProvider())
+                .setPublickeyAuthenticator(configuration.getPublickeyAuthenticator())
                 .setKeyPairProvider(keyPairProvider)
                 .setIdleTimeout(Integer.MAX_VALUE)
                 .createSshProxyServerConfiguration();
@@ -324,7 +321,10 @@ public class NetconfDeviceSimulator implements Closeable {
             LOG.info("Custom module loading skipped.");
         }
 
-        addDefaultSchemas(consumer);
+        configuration.getDefaultYangResources().forEach(r -> {
+            SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create(r.getModuleName(), r.getRevision());
+            registerSource(consumer, r.getResourcePath(), sourceIdentifier);
+        });
 
         try {
             //necessary for creating mdsal data stores and operations
@@ -360,20 +360,6 @@ public class NetconfDeviceSimulator implements Closeable {
             throw new RuntimeException("Cannot retrieve schema source for module "
                 + moduleSourceIdentifier.toString() + " from schema repository", e);
         }
-    }
-
-    private void addDefaultSchemas(final SharedSchemaRepository consumer) {
-        SourceIdentifier srcId = RevisionSourceIdentifier.create("ietf-netconf-monitoring", "2010-10-04");
-        registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring.yang", srcId);
-
-        srcId = RevisionSourceIdentifier.create("ietf-netconf-monitoring-extension", "2013-12-10");
-        registerSource(consumer, "/META-INF/yang/ietf-netconf-monitoring-extension.yang", srcId);
-
-        srcId = RevisionSourceIdentifier.create("ietf-yang-types", "2013-07-15");
-        registerSource(consumer, "/META-INF/yang/ietf-yang-types@2013-07-15.yang", srcId);
-
-        srcId = RevisionSourceIdentifier.create("ietf-inet-types", "2013-07-15");
-        registerSource(consumer, "/META-INF/yang/ietf-inet-types@2013-07-15.yang", srcId);
     }
 
     private void registerSource(final SharedSchemaRepository consumer, final String resource,

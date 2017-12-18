@@ -9,15 +9,23 @@ package org.opendaylight.netconf.test.tool.config;
 
 import com.google.common.collect.ImmutableSet;
 import java.io.File;
+import java.security.PublicKey;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.sshd.server.PublickeyAuthenticator;
+import org.apache.sshd.server.session.ServerSession;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.test.tool.operations.OperationsCreator;
 import org.opendaylight.netconf.test.tool.rpchandler.RpcHandler;
 import org.opendaylight.netconf.test.tool.rpchandler.RpcHandlerDefault;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Configuration {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
     public static final Set<String> DEFAULT_BASE_CAPABILITIES_EXI = ImmutableSet.of(
             XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
@@ -30,17 +38,47 @@ public class Configuration {
             XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1
     );
 
+    public static final Set<YangResource> DEFAULT_YANG_RESOURCES = ImmutableSet.of(
+            new YangResource("ietf-netconf-monitoring", "2010-10-04",
+                    "/META-INF/yang/ietf-netconf-monitoring.yang"),
+            new YangResource("ietf-netconf-monitoring-extension", "2013-12-10",
+                    "/META-INF/yang/ietf-netconf-monitoring-extension.yang"),
+            new YangResource("ietf-yang-types", "2013-07-15",
+                    "/META-INF/yang/ietf-yang-types@2013-07-15.yang"),
+            new YangResource("ietf-inet-types", "2013-07-15",
+                    "/META-INF/yang/ietf-inet-types@2013-07-15.yang")
+    );
+
+    public static final AuthProvider DEFAULT_AUTH_PROVIDER = new AuthProvider() {
+        @Override
+        public boolean authenticated(String username, String password) {
+            LOG.info("Auth with username and password: {}", username);
+            return true;
+        }
+    };
+
+    public static final PublickeyAuthenticator DEFAULT_PUBLIC_KEY_AUTHENTICATOR = new PublickeyAuthenticator() {
+        @Override
+        public boolean authenticate(String username, PublicKey key, ServerSession session) {
+            LOG.info("Auth with public key: {}", key);
+            return true;
+        }
+    };
+
     private int generateConfigsTimeout = (int) TimeUnit.MINUTES.toMillis(30);
     private int threadPoolSize = 8;
     private int startingPort = 17830;
     private int deviceCount = 1;
     private boolean ssh = true;
     private String ip = "0.0.0.0";
+    private Set<YangResource> defaultYangResources = DEFAULT_YANG_RESOURCES;
 
     private Set<String> models;
     private Set<String> capabilities = DEFAULT_BASE_CAPABILITIES_EXI;
     private RpcHandler rpcHandler = new RpcHandlerDefault();
     private OperationsCreator operationsCreator;
+    private AuthProvider authProvider = DEFAULT_AUTH_PROVIDER;
+    private PublickeyAuthenticator publickeyAuthenticator = DEFAULT_PUBLIC_KEY_AUTHENTICATOR;
 
     @Deprecated
     private boolean mdSal = false;
@@ -58,6 +96,30 @@ public class Configuration {
     private File schemasDir;
 
     public Configuration() {
+    }
+
+    public PublickeyAuthenticator getPublickeyAuthenticator() {
+        return publickeyAuthenticator;
+    }
+
+    public void setPublickeyAuthenticator(PublickeyAuthenticator publickeyAuthenticator) {
+        this.publickeyAuthenticator = publickeyAuthenticator;
+    }
+
+    public AuthProvider getAuthProvider() {
+        return authProvider;
+    }
+
+    public void setAuthProvider(AuthProvider authProvider) {
+        this.authProvider = authProvider;
+    }
+
+    public Set<YangResource> getDefaultYangResources() {
+        return defaultYangResources;
+    }
+
+    public void setDefaultYangResources(Set<YangResource> defaultYangResources) {
+        this.defaultYangResources = defaultYangResources;
     }
 
     public int getThreadPoolSize() {

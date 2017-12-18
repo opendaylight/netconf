@@ -9,6 +9,9 @@ package org.opendaylight.netconf.test.tool.config;
 
 import java.io.File;
 import java.util.Set;
+
+import org.apache.sshd.server.PublickeyAuthenticator;
+import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.test.tool.TesttoolParameters;
 import org.opendaylight.netconf.test.tool.operations.OperationsCreator;
 import org.opendaylight.netconf.test.tool.rpchandler.RpcHandler;
@@ -19,6 +22,21 @@ public class ConfigurationBuilder {
 
     public ConfigurationBuilder() {
         this.configuration = new Configuration();
+    }
+
+    public ConfigurationBuilder setPublickeyAuthenticator(PublickeyAuthenticator publickeyAuthenticator) {
+        this.configuration.setPublickeyAuthenticator(publickeyAuthenticator);
+        return this;
+    }
+
+    public ConfigurationBuilder setAuthProvider(AuthProvider authProvider) {
+        this.configuration.setAuthProvider(authProvider);
+        return this;
+    }
+
+    public ConfigurationBuilder setGetDefaultYangResources(Set<YangResource> defaultYangResources) {
+        this.configuration.setDefaultYangResources(defaultYangResources);
+        return this;
     }
 
     public ConfigurationBuilder setThreadPoolSize(int threadPoolSize) {
@@ -111,6 +129,9 @@ public class ConfigurationBuilder {
         this.configuration.setInitialConfigXMLFile(configuration.getInitialConfigXMLFile());
         this.configuration.setNotificationFile(configuration.getNotificationFile());
         this.configuration.setSchemasDir(configuration.getSchemasDir());
+        this.configuration.setDefaultYangResources(configuration.getDefaultYangResources());
+        this.configuration.setAuthProvider(configuration.getAuthProvider());
+        this.configuration.setPublickeyAuthenticator(configuration.getPublickeyAuthenticator());
         return this;
     }
 
