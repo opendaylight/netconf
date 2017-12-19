@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc456bd_9e3b2f95",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/config/Configuration.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5872
+      },
+      "writtenOn": "2017-12-19T10:35:21Z",
+      "side": 1,
+      "message": "This is confusing. You have a public constant on line 41 and then use a private mutable field with a getter and a setter down at ~120 with the same lowercase name. At the very least remove the \"default\" prefix.",
+      "revId": "63d5c602e37f71ee923888c98572bc54b265adb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "037a3d67_57213583",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/config/YangResource.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5872
+      },
+      "writtenOn": "2017-12-19T10:35:21Z",
+      "side": 1,
+      "message": "Is this to be run in an OSGi environment? If so, do not use simple class comparison.",
+      "revId": "63d5c602e37f71ee923888c98572bc54b265adb3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
