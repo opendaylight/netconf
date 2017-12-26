@@ -132,6 +132,8 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         String reason = throwable != null && throwable.getMessage() != null ? throwable.getMessage() : UNKNOWN_REASON;
 
         final NetconfNode data = new NetconfNodeBuilder()
+                .setHost(id.getHost())
+                .setPort(new PortNumber(id.getAddress().getPort()))
                 .setConnectionStatus(ConnectionStatus.UnableToConnect).setConnectedMessage(reason).build();
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
