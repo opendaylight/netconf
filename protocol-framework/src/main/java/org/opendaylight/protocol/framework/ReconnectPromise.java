@@ -54,7 +54,7 @@ final class ReconnectPromise<S extends ProtocolSession<?>, L extends SessionList
         });
 
         pending.addListener((GenericFutureListener<Future<Object>>) future -> {
-            if (!future.isSuccess()) {
+            if (!future.isSuccess() && !ReconnectPromise.this.isDone()) {
                 ReconnectPromise.this.setFailure(future.cause());
             }
         });
