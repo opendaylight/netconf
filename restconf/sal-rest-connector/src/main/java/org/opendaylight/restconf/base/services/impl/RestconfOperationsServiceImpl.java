@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -43,6 +44,7 @@ import org.slf4j.LoggerFactory;
  * Implementation of {@link RestconfOperationsService}.
  *
  */
+@Path("/")
 public class RestconfOperationsServiceImpl implements RestconfOperationsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfOperationsServiceImpl.class);
