@@ -192,8 +192,13 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
                 if (previousKeepalive != null && !previousKeepalive.isDone()) {
                     onFailure(new IllegalStateException("Previous keepalive timed out"));
                 } else {
-                    Futures.addCallback(currentDeviceRpc.invokeRpc(PATH, KEEPALIVE_PAYLOAD), this,
+                    final CheckedFuture<DOMRpcResult, DOMRpcException> keepaliveDOMRpcExceptionCheckedFuture =
+                            currentDeviceRpc.invokeRpc(PATH, KEEPALIVE_PAYLOAD);
+                    Futures.addCallback(keepaliveDOMRpcExceptionCheckedFuture, this,
                                         MoreExecutors.directExecutor());
+                    final RequestTimeoutTask keepaliveTimeoutTask =
+                            new RequestTimeoutTask(keepaliveDOMRpcExceptionCheckedFuture);
+                    executor.schedule(keepaliveTimeoutTask, keepaliveDelaySeconds, TimeUnit.SECONDS);
                 }
             } catch (NullPointerException e) {
                 LOG.debug("{}: Skipping keepalive while reconnecting", id);
