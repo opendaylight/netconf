@@ -39,14 +39,9 @@
         <scope>import</scope>
       </dependency>
       <dependency>
-        <groupId>openexi</groupId>
-        <artifactId>nagasena</artifactId>
-        <version>0000.0002.0062.0</version>
-      </dependency>
-      <dependency>
-        <groupId>openexi</groupId>
-        <artifactId>nagasena-rta</artifactId>
-        <version>0000.0002.0062.0</version>
+        <groupId>com.siemens.ct.exi</groupId>
+        <artifactId>exificient</artifactId>
+        <version>0.9.7</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -79,12 +74,13 @@
       <version>1.6.0</version>
     </dependency>
     <dependency>
-      <groupId>openexi</groupId>
-      <artifactId>nagasena</artifactId>
+      <groupId>com.siemens.ct.exi</groupId>
+      <artifactId>exificient</artifactId>
     </dependency>
     <dependency>
-      <groupId>openexi</groupId>
-      <artifactId>nagasena-rta</artifactId>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+      <version>1.4.01</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -107,18 +103,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-            <phase>package</phase>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
