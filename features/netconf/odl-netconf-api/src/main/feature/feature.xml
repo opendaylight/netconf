@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!--
   ~ Copyright © 2018 Red Hat, Inc. and others.
   ~
@@ -6,9 +6,8 @@
   ~ terms of the Eclipse Public License v1.0 which accompanies this distribution,
   ~ and is available at http://www.eclipse.org/legal/epl-v10.html
   -->
-<features name="odl-netconf-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
-    <feature name="odl-yanglib" version="${project.version}">
-        <feature version="[3.0.0,4)">odl-karaf-feat-jetty</feature>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-api">
+    <feature name="odl-netconf-api">
         <feature version="[2.0.0,3)">odl-yangtools-data</feature>
     </feature>
 </features>
