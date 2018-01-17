@@ -50,10 +50,10 @@ import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
+import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
-import org.openexi.proc.common.EXIOptions;
 import org.w3c.dom.Document;
 
 public class NetconfClientSessionNegotiatorTest {
@@ -157,7 +157,7 @@ public class NetconfClientSessionNegotiatorTest {
 
     @Test
     public void testNetconfClientSessionNegotiator() throws Exception {
-        Promise promise = mock(Promise.class);
+        Promise<NetconfClientSession> promise = mock(Promise.class);
         doReturn(promise).when(promise).setSuccess(anyObject());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
 
@@ -170,9 +170,8 @@ public class NetconfClientSessionNegotiatorTest {
 
     @Test
     public void testNetconfClientSessionNegotiatorWithEXI() throws Exception {
-        Promise promise = mock(Promise.class);
-        EXIOptions exiOptions = new EXIOptions();
-        NetconfStartExiMessage exiMessage = NetconfStartExiMessage.create(exiOptions, "msg-id");
+        Promise<NetconfClientSession> promise = mock(Promise.class);
+        NetconfStartExiMessage exiMessage = NetconfStartExiMessage.create(EXIParameters.empty(), "msg-id");
         doReturn(promise).when(promise).setSuccess(anyObject());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, exiMessage);
 
