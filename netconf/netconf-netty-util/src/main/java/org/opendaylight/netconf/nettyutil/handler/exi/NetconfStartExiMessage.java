@@ -43,11 +43,21 @@ public final class NetconfStartExiMessage extends NetconfMessage {
 
         addAlignment(exiOptions, doc, startExiElement);
         addFidelity(exiOptions, doc, startExiElement);
+        addSchema(exiOptions, doc, startExiElement);
 
         rpcElement.appendChild(startExiElement);
 
         doc.appendChild(rpcElement);
         return new NetconfStartExiMessage(doc);
+    }
+
+    private static void addAlignment(final EXIParameters exiOptions, final Document doc,
+            final Element startExiElement) {
+        final Element alignmentElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0,
+            EXIParameters.EXI_PARAMETER_ALIGNMENT);
+
+        alignmentElement.setTextContent(exiOptions.getAlignment());
+        startExiElement.appendChild(alignmentElement);
     }
 
     private static void addFidelity(final EXIParameters exiOptions, final Document doc, final Element startExiElement) {
@@ -68,13 +78,14 @@ public final class NetconfStartExiMessage extends NetconfMessage {
         }
     }
 
-    private static void addAlignment(final EXIParameters exiOptions, final Document doc,
-                                     final Element startExiElement) {
-        final Element alignmentElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0,
-            EXIParameters.EXI_PARAMETER_ALIGNMENT);
-
-        alignmentElement.setTextContent(exiOptions.getAlignment());
-        startExiElement.appendChild(alignmentElement);
+    private static void addSchema(final EXIParameters exiOptions, final Document doc, final Element startExiElement) {
+        final String schema = exiOptions.getSchema();
+        if (schema != null) {
+            final Element child = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0,
+                EXIParameters.EXI_PARAMETER_SCHEMAS);
+            child.setTextContent(schema);
+            startExiElement.appendChild(child);
+        }
     }
 
     private static void createFidelityElement(final Document doc, final List<Element> elements,
