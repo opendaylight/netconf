@@ -13,7 +13,10 @@ import com.siemens.ct.exi.CodingMode;
 import com.siemens.ct.exi.EXIFactory;
 import com.siemens.ct.exi.EncodingOptions;
 import com.siemens.ct.exi.FidelityOptions;
+import com.siemens.ct.exi.SchemaIdResolver;
+import com.siemens.ct.exi.exceptions.EXIException;
 import com.siemens.ct.exi.exceptions.UnsupportedOption;
+import com.siemens.ct.exi.grammars.Grammars;
 import com.siemens.ct.exi.helpers.DefaultEXIFactory;
 import java.util.Objects;
 import org.opendaylight.controller.config.util.xml.XmlElement;
@@ -38,6 +41,27 @@ public final class EXIParameters {
     private static final String EXI_FIDELITY_PIS = "pis";
     private static final String EXI_FIDELITY_PREFIXES = "prefixes";
 
+    static final String EXI_PARAMETER_SCHEMAS = "schemas";
+
+    private static final SchemaIdResolver SCHEMA_RESOLVER = new SchemaIdResolver() {
+        @Override
+        public Grammars resolveSchemaId(final String schemaId) throws EXIException {
+            if (schemaId == null) {
+                return null;
+            }
+            if (schemaId.isEmpty()) {
+                return EXISchema.BUILTIN.getGrammar();
+            }
+
+            final Grammars g = EXISchema.BASE_1_1.getGrammar();
+            if (g.getSchemaId().equals(schemaId)) {
+                return g;
+            }
+
+            throw new EXIException("Cannot resolve schema " + schemaId);
+        }
+    };
+
     private static final EncodingOptions ENCODING_OPTIONS;
 
     static {
@@ -61,10 +85,16 @@ public final class EXIParameters {
 
     private final FidelityOptions fidelityOptions;
     private final CodingMode codingMode;
+    private final EXISchema schema;
 
     public EXIParameters(final CodingMode codingMode, final FidelityOptions fidelityOptions) {
+        this(codingMode, fidelityOptions, EXISchema.NONE);
+    }
+
+    public EXIParameters(final CodingMode codingMode, final FidelityOptions fidelityOptions, final EXISchema schema) {
         this.fidelityOptions = Preconditions.checkNotNull(fidelityOptions);
         this.codingMode = Preconditions.checkNotNull(codingMode);
+        this.schema = Preconditions.checkNotNull(schema);
     }
 
     @VisibleForTesting
@@ -119,7 +149,18 @@ public final class EXIParameters {
                 fidelityElement.getElementsByTagName(EXI_FIDELITY_PREFIXES).getLength() > 0);
         }
 
-        return new EXIParameters(coding, fidelity);
+        final EXISchema schema;
+        final NodeList schemaElements = root.getElementsByTagName(EXI_PARAMETER_SCHEMAS);
+        if (schemaElements.getLength() > 0) {
+            final Element schemaElement = (Element) schemaElements.item(0);
+            final String schemaName = schemaElement.getTextContent().trim();
+            schema = EXISchema.forOption(schemaName);
+            Preconditions.checkArgument(schema != null, "Unsupported schema name %s", schemaName);
+        } else {
+            schema = EXISchema.NONE;
+        }
+
+        return new EXIParameters(coding, fidelity, schema);
     }
 
     public EXIFactory getFactory() {
@@ -127,12 +168,14 @@ public final class EXIParameters {
         factory.setCodingMode(codingMode);
         factory.setEncodingOptions(ENCODING_OPTIONS);
         factory.setFidelityOptions(fidelityOptions);
+        factory.setGrammars(schema.getGrammar());
+        factory.setSchemaIdResolver(SCHEMA_RESOLVER);
         return factory;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(fidelityOptions, codingMode);
+        return Objects.hash(fidelityOptions, codingMode, schema);
     }
 
     @Override
@@ -144,7 +187,8 @@ public final class EXIParameters {
             return false;
         }
         final EXIParameters other = (EXIParameters) obj;
-        return codingMode == other.codingMode && fidelityOptions.equals(other.fidelityOptions);
+        return codingMode == other.codingMode && schema == other.schema
+                && fidelityOptions.equals(other.fidelityOptions);
     }
 
     String getAlignment() {
@@ -184,5 +228,9 @@ public final class EXIParameters {
 
     String getPreservePrefixes() {
         return fidelityString(FidelityOptions.FEATURE_PREFIX, EXI_FIDELITY_PREFIXES);
+    }
+
+    String getSchema() {
+        return schema == EXISchema.NONE ? null : schema.name();
     }
 }
