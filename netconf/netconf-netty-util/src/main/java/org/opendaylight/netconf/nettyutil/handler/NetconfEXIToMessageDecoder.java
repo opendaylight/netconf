@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.nettyutil.handler;
 
 import com.google.common.base.Preconditions;
+import com.siemens.ct.exi.exceptions.EXIException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufUtil;
@@ -25,13 +26,12 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
-import org.openexi.proc.common.EXIOptionsException;
-import org.openexi.sax.EXIReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
 
@@ -53,21 +53,21 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
      * which means that {@link #decode(ChannelHandlerContext, ByteBuf, List)}
      * cannot be invoked concurrently. Hence we can reuse the reader.
      */
-    private final EXIReader reader;
+    private final XMLReader reader;
     private final DocumentBuilder documentBuilder;
 
-    private NetconfEXIToMessageDecoder(final EXIReader reader) {
+    private NetconfEXIToMessageDecoder(final XMLReader reader) {
         this.reader = Preconditions.checkNotNull(reader);
         this.documentBuilder = UntrustedXML.newDocumentBuilder();
     }
 
-    public static NetconfEXIToMessageDecoder create(final NetconfEXICodec codec) throws EXIOptionsException {
+    public static NetconfEXIToMessageDecoder create(final NetconfEXICodec codec) throws EXIException {
         return new NetconfEXIToMessageDecoder(codec.getReader());
     }
 
     @Override
     protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out)
-            throws EXIOptionsException, IOException, SAXException, TransformerConfigurationException  {
+            throws IOException, SAXException, TransformerConfigurationException {
         /*
          * Note that we could loop here and process all the messages, but we can't do that.
          * The reason is <stop-exi> operation, which has the contract of immediately stopping

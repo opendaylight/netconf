@@ -26,7 +26,7 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
-import org.openexi.proc.common.EXIOptions;
+import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 
 public class NetconfClientSessionTest {
 
@@ -43,18 +43,18 @@ public class NetconfClientSessionTest {
 
     @Test
     public void testNetconfClientSession() throws Exception {
-        NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
-        long sessId = 20L;
-        Collection<String> caps = Lists.newArrayList("cap1", "cap2");
+        final NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
+        final long sessId = 20L;
+        final Collection<String> caps = Lists.newArrayList("cap1", "cap2");
 
-        NetconfEXICodec codec = new NetconfEXICodec(new EXIOptions());
-        ChannelPipeline pipeline = mock(ChannelPipeline.class);
+        final NetconfEXICodec codec = NetconfEXICodec.forParameters(EXIParameters.empty());
+        final ChannelPipeline pipeline = mock(ChannelPipeline.class);
 
         Mockito.doReturn(pipeline).when(channel).pipeline();
         Mockito.doReturn(channelHandler).when(pipeline).replace(anyString(), anyString(), any(ChannelHandler.class));
         Mockito.doReturn("").when(channelHandler).toString();
 
-        NetconfClientSession session = new NetconfClientSession(sessionListener, channel, sessId, caps);
+        final NetconfClientSession session = new NetconfClientSession(sessionListener, channel, sessId, caps);
         final NetconfMessageToEXIEncoder exiEncoder = NetconfMessageToEXIEncoder.create(codec);
         final NetconfEXIToMessageDecoder exiDecoder = NetconfEXIToMessageDecoder.create(codec);
         session.addExiHandlers(exiDecoder, exiEncoder);

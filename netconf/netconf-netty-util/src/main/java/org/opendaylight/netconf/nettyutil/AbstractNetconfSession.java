@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
+import com.siemens.ct.exi.exceptions.EXIException;
+import com.siemens.ct.exi.exceptions.UnsupportedOption;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -27,8 +29,6 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.protocol.framework.AbstractProtocolSession;
-import org.openexi.proc.common.EXIOptionsException;
-import org.openexi.sax.TransmogrifierException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +82,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession,L extends 
                 final ChannelFuture future = channel.writeAndFlush(netconfMessage);
                 future.addListener(new FutureListener<Void>() {
                     @Override
-                    public void operationComplete(Future<Void> future) throws Exception {
+                    public void operationComplete(final Future<Void> future) throws Exception {
                         if (future.isSuccess()) {
                             proxyFuture.setSuccess();
                         } else {
@@ -147,24 +147,17 @@ public abstract class AbstractNetconfSession<S extends NetconfSession,L extends 
         final EXIParameters exiParams;
         try {
             exiParams = EXIParameters.fromXmlElement(XmlElement.fromDomDocument(startExiMessage.getDocument()));
-        } catch (final EXIOptionsException e) {
+        } catch (final UnsupportedOption e) {
             LOG.warn("Unable to parse EXI parameters from {} on session {}", startExiMessage, this, e);
             throw new IllegalArgumentException("Cannot parse options", e);
         }
 
-        final NetconfEXICodec exiCodec = new NetconfEXICodec(exiParams.getOptions());
-        final NetconfMessageToEXIEncoder exiEncoder;
-        try {
-            exiEncoder = NetconfMessageToEXIEncoder.create(exiCodec);
-        } catch (EXIOptionsException | TransmogrifierException e) {
-            LOG.warn("Failed to instantiate EXI encoder for {} on session {}", exiCodec, this, e);
-            throw new IllegalStateException("Cannot instantiate encoder for options", e);
-        }
-
+        final NetconfEXICodec exiCodec = NetconfEXICodec.forParameters(exiParams);
+        final NetconfMessageToEXIEncoder exiEncoder = NetconfMessageToEXIEncoder.create(exiCodec);
         final NetconfEXIToMessageDecoder exiDecoder;
         try {
             exiDecoder = NetconfEXIToMessageDecoder.create(exiCodec);
-        } catch (EXIOptionsException e) {
+        } catch (EXIException e) {
             LOG.warn("Failed to instantiate EXI decodeer for {} on session {}", exiCodec, this, e);
             throw new IllegalStateException("Cannot instantiate encoder for options", e);
         }

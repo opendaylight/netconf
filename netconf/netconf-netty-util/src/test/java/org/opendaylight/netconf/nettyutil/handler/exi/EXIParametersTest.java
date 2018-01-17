@@ -10,14 +10,15 @@ package org.opendaylight.netconf.nettyutil.handler.exi;
 
 import static org.junit.Assert.assertEquals;
 
+import com.siemens.ct.exi.CodingMode;
+import com.siemens.ct.exi.EXIFactory;
+import com.siemens.ct.exi.FidelityOptions;
 import java.util.Arrays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
-import org.openexi.proc.common.AlignmentType;
-import org.openexi.proc.common.EXIOptions;
 
 @RunWith(Parameterized.class)
 public class EXIParametersTest {
@@ -42,26 +43,27 @@ public class EXIParametersTest {
                 + "</fidelity>\n"
                 + "</start-exi>\n";
 
-        final EXIOptions fullOptions = new EXIOptions();
-        fullOptions.setAlignmentType(AlignmentType.byteAligned);
-        fullOptions.setPreserveLexicalValues(true);
-        fullOptions.setPreserveDTD(true);
-        fullOptions.setPreserveComments(true);
-        fullOptions.setPreserveNS(true);
-        fullOptions.setPreservePIs(true);
+        final FidelityOptions fullOptions = FidelityOptions.createDefault();
+        fullOptions.setFidelity(FidelityOptions.FEATURE_LEXICAL_VALUE, true);
+        fullOptions.setFidelity(FidelityOptions.FEATURE_DTD, true);
+        fullOptions.setFidelity(FidelityOptions.FEATURE_COMMENT, true);
+        fullOptions.setFidelity(FidelityOptions.FEATURE_PREFIX, true);
+        fullOptions.setFidelity(FidelityOptions.FEATURE_PI, true);
 
         return Arrays.asList(new Object[][]{
-            {noChangeXml, new EXIOptions()},
-            {fullOptionsXml, fullOptions},
+            {noChangeXml, CodingMode.BIT_PACKED, FidelityOptions.createDefault()},
+            {fullOptionsXml, CodingMode.BYTE_PACKED, fullOptions},
         });
     }
 
     private final String sourceXml;
-    private final EXIOptions exiOptions;
+    private final CodingMode coding;
+    private final FidelityOptions fidelity;
 
-    public EXIParametersTest(final String sourceXml, final EXIOptions exiOptions) {
+    public EXIParametersTest(final String sourceXml, final CodingMode coding, final FidelityOptions fidelity) {
         this.sourceXml = sourceXml;
-        this.exiOptions = exiOptions;
+        this.coding = coding;
+        this.fidelity = fidelity;
     }
 
     @Test
@@ -71,12 +73,8 @@ public class EXIParametersTest {
                         XmlElement.fromDomElement(
                                 XmlUtil.readXmlToElement(sourceXml)));
 
-
-        assertEquals(opts.getOptions().getAlignmentType(), exiOptions.getAlignmentType());
-        assertEquals(opts.getOptions().getPreserveComments(), exiOptions.getPreserveComments());
-        assertEquals(opts.getOptions().getPreserveLexicalValues(), exiOptions.getPreserveLexicalValues());
-        assertEquals(opts.getOptions().getPreserveNS(), exiOptions.getPreserveNS());
-        assertEquals(opts.getOptions().getPreserveDTD(), exiOptions.getPreserveDTD());
-        assertEquals(opts.getOptions().getPreserveNS(), exiOptions.getPreserveNS());
+        final EXIFactory factory = opts.getFactory();
+        assertEquals(fidelity, factory.getFidelityOptions());
+        assertEquals(coding, factory.getCodingMode());
     }
 }

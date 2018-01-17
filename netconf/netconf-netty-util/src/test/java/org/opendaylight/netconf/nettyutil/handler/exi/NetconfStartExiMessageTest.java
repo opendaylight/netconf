@@ -10,14 +10,14 @@ package org.opendaylight.netconf.nettyutil.handler.exi;
 
 import static org.junit.Assert.assertTrue;
 
+import com.siemens.ct.exi.CodingMode;
+import com.siemens.ct.exi.FidelityOptions;
 import java.util.Arrays;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.openexi.proc.common.AlignmentType;
-import org.openexi.proc.common.EXIOptions;
 
 @RunWith(Parameterized.class)
 public class NetconfStartExiMessageTest {
@@ -46,24 +46,23 @@ public class NetconfStartExiMessageTest {
                 + "</start-exi>\n"
                 + "</rpc>";
 
-        final EXIOptions fullOptions = new EXIOptions();
-        fullOptions.setAlignmentType(AlignmentType.byteAligned);
-        fullOptions.setPreserveLexicalValues(true);
-        fullOptions.setPreserveDTD(true);
-        fullOptions.setPreserveComments(true);
-        fullOptions.setPreserveNS(true);
-        fullOptions.setPreservePIs(true);
+        final FidelityOptions fullOptions = FidelityOptions.createDefault();
+        fullOptions.setFidelity(FidelityOptions.FEATURE_LEXICAL_VALUE, true);
+        fullOptions.setFidelity(FidelityOptions.FEATURE_DTD, true);
+        fullOptions.setFidelity(FidelityOptions.FEATURE_COMMENT, true);
+        fullOptions.setFidelity(FidelityOptions.FEATURE_PREFIX, true);
+        fullOptions.setFidelity(FidelityOptions.FEATURE_PI, true);
 
         return Arrays.asList(new Object[][]{
-            {noChangeXml, new EXIOptions()},
-            {fullOptionsXml, fullOptions},
+            {noChangeXml, EXIParameters.empty()},
+            {fullOptionsXml, new EXIParameters(CodingMode.BYTE_PACKED, fullOptions)},
         });
     }
 
     private final String controlXml;
-    private final EXIOptions exiOptions;
+    private final EXIParameters exiOptions;
 
-    public NetconfStartExiMessageTest(final String controlXml, final EXIOptions exiOptions) {
+    public NetconfStartExiMessageTest(final String controlXml, final EXIParameters exiOptions) {
         this.controlXml = controlXml;
         this.exiOptions = exiOptions;
     }
