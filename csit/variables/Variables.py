@@ -28,10 +28,10 @@ TOOLS_SYSTEM_PROMPT = DEFAULT_LINUX_PROMPT
 # KARAF Variables
 KARAF_SHELL_PORT = '8101'
 ESCAPE_CHARACTER = '\x1B'
-KARAF_DETAILED_PROMPT = '@' + ESCAPE_CHARACTER + '[0m' + ESCAPE_CHARACTER + '[34mroot' + ESCAPE_CHARACTER + '[0m>'
+KARAF_PROMPT_LOGIN = 'opendaylight-user'
 KARAF_USER = 'karaf'
 KARAF_PASSWORD = 'karaf'
-KARAF_PROMPT = 'opendaylight-user'
+KARAF_PROMPT = 'opendaylight-user.*root.*>'
 
 # Logging levels
 DEFAULT_ODL_LOG_LEVEL = 'INFO'
