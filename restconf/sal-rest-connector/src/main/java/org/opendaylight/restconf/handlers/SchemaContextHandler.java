@@ -12,6 +12,7 @@ import java.util.Collection;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfDocumentedException;
 import org.opendaylight.restconf.RestConnectorProvider;
 import org.opendaylight.restconf.Rfc8040.IetfYangLibrary;
@@ -54,6 +55,7 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
     @Override
     public void onGlobalContextUpdated(final SchemaContext context) {
         Preconditions.checkNotNull(context);
+        ControllerContext.getInstance().setSchemas(context);
         this.context = null;
         this.context = context;
         this.moduleSetId++;
