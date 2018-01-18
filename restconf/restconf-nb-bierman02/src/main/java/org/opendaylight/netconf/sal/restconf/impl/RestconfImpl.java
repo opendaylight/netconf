@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -1209,9 +1210,19 @@ public final class RestconfImpl implements RestconfService {
         final WebSocketServer webSocketServerInstance = WebSocketServer.getInstance(NOTIFICATION_PORT);
         final int notificationPort = webSocketServerInstance.getPort();
 
-        final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
+
+        final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme(getWsScheme(uriInfo));
 
         return uriToWebsocketServerBuilder.replacePath(streamName).build();
+    }
+
+    private String getWsScheme(UriInfo uriInfo) {
+        URI uri = uriInfo.getAbsolutePath();
+        if (uri == null) {
+            return "ws";
+        }
+        String subscriptionScheme = uri.getScheme().toLowerCase(Locale.ROOT);
+        return subscriptionScheme.equals("https") ? "wss" : "ws";
     }
 
     /**
@@ -1265,7 +1276,7 @@ public final class RestconfImpl implements RestconfService {
         final WebSocketServer webSocketServerInstance = WebSocketServer.getInstance(NOTIFICATION_PORT);
         final int notificationPort = webSocketServerInstance.getPort();
 
-        final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
+        final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme(getWsScheme(uriInfo));
 
         return uriToWebsocketServerBuilder.replacePath(streamName).build();
     }
