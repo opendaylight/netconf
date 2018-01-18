@@ -1236,9 +1236,19 @@ public final class RestconfImpl implements RestconfService {
         final WebSocketServer webSocketServerInstance = WebSocketServer.getInstance(NOTIFICATION_PORT);
         final int notificationPort = webSocketServerInstance.getPort();
 
-        final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
+
+        final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme(getWsScheme(uriInfo));
 
         return uriToWebsocketServerBuilder.replacePath(streamName).build();
+    }
+
+    private String getWsScheme(UriInfo uriInfo) {
+        URI uri = uriInfo.getAbsolutePath();
+        if (uri == null) {
+            return "ws";
+        }
+        String subscriptionScheme = uri.getScheme().toLowerCase();
+        return subscriptionScheme.equals("https") ? "wss" : "ws";
     }
 
     /**
@@ -1292,7 +1302,7 @@ public final class RestconfImpl implements RestconfService {
         final WebSocketServer webSocketServerInstance = WebSocketServer.getInstance(NOTIFICATION_PORT);
         final int notificationPort = webSocketServerInstance.getPort();
 
-        final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme("ws");
+        final UriBuilder uriToWebsocketServerBuilder = uriBuilder.port(notificationPort).scheme(getWsScheme(uriInfo));
 
         return uriToWebsocketServerBuilder.replacePath(streamName).build();
     }
