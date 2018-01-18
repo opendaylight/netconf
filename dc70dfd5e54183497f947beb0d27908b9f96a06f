@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a1969be_3752f713",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/NetconfConfigurationImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2018-01-18T14:45:09Z",
+      "side": 1,
+      "message": "Going to make this a static configuration for now, as it will adhere to the existing behavior (i.e., updates don\u0027t work).",
+      "parentUuid": "9a245df4_cf41f63a",
+      "revId": "dc70dfd5e54183497f947beb0d27908b9f96a06f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a245df4_d90c2445",
         "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/NetconfConfigurationImpl.java",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2017-10-26T15:34:04Z",
       "side": 1,
       "message": "Prior, this instance was advertised as a ManageService so this method would be invoked when the cfg changed. This is not longer the case. We would have to use \u003ccm:managed-properties\u003e in BP. The next question is how users (eg NetconfSSHProvider) would be notified of changes. From what I can tell from the previous code, there was no mechanism for this so we\u0027re not regressing there. But we should retain the ability for this instance to be updated. See my comments in the BP xml file. Also the signature of this method would have to be a Map and not Dictionary.",
+      "revId": "dc70dfd5e54183497f947beb0d27908b9f96a06f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a1969be_97576b02",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/NetconfConfigurationImpl.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2018-01-18T14:45:09Z",
+      "side": 1,
+      "message": "Just made it a static configuration instead.",
+      "parentUuid": "9a245df4_d90c2445",
       "revId": "dc70dfd5e54183497f947beb0d27908b9f96a06f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
