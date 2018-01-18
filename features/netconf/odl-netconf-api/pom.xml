@@ -53,7 +53,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>odl-yangtools-data</artifactId>
+            <artifactId>odl-yangtools-data-api</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
