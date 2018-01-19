@@ -37,6 +37,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
@@ -175,6 +176,6 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
 
     private static JSONCodecFactory getCodecFactory(final InstanceIdentifierContext<?> context) {
         // TODO: Performance: Cache JSON Codec factory and schema context
-        return JSONCodecFactory.getShared(context.getSchemaContext());
+        return JSONCodecFactorySupplier.RFC7951.getShared(context.getSchemaContext());
     }
 }

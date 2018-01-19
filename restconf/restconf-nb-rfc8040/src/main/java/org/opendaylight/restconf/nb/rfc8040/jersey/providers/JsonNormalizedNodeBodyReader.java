@@ -34,6 +34,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
@@ -83,7 +84,9 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
             }
         }
 
-        final JsonParserStream jsonParser = JsonParserStream.create(writer, path.getSchemaContext(), parentSchema);
+        final JsonParserStream jsonParser = JsonParserStream.create(writer,
+            JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()), parentSchema);
+
         final JsonReader reader = new JsonReader(new InputStreamReader(entityStream));
         jsonParser.parse(reader);
 
