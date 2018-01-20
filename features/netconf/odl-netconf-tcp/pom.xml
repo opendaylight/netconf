@@ -26,26 +26,10 @@
     <name>OpenDaylight :: Netconf Connector :: TCP</name>
 
     <dependencies>
-        <!-- This is pulled in via feature.xml directly for now (until we can configure prerequisites here
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>odl-netconf-util</artifactId>
-            <version>${project.version}</version>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-impl</artifactId>
             <version>${project.version}</version>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>odl-config-netty</artifactId>
-            <version>0.8.0-SNAPSHOT</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

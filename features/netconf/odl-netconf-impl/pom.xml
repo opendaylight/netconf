@@ -26,46 +26,6 @@
     <name>OpenDaylight :: Netconf :: Impl</name>
 
     <dependencies>
-        <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>yang-jmx-generator</artifactId>
-            <version>0.8.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>odl-netconf-api</artifactId>
-            <version>${project.version}</version>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>odl-netconf-mapping-api</artifactId>
-            <version>${project.version}</version>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>odl-netconf-util</artifactId>
-            <version>${project.version}</version>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>odl-netconf-netty-util</artifactId>
-            <version>${project.version}</version>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>odl-config-netty</artifactId>
-            <version>0.8.0-SNAPSHOT</version>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
         <!-- Netconf server without config connector is just an empty shell -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -75,11 +35,6 @@
             <classifier>features</classifier>
         </dependency>
         <!-- Netconf will not provide schemas without monitoring -->
-        <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>config-manager-facade-xml</artifactId>
-            <version>0.8.0-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-monitoring</artifactId>
