@@ -200,7 +200,7 @@ public class PostDataTransactionUtilTest {
             fail("Expected RestconfDocumentedException");
         } catch (final RestconfDocumentedException e) {
             assertEquals(1, e.getErrors().size());
-            assertTrue(e.getErrors().get(0).getErrorInfo().contains(domException.getMessage()));
+            assertTrue(e.getErrors().get(0).getErrorInfo().contains(domException.getClass().getSimpleName()));
         }
 
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
