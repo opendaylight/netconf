@@ -411,7 +411,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         final Optional<String> patchResult = this.service.patch(uriPath, payload);
         assertTrue("Patch output is not null", patchResult.isPresent());
         String patch = patchResult.get();
-        assertTrue(patch.contains("TransactionCommitFailedException"));
+        assertTrue(patch.contains("mock"));
     }
 
     @Test
