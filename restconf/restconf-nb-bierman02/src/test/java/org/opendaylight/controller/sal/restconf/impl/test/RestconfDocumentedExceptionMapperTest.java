@@ -398,7 +398,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
         final Exception cause = new Exception("mock exception cause");
         testJsonResponse(new RestconfDocumentedException("mock error", cause), Status.INTERNAL_SERVER_ERROR,
                 ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "mock error", null,
-                new SimpleErrorInfoVerifier(cause.getMessage()));
+                new SimpleErrorInfoVerifier(cause.getClass().getSimpleName()));
     }
 
     void testXMLResponse(final RestconfDocumentedException ex, final Status expStatus, final ErrorType expErrorType,
@@ -598,7 +598,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
         final Exception cause = new Exception("mock exception cause");
         testXMLResponse(new RestconfDocumentedException("mock error", cause), Status.INTERNAL_SERVER_ERROR,
                 ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, "mock error", null,
-                new SimpleErrorInfoVerifier(cause.getMessage()));
+                new SimpleErrorInfoVerifier(cause.getClass().getSimpleName()));
     }
 
     @Test
