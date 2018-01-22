@@ -8,7 +8,8 @@
   -->
 <features name="odl-netconf-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
     <feature name="odl-restconf-nb-rfc8040-noauth" version="${project.version}">
-        <feature version="[3.0.0,4)">odl-karaf-feat-jetty</feature>
+        <feature>jetty</feature>
+        <feature>http</feature>
         <feature version="[3.0.0,4)">odl-netty-4</feature>
     </feature>
 </features>
