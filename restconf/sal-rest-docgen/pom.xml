@@ -133,14 +133,17 @@
             <Embed-Dependency>generex, automaton</Embed-Dependency>
             <!-- needed for web.xml. Remove once we have Jersey 2 -->
             <Import-Package>
-              *,
               com.sun.jersey.spi.container.servlet,
               org.eclipse.jetty.servlets,
               org.opendaylight.aaa.shiro.filters,
               org.opendaylight.aaa.shiro.realm,
               org.opendaylight.aaa.shiro.web.env,
               org.apache.shiro.web.env,
-              org.opendaylight.aaa.api
+              org.opendaylight.aaa.api,
+              javax.ws.rs;version="[1.1,2)",
+              javax.ws.rs.core;version="[1.1,2)",
+              javax.ws.rs.ext;version="[1.1,2)",
+              *,
             </Import-Package>
             <Export-Package>
               com.fasterxml.jackson.datatype.*
