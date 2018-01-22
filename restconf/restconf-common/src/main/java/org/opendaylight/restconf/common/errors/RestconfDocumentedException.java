@@ -64,7 +64,7 @@ public class RestconfDocumentedException extends WebApplicationException {
     public RestconfDocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag,
                                        final Throwable cause) {
         this(cause, new RestconfError(errorType, errorTag, message, null,
-                Throwables.getStackTraceAsString(cause), null));
+                cause.getMessage(), null));
     }
 
     /**
@@ -100,7 +100,7 @@ public class RestconfDocumentedException extends WebApplicationException {
 
     /**
      * Constructs an instance with an error message and exception cause.
-     * The stack trace of the exception is included in the error info.
+     * The underlying exception is included in the error-info.
      *
      * @param message
      *            A string which provides a plain text string describing the error.
@@ -109,7 +109,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      */
     public RestconfDocumentedException(final String message, final Throwable cause) {
         this(cause, new RestconfError(RestconfError.ErrorType.APPLICATION, RestconfError.ErrorTag.OPERATION_FAILED,
-                message, null, Throwables.getStackTraceAsString(cause), null));
+                message, null, cause.getMessage(), null));
     }
 
     /**
