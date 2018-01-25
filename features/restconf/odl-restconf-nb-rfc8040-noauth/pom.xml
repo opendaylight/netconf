@@ -93,6 +93,13 @@
             <classifier>features</classifier>
         </dependency>
         <dependency>
+            <groupId>org.opendaylight.yangtools</groupId>
+            <artifactId>odl-yangtools-export</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+
+        <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>ietf-restconf</artifactId>
         </dependency>
@@ -107,7 +114,6 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-nb-rfc8040</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
