@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.rest.doc.jaxrs;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.Application;
+import org.opendaylight.aaa.provider.GsonProvider;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl;
 
 public class ApiDocApplication extends Application {
@@ -18,6 +19,7 @@ public class ApiDocApplication extends Application {
         Set<Object> singletons = new HashSet<>();
         singletons.add(ApiDocServiceImpl.getInstance());
         singletons.add(new JaxbContextResolver());
+        singletons.add(new GsonProvider());
         return singletons;
     }
 }
