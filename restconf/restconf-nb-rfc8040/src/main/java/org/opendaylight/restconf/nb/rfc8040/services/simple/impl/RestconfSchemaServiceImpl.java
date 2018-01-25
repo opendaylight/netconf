@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.services.simple.impl;
 
+import javax.ws.rs.Path;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
@@ -20,6 +21,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  * Implementation of {@link RestconfSchemaService}.
  *
  */
+@Path("/")
 public class RestconfSchemaServiceImpl implements RestconfSchemaService {
 
     private SchemaContextHandler schemaContextHandler;

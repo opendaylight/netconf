@@ -20,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map.Entry;
 import javax.annotation.Nonnull;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
@@ -58,6 +59,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of {@link RestconfDataService}.
  */
+@Path("/")
 public class RestconfDataServiceImpl implements RestconfDataService {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);

@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import java.net.URI;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -31,6 +32,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
  * Implementation of {@link RestconfInvokeOperationsService}.
  *
  */
+@Path("/")
 public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
 
     private RpcServiceHandler rpcServiceHandler;
