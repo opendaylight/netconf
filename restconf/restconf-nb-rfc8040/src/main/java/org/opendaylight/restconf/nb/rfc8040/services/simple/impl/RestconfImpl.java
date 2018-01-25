@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.services.simple.impl;
 
+import javax.ws.rs.Path;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
@@ -23,6 +24,7 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
+@Path("/")
 public class RestconfImpl implements RestconfService {
 
     private SchemaContextHandler schemaContextHandler;
