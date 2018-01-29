@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5cbd9979_3c31cfaa",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2018-01-29T14:01:31Z",
+      "side": 1,
+      "message": "The purpose of this code is to exactly handle this case. Basically, what we want is to make sure there is, at any time, only one Keepalive RPC sent to the device.\nThis code is saying that if the previous keepalive request hasn\u0027t finished yet, in the keepaliveDelaySeconds timeframce, then we haven\u0027t got an answer from the device, then we consider the request a failure.\nWhat you have added seems redundant to this logic.",
+      "range": {
+        "startLine": 192,
+        "startChar": 0,
+        "endLine": 194,
+        "endChar": 24
+      },
+      "revId": "f2e33e655f5731ad6f1f60c0a96ff0fda96bb05f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
