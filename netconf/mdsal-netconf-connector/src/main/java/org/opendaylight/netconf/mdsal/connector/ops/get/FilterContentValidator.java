@@ -36,7 +36,9 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
+import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -207,15 +209,16 @@ public class FilterContentValidator {
                 if (listKey instanceof IdentityrefTypeDefinition) {
                     keys.put(qName, keyValue.get());
                 } else {
-                    if (listKey.getType() instanceof IdentityrefTypeDefinition) {
+                    final TypeDefinition<? extends TypeDefinition<?>> keyType = listKey.getType();
+                    if (keyType instanceof IdentityrefTypeDefinition || keyType instanceof LeafrefTypeDefinition) {
                         final Document document = filterContent.getDomElement().getOwnerDocument();
                         final NamespaceContext nsContext = new UniversalNamespaceContextImpl(document, false);
                         final XmlCodecFactory xmlCodecFactory = XmlCodecFactory.create(schemaContext.getCurrentContext());
-                        final TypeAwareCodec identityrefTypeCodec = xmlCodecFactory.codecFor(listKey);
-                        final QName deserializedKey = (QName) identityrefTypeCodec.parseValue(nsContext, keyValue.get());
-                        keys.put(qName, deserializedKey);
+                        final TypeAwareCodec typeCodec = xmlCodecFactory.codecFor(listKey);
+                        final Object deserializedKeyValue = typeCodec.parseValue(nsContext, keyValue.get());
+                        keys.put(qName, deserializedKeyValue);
                     } else {
-                        final Object deserializedKey = TypeDefinitionAwareCodec.from(listKey.getType())
+                        final Object deserializedKey = TypeDefinitionAwareCodec.from(keyType)
                                 .deserialize(keyValue.get());
                         keys.put(qName, deserializedKey);
                     }
