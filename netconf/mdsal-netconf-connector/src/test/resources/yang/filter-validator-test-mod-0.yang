@@ -107,5 +107,19 @@ module filter-validator-test-mod-0 {
                 }
             }
         }
+
+        list leafref-key-list {
+            key "name";
+            leaf name {
+                type leafref {
+                    path "../config/name";
+                }
+            }
+            container config {
+                leaf name {
+                    type string;
+                }
+            }
+        }
     }
 }
