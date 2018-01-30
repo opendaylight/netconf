@@ -11,6 +11,8 @@ import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.Application;
+
+import org.opendaylight.aaa.provider.GsonProvider;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYangBodyWriter;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYinBodyWriter;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaRetrievalServiceImpl;
@@ -35,6 +37,7 @@ public class RestconfApplication extends Application {
                 .add(NormalizedNodeXmlBodyWriter.class)
                 .add(SchemaExportContentYinBodyWriter.class)
                 .add(SchemaExportContentYangBodyWriter.class)
+                .add(GsonProvider.class)
                 .build();
     }
 
