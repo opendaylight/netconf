@@ -773,20 +773,18 @@ public class ControllerContext implements SchemaContextListener {
         Preconditions.checkNotNull(uriValue);
         Preconditions.checkArgument(node instanceof LeafSchemaNode);
 
+        final SchemaContext schemaContext = mountPoint == null ? this.globalSchema : mountPoint.getSchemaContext();
         final String urlDecoded = urlPathArgDecode(uriValue);
         TypeDefinition<?> typedef = ((LeafSchemaNode) node).getType();
         final TypeDefinition<?> baseType = RestUtil.resolveBaseTypeFrom(typedef);
         if (baseType instanceof LeafrefTypeDefinition) {
-            typedef = SchemaContextUtil.getBaseTypeForLeafRef((LeafrefTypeDefinition) baseType, this.globalSchema,
-                node);
+            typedef = SchemaContextUtil.getBaseTypeForLeafRef((LeafrefTypeDefinition) baseType, schemaContext, node);
         }
         final Codec<Object, Object> codec = RestCodec.from(typedef, mountPoint);
         Object decoded = codec.deserialize(urlDecoded);
         String additionalInfo = "";
         if (decoded == null) {
             if (typedef instanceof IdentityrefTypeDefinition) {
-                final SchemaContext schemaContext =
-                        mountPoint == null ? this.globalSchema : mountPoint.getSchemaContext();
                 decoded = toQName(schemaContext, urlDecoded);
                 additionalInfo =
                         "For key which is of type identityref it should be in format module_name:identity_name.";
