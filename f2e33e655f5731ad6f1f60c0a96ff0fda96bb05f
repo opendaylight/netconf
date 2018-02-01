@@ -22,6 +22,30 @@
       "revId": "f2e33e655f5731ad6f1f60c0a96ff0fda96bb05f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d810558e_21ccc5c1",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 6757
+      },
+      "writtenOn": "2018-02-01T02:02:50Z",
+      "side": 1,
+      "message": "Actually, after testing, when the controller connected the  Netconf physical device via a Switch Device, if we shutdown the Netconf device\u0027s port, we haven\u0027t got an answer from the device for the previous keepalive request, then we would do nothing. There is no any condition to trigger the onSuccess or onFailure, the future\u0027s result will never return and the connection of Netconf between controller and device will still display \"Connected\" state.",
+      "parentUuid": "5cbd9979_3c31cfaa",
+      "range": {
+        "startLine": 192,
+        "startChar": 0,
+        "endLine": 194,
+        "endChar": 24
+      },
+      "revId": "f2e33e655f5731ad6f1f60c0a96ff0fda96bb05f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
