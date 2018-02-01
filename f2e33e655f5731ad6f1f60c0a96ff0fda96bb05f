@@ -46,6 +46,30 @@
       "revId": "f2e33e655f5731ad6f1f60c0a96ff0fda96bb05f",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6893dfd4_f806715b",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2018-02-01T13:27:22Z",
+      "side": 1,
+      "message": "I\u0027ll try to test test ASAP.\n\nThe logic here is, or should be:\n- keepalive is setup to be send every X mn\n- keepalive rpc is triggered\n- no reponse, and next keepalive is triggered. The condition checks if the previous keepalive is done, if not,bounce the session.\n\nIf that logic doesn\u0027t work, either it should be fixed, either it should be removed in favor of the new logic you\u0027ve added. But let\u0027s clean up / fix the code if it\u0027s not working. The class is already complex enough",
+      "parentUuid": "d810558e_21ccc5c1",
+      "range": {
+        "startLine": 192,
+        "startChar": 0,
+        "endLine": 194,
+        "endChar": 24
+      },
+      "revId": "f2e33e655f5731ad6f1f60c0a96ff0fda96bb05f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
