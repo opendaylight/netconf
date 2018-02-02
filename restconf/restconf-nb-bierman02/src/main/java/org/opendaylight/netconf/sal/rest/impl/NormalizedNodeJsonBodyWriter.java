@@ -86,12 +86,15 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
                 (InstanceIdentifierContext<SchemaNode>) context.getInstanceIdentifierContext();
 
         final SchemaPath path = identifierCtx.getSchemaNode().getPath();
-        final JsonWriter jsonWriter = createJsonWriter(entityStream, context.getWriterParameters().isPrettyPrint());
-        jsonWriter.beginObject();
-        writeNormalizedNode(
-                jsonWriter,path,identifierCtx,data, Optional.fromNullable(context.getWriterParameters().getDepth()));
-        jsonWriter.endObject();
-        jsonWriter.flush();
+        try (final JsonWriter jsonWriter = createJsonWriter(entityStream,
+                context.getWriterParameters().isPrettyPrint())) {
+            jsonWriter.beginObject();
+            writeNormalizedNode(
+                    jsonWriter, path, identifierCtx, data,
+                    Optional.fromNullable(context.getWriterParameters().getDepth()));
+            jsonWriter.endObject();
+            jsonWriter.flush();
+        }
     }
 
     private static void writeNormalizedNode(final JsonWriter jsonWriter, SchemaPath path,
