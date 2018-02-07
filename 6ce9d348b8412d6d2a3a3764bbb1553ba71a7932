@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e41aa3ff_2e1cc159",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfKeystoreAdapter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2018-02-07T23:49:57Z",
+      "side": 1,
+      "message": "add jdoc, please",
+      "range": {
+        "startLine": 69,
+        "startChar": 34,
+        "endLine": 69,
+        "endChar": 49
+      },
+      "revId": "6ce9d348b8412d6d2a3a3764bbb1553ba71a7932",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
