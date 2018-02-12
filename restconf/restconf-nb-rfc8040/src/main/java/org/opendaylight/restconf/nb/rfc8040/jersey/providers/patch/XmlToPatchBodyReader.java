@@ -17,13 +17,13 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.Provider;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -170,8 +170,8 @@ public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param operation Name of current operation
      * @return List of value elements
      */
-    private static List<Element> readValueNodes(@Nonnull final Element element,
-            @Nonnull final PatchEditOperation operation) {
+    private static List<Element> readValueNodes(final @NonNull Element element,
+            final @NonNull PatchEditOperation operation) {
         final Node valueNode = element.getElementsByTagName("value").item(0);
 
         if (operation.isWithValue() && valueNode == null) {
@@ -209,8 +209,8 @@ public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param revision Module revision
      * @return Non-conditional XPath
      */
-    private static String prepareNonCondXpath(@Nonnull final DataSchemaNode schemaNode, @Nonnull final String target,
-            @Nonnull final Element value, @Nonnull final String namespace, @Nonnull final String revision) {
+    private static String prepareNonCondXpath(final @NonNull DataSchemaNode schemaNode, final @NonNull String target,
+            final @NonNull Element value, final @NonNull String namespace, final @NonNull String revision) {
         final Iterator<String> args = SLASH_SPLITTER.split(target.substring(target.indexOf(':') + 1)).iterator();
 
         final StringBuilder nonCondXpath = new StringBuilder();
@@ -218,7 +218,7 @@ public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
 
         while (args.hasNext()) {
             final String s = args.next();
-            nonCondXpath.append("/");
+            nonCondXpath.append('/');
             nonCondXpath.append(s);
             childNode = ((DataNodeContainer) childNode).getDataChildByName(QName.create(namespace, revision, s));
 
@@ -243,7 +243,7 @@ public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param keys Iterator of list keys names
      * @return Iterator of list keys values
      */
-    private static Iterator<String> readKeyValues(@Nonnull final Element value, @Nonnull final Iterator<QName> keys) {
+    private static Iterator<String> readKeyValues(final @NonNull Element value, final @NonNull Iterator<QName> keys) {
         final List<String> result = new ArrayList<>();
 
         while (keys.hasNext()) {
@@ -260,8 +260,8 @@ public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param keyNames Iterator of list keys names
      * @param keyValues Iterator of list keys values
      */
-    private static void appendKeys(@Nonnull final StringBuilder nonCondXpath, @Nonnull final Iterator<QName> keyNames,
-                            @Nonnull final Iterator<String> keyValues) {
+    private static void appendKeys(final @NonNull StringBuilder nonCondXpath, final @NonNull Iterator<QName> keyNames,
+                            final @NonNull Iterator<String> keyValues) {
         while (keyNames.hasNext()) {
             nonCondXpath.append('[');
             nonCondXpath.append(keyNames.next().getLocalName());

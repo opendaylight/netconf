@@ -18,10 +18,10 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.Provider;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -158,10 +158,10 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param resultCollection collection of parsed edits
      * @throws IOException if operation fails
      */
-    private void parseByName(@Nonnull final String name, @Nonnull final PatchEdit edit,
-                             @Nonnull final JsonReader in, @Nonnull final InstanceIdentifierContext<?> path,
-                             @Nonnull final StringModuleInstanceIdentifierCodec codec,
-                             @Nonnull final List<PatchEntity> resultCollection) throws IOException {
+    private void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
+                             final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext<?> path,
+                             final @NonNull StringModuleInstanceIdentifierCodec codec,
+                             final @NonNull List<PatchEntity> resultCollection) throws IOException {
         switch (name) {
             case "edit":
                 if (in.peek() == JsonToken.BEGIN_ARRAY) {
@@ -198,9 +198,9 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param codec Draft11StringModuleInstanceIdentifierCodec codec
      * @throws IOException if operation fails
      */
-    private void readEditDefinition(@Nonnull final PatchEdit edit, @Nonnull final JsonReader in,
-                                    @Nonnull final InstanceIdentifierContext<?> path,
-                                    @Nonnull final StringModuleInstanceIdentifierCodec codec) throws IOException {
+    private void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
+                                    final @NonNull InstanceIdentifierContext<?> path,
+                                    final @NonNull StringModuleInstanceIdentifierCodec codec) throws IOException {
         String deferredValue = null;
         in.beginObject();
 
@@ -264,7 +264,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private void readValueNode(@Nonnull final StringBuilder sb, @Nonnull final JsonReader in) throws IOException {
+    private void readValueNode(final @NonNull StringBuilder sb, final @NonNull JsonReader in) throws IOException {
         in.beginObject();
 
         sb.append("{\"").append(in.nextName()).append("\":");
@@ -303,7 +303,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private void readValueObject(@Nonnull final StringBuilder sb, @Nonnull final JsonReader in) throws IOException {
+    private void readValueObject(final @NonNull StringBuilder sb, final @NonNull JsonReader in) throws IOException {
         // read simple leaf value
         if (in.peek() == JsonToken.STRING) {
             sb.append('"').append(in.nextString()).append('"');
@@ -357,8 +357,8 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      */
-    private static NormalizedNode<?, ?> readEditData(@Nonnull final JsonReader in,
-            @Nonnull final SchemaNode targetSchemaNode, @Nonnull final InstanceIdentifierContext<?> path) {
+    private static NormalizedNode<?, ?> readEditData(final @NonNull JsonReader in,
+            final @NonNull SchemaNode targetSchemaNode, final @NonNull InstanceIdentifierContext<?> path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         JsonParserStream.create(writer, JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()),
@@ -372,7 +372,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param edit Instance of PatchEdit
      * @return PatchEntity Patch entity
      */
-    private static PatchEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
+    private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) {
         if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
                 && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
             if (!edit.getOperation().isWithValue()) {
@@ -400,7 +400,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @return true if data is present when operation requires it or if there are no data when operation does not
      *     allow it, false otherwise
      */
-    private static boolean checkDataPresence(@Nonnull final PatchEditOperation operation, final boolean hasData) {
+    private static boolean checkDataPresence(final @NonNull PatchEditOperation operation, final boolean hasData) {
         return operation.isWithValue() == hasData;
     }
 

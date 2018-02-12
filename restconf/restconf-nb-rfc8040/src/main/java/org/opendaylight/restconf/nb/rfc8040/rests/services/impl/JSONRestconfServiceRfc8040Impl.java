@@ -16,10 +16,10 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import javax.annotation.Nullable;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -209,7 +209,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
     public void close() {
     }
 
-    private NormalizedNodeContext toNormalizedNodeContext(final String uriPath, @Nullable final String payload,
+    private NormalizedNodeContext toNormalizedNodeContext(final String uriPath, final @Nullable String payload,
             final boolean isPost) throws OperationFailedException {
         final InstanceIdentifierContext<?> instanceIdentifierContext = ParserIdentifier.toInstanceIdentifier(
                 uriPath, SchemaContextHandler.getActualSchemaContext(),

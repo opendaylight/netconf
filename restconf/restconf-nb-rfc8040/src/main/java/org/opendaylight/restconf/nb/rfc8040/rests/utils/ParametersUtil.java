@@ -11,7 +11,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 import com.google.common.collect.Sets;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -33,9 +33,9 @@ final class ParametersUtil {
      * @param allowedParameters
      *             allowed parameters for operation
      */
-    static void checkParametersTypes(@Nonnull final String operationType,
-                                     @Nonnull final Set<String> usedParameters,
-                                     @Nonnull final String... allowedParameters) {
+    static void checkParametersTypes(final @NonNull String operationType,
+                                     final @NonNull Set<String> usedParameters,
+                                     final @NonNull String... allowedParameters) {
         final Set<String> notAllowedParameters = Sets.newHashSet(usedParameters);
         notAllowedParameters.removeAll(Sets.newHashSet(allowedParameters));
 
@@ -55,7 +55,7 @@ final class ParametersUtil {
      * @param parameterName
      *             URI parameter name
      */
-    static void checkParameterCount(@Nonnull final List<String> parameterValues, @Nonnull final String parameterName) {
+    static void checkParameterCount(final @NonNull List<String> parameterValues, @NonNull final String parameterName) {
         if (parameterValues.size() > 1) {
             throw new RestconfDocumentedException(
                     "Parameter " + parameterName + " can appear at most once in request URI",

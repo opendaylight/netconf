@@ -11,7 +11,6 @@ import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import org.json.XML;
@@ -74,7 +73,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     }
 
     @Override
-    public void onDataTreeChanged(@Nonnull final Collection<DataTreeCandidate> dataTreeCandidates) {
+    public void onDataTreeChanged(final Collection<DataTreeCandidate> dataTreeCandidates) {
         this.candidates = dataTreeCandidates;
         final String xml = prepareXml();
         if (checkQueryParams(xml, this)) {
@@ -258,7 +257,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     }
 
     private Node createCreatedChangedDataChangeEventElement(final Document doc,
-            final YangInstanceIdentifier eventPath, final NormalizedNode normalized, final Operation operation,
+            final YangInstanceIdentifier eventPath, final NormalizedNode<?, ?> normalized, final Operation operation,
             final SchemaContext schemaContext, final DataSchemaContextTree dataSchemaContextTree) {
         final Element dataChangeEventElement = doc.createElement("data-change-event");
         final Element pathElement = doc.createElement("path");
@@ -307,7 +306,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
             if (pathArgument instanceof YangInstanceIdentifier.AugmentationIdentifier) {
                 continue;
             }
-            textContent.append("/");
+            textContent.append('/');
             writeIdentifierWithNamespacePrefix(element, textContent, pathArgument.getNodeType());
             if (pathArgument instanceof NodeIdentifierWithPredicates) {
                 final Map<QName, Object> predicates = ((NodeIdentifierWithPredicates) pathArgument).getKeyValues();
@@ -317,14 +316,12 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
                     writeIdentifierWithNamespacePrefix(element, textContent, keyValue);
                     textContent.append("='");
                     textContent.append(predicateValue);
-                    textContent.append("'");
-                    textContent.append("]");
+                    textContent.append("']");
                 }
             } else if (pathArgument instanceof NodeWithValue) {
                 textContent.append("[.='");
                 textContent.append(((NodeWithValue) pathArgument).getValue());
-                textContent.append("'");
-                textContent.append("]");
+                textContent.append("']");
             }
         }
         element.setTextContent(textContent.toString());

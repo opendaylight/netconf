@@ -10,8 +10,8 @@ package org.opendaylight.restconf.nb.rfc8040.codecs;
 
 import com.google.common.base.Preconditions;
 import java.net.URI;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yangtools.yang.data.util.AbstractModuleStringInstanceIdentifierCodec;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -29,27 +29,26 @@ public final class StringModuleInstanceIdentifierCodec extends AbstractModuleStr
         this.defaultPrefix = "";
     }
 
-    public StringModuleInstanceIdentifierCodec(final SchemaContext context, @Nonnull final String defaultPrefix) {
+    public StringModuleInstanceIdentifierCodec(final @NonNull SchemaContext context,
+            final @NonNull String defaultPrefix) {
         this.context = Preconditions.checkNotNull(context);
         this.dataContextTree = DataSchemaContextTree.from(context);
         this.defaultPrefix = defaultPrefix;
     }
 
     @Override
-    protected Module moduleForPrefix(@Nonnull final String prefix) {
+    protected Module moduleForPrefix(final String prefix) {
         final String moduleName = prefix.isEmpty() && !defaultPrefix.isEmpty() ? defaultPrefix : prefix;
         return context.findModules(moduleName).stream().findFirst().orElse(null);
     }
 
-    @Nonnull
     @Override
-    public DataSchemaContextTree getDataContextTree() {
+    public @NonNull DataSchemaContextTree getDataContextTree() {
         return this.dataContextTree;
     }
 
-    @Nullable
     @Override
-    protected String prefixForNamespace(@Nonnull final URI namespace) {
+    protected @Nullable String prefixForNamespace(final URI namespace) {
         return this.context.findModules(namespace).stream().findFirst().map(Module::getName).orElse(null);
     }
 }

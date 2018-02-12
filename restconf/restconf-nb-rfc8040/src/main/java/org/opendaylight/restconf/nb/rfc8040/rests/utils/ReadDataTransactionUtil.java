@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
@@ -97,9 +97,8 @@ public final class ReadDataTransactionUtil {
      *             set tagged for {@link WriterParameters}
      * @return {@link WriterParameters}
      */
-    @Nonnull
-    public static WriterParameters parseUriParameters(@Nonnull final InstanceIdentifierContext<?> identifier,
-            @Nullable final UriInfo uriInfo, final boolean tagged) {
+    public static @NonNull WriterParameters parseUriParameters(final @NonNull InstanceIdentifierContext<?> identifier,
+            final @Nullable UriInfo uriInfo, final boolean tagged) {
         return parseParams(identifier, uriInfo, tagged);
     }
 
@@ -113,9 +112,8 @@ public final class ReadDataTransactionUtil {
      *             URI info
      * @return {@link WriterParameters}
      */
-    @Nonnull
-    public static WriterParameters parseUriParameters(@Nonnull final InstanceIdentifierContext<?> identifier,
-                                                               @Nullable final UriInfo uriInfo) {
+    public static @NonNull WriterParameters parseUriParameters(final @NonNull InstanceIdentifierContext<?> identifier,
+                                                               final @Nullable UriInfo uriInfo) {
         return parseParams(identifier, uriInfo, false);
     }
 
@@ -203,8 +201,8 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     @Nullable
-    public static NormalizedNode<?, ?> readData(@Nonnull final String valueOfContent,
-            @Nonnull final TransactionVarsWrapper transactionNode, final SchemaContext schemaContext) {
+    public static NormalizedNode<?, ?> readData(final @NonNull String valueOfContent,
+            final @NonNull TransactionVarsWrapper transactionNode, final SchemaContext schemaContext) {
         return readData(valueOfContent, transactionNode, null, schemaContext);
     }
 
@@ -222,8 +220,8 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     @Nullable
-    public static NormalizedNode<?, ?> readData(@Nonnull final String valueOfContent,
-            @Nonnull final TransactionVarsWrapper transactionNode, final String withDefa, final SchemaContext ctx) {
+    public static NormalizedNode<?, ?> readData(final @NonNull String valueOfContent,
+            final @NonNull TransactionVarsWrapper transactionNode, final String withDefa, final SchemaContext ctx) {
         switch (valueOfContent) {
             case RestconfDataServiceConstant.ReadData.CONFIG:
                 transactionNode.setLogicalDatastoreType(LogicalDatastoreType.CONFIGURATION);
@@ -432,7 +430,7 @@ public final class ReadDataTransactionUtil {
      */
     @Nullable
     private static NormalizedNode<?, ?> readDataViaTransaction(
-            @Nonnull final TransactionVarsWrapper transactionNode) {
+            final @NonNull TransactionVarsWrapper transactionNode) {
         final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
         try (DOMDataReadOnlyTransaction tx = transactionNode.getTransactionChain().newReadOnlyTransaction()) {
             final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture = tx.read(
@@ -456,7 +454,7 @@ public final class ReadDataTransactionUtil {
      * @return {@link NormalizedNode}
      */
     @Nullable
-    private static NormalizedNode<?, ?> readAllData(@Nonnull final TransactionVarsWrapper transactionNode,
+    private static NormalizedNode<?, ?> readAllData(final @NonNull TransactionVarsWrapper transactionNode,
             final String withDefa, final SchemaContext ctx) {
         // PREPARE STATE DATA NODE
         transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
@@ -500,9 +498,8 @@ public final class ReadDataTransactionUtil {
      *             data node of config data
      * @return {@link NormalizedNode}
      */
-    @Nonnull
-    private static NormalizedNode<?, ?> mapNode(@Nonnull final NormalizedNode<?, ?> stateDataNode,
-                                                         @Nonnull final NormalizedNode<?, ?> configDataNode) {
+    private static @NonNull NormalizedNode<?, ?> mapNode(final @NonNull NormalizedNode<?, ?> stateDataNode,
+                                                         final @NonNull NormalizedNode<?, ?> configDataNode) {
         validPossibilityOfMergeNodes(stateDataNode, configDataNode);
         if (configDataNode instanceof RpcDefinition) {
             return prepareRpcData(configDataNode, stateDataNode);
@@ -519,8 +516,8 @@ public final class ReadDataTransactionUtil {
      * @param configDataNode
      *             data node of config data
      */
-    private static void validPossibilityOfMergeNodes(@Nonnull final NormalizedNode<?, ?> stateDataNode,
-                                                     @Nonnull final NormalizedNode<?, ?> configDataNode) {
+    private static void validPossibilityOfMergeNodes(final @NonNull NormalizedNode<?, ?> stateDataNode,
+                                                     final @NonNull NormalizedNode<?, ?> configDataNode) {
         final QNameModule moduleOfStateData = stateDataNode.getIdentifier().getNodeType().getModule();
         final QNameModule moduleOfConfigData = configDataNode.getIdentifier().getNodeType().getModule();
         if (moduleOfStateData != moduleOfConfigData) {
@@ -537,9 +534,8 @@ public final class ReadDataTransactionUtil {
      *             data node of state data
      * @return {@link NormalizedNode}
      */
-    @Nonnull
-    private static NormalizedNode<?, ?> prepareRpcData(@Nonnull final NormalizedNode<?, ?> configDataNode,
-                                                                @Nonnull final NormalizedNode<?, ?> stateDataNode) {
+    private static @NonNull NormalizedNode<?, ?> prepareRpcData(final @NonNull NormalizedNode<?, ?> configDataNode,
+                                                                final @NonNull NormalizedNode<?, ?> stateDataNode) {
         final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder = ImmutableNodes
                 .mapEntryBuilder();
         mapEntryBuilder.withNodeIdentifier((NodeIdentifierWithPredicates) configDataNode.getIdentifier());
@@ -560,9 +556,8 @@ public final class ReadDataTransactionUtil {
      * @param mapEntryBuilder
      *             builder for mapping data
      */
-    private static void mapRpcDataNode(@Nonnull final NormalizedNode<?, ?> dataNode,
-                                       @Nonnull final DataContainerNodeBuilder<
-                                               NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder) {
+    private static void mapRpcDataNode(final @NonNull NormalizedNode<?, ?> dataNode,
+            final @NonNull DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder) {
         ((ContainerNode) dataNode).getValue().forEach(mapEntryBuilder::addChild);
     }
 
@@ -575,9 +570,8 @@ public final class ReadDataTransactionUtil {
      *             data node of state data
      * @return {@link NormalizedNode}
      */
-    @Nonnull
-    private static NormalizedNode<?, ?> prepareData(@Nonnull final NormalizedNode<?, ?> configDataNode,
-                                                             @Nonnull final NormalizedNode<?, ?> stateDataNode) {
+    private static @NonNull NormalizedNode<?, ?> prepareData(final @NonNull NormalizedNode<?, ?> configDataNode,
+                                                             final @NonNull NormalizedNode<?, ?> stateDataNode) {
         if (configDataNode instanceof MapNode) {
             final CollectionNodeBuilder<MapEntryNode, MapNode> builder = ImmutableNodes
                     .mapNodeBuilder().withNodeIdentifier(((MapNode) configDataNode).getIdentifier());
@@ -636,9 +630,8 @@ public final class ReadDataTransactionUtil {
      *             builder
      */
     private static <T extends NormalizedNode<? extends PathArgument, ?>> void mapValueToBuilder(
-            @Nonnull final Collection<T> configData,
-            @Nonnull final Collection<T> stateData,
-            @Nonnull final NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
+            final @NonNull Collection<T> configData, final @NonNull Collection<T> stateData,
+            final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
         final Map<PathArgument, T> configMap = configData.stream().collect(
                 Collectors.toMap(NormalizedNode::getIdentifier, Function.identity()));
         final Map<PathArgument, T> stateMap = stateData.stream().collect(
@@ -663,9 +656,8 @@ public final class ReadDataTransactionUtil {
      *           - builder
      */
     private static <T extends NormalizedNode<? extends PathArgument, ?>> void mapDataToBuilder(
-            @Nonnull final Map<PathArgument, T> configMap,
-            @Nonnull final Map<PathArgument, T> stateMap,
-            @Nonnull final NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
+            final @NonNull Map<PathArgument, T> configMap, final @NonNull Map<PathArgument, T> stateMap,
+            final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
         configMap.entrySet().stream().filter(x -> !stateMap.containsKey(x.getKey())).forEach(
             y -> builder.addChild(y.getValue()));
         stateMap.entrySet().stream().filter(x -> !configMap.containsKey(x.getKey())).forEach(
@@ -685,9 +677,8 @@ public final class ReadDataTransactionUtil {
      */
     @SuppressWarnings("unchecked")
     private static <T extends NormalizedNode<? extends PathArgument, ?>> void mergeDataToBuilder(
-            @Nonnull final Map<PathArgument, T> configMap,
-            @Nonnull final Map<PathArgument, T> stateMap,
-            @Nonnull final NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
+            final @NonNull Map<PathArgument, T> configMap, final @NonNull Map<PathArgument, T> stateMap,
+            final @NonNull NormalizedNodeContainerBuilder<?, PathArgument, T, ?> builder) {
         // it is enough to process only config data because operational contains the same data
         configMap.entrySet().stream().filter(x -> stateMap.containsKey(x.getKey())).forEach(
             y -> builder.addChild((T) prepareData(y.getValue(), stateMap.get(y.getKey()))));

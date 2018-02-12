@@ -23,8 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
-import javax.annotation.Nullable;
 import javax.ws.rs.core.Response.Status;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
@@ -451,7 +451,7 @@ public class BrokerFacade {
 
         Futures.addCallback(future, new FutureCallback<Void>() {
             @Override
-            public void onSuccess(@Nullable final Void result) {
+            public void onSuccess(final @Nullable Void result) {
                 status.setStatus(new PatchStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection),
                         true, null));
                 waiter.countDown();

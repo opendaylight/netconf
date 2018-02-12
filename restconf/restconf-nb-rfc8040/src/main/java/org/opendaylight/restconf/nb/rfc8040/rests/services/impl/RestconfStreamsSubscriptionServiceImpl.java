@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
@@ -233,8 +233,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          *
          * @return start-time
          */
-        @Nonnull
-        public Instant getStart() {
+        public @NonNull Instant getStart() {
             return start;
         }
 

@@ -19,10 +19,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map.Entry;
-import javax.annotation.Nonnull;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
@@ -351,7 +351,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      *            mount point reference
      * @return {@link DOMTransactionChain}
      */
-    private static DOMTransactionChain transactionChainOfMountPoint(@Nonnull final DOMMountPoint mountPoint) {
+    private static DOMTransactionChain transactionChainOfMountPoint(final @NonNull DOMMountPoint mountPoint) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
             return domDataBrokerService.get().createTransactionChain(RestConnectorProvider.TRANSACTION_CHAIN_LISTENER);

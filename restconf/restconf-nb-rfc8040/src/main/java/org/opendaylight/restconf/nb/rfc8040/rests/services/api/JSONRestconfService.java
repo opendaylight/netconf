@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.api;
 
 import com.google.common.base.Optional;
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 
@@ -27,27 +27,27 @@ public interface JSONRestconfService {
      * Issues a restconf PUT request to the configuration data store.
      *
      * @param uriPath the yang instance identifier path, eg "opendaylight-inventory:nodes/node/device-id".
-     *       To specify the root, use {@link ROOT_PATH}.
+     *       To specify the root, use {@link #ROOT_PATH}.
      * @param payload the payload data in JSON format.
      * @throws OperationFailedException if the request fails.
      */
-    void put(String uriPath, @Nonnull String payload) throws OperationFailedException;
+    void put(String uriPath, @NonNull String payload) throws OperationFailedException;
 
     /**
      * Issues a restconf POST request to the configuration data store.
      *
      * @param uriPath the yang instance identifier path, eg "opendaylight-inventory:nodes/node/device-id".
-     *       To specify the root, use {@link ROOT_PATH}.
+     *       To specify the root, use {@link #ROOT_PATH}.
      * @param payload the payload data in JSON format.
      * @throws OperationFailedException if the request fails.
      */
-    void post(String uriPath, @Nonnull String payload) throws OperationFailedException;
+    void post(String uriPath, @NonNull String payload) throws OperationFailedException;
 
     /**
      * Issues a restconf DELETE request to the configuration data store.
      *
      * @param uriPath the yang instance identifier path, eg "opendaylight-inventory:nodes/node/device-id".
-     *       To specify the root, use {@link ROOT_PATH}.
+     *       To specify the root, use {@link #ROOT_PATH}.
      * @throws OperationFailedException if the request fails.
      */
     void delete(String uriPath) throws OperationFailedException;
@@ -56,7 +56,7 @@ public interface JSONRestconfService {
      * Issues a restconf GET request to the given data store.
      *
      * @param uriPath the yang instance identifier path, eg "opendaylight-inventory:nodes/node/device-id".
-     *       To specify the root, use {@link ROOT_PATH}.
+     *       To specify the root, use {@link #ROOT_PATH}.
      * @param datastoreType the data store type to read from.
      * @return an Optional containing the data in JSON format if present.
      * @throws OperationFailedException if the request fails.
@@ -72,16 +72,16 @@ public interface JSONRestconfService {
      * @return an Optional containing the output in JSON format if the RPC returns output.
      * @throws OperationFailedException if the request fails.
      */
-    Optional<String> invokeRpc(@Nonnull String uriPath, Optional<String> input) throws OperationFailedException;
+    Optional<String> invokeRpc(@NonNull String uriPath, Optional<String> input) throws OperationFailedException;
 
     /**
      * Issues a restconf PATCH request to the configuration data store.
      *
      * @param uriPath the yang instance identifier path, eg "opendaylight-inventory:nodes/node/device-id".
-     *       To specify the root, use {@link ROOT_PATH}.
+     *       To specify the root, use {@link #ROOT_PATH}.
      * @param payload the payload data in JSON format.
      * @return an Optional containing the patch response data in JSON format.
      * @throws OperationFailedException if the request fails.
      */
-    Optional<String> patch(@Nonnull String uriPath, @Nonnull String payload) throws OperationFailedException;
+    Optional<String> patch(@NonNull String uriPath, @NonNull String payload) throws OperationFailedException;
 }
