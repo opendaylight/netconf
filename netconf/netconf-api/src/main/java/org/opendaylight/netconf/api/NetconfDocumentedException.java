@@ -13,10 +13,10 @@ import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.w3c.dom.Document;
 
 /**
- * Checked exception to communicate an error that needs to be sent to the
- * netconf client.
+ * Checked exception to communicate an error that needs to be sent to the netconf client.
  */
 public class NetconfDocumentedException extends DocumentedException {
+    private static final long serialVersionUID = 1L;
 
     public NetconfDocumentedException(final String message) {
         super(message);
@@ -43,12 +43,12 @@ public class NetconfDocumentedException extends DocumentedException {
         super(message, cause, errorType, errorTag, errorSeverity, errorInfo);
     }
 
-    public NetconfDocumentedException(DocumentedException exception) {
+    public NetconfDocumentedException(final DocumentedException exception) {
         super(exception.getMessage(), (Exception) exception.getCause(), exception.getErrorType(),
                 exception.getErrorTag(), exception.getErrorSeverity(), exception.getErrorInfo());
     }
 
-    public static NetconfDocumentedException fromXMLDocument(Document fromDoc) {
+    public static NetconfDocumentedException fromXMLDocument(final Document fromDoc) {
         return new NetconfDocumentedException(DocumentedException.fromXMLDocument(fromDoc));
     }
 }
