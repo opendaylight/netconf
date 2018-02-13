@@ -13,5 +13,6 @@
         </configfile>
         <feature version="[3.0.0,4)">odl-karaf-feat-jetty</feature>
         <feature version="[3.0.0,4)">odl-netty-4</feature>
+        <feature version="[2.0.1,3)">odl-yangtools-export</feature>
     </feature>
 </features>
