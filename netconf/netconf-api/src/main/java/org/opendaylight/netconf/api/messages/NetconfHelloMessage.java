@@ -9,15 +9,14 @@
 package org.opendaylight.netconf.api.messages;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import java.util.Set;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -31,37 +30,37 @@ public final class NetconfHelloMessage extends NetconfMessage {
 
     private final NetconfHelloMessageAdditionalHeader additionalHeader;
 
-    public NetconfHelloMessage(Document doc, NetconfHelloMessageAdditionalHeader additionalHeader)
+    public NetconfHelloMessage(final Document doc, final NetconfHelloMessageAdditionalHeader additionalHeader)
             throws NetconfDocumentedException {
         super(doc);
         checkHelloMessage(doc);
         this.additionalHeader = additionalHeader;
     }
 
-    public NetconfHelloMessage(Document doc) throws NetconfDocumentedException {
+    public NetconfHelloMessage(final Document doc) throws NetconfDocumentedException {
         this(doc, null);
     }
 
     public Optional<NetconfHelloMessageAdditionalHeader> getAdditionalHeader() {
-        return additionalHeader == null ? Optional.<NetconfHelloMessageAdditionalHeader>absent()
-                : Optional.of(additionalHeader);
+        return Optional.fromNullable(additionalHeader);
     }
 
-    private static void checkHelloMessage(Document doc) {
-        Preconditions.checkArgument(isHelloMessage(doc),
+    private static void checkHelloMessage(final Document doc) {
+        if (!isHelloMessage(doc)) {
+            throw new IllegalArgumentException(String.format(
                 "Hello message invalid format, should contain %s tag from namespace %s, but is: %s", HELLO_TAG,
-                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlUtil.toString(doc));
+                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlUtil.toString(doc)));
+        }
     }
 
-    public static NetconfHelloMessage createClientHello(Iterable<String> capabilities,
-            Optional<NetconfHelloMessageAdditionalHeader> additionalHeaderOptional) throws NetconfDocumentedException {
-        Document doc = createHelloMessageDoc(capabilities);
-        return additionalHeaderOptional.isPresent() ? new NetconfHelloMessage(doc, additionalHeaderOptional.get())
-                : new NetconfHelloMessage(doc);
+    public static NetconfHelloMessage createClientHello(final Iterable<String> capabilities,
+            final Optional<NetconfHelloMessageAdditionalHeader> additionalHeaderOptional)
+                    throws NetconfDocumentedException {
+        return new NetconfHelloMessage(createHelloMessageDoc(capabilities), additionalHeaderOptional.orNull());
     }
 
-    private static Document createHelloMessageDoc(Iterable<String> capabilities) {
-        Document doc = XmlUtil.newDocument();
+    private static Document createHelloMessageDoc(final Iterable<String> capabilities) {
+        Document doc = UntrustedXML.newDocumentBuilder().newDocument();
         Element helloElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
                 HELLO_TAG);
         Element capabilitiesElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
@@ -80,7 +79,7 @@ public final class NetconfHelloMessage extends NetconfMessage {
         return doc;
     }
 
-    public static NetconfHelloMessage createServerHello(Set<String> capabilities, long sessionId)
+    public static NetconfHelloMessage createServerHello(final Set<String> capabilities, final long sessionId)
             throws NetconfDocumentedException {
         Document doc = createHelloMessageDoc(capabilities);
         Element sessionIdElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
@@ -91,20 +90,18 @@ public final class NetconfHelloMessage extends NetconfMessage {
     }
 
     public static boolean isHelloMessage(final NetconfMessage msg) {
-        Document document = msg.getDocument();
-        return isHelloMessage(document);
+        return isHelloMessage(msg.getDocument());
     }
 
     private static boolean isHelloMessage(final Document document) {
-        XmlElement element = XmlElement.fromDomElement(document.getDocumentElement());
-        try {
-            // accept even if hello has no namespace
-            return element.getName().equals(HELLO_TAG)
-                    && (!element.hasNamespace()
-                    || element.getNamespace().equals(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
-        } catch (DocumentedException e) {
-            // Cannot happen, since we check for hasNamespace
-            throw new IllegalStateException(e);
+        final XmlElement element = XmlElement.fromDomElement(document.getDocumentElement());
+        if (!HELLO_TAG.equals(element.getName())) {
+            return false;
         }
+
+        final Optional<String> optNamespace = element.getNamespaceOptionally();
+        // accept even if hello has no namespace
+        return !optNamespace.isPresent()
+                || XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0.equals(optNamespace.get());
     }
 }
