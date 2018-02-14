@@ -13,7 +13,7 @@
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>protocol-framework</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
   <packaging>bundle</packaging>
   <name>${project.artifactId}</name>
   <description>Common protocol framework</description>
@@ -48,7 +48,7 @@
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>mockito-configuration</artifactId>
-      <version>1.2.2-SNAPSHOT</version>
+      <version>1.2.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>

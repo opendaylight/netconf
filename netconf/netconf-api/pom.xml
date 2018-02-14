@@ -18,7 +18,7 @@
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>netconf-api</artifactId>
-  <version>1.3.2-SNAPSHOT</version>
+  <version>1.3.2</version>
   <name>${project.artifactId}</name>
   <packaging>bundle</packaging>
 
@@ -34,21 +34,21 @@
       <dependency>
         <groupId>org.opendaylight.yangtools</groupId>
         <artifactId>yangtools-artifacts</artifactId>
-        <version>1.2.2-SNAPSHOT</version>
+        <version>1.2.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.opendaylight.controller</groupId>
         <artifactId>config-artifacts</artifactId>
-        <version>0.7.2-SNAPSHOT</version>
+        <version>0.7.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.opendaylight.mdsal.model</groupId>
         <artifactId>mdsal-model-artifacts</artifactId>
-        <version>0.11.2-SNAPSHOT</version>
+        <version>0.11.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

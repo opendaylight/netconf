@@ -20,7 +20,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-connector-ssh</artifactId>
-    <version>1.3.2-SNAPSHOT</version>
+    <version>1.3.2</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Netconf Connector :: Netconf Connector + Netconf SSH Server + loopback connection configuration</name>

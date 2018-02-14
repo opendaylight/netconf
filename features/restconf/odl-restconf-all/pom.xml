@@ -20,7 +20,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-restconf-all</artifactId>
-    <version>1.6.2-SNAPSHOT</version>
+    <version>1.6.2</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Restconf :: All</name>

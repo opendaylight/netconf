@@ -17,7 +17,7 @@
     </parent>
     <artifactId>features-restconf-aggregator</artifactId>
     <groupId>org.opendaylight.netconf</groupId>
-    <version>1.6.2-SNAPSHOT</version>
+    <version>1.6.2</version>
     <packaging>pom</packaging>
 
     <modules>

@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-subsystem</artifactId>
-    <version>1.3.2-SNAPSHOT</version>
+    <version>1.3.2</version>
   </parent>
 
   <artifactId>netconf-it</artifactId>

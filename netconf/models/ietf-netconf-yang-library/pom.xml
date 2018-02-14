@@ -14,13 +14,13 @@
     <parent>
         <groupId>org.opendaylight.mdsal</groupId>
         <artifactId>binding-parent</artifactId>
-        <version>0.11.2-SNAPSHOT</version>
+        <version>0.11.2</version>
         <relativePath/>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>ietf-netconf-yang-library</artifactId>
-    <version>1.3.2-SNAPSHOT</version>
+    <version>1.3.2</version>
     <name>${project.artifactId}</name>
     <packaging>bundle</packaging>
 
