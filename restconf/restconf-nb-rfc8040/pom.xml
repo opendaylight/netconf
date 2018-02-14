@@ -203,6 +203,8 @@
           <instructions>
             <Bundle-Name>MD SAL Restconf Connector</Bundle-Name>
             <Import-Package>
+              !javax.annotation,
+              javax.ws.rs.*;version="[1.1.0,2.0.0)",
               *,
               com.sun.jersey.spi.container.servlet,
               org.eclipse.jetty.servlets,
