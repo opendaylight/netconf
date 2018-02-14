@@ -525,8 +525,8 @@ public final class RestconfImpl implements RestconfService {
 
         if (!rpc.getInput().getChildNodes().isEmpty()) {
             LOG.debug("RPC " + rpc + " does not need input value.");
-            // FIXME : find a correct Error from specification
-            throw new IllegalStateException("RPC " + rpc + " does'n need input value!");
+            throw new RestconfDocumentedException("RPC " + rpc + " does not take any input value.",
+                    ErrorType.RPC, ErrorTag.INVALID_VALUE);
         }
 
         final CheckedFuture<DOMRpcResult, DOMRpcException> response;
