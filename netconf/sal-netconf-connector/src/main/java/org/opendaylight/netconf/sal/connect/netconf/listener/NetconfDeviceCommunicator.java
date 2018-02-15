@@ -162,7 +162,7 @@ public class NetconfDeviceCommunicator implements NetconfClientSessionListener, 
 
     public void disconnect() {
         // If session is already in closing, no need to close it again
-        if(session != null && isSessionClosing.compareAndSet(false, true)) {
+        if(session != null && isSessionClosing.compareAndSet(false, true) && session.isUp())  {
             session.close();
         }
     }
