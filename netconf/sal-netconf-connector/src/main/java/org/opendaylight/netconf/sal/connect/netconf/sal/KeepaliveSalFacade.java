@@ -21,6 +21,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
@@ -66,6 +67,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     private volatile NetconfDeviceCommunicator listener;
     private volatile ScheduledFuture<?> currentKeepalive;
     private volatile DOMRpcService currentDeviceRpc;
+    private final AtomicBoolean lastKeepAliveSucceeded = new AtomicBoolean(false);
 
     public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
                               final ScheduledExecutorService executor, final long keepaliveDelaySeconds,
@@ -137,9 +139,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     }
 
     private void scheduleKeepalive() {
+        lastKeepAliveSucceeded.set(true);
         Preconditions.checkState(currentDeviceRpc != null);
-        LOG.trace("{}: Scheduling next keepalive in {} {}", id, keepaliveDelaySeconds, TimeUnit.SECONDS);
-        currentKeepalive = executor.schedule(new Keepalive(currentKeepalive), keepaliveDelaySeconds, TimeUnit.SECONDS);
+        LOG.trace("{}: Scheduling keepalives every  {} {} ", id, keepaliveDelaySeconds, TimeUnit.SECONDS);
+        currentKeepalive = executor.scheduleWithFixedDelay(new Keepalive(),
+          keepaliveDelaySeconds, keepaliveDelaySeconds,TimeUnit.SECONDS);
     }
 
     @Override
@@ -179,18 +183,13 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
      */
     private class Keepalive implements Runnable, FutureCallback<DOMRpcResult> {
 
-        private final ScheduledFuture<?> previousKeepalive;
-
-        Keepalive(final ScheduledFuture<?> previousKeepalive) {
-            this.previousKeepalive = previousKeepalive;
-        }
-
         @Override
         public void run() {
             LOG.trace("{}: Invoking keepalive RPC", id);
 
             try {
-                if (previousKeepalive != null && !previousKeepalive.isDone()) {
+                boolean lastJobSucceeded = lastKeepAliveSucceeded.getAndSet(false);
+                if (!lastJobSucceeded) {
                     onFailure(new IllegalStateException("Previous keepalive timed out"));
                 } else {
                     Futures.addCallback(currentDeviceRpc.invokeRpc(PATH, KEEPALIVE_PAYLOAD), this,
@@ -212,11 +211,10 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
             // No matter what response we got, rpc-reply or rpc-error,
             // we got it from device so the netconf session is OK
             if (result != null && result.getResult() != null) {
-                LOG.debug("{}: Keepalive RPC successful with response: {}", id, result.getResult());
-                scheduleKeepalive();
-            } else if (result != null && !result.getErrors().isEmpty()) {
+            	lastKeepAliveSucceeded.set(true);
+            }  else if (result != null && result.getErrors() != null) {
                 LOG.warn("{}: Keepalive RPC failed with error: {}", id, result.getErrors());
-                scheduleKeepalive();
+                lastKeepAliveSucceeded.set(true);
             } else {
                 LOG.warn("{} Keepalive RPC returned null with response. Reconnecting netconf session", id);
                 reconnect();
