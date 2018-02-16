@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "57ccb33e_9fc2c93d",
+        "filename": "restconf/restconf-nb-rfc8040/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 797
+      },
+      "writtenOn": "2018-02-16T18:39:19Z",
+      "side": 1,
+      "message": "TomP, how did you come up with this valid range? there is some other project in distribution pulling 2.0.1 and thats why i think this patch does not pass distribution-check.",
+      "revId": "100424dd6cc96538462d80b2bc3c09ca7f8a9ac4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
