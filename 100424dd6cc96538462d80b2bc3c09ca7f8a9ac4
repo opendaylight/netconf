@@ -16,6 +16,24 @@
       "revId": "100424dd6cc96538462d80b2bc3c09ca7f8a9ac4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0dce2f22_86782033",
+        "filename": "restconf/restconf-nb-rfc8040/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-02-16T18:53:55Z",
+      "side": 1,
+      "message": "In karaf console these were the 2 versions I saw installed.  jersey needs 1.1.0. That syntax translates to (\u003e\u003d 1.1.0) \u0026\u0026 (\u003c 2.0.0) so 2.0.1 shouldn\u0027t affect it.",
+      "parentUuid": "57ccb33e_9fc2c93d",
+      "revId": "100424dd6cc96538462d80b2bc3c09ca7f8a9ac4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
