@@ -52,6 +52,24 @@
       "revId": "100424dd6cc96538462d80b2bc3c09ca7f8a9ac4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4e92d39b_2e1701a0",
+        "filename": "restconf/restconf-nb-rfc8040/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 797
+      },
+      "writtenOn": "2018-02-16T19:18:51Z",
+      "side": 1,
+      "message": "I fact when I build this patch and then distribution in my laptop, in the resulting distribution I see javax.ws.rs-api version 2.0.1 in system folder so not sure if this patch is really being applied when distribution builds in my laptop.",
+      "parentUuid": "0183c56e_a20eec84",
+      "revId": "100424dd6cc96538462d80b2bc3c09ca7f8a9ac4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
