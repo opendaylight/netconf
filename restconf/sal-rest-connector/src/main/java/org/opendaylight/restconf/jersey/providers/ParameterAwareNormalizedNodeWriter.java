@@ -263,7 +263,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
         boolean processedAsCompositeNode = false;
         if (node instanceof ContainerNode) {
             final ContainerNode n = (ContainerNode) node;
-            if (!n.getNodeType().equals(ROOT_DATA_QNAME)) {
+            if (!n.getNodeType().withoutRevision().equals(ROOT_DATA_QNAME)) {
                 if (writer instanceof NormalizedNodeStreamAttributeWriter) {
                     ((NormalizedNodeStreamAttributeWriter) writer).startContainerNode(
                             n.getIdentifier(), childSizeHint(n.getValue()), n.getAttributes());
