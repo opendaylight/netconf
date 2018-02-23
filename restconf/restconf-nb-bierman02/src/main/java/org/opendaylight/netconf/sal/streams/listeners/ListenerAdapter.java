@@ -11,6 +11,7 @@ import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
@@ -311,8 +312,9 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
             writeIdentifierWithNamespacePrefix(element, textContent, pathArgument.getNodeType());
             if (pathArgument instanceof NodeIdentifierWithPredicates) {
                 final Map<QName, Object> predicates = ((NodeIdentifierWithPredicates) pathArgument).getKeyValues();
-                for (final QName keyValue : predicates.keySet()) {
-                    final String predicateValue = String.valueOf(predicates.get(keyValue));
+                for (final Entry<QName, Object> entry : predicates.entrySet()) {
+                    final QName keyValue = entry.getKey();
+                    final String predicateValue = String.valueOf(entry.getValue());
                     textContent.append("[");
                     writeIdentifierWithNamespacePrefix(element, textContent, keyValue);
                     textContent.append("='");

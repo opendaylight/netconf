@@ -100,7 +100,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNo
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.FeatureDefinition;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
@@ -468,9 +467,12 @@ public final class RestconfImpl implements RestconfService {
         final DOMRpcResult result = checkRpcResponse(response);
 
         RpcDefinition resultNodeSchema = null;
-        final NormalizedNode<?, ?> resultData = result.getResult();
+        final NormalizedNode<?, ?> resultData;
         if (result != null && result.getResult() != null) {
+            resultData = result.getResult();
             resultNodeSchema = (RpcDefinition) payload.getInstanceIdentifierContext().getSchemaNode();
+        } else {
+            resultData = null;
         }
 
         return new NormalizedNodeContext(
@@ -553,7 +555,7 @@ public final class RestconfImpl implements RestconfService {
         }
         try {
             final DOMRpcResult retValue = response.get();
-            if (retValue.getErrors() == null || retValue.getErrors().isEmpty()) {
+            if (retValue.getErrors().isEmpty()) {
                 return retValue;
             }
             LOG.debug("RpcError message", retValue.getErrors());
@@ -699,11 +701,11 @@ public final class RestconfImpl implements RestconfService {
         }
         boolean tagged = false;
         if (withDefaUsed) {
-            if (withDefa.equals("report-all-tagged")) {
+            if ("report-all-tagged".equals(withDefa)) {
                 tagged = true;
                 withDefa = null;
             }
-            if (withDefa.equals("report-all")) {
+            if ("report-all".equals(withDefa)) {
                 withDefa = null;
             }
         }
@@ -933,26 +935,28 @@ public final class RestconfImpl implements RestconfService {
         String insert = null;
         String point = null;
 
-        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            switch (entry.getKey()) {
-                case "insert":
-                    if (!insertUsed) {
-                        insertUsed = true;
-                        insert = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Insert parameter can be used only once.");
-                    }
-                    break;
-                case "point":
-                    if (!pointUsed) {
-                        pointUsed = true;
-                        point = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Point parameter can be used only once.");
-                    }
-                    break;
-                default:
-                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey());
+        if (uriInfo != null) {
+            for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
+                switch (entry.getKey()) {
+                    case "insert":
+                        if (!insertUsed) {
+                            insertUsed = true;
+                            insert = entry.getValue().iterator().next();
+                        } else {
+                            throw new RestconfDocumentedException("Insert parameter can be used only once.");
+                        }
+                        break;
+                    case "point":
+                        if (!pointUsed) {
+                            pointUsed = true;
+                            point = entry.getValue().iterator().next();
+                        } else {
+                            throw new RestconfDocumentedException("Point parameter can be used only once.");
+                        }
+                        break;
+                    default:
+                        throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey());
+                }
             }
         }
 
@@ -991,37 +995,6 @@ public final class RestconfImpl implements RestconfService {
             responseBuilder.location(location);
         }
         return responseBuilder.build();
-    }
-
-    // FIXME create RestconfIdetifierHelper and move this method there
-    private static YangInstanceIdentifier checkConsistencyOfNormalizedNodeContext(final NormalizedNodeContext payload) {
-        Preconditions.checkArgument(payload != null);
-        Preconditions.checkArgument(payload.getData() != null);
-        Preconditions.checkArgument(payload.getData().getNodeType() != null);
-        Preconditions.checkArgument(payload.getInstanceIdentifierContext() != null);
-        Preconditions.checkArgument(payload.getInstanceIdentifierContext().getInstanceIdentifier() != null);
-
-        final QName payloadNodeQname = payload.getData().getNodeType();
-        final YangInstanceIdentifier yangIdent = payload.getInstanceIdentifierContext().getInstanceIdentifier();
-        if (payloadNodeQname.compareTo(yangIdent.getLastPathArgument().getNodeType()) > 0) {
-            return yangIdent;
-        }
-        final InstanceIdentifierContext<?> parentContext = payload.getInstanceIdentifierContext();
-        final SchemaNode parentSchemaNode = parentContext.getSchemaNode();
-        if (parentSchemaNode instanceof DataNodeContainer) {
-            final DataNodeContainer cast = (DataNodeContainer) parentSchemaNode;
-            for (final DataSchemaNode child : cast.getChildNodes()) {
-                if (payloadNodeQname.compareTo(child.getQName()) == 0) {
-                    return YangInstanceIdentifier.builder(yangIdent).node(child.getQName()).build();
-                }
-            }
-        }
-        if (parentSchemaNode instanceof RpcDefinition) {
-            return yangIdent;
-        }
-        final String errMsg = "Error parsing input: DataSchemaNode has not children ";
-        LOG.info(errMsg + yangIdent);
-        throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
@@ -1526,6 +1499,7 @@ public final class RestconfImpl implements RestconfService {
         final List<SchemaPath> paths = new ArrayList<>();
         String streamName = CREATE_NOTIFICATION_STREAM + "/";
 
+        StringBuilder streamNameBuilder = new StringBuilder(streamName);
         final Iterator<LeafSetEntryNode> iterator = entryNodes.iterator();
         while (iterator.hasNext()) {
             final QName valueQName = QName.create((String) iterator.next().getValue());
@@ -1544,11 +1518,13 @@ public final class RestconfImpl implements RestconfService {
             Preconditions.checkNotNull(notifiDef,
                     "Notification " + valueQName + "doesn't exist in module " + moduleName);
             paths.add(notifiDef.getPath());
-            streamName = streamName + moduleName + ":" + valueQName.getLocalName();
+            streamNameBuilder.append(moduleName).append(':').append(valueQName.getLocalName());
             if (iterator.hasNext()) {
-                streamName = streamName + ",";
+                streamNameBuilder.append(',');
             }
         }
+
+        streamName = streamNameBuilder.toString();
 
         final QName rpcQName = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
         final QName outputQname = QName.create(rpcQName, "output");
