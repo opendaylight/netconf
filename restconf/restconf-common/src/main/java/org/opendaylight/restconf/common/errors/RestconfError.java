@@ -220,18 +220,18 @@ public class RestconfError {
         this.errorMessage = rpcError.getMessage();
         this.errorAppTag = rpcError.getApplicationTag();
 
-        String errorInfo = null;
+        String localErrorInfo = null;
         if (rpcError.getInfo() == null) {
             if (rpcError.getCause() != null) {
-                errorInfo = Throwables.getStackTraceAsString(rpcError.getCause());
+                localErrorInfo = Throwables.getStackTraceAsString(rpcError.getCause());
             } else if (rpcError.getSeverity() != null) {
-                errorInfo = "<severity>" + rpcError.getSeverity().toString().toLowerCase() + "</severity>";
+                localErrorInfo = "<severity>" + rpcError.getSeverity().toString().toLowerCase() + "</severity>";
             }
         } else {
-            errorInfo = rpcError.getInfo();
+            localErrorInfo = rpcError.getInfo();
         }
 
-        this.errorInfo = errorInfo;
+        this.errorInfo = localErrorInfo;
         this.errorPath = null;
     }
 
