@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 import org.opendaylight.yangtools.yang.common.QName;
 
-public class WriterParameters {
+public final class WriterParameters {
     private final String content;
     private final Integer depth;
     private final List<Set<QName>> fields;

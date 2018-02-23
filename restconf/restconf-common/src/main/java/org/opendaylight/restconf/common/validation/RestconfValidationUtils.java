@@ -22,7 +22,7 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
  * for all error situation followed by restconf-netconf specification.
  * See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>.
  */
-public class RestconfValidationUtils {
+public final class RestconfValidationUtils {
 
     private RestconfValidationUtils() {
         throw new UnsupportedOperationException("Utility class");
