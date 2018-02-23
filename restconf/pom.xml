@@ -23,6 +23,7 @@
     <name>${project.artifactId}</name>
 
     <modules>
+        <module>restconf-binding-parent</module>
         <module>restconf-artifacts</module>
         <module>restconf-models</module>
         <module>restconf-common-models</module>
