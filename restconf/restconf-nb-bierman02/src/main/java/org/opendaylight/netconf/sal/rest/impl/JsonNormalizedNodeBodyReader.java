@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -119,7 +120,8 @@ public class JsonNormalizedNodeBodyReader
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer,
             JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(path.getSchemaContext()), parentSchema);
-        final JsonReader reader = new JsonReader(new InputStreamReader(nonEmptyInputStreamOptional.get()));
+        final JsonReader reader = new JsonReader(new InputStreamReader(nonEmptyInputStreamOptional.get(),
+                StandardCharsets.UTF_8));
         jsonParser.parse(reader);
 
         NormalizedNode<?, ?> result = resultHolder.getResult();
