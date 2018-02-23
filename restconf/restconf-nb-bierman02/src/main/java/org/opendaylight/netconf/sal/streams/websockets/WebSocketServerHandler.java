@@ -95,7 +95,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
             }
         } else if (streamName.contains(RestconfImpl.NOTIFICATION_STREAM)) {
             final List<NotificationListenerAdapter> listeners = Notificator.getNotificationListenerFor(streamName);
-            if (!listeners.isEmpty() && (listeners != null)) {
+            if (listeners != null && !listeners.isEmpty()) {
                 for (final NotificationListenerAdapter listener : listeners) {
                     listener.addSubscriber(ctx.channel());
                     LOG.debug("Subscriber successfully registered.");
@@ -141,7 +141,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
         // Send the response and close the connection if necessary.
         final ChannelFuture f = ctx.channel().writeAndFlush(res);
-        if (!isKeepAlive(req) || (res.getStatus().code() != 200)) {
+        if (!isKeepAlive(req) || res.getStatus().code() != 200) {
             f.addListener(ChannelFutureListener.CLOSE);
         }
     }
@@ -163,11 +163,12 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
                 if (listener != null) {
                     listener.removeSubscriber(ctx.channel());
                     LOG.debug("Subscriber successfully registered.");
+
+                    Notificator.removeListenerIfNoSubscriberExists(listener);
                 }
-                Notificator.removeListenerIfNoSubscriberExists(listener);
             } else if (streamName.contains(RestconfImpl.NOTIFICATION_STREAM)) {
                 final List<NotificationListenerAdapter> listeners = Notificator.getNotificationListenerFor(streamName);
-                if (!listeners.isEmpty() && (listeners != null)) {
+                if (listeners != null && !listeners.isEmpty()) {
                     for (final NotificationListenerAdapter listener : listeners) {
                         listener.removeSubscriber(ctx.channel());
                     }
@@ -182,9 +183,6 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        if (!(cause instanceof java.nio.channels.ClosedChannelException)) {
-            // LOG.info("Not expected error cause: ", cause.toString());
-        }
         ctx.close();
     }
 
