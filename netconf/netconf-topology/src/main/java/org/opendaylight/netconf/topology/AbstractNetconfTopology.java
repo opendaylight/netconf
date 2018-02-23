@@ -12,19 +12,29 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.util.concurrent.EventExecutor;
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.TrustManagerFactory;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -33,6 +43,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
@@ -586,6 +597,64 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         public void close() {
             communicator.close();
             facade.close();
+        }
+    }
+
+    private static final class SslHandlerFactoryImpl implements SslHandlerFactory {
+        private final NetconfKeystoreAdapter keystoreAdapter;
+        private final Optional<org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114
+            .netconf.node.connection.parameters.protocol.Specification> specOptional;
+
+        SslHandlerFactoryImpl(final NetconfKeystoreAdapter keystoreAdapter,
+                              final org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114
+                                  .netconf.node.connection.parameters.protocol.Specification specification) {
+            this.keystoreAdapter = keystoreAdapter;
+            this.specOptional = Optional.fromNullable(specification);
+        }
+
+        @Override
+        public SslHandler createSslHandler() {
+            try {
+                final KeyStore keyStore = keystoreAdapter.getJavaKeyStore();
+
+                final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+                kmf.init(keyStore, "".toCharArray());
+
+                final TrustManagerFactory tmf =
+                        TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                tmf.init(keyStore);
+
+                final SSLContext sslCtx = SSLContext.getInstance("TLS");
+                sslCtx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+                final SSLEngine engine = sslCtx.createSSLEngine();
+                engine.setUseClientMode(true);
+
+                final Set<String> protocols = Sets.newHashSet(engine.getSupportedProtocols());
+                if (specOptional.isPresent()) {
+                    final org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node
+                        .connection.parameters.protocol.Specification specification = specOptional.get();
+
+                    if (!(specification instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
+                            .rev150114.netconf.node.connection.parameters.protocol.specification.TlsCase)) {
+                        throw new IllegalArgumentException("Cannot get TLS specification from: " + specification);
+                    }
+
+                    final org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node
+                        .connection.parameters.protocol.specification.TlsCase tlsCase =
+                            (org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node
+                                    .connection.parameters.protocol.specification.TlsCase)specification;
+
+                    protocols.removeAll(tlsCase.getTls().getExcludedVersions());
+                }
+
+                engine.setEnabledProtocols(protocols.toArray(new String[0]));
+                engine.setEnabledCipherSuites(engine.getSupportedCipherSuites());
+                engine.setEnableSessionCreation(true);
+
+                return new SslHandler(engine);
+            } catch (GeneralSecurityException | IOException exc) {
+                throw new IllegalStateException(exc);
+            }
         }
     }
 }
