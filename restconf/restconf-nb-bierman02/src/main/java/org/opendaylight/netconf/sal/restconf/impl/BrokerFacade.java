@@ -377,23 +377,6 @@ public class BrokerFacade {
                     }
                     break;
                 case DELETE:
-                    if (withoutError) {
-                        try {
-                            deleteDataWithinTransaction(patchTransaction, CONFIGURATION, patchEntity
-                                    .getTargetNode());
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), true, null));
-                        } catch (final RestconfDocumentedException e) {
-                            LOG.error("Error call http Patch operation {} on target {}",
-                                    operation,
-                                    patchEntity.getTargetNode().toString());
-
-                            editErrors = new ArrayList<>();
-                            editErrors.addAll(e.getErrors());
-                            editCollection.add(new PatchStatusEntity(patchEntity.getEditId(), false, editErrors));
-                            withoutError = false;
-                        }
-                    }
-                    break;
                 case REMOVE:
                     if (withoutError) {
                         try {

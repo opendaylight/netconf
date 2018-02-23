@@ -53,7 +53,7 @@ public final class QueryParametersParser {
         String param = info.getQueryParameters(false).getFirst(UriParameters.DEPTH.toString());
         if (!Strings.isNullOrEmpty(param) && !"unbounded".equals(param)) {
             try {
-                final int depth = Integer.valueOf(param);
+                final int depth = Integer.parseInt(param);
                 if (depth < 1) {
                     throw new RestconfDocumentedException(
                             new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,

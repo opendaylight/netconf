@@ -12,11 +12,13 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
@@ -45,11 +47,12 @@ final class BatchedExistenceCheck {
             final ListenableFuture<Boolean> f = readTx.exists(datastore, path);
             Futures.addCallback(f, new FutureCallback<Boolean>() {
                 @Override
-                public void onSuccess(final Boolean result) {
+                public void onSuccess(@Nonnull final Boolean result) {
                     ret.complete(path, result.booleanValue());
                 }
 
                 @Override
+                @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
                 public void onFailure(final Throwable throwable) {
                     final Exception e;
                     if (throwable instanceof Exception) {

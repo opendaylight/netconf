@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.sal.rest.impl.StringModuleInstanceIdentifierCodec;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO;
@@ -305,8 +306,9 @@ public final class RestCodec {
 
         private static List<Predicate> keyValuesToPredicateList(final Map<QName, Object> keyValues) {
             final List<Predicate> result = new ArrayList<>();
-            for (final QName qualifiedName : keyValues.keySet()) {
-                final Object value = keyValues.get(qualifiedName);
+            for (final Entry<QName, Object> entry : keyValues.entrySet()) {
+                final QName qualifiedName = entry.getKey();
+                final Object value = entry.getValue();
                 result.add(new Predicate(qNameToIdentityValue(qualifiedName), String.valueOf(value)));
             }
             return result;
