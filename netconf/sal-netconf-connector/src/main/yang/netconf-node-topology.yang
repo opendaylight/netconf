@@ -64,6 +64,30 @@ module netconf-node-topology {
         }
     }
 
+    grouping protocol-grouping {
+        container protocol {
+            leaf name {
+                type enumeration {
+                    enum SSH;
+                    enum TLS;
+                }
+            }
+
+            choice specification {
+                case tls-case {
+                   container tls {
+                       leaf-list excluded-versions {
+                           type string;
+                           description "A list of TLS version names provided in JDK that are not supported by the
+                                        target netconf device, eg, the netopeer2 simulator does not support the
+                                        SSLv2Hello. Most of the time, this list need not be set";
+                       }
+                   }
+                }
+            }
+        }
+    }
+
     grouping netconf-node-connection-parameters {
 
         leaf host {
@@ -78,6 +102,8 @@ module netconf-node-topology {
             config true;
             type boolean;
         }
+
+        uses protocol-grouping;
 
         leaf schemaless {
             type boolean;
