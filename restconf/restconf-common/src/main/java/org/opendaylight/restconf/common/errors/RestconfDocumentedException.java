@@ -34,7 +34,7 @@ public class RestconfDocumentedException extends WebApplicationException {
 
     private static final long serialVersionUID = 1L;
 
-    private final List<RestconfError> errors;
+    private final ImmutableList<RestconfError> errors;
     private final Status status;
 
     /**

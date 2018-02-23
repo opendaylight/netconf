@@ -10,6 +10,8 @@ package org.opendaylight.restconf.common.errors;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import java.io.Serializable;
+import java.util.Locale;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -23,7 +25,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
  * @author Devin Avery
  *     See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>.
  */
-public class RestconfError {
+public class RestconfError implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     public enum ErrorType {
         /**
@@ -44,12 +47,12 @@ public class RestconfError {
         APPLICATION;
 
         public String getErrorTypeTag() {
-            return name().toLowerCase();
+            return name().toLowerCase(Locale.ROOT);
         }
 
         public static ErrorType valueOfCaseInsensitive(final String value) {
             try {
-                return ErrorType.valueOf(ErrorType.class, value.toUpperCase());
+                return ErrorType.valueOf(ErrorType.class, value.toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException e) {
                 return APPLICATION;
             }
@@ -88,12 +91,12 @@ public class RestconfError {
         }
 
         public String getTagValue() {
-            return this.tagValue.toLowerCase();
+            return this.tagValue.toLowerCase(Locale.ROOT);
         }
 
         public static ErrorTag valueOfCaseInsensitive(final String value) {
             try {
-                return ErrorTag.valueOf(ErrorTag.class, value.toUpperCase().replaceAll("-", "_"));
+                return ErrorTag.valueOf(ErrorTag.class, value.toUpperCase(Locale.ROOT).replaceAll("-", "_"));
             } catch (IllegalArgumentException e) {
                 return OPERATION_FAILED;
             }
@@ -215,7 +218,7 @@ public class RestconfError {
                 .valueOfCaseInsensitive(rpcError.getErrorType().name());
 
         this.errorTag = rpcError.getTag() == null ? ErrorTag.OPERATION_FAILED : ErrorTag
-                .valueOfCaseInsensitive(rpcError.getTag().toString());
+                .valueOfCaseInsensitive(rpcError.getTag());
 
         this.errorMessage = rpcError.getMessage();
         this.errorAppTag = rpcError.getApplicationTag();
@@ -225,7 +228,8 @@ public class RestconfError {
             if (rpcError.getCause() != null) {
                 localErrorInfo = Throwables.getStackTraceAsString(rpcError.getCause());
             } else if (rpcError.getSeverity() != null) {
-                localErrorInfo = "<severity>" + rpcError.getSeverity().toString().toLowerCase() + "</severity>";
+                localErrorInfo = "<severity>" + rpcError.getSeverity().toString().toLowerCase(Locale.ROOT)
+                        + "</severity>";
             }
         } else {
             localErrorInfo = rpcError.getInfo();
