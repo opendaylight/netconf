@@ -93,9 +93,7 @@ public final class IdentityValuesDTO {
             }
             if (predicates != null && !predicates.isEmpty()) {
                 for (final Predicate predicate : predicates) {
-                    sb.append("[");
-                    predicate.toString();
-                    sb.append("]");
+                    sb.append("[").append(predicate.toString()).append("]");
                 }
             }
             return sb.toString();
