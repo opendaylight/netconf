@@ -162,7 +162,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
             if (outputContext.getData() != null) {
                 output = toJson(outputContext);
             }
-        } catch (final Exception e) {
+        } catch (final RuntimeException | IOException e) {
             propagateExceptionAs(uriPath, e, "RPC");
         }
 
