@@ -29,6 +29,9 @@ public final class RestUtil {
     public static final String DQUOTE = "\"";
     private static final Pattern PREDICATE_PATTERN = Pattern.compile("\\[(.*?)\\]");
 
+    private RestUtil() {
+    }
+
     public static TypeDefinition<?> resolveBaseTypeFrom(final TypeDefinition<?> type) {
         TypeDefinition<?> superType = type;
         while (superType.getBaseType() != null) {
