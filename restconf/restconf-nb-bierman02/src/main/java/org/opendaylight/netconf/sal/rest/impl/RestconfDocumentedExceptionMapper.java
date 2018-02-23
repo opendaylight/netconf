@@ -15,6 +15,7 @@ import com.google.gson.stream.JsonWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
@@ -93,7 +94,9 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         LOG.debug("In toResponse: {}", exception.getMessage());
 
         final List<MediaType> accepts = headers.getAcceptableMediaTypes();
-        accepts.remove(MediaType.WILDCARD_TYPE);
+        if (accepts != null) {
+            accepts.remove(MediaType.WILDCARD_TYPE);
+        }
 
         LOG.debug("Accept headers: {}", accepts);
 
@@ -274,8 +277,12 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             LOG.warn("Error writing error response body", e);
         }
 
-        return outStream.toString();
-
+        try {
+            return outStream.toString(StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            // Shouldn't happen
+            return "Failure encoding error response: " + e;
+        }
     }
 
     private static Object toXMLResponseBody(final NormalizedNodeContext errorsNode,
@@ -350,7 +357,12 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             LOG.warn("Error writing error response body.", e);
         }
 
-        return outStream.toString();
+        try {
+            return outStream.toString(StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            // Shouldn't happen
+            return "Failure encoding error response: " + e;
+        }
     }
 
     private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,

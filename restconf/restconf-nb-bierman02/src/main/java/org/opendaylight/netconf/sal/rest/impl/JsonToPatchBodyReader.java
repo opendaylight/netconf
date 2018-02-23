@@ -17,8 +17,10 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
@@ -103,7 +105,8 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
             return new PatchContext(path, null, null);
         }
 
-        final JsonReader jsonReader = new JsonReader(new InputStreamReader(nonEmptyInputStreamOptional.get()));
+        final JsonReader jsonReader = new JsonReader(new InputStreamReader(nonEmptyInputStreamOptional.get(),
+                StandardCharsets.UTF_8));
         final List<PatchEntity> resultList = read(jsonReader, path);
         jsonReader.close();
 
@@ -231,7 +234,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
                     edit.setId(in.nextString());
                     break;
                 case "operation" :
-                    edit.setOperation(PatchEditOperation.valueOf(in.nextString().toUpperCase()));
+                    edit.setOperation(PatchEditOperation.valueOf(in.nextString().toUpperCase(Locale.ROOT)));
                     break;
                 case "target" :
                     // target can be specified completely in request URI
