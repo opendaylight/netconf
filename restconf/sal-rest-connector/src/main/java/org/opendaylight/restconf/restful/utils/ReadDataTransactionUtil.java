@@ -51,14 +51,21 @@ import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.OrderedLeafSetNode;
+import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeContainerBuilder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
@@ -571,10 +578,19 @@ public final class ReadDataTransactionUtil {
      *             data node of state data
      * @return {@link NormalizedNode}
      */
+    @SuppressWarnings("unchecked")
     @Nonnull
     private static NormalizedNode<?, ?> prepareData(@Nonnull final NormalizedNode<?, ?> configDataNode,
                                                              @Nonnull final NormalizedNode<?, ?> stateDataNode) {
-        if (configDataNode instanceof MapNode) {
+        if (configDataNode instanceof OrderedMapNode) {
+            final CollectionNodeBuilder<MapEntryNode, OrderedMapNode> builder = Builders
+                    .orderedMapBuilder().withNodeIdentifier(((MapNode) configDataNode).getIdentifier());
+
+            mapValueToBuilder(
+                    ((OrderedMapNode) configDataNode).getValue(), ((OrderedMapNode) stateDataNode).getValue(), builder);
+
+            return builder.build();
+        } else if (configDataNode instanceof MapNode) {
             final CollectionNodeBuilder<MapEntryNode, MapNode> builder = ImmutableNodes
                     .mapNodeBuilder().withNodeIdentifier(((MapNode) configDataNode).getIdentifier());
 
@@ -616,8 +632,36 @@ public final class ReadDataTransactionUtil {
             return builder.build();
         } else if (configDataNode instanceof LeafNode) {
             return ImmutableNodes.leafNode(configDataNode.getNodeType(), configDataNode.getValue());
+        } else if (configDataNode instanceof OrderedLeafSetNode) {
+            final ListNodeBuilder<Object, LeafSetEntryNode<Object>> builder = Builders
+                .orderedLeafSetBuilder().withNodeIdentifier(((OrderedLeafSetNode<?>) configDataNode).getIdentifier());
+
+            mapValueToBuilder(((OrderedLeafSetNode<Object>) configDataNode).getValue(),
+                    ((OrderedLeafSetNode<Object>) stateDataNode).getValue(), builder);
+            return builder.build();
+        } else if (configDataNode instanceof LeafSetNode) {
+            final ListNodeBuilder<Object, LeafSetEntryNode<Object>> builder = Builders
+                    .leafSetBuilder().withNodeIdentifier(((LeafSetNode<?>) configDataNode).getIdentifier());
+
+            mapValueToBuilder(((LeafSetNode<Object>) configDataNode).getValue(),
+                    ((LeafSetNode<Object>) stateDataNode).getValue(), builder);
+            return builder.build();
+        } else if (configDataNode instanceof UnkeyedListNode) {
+            final CollectionNodeBuilder<UnkeyedListEntryNode, UnkeyedListNode> builder = Builders
+                    .unkeyedListBuilder().withNodeIdentifier(((UnkeyedListNode) configDataNode).getIdentifier());
+
+            mapValueToBuilder(((UnkeyedListNode) configDataNode).getValue(),
+                    ((UnkeyedListNode) stateDataNode).getValue(), builder);
+            return builder.build();
+        } else if (configDataNode instanceof UnkeyedListEntryNode) {
+            final DataContainerNodeAttrBuilder<NodeIdentifier, UnkeyedListEntryNode> builder = Builders
+                .unkeyedListEntryBuilder().withNodeIdentifier(((UnkeyedListEntryNode) configDataNode).getIdentifier());
+
+            mapValueToBuilder(((UnkeyedListEntryNode) configDataNode).getValue(),
+                    ((UnkeyedListEntryNode) stateDataNode).getValue(), builder);
+            return builder.build();
         } else {
-            throw new RestconfDocumentedException("Bad type of node.");
+            throw new RestconfDocumentedException("Unexpected node type: " + configDataNode.getClass().getName());
         }
     }
 

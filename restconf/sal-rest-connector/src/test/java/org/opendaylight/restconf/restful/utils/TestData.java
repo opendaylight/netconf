@@ -12,9 +12,12 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
@@ -29,7 +32,8 @@ class TestData {
     final ContainerNode data4;
     final MapNode listData;
     final MapNode listData2;
-    final UnkeyedListEntryNode unkeyedListEntryNode;
+    final OrderedMapNode orderedMapNode1;
+    final OrderedMapNode orderedMapNode2;
     final LeafNode contentLeaf;
     final LeafNode contentLeaf2;
     final MapEntryNode checkData;
@@ -37,11 +41,22 @@ class TestData {
     final SchemaPath errorRpc;
     final ContainerNode input;
     final ContainerNode output;
+    final LeafSetNode<String> leafSetNode1;
+    final LeafSetNode<String> leafSetNode2;
+    final LeafSetNode<String> orderedLeafSetNode1;
+    final LeafSetNode<String> orderedLeafSetNode2;
+    final YangInstanceIdentifier leafSetNodePath;
+    final UnkeyedListNode unkeyedListNode1;
+    final UnkeyedListNode unkeyedListNode2;
+    final UnkeyedListEntryNode unkeyedListEntryNode1;
+    final UnkeyedListEntryNode unkeyedListEntryNode2;
+
+    final QName base = QName.create("ns", "2016-02-28", "base");
+    final QName listKeyQName = QName.create(base, "list-key");
+    final QName leafListQname = QName.create(base, "leaf-list");
+    final QName listQname = QName.create(base, "list");
 
     TestData() {
-        final QName base = QName.create("ns", "2016-02-28", "base");
-        final QName listQname = QName.create(base, "list");
-        final QName listKeyQName = QName.create(base, "list-key");
         final YangInstanceIdentifier.NodeIdentifierWithPredicates nodeWithKey =
                 new YangInstanceIdentifier.NodeIdentifierWithPredicates(listQname, listKeyQName, "keyValue");
         final YangInstanceIdentifier.NodeIdentifierWithPredicates nodeWithKey2 =
@@ -59,10 +74,6 @@ class TestData {
                 Builders.leafBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(listQname, "identifier")))
                 .withValue("id")
-                .build();
-        unkeyedListEntryNode = Builders.unkeyedListEntryBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(listQname, "list")))
-                .withChild(dataContainer)
                 .build();
         data = Builders.mapEntryBuilder()
                 .withNodeIdentifier(nodeWithKey)
@@ -117,6 +128,37 @@ class TestData {
                 .withChild(contentLeaf2)
                 .build();
 
+        leafSetNodePath = YangInstanceIdentifier.builder().node(QName.create(base, "cont"))
+                .node(leafListQname).build();
+        leafSetNode1 = Builders.<String>leafSetBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(
+                leafListQname)).withChildValue("one").withChildValue("two").build();
+
+        leafSetNode2 = Builders.<String>leafSetBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(
+                leafListQname)).withChildValue("three").build();
+
+        orderedLeafSetNode1 = Builders.<String>orderedLeafSetBuilder().withNodeIdentifier(
+                new YangInstanceIdentifier.NodeIdentifier(leafListQname)).withChildValue("one")
+                .withChildValue("two").build();
+        orderedLeafSetNode2 = Builders.<String>orderedLeafSetBuilder().withNodeIdentifier(
+                new YangInstanceIdentifier.NodeIdentifier(leafListQname)).withChildValue("three")
+                .withChildValue("four").build();
+
+        orderedMapNode1 = Builders.orderedMapBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(listQname)).withChild(data).build();
+
+        orderedMapNode2 = Builders.orderedMapBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(listQname)).withChild(data)
+                .withChild(data2).build();
+
+        unkeyedListEntryNode1 = Builders.unkeyedListEntryBuilder().withNodeIdentifier(
+                new YangInstanceIdentifier.NodeIdentifier(listQname)).withChild(content).build();
+        unkeyedListNode1 = Builders.unkeyedListBuilder().withNodeIdentifier(
+                new YangInstanceIdentifier.NodeIdentifier(listQname)).withChild(unkeyedListEntryNode1).build();
+
+        unkeyedListEntryNode2 = Builders.unkeyedListEntryBuilder().withNodeIdentifier(
+                new YangInstanceIdentifier.NodeIdentifier(listQname)).withChild(content2).build();
+        unkeyedListNode2 = Builders.unkeyedListBuilder().withNodeIdentifier(
+                new YangInstanceIdentifier.NodeIdentifier(listQname)).withChild(unkeyedListEntryNode2).build();
 
         final QName rpcQname = QName.create("ns", "2015-02-28", "test-rpc");
         final QName errorRpcQname = QName.create(rpcQname, "error-rpc");
