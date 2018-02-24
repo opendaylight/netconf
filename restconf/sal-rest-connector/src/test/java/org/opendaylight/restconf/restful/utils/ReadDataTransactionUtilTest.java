@@ -16,6 +16,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import java.util.Collections;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -37,8 +38,11 @@ import org.opendaylight.restconf.restful.transaction.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
@@ -176,6 +180,79 @@ public class ReadDataTransactionUtilTest {
                 .withChild(DATA.checkData)
                 .build();
         assertEquals(checkingData, normalizedNode);
+    }
+
+    @Test
+    public void readOrderedListDataAllTest() {
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.orderedMapNode1))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, DATA.path3);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.orderedMapNode2))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, DATA.path3);
+        doReturn(DATA.path3).when(context).getInstanceIdentifier();
+
+        final NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
+
+        final MapNode expectedData = Builders.orderedMapBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(DATA.listQname)).withChild(DATA.checkData)
+                .build();
+        assertEquals(expectedData, normalizedNode);
+    }
+
+    @Test
+    public void readUnkeyedListDataAllTest() {
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.unkeyedListNode1))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, DATA.path3);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.unkeyedListNode2))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, DATA.path3);
+        doReturn(DATA.path3).when(context).getInstanceIdentifier();
+
+        final NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
+
+        final UnkeyedListNode expectedData = Builders.unkeyedListBuilder()
+                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(DATA.listQname))
+                .withChild(Builders.unkeyedListEntryBuilder().withNodeIdentifier(
+                        new YangInstanceIdentifier.NodeIdentifier(DATA.listQname))
+                        .withChild(DATA.unkeyedListEntryNode1.getValue().iterator().next())
+                        .withChild(DATA.unkeyedListEntryNode2.getValue().iterator().next()).build()).build();
+        assertEquals(expectedData, normalizedNode);
+    }
+
+    @Test
+    public void readLeafListDataAllTest() {
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.leafSetNode1))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, DATA.leafSetNodePath);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.leafSetNode2))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, DATA.leafSetNodePath);
+        doReturn(DATA.leafSetNodePath).when(context).getInstanceIdentifier();
+
+        final NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
+
+        final LeafSetNode<String> expectedData = Builders.<String>leafSetBuilder().withNodeIdentifier(
+                new YangInstanceIdentifier.NodeIdentifier(DATA.leafListQname)).withValue(
+                        ImmutableList.<LeafSetEntryNode<String>>builder().addAll(DATA.leafSetNode1.getValue())
+                        .addAll(DATA.leafSetNode2.getValue()).build()).build();
+        assertEquals(expectedData, normalizedNode);
+    }
+
+    @Test
+    public void readOrderedLeafListDataAllTest() {
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.orderedLeafSetNode1))).when(read)
+                .read(LogicalDatastoreType.OPERATIONAL, DATA.leafSetNodePath);
+        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.orderedLeafSetNode2))).when(read)
+                .read(LogicalDatastoreType.CONFIGURATION, DATA.leafSetNodePath);
+        doReturn(DATA.leafSetNodePath).when(context).getInstanceIdentifier();
+
+        final NormalizedNode<?, ?> normalizedNode =
+                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.ALL, wrapper, schemaContext);
+
+        final LeafSetNode<String> expectedData = Builders.<String>orderedLeafSetBuilder().withNodeIdentifier(
+                new YangInstanceIdentifier.NodeIdentifier(DATA.leafListQname)).withValue(
+                        ImmutableList.<LeafSetEntryNode<String>>builder().addAll(DATA.orderedLeafSetNode1.getValue())
+                        .addAll(DATA.orderedLeafSetNode2.getValue()).build()).build();
+        assertEquals(expectedData, normalizedNode);
     }
 
     @Test
