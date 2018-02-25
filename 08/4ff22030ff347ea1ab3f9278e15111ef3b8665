@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: JakubToth <jakub.toth@pantheon.tech>
+Submitted-by: JakubToth <jakub.toth@pantheon.tech>
+Submitted-at: Sun, 25 Feb 2018 01:24:51 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/68325
+Project: netconf
+Branch: refs/heads/stable/nitrogen
