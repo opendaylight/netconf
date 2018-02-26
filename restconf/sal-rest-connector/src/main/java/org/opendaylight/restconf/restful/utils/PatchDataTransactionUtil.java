@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.core.Response.Status;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
@@ -131,7 +132,7 @@ public final class PatchDataTransactionUtil {
 
         // if no errors then submit transaction, otherwise cancel
         if (noError) {
-            final ResponseFactory response = new ResponseFactory();
+            final ResponseFactory response = new ResponseFactory(Status.OK);
             final CheckedFuture<Void, TransactionCommitFailedException> future = tx.submit();
 
             try {

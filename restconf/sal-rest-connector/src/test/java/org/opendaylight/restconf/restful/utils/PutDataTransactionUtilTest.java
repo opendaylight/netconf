@@ -12,7 +12,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Futures;
 import org.junit.Before;
 import org.junit.Test;
@@ -208,16 +207,16 @@ public class PutDataTransactionUtilTest {
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
         doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
         doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
-        doReturn(Futures.immediateCheckedFuture(Optional.absent()))
-                .when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iid2);
-        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION,
+        doReturn(Futures.immediateCheckedFuture(Boolean.FALSE))
+                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
+        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
 
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain), null,
                 null);
-        verify(this.read).read(LogicalDatastoreType.CONFIGURATION,
+        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
@@ -232,16 +231,16 @@ public class PutDataTransactionUtilTest {
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
         doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
         doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
-        doReturn(Futures.immediateCheckedFuture(Optional.absent()))
-                .when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iid);
-        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION,
+        doReturn(Futures.immediateCheckedFuture(Boolean.FALSE))
+                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid);
+        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
 
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain), null,
                 null);
-        verify(this.read).read(LogicalDatastoreType.CONFIGURATION,
+        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
@@ -256,15 +255,15 @@ public class PutDataTransactionUtilTest {
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
         doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
         doReturn(this.write).when(this.transactionChain).newWriteOnlyTransaction();
-        doReturn(Futures.immediateCheckedFuture(Optional.absent()))
-                .when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iid2);
-        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION,
+        doReturn(Futures.immediateCheckedFuture(Boolean.FALSE))
+                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
+        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain), null,
                 null);
-        verify(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iid2);
+        verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iid2, payload.getData());
     }
 

@@ -10,6 +10,7 @@ package org.opendaylight.restconf.restful.utils;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.net.URI;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -73,7 +74,7 @@ public final class PostDataTransactionUtil {
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(),
                 transactionNode, schemaContextRef.get(), insert, point);
         final URI location = PostDataTransactionUtil.resolveLocation(uriInfo, transactionNode, schemaContextRef);
-        final ResponseFactory dataFactory = new ResponseFactory(null, location);
+        final ResponseFactory dataFactory = new ResponseFactory(Status.CREATED).location(location);
         FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory);
         return dataFactory.build();
     }
@@ -112,7 +113,7 @@ public final class PostDataTransactionUtil {
                                 PutDataTransactionUtil.readList(path.getParent(), schemaContext, domTransactionChain,
                                         schemaNode);
                         final OrderedMapNode readList = (OrderedMapNode) readData;
-                        if ((readList == null) || readList.getValue().isEmpty()) {
+                        if (readList == null || readList.getValue().isEmpty()) {
                             makePost(path, data, schemaContext, domTransactionChain, newReadWriteTransaction);
                             return newReadWriteTransaction.submit();
                         } else {
@@ -129,7 +130,7 @@ public final class PostDataTransactionUtil {
                                         .readList(path.getParent(), schemaContext, domTransactionChain, schemaNode);
 
                         final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
-                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
                             makePost(path, data, schemaContext, domTransactionChain, newReadWriteTransaction);
                             return newReadWriteTransaction.submit();
                         } else {
@@ -150,7 +151,7 @@ public final class PostDataTransactionUtil {
                                 PutDataTransactionUtil.readList(path.getParent(), schemaContext, domTransactionChain,
                                         schemaNode);
                         final OrderedMapNode readList = (OrderedMapNode) readData;
-                        if ((readList == null) || readList.getValue().isEmpty()) {
+                        if (readList == null || readList.getValue().isEmpty()) {
                             makePost(path, data, schemaContext, domTransactionChain, newReadWriteTransaction);
                             return newReadWriteTransaction.submit();
                         } else {
@@ -164,7 +165,7 @@ public final class PostDataTransactionUtil {
                                         schemaNode);
 
                         final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
-                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
                             makePost(path, data, schemaContext, domTransactionChain, newReadWriteTransaction);
                             return newReadWriteTransaction.submit();
                         } else {
@@ -179,7 +180,7 @@ public final class PostDataTransactionUtil {
                                 PutDataTransactionUtil.readList(path.getParent(), schemaContext, domTransactionChain,
                                         schemaNode);
                         final OrderedMapNode readList = (OrderedMapNode) readData;
-                        if ((readList == null) || readList.getValue().isEmpty()) {
+                        if (readList == null || readList.getValue().isEmpty()) {
                             makePost(path, data, schemaContext, domTransactionChain, newReadWriteTransaction);
                             return newReadWriteTransaction.submit();
                         } else {
@@ -193,7 +194,7 @@ public final class PostDataTransactionUtil {
                                         schemaNode);
 
                         final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
-                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
+                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
                             makePost(path, data, schemaContext, domTransactionChain, newReadWriteTransaction);
                             return newReadWriteTransaction.submit();
                         } else {
