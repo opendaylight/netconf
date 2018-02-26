@@ -322,9 +322,9 @@ public class RestconfDataServiceImplTest {
                 new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef.get());
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseCont))).when(this.read)
-                .read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
-        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, payload.getData());
+        doReturn(Futures.immediateCheckedFuture(Boolean.TRUE)).when(this.readWrite)
+                .exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         final Response response = this.dataService.putData(null, payload, this.uriInfo);
         assertNotNull(response);
@@ -341,9 +341,9 @@ public class RestconfDataServiceImplTest {
                 new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, mountPoint, this.contextRef.get());
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseCont))).when(this.read)
-                .read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
-        doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, payload.getData());
+        doReturn(Futures.immediateCheckedFuture(Boolean.TRUE)).when(this.readWrite)
+                .exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
+        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         final Response response = this.dataService.putData(null, payload, this.uriInfo);
         assertNotNull(response);
