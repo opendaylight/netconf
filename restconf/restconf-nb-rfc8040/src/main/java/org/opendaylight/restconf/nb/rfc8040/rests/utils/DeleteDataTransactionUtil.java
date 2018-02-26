@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.CheckedFuture;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
@@ -37,7 +38,7 @@ public final class DeleteDataTransactionUtil {
         final CheckedFuture<Void, TransactionCommitFailedException> future = submitData(
                 transactionNode.getTransactionChain(), transactionNode.getTransactionChain().newReadWriteTransaction(),
                 transactionNode.getInstanceIdentifier().getInstanceIdentifier());
-        final ResponseFactory response = new ResponseFactory();
+        final ResponseFactory response = new ResponseFactory(Status.OK);
         FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE, response);
         return response.build();
     }
