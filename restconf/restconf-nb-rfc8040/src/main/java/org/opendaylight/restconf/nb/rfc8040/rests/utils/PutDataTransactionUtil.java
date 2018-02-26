@@ -13,7 +13,9 @@ import com.google.common.util.concurrent.CheckedFuture;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -66,9 +68,9 @@ public final class PutDataTransactionUtil {
      *             input data
      */
     public static void validInputData(final SchemaNode schemaNode, final NormalizedNodeContext payload) {
-        if ((schemaNode != null) && (payload.getData() == null)) {
+        if (schemaNode != null && payload.getData() == null) {
             throw new RestconfDocumentedException("Input is required.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
-        } else if ((schemaNode == null) && (payload.getData() != null)) {
+        } else if (schemaNode == null && payload.getData() != null) {
             throw new RestconfDocumentedException("No input expected.", ErrorType.PROTOCOL, ErrorTag.MALFORMED_MESSAGE);
         }
     }
@@ -113,7 +115,7 @@ public final class PutDataTransactionUtil {
         final NormalizedNode<?, ?> data = payload.getData();
         if (schemaNode instanceof ListSchemaNode) {
             final List<QName> keyDefinitions = ((ListSchemaNode) schemaNode).getKeyDefinition();
-            if ((lastPathArgument instanceof NodeIdentifierWithPredicates) && (data instanceof MapEntryNode)) {
+            if (lastPathArgument instanceof NodeIdentifierWithPredicates && data instanceof MapEntryNode) {
                 final Map<QName, Object> uriKeyValues = ((NodeIdentifierWithPredicates) lastPathArgument)
                         .getKeyValues();
                 isEqualUriAndPayloadKeyValues(uriKeyValues, (MapEntryNode) data, keyDefinitions);
@@ -159,11 +161,18 @@ public final class PutDataTransactionUtil {
                                final TransactionVarsWrapper transactionNode, final String insert, final String point) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
         final SchemaContext schemaContext = schemaCtxRef.get();
-        final ResponseFactory responseFactory = new ResponseFactory(
-                ReadDataTransactionUtil.readData(RestconfDataServiceConstant.ReadData.CONFIG, transactionNode,
-                        schemaContext));
+
+        final DOMDataReadWriteTransaction readWriteTransaction =
+                transactionNode.getTransactionChain().newReadWriteTransaction();
+
+        final CheckedFuture<Boolean, ReadFailedException> existsFuture =
+                readWriteTransaction.exists(LogicalDatastoreType.CONFIGURATION, path);
+        final FutureDataFactory<Boolean> existsResponse = new FutureDataFactory<>();
+        FutureCallbackTx.addCallback(existsFuture, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, existsResponse);
+
+        final ResponseFactory responseFactory = new ResponseFactory(existsResponse.result ? Status.OK : Status.CREATED);
         final CheckedFuture<Void, TransactionCommitFailedException> submitData = submitData(path, schemaContext,
-                transactionNode.getTransactionChain(), payload.getData(), insert, point);
+                transactionNode.getTransactionChain(), readWriteTransaction, payload.getData(), insert, point);
         FutureCallbackTx.addCallback(submitData, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, responseFactory);
         return responseFactory.build();
     }
@@ -187,10 +196,10 @@ public final class PutDataTransactionUtil {
      */
     private static CheckedFuture<Void, TransactionCommitFailedException> submitData(final YangInstanceIdentifier path,
             final SchemaContext schemaContext, final DOMTransactionChain domTransactionChain,
+            final DOMDataReadWriteTransaction readWriteTransaction,
             final NormalizedNode<?, ?> data, final String insert, final String point) {
-        final DOMDataReadWriteTransaction newReadWriteTransaction = domTransactionChain.newReadWriteTransaction();
         if (insert == null) {
-            return makePut(path, schemaContext, newReadWriteTransaction, data);
+            return makePut(path, schemaContext, readWriteTransaction, data);
         } else {
             final DataSchemaNode schemaNode = checkListAndOrderedType(schemaContext, path);
             switch (insert) {
@@ -199,57 +208,57 @@ public final class PutDataTransactionUtil {
                         final NormalizedNode<?, ?> readData =
                                 readList(path, schemaContext, domTransactionChain, schemaNode);
                         final OrderedMapNode readList = (OrderedMapNode) readData;
-                        if ((readList == null) || readList.getValue().isEmpty()) {
-                            return makePut(path, schemaContext, newReadWriteTransaction, data);
+                        if (readList == null || readList.getValue().isEmpty()) {
+                            return makePut(path, schemaContext, readWriteTransaction, data);
                         } else {
-                            newReadWriteTransaction.delete(LogicalDatastoreType.CONFIGURATION, path.getParent());
-                            simplePut(LogicalDatastoreType.CONFIGURATION, path, newReadWriteTransaction,
+                            readWriteTransaction.delete(LogicalDatastoreType.CONFIGURATION, path.getParent());
+                            simplePut(LogicalDatastoreType.CONFIGURATION, path, readWriteTransaction,
                                     schemaContext, data);
-                            listPut(LogicalDatastoreType.CONFIGURATION, path.getParent(), newReadWriteTransaction,
+                            listPut(LogicalDatastoreType.CONFIGURATION, path.getParent(), readWriteTransaction,
                                     schemaContext, readList);
-                            return newReadWriteTransaction.submit();
+                            return readWriteTransaction.submit();
                         }
                     } else {
                         final NormalizedNode<?, ?> readData =
                                 readList(path, schemaContext, domTransactionChain, schemaNode);
 
                         final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
-                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
-                            return makePut(path, schemaContext, newReadWriteTransaction, data);
+                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
+                            return makePut(path, schemaContext, readWriteTransaction, data);
                         } else {
-                            newReadWriteTransaction.delete(LogicalDatastoreType.CONFIGURATION, path.getParent());
-                            simplePut(LogicalDatastoreType.CONFIGURATION, path, newReadWriteTransaction,
+                            readWriteTransaction.delete(LogicalDatastoreType.CONFIGURATION, path.getParent());
+                            simplePut(LogicalDatastoreType.CONFIGURATION, path, readWriteTransaction,
                                     schemaContext, data);
-                            listPut(LogicalDatastoreType.CONFIGURATION, path.getParent(), newReadWriteTransaction,
+                            listPut(LogicalDatastoreType.CONFIGURATION, path.getParent(), readWriteTransaction,
                                     schemaContext, readLeafList);
-                            return newReadWriteTransaction.submit();
+                            return readWriteTransaction.submit();
                         }
                     }
                 case "last":
-                    return makePut(path, schemaContext, newReadWriteTransaction, data);
+                    return makePut(path, schemaContext, readWriteTransaction, data);
                 case "before":
                     if (schemaNode instanceof ListSchemaNode) {
                         final NormalizedNode<?, ?> readData =
                                 readList(path, schemaContext, domTransactionChain, schemaNode);
                         final OrderedMapNode readList = (OrderedMapNode) readData;
-                        if ((readList == null) || readList.getValue().isEmpty()) {
-                            return makePut(path, schemaContext, newReadWriteTransaction, data);
+                        if (readList == null || readList.getValue().isEmpty()) {
+                            return makePut(path, schemaContext, readWriteTransaction, data);
                         } else {
-                            insertWithPointListPut(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path,
+                            insertWithPointListPut(readWriteTransaction, LogicalDatastoreType.CONFIGURATION, path,
                                     data, schemaContext, point, readList, true);
-                            return newReadWriteTransaction.submit();
+                            return readWriteTransaction.submit();
                         }
                     } else {
                         final NormalizedNode<?, ?> readData =
                                 readList(path, schemaContext, domTransactionChain, schemaNode);
 
                         final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
-                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
-                            return makePut(path, schemaContext, newReadWriteTransaction, data);
+                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
+                            return makePut(path, schemaContext, readWriteTransaction, data);
                         } else {
-                            insertWithPointLeafListPut(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION,
+                            insertWithPointLeafListPut(readWriteTransaction, LogicalDatastoreType.CONFIGURATION,
                                     path, data, schemaContext, point, readLeafList, true);
-                            return newReadWriteTransaction.submit();
+                            return readWriteTransaction.submit();
                         }
                     }
                 case "after":
@@ -257,24 +266,24 @@ public final class PutDataTransactionUtil {
                         final NormalizedNode<?, ?> readData =
                                 readList(path, schemaContext, domTransactionChain, schemaNode);
                         final OrderedMapNode readList = (OrderedMapNode) readData;
-                        if ((readList == null) || readList.getValue().isEmpty()) {
-                            return makePut(path, schemaContext, newReadWriteTransaction, data);
+                        if (readList == null || readList.getValue().isEmpty()) {
+                            return makePut(path, schemaContext, readWriteTransaction, data);
                         } else {
-                            insertWithPointListPut(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION,
+                            insertWithPointListPut(readWriteTransaction, LogicalDatastoreType.CONFIGURATION,
                                     path, data, schemaContext, point, readList, false);
-                            return newReadWriteTransaction.submit();
+                            return readWriteTransaction.submit();
                         }
                     } else {
                         final NormalizedNode<?, ?> readData =
                                 readList(path, schemaContext, domTransactionChain, schemaNode);
 
                         final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
-                        if ((readLeafList == null) || readLeafList.getValue().isEmpty()) {
-                            return makePut(path, schemaContext, newReadWriteTransaction, data);
+                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
+                            return makePut(path, schemaContext, readWriteTransaction, data);
                         } else {
-                            insertWithPointLeafListPut(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION,
+                            insertWithPointLeafListPut(readWriteTransaction, LogicalDatastoreType.CONFIGURATION,
                                     path, data, schemaContext, point, readLeafList, true);
-                            return newReadWriteTransaction.submit();
+                            return readWriteTransaction.submit();
                         }
                     }
                 default:
