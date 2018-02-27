@@ -28,6 +28,13 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>odl-aaa-netconf-plugin</artifactId>
+            <version>${project.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-util</artifactId>
             <version>${project.version}</version>
             <type>xml</type>
