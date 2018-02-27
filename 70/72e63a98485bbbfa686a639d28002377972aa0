@@ -1,0 +1,9 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Tom Pantelis <tompantelis@gmail.com>
+Code-Review+1: Robert Varga <nite@hq.sk>
+Code-Review+2: JakubToth <jakub.toth@pantheon.tech>
+Submitted-by: JakubToth <jakub.toth@pantheon.tech>
+Submitted-at: Tue, 27 Feb 2018 19:48:28 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/61718
+Project: netconf
+Branch: refs/heads/master
