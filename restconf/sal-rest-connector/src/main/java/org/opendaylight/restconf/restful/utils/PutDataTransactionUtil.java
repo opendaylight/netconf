@@ -165,7 +165,8 @@ public final class PutDataTransactionUtil {
         final FutureDataFactory<Boolean> existsResponse = new FutureDataFactory<>();
         FutureCallbackTx.addCallback(existsFuture, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, existsResponse);
 
-        final ResponseFactory responseFactory = new ResponseFactory(existsResponse.result ? Status.OK : Status.CREATED);
+        final ResponseFactory responseFactory =
+                new ResponseFactory(existsResponse.result ? Status.NO_CONTENT : Status.CREATED);
         final CheckedFuture<Void, TransactionCommitFailedException> submitData = submitData(path, schemaContext,
                 transactionNode.getTransactionChain(), readWriteTransaction, payload.getData(), insert, point);
         FutureCallbackTx.addCallback(submitData, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, responseFactory);

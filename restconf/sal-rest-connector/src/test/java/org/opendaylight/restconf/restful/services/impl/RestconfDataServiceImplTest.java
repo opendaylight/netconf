@@ -328,7 +328,7 @@ public class RestconfDataServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         final Response response = this.dataService.putData(null, payload, this.uriInfo);
         assertNotNull(response);
-        assertEquals(200, response.getStatus());
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -348,7 +348,7 @@ public class RestconfDataServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         final Response response = this.dataService.putData(null, payload, this.uriInfo);
         assertNotNull(response);
-        assertEquals(200, response.getStatus());
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -404,7 +404,7 @@ public class RestconfDataServiceImplTest {
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         final Response response = this.dataService.deleteData("example-jukebox:jukebox");
         assertNotNull(response);
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
     /**
@@ -419,7 +419,7 @@ public class RestconfDataServiceImplTest {
         final Response response =
                 this.dataService.deleteData("example-jukebox:jukebox/yang-ext:mount/example-jukebox:jukebox");
         assertNotNull(response);
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
     @Test
