@@ -92,7 +92,7 @@ public class DeleteDataTransactionUtilTest {
                 new TransactionVarsWrapper(this.context, null, this.transactionChain));
 
         // assert success
-        assertEquals("Not expected response received", Status.OK.getStatusCode(), response.getStatus());
+        assertEquals("Not expected response received", Status.NO_CONTENT.getStatusCode(), response.getStatus());
     }
 
     /**
