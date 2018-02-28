@@ -54,7 +54,7 @@ public class XmlPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
         when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mountPointService);
         when(mountPointService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountPoint));
         when(mountPoint.getSchemaContext()).thenReturn(schemaContext);
-        SchemaContextHandler.setActualSchemaContext(schemaContext);
+        SchemaContextHandler.setSchemaContext(schemaContext);
     }
 
     @Test

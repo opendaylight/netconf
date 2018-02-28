@@ -7,8 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
+import java.util.Objects;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 
 /**
@@ -16,9 +15,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
  *
  */
 public class DOMMountPointServiceHandler implements Handler<DOMMountPointService> {
-
     private final DOMMountPointService domMountPointService;
-    private static DOMMountPointService actualDomMountPointService;
 
     /**
      * Prepare mount point service for Restconf services.
@@ -27,18 +24,11 @@ public class DOMMountPointServiceHandler implements Handler<DOMMountPointService
      *             mount point service
      */
     public DOMMountPointServiceHandler(final DOMMountPointService domMountPointService) {
-        Preconditions.checkNotNull(domMountPointService);
-        this.domMountPointService = domMountPointService;
-        actualDomMountPointService = domMountPointService;
+        this.domMountPointService = Objects.requireNonNull(domMountPointService);
     }
 
     @Override
     public DOMMountPointService get() {
         return this.domMountPointService;
     }
-
-    public static Optional<DOMMountPointService> getActualMountPointService() {
-        return Optional.fromNullable(actualDomMountPointService);
-    }
-
 }

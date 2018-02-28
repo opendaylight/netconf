@@ -28,7 +28,7 @@ public final class RestconfDataServiceConstant {
      * Constants for read data.
      *
      */
-    public final class ReadData {
+    public static final class ReadData {
         // URI parameters
         public static final String CONTENT = "content";
         public static final String DEPTH = "depth";
@@ -56,7 +56,7 @@ public final class RestconfDataServiceConstant {
      * Constants for data to put.
      *
      */
-    public final class PutData {
+    public static final class PutData {
         public static final String NETCONF_BASE = "urn:ietf:params:xml:ns:netconf:base:1.0";
         public static final String NETCONF_BASE_PAYLOAD_NAME = "data";
         public static final String PUT_TX_TYPE = "PUT";
@@ -70,7 +70,7 @@ public final class RestconfDataServiceConstant {
      * Constants for data to post.
      *
      */
-    public final class PostData {
+    public static final class PostData {
         public static final String POST_TX_TYPE = "POST";
 
         private PostData() {
@@ -82,7 +82,7 @@ public final class RestconfDataServiceConstant {
      * Constants for data to delete.
      *
      */
-    public final class DeleteData {
+    public static final class DeleteData {
         public static final String DELETE_TX_TYPE = "DELETE";
 
         private DeleteData() {
@@ -94,7 +94,7 @@ public final class RestconfDataServiceConstant {
      * Constants for data to yang patch.
      *
      */
-    public final class PatchData {
+    public static final class PatchData {
         public static final String PATCH_TX_TYPE = "Patch";
 
         private PatchData() {
