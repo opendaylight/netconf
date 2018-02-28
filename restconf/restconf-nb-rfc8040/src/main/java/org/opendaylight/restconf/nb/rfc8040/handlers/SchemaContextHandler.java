@@ -8,7 +8,9 @@
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
 import com.google.common.base.Preconditions;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -36,57 +38,53 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);
 
-    private final TransactionChainHandler transactionChainHandler;
-    private SchemaContext context;
-    private static SchemaContext actualSchemaContext;
+    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
+    private static volatile SchemaContext schemaContext;
 
-    private int moduleSetId;
+    private final TransactionChainHandler transactionChainHandler;
+
+    private final AtomicInteger moduleSetId = new AtomicInteger(0);
 
     /**
-     * Set module-set-id on initial value - 0.
+     * Constructor.
      *
      * @param transactionChainHandler Transaction chain handler
      */
     public SchemaContextHandler(final TransactionChainHandler transactionChainHandler) {
         this.transactionChainHandler = transactionChainHandler;
-        this.moduleSetId = 0;
-        actualSchemaContext = null;
+        schemaContext = null;
     }
 
     @Override
     @SuppressWarnings("checkstyle:hiddenField")
     public void onGlobalContextUpdated(final SchemaContext context) {
         Preconditions.checkNotNull(context);
-        this.context = null;
-        this.context = context;
+        schemaContext = context;
 
-        actualSchemaContext = context;
-
-        this.moduleSetId++;
         final Module ietfYangLibraryModule =
                 context.findModule(IetfYangLibrary.MODULE_QNAME).orElse(null);
         NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
                 RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(context.getModules(), ietfYangLibraryModule,
-                        context, String.valueOf(this.moduleSetId));
+                        context, String.valueOf(this.moduleSetId.incrementAndGet()));
         putData(normNode);
 
         final Module monitoringModule =
-                this.context.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
+                schemaContext.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
         normNode = RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
         putData(normNode);
     }
 
     @Override
     public SchemaContext get() {
-        return this.context;
+        return schemaContext;
     }
 
-    public static SchemaContext getActualSchemaContext() {
-        return actualSchemaContext;
+    public static SchemaContext getSchemaContext() {
+        return schemaContext;
     }
 
-    public static void setActualSchemaContext(final SchemaContext schemaContext) {
-        actualSchemaContext = schemaContext;
+    public static void setSchemaContext(final SchemaContext context) {
+        schemaContext = context;
     }
 
     private void putData(

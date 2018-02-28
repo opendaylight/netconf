@@ -68,7 +68,7 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         testFiles.addAll(TestRestconfUtils.loadFiles("/foo-xml-test/yang"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
         when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mock(DOMMountPointService.class));
-        SchemaContextHandler.setActualSchemaContext(schemaContext);
+        SchemaContextHandler.setSchemaContext(schemaContext);
     }
 
     @Test

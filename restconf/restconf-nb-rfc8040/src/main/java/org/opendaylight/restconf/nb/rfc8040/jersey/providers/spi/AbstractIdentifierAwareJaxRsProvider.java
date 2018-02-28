@@ -80,7 +80,7 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
     private InstanceIdentifierContext<?> getInstanceIdentifierContext() {
         return ParserIdentifier.toInstanceIdentifier(
                 getIdentifier(),
-                SchemaContextHandler.getActualSchemaContext(),
+                SchemaContextHandler.getSchemaContext(),
                 Optional.of(RestConnectorProvider.getMountPointService()));
     }
 

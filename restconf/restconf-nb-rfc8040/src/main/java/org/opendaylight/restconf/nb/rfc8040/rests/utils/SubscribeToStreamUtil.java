@@ -113,7 +113,7 @@ public final class SubscribeToStreamUtil {
         } else {
             listeners = pickSpecificListenerByOutput(listeners, NotificationOutputType.XML.getName());
         }
-        if (listeners == null || listeners.isEmpty()) {
+        if (listeners.isEmpty()) {
             throw new RestconfDocumentedException("Stream was not found.", ErrorType.PROTOCOL,
                     ErrorTag.UNKNOWN_ELEMENT);
         }

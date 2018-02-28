@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.utils.validations;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
@@ -67,7 +68,7 @@ public final class RestconfValidation {
         );
 
         RestconfValidationUtils.checkDocumentedError(
-                !name.toUpperCase().startsWith("XML"),
+                !name.toUpperCase(Locale.ROOT).startsWith("XML"),
                 ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
                 "Identifier must NOT start with XML ignore case."
         );

@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO.IdentityValue;
@@ -325,8 +326,9 @@ public final class RestCodec {
 
         private static List<Predicate> keyValuesToPredicateList(final Map<QName, Object> keyValues) {
             final List<Predicate> result = new ArrayList<>();
-            for (final QName qualifiedName : keyValues.keySet()) {
-                final Object value = keyValues.get(qualifiedName);
+            for (final Entry<QName, Object> entry : keyValues.entrySet()) {
+                final QName qualifiedName = entry.getKey();
+                final Object value = entry.getValue();
                 result.add(new Predicate(qNameToIdentityValue(qualifiedName), String.valueOf(value)));
             }
             return result;
@@ -360,7 +362,7 @@ public final class RestCodec {
             final SchemaContext schemaContext) {
         URI validNamespace;
         if (mountPoint != null) {
-            validNamespace = findFirstModuleByName(schemaContext, namespace);
+            validNamespace = findFirstModuleByName(mountPoint.getSchemaContext(), namespace);
         } else {
             validNamespace = findFirstModuleByName(schemaContext, namespace);
         }

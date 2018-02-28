@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import com.google.common.base.Preconditions;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map.Entry;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants;
@@ -137,7 +138,7 @@ public final class YangInstanceIdentifierSerializer {
         while (start < valueOf.length()) {
             if (Serializer.PERCENT_ENCODE_CHARS.matches(valueOf.charAt(start))) {
                 final String format = String.format("%x", (int) valueOf.charAt(start));
-                final String upperCase = format.toUpperCase();
+                final String upperCase = format.toUpperCase(Locale.ROOT);
                 sb.append(ParserBuilderConstants.Deserializer.PERCENT_ENCODING + upperCase);
             } else {
                 sb.append(valueOf.charAt(start));
