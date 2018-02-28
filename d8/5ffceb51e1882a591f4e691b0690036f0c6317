@@ -1,0 +1,8 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Robert Varga <nite@hq.sk>
+Code-Review+2: JakubToth <jakub.toth@pantheon.tech>
+Submitted-by: Thanh Ha <thanh.ha@linuxfoundation.org>
+Submitted-at: Wed, 28 Feb 2018 16:11:59 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/68829
+Project: netconf
+Branch: refs/heads/stable/oxygen
