@@ -49,8 +49,8 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfOperationsServiceImpl.class);
 
-    private SchemaContextHandler schemaContextHandler;
-    private DOMMountPointServiceHandler domMountPointServiceHandler;
+    private volatile SchemaContextHandler schemaContextHandler;
+    private volatile DOMMountPointServiceHandler domMountPointServiceHandler;
 
     /**
      * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}.

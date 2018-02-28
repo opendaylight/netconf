@@ -51,6 +51,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
@@ -144,9 +145,10 @@ public class JSONRestconfServiceRfc8040ImplTest {
     @BeforeClass
     public static void init() throws IOException, ReactorException {
         schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
-        SchemaContextHandler.setActualSchemaContext(schemaContext);
+        SchemaContextHandler.setSchemaContext(schemaContext);
     }
 
+    @SuppressWarnings("resource")
     @Before
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -182,12 +184,18 @@ public class JSONRestconfServiceRfc8040ImplTest {
         final DOMMountPointServiceHandler mountPointServiceHandler =
                 new DOMMountPointServiceHandler(mockMountPointService);
 
+        final DOMNotificationService mockNotificationService = mock(DOMNotificationService.class);
         ServicesWrapperImpl.getInstance().setHandlers(mockSchemaContextHandler, mountPointServiceHandler,
                 txChainHandler, new DOMDataBrokerHandler(mockDOMDataBroker),
                 new RpcServiceHandler(mockRpcService),
-                new NotificationServiceHandler(mock(DOMNotificationService.class)), domSchemaService);
+                new NotificationServiceHandler(mockNotificationService), domSchemaService);
 
         service = new JSONRestconfServiceRfc8040Impl(ServicesWrapperImpl.getInstance(), mountPointServiceHandler);
+
+        new RestConnectorProvider<>(mockDOMDataBroker, domSchemaService, mockRpcService, mockNotificationService,
+                mockMountPointService).start();
+
+        SchemaContextHandler.setSchemaContext(schemaContext);
     }
 
     private static String loadData(final String path) throws IOException {

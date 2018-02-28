@@ -64,7 +64,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
         when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mock(DOMMountPointService.class));
-        SchemaContextHandler.setActualSchemaContext(schemaContext);
+        SchemaContextHandler.setSchemaContext(schemaContext);
     }
 
     @Test

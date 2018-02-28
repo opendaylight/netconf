@@ -12,6 +12,7 @@ import com.google.gson.stream.JsonReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.Consumes;
@@ -87,7 +88,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
         final JsonParserStream jsonParser = JsonParserStream.create(writer,
             JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()), parentSchema);
 
-        final JsonReader reader = new JsonReader(new InputStreamReader(entityStream));
+        final JsonReader reader = new JsonReader(new InputStreamReader(entityStream, StandardCharsets.UTF_8));
         jsonParser.parse(reader);
 
         NormalizedNode<?, ?> result = resultHolder.getResult();
