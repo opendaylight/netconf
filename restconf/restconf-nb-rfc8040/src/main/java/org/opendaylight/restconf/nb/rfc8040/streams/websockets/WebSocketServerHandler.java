@@ -8,7 +8,6 @@
 
 package org.opendaylight.restconf.nb.rfc8040.streams.websockets;
 
-import static io.netty.handler.codec.http.HttpHeaders.Names.HOST;
 import static io.netty.handler.codec.http.HttpHeaders.isKeepAlive;
 import static io.netty.handler.codec.http.HttpHeaders.setContentLength;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -26,6 +25,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders.Names;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
@@ -95,7 +95,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
             }
         } else if (streamName.contains(RestconfConstants.NOTIFICATION_STREAM)) {
             final List<NotificationListenerAdapter> listeners = Notificator.getNotificationListenerFor(streamName);
-            if (!listeners.isEmpty() && (listeners != null)) {
+            if (listeners != null && !listeners.isEmpty()) {
                 for (final NotificationListenerAdapter listener : listeners) {
                     listener.addSubscriber(ctx.channel());
                     LOG.debug("Subscriber successfully registered.");
@@ -141,7 +141,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
         // Send the response and close the connection if necessary.
         final ChannelFuture f = ctx.channel().writeAndFlush(res);
-        if (!isKeepAlive(req) || (res.getStatus().code() != 200)) {
+        if (!isKeepAlive(req) || res.getStatus().code() != 200) {
             f.addListener(ChannelFutureListener.CLOSE);
         }
     }
@@ -163,11 +163,11 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
                 if (listener != null) {
                     listener.removeSubscriber(ctx.channel());
                     LOG.debug("Subscriber successfully registered.");
+                    Notificator.removeListenerIfNoSubscriberExists(listener);
                 }
-                Notificator.removeListenerIfNoSubscriberExists(listener);
             } else if (streamName.contains(RestconfConstants.NOTIFICATION_STREAM)) {
                 final List<NotificationListenerAdapter> listeners = Notificator.getNotificationListenerFor(streamName);
-                if (!listeners.isEmpty() && (listeners != null)) {
+                if (listeners != null && !listeners.isEmpty()) {
                     for (final NotificationListenerAdapter listener : listeners) {
                         listener.removeSubscriber(ctx.channel());
                     }
@@ -182,9 +182,6 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
     @Override
     public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
-        if (!(cause instanceof java.nio.channels.ClosedChannelException)) {
-            // LOG.info("Not expected error cause: ", cause.toString());
-        }
         ctx.close();
     }
 
@@ -196,7 +193,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
      * @return String representation of web socket location.
      */
     private static String getWebSocketLocation(final HttpRequest req) {
-        return "ws://" + req.headers().get(HOST) + req.getUri();
+        return "ws://" + req.headers().get(Names.HOST) + req.getUri();
     }
 
 }

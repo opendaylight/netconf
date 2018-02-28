@@ -24,9 +24,9 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 @Path("/")
 public class RestconfSchemaServiceImpl implements RestconfSchemaService {
 
-    private SchemaContextHandler schemaContextHandler;
-    private DOMMountPointServiceHandler domMountPointServiceHandler;
-    private DOMYangTextSourceProvider sourceProvider;
+    private volatile SchemaContextHandler schemaContextHandler;
+    private volatile DOMMountPointServiceHandler domMountPointServiceHandler;
+    private volatile DOMYangTextSourceProvider sourceProvider;
 
     /**
      * Set {@link SchemaContextHandler} for getting actual {@link SchemaContext}

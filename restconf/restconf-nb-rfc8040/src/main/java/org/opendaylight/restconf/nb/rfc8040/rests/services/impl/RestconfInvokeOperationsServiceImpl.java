@@ -35,8 +35,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 @Path("/")
 public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
 
-    private RpcServiceHandler rpcServiceHandler;
-    private SchemaContextHandler schemaContextHandler;
+    private volatile RpcServiceHandler rpcServiceHandler;
+    private volatile SchemaContextHandler schemaContextHandler;
 
     public RestconfInvokeOperationsServiceImpl(final RpcServiceHandler rpcServiceHandler,
             final SchemaContextHandler schemaContextHandler) {
@@ -45,7 +45,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
     }
 
     @Override
-    public synchronized void updateHandlers(final Object... handlers) {
+    public void updateHandlers(final Object... handlers) {
         for (final Object object : handlers) {
             if (object instanceof SchemaContextHandler) {
                 schemaContextHandler = (SchemaContextHandler) object;
@@ -87,11 +87,12 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         final DOMRpcResult result = RestconfInvokeOperationsUtil.checkResponse(response);
 
         RpcDefinition resultNodeSchema = null;
-        final NormalizedNode<?, ?> resultData = result.getResult();
-        if ((result != null) && (result.getResult() != null)) {
+        NormalizedNode<?, ?> resultData = null;
+        if (result != null && result.getResult() != null) {
+            resultData = result.getResult();
             resultNodeSchema = (RpcDefinition) payload.getInstanceIdentifierContext().getSchemaNode();
         }
-        return new NormalizedNodeContext(new InstanceIdentifierContext<RpcDefinition>(null, resultNodeSchema,
+        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, resultNodeSchema,
                 mountPoint, schemaContextRef.get()), resultData);
     }
 }

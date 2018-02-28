@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.handlers;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 
 /**
@@ -17,8 +18,10 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
  */
 public class DOMMountPointServiceHandler implements Handler<DOMMountPointService> {
 
+    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
+    private static volatile DOMMountPointService actualDomMountPointService;
+
     private final DOMMountPointService domMountPointService;
-    private static DOMMountPointService actualDomMountPointService;
 
     /**
      * Prepare mount point service for Restconf services.
