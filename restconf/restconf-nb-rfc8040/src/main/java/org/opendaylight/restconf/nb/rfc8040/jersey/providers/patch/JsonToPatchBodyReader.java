@@ -8,6 +8,7 @@
 
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.stream.JsonReader;
@@ -16,8 +17,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -29,9 +32,9 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
+import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.codecs.StringModuleInstanceIdentifierCodec;
-import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -69,7 +72,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
 
     private PatchContext readFrom(final InstanceIdentifierContext<?> path, final InputStream entityStream)
             throws IOException {
-        final JsonReader jsonReader = new JsonReader(new InputStreamReader(entityStream));
+        final JsonReader jsonReader = new JsonReader(new InputStreamReader(entityStream, StandardCharsets.UTF_8));
         final List<PatchEntity> resultList = read(jsonReader, path);
         jsonReader.close();
 
@@ -82,7 +85,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
         try {
             return readFrom(
                     ParserIdentifier.toInstanceIdentifier(uriPath, SchemaContextHandler.getActualSchemaContext(),
-                            DOMMountPointServiceHandler.getActualMountPointService()), entityStream);
+                            Optional.of(RestConnectorProvider.getMountPointService())), entityStream);
         } catch (final Exception e) {
             propagateExceptionAs(e);
             return null; // no-op
@@ -211,7 +214,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
                     edit.setId(in.nextString());
                     break;
                 case "operation":
-                    edit.setOperation(PatchEditOperation.valueOf(in.nextString().toUpperCase()));
+                    edit.setOperation(PatchEditOperation.valueOf(in.nextString().toUpperCase(Locale.ROOT)));
                     break;
                 case "target":
                     // target can be specified completely in request URI

@@ -17,6 +17,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -92,7 +93,7 @@ public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
             DataSchemaNode schemaNode = (DataSchemaNode) pathContext.getSchemaNode();
             final Element element = (Element) editNodes.item(i);
             final String operation = element.getElementsByTagName("operation").item(0).getFirstChild().getNodeValue();
-            final PatchEditOperation oper = PatchEditOperation.valueOf(operation.toUpperCase());
+            final PatchEditOperation oper = PatchEditOperation.valueOf(operation.toUpperCase(Locale.ROOT));
             final String editId = element.getElementsByTagName("edit-id").item(0).getFirstChild().getNodeValue();
             final String target = element.getElementsByTagName("target").item(0).getFirstChild().getNodeValue();
             final List<Element> values = readValueNodes(element, oper);

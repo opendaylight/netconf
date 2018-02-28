@@ -12,6 +12,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -118,7 +119,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
         final Event event = new Event(EventType.NOTIFY);
         if (this.outputType.equals(NotificationOutputType.JSON)) {
             try {
-                final JsonNode node = new XmlMapper().readTree(xml.getBytes());
+                final JsonNode node = new XmlMapper().readTree(xml.getBytes(StandardCharsets.UTF_8));
                 event.setData(node.toString());
             } catch (final IOException e) {
                 LOG.error("Error parsing XML {}", xml, e);
@@ -312,8 +313,9 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
             writeIdentifierWithNamespacePrefix(element, textContent, pathArgument.getNodeType(), schemaContext);
             if (pathArgument instanceof NodeIdentifierWithPredicates) {
                 final Map<QName, Object> predicates = ((NodeIdentifierWithPredicates) pathArgument).getKeyValues();
-                for (final QName keyValue : predicates.keySet()) {
-                    final String predicateValue = String.valueOf(predicates.get(keyValue));
+                for (final Entry<QName, Object> entry : predicates.entrySet()) {
+                    final QName keyValue = entry.getKey();
+                    final String predicateValue = String.valueOf(entry.getValue());
                     textContent.append("[");
                     writeIdentifierWithNamespacePrefix(element, textContent, keyValue, schemaContext);
                     textContent.append("='");

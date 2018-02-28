@@ -11,9 +11,12 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.restconf.common.util.RestconfSchemaUtil;
@@ -136,8 +139,16 @@ public final class YangInstanceIdentifierDeserializer {
             DataSchemaNode leafSchemaNode = null;
             if (dataSchemaNode instanceof ListSchemaNode) {
                 leafSchemaNode = ((ListSchemaNode) dataSchemaNode).getDataChildByName(key);
+                if (leafSchemaNode == null) {
+                    throw new RestconfDocumentedException("Schema not found for " + key,
+                            RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+                }
             } else if (dataSchemaNode instanceof LeafListSchemaNode) {
                 leafSchemaNode = dataSchemaNode;
+            } else {
+                throw new RestconfDocumentedException("Unexpected schema type " + dataSchemaNode,
+                        RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+
             }
             final String value = findAndParsePercentEncoded(nextIdentifierFromNextSequence(
                     ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE, variables));
@@ -252,6 +263,7 @@ public final class YangInstanceIdentifierDeserializer {
 
         switch (currentChar(variables.getOffset(), variables.getData())) {
             case RestconfConstants.SLASH:
+            case ParserBuilderConstants.Deserializer.EQUAL:
                 prefix = preparedPrefix;
                 return getQNameOfDataSchemaNode(prefix, variables);
             case ParserBuilderConstants.Deserializer.COLON:
@@ -272,9 +284,6 @@ public final class YangInstanceIdentifierDeserializer {
                     Preconditions.checkArgument(module != null, "Failed to lookup prefix %s", prefix);
                     return QName.create(module.getQNameModule(), localName);
                 }
-            case ParserBuilderConstants.Deserializer.EQUAL:
-                prefix = preparedPrefix;
-                return getQNameOfDataSchemaNode(prefix, variables);
             default:
                 throw new IllegalArgumentException("Failed build path.");
         }
@@ -321,15 +330,18 @@ public final class YangInstanceIdentifierDeserializer {
                 variables.getData(), variables.getOffset());
     }
 
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH") // code does check for null 'current' but FB doesn't recognize it
     private static DataSchemaContextNode<?> nextContextNode(final QName qname, final List<PathArgument> path,
             final MainVarsWrapper variables) {
         variables.setCurrent(variables.getCurrent().getChild(qname));
         DataSchemaContextNode<?> current = variables.getCurrent();
         if (current == null) {
-            for (final RpcDefinition rpcDefinition : variables.getSchemaContext()
-                    .findModule(qname.getModule()).orElse(null).getRpcs()) {
-                if (rpcDefinition.getQName().getLocalName().equals(qname.getLocalName())) {
-                    return null;
+            final Optional<Module> module = variables.getSchemaContext().findModule(qname.getModule());
+            if (module.isPresent()) {
+                for (final RpcDefinition rpcDefinition : module.get().getRpcs()) {
+                    if (rpcDefinition.getQName().getLocalName().equals(qname.getLocalName())) {
+                        return null;
+                    }
                 }
             }
         }

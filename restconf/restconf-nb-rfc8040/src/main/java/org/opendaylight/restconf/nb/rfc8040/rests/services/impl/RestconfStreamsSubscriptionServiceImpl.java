@@ -115,7 +115,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     /**
      * Holder of all handlers for notifications.
      */
-    public final class HandlersHolder {
+    public static final class HandlersHolder {
 
         private final DOMDataBrokerHandler domDataBrokerHandler;
         private final NotificationServiceHandler notificationServiceHandler;

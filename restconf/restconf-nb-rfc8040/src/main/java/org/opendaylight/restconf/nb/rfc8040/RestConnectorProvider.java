@@ -11,6 +11,7 @@ package org.opendaylight.restconf.nb.rfc8040;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Set;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
@@ -56,9 +57,12 @@ public class RestConnectorProvider<T extends ServiceWrapper> implements Restconf
         }
     };
 
-    private static TransactionChainHandler transactionChainHandler;
-    private static DOMDataBroker dataBroker;
-    private static DOMMountPointServiceHandler mountPointServiceHandler;
+    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
+    private static volatile TransactionChainHandler transactionChainHandler;
+    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
+    private static volatile DOMDataBroker dataBroker;
+    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
+    private static volatile DOMMountPointServiceHandler mountPointServiceHandler;
 
     private final DOMRpcService rpcService;
     private final DOMNotificationService notificationService;

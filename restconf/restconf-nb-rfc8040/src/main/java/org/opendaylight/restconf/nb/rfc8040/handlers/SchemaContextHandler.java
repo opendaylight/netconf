@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
 import com.google.common.base.Preconditions;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
@@ -36,9 +37,11 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);
 
+    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
+    private static volatile SchemaContext actualSchemaContext;
+
     private final TransactionChainHandler transactionChainHandler;
-    private SchemaContext context;
-    private static SchemaContext actualSchemaContext;
+    private volatile SchemaContext context;
 
     private int moduleSetId;
 
@@ -57,7 +60,6 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
     @SuppressWarnings("checkstyle:hiddenField")
     public void onGlobalContextUpdated(final SchemaContext context) {
         Preconditions.checkNotNull(context);
-        this.context = null;
         this.context = context;
 
         actualSchemaContext = context;
