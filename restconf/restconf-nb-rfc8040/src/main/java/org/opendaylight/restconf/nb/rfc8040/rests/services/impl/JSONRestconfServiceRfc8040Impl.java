@@ -171,7 +171,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
             if (outputContext.getData() != null) {
                 output = toJson(outputContext);
             }
-        } catch (final Exception e) {
+        } catch (RuntimeException | IOException e) {
             propagateExceptionAs(uriPath, e, "RPC");
         }
 
@@ -212,7 +212,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
     private NormalizedNodeContext toNormalizedNodeContext(final String uriPath, @Nullable final String payload,
             final boolean isPost) throws OperationFailedException {
         final InstanceIdentifierContext<?> instanceIdentifierContext = ParserIdentifier.toInstanceIdentifier(
-                uriPath, SchemaContextHandler.getActualSchemaContext(),
+                uriPath, SchemaContextHandler.getSchemaContext(),
                 Optional.of(mountPointServiceHandler.get()));
 
         if (payload == null) {

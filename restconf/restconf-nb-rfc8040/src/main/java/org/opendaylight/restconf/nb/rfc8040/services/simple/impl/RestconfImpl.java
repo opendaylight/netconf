@@ -27,7 +27,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 @Path("/")
 public class RestconfImpl implements RestconfService {
 
-    private SchemaContextHandler schemaContextHandler;
+    private volatile SchemaContextHandler schemaContextHandler;
 
     public RestconfImpl(final SchemaContextHandler schemaContextHandler) {
         this.schemaContextHandler = schemaContextHandler;

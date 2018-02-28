@@ -128,7 +128,7 @@ public final class CreateStreamUtil {
      */
     private static NotificationOutputType prepareOutputType(final ContainerNode data) {
         NotificationOutputType outputType = parseEnum(data, NotificationOutputType.class, OUTPUT_TYPE_PARAM_NAME);
-        return outputType = outputType == null ? NotificationOutputType.XML : outputType;
+        return outputType == null ? NotificationOutputType.XML : outputType;
     }
 
     private static String prepareDataChangeNotifiStreamName(final YangInstanceIdentifier path,
