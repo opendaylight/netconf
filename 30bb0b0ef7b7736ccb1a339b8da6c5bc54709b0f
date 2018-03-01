@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb7d77f_5c53d2ac",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/DOMMountPointServiceHandler.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-01T13:38:00Z",
+      "side": 0,
+      "message": "Not sure why this was also stored statically but it doesn\u0027t need to be and avoids FB violation.",
+      "revId": "30bb0b0ef7b7736ccb1a339b8da6c5bc54709b0f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a32d44e5_906fc888",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-01T13:38:00Z",
+      "side": 0,
+      "message": "The naming of \"actual\" wasn\u0027t clear to me and it was also confusing that the 2 vars could diverge via setActualSchemaContext which doesn\u0027t seem right. Therefore, retain only the static to simplify.",
+      "revId": "30bb0b0ef7b7736ccb1a339b8da6c5bc54709b0f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5b451f13_2df05c28",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-01T13:38:00Z",
+      "side": 0,
+      "message": "Method uses the same code for two switch clauses.",
+      "revId": "30bb0b0ef7b7736ccb1a339b8da6c5bc54709b0f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "faa65484_6893b83a",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-01T13:38:00Z",
+      "side": 0,
+      "message": "This would cause an NPE.",
+      "range": {
+        "startLine": 330,
+        "startChar": 50,
+        "endLine": 330,
+        "endChar": 63
+      },
+      "revId": "30bb0b0ef7b7736ccb1a339b8da6c5bc54709b0f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}

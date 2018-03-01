@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fe832ecb_a462d37f",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/RestConnectorProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-01T13:38:00Z",
+      "side": 1,
+      "message": "Unfortunately it looks like these statics are necessary for now until we can migrate away from the war file.",
+      "revId": "69b2112b749af88ce1e9010cff99b0c62e8c68d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fb9a7fc_fadb8d1e",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/codecs/RestCodec.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-01T13:38:00Z",
+      "side": 1,
+      "message": "\"Method uses the same code for two branches\" - I\u0027m guessing that this branch should pass the mount point\u0027s SchemaContext.",
+      "revId": "69b2112b749af88ce1e9010cff99b0c62e8c68d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c487b5e9_c67e8108",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-01T13:38:00Z",
+      "side": 1,
+      "message": "Added these branches to eliminate \"Method call passes null for non-null parameter\" violation for leafSchemaNode passed to prepareValueByType which doesn\u0027t expect null. \n\nThe instanceof checks don\u0027t match line 111 which blindly casts dataSchemaNode to ListSchemaNode. I\u0027m not sure if line 111 is actually correct but I kept it as is for now - this can be addressed in another  patch.",
+      "revId": "69b2112b749af88ce1e9010cff99b0c62e8c68d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
