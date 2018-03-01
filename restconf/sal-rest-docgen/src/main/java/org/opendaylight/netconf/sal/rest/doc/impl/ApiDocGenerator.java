@@ -31,6 +31,7 @@ public class ApiDocGenerator extends BaseYangSwaggerGenerator {
     }
 
     public ApiDeclaration getApiDeclaration(final String module, final String revision, final UriInfo uriInfo) {
+        Preconditions.checkState(schemaService != null);
         final SchemaContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
         return super.getApiDeclaration(module, revision, uriInfo, schemaContext, "");
@@ -41,10 +42,6 @@ public class ApiDocGenerator extends BaseYangSwaggerGenerator {
      */
     public static ApiDocGenerator getInstance() {
         return INSTANCE;
-    }
-
-    public void setDraft(final boolean newDraft) {
-        super.setDraft(newDraft);
     }
 
     public void setSchemaService(final SchemaService schemaService) {

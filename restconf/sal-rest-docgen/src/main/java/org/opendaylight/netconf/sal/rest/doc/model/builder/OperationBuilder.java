@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.model.builder;
 
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Operation;
@@ -22,12 +23,7 @@ public final class OperationBuilder {
     public static final String CONFIG = "(config)";
     public static final String TOP = "-TOP";
 
-    public static final List<String> CONSUMES_PUT_POST = new ArrayList<>();
-
-    static {
-        CONSUMES_PUT_POST.add("application/json");
-        CONSUMES_PUT_POST.add("application/xml");
-    }
+    public static final List<String> CONSUMES_PUT_POST = ImmutableList.of("application/json", "application/xml");
 
     private OperationBuilder() {
 

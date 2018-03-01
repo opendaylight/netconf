@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.sal.rest.doc.mountpoints;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -39,7 +40,6 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
 
     private static final String DATASTORES_REVISION = "-";
     private static final String DATASTORES_LABEL = "Datastores";
-    private static final String RESTCONF_DRAFT = "18";
     private static final AtomicReference<MountPointSwagger> SELF_REF = new AtomicReference<>();
 
     private DOMMountPointService mountService;
@@ -51,9 +51,9 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
 
     private final AtomicLong idKey = new AtomicLong(0);
     private SchemaService globalSchema;
-    private static boolean newDraft;
 
     public Map<String, Long> getInstanceIdentifiers() {
+        Preconditions.checkState(globalSchema != null);
         final Map<String, Long> urlToId = new HashMap<>();
         synchronized (this.lock) {
             final SchemaContext context = this.globalSchema.getGlobalContext();
@@ -90,7 +90,7 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
             if (arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates) {
                 final NodeIdentifierWithPredicates nodeId = (NodeIdentifierWithPredicates) arg;
                 for (final Entry<QName, Object> entry : nodeId.getKeyValues().entrySet()) {
-                    if (newDraft) {
+                    if (isNewDraft()) {
                         builder.deleteCharAt(builder.length() - 1).append("=").append(entry.getValue()).append('/');
                     } else {
                         builder.append(entry.getValue()).append('/');
@@ -104,6 +104,7 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
     }
 
     private String getYangMountUrl(final YangInstanceIdentifier key) {
+        Preconditions.checkState(globalSchema != null);
         final String modName = findModuleName(key, this.globalSchema.getGlobalContext());
         return generateUrlPrefixFromInstanceID(key, modName) + "yang-ext:mount";
     }
@@ -143,6 +144,7 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
             return null;
         }
 
+        Preconditions.checkState(mountService != null);
         final Optional<DOMMountPoint> mountPoint = this.mountService.getMountPoint(id);
         if (!mountPoint.isPresent()) {
             return null;
@@ -224,7 +226,8 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
             SELF_REF.compareAndSet(null, new MountPointSwagger());
             swagger = SELF_REF.get();
         }
-        newDraft = false;
+
+        swagger.setDraft(false);
         return swagger;
     }
 
@@ -234,7 +237,8 @@ public class MountPointSwagger extends BaseYangSwaggerGenerator implements Mount
             SELF_REF.compareAndSet(null, new MountPointSwagger());
             swagger = SELF_REF.get();
         }
-        newDraft = true;
+
+        swagger.setDraft(true);
         return swagger;
     }
 }
