@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.rest.doc.maven;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -30,20 +31,20 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang2sources.spi.BasicCodeGenerator;
 import org.opendaylight.yangtools.yang2sources.spi.MavenProjectAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class gathers all yang defined {@link Module}s and generates Swagger compliant documentation.
  */
 public class StaticDocGenerator extends ApiDocGenerator implements BasicCodeGenerator, MavenProjectAware {
+    private static final Logger LOG = LoggerFactory.getLogger(StaticDocGenerator.class);
+
     private static final String DEFAULT_OUTPUT_BASE_DIR_PATH = "target" + File.separator + "generated-resources"
         + File.separator + "swagger-api-documentation";
 
-    private MavenProject mavenProject;
-    private File projectBaseDir;
-    private Map<String, String> additionalConfig;
-    private File resourceBaseDir;
-
     @Override
+    @SuppressFBWarnings("DM_DEFAULT_ENCODING")
     public Collection<File> generateSources(final SchemaContext context, final File outputBaseDir,
             final Set<Module> currentModules, final Function<Module, Optional<String>> moduleResourcePathResolver)
                     throws IOException {
@@ -56,48 +57,58 @@ public class StaticDocGenerator extends ApiDocGenerator implements BasicCodeGene
         } else {
             outputDir = outputBaseDir;
         }
-        outputDir.mkdirs();
+
+        if (!outputDir.mkdirs()) {
+            throw new IOException("Could not create directory " + outputDir);
+        }
 
         // Create Resources directory
         File resourcesDir = new File(outputDir, "resources");
-        resourcesDir.mkdirs();
+        if (!resourcesDir.mkdirs()) {
+            throw new IOException("Could not create directory " + resourcesDir);
+        }
 
         // Create JS file
         File resourcesJsFile = new File(outputDir, "resources.js");
-        resourcesJsFile.createNewFile();
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(resourcesJsFile));
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-
-        // Write resource listing to JS file
-        ResourceList resourceList = super.getResourceListing(null, context, "");
-        String resourceListJson = mapper.writeValueAsString(resourceList);
-        resourceListJson = resourceListJson.replace("\'", "\\\'").replace("\\n", "\\\\n");
-        bufferedWriter.write("function getSpec() {\n\treturn \'" + resourceListJson + "\';\n}\n\n");
-
-        // Write resources/APIs to JS file and to disk
-        bufferedWriter.write("function jsonFor(resource) {\n\tswitch(resource) {\n");
-        for (Resource resource : resourceList.getApis()) {
-            int revisionIndex = resource.getPath().indexOf('(');
-            String name = resource.getPath().substring(0, revisionIndex);
-            String revision = resource.getPath().substring(revisionIndex + 1, resource.getPath().length() - 1);
-            ApiDeclaration apiDeclaration = super.getApiDeclaration(name, revision, null, context, "");
-            String json = mapper.writeValueAsString(apiDeclaration);
-            // Manually insert models because org.json.JSONObject cannot be serialized by ObjectMapper
-            json = json.replace(
-                "\"models\":{}", "\"models\":" + apiDeclaration.getModels().toString().replace("\\\"", "\""));
-            // Escape single quotes and new lines
-            json = json.replace("\'", "\\\'").replace("\\n", "\\\\n");
-            bufferedWriter.write("\t\tcase \"" + name + "(" + revision + ")\": return \'" + json + "\';\n");
-
-            File resourceFile = new File(resourcesDir, name + "(" + revision + ").json");
-            BufferedWriter resourceFileWriter = new BufferedWriter(new FileWriter(resourceFile));
-            resourceFileWriter.write(json);
-            resourceFileWriter.close();
-            result.add(resourceFile);
+        if (!resourcesJsFile.createNewFile()) {
+            LOG.info("File " + resourcesJsFile + " already exists.");
         }
-        bufferedWriter.write("\t}\n\treturn \"\";\n}");
-        bufferedWriter.close();
+
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(resourcesJsFile))) {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+
+            // Write resource listing to JS file
+            ResourceList resourceList = super.getResourceListing(null, context, "");
+            String resourceListJson = mapper.writeValueAsString(resourceList);
+            resourceListJson = resourceListJson.replace("\'", "\\\'").replace("\\n", "\\\\n");
+            bufferedWriter.write("function getSpec() {\n\treturn \'" + resourceListJson + "\';\n}\n\n");
+
+            // Write resources/APIs to JS file and to disk
+            bufferedWriter.write("function jsonFor(resource) {\n\tswitch(resource) {\n");
+            for (Resource resource : resourceList.getApis()) {
+                int revisionIndex = resource.getPath().indexOf('(');
+                String name = resource.getPath().substring(0, revisionIndex);
+                String revision = resource.getPath().substring(revisionIndex + 1, resource.getPath().length() - 1);
+                ApiDeclaration apiDeclaration = super.getApiDeclaration(name, revision, null, context, "");
+                String json = mapper.writeValueAsString(apiDeclaration);
+                // Manually insert models because org.json.JSONObject cannot be serialized by ObjectMapper
+                json = json.replace(
+                        "\"models\":{}", "\"models\":" + apiDeclaration.getModels().toString().replace("\\\"", "\""));
+                // Escape single quotes and new lines
+                json = json.replace("\'", "\\\'").replace("\\n", "\\\\n");
+                bufferedWriter.write("\t\tcase \"" + name + "(" + revision + ")\": return \'" + json + "\';\n");
+
+                File resourceFile = new File(resourcesDir, name + "(" + revision + ").json");
+
+                try (BufferedWriter resourceFileWriter = new BufferedWriter(new FileWriter(resourceFile))) {
+                    resourceFileWriter.write(json);
+                }
+
+                result.add(resourceFile);
+            }
+            bufferedWriter.write("\t}\n\treturn \"\";\n}");
+        }
 
         result.add(resourcesJsFile);
         return result;
@@ -121,17 +132,13 @@ public class StaticDocGenerator extends ApiDocGenerator implements BasicCodeGene
 
     @Override
     public void setAdditionalConfig(final Map<String, String> additionalConfig) {
-        this.additionalConfig = additionalConfig;
     }
 
     @Override
     public void setResourceBaseDir(final File resourceBaseDir) {
-        this.resourceBaseDir = resourceBaseDir;
     }
 
     @Override
     public void setMavenProject(final MavenProject mavenProject) {
-        this.mavenProject = mavenProject;
-        this.projectBaseDir = mavenProject.getBasedir();
     }
 }
