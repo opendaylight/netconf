@@ -10,7 +10,9 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
 import javax.ws.rs.core.Response;
@@ -82,7 +84,6 @@ public class ApiDocServiceImpl implements ApiDocService {
         return Response.seeOther(uriInfo.getBaseUriBuilder().path("../explorer/index.html").build()).build();
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public synchronized Response getListOfMounts(final UriInfo uriInfo) {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -98,10 +99,16 @@ public class ApiDocServiceImpl implements ApiDocService {
             }
             writer.writeEndArray();
             writer.flush();
-        } catch (final Exception e) {
-            return Response.status(500).entity(e.getMessage()).build();
+        } catch (IOException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
-        return Response.status(200).entity(baos.toString()).build();
+
+        try {
+            String responseStr = baos.toString(StandardCharsets.UTF_8.name());
+            return Response.status(Response.Status.OK).entity(responseStr).build();
+        } catch (UnsupportedEncodingException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
     }
 
     @Override

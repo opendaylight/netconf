@@ -42,7 +42,6 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -64,7 +63,7 @@ public class BaseYangSwaggerGenerator {
 
     // private Map<String, ApiDeclaration> MODULE_DOC_CACHE = new HashMap<>()
     private final ObjectMapper mapper = new ObjectMapper();
-    private static boolean newDraft;
+    private volatile boolean newDraft;
 
     protected BaseYangSwaggerGenerator() {
         this.mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
@@ -230,7 +229,7 @@ public class BaseYangSwaggerGenerator {
         return null;
     }
 
-    private static void addRootPostLink(final Module module, final DataNodeContainer node,
+    private void addRootPostLink(final Module module, final DataNodeContainer node,
             final List<Parameter> pathParams, final String resourcePath, final String dataStore, final List<Api> apis) {
         if (containsListOrContainer(module.getChildNodes())) {
             final Api apiForRootPostUri = new Api();
@@ -295,7 +294,7 @@ public class BaseYangSwaggerGenerator {
         }
     }
 
-    protected static String getContent(final String dataStore) {
+    protected String getContent(final String dataStore) {
         if (newDraft) {
             if ("operational".contains(dataStore)) {
                 return "?content=nonconfig";
@@ -352,9 +351,8 @@ public class BaseYangSwaggerGenerator {
         return operations;
     }
 
-    private static String createPath(final DataSchemaNode schemaNode, final List<Parameter> pathParams,
+    private String createPath(final DataSchemaNode schemaNode, final List<Parameter> pathParams,
             final SchemaContext schemaContext) {
-        final ArrayList<LeafSchemaNode> pathListParams = new ArrayList<>();
         final StringBuilder path = new StringBuilder();
         final String localName = resolvePathArgumentsName(schemaNode, schemaContext);
         path.append(localName);
@@ -368,7 +366,6 @@ public class BaseYangSwaggerGenerator {
 
             for (final QName listKey : listKeys) {
                 final DataSchemaNode dataChildByName = ((DataNodeContainer) schemaNode).getDataChildByName(listKey);
-                pathListParams.add((LeafSchemaNode) dataChildByName);
                 final String pathParamIdentifier;
                 if (newDraft) {
                     pathParamIdentifier = keyBuilder.append("{").append(listKey.getLocalName()).append("}").toString();
@@ -444,6 +441,10 @@ public class BaseYangSwaggerGenerator {
     }
 
     public void setDraft(final boolean draft) {
-        BaseYangSwaggerGenerator.newDraft = draft;
+        this.newDraft = draft;
+    }
+
+    protected boolean isNewDraft() {
+        return newDraft;
     }
 }
