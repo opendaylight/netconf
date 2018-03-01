@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0775f1a6_d61870cb",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2018-03-01T13:16:41Z",
+      "side": 1,
+      "message": "Ah, that\u0027s a different issue than the one mentioned in the commit message. It\u0027s a nice to fix because the missingListener exception has been there for ages when the Netconf session bounces (if I\u0027m understanding this fix correctly, it\u0027 fixing the \"Unable to reconnect, session listener is missing\"). Do you mind having this in a seperated patch. And maybe create a ticket with the stacktrace so people can related to this when googling.",
+      "range": {
+        "startLine": 215,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 77
+      },
+      "revId": "98f13cd5ddd47eb2f4a96c4ce7dc2ac0e514877f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "512f81b6_39007b97",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2018-03-01T13:16:41Z",
+      "side": 1,
+      "message": "Is this really adding value? isn\u0027t isSessionClosing enough? It makes sense to have this, I\u0027m just trying to see if we can avoid non-necessary condition",
+      "range": {
+        "startLine": 165,
+        "startChar": 74,
+        "endLine": 165,
+        "endChar": 91
+      },
+      "revId": "98f13cd5ddd47eb2f4a96c4ce7dc2ac0e514877f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "397e7745_20140eea",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2018-03-01T13:16:41Z",
+      "side": 1,
+      "message": "please adjust the comment, now this method won\u0027t schedule every x times, the executor will.",
+      "range": {
+        "startLine": 141,
+        "startChar": 23,
+        "endLine": 141,
+        "endChar": 51
+      },
+      "revId": "98f13cd5ddd47eb2f4a96c4ce7dc2ac0e514877f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60370c5d_369ad53c",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2018-03-01T13:16:41Z",
+      "side": 1,
+      "message": "no need to keep this, please remove.",
+      "range": {
+        "startLine": 182,
+        "startChar": 0,
+        "endLine": 186,
+        "endChar": 9
+      },
+      "revId": "98f13cd5ddd47eb2f4a96c4ce7dc2ac0e514877f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
