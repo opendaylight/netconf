@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3e97e42f_28a4144e",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 630,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2018-03-02T06:25:13Z",
+      "side": 1,
+      "message": "can it be configurable ?",
+      "range": {
+        "startLine": 628,
+        "startChar": 0,
+        "endLine": 630,
+        "endChar": 46
+      },
+      "revId": "86d8386b01371d126b8f389f4e13cb2c73d55c97",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
