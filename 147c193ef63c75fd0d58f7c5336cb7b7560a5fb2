@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5507903d_054f4265",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2018-03-02T14:56:14Z",
+      "side": 1,
+      "message": "I see this is done on L27 as well.  Are you using checkState instead of checkNotNull because schemaService is injected via BP?  Seems strange to not use checkNotNull but I could be incorrect.",
+      "range": {
+        "startLine": 34,
+        "startChar": 8,
+        "endLine": 34,
+        "endChar": 56
+      },
+      "revId": "147c193ef63c75fd0d58f7c5336cb7b7560a5fb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
