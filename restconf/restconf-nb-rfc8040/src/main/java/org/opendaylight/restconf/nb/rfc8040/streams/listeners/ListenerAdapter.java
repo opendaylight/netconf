@@ -7,19 +7,16 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataChangeEvent;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
+import org.json.XML;
+import org.opendaylight.controller.md.sal.dom.api.ClusteredDOMDataTreeChangeListener;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -30,6 +27,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
+import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidateNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -44,15 +43,13 @@ import org.w3c.dom.Node;
  * {@link ListenerAdapter} is responsible to track events, which occurred by
  * changing data in data source.
  */
-public class ListenerAdapter extends AbstractCommonSubscriber implements DOMDataChangeListener {
+public class ListenerAdapter extends AbstractCommonSubscriber implements ClusteredDOMDataTreeChangeListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(ListenerAdapter.class);
 
     private final YangInstanceIdentifier path;
     private final String streamName;
     private final NotificationOutputType outputType;
-
-    private AsyncDataChangeEvent<YangInstanceIdentifier, NormalizedNode<?, ?>> change;
 
     /**
      * Creates new {@link ListenerAdapter} listener specified by path and stream
@@ -77,10 +74,8 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
     }
 
     @Override
-    @SuppressWarnings("checkstyle:hiddenField")
-    public void onDataChanged(final AsyncDataChangeEvent<YangInstanceIdentifier, NormalizedNode<?, ?>> change) {
-        this.change = change;
-        final String xml = prepareXml();
+    public void onDataTreeChanged(final Collection<DataTreeCandidate> dataTreeCandidates) {
+        final String xml = prepareXml(dataTreeCandidates);
         if (checkQueryParams(xml, this)) {
             prepareAndPostData(xml);
         }
@@ -118,13 +113,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
     private void prepareAndPostData(final String xml) {
         final Event event = new Event(EventType.NOTIFY);
         if (this.outputType.equals(NotificationOutputType.JSON)) {
-            try {
-                final JsonNode node = new XmlMapper().readTree(xml.getBytes(StandardCharsets.UTF_8));
-                event.setData(node.toString());
-            } catch (final IOException e) {
-                LOG.error("Error parsing XML {}", xml, e);
-                Throwables.propagate(e);
-            }
+            event.setData(XML.toJSONObject(xml).toString());
         } else {
             event.setData(xml);
         }
@@ -138,9 +127,11 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
     /**
      * Prepare data in printable form and transform it to String.
      *
+     * @param dataTreeCandidates the DataTreeCandidates to transform
+     *
      * @return Data in printable form.
      */
-    private String prepareXml() {
+    private String prepareXml(final Collection<DataTreeCandidate> dataTreeCandidates) {
         final SchemaContext schemaContext = schemaHandler.get();
         final DataSchemaContextTree dataContextTree = DataSchemaContextTree.from(schemaContext);
         final Document doc = createDocument();
@@ -149,7 +140,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
         final Element dataChangedNotificationEventElement = doc.createElementNS(
                 "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "data-changed-notification");
 
-        addValuesToDataChangedNotificationEventElement(doc, dataChangedNotificationEventElement, this.change,
+        addValuesToDataChangedNotificationEventElement(doc, dataChangedNotificationEventElement, dataTreeCandidates,
                 schemaContext, dataContextTree);
         notificationElement.appendChild(dataChangedNotificationEventElement);
         return transformDoc(doc);
@@ -157,74 +148,82 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
 
     /**
      * Adds values to data changed notification event element.
-     *
-     * @param doc
-     *            {@link Document}
-     * @param dataChangedNotificationEventElement
-     *            {@link Element}
-     * @param change
-     *            {@link AsyncDataChangeEvent}
      */
     @SuppressWarnings("checkstyle:hiddenField")
     private void addValuesToDataChangedNotificationEventElement(final Document doc,
             final Element dataChangedNotificationEventElement,
-            final AsyncDataChangeEvent<YangInstanceIdentifier, NormalizedNode<?, ?>> change,
+            final Collection<DataTreeCandidate> dataTreeCandidates,
             final SchemaContext schemaContext, final DataSchemaContextTree dataSchemaContextTree) {
 
-        addCreatedChangedValuesFromDataToElement(doc, change.getCreatedData().entrySet(),
-                dataChangedNotificationEventElement, Operation.CREATED, schemaContext, dataSchemaContextTree);
-
-        addCreatedChangedValuesFromDataToElement(doc, change.getUpdatedData().entrySet(),
-                dataChangedNotificationEventElement, Operation.UPDATED, schemaContext, dataSchemaContextTree);
-
-        addValuesFromDataToElement(doc, change.getRemovedPaths(), dataChangedNotificationEventElement,
-                Operation.DELETED, schemaContext, dataSchemaContextTree);
-    }
-
-    /**
-     * Adds values from data to element.
-     *
-     * @param doc
-     *            {@link Document}
-     * @param data
-     *            Set of {@link YangInstanceIdentifier}.
-     * @param element
-     *            {@link Element}
-     * @param operation
-     *            {@link Operation}
-     * @param schemaContext
-     *            schema context
-     * @param dataSchemaContextTree
-     *            data schema context tree
-     */
-    private void addValuesFromDataToElement(final Document doc, final Set<YangInstanceIdentifier> data,
-            final Element element, final Operation operation, final SchemaContext schemaContext,
-            final DataSchemaContextTree dataSchemaContextTree) {
-        if (data == null || data.isEmpty()) {
-            return;
-        }
-        for (final YangInstanceIdentifier yiid : data) {
-            if (!dataSchemaContextTree.getChild(yiid).isMixin()) {
-                final Node node = createDataChangeEventElement(doc, yiid, operation, schemaContext);
-                element.appendChild(node);
+        for (DataTreeCandidate dataTreeCandidate : dataTreeCandidates) {
+            DataTreeCandidateNode candidateNode = dataTreeCandidate.getRootNode();
+            if (candidateNode == null) {
+                continue;
             }
+            YangInstanceIdentifier yiid = dataTreeCandidate.getRootPath();
+            addNodeToDataChangeNotificationEventElement(doc, dataChangedNotificationEventElement, candidateNode,
+                    yiid.getParent(), schemaContext, dataSchemaContextTree);
         }
     }
 
-    private void addCreatedChangedValuesFromDataToElement(final Document doc,
-            final Set<Entry<YangInstanceIdentifier, NormalizedNode<?, ?>>> data, final Element element,
-            final Operation operation, final SchemaContext schemaContext,
+    private void addNodeToDataChangeNotificationEventElement(final Document doc,
+            final Element dataChangedNotificationEventElement, final DataTreeCandidateNode candidateNode,
+            final YangInstanceIdentifier parentYiid, final SchemaContext schemaContext,
             final DataSchemaContextTree dataSchemaContextTree) {
-        if (data == null || data.isEmpty()) {
+
+        Optional<NormalizedNode<?,?>> optionalNormalizedNode = Optional.empty();
+        switch (candidateNode.getModificationType()) {
+            case APPEARED:
+            case SUBTREE_MODIFIED:
+            case WRITE:
+                optionalNormalizedNode = candidateNode.getDataAfter();
+                break;
+            case DELETE:
+            case DISAPPEARED:
+                optionalNormalizedNode = candidateNode.getDataBefore();
+                break;
+            case UNMODIFIED:
+            default:
+                break;
+        }
+
+        if (!optionalNormalizedNode.isPresent()) {
+            LOG.error("No node present in notification for {}", candidateNode);
             return;
         }
-        for (final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry : data) {
-            if (!dataSchemaContextTree.getChild(entry.getKey()).isMixin()
-                    && (!getLeafNodesOnly() || entry.getValue() instanceof LeafNode)) {
-                final Node node = createCreatedChangedDataChangeEventElement(doc, entry, operation, schemaContext,
-                        dataSchemaContextTree);
-                element.appendChild(node);
+
+        NormalizedNode<?,?> normalizedNode = optionalNormalizedNode.get();
+        YangInstanceIdentifier yiid = YangInstanceIdentifier.builder(parentYiid)
+                                                            .append(normalizedNode.getIdentifier()).build();
+
+        boolean isNodeMixin = dataSchemaContextTree.getChild(yiid).isMixin();
+        boolean isSkippedNonLeaf = getLeafNodesOnly() && !(normalizedNode instanceof LeafNode);
+        if (!isNodeMixin && !isSkippedNonLeaf) {
+            Node node = null;
+            switch (candidateNode.getModificationType()) {
+                case APPEARED:
+                case SUBTREE_MODIFIED:
+                case WRITE:
+                    Operation op = candidateNode.getDataBefore().isPresent() ? Operation.UPDATED : Operation.CREATED;
+                    node = createCreatedChangedDataChangeEventElement(doc, yiid, normalizedNode, op,
+                            schemaContext, dataSchemaContextTree);
+                    break;
+                case DELETE:
+                case DISAPPEARED:
+                    node = createDataChangeEventElement(doc, yiid, Operation.DELETED, schemaContext);
+                    break;
+                case UNMODIFIED:
+                default:
+                    break;
             }
+            if (node != null) {
+                dataChangedNotificationEventElement.appendChild(node);
+            }
+        }
+
+        for (DataTreeCandidateNode childNode : candidateNode.getChildNodes()) {
+            addNodeToDataChangeNotificationEventElement(doc, dataChangedNotificationEventElement, childNode,
+                                                                        yiid, schemaContext, dataSchemaContextTree);
         }
     }
 
@@ -256,11 +255,10 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
     }
 
     private Node createCreatedChangedDataChangeEventElement(final Document doc,
-            final Entry<YangInstanceIdentifier, NormalizedNode<?, ?>> entry, final Operation operation,
+            final YangInstanceIdentifier eventPath, NormalizedNode<?, ?> normalized, final Operation operation,
             final SchemaContext schemaContext, final DataSchemaContextTree dataSchemaContextTree) {
         final Element dataChangeEventElement = doc.createElement("data-change-event");
         final Element pathElement = doc.createElement("path");
-        final YangInstanceIdentifier eventPath = entry.getKey();
         addPathAsValueToElement(eventPath, pathElement, schemaContext);
         dataChangeEventElement.appendChild(pathElement);
 
@@ -270,7 +268,6 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements DOMData
 
         try {
             SchemaPath nodePath;
-            final NormalizedNode<?, ?> normalized = entry.getValue();
             if (normalized instanceof MapEntryNode || normalized instanceof UnkeyedListEntryNode) {
                 nodePath = dataSchemaContextTree.getChild(eventPath).getDataSchemaNode().getPath();
             } else {

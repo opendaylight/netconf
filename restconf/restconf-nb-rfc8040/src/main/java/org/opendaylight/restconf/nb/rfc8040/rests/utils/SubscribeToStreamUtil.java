@@ -28,8 +28,9 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -324,16 +325,21 @@ public final class SubscribeToStreamUtil {
      * @param domDataBroker
      *             data broker for register data change listener
      */
-    @SuppressWarnings("deprecation")
     private static void registration(final LogicalDatastoreType ds, final DataChangeScope scope,
             final ListenerAdapter listener, final DOMDataBroker domDataBroker) {
         if (listener.isListening()) {
             return;
         }
 
-        final YangInstanceIdentifier path = listener.getPath();
-        final ListenerRegistration<DOMDataChangeListener> registration =
-                domDataBroker.registerDataChangeListener(ds, path, listener, scope);
+        final DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)domDataBroker.getSupportedExtensions()
+                .get(DOMDataTreeChangeService.class);
+        if (changeService == null) {
+            throw new UnsupportedOperationException("DOMDataBroker does not support the DOMDataTreeChangeService");
+        }
+
+        final DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(ds, listener.getPath());
+        final ListenerRegistration<ListenerAdapter> registration =
+                                    changeService.registerDataTreeChangeListener(root, listener);
 
         listener.setRegistration(registration);
     }
