@@ -17,6 +17,7 @@ import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,8 +38,8 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -98,9 +99,16 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         this.schemaHandler = new SchemaContextHandler(txHandler);
 
         final DOMDataBroker dataBroker = mock(DOMDataBroker.class);
-        final ListenerRegistration<DOMDataChangeListener> listener = mock(ListenerRegistration.class);
+
+        DOMDataTreeChangeService dataTreeChangeService = Mockito.mock(DOMDataTreeChangeService.class);
+        doReturn(mock(ListenerRegistration.class)).when(dataTreeChangeService)
+                .registerDataTreeChangeListener(any(), any());
+
+        doReturn(Collections.singletonMap(DOMDataTreeChangeService.class, dataTreeChangeService))
+                .when(dataBroker).getSupportedExtensions();
+
         doReturn(dataBroker).when(this.dataBrokerHandler).get();
-        doReturn(listener).when(dataBroker).registerDataChangeListener(any(), any(), any(), any());
+
         final MultivaluedMap<String, String> map = Mockito.mock(MultivaluedMap.class);
         final Set<Entry<String, List<String>>> set = new HashSet<>();
         Mockito.when(map.entrySet()).thenReturn(set);
