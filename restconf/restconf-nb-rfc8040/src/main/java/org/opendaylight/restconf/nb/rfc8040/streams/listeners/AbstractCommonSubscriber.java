@@ -29,8 +29,8 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
 
     @SuppressWarnings("rawtypes")
     private EventBusChangeRecorder eventBusChangeRecorder;
-    @SuppressWarnings("rawtypes")
-    private ListenerRegistration registration;
+
+    private volatile ListenerRegistration<?> registration;
 
     /**
      * Creating {@link EventBus}.
@@ -51,8 +51,10 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
 
     @Override
     public final void close() throws Exception {
-        this.registration.close();
-        this.registration = null;
+        if (this.registration != null) {
+            this.registration.close();
+            this.registration = null;
+        }
 
         deleteDataInDS();
         unregister();
@@ -93,8 +95,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
      * @param registration
      *            DOMDataChangeListener registration
      */
-    @SuppressWarnings("rawtypes")
-    public void setRegistration(final ListenerRegistration registration) {
+    public void setRegistration(final ListenerRegistration<?> registration) {
         this.registration = registration;
     }
 
