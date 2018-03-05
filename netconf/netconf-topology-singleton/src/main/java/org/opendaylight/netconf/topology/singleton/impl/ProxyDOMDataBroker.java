@@ -16,11 +16,9 @@ import com.google.common.base.Verify;
 import java.util.Collections;
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBrokerExtension;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -35,8 +33,6 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.NewRead
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadWriteTransactionRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionRequest;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 
@@ -121,13 +117,6 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
         Verify.verify(msg instanceof NewWriteTransactionReply);
         final NewWriteTransactionReply reply = (NewWriteTransactionReply) msg;
         return new ProxyWriteTransaction(reply.getTxActor(), id, actorSystem, askTimeout);
-    }
-
-    @Override
-    public ListenerRegistration<DOMDataChangeListener> registerDataChangeListener(
-            final LogicalDatastoreType store, final YangInstanceIdentifier path, final DOMDataChangeListener listener,
-            final DataChangeScope triggeringScope) {
-        throw new UnsupportedOperationException(id + ": Data change listeners not supported for netconf mount point");
     }
 
     @Override

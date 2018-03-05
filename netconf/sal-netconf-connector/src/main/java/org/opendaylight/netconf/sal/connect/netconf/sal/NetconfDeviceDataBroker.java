@@ -11,11 +11,9 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.Map;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBrokerExtension;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataChangeListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -30,8 +28,6 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteRunningTx;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public final class NetconfDeviceDataBroker implements DOMDataBroker {
@@ -77,13 +73,6 @@ public final class NetconfDeviceDataBroker implements DOMDataBroker {
         } else {
             return new WriteRunningTx(id, netconfOps, rollbackSupport);
         }
-    }
-
-    @Override
-    public ListenerRegistration<DOMDataChangeListener> registerDataChangeListener(
-            final LogicalDatastoreType store, final YangInstanceIdentifier path, final DOMDataChangeListener listener,
-            final DataChangeScope triggeringScope) {
-        throw new UnsupportedOperationException(id + ": Data change listeners not supported for netconf mount point");
     }
 
     @Override
