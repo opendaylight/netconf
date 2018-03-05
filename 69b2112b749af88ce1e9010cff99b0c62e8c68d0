@@ -50,6 +50,24 @@
       "revId": "69b2112b749af88ce1e9010cff99b0c62e8c68d0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7771bf00_668f04fb",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2018-03-05T14:59:51Z",
+      "side": 1,
+      "message": "This method is only used in create(..) method on line 90 - 91 and only with ListSchemaNode.. so it seems that block of instanceOf LeafListSchemaNode should be never happen here.. I have tried tests of this class (YangInstanceIdentifierDeserializerTest) and everything works fine without this block - line 146-147 - soo I think you can remove it.\nIn case of creating LeafList, there is used block with prepareNodeWithValue(..) on line 93",
+      "parentUuid": "c487b5e9_c67e8108",
+      "revId": "69b2112b749af88ce1e9010cff99b0c62e8c68d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
