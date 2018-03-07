@@ -1,0 +1,8 @@
+Code-Review+1: Michael Vorburger <vorburger@redhat.com>
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: JakubToth <jakub.toth@pantheon.tech>
+Submitted-by: JakubToth <jakub.toth@pantheon.tech>
+Submitted-at: Wed, 07 Mar 2018 11:31:53 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/67283
+Project: netconf
+Branch: refs/heads/master
