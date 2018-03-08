@@ -51,5 +51,25 @@ public class NetconfReconnectingClientConfigurationTest {
         Assert.assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, cfg.getProtocol());
         Assert.assertEquals(address, cfg.getAddress());
         Assert.assertEquals(reconnect, cfg.getReconnectStrategy());
+
+        SslHandlerFactory sslHandlerFactory = Mockito.mock(SslHandlerFactory.class);
+        NetconfReconnectingClientConfiguration cfg2 = NetconfReconnectingClientConfigurationBuilder.create()
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS)
+                .withAddress(address)
+                .withConnectionTimeoutMillis(timeout)
+                .withReconnectStrategy(reconnect)
+                .withAdditionalHeader(header)
+                .withSessionListener(listener)
+                .withConnectStrategyFactory(strategy)
+                .withSslHandlerFactory(sslHandlerFactory).build();
+
+        Assert.assertEquals(timeout, cfg2.getConnectionTimeoutMillis());
+        Assert.assertEquals(Optional.fromNullable(header), cfg2.getAdditionalHeader());
+        Assert.assertEquals(listener, cfg2.getSessionListener());
+        Assert.assertEquals(sslHandlerFactory, cfg2.getSslHandlerFactory());
+        Assert.assertEquals(strategy, cfg2.getConnectStrategyFactory());
+        Assert.assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TLS, cfg2.getProtocol());
+        Assert.assertEquals(address, cfg2.getAddress());
+        Assert.assertEquals(reconnect, cfg2.getReconnectStrategy());
     }
 }

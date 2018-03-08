@@ -10,6 +10,7 @@ package org.opendaylight.netconf.client.conf;
 import java.net.InetSocketAddress;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
 
@@ -26,6 +27,7 @@ public class NetconfClientConfigurationBuilder {
     private ReconnectStrategy reconnectStrategy;
     private AuthenticationHandler authHandler;
     private NetconfClientConfiguration.NetconfClientProtocol clientProtocol = DEFAULT_CLIENT_PROTOCOL;
+    private SslHandlerFactory sslHandlerFactory;
 
     protected NetconfClientConfigurationBuilder() {
     }
@@ -78,6 +80,12 @@ public class NetconfClientConfigurationBuilder {
         return this;
     }
 
+    @SuppressWarnings("checkstyle:hiddenField")
+    public NetconfClientConfigurationBuilder withSslHandlerFactory(final SslHandlerFactory sslHandlerFactory) {
+        this.sslHandlerFactory = sslHandlerFactory;
+        return this;
+    }
+
     final InetSocketAddress getAddress() {
         return address;
     }
@@ -106,8 +114,12 @@ public class NetconfClientConfigurationBuilder {
         return clientProtocol;
     }
 
+    final SslHandlerFactory getSslHandlerFactory() {
+        return sslHandlerFactory;
+    }
+
     public NetconfClientConfiguration build() {
         return new NetconfClientConfiguration(clientProtocol, address, connectionTimeoutMillis, additionalHeader,
-                sessionListener, reconnectStrategy, authHandler);
+                sessionListener, reconnectStrategy, authHandler, sslHandlerFactory);
     }
 }

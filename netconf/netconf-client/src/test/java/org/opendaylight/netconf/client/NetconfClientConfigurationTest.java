@@ -45,5 +45,23 @@ public class NetconfClientConfigurationTest {
         Assert.assertEquals(strategy, cfg.getReconnectStrategy());
         Assert.assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, cfg.getProtocol());
         Assert.assertEquals(address, cfg.getAddress());
+
+        SslHandlerFactory sslHandlerFactory = Mockito.mock(SslHandlerFactory.class);
+        NetconfClientConfiguration cfg2 = NetconfClientConfigurationBuilder.create()
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS)
+                .withAddress(address)
+                .withConnectionTimeoutMillis(timeout)
+                .withReconnectStrategy(strategy)
+                .withAdditionalHeader(header)
+                .withSessionListener(listener)
+                .withSslHandlerFactory(sslHandlerFactory).build();
+
+        Assert.assertEquals(timeout, cfg2.getConnectionTimeoutMillis());
+        Assert.assertEquals(Optional.fromNullable(header), cfg2.getAdditionalHeader());
+        Assert.assertEquals(listener, cfg2.getSessionListener());
+        Assert.assertEquals(sslHandlerFactory, cfg2.getSslHandlerFactory());
+        Assert.assertEquals(strategy, cfg2.getReconnectStrategy());
+        Assert.assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TLS, cfg2.getProtocol());
+        Assert.assertEquals(address, cfg2.getAddress());
     }
 }
