@@ -14,6 +14,7 @@ import com.google.common.base.Preconditions;
 import java.net.InetSocketAddress;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
 import org.slf4j.Logger;
@@ -33,12 +34,14 @@ public class NetconfClientConfiguration {
     private final ReconnectStrategy reconnectStrategy;
 
     private final AuthenticationHandler authHandler;
+    private final SslHandlerFactory sslHandlerFactory;
 
     NetconfClientConfiguration(final NetconfClientProtocol protocol, final InetSocketAddress address,
                                final Long connectionTimeoutMillis,
                                final NetconfHelloMessageAdditionalHeader additionalHeader,
                                final NetconfClientSessionListener sessionListener,
-                               final ReconnectStrategy reconnectStrategy, final AuthenticationHandler authHandler) {
+                               final ReconnectStrategy reconnectStrategy, final AuthenticationHandler authHandler,
+                               final SslHandlerFactory sslHandlerFactory) {
         this.address = address;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.additionalHeader = additionalHeader;
@@ -46,6 +49,7 @@ public class NetconfClientConfiguration {
         this.clientProtocol = protocol;
         this.reconnectStrategy = reconnectStrategy;
         this.authHandler = authHandler;
+        this.sslHandlerFactory = sslHandlerFactory;
         validateConfiguration();
     }
 
@@ -77,19 +81,32 @@ public class NetconfClientConfiguration {
         return clientProtocol;
     }
 
+    public SslHandlerFactory getSslHandlerFactory() {
+        return sslHandlerFactory;
+    }
+
     @SuppressWarnings("checkstyle:FallThrough")
     private void validateConfiguration() {
         Preconditions.checkNotNull(clientProtocol, " ");
         switch (clientProtocol) {
+            case TLS:
             case SSH:
-                validateSshConfiguration();
-                // Fall through intentional (ssh validation is a superset of tcp validation)
+                if (clientProtocol == NetconfClientProtocol.SSH) {
+                    validateSshConfiguration();
+                } else {
+                    validateTlsConfiguration();
+                }
+                // Fall through intentional (ssh or tls validation is a superset of tcp validation)
             case TCP:
                 validateTcpConfiguration();
                 break;
             default:
                 LOG.warn("Unexpected protocol: {} in netconf client configuration.", clientProtocol);
         }
+    }
+
+    protected void validateTlsConfiguration() {
+        Preconditions.checkNotNull(sslHandlerFactory, "sslHandlerFactory");
     }
 
     protected void validateSshConfiguration() {
@@ -117,10 +134,11 @@ public class NetconfClientConfiguration {
                 .add("sessionListener", sessionListener)
                 .add("reconnectStrategy", reconnectStrategy)
                 .add("clientProtocol", clientProtocol)
-                .add("authHandler", authHandler);
+                .add("authHandler", authHandler)
+                .add("sslHandlerFactory", sslHandlerFactory);
     }
 
     public enum NetconfClientProtocol {
-        TCP, SSH
+        TCP, SSH, TLS
     }
 }

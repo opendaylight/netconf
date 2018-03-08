@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import java.net.InetSocketAddress;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
 import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
@@ -26,9 +27,10 @@ public final class NetconfReconnectingClientConfiguration extends NetconfClientC
                                            final NetconfClientSessionListener sessionListener,
                                            final ReconnectStrategy reconnectStrategy,
                                            final ReconnectStrategyFactory connectStrategyFactory,
-                                           final AuthenticationHandler authHandler) {
+                                           final AuthenticationHandler authHandler,
+                                           final SslHandlerFactory sslHandlerFactory) {
         super(clientProtocol, address, connectionTimeoutMillis, additionalHeader, sessionListener, reconnectStrategy,
-                authHandler);
+                authHandler, sslHandlerFactory);
         this.connectStrategyFactory = connectStrategyFactory;
         validateReconnectConfiguration();
     }
