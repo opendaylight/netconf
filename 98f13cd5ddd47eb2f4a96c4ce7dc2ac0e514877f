@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "c8f1afde_a1d185d9",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2018-03-08T23:07:00Z",
+      "side": 1,
+      "message": "Thanks Alexis. I am planning to file a bug and add these details. However I do not think this is a separate a issue altogether as this is related to keep-alive. It will be artificial to separate these two issues.",
+      "parentUuid": "0775f1a6_d61870cb",
+      "range": {
+        "startLine": 215,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 77
+      },
+      "revId": "98f13cd5ddd47eb2f4a96c4ce7dc2ac0e514877f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "512f81b6_39007b97",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2018-03-01T13:16:41Z",
       "side": 1,
       "message": "Is this really adding value? isn\u0027t isSessionClosing enough? It makes sense to have this, I\u0027m just trying to see if we can avoid non-necessary condition",
+      "range": {
+        "startLine": 165,
+        "startChar": 74,
+        "endLine": 165,
+        "endChar": 91
+      },
+      "revId": "98f13cd5ddd47eb2f4a96c4ce7dc2ac0e514877f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0d2ac4ff_1f5ccd48",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2018-03-08T23:07:00Z",
+      "side": 1,
+      "message": "Trying to be cautious here as we ran into some edge conditions. I do not think this will hurt though. What do you think?",
+      "parentUuid": "512f81b6_39007b97",
       "range": {
         "startLine": 165,
         "startChar": 74,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "fe273035_e5170ed4",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2018-03-08T23:07:00Z",
+      "side": 1,
+      "message": "Will do.",
+      "parentUuid": "397e7745_20140eea",
+      "range": {
+        "startLine": 141,
+        "startChar": 23,
+        "endLine": 141,
+        "endChar": 51
+      },
+      "revId": "98f13cd5ddd47eb2f4a96c4ce7dc2ac0e514877f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "60370c5d_369ad53c",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
         "patchSetId": 2
@@ -82,6 +154,30 @@
       "writtenOn": "2018-03-01T13:16:41Z",
       "side": 1,
       "message": "no need to keep this, please remove.",
+      "range": {
+        "startLine": 182,
+        "startChar": 0,
+        "endLine": 186,
+        "endChar": 9
+      },
+      "revId": "98f13cd5ddd47eb2f4a96c4ce7dc2ac0e514877f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9cfc3878_efcc866a",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2018-03-08T23:07:00Z",
+      "side": 1,
+      "message": "Will do.",
+      "parentUuid": "60370c5d_369ad53c",
       "range": {
         "startLine": 182,
         "startChar": 0,
