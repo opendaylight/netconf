@@ -72,7 +72,8 @@ public class DatastoreBackedPublicKeyAuth extends AuthenticationHandler {
             try {
                 this.keyPair = Optional.of(
                         new PKIUtil().decodePrivateKey(
-                                new StringReader(encryptionService.decrypt(dsKeypair.getPrivateKey())),
+                                new StringReader(encryptionService.decrypt(
+                                        dsKeypair.getPrivateKey()).replaceAll("\\\\n", "\n")),
                                 encryptionService.decrypt(passPhrase)));
             } catch (IOException exception) {
                 LOG.warn("Unable to decode private key, id={}", pairId, exception);
