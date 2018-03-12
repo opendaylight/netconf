@@ -17,6 +17,7 @@ import static org.mockito.Mockito.doAnswer;
 
 import com.google.common.io.ByteSource;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.io.StringWriter;
 import java.util.EnumMap;
 import java.util.concurrent.ExecutorService;
@@ -34,7 +35,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.cluster.databroker.ConcurrentDOMDataBroker;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
@@ -42,6 +42,7 @@ import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.dom.broker.impl.SerializedDOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.core.spi.data.DOMStore;
@@ -144,8 +145,9 @@ public class NetconfMDSalMappingTest {
         final ExecutorService listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(
                 16, 16, "CommitFutures", NetconfMDSalMappingTest.class);
 
-        final ConcurrentDOMDataBroker cdb = new ConcurrentDOMDataBroker(datastores, listenableFutureExecutor);
-        this.transactionProvider = new TransactionProvider(cdb, SESSION_ID_FOR_REPORTING);
+        final SerializedDOMDataBroker sdb = new SerializedDOMDataBroker(datastores,
+                MoreExecutors.listeningDecorator(listenableFutureExecutor));
+        this.transactionProvider = new TransactionProvider(sdb, SESSION_ID_FOR_REPORTING);
 
         doAnswer(invocationOnMock -> {
             final SourceIdentifier sId = (SourceIdentifier) invocationOnMock.getArguments()[0];

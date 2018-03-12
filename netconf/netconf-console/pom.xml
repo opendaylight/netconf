@@ -73,11 +73,6 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
           <scope>test</scope>
       </dependency>
       <dependency>
-          <groupId>org.opendaylight.controller</groupId>
-          <artifactId>sal-distributed-datastore</artifactId>
-          <scope>test</scope>
-      </dependency>
-      <dependency>
           <groupId>org.powermock</groupId>
           <artifactId>powermock-module-junit4</artifactId>
           <scope>test</scope>
@@ -95,6 +90,11 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
           <groupId>org.opendaylight.yangtools</groupId>
           <artifactId>yang-test-util</artifactId>
       </dependency>
+      <dependency>
+          <groupId>org.opendaylight.controller</groupId>
+          <artifactId>sal-binding-broker-impl</artifactId>
+          <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

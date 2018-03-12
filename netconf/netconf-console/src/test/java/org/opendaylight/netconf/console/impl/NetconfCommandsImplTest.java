@@ -15,25 +15,26 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import javassist.ClassPool;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.controller.cluster.databroker.ConcurrentDOMDataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.binding.impl.BindingDOMDataBrokerAdapter;
 import org.opendaylight.controller.md.sal.binding.impl.BindingToNormalizedNodeCodec;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
+import org.opendaylight.controller.md.sal.dom.broker.impl.SerializedDOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.core.spi.data.DOMStore;
@@ -67,7 +68,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
@@ -101,11 +101,8 @@ public class NetconfCommandsImplTest {
         datastores.put(LogicalDatastoreType.CONFIGURATION, configStore);
         datastores.put(LogicalDatastoreType.OPERATIONAL, operStore);
 
-        final ExecutorService listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(
-                16, 16, "CommitFutures", NetconfCommandsImplTest.class);
-
-        final ConcurrentDOMDataBroker cDOMDataBroker =
-                new ConcurrentDOMDataBroker(datastores, listenableFutureExecutor);
+        final DOMDataBroker domDataBroker =
+                new SerializedDOMDataBroker(datastores, MoreExecutors.newDirectExecutorService());
 
         final ClassPool pool = ClassPool.getDefault();
         final DataObjectSerializerGenerator generator = StreamWriterGenerator.create(JavassistUtils.forClassPool(pool));
@@ -118,7 +115,7 @@ public class NetconfCommandsImplTest {
         final BindingToNormalizedNodeCodec bindingToNormalized =
                 new BindingToNormalizedNodeCodec(loading, codecRegistry);
         bindingToNormalized.onGlobalContextUpdated(schemaContext);
-        dataBroker = new BindingDOMDataBrokerAdapter(cDOMDataBroker, bindingToNormalized);
+        dataBroker = new BindingDOMDataBrokerAdapter(domDataBroker, bindingToNormalized);
 
         netconfCommands = new NetconfCommandsImpl(dataBroker);
     }

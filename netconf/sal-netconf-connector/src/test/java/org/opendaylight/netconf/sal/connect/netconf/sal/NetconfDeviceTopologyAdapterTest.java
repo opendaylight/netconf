@@ -17,16 +17,15 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.net.InetSocketAddress;
 import java.util.EnumMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import javassist.ClassPool;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.cluster.databroker.ConcurrentDOMDataBroker;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
@@ -36,7 +35,9 @@ import org.opendaylight.controller.md.sal.common.api.data.AsyncTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.controller.md.sal.dom.broker.impl.SerializedDOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.core.spi.data.DOMStore;
@@ -55,7 +56,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -88,7 +88,7 @@ public class NetconfDeviceTopologyAdapterTest {
 
     private DataBroker dataBroker;
 
-    private ConcurrentDOMDataBroker concurrentDOMDataBroker;
+    private DOMDataBroker domDataBroker;
 
     @Before
     public void setUp() throws Exception {
@@ -116,10 +116,7 @@ public class NetconfDeviceTopologyAdapterTest {
         datastores.put(LogicalDatastoreType.CONFIGURATION, configStore);
         datastores.put(LogicalDatastoreType.OPERATIONAL, operStore);
 
-        ExecutorService listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(
-                16, 16, "CommitFutures", NetconfDeviceTopologyAdapterTest.class);
-
-        concurrentDOMDataBroker = new ConcurrentDOMDataBroker(datastores, listenableFutureExecutor);
+        domDataBroker = new SerializedDOMDataBroker(datastores, MoreExecutors.newDirectExecutorService());
 
         final ClassPool pool = ClassPool.getDefault();
         final DataObjectSerializerGenerator generator = StreamWriterGenerator.create(JavassistUtils.forClassPool(pool));
@@ -132,7 +129,7 @@ public class NetconfDeviceTopologyAdapterTest {
         final BindingToNormalizedNodeCodec bindingToNormalized =
                 new BindingToNormalizedNodeCodec(loading, codecRegistry);
         bindingToNormalized.onGlobalContextUpdated(schemaContext);
-        dataBroker = new BindingDOMDataBrokerAdapter(concurrentDOMDataBroker, bindingToNormalized);
+        dataBroker = new BindingDOMDataBrokerAdapter(domDataBroker, bindingToNormalized);
 
         transactionChain = dataBroker.createTransactionChain(new TransactionChainListener() {
             @Override
@@ -208,19 +205,19 @@ public class NetconfDeviceTopologyAdapterTest {
         NormalizedNode<?, ?> augmentNode = ImmutableLeafNodeBuilder.create().withValue(dataTestId)
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(netconfTestLeafQname)).build();
 
-        DOMDataWriteTransaction wtx =  concurrentDOMDataBroker.newWriteOnlyTransaction();
+        DOMDataWriteTransaction wtx =  domDataBroker.newWriteOnlyTransaction();
         wtx.put(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf, augmentNode);
-        wtx.submit();
+        wtx.submit().get(5, TimeUnit.SECONDS);
 
         adapter.updateDeviceData(true, new NetconfDeviceCapabilities());
-        Optional<NormalizedNode<?, ?>> testNode = concurrentDOMDataBroker.newReadOnlyTransaction()
+        Optional<NormalizedNode<?, ?>> testNode = domDataBroker.newReadOnlyTransaction()
                 .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).checkedGet(2, TimeUnit.SECONDS);
 
         assertEquals("Augmented node data should be still present after device update.", true, testNode.isPresent());
         assertEquals("Augmented data should be the same as before update node.", dataTestId, testNode.get().getValue());
 
         adapter.setDeviceAsFailed(null);
-        testNode = concurrentDOMDataBroker.newReadOnlyTransaction()
+        testNode = domDataBroker.newReadOnlyTransaction()
                 .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).checkedGet(2, TimeUnit.SECONDS);
 
         assertEquals("Augmented node data should be still present after device failed.", true, testNode.isPresent());
