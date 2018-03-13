@@ -43,7 +43,7 @@ public class SchemaExportContentYinBodyWriter implements MessageBodyWriter<Schem
             final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException,
             WebApplicationException {
         try {
-            YinExportUtils.writeModuleToOutputStream(context.getSchemaContext(), context.getModule(), entityStream);
+            YinExportUtils.writeModuleAsYinText(context.getModule(), entityStream);
         } catch (final XMLStreamException e) {
             throw new IllegalStateException(e);
         }
