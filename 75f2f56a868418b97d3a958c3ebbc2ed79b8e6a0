@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9906cace_41b98c63",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-13T18:16:59Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "e449e198_049ac2b6",
+      "range": {
+        "startLine": 173,
+        "startChar": 8,
+        "endLine": 173,
+        "endChar": 18
+      },
+      "revId": "75f2f56a868418b97d3a958c3ebbc2ed79b8e6a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4a6bf157_82248621",
         "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfStreamsSubscriptionServiceImplTest.java",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2018-03-13T14:36:39Z",
       "side": 1,
       "message": "there is static import for mock",
+      "range": {
+        "startLine": 103,
+        "startChar": 57,
+        "endLine": 103,
+        "endChar": 64
+      },
+      "revId": "75f2f56a868418b97d3a958c3ebbc2ed79b8e6a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7310a7af_8c1f673a",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfStreamsSubscriptionServiceImplTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-13T18:16:59Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "4a6bf157_82248621",
       "range": {
         "startLine": 103,
         "startChar": 57,
