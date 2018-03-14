@@ -105,7 +105,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         final DataContainerChild<?, ?> editStructure =
                 netOps.createEditConfigStrcture(Optional.<NormalizedNode<?, ?>>fromNullable(data),
                         Optional.of(ModifyAction.REPLACE), path);
-        editConfig(path, Optional.fromNullable(data), editStructure, Optional.of(ModifyAction.NONE), "put");
+        editConfig(path, Optional.fromNullable(data), editStructure, Optional.<ModifyAction>absent(), "put");
     }
 
     @Override
