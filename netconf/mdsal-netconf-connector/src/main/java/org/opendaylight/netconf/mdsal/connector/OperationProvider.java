@@ -14,6 +14,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mdsal.connector.ops.Commit;
+import org.opendaylight.netconf.mdsal.connector.ops.CopyConfig;
 import org.opendaylight.netconf.mdsal.connector.ops.DiscardChanges;
 import org.opendaylight.netconf.mdsal.connector.ops.EditConfig;
 import org.opendaylight.netconf.mdsal.connector.ops.Lock;
@@ -35,6 +36,7 @@ final class OperationProvider {
             new Commit(netconfSessionIdForReporting, transactionProvider),
             new DiscardChanges(netconfSessionIdForReporting, transactionProvider),
             new EditConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
+            new CopyConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
             new Get(netconfSessionIdForReporting, schemaContext, transactionProvider),
             new GetConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
             new Lock(netconfSessionIdForReporting),
