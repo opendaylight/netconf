@@ -95,5 +95,21 @@ public class NetconfClientDispatcherImplTest {
         assertNotNull(sshReconn);
         assertNotNull(tcpReconn);
 
+        SslHandlerFactory sslHandlerFactory = Mockito.mock(SslHandlerFactory.class);
+        NetconfReconnectingClientConfiguration cfg3 = NetconfReconnectingClientConfigurationBuilder.create()
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS)
+                .withAddress(address)
+                .withConnectionTimeoutMillis(timeout)
+                .withReconnectStrategy(reconnect)
+                .withAdditionalHeader(header)
+                .withSessionListener(listener)
+                .withConnectStrategyFactory(reconnectStrategyFactory)
+                .withSslHandlerFactory(sslHandlerFactory).build();
+
+        Future<NetconfClientSession> tlsSession = dispatcher.createClient(cfg3);
+        Future<Void> tlsReconn = dispatcher.createReconnectingClient(cfg3);
+
+        assertNotNull(tlsSession);
+        assertNotNull(tlsReconn);
     }
 }
