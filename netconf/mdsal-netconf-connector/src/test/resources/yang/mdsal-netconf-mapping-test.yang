@@ -210,4 +210,20 @@ module config {
             }
         }
     }
+
+    list toplevel-list {
+        key "id";
+        leaf id {
+            type string;
+        }
+
+        leaf content {
+            type string;
+        }
+    }
+
+    container top-with-presence {
+        presence "For testing presence containers";
+
+    }
 }
