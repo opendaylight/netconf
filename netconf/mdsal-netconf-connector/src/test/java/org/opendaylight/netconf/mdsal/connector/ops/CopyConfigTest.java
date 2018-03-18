@@ -105,7 +105,7 @@ public class CopyConfigTest {
             fail("Should have failed - <target> element is missing");
         } catch (final DocumentedException e) {
             assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
-            assertTrue(e.getErrorTag() == ErrorTag.MISSING_ELEMENT);
+            assertTrue(e.getErrorTag() == ErrorTag.MISSING_ATTRIBUTE);
             assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
         }
     }
