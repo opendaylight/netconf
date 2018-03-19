@@ -73,6 +73,7 @@ import org.opendaylight.protocol.framework.TimedReconnectStrategy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.protocol.Specification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.protocol.specification.TlsCase;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
@@ -458,15 +459,29 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 maxConnectionAttempts, betweenAttemptsTimeoutMillis, sleepFactor);
         final ReconnectStrategy strategy = sf.createReconnectStrategy();
 
-        final AuthenticationHandler authHandler = getHandlerFromCredentials(node.getCredentials());
+        final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder =
+                NetconfReconnectingClientConfigurationBuilder.create();
 
-        return NetconfReconnectingClientConfigurationBuilder.create()
+        if (node.isTcpOnly() || node.getProtocol() == null || node.getProtocol().getName() == Name.SSH) {
+            final AuthenticationHandler authHandler = getHandlerFromCredentials(node.getCredentials());
+            reconnectingClientConfigurationBuilder
+                .withAuthHandler(authHandler)
+                .withProtocol(node.isTcpOnly() ? NetconfClientConfiguration.NetconfClientProtocol.TCP :
+                    NetconfClientConfiguration.NetconfClientProtocol.SSH);
+        } else if (node.getProtocol().getName() == Name.TLS) {
+            final SslHandlerFactory sslHandlerFactory = new SslHandlerFactoryImpl(keystoreAdapter,
+                    node.getProtocol().getSpecification());
+            reconnectingClientConfigurationBuilder
+                .withSslHandlerFactory(sslHandlerFactory)
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS);
+        } else {
+            throw new IllegalStateException("Unsupported protocol type: " + node.getProtocol().getName().getClass());
+        }
+
+        return reconnectingClientConfigurationBuilder
                 .withAddress(socketAddress)
                 .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
                 .withReconnectStrategy(strategy)
-                .withAuthHandler(authHandler)
-                .withProtocol(node.isTcpOnly() ? NetconfClientConfiguration.NetconfClientProtocol.TCP :
-                        NetconfClientConfiguration.NetconfClientProtocol.SSH)
                 .withConnectStrategyFactory(sf)
                 .withSessionListener(listener)
                 .build();
