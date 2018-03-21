@@ -169,6 +169,22 @@ public class NetconfClientSessionNegotiatorTest {
     }
 
     @Test
+    public void testNegotiatorWhenChannelActiveHappenAfterHandleMessage() throws Exception {
+        Promise promise = mock(Promise.class);
+        doReturn(false).when(promise).isDone();
+        doReturn(promise).when(promise).setSuccess(anyObject());
+        NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
+        Set<String> caps = Sets.newSet("a", "b");
+        NetconfHelloMessage helloServerMessage = NetconfHelloMessage.createServerHello(caps, 10);
+
+        negotiator.handleMessage(helloServerMessage);
+        negotiator.channelActive(null);
+
+        verify(promise).setSuccess(anyObject());
+    }
+
+
+    @Test
     public void testNetconfClientSessionNegotiatorWithEXI() throws Exception {
         Promise promise = mock(Promise.class);
         EXIOptions exiOptions = new EXIOptions();
