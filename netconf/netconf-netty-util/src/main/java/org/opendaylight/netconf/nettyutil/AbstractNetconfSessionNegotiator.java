@@ -79,20 +79,29 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
 
     @Override
     protected final void startNegotiation() {
-        final Optional<SslHandler> sslHandler = getSslHandler(channel);
-        if (sslHandler.isPresent()) {
-            Future<Channel> future = sslHandler.get().handshakeFuture();
-            future.addListener(new GenericFutureListener<Future<? super Channel>>() {
-                @Override
-                public void operationComplete(final Future<? super Channel> future) {
-                    Preconditions.checkState(future.isSuccess(), "Ssl handshake was not successful");
-                    LOG.debug("Ssl handshake complete");
-                    start();
-                }
-            });
+        if (isStateIdle()) {
+            LOG.info("start Negotiation already on channel {}", channel);
         } else {
-            start();
+            final Optional<SslHandler> sslHandler = getSslHandler(channel);
+            if (sslHandler.isPresent()) {
+                Future<Channel> future = sslHandler.get().handshakeFuture();
+                future.addListener(new GenericFutureListener<Future<? super Channel>>() {
+                    @Override
+                    public void operationComplete(final Future<? super Channel> future) {
+                        Preconditions.checkState(future.isSuccess(), "Ssl handshake was not successful");
+                        LOG.debug("Ssl handshake complete");
+                        start();
+                    }
+                });
+            } else {
+                start();
+            }
         }
+    }
+
+    protected final boolean isStateIdle() {
+        //It indicates whether start Negotiation Already
+        return this.state != State.IDLE;
     }
 
     private static Optional<SslHandler> getSslHandler(final Channel channel) {
