@@ -12,7 +12,7 @@
 
     <reference id="credentialAuth" interface="org.opendaylight.aaa.api.CredentialAuth" odl:type="default" />
 
-    <bean id="credentialServiceAuthProvider" class="org.opendaylight.aaa.odl.CredentialServiceAuthProvider">
+    <bean id="credentialServiceAuthProvider" class="org.opendaylight.netconf.authprovider.CredentialServiceAuthProvider">
         <argument ref="credentialAuth"/>
     </bean>
     <service ref="credentialServiceAuthProvider" interface="org.opendaylight.netconf.auth.AuthProvider"
