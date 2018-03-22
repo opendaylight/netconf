@@ -17,7 +17,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import javax.annotation.Nullable;
-import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
@@ -97,7 +96,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
     @Override
     public synchronized CheckedFuture<Void, TransactionCommitFailedException> submit() {
         final ListenableFuture<Void> commitFutureAsVoid = Futures.transform(commit(),
-            (Function<RpcResult<TransactionStatus>, Void>) input -> {
+            (Function<RpcResult<Void>, Void>) input -> {
                 Preconditions.checkArgument(input.isSuccessful() && input.getErrors().isEmpty(),
                         "Submit failed with errors: %s", input.getErrors());
                 return null;
@@ -116,13 +115,13 @@ public class WriteCandidateTx extends AbstractWriteTx {
     }
 
     @Override
-    public synchronized ListenableFuture<RpcResult<TransactionStatus>> performCommit() {
+    public synchronized ListenableFuture<RpcResult<Void>> performCommit() {
         resultsFutures.add(netOps.commit(new NetconfRpcFutureCallback("Commit", id)));
-        final ListenableFuture<RpcResult<TransactionStatus>> txResult = resultsToTxStatus();
+        final ListenableFuture<RpcResult<Void>> txResult = resultsToTxStatus();
 
-        Futures.addCallback(txResult, new FutureCallback<RpcResult<TransactionStatus>>() {
+        Futures.addCallback(txResult, new FutureCallback<RpcResult<Void>>() {
             @Override
-            public void onSuccess(@Nullable final RpcResult<TransactionStatus> result) {
+            public void onSuccess(@Nullable final RpcResult<Void> result) {
                 cleanupOnSuccess();
             }
 
