@@ -25,6 +25,7 @@
         <module>odl-mdsal-apidocs</module>
         <module>odl-restconf</module>
         <module>odl-restconf-all</module>
+        <module>odl-restconf-common</module>
         <module>odl-restconf-noauth</module>
         <module>odl-restconf-nb-rfc8040-noauth</module>
         <module>odl-restconf-nb-rfc8040</module>
