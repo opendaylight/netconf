@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -147,15 +146,14 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
                 editStructure, Optional.of(ModifyAction.NONE), "delete");
     }
 
-    @Override
-    public final ListenableFuture<RpcResult<TransactionStatus>> commit() {
+    protected final ListenableFuture<RpcResult<Void>> commitConfiguration() {
         listeners.forEach(listener -> listener.onTransactionSubmitted(this));
         checkNotFinished();
         finished = true;
-        final ListenableFuture<RpcResult<TransactionStatus>> result = performCommit();
-        Futures.addCallback(result, new FutureCallback<RpcResult<TransactionStatus>>() {
+        final ListenableFuture<RpcResult<Void>> result = performCommit();
+        Futures.addCallback(result, new FutureCallback<RpcResult<Void>>() {
             @Override
-            public void onSuccess(@Nullable final RpcResult<TransactionStatus> result) {
+            public void onSuccess(@Nullable final RpcResult<Void> result) {
                 if (result != null && result.isSuccessful()) {
                     listeners.forEach(txListener -> txListener.onTransactionSuccessful(AbstractWriteTx.this));
                 } else {
@@ -174,7 +172,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         return result;
     }
 
-    protected abstract ListenableFuture<RpcResult<TransactionStatus>> performCommit();
+    protected abstract ListenableFuture<RpcResult<Void>> performCommit();
 
     private void checkEditable(final LogicalDatastoreType store) {
         checkNotFinished();
@@ -186,8 +184,8 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
                                        DataContainerChild<?, ?> editStructure,
                                        Optional<ModifyAction> defaultOperation, String operation);
 
-    protected ListenableFuture<RpcResult<TransactionStatus>> resultsToTxStatus() {
-        final SettableFuture<RpcResult<TransactionStatus>> transformed = SettableFuture.create();
+    protected ListenableFuture<RpcResult<Void>> resultsToTxStatus() {
+        final SettableFuture<RpcResult<Void>> transformed = SettableFuture.create();
 
         Futures.addCallback(Futures.allAsList(resultsFutures), new FutureCallback<List<DOMRpcResult>>() {
             @Override
@@ -204,7 +202,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
                 });
 
                 if (!transformed.isDone()) {
-                    transformed.set(RpcResultBuilder.success(TransactionStatus.COMMITED).build());
+                    transformed.set(RpcResultBuilder.<Void>success().build());
                 }
             }
 

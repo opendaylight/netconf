@@ -35,7 +35,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
@@ -48,7 +47,6 @@ import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
-import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -137,9 +135,6 @@ public class RestPostOperationTest extends JerseyTest {
     // - we expecting problems with singletons ControllerContext as schemaContext holder
     public void createConfigurationDataTest() throws UnsupportedEncodingException, ParseException {
         initMocking();
-        final RpcResult<TransactionStatus> rpcResult = new DummyRpcResult.Builder<TransactionStatus>().result(
-                TransactionStatus.COMMITED).build();
-
         when(brokerFacade.commitConfigurationDataPost((SchemaContext) null, any(YangInstanceIdentifier.class),
                 any(NormalizedNode.class), null, null))
                 .thenReturn(mock(CheckedFuture.class));

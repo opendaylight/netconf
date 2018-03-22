@@ -16,7 +16,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.List;
-import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
@@ -73,8 +72,8 @@ public class WriteRunningTx extends AbstractWriteTx {
 
     @Override
     public synchronized CheckedFuture<Void, TransactionCommitFailedException> submit() {
-        final ListenableFuture<Void> commmitFutureAsVoid = Futures.transform(commit(),
-                (Function<RpcResult<TransactionStatus>, Void>) input -> null, MoreExecutors.directExecutor());
+        final ListenableFuture<Void> commmitFutureAsVoid = Futures.transform(commitConfiguration(),
+                (Function<RpcResult<Void>, Void>) input -> null, MoreExecutors.directExecutor());
 
         return Futures.makeChecked(commmitFutureAsVoid,
             input -> new TransactionCommitFailedException("Submit of transaction " + getIdentifier() + " failed",
@@ -82,7 +81,7 @@ public class WriteRunningTx extends AbstractWriteTx {
     }
 
     @Override
-    public synchronized ListenableFuture<RpcResult<TransactionStatus>> performCommit() {
+    public synchronized ListenableFuture<RpcResult<Void>> performCommit() {
         for (final Change change : changes) {
             resultsFutures.add(change.execute(id, netOps, rollbackSupport));
         }
