@@ -17,6 +17,7 @@ import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -204,6 +205,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
             }
         }
 
+        @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE",
+                justification = "Unrecognised NullableDecl")
         @Override
         public void onSuccess(final DOMRpcResult result) {
             // No matter what response we got, rpc-reply or rpc-error,

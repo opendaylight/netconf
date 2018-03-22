@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -229,6 +230,8 @@ public final class RestCodec {
             return identityValuesDTO;
         }
 
+        @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE",
+                justification = "Unrecognised NullableDecl")
         @Override
         public YangInstanceIdentifier deserialize(final IdentityValuesDTO data) {
             final List<PathArgument> result = new ArrayList<>();

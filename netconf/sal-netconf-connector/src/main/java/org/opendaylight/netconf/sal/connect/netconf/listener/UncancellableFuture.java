@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.connect.netconf.listener;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.AbstractFuture;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javax.annotation.Nullable;
 
 final class UncancellableFuture<V> extends AbstractFuture<V> {
@@ -36,6 +37,8 @@ final class UncancellableFuture<V> extends AbstractFuture<V> {
         return !uncancellable && super.cancel(mayInterruptIfRunning);
     }
 
+    @SuppressFBWarnings(value = "NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE",
+            justification = "Unrecognised NullableDecl")
     @Override
     public boolean set(@Nullable final V value) {
         Preconditions.checkState(uncancellable);
