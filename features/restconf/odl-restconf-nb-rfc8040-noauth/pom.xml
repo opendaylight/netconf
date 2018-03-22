@@ -23,38 +23,10 @@
     <version>1.7.1-SNAPSHOT</version>
     <packaging>feature</packaging>
 
-    <name>OpenDaylight :: Restconf NB - RFC8040</name>
+    <name>OpenDaylight :: RESTCONF :: RFC8040</name>
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.opendaylight.odlparent</groupId>
-                <artifactId>odlparent-artifacts</artifactId>
-                <version>3.0.2</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.yangtools</groupId>
-                <artifactId>yangtools-artifacts</artifactId>
-                <version>2.0.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.aaa</groupId>
-                <artifactId>aaa-artifacts</artifactId>
-                <version>0.7.1-SNAPSHOT</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>netconf-artifacts</artifactId>
-                <version>1.4.1-SNAPSHOT</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>restconf-artifacts</artifactId>
@@ -67,50 +39,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.aaa</groupId>
-            <artifactId>odl-aaa-shiro</artifactId>
-            <version>0.7.1-SNAPSHOT</version>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>odl-mdsal-broker</artifactId>
-            <version>1.7.1-SNAPSHOT</version>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.odlparent</groupId>
-            <artifactId>odl-netty-4</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.odlparent</groupId>
-            <artifactId>odl-karaf-feat-jetty</artifactId>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>odl-yangtools-export</artifactId>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-restconf-common</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
 
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>ietf-restconf</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>ietf-yang-library</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>ietf-restconf-monitoring</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-nb-rfc8040</artifactId>
