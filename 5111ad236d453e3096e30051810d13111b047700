@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aa0adc07_0c3dc9f6",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientSessionNegotiator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5706
+      },
+      "writtenOn": "2018-03-23T06:10:52Z",
+      "side": 1,
+      "message": "session will be closed in negotiationFailed and no need to do later operations, so after negotiationFailed we need to return directly.",
+      "revId": "5111ad236d453e3096e30051810d13111b047700",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fcde0899_b4a7c54b",
+        "filename": "netconf/netconf-client/src/test/java/org/opendaylight/netconf/client/NetconfClientSessionNegotiatorTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5706
+      },
+      "writtenOn": "2018-03-23T06:10:52Z",
+      "side": 1,
+      "message": "testNetconfClientSessionNegotiator2 is a bad test case name. Give a more descriptive name.",
+      "revId": "5111ad236d453e3096e30051810d13111b047700",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "49d7e977_1ad12f4e",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5706
+      },
+      "writtenOn": "2018-03-23T06:10:52Z",
+      "side": 1,
+      "message": "startNegotiationAlready is not a good method name. I feel that isStateIdle or isIdleState is a better name. Or just eliminate this method.",
+      "revId": "5111ad236d453e3096e30051810d13111b047700",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
