@@ -25,13 +25,14 @@
 
     <name>OpenDaylight :: Restconf</name>
 
-    <!-- Enables AAA through the odl-shiro-act bundle Activator -->
-
     <dependencies>
+        <!-- Enables AAA through aaa-shiro-act -->
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>aaa-shiro-act</artifactId>
             <version>0.8.0-SNAPSHOT</version>
+            <type>xml</type>
+            <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
