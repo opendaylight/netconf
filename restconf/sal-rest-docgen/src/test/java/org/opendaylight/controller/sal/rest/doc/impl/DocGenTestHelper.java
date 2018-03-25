@@ -67,10 +67,6 @@ public class DocGenTestHelper {
         return this.schemaContext;
     }
 
-    public SchemaService createMockSchemaService() {
-        return createMockSchemaService(null);
-    }
-
     public SchemaService createMockSchemaService(SchemaContext mockContext) {
         if (mockContext == null) {
             mockContext = createMockSchemaContext();
