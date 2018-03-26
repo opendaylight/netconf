@@ -35,6 +35,7 @@
     <module>mdsal-netconf-notification</module>
     <module>mdsal-netconf-yang-library</module>
     <module>mdsal-netconf-impl</module>
+    <module>netconf-binding-parent</module>
     <module>netconf-util</module>
     <module>netconf-netty-util</module>
     <module>netconf-mapping-api</module>
