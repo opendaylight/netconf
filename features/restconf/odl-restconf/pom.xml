@@ -41,5 +41,13 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
+
+        <dependency>
+            <groupId>org.opendaylight.odlparent</groupId>
+            <artifactId>odl-jackson-2.8</artifactId>
+            <version>3.1.0</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
     </dependencies>
 </project>
