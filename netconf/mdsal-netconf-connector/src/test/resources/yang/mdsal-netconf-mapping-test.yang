@@ -67,6 +67,18 @@ module config {
                 }
             }
         }
+
+        list list-with-leafref {
+            key "name";
+            leaf name {
+                type leafref {
+                    path "../../mapping-node/id";
+                }
+            }
+            leaf attribute {
+                type string;
+            }
+        }
     }
 
     augment "/map:mapping-nodes/map:mapping-node/map:ordered-choice/map:b/map:augmented-ordered-items" {
