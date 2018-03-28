@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2aa4f582_eb31525f",
+        "filename": "netconf/netconf-binding-parent/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-28T20:56:28Z",
+      "side": 1,
+      "message": "Do we need to stress the that this will generate also binding classes? Maybe just netconf-parent can be enough..",
+      "revId": "bb98dfc0b1e951ed25deeffc92e643e417bd439d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
