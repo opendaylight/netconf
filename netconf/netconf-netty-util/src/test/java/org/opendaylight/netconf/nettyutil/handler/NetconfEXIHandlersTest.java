@@ -12,23 +12,23 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.Lists;
+import com.siemens.ct.exi.api.sax.SAXEncoder;
+import com.siemens.ct.exi.exceptions.EXIException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfMessage;
-import org.openexi.proc.common.EXIOptions;
-import org.openexi.proc.common.EXIOptionsException;
-import org.openexi.sax.Transmogrifier;
-import org.openexi.sax.TransmogrifierException;
-import org.xml.sax.InputSource;
+import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 
 public class NetconfEXIHandlersTest {
 
@@ -40,20 +40,21 @@ public class NetconfEXIHandlersTest {
 
     @Before
     public void setUp() throws Exception {
-        final NetconfEXICodec codec = new NetconfEXICodec(new EXIOptions());
+        final NetconfEXICodec codec = NetconfEXICodec.forParameters(EXIParameters.empty());
         netconfMessageToEXIEncoder = NetconfMessageToEXIEncoder.create(codec);
         netconfEXIToMessageDecoder = NetconfEXIToMessageDecoder.create(codec);
 
         msg = new NetconfMessage(XmlUtil.readXmlToDocument(msgAsString));
-        this.msgAsExi = msgToExi(msgAsString, codec);
+        this.msgAsExi = msgToExi(msg, codec);
     }
 
-    private static byte[] msgToExi(final String msgAsString,final NetconfEXICodec codec)
-            throws EXIOptionsException, TransmogrifierException, IOException {
+    private static byte[] msgToExi(final NetconfMessage msg, final NetconfEXICodec codec)
+            throws IOException, EXIException, TransformerException {
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        final Transmogrifier transmogrifier = codec.getTransmogrifier();
-        transmogrifier.setOutputStream(byteArrayOutputStream);
-        transmogrifier.encode(new InputSource(new ByteArrayInputStream(msgAsString.getBytes())));
+        final SAXEncoder encoder = codec.getWriter();
+        encoder.setOutputStream(byteArrayOutputStream);
+        ThreadLocalTransformers.getDefaultTransformer().transform(new DOMSource(msg.getDocument()),
+                new SAXResult(encoder));
         return byteArrayOutputStream.toByteArray();
     }
 
