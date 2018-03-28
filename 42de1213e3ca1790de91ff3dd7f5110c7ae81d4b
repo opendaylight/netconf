@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "915cd9ce_a1700ce0",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-28T14:40:30Z",
+      "side": 1,
+      "message": "We should do the same also in AbstractNetconfTopolgy\u0027s createDeviceCommunicator method",
+      "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "891a0512_42ad1949",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-28T14:40:30Z",
+      "side": 1,
+      "message": "No need for blank line",
+      "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e13d6c3b_de1e3fb6",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-28T14:40:30Z",
+      "side": 1,
+      "message": "Also here.",
+      "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "00d3590c_dde5b5f0",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-28T14:40:30Z",
+      "side": 1,
+      "message": "Also here",
+      "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "73897f4f_c47e3608",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-28T14:40:30Z",
+      "side": 1,
+      "message": "Maybe scheduleKeepalives is better name now",
+      "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b1f15dd9_c81980ca",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-28T14:40:30Z",
+      "side": 1,
+      "message": "No need to add trailing space in log message",
+      "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "72ef24f9_bde1d5e6",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-28T14:40:30Z",
+      "side": 1,
+      "message": "missing space between comma and TimeUnit.SECONDS\n\nShould look like this:\nkeepaliveDelaySeconds, keepaliveDelaySeconds, TimeUnit.SECONDS)",
+      "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
