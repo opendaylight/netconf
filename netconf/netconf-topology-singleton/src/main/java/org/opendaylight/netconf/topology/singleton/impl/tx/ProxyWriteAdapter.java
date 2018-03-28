@@ -17,11 +17,9 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nullable;
-import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -33,8 +31,6 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.MergeRe
 import org.opendaylight.netconf.topology.singleton.messages.transactions.PutRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitFailedReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitRequest;
-import org.opendaylight.yangtools.yang.common.RpcResult;
-import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
@@ -116,19 +112,6 @@ public class ProxyWriteAdapter {
             public TransactionCommitFailedException apply(@Nullable final Exception input) {
                 final String message = "Submit of transaction " + identifier + " failed";
                 return new TransactionCommitFailedException(message, input);
-            }
-        });
-    }
-
-    public ListenableFuture<RpcResult<TransactionStatus>> commit(final Object identifier) {
-        LOG.trace("{}: Commit", id);
-
-        final CheckedFuture<Void, TransactionCommitFailedException> submit = submit(identifier);
-        return Futures.transform(submit, new Function<Void, RpcResult<TransactionStatus>>() {
-            @Nullable
-            @Override
-            public RpcResult<TransactionStatus> apply(@Nullable final Void input) {
-                return RpcResultBuilder.success(TransactionStatus.SUBMITED).build();
             }
         });
     }

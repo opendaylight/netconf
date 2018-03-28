@@ -56,12 +56,6 @@ public class ReadWriteTxTest {
     }
 
     @Test
-    public void commit() throws Exception {
-        tx.commit();
-        verify(delegateWriteTx).commit();
-    }
-
-    @Test
     public void cancel() throws Exception {
         tx.cancel();
         verify(delegateWriteTx).cancel();

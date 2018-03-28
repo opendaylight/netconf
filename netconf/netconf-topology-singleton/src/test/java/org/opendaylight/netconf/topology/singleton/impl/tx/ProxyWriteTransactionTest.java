@@ -22,7 +22,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -33,7 +32,6 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.PutRequ
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitRequest;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -102,14 +100,6 @@ public class ProxyWriteTransactionTest {
         } catch (final IllegalStateException e) {
             masterActor.expectNoMsg();
         }
-    }
-
-    @Test
-    public void testCommit() throws Exception {
-        final ListenableFuture<RpcResult<TransactionStatus>> submitFuture = tx.commit();
-        masterActor.expectMsgClass(SubmitRequest.class);
-        masterActor.reply(new SubmitReply());
-        Assert.assertEquals(TransactionStatus.SUBMITED, submitFuture.get().getResult());
     }
 
     @Test

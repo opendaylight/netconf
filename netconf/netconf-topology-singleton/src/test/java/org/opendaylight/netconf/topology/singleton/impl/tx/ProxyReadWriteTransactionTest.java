@@ -14,7 +14,6 @@ import akka.testkit.TestProbe;
 import akka.util.Timeout;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -24,7 +23,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.md.sal.common.api.TransactionStatus;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
@@ -40,7 +38,6 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadReq
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitRequest;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -110,14 +107,6 @@ public class ProxyReadWriteTransactionTest {
         } catch (final IllegalStateException e) {
             masterActor.expectNoMsg();
         }
-    }
-
-    @Test
-    public void testCommit() throws Exception {
-        final ListenableFuture<RpcResult<TransactionStatus>> submitFuture = tx.commit();
-        masterActor.expectMsgClass(SubmitRequest.class);
-        masterActor.reply(new SubmitReply());
-        Assert.assertEquals(TransactionStatus.SUBMITED, submitFuture.get().getResult());
     }
 
     @Test
