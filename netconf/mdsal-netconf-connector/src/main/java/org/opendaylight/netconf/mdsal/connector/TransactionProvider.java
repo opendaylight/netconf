@@ -8,6 +8,8 @@
 
 package org.opendaylight.netconf.mdsal.connector;
 
+import static org.opendaylight.netconf.mdsal.connector.DOMDataTransactionValidator.ValidationFailedException;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
@@ -32,6 +34,7 @@ public class TransactionProvider implements AutoCloseable {
     private DOMDataReadWriteTransaction candidateTransaction = null;
     private DOMDataReadWriteTransaction runningTransaction = null;
     private final List<DOMDataReadWriteTransaction> allOpenReadWriteTransactions = new ArrayList<>();
+    private final DOMDataTransactionValidator transactionValidator;
 
     private final String netconfSessionIdForReporting;
 
@@ -40,6 +43,8 @@ public class TransactionProvider implements AutoCloseable {
     public TransactionProvider(final DOMDataBroker dataBroker, final String netconfSessionIdForReporting) {
         this.dataBroker = dataBroker;
         this.netconfSessionIdForReporting = netconfSessionIdForReporting;
+        this.transactionValidator = (DOMDataTransactionValidator)dataBroker.getSupportedExtensions()
+            .get(DOMDataTransactionValidator.class);
     }
 
     @Override
@@ -67,6 +72,32 @@ public class TransactionProvider implements AutoCloseable {
         candidateTransaction = dataBroker.newReadWriteTransaction();
         allOpenReadWriteTransactions.add(candidateTransaction);
         return candidateTransaction;
+    }
+
+    public synchronized void validateTransaction() throws DocumentedException {
+        if (transactionValidator == null) {
+            LOG.error("Validate capability is not supported");
+            throw new DocumentedException("Validate capability is not supported",
+                ErrorType.PROTOCOL, ErrorTag.OPERATION_NOT_SUPPORTED, ErrorSeverity.ERROR);
+        }
+
+        if (!getCandidateTransaction().isPresent()) {
+            // Validating empty transaction, just return true
+            LOG.debug("Validating empty candidate transaction for session {}", netconfSessionIdForReporting);
+            return;
+        }
+
+        try {
+            transactionValidator.validate(candidateTransaction).checkedGet();
+        } catch (final ValidationFailedException e) {
+            LOG.debug("Candidate transaction validation {} failed on session {}", candidateTransaction,
+                netconfSessionIdForReporting, e);
+            final String cause = e.getCause() != null ? (" Cause: " + e.getCause().getMessage()) : "";
+            throw new DocumentedException(
+                "Candidate transaction validate failed on " + e.getMessage() + " " + netconfSessionIdForReporting
+                    +  cause, e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
+        }
+        return;
     }
 
     public synchronized boolean commitTransaction() throws DocumentedException {
