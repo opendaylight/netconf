@@ -16,6 +16,24 @@
       "revId": "bb98dfc0b1e951ed25deeffc92e643e417bd439d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "51782136_91b15ba1",
+        "filename": "netconf/netconf-binding-parent/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-28T20:57:55Z",
+      "side": 1,
+      "message": "I went back and forth on that - I can drop the binding.",
+      "parentUuid": "2aa4f582_eb31525f",
+      "revId": "bb98dfc0b1e951ed25deeffc92e643e417bd439d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
