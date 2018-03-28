@@ -59,7 +59,7 @@ public class NetconfCommandsImplCallsTest {
                 new NetconfDisconnectDeviceCommand(netconfCommands);
         netconfDisconnectDeviceCommand.doExecute();
 
-        verify(netconfCommands, times(0)).connectDevice(any(), any());
+        verify(netconfCommands, times(0)).disconnectDevice(any(), any());
 
         netconfDisconnectDeviceCommand = new NetconfDisconnectDeviceCommand(netconfCommands, "deviceId", null, null);
 
