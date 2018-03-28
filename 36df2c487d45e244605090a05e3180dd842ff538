@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "919c0fcd_d3cdc7ef",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/AbstractEdit.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-28T17:31:00Z",
+      "side": 1,
+      "message": "since any edit operation",
+      "revId": "36df2c487d45e244605090a05e3180dd842ff538",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "55c14aa7_6dc62bc7",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/AbstractEdit.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-28T17:31:00Z",
+      "side": 1,
+      "message": "I think you can remove annotation. Also maybe you should make this protected.",
+      "revId": "36df2c487d45e244605090a05e3180dd842ff538",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
