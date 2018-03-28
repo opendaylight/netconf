@@ -17,13 +17,13 @@
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
-    <artifactId>restconf-parent</artifactId>
+    <artifactId>restconf-subsystem</artifactId>
     <version>1.8.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
 
     <modules>
-        <module>restconf-binding-parent</module>
+        <module>restconf-parent</module>
         <module>restconf-artifacts</module>
         <module>restconf-models</module>
         <module>restconf-common-models</module>

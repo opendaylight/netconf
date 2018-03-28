@@ -15,8 +15,8 @@
     <relativePath/>
   </parent>
 
-  <groupId>org.opendaylight.netconf</groupId>
-  <artifactId>restconf-binding-parent</artifactId>
+  <groupId>org.restconf-binopendaylight.netconf</groupId>
+  <artifactId>ding-parent</artifactId>
   <version>1.8.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
