@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,7 +22,6 @@ import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
-import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
@@ -36,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-abstract class AbstractEdit extends AbstractSingletonNetconfOperation {
+abstract class AbstractEdit extends AbstractConfigOperation {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractEdit.class);
     private static final String TARGET_KEY = "target";
 
@@ -128,19 +126,5 @@ abstract class AbstractEdit extends AbstractSingletonNetconfOperation {
         }
 
         return childNode.get();
-    }
-
-    protected static NodeList getElementsByTagName(final XmlElement parent, final String key) throws
-        DocumentedException {
-        final Element domParent = parent.getDomElement();
-        final NodeList elementsByTagName;
-
-        if (Strings.isNullOrEmpty(domParent.getPrefix())) {
-            elementsByTagName = domParent.getElementsByTagName(key);
-        } else {
-            elementsByTagName = domParent.getElementsByTagNameNS(parent.getNamespace(), key);
-        }
-
-        return elementsByTagName;
     }
 }
