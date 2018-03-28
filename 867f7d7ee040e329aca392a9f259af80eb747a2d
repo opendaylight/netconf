@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b5646278_a7c3c353",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/CopyConfig.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5719
+      },
+      "writtenOn": "2018-03-28T15:38:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab4145bb_8e5b3614",
+      "revId": "867f7d7ee040e329aca392a9f259af80eb747a2d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "51f37449_ba2bdfa7",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/CopyConfig.java",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2018-03-27T15:15:50Z",
       "side": 1,
       "message": "add a space after //\nalso this is not edit-config operation but copy-config so maybe you can also change this in a comment",
+      "revId": "867f7d7ee040e329aca392a9f259af80eb747a2d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c1aa76b2_cace0df7",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/CopyConfig.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5719
+      },
+      "writtenOn": "2018-03-28T15:38:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51f37449_ba2bdfa7",
       "revId": "867f7d7ee040e329aca392a9f259af80eb747a2d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "e5f6aa2e_4b2460e0",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/CopyConfig.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5719
+      },
+      "writtenOn": "2018-03-28T15:38:15Z",
+      "side": 1,
+      "message": "Right, the issue was originally fixed only in https://git.opendaylight.org/gerrit/#/c/69593/",
+      "parentUuid": "8a0be182_093a7986",
+      "revId": "867f7d7ee040e329aca392a9f259af80eb747a2d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cb0ac951_95b14da9",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/CopyConfig.java",
         "patchSetId": 1
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "b0b053e7_5c3ab9be",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/CopyConfig.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5719
+      },
+      "writtenOn": "2018-03-28T15:38:15Z",
+      "side": 1,
+      "message": "Caller code assumes data is present, so removed Optional from return type.",
+      "parentUuid": "cb0ac951_95b14da9",
+      "revId": "867f7d7ee040e329aca392a9f259af80eb747a2d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "29a2a114_60cca628",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/CopyConfig.java",
         "patchSetId": 1
@@ -81,6 +153,24 @@
       "writtenOn": "2018-03-27T15:15:50Z",
       "side": 1,
       "message": "You are not actually using this in any test. So you can remove the annotation and change access to private.",
+      "revId": "867f7d7ee040e329aca392a9f259af80eb747a2d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "93cb18a4_62942c18",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/CopyConfig.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5719
+      },
+      "writtenOn": "2018-03-28T15:38:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29a2a114_60cca628",
       "revId": "867f7d7ee040e329aca392a9f259af80eb747a2d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
