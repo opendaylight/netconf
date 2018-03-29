@@ -9,13 +9,12 @@
 package org.opendaylight.netconf.topology.singleton.messages;
 
 import akka.util.Timeout;
-import java.io.Serializable;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 
-public class RefreshSlaveActor implements Serializable {
+public class RefreshSlaveActor {
 
     private final SchemaRepository schemaRepository;
     private final RemoteDeviceId id;

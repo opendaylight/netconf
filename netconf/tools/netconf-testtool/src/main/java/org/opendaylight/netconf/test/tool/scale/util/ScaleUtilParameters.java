@@ -8,12 +8,14 @@
 
 package org.opendaylight.netconf.test.tool.scale.util;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import net.sourceforge.argparse4j.ArgumentParsers;
 import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 
+@SuppressFBWarnings("DM_EXIT")
 public class ScaleUtilParameters {
 
     @Arg(dest = "distro-folder")

@@ -33,6 +33,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.util.Locale;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade.KeepaliveDOMRpcService;
@@ -304,7 +305,7 @@ public final class NetconfBaseOps {
 
         // Default operation
         if (defaultOperation.isPresent()) {
-            final String opString = defaultOperation.get().name().toLowerCase();
+            final String opString = defaultOperation.get().name().toLowerCase(Locale.ROOT);
             editBuilder.withChild(Builders.leafBuilder().withNodeIdentifier(toId(NETCONF_DEFAULT_OPERATION_QNAME))
                     .withValue(opString).build());
         }

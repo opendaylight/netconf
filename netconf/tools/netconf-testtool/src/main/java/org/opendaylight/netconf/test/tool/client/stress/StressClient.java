@@ -11,6 +11,7 @@ package org.opendaylight.netconf.test.tool.client.stress;
 import ch.qos.logback.classic.Level;
 import com.google.common.base.Stopwatch;
 import com.google.common.io.Files;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
@@ -44,6 +45,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+@SuppressFBWarnings("DM_EXIT")
 public final class StressClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(StressClient.class);
@@ -183,7 +185,7 @@ public final class StressClient {
         started.stop();
 
         LOG.info("FINISHED. Execution time: {}", started);
-        LOG.info("Requests per second: {}", (params.editCount * 1000.0 / started.elapsed(TimeUnit.MILLISECONDS)));
+        LOG.info("Requests per second: {}", params.editCount * 1000.0 / started.elapsed(TimeUnit.MILLISECONDS));
 
         // Cleanup
         timer.stop();

@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Interner;
 import com.google.common.collect.Interners;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -64,16 +65,17 @@ public class NetconfClientSessionNegotiator extends
     }
 
     @Override
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     protected void handleMessage(final NetconfHelloMessage netconfMessage) throws NetconfDocumentedException {
         final NetconfClientSession session = getSessionForHelloMessage(netconfMessage);
         replaceHelloMessageInboundHandler(session);
 
         // If exi should be used, try to initiate exi communication
         // Call negotiationSuccessFul after exi negotiation is finished successfully or not
-        if (shouldUseExi(netconfMessage)) {
+        final NetconfMessage startExiMessage = sessionPreferences.getStartExiMessage();
+        if (shouldUseExi(netconfMessage) && startExiMessage instanceof NetconfStartExiMessage) {
             LOG.debug("Netconf session {} should use exi.", session);
-            NetconfStartExiMessage startExiMessage = (NetconfStartExiMessage) sessionPreferences.getStartExiMessage();
-            tryToInitiateExi(session, startExiMessage);
+            tryToInitiateExi(session, (NetconfStartExiMessage) startExiMessage);
         } else {
             // Exi is not supported, release session immediately
             LOG.debug("Netconf session {} isn't capable of using exi.", session);
@@ -105,6 +107,7 @@ public class NetconfClientSessionNegotiator extends
         });
     }
 
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     private boolean shouldUseExi(final NetconfHelloMessage helloMsg) {
         return containsExi10Capability(helloMsg.getDocument())
                 && containsExi10Capability(sessionPreferences.getHelloMessage().getDocument());
@@ -130,7 +133,7 @@ public class NetconfClientSessionNegotiator extends
             }
         }
 
-        return Long.valueOf(textContent);
+        return Long.parseLong(textContent);
     }
 
     private static String getSessionIdWithXPath(final Document doc, final XPathExpression sessionIdXPath) {

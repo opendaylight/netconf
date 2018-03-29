@@ -13,7 +13,9 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
@@ -156,7 +158,8 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         final YangInstanceIdentifier.NodeIdentifierWithPredicates keyedId =
                 (YangInstanceIdentifier.NodeIdentifierWithPredicates) lastPathArgument;
         final Map<QName, Object> keyValues = keyedId.getKeyValues();
-        for (QName qualifiedName : keyValues.keySet()) {
+        for (Entry<QName, Object> entry : keyValues.entrySet()) {
+            QName qualifiedName = entry.getKey();
             final List<XmlElement> key =
                     dataElement.getChildElementsWithinNamespace(qualifiedName.getLocalName(),
                             qualifiedName.getNamespace().toString());
@@ -172,7 +175,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
             } catch (DocumentedException e) {
                 throw new IllegalStateException("Key value not present in key element", e);
             }
-            if (!keyValues.get(qualifiedName).equals(textContent)) {
+            if (!entry.getValue().equals(textContent)) {
                 throw new IllegalStateException("Key value in path not equal to key value in xml");
             }
         }
@@ -225,7 +228,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
     }
 
     private static String toOperationString(final ModifyAction operation) {
-        return operation.name().toLowerCase();
+        return operation.name().toLowerCase(Locale.ROOT);
     }
 
     private static Element getSourceElement(final DOMSource source) {

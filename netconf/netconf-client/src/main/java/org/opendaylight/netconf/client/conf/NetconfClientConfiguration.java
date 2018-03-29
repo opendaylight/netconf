@@ -85,18 +85,17 @@ public class NetconfClientConfiguration {
         return sslHandlerFactory;
     }
 
-    @SuppressWarnings("checkstyle:FallThrough")
     private void validateConfiguration() {
         Preconditions.checkNotNull(clientProtocol, " ");
         switch (clientProtocol) {
             case TLS:
+                validateTlsConfiguration();
+                validateTcpConfiguration();
+                break;
             case SSH:
-                if (clientProtocol == NetconfClientProtocol.SSH) {
-                    validateSshConfiguration();
-                } else {
-                    validateTlsConfiguration();
-                }
-                // Fall through intentional (ssh or tls validation is a superset of tcp validation)
+                validateSshConfiguration();
+                validateTcpConfiguration();
+                break;
             case TCP:
                 validateTcpConfiguration();
                 break;

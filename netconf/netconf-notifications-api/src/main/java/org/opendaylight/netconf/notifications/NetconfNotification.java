@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.notifications;
 
 import com.google.common.base.Preconditions;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.text.ParsePosition;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -179,6 +180,7 @@ public final class NetconfNotification extends NetconfMessage {
     /**
      * Create new notification with provided timestamp.
      */
+    @SuppressFBWarnings("EI_EXPOSE_REP2") // stores a reference to an externally mutable Date object
     public NetconfNotification(final Document notificationContent, final Date eventTime) {
         super(wrapNotification(notificationContent, eventTime));
         this.eventTime = eventTime;
@@ -189,6 +191,7 @@ public final class NetconfNotification extends NetconfMessage {
      *
      * @return notification event time
      */
+    @SuppressFBWarnings("EI_EXPOSE_REP")
     public Date getEventTime() {
         return eventTime;
     }

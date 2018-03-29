@@ -125,7 +125,7 @@ class RpcMapping {
                 }
             }
 
-            if (e1Children.isEmpty() && e1Children.isEmpty()) {
+            if (e1Children.isEmpty() && e2Children.isEmpty()) {
                 try {
                     return e1.getTextContent().equals(e2.getTextContent());
                 } catch (final DocumentedException e) {

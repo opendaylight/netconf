@@ -19,9 +19,6 @@ import org.opendaylight.netconf.topology.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 
 abstract class BaseCallHomeTopology extends AbstractNetconfTopology {
-
-    protected DOMMountPointService mountPointService = null;
-
     BaseCallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                          final EventExecutor eventExecutor,
                          final ScheduledThreadPool keepaliveExecutor,
@@ -33,6 +30,5 @@ abstract class BaseCallHomeTopology extends AbstractNetconfTopology {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
               processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService,
               encryptionService);
-        this.mountPointService = mountPointService;
     }
 }

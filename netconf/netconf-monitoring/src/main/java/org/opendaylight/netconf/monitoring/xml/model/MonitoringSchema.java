@@ -30,7 +30,7 @@ final class MonitoringSchema {
 
     @XmlElement(name = "namespace")
     public String getNamespace() {
-        return schema.getNamespace().getValue().toString();
+        return schema.getNamespace().getValue();
     }
 
     @XmlElement(name = "location")

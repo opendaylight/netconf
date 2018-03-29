@@ -8,10 +8,10 @@
 
 package org.opendaylight.netconf.ssh;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import java.nio.charset.StandardCharsets;
 import org.apache.sshd.common.io.IoInputStream;
 import org.apache.sshd.common.io.IoOutputStream;
 import org.apache.sshd.server.ExitCallback;
@@ -52,27 +52,21 @@ final class SshProxyClientHandler extends ChannelInboundHandlerAdapter {
         writeAdditionalHeader(ctx);
 
         asyncSshHandlerWriter = new AsyncSshHandlerWriter(out);
-        asyncSshHandlerReader = new AsyncSshHandlerReader(new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-                // Close both sessions (delegate server and remote client)
-                ctx.fireChannelInactive();
-                ctx.disconnect();
-                ctx.close();
-                asyncSshHandlerReader.close();
-                asyncSshHandlerWriter.close();
+        asyncSshHandlerReader = new AsyncSshHandlerReader(() -> {
+            // Close both sessions (delegate server and remote client)
+            ctx.fireChannelInactive();
+            ctx.disconnect();
+            ctx.close();
+            asyncSshHandlerReader.close();
+            asyncSshHandlerWriter.close();
+        }, msg -> {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Forwarding message for client: {} on channel: {}, message: {}",
+                        netconfHelloMessageAdditionalHeader.getAddress(), ctx.channel(),
+                        AsyncSshHandlerWriter.byteBufToString(msg));
             }
-        }, new AsyncSshHandlerReader.ReadMsgHandler() {
-            @Override
-            public void onMessageRead(final ByteBuf msg) {
-                if (LOG.isTraceEnabled()) {
-                    LOG.trace("Forwarding message for client: {} on channel: {}, message: {}",
-                            netconfHelloMessageAdditionalHeader.getAddress(), ctx.channel(),
-                            AsyncSshHandlerWriter.byteBufToString(msg));
-                }
-                // Just forward to delegate
-                ctx.writeAndFlush(msg);
-            }
+            // Just forward to delegate
+            ctx.writeAndFlush(msg);
         }, "ssh" + netconfHelloMessageAdditionalHeader.getAddress(), in);
 
 
@@ -80,7 +74,8 @@ final class SshProxyClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void writeAdditionalHeader(final ChannelHandlerContext ctx) {
-        ctx.writeAndFlush(Unpooled.copiedBuffer(netconfHelloMessageAdditionalHeader.toFormattedString().getBytes()));
+        ctx.writeAndFlush(Unpooled.copiedBuffer(netconfHelloMessageAdditionalHeader.toFormattedString()
+                .getBytes(StandardCharsets.UTF_8)));
     }
 
     @Override

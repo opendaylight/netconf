@@ -13,7 +13,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.nio.charset.StandardCharsets;
-import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
 
 public class ChunkedFramingMechanismEncoder extends MessageToByteEncoder<ByteBuf> {
     public static final int DEFAULT_CHUNK_SIZE = 8192;
@@ -41,13 +40,13 @@ public class ChunkedFramingMechanismEncoder extends MessageToByteEncoder<ByteBuf
         do {
             final int xfer = Math.min(chunkSize, msg.readableBytes());
 
-            out.writeBytes(NetconfMessageConstants.START_OF_CHUNK);
+            out.writeBytes(MessageParts.START_OF_CHUNK);
             out.writeBytes(String.valueOf(xfer).getBytes(StandardCharsets.US_ASCII));
             out.writeByte('\n');
 
             out.writeBytes(msg, xfer);
         } while (msg.isReadable());
 
-        out.writeBytes(NetconfMessageConstants.END_OF_CHUNK);
+        out.writeBytes(MessageParts.END_OF_CHUNK);
     }
 }

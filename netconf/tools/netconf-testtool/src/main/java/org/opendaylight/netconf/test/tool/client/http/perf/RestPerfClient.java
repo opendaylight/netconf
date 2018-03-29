@@ -10,6 +10,7 @@ package org.opendaylight.netconf.test.tool.client.http.perf;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.io.Files;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import org.opendaylight.netconf.test.tool.TestToolUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressFBWarnings("DM_EXIT")
 public final class RestPerfClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestPerfClient.class);
@@ -188,7 +190,7 @@ public final class RestPerfClient {
         // and do not log it
         if (allThreadsCompleted) {
             LOG.info(
-                "Requests per second: {}", (parameters.editCount * 1000.0 / started.elapsed(TimeUnit.MILLISECONDS)));
+                "Requests per second: {}", parameters.editCount * 1000.0 / started.elapsed(TimeUnit.MILLISECONDS));
         }
         System.exit(0);
     }

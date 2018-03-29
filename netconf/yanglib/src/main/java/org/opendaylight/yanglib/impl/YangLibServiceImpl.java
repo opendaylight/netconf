@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.yanglib.api.YangLibService;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -51,7 +52,7 @@ public class YangLibServiceImpl implements YangLibService {
 
         try {
             final YangTextSchemaSource source = sourceFuture.get();
-            return new String(ByteStreams.toByteArray(source.openStream()));
+            return new String(ByteStreams.toByteArray(source.openStream()), Charset.defaultCharset());
         } catch (InterruptedException | ExecutionException | IOException e) {
             throw new IllegalStateException("Unable to get schema " + sourceId, e);
         }

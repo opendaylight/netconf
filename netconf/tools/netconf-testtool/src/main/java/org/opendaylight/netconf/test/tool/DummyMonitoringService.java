@@ -16,6 +16,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
@@ -39,18 +40,13 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 public class DummyMonitoringService implements NetconfMonitoringService {
 
     private static final Sessions EMPTY_SESSIONS = new SessionsBuilder().setSession(Collections.emptyList()).build();
-    private static final Function<Capability, Uri> CAPABILITY_URI_FUNCTION = new Function<Capability, Uri>() {
-        @Nullable
-        @Override
-        public Uri apply(Capability capability) {
-            return new Uri(capability.getCapabilityUri());
-        }
-    };
+    private static final Function<Capability, Uri> CAPABILITY_URI_FUNCTION =
+        capability -> new Uri(capability.getCapabilityUri());
 
     private static final Function<Capability, Schema> CAPABILITY_SCHEMA_FUNCTION = new Function<Capability, Schema>() {
         @Nullable
         @Override
-        public Schema apply(@Nullable Capability capability) {
+        public Schema apply(@Nonnull Capability capability) {
             return new SchemaBuilder()
                     .setIdentifier(capability.getModuleName().get())
                     .setNamespace(new Uri(capability.getModuleNamespace().get()))

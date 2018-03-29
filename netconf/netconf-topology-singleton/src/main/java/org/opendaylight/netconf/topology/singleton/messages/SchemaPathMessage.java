@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.topology.singleton.messages;
 
 import com.google.common.collect.Iterables;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -20,7 +21,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 public class SchemaPathMessage implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private SchemaPath schemaPath;
+    @SuppressFBWarnings("SE_BAD_FIELD")
+    private final SchemaPath schemaPath;
 
     public SchemaPathMessage(final SchemaPath schemaPath) {
         this.schemaPath = schemaPath;
@@ -39,7 +41,8 @@ public class SchemaPathMessage implements Serializable {
 
         private SchemaPathMessage schemaPathMessage;
 
-        Proxy() {
+        @SuppressWarnings("checkstyle:RedundantModifier")
+        public Proxy() {
             //due to Externalizable
         }
 

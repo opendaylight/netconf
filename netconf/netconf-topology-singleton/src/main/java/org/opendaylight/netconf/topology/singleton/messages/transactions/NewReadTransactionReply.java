@@ -12,6 +12,7 @@ import akka.actor.ActorRef;
 import java.io.Serializable;
 
 public class NewReadTransactionReply implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final ActorRef txActor;
 

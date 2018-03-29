@@ -18,6 +18,7 @@ import akka.util.Timeout;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonService;
@@ -47,7 +48,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
     private NetconfNodeManager netconfNodeManager;
     private ActorRef masterActorRef;
     private boolean finalClose = false;
-    private boolean closed = false;
+    private final AtomicBoolean closed = new AtomicBoolean(false);
     private boolean isMaster;
 
     NetconfTopologyContext(final NetconfTopologySetup netconfTopologyDeviceSetup,
@@ -164,8 +165,8 @@ class NetconfTopologyContext implements ClusterSingletonService {
         }
     }
 
-    private synchronized void stopDeviceConnectorAndActor() {
-        if (closed) {
+    private void stopDeviceConnectorAndActor() {
+        if (!closed.compareAndSet(false, true)) {
             return;
         }
         if (remoteDeviceConnector != null) {
@@ -176,6 +177,5 @@ class NetconfTopologyContext implements ClusterSingletonService {
             netconfTopologyDeviceSetup.getActorSystem().stop(masterActorRef);
             masterActorRef = null;
         }
-        closed = true;
     }
 }

@@ -13,6 +13,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Preconditions;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -23,6 +24,7 @@ import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringJoiner;
@@ -34,6 +36,7 @@ import net.sourceforge.argparse4j.annotation.Arg;
 import net.sourceforge.argparse4j.inf.ArgumentParser;
 import net.sourceforge.argparse4j.inf.ArgumentParserException;
 
+@SuppressFBWarnings({"DM_EXIT", "DM_DEFAULT_ENCODING"})
 public class TesttoolParameters {
 
     private static final String HOST_KEY = "{HOST}";
@@ -303,13 +306,12 @@ public class TesttoolParameters {
             checkArgument(schemasDir.isDirectory(), "Schemas dir has to be a directory");
             checkArgument(schemasDir.canRead(), "Schemas dir has to be readable");
 
-            final List<File> files = Arrays.asList(schemasDir.listFiles());
+            final File[] filesArray = schemasDir.listFiles();
+            final List<File> files = filesArray != null ? Arrays.asList(filesArray) : Collections.emptyList();
             for (final File file : files) {
                 final Matcher matcher = YANG_FILENAME_PATTERN.matcher(file.getName());
                 if (!matcher.matches()) {
-                    final BufferedReader reader;
-                    try {
-                        reader = new BufferedReader(new FileReader(file));
+                    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                         String line = reader.readLine();
                         while (!DATE_PATTERN.matcher(line).find()) {
                             line = reader.readLine();
@@ -324,7 +326,9 @@ public class TesttoolParameters {
                             final String revision = m.group(1);
                             final String correctName = moduleName + "@" + revision + ".yang";
                             final File correctNameFile = new File(correctName);
-                            file.renameTo(correctNameFile);
+                            if (!file.renameTo(correctNameFile)) {
+                                System.err.println("Failed to rename " + file);
+                            }
                         }
                     } catch (final IOException e) {
                         // print error to console (test tool is running from console)
@@ -361,8 +365,8 @@ public class TesttoolParameters {
 
             final int batchedRequests = openDevices.size() / generateConfigBatchSize;
             final int batchedRequestsPerThread = batchedRequests / threadAmount;
-            final int leftoverBatchedRequests = (batchedRequests) % threadAmount;
-            final int leftoverRequests = openDevices.size() - (batchedRequests * generateConfigBatchSize);
+            final int leftoverBatchedRequests = batchedRequests % threadAmount;
+            final int leftoverRequests = openDevices.size() - batchedRequests * generateConfigBatchSize;
 
             final StringBuilder destBuilder = new StringBuilder(DEST);
             destBuilder.replace(destBuilder.indexOf(ADDRESS_PORT),
@@ -370,16 +374,16 @@ public class TesttoolParameters {
                 controllerDestination);
 
             for (int l = 0; l < threadAmount; l++) {
-                from = l * (batchedRequests * batchedRequestsPerThread);
-                to = from + (batchedRequests * batchedRequestsPerThread);
+                from = l * batchedRequests * batchedRequestsPerThread;
+                to = from + batchedRequests * batchedRequestsPerThread;
                 iterator = openDevices.subList(from, to).iterator();
                 allThreadsPayloads.add(createBatchedPayloads(batchedRequestsPerThread, iterator, editContentString,
                     destBuilder.toString()));
             }
             ArrayList<Execution.DestToPayload> payloads = null;
             if (leftoverBatchedRequests > 0) {
-                from = threadAmount * (batchedRequests * batchedRequestsPerThread);
-                to = from + (batchedRequests * batchedRequestsPerThread);
+                from = threadAmount * batchedRequests * batchedRequestsPerThread;
+                to = from + batchedRequests * batchedRequestsPerThread;
                 iterator = openDevices.subList(from, to).iterator();
                 payloads = createBatchedPayloads(leftoverBatchedRequests, iterator, editContentString,
                     destBuilder.toString());
@@ -413,7 +417,7 @@ public class TesttoolParameters {
             }
 
             if (leftoverRequests > 0) {
-                from = (threadAmount) * requestPerThreads;
+                from = threadAmount * requestPerThreads;
                 to = from + leftoverRequests;
                 iterator = openDevices.subList(from, to).iterator();
                 allThreadsPayloads.add(createPayloads(iterator, editContentString));
@@ -464,13 +468,13 @@ public class TesttoolParameters {
         final ArrayList<Execution.DestToPayload> payloads = new ArrayList<>();
 
         for (int i = 0; i < batchedRequestsCount; i++) {
-            String payload = "";
+            StringBuilder payload = new StringBuilder();
             for (int j = 0; j < generateConfigBatchSize; j++) {
                 final StringBuilder payloadBuilder = new StringBuilder(
                     prepareMessage(openDevices.next(), editContentString));
-                payload += modifyMessage(payloadBuilder, j, generateConfigBatchSize);
+                payload.append(modifyMessage(payloadBuilder, j, generateConfigBatchSize));
             }
-            payloads.add(new Execution.DestToPayload(destination, payload));
+            payloads.add(new Execution.DestToPayload(destination, payload.toString()));
         }
         return payloads;
     }

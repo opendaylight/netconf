@@ -12,9 +12,7 @@ import com.google.common.collect.ImmutableList;
 import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
 import java.nio.channels.AsynchronousChannelGroup;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -82,15 +80,6 @@ public class SshProxyServer implements AutoCloseable {
                         sshProxyServerConfiguration.getLocalAddress());
         sshServer.setSubsystemFactories(ImmutableList.of(netconfCommandFactory));
         sshServer.start();
-    }
-
-    private static Map<String, String> getProperties(final SshProxyServerConfiguration sshProxyServerConfiguration) {
-        final Map<String, String> ret = new HashMap<>();
-        ret.put(ServerFactoryManager.IDLE_TIMEOUT, String.valueOf(sshProxyServerConfiguration.getIdleTimeout()));
-        // TODO make auth timeout configurable on its own
-        ret.put(ServerFactoryManager.AUTH_TIMEOUT, String.valueOf(sshProxyServerConfiguration.getIdleTimeout()));
-
-        return ret;
     }
 
     @Override

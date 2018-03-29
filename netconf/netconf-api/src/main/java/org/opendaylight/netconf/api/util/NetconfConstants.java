@@ -8,7 +8,7 @@
 
 package org.opendaylight.netconf.api.util;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 
 /**
@@ -25,7 +25,7 @@ public final class NetconfConstants {
     public static final String NETCONF_MONITORING = "ietf-netconf-monitoring";
     public static final String NETCONF_NOTIFICATION = "ietf-netconf-notifications";
 
-    public static final Set<String> CONFIG_SERVICE_MARKERS = Sets.newHashSet(SERVICE_NAME, CONFIG_NETCONF_CONNECTOR,
+    public static final Set<String> CONFIG_SERVICE_MARKERS = ImmutableSet.of(SERVICE_NAME, CONFIG_NETCONF_CONNECTOR,
             NETCONF_MONITORING, NETCONF_NOTIFICATION);
 
     private NetconfConstants() {

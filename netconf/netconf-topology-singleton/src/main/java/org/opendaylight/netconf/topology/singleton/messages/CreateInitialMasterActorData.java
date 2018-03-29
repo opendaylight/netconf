@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.topology.singleton.messages;
 
-import java.io.Serializable;
 import java.util.List;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -17,9 +16,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 /**
  * Master sends this message to the own actor to set necessary parameters.
  */
-public class CreateInitialMasterActorData implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class CreateInitialMasterActorData {
     private final DOMDataBroker deviceDataBroker;
     private final List<SourceIdentifier> allSourceIdentifiers;
     private final DOMRpcService deviceRpc;
