@@ -50,6 +50,24 @@
       "revId": "5111ad236d453e3096e30051810d13111b047700",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f28632e1_f1b034b4",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8057
+      },
+      "writtenOn": "2018-03-29T06:09:20Z",
+      "side": 1,
+      "message": "this method is used to indicate whether start session negotiation by myself when handle message.you can get this\nin NetconfClientSessionNegotiator.java.",
+      "parentUuid": "49d7e977_1ad12f4e",
+      "revId": "5111ad236d453e3096e30051810d13111b047700",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
