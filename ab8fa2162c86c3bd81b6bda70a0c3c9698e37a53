@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fcdb543_3fab053c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-29T10:49:44Z",
+      "side": 1,
+      "message": "The commit message is little bit hard to read. Can you please check the guidelines https://wiki.openstack.org/wiki/GitCommitMessages#Summary_of_Git_commit_message_structure and adjust your commit message so it conforms to those guidelines?",
+      "revId": "ab8fa2162c86c3bd81b6bda70a0c3c9698e37a53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "52c5a16e_f93198e2",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/NetconfClientSessionNegotiator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-29T10:49:44Z",
+      "side": 1,
+      "message": "I think, we should be more specific here in the log.\n\nMaybe something like, \"Server hello message received, starting negotiation on channel {}\".",
+      "revId": "ab8fa2162c86c3bd81b6bda70a0c3c9698e37a53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62353a06_18ec09bc",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-29T10:49:44Z",
+      "side": 1,
+      "message": "Negotiation on channel {} already started\n\nAlso this does not have to be logged at INFO level, DEBUG should be enough",
+      "revId": "ab8fa2162c86c3bd81b6bda70a0c3c9698e37a53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "11d28a93_94e380a9",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-29T10:49:44Z",
+      "side": 1,
+      "message": "Well this is little bit strange naming because this returns true when the state is not actually IDLE",
+      "revId": "ab8fa2162c86c3bd81b6bda70a0c3c9698e37a53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "781688da_9c35d3bf",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-03-29T10:49:44Z",
+      "side": 1,
+      "message": "// Indicates whether negotiation already started",
+      "revId": "ab8fa2162c86c3bd81b6bda70a0c3c9698e37a53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
