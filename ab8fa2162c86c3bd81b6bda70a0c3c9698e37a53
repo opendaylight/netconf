@@ -70,6 +70,24 @@
     },
     {
       "key": {
+        "uuid": "a80eeecf_d86d4cf5",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8057
+      },
+      "writtenOn": "2018-03-29T13:01:44Z",
+      "side": 1,
+      "message": "this method is used to indicate whether negotiation already  started by checking the state.So maybe \"ifNegotiatedAlready\"?",
+      "parentUuid": "11d28a93_94e380a9",
+      "revId": "ab8fa2162c86c3bd81b6bda70a0c3c9698e37a53",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "781688da_9c35d3bf",
         "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiator.java",
         "patchSetId": 5
