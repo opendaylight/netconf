@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
@@ -68,13 +67,8 @@ public final class NetconfDeviceRpc implements DOMRpcService {
                 }
             }, MoreExecutors.directExecutor());
 
-        return Futures.makeChecked(transformed, new Function<Exception, DOMRpcException>() {
-            @Nullable
-            @Override
-            public DOMRpcException apply(@Nullable final Exception exception) {
-                return new DOMRpcImplementationNotAvailableException(exception, "Unable to invoke rpc %s", type);
-            }
-        });
+        return Futures.makeChecked(transformed, exception ->
+            new DOMRpcImplementationNotAvailableException(exception, "Unable to invoke rpc %s", type));
     }
 
     @Nonnull

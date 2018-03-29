@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.local.LocalAddress;
@@ -75,6 +76,7 @@ import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToASTTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressFBWarnings("DM_DEFAULT_ENCODING")
 public class NetconfDeviceSimulator implements Closeable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceSimulator.class);

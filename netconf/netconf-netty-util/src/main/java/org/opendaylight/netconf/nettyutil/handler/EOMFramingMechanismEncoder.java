@@ -11,12 +11,11 @@ package org.opendaylight.netconf.nettyutil.handler;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
 
 public class EOMFramingMechanismEncoder extends MessageToByteEncoder<ByteBuf> {
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
         out.writeBytes(msg);
-        out.writeBytes(NetconfMessageConstants.END_OF_MESSAGE);
+        out.writeBytes(MessageParts.END_OF_MESSAGE);
     }
 }

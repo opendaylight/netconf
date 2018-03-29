@@ -15,6 +15,7 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig.Builder;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -30,13 +31,12 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.sourceforge.argparse4j.inf.ArgumentParser;
-import net.sourceforge.argparse4j.inf.ArgumentParserException;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressFBWarnings({"DM_EXIT", "DM_DEFAULT_ENCODING"})
 public final class ScaleUtil {
     private static final ScheduledExecutorService EXECUTOR = new LoggingWrapperExecutor(4);
     private static final Semaphore SEMAPHORE = new Semaphore(0);
@@ -73,16 +73,20 @@ public final class ScaleUtil {
                     root.error("Failed to start any simulated devices, exiting...");
                     System.exit(1);
                 }
-                if (params.distroFolder != null) {
-                    final Main.ConfigGenerator configGenerator = new Main.ConfigGenerator(
-                        params.distroFolder, openDevices);
-                    final List<File> generated = configGenerator.generate(
-                            params.ssh, params.generateConfigBatchSize,
-                            params.generateConfigsTimeout, params.generateConfigsAddress,
-                            params.devicesPerPort);
-                    configGenerator.updateFeatureFile(generated);
-                    configGenerator.changeLoadOrder();
+
+                if (params.distroFolder == null) {
+                    root.error("Distro folder is not set, exiting...");
+                    System.exit(1);
                 }
+
+                final Main.ConfigGenerator configGenerator = new Main.ConfigGenerator(
+                        params.distroFolder, openDevices);
+                final List<File> generated = configGenerator.generate(
+                        params.ssh, params.generateConfigBatchSize,
+                        params.generateConfigsTimeout, params.generateConfigsAddress,
+                        params.devicesPerPort);
+                configGenerator.updateFeatureFile(generated);
+                configGenerator.changeLoadOrder();
             } catch (final Exception e) {
                 root.error("Unhandled exception", e);
                 netconfDeviceSimulator.close();
@@ -181,24 +185,15 @@ public final class ScaleUtil {
                 if (f.isDirectory()) {
                     deleteFolder(f);
                 } else {
-                    f.delete();
+                    if (!f.delete()) {
+                        root.warn("Failed to delete {}", f);
+                    }
                 }
             }
         }
-        folder.delete();
-    }
-
-    private static TesttoolParameters parseArgs(final String[] args, final ArgumentParser parser) {
-        final TesttoolParameters parameters = new TesttoolParameters();
-        try {
-            parser.parseArgs(args, parameters);
-            return parameters;
-        } catch (ArgumentParserException e) {
-            parser.handleError(e);
+        if (!folder.delete()) {
+            root.warn("Failed to delete {}", folder);
         }
-
-        System.exit(1);
-        return null;
     }
 
     private static class ScaleVerifyCallable implements Callable {
@@ -287,8 +282,8 @@ public final class ScaleUtil {
             return new LogOnExceptionCallable(callable);
         }
 
-        private class LogOnExceptionCallable implements Callable {
-            private Callable theCallable;
+        private static class LogOnExceptionCallable implements Callable {
+            private final Callable theCallable;
 
             LogOnExceptionCallable(Callable theCallable) {
                 this.theCallable = theCallable;

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -73,7 +74,8 @@ public class NetconfCommandsImpl implements NetconfCommands {
             attributes.put(NetconfConsoleConstants.NETCONF_IP,
                     netconfNode.getHost().getIpAddress().getIpv4Address().getValue());
             attributes.put(NetconfConsoleConstants.NETCONF_PORT, netconfNode.getPort().getValue().toString());
-            attributes.put(NetconfConsoleConstants.STATUS, netconfNode.getConnectionStatus().name().toLowerCase());
+            attributes.put(NetconfConsoleConstants.STATUS, netconfNode.getConnectionStatus().name()
+                    .toLowerCase(Locale.ROOT));
             netconfNodes.put(node.getNodeId().getValue(), attributes);
         }
         return netconfNodes;

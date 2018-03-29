@@ -13,7 +13,6 @@ import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.HttpResponseStatus;
-import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Realm;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
@@ -112,7 +111,6 @@ public class Execution implements Callable<Void> {
     }
 
     private void invokeAsync() {
-        final ArrayList<ListenableFuture<Response>> futures = new ArrayList<>();
         LOG.info("Begin sending async requests");
 
         for (final Request request : payloads) {
@@ -121,7 +119,7 @@ public class Execution implements Callable<Void> {
             } catch (InterruptedException e) {
                 LOG.warn("Semaphore acquire interrupted");
             }
-            futures.add(asyncHttpClient.executeRequest(request, new AsyncCompletionHandler<Response>() {
+            asyncHttpClient.executeRequest(request, new AsyncCompletionHandler<Response>() {
                 @Override
                 public STATE onStatusReceived(HttpResponseStatus status) throws Exception {
                     super.onStatusReceived(status);
@@ -143,7 +141,7 @@ public class Execution implements Callable<Void> {
                     semaphore.release();
                     return response;
                 }
-            }));
+            });
         }
         LOG.info("Requests sent, waiting for responses");
 

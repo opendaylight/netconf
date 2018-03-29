@@ -211,11 +211,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
             if (result != null && result.getResult() != null) {
                 LOG.debug("{}: Keepalive RPC successful with response: {}", id, result.getResult());
                 scheduleKeepalive();
-            } else if (result != null && result.getErrors() != null) {
+            } else if (result != null && !result.getErrors().isEmpty()) {
                 LOG.warn("{}: Keepalive RPC failed with error: {}", id, result.getErrors());
                 scheduleKeepalive();
             } else {
-                LOG.warn("{} Keepalive RPC returned null with response: {}. Reconnecting netconf session", id, result);
+                LOG.warn("{} Keepalive RPC returned null with response. Reconnecting netconf session", id);
                 reconnect();
             }
         }
@@ -276,7 +276,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     public static final class KeepaliveDOMRpcService implements DOMRpcService {
 
         private final DOMRpcService deviceRpc;
-        private ResetKeepalive resetKeepaliveTask;
+        private final ResetKeepalive resetKeepaliveTask;
         private final long defaultRequestTimeoutMillis;
         private final ScheduledExecutorService executor;
 

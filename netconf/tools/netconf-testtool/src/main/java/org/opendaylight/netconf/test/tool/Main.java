@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -42,6 +43,7 @@ import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressFBWarnings("DM_DEFAULT_ENCODING")
 public final class Main {
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
@@ -50,6 +52,7 @@ public final class Main {
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
+    @SuppressFBWarnings({"UW_UNCOND_WAIT", "WA_NOT_IN_LOOP"})
     public static void main(final String[] args) {
         final TesttoolParameters params = TesttoolParameters.parseArgs(args, TesttoolParameters.getParser());
         params.validate();
@@ -84,7 +87,7 @@ public final class Main {
                     } else {
                         try {
                             future.get();
-                        } catch (final ExecutionException e) {
+                        } catch (final ExecutionException | InterruptedException e) {
                             LOG.info("{}. thread failed.", threadNum, e);
                         }
                     }
@@ -102,7 +105,7 @@ public final class Main {
                 configGenerator.updateFeatureFile(generated);
                 configGenerator.changeLoadOrder();
             }
-        } catch (final Exception e) {
+        } catch (RuntimeException | InterruptedException e) {
             LOG.error("Unhandled exception", e);
             netconfDeviceSimulator.close();
             System.exit(1);
@@ -150,9 +153,12 @@ public final class Main {
                 Preconditions.checkState(configDir.mkdirs(), "Unable to create directory " + configDir);
             }
 
-            for (final File file : configDir.listFiles(pathname ->
-                    !pathname.isDirectory() && pathname.getName().startsWith(SIM_DEVICE_CFG_PREFIX))) {
-                Preconditions.checkState(file.delete(), "Unable to clean previous generated file %s", file);
+            final File[] files = configDir.listFiles(pathname ->
+                    !pathname.isDirectory() && pathname.getName().startsWith(SIM_DEVICE_CFG_PREFIX));
+            if (files != null) {
+                for (final File file : files) {
+                    Preconditions.checkState(file.delete(), "Unable to clean previous generated file %s", file);
+                }
             }
 
             try (InputStream stream = Main.class.getResourceAsStream(NETCONF_CONNECTOR_XML)) {
@@ -183,7 +189,7 @@ public final class Main {
                         String configContent = String.format(
                             middleBlueprint, name, address, String.valueOf(openDevice), String.valueOf(!useSsh));
                         configContent = String.format(
-                            "%s%s%d%s\n%s\n", configContent, "<connection-timeout-millis>",
+                            "%s%s%d%s%n%s%n", configContent, "<connection-timeout-millis>",
                             generateConfigsTimeout, "</connection-timeout-millis>", "</module>");
 
                         builder.append(configContent);

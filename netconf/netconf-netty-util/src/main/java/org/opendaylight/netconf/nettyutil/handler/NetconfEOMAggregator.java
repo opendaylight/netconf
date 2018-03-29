@@ -11,11 +11,10 @@ package org.opendaylight.netconf.nettyutil.handler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
 
 public class NetconfEOMAggregator extends DelimiterBasedFrameDecoder {
 
-    public static final ByteBuf DELIMITER = Unpooled.wrappedBuffer(NetconfMessageConstants.END_OF_MESSAGE);
+    public static final ByteBuf DELIMITER = Unpooled.wrappedBuffer(MessageParts.END_OF_MESSAGE);
 
     public NetconfEOMAggregator() {
         super(Integer.MAX_VALUE, DELIMITER);

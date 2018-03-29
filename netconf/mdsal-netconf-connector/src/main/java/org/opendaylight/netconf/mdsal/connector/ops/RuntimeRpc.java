@@ -259,7 +259,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
     @Nullable
     private NormalizedNode<?, ?> rpcToNNode(final XmlElement element, @Nullable final ContainerSchemaNode input)
             throws DocumentedException {
-        if (input.getChildNodes().isEmpty()) {
+        if (input == null || input.getChildNodes().isEmpty()) {
             return null;
         }
 

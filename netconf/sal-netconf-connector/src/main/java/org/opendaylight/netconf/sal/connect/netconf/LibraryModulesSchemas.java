@@ -24,16 +24,22 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
@@ -67,6 +73,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 /**
  * Holds URLs with YANG schema resources for all yang modules reported in
@@ -130,7 +137,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             if (connection instanceof HttpURLConnection) {
                 connection.setRequestProperty("Accept", "application/xml");
                 final String userpass = username + ":" + password;
-                final String basicAuth = "Basic " + printBase64Binary(userpass.getBytes());
+                final String basicAuth = "Basic " + printBase64Binary(userpass.getBytes(StandardCharsets.UTF_8));
 
                 connection.setRequestProperty("Authorization", basicAuth);
             }
@@ -291,7 +298,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         String extension = "";
         final int i = fileName.lastIndexOf(46);
         if (i != -1) {
-            extension = fileName.substring(i).toLowerCase();
+            extension = fileName.substring(i).toLowerCase(Locale.ROOT);
         }
 
         return extension.equals(".json");
@@ -302,14 +309,13 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer, LIBRARY_CONTEXT);
-        final JsonReader reader = new JsonReader(new InputStreamReader(in));
+        final JsonReader reader = new JsonReader(new InputStreamReader(in, Charset.defaultCharset()));
 
         jsonParser.parse(reader);
 
         return resultHolder.isFinished() ? Optional.of(resultHolder.getResult()) : Optional.empty();
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     private static Optional<NormalizedNode<?, ?>> readXml(final InputStream in) {
         try {
             final DocumentBuilder docBuilder = UntrustedXML.newDocumentBuilder();
@@ -338,7 +344,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             final NormalizedNode<?, ?> parsed = resultHolder.getResult();
             return Optional.of(parsed);
-        } catch (final Exception e) {
+        } catch (XMLStreamException | URISyntaxException | IOException | ParserConfigurationException
+                | SAXException e) {
             LOG.warn("Unable to parse yang library xml content", e);
         }
 
@@ -394,9 +401,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
     private static Optional<String> getValueOfSimpleNode(
             final NormalizedNode<? extends YangInstanceIdentifier.PathArgument, ?> node) {
-        final Object value = node.getValue();
-        return value == null || Strings.isNullOrEmpty(value.toString()) ? Optional.empty()
-                : Optional.of(value.toString().trim());
+        final String valueStr = node.getValue().toString();
+        return Strings.isNullOrEmpty(valueStr) ? Optional.empty() : Optional.of(valueStr.trim());
     }
 
     @Override

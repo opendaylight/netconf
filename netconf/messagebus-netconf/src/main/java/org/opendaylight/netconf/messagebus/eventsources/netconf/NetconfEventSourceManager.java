@@ -114,22 +114,6 @@ public final class NetconfEventSourceManager implements DataTreeChangeListener<N
         }
     }
 
-    private void nodeUpdated(final InstanceIdentifier<?> key, final Node node) {
-        Preconditions.checkNotNull(key);
-        if (!validateNode(node)) {
-            LOG.warn("NodeUpdated event : Node [{}] is null or not valid.", key.toString());
-            return;
-        }
-
-        LOG.info("Netconf event source [{}] is updating...", key.toString());
-        NetconfEventSourceRegistration nesr = registrationMap.get(key);
-        if (nesr != null) {
-            nesr.updateStatus();
-        } else {
-            nodeCreated(key, node);
-        }
-    }
-
     private void nodeRemoved(final InstanceIdentifier<?> key) {
         Preconditions.checkNotNull(key);
         LOG.info("Netconf event source [{}] is removing...", key.toString());

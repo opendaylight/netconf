@@ -248,11 +248,6 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         }, MoreExecutors.directExecutor());
     }
 
-    private static Node getNodeWithId(final RemoteDeviceId id) {
-        final NodeBuilder builder = getNodeIdBuilder(id);
-        return builder.build();
-    }
-
     private static NodeBuilder getNodeIdBuilder(final RemoteDeviceId id) {
         final NodeBuilder nodeBuilder = new NodeBuilder();
         nodeBuilder.setKey(new NodeKey(new NodeId(id.getName())));

@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.topology.singleton.messages.rpc;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -21,6 +22,7 @@ import org.opendaylight.yangtools.yang.common.RpcError;
 public class InvokeRpcMessageReply implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @SuppressFBWarnings("SE_BAD_FIELD")
     private final Collection<RpcError> rpcErrors;
     private final NormalizedNodeMessage normalizedNodeMessage;
 
@@ -47,7 +49,8 @@ public class InvokeRpcMessageReply implements Serializable {
 
         private InvokeRpcMessageReply invokeRpcMessageReply;
 
-        Proxy() {
+        @SuppressWarnings("checkstyle:RedundantModifier")
+        public Proxy() {
             //due to Externalizable
         }
 

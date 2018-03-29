@@ -259,7 +259,7 @@ public final class NetconfNodeActor extends UntypedActor {
 
         Futures.addCallback(remoteSchemaContext, new FutureCallback<SchemaContext>() {
             @Override
-            public void onSuccess(final SchemaContext result) {
+            public void onSuccess(@Nonnull final SchemaContext result) {
                 LOG.info("{}: Schema context resolved: {}", id, result.getModules());
                 slaveSalManager.registerSlaveMountPoint(result, deviceRpcService, masterReference);
             }

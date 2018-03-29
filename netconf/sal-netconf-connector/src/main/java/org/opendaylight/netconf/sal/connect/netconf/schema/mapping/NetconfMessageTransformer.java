@@ -16,11 +16,13 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import javax.annotation.Nonnull;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
@@ -54,6 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 public class NetconfMessageTransformer implements MessageTransformer<NetconfMessage> {
 
@@ -82,7 +85,6 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         this.strictParsing = strictParsing;
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public synchronized DOMNotification toNotification(final NetconfMessage message) {
         final Map.Entry<Date, XmlElement> stripped = NetconfMessageTransformUtil.stripNotification(message);
@@ -113,7 +115,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                     notificationAsContainerSchemaNode, strictParsing);
             xmlParser.traverse(new DOMSource(element));
             content = (ContainerNode) resultHolder.getResult();
-        } catch (final Exception e) {
+        } catch (XMLStreamException | URISyntaxException | IOException | ParserConfigurationException
+                | SAXException | UnsupportedOperationException e) {
             throw new IllegalArgumentException(String.format("Failed to parse notification %s", element), e);
         }
         return new NetconfDeviceNotification(content, stripped.getKey());
@@ -175,7 +178,6 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 || rpc.getNamespace().equals(NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME.getNamespace());
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public synchronized DOMRpcResult toRpcResult(final NetconfMessage message, final SchemaPath rpc) {
         final NormalizedNode<?, ?> normalizedNode;
@@ -193,7 +195,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                         strictParsing);
                 xmlParser.traverse(new DOMSource(xmlData));
                 dataNode = (ContainerNode) resultHolder.getResult();
-            } catch (final Exception e) {
+            } catch (XMLStreamException | URISyntaxException | IOException | ParserConfigurationException
+                    | SAXException e) {
                 throw new IllegalArgumentException(String.format("Failed to parse data response %s", xmlData), e);
             }
 
@@ -232,7 +235,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                             rpcDefinition.getOutput(), strictParsing);
                     xmlParser.traverse(new DOMSource(element));
                     normalizedNode = resultHolder.getResult();
-                } catch (final Exception e) {
+                } catch (XMLStreamException | URISyntaxException | IOException | ParserConfigurationException
+                        | SAXException e) {
                     throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
                 }
             }

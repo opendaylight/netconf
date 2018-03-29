@@ -16,6 +16,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
@@ -68,7 +69,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
     private void lock() {
         final FutureCallback<DOMRpcResult> lockCandidateCallback = new FutureCallback<DOMRpcResult>() {
             @Override
-            public void onSuccess(final DOMRpcResult result) {
+            public void onSuccess(@Nonnull final DOMRpcResult result) {
                 if (isSuccess(result)) {
                     if (LOG.isTraceEnabled()) {
                         LOG.trace("Lock candidate successful");

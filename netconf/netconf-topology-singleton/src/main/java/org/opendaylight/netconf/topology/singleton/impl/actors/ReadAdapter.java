@@ -56,7 +56,7 @@ class ReadAdapter {
         Futures.addCallback(read, new FutureCallback<Optional<NormalizedNode<?, ?>>>() {
 
             @Override
-            public void onSuccess(final Optional<NormalizedNode<?, ?>> result) {
+            public void onSuccess(@Nonnull final Optional<NormalizedNode<?, ?>> result) {
                 if (!result.isPresent()) {
                     sender.tell(new EmptyReadResponse(), self);
                     return;

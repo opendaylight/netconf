@@ -15,6 +15,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Map;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
@@ -51,7 +52,7 @@ public final class YangLibrarySchemaYangSourceProvider implements SchemaSourcePr
     private ListenableFuture<? extends YangTextSchemaSource> download(final SourceIdentifier sourceIdentifier) {
         final URL url = availableSources.get(sourceIdentifier);
         try (InputStream in = url.openStream()) {
-            final String schemaContent = new String(ByteStreams.toByteArray(in));
+            final String schemaContent = new String(ByteStreams.toByteArray(in), Charset.defaultCharset());
             final NetconfRemoteSchemaYangSourceProvider.NetconfYangTextSchemaSource yangSource =
                     new NetconfRemoteSchemaYangSourceProvider
                             .NetconfYangTextSchemaSource(id, sourceIdentifier, Optional.of(schemaContent));

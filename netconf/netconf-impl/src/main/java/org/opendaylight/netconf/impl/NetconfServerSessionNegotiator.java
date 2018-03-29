@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.impl;
 
 import com.google.common.base.Optional;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
 import io.netty.channel.local.LocalAddress;
 import io.netty.util.Timer;
@@ -52,6 +53,7 @@ public class NetconfServerSessionNegotiator
     }
 
     @Override
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
     protected NetconfServerSession getSession(
             NetconfServerSessionListener sessionListener, Channel channel,
             NetconfHelloMessage message) {

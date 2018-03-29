@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import javax.annotation.Nonnull;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -144,7 +145,7 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         }
 
         @Override
-        public YangTextSchemaSource apply(final DOMRpcResult input) {
+        public YangTextSchemaSource apply(@Nonnull final DOMRpcResult input) {
 
             if (input.getErrors().isEmpty()) {
 

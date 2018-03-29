@@ -11,7 +11,6 @@ package org.opendaylight.netconf.test.tool.rpc;
 import com.google.common.base.Optional;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
@@ -46,11 +45,10 @@ public class SimulatedGetConfig extends AbstractConfigNetconfOperation {
     private static DataList loadInitialConfigXMLFile(final File file) {
         LOG.info("Loading initial config xml file: {}", file.getName());
         DataList configData = new DataList();
-        List<XmlElement> xmlElementList = Collections.emptyList();
         try {
             Element element = XmlUtil.readXmlToElement(file);
             XmlElement xmlElement = XmlElement.fromDomElement(element);
-            xmlElementList = xmlElement.getChildElements();
+            List<XmlElement> xmlElementList = xmlElement.getChildElements();
             configData.setConfigList(xmlElementList);
         } catch (IOException e) {
             LOG.info("IO exception loading xml file: {} ", e.getMessage());

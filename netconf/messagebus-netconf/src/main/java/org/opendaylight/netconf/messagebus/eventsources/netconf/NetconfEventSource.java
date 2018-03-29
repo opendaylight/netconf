@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
@@ -122,8 +123,9 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
                 .put(cntr.getNotificationUrnPrefix(), cntr);
         Map<String, Stream> availableStreams = getAvailableStreams();
         LOG.debug("Stream configuration compare...");
-        for (String urnPrefix : this.urnPrefixToStreamMap.keySet()) {
-            final String streamName = this.urnPrefixToStreamMap.get(urnPrefix);
+        for (Entry<String, String> entry : this.urnPrefixToStreamMap.entrySet()) {
+            String urnPrefix = entry.getKey();
+            final String streamName = entry.getValue();
             LOG.debug("urnPrefix: {} streamName: {}", urnPrefix, streamName);
             if (availableStreams.containsKey(streamName)) {
                 LOG.debug("Stream containig on device");

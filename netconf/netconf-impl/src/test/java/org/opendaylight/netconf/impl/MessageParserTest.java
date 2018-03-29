@@ -62,18 +62,19 @@ public class MessageParserTest {
         int msgLength = out.readableBytes();
 
         int chunkCount = msgLength / ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE;
-        if ((msgLength % ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE) != 0) {
+        if (msgLength % ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE != 0) {
             chunkCount++;
         }
+
+        byte[] endOfChunkBytes = NetconfMessageConstants.END_OF_CHUNK.getBytes(StandardCharsets.UTF_8);
         for (int i = 1; i <= chunkCount; i++) {
             ByteBuf recievedOutbound = (ByteBuf) messages.poll();
             int exptHeaderLength = ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE;
             if (i == chunkCount) {
-                exptHeaderLength = msgLength - (ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE * (i - 1));
-                byte[] eom = new byte[NetconfMessageConstants.END_OF_CHUNK.length];
-                recievedOutbound
-                        .getBytes(recievedOutbound.readableBytes() - NetconfMessageConstants.END_OF_CHUNK.length, eom);
-                assertArrayEquals(NetconfMessageConstants.END_OF_CHUNK, eom);
+                exptHeaderLength = msgLength - ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE * (i - 1);
+                byte[] eom = new byte[endOfChunkBytes.length];
+                recievedOutbound.getBytes(recievedOutbound.readableBytes() - endOfChunkBytes.length, eom);
+                assertArrayEquals(endOfChunkBytes, eom);
             }
 
             byte[] header = new byte[String.valueOf(exptHeaderLength).length()
@@ -99,10 +100,10 @@ public class MessageParserTest {
         testChunkChannel.writeOutbound(this.msg);
         ByteBuf recievedOutbound = (ByteBuf) testChunkChannel.readOutbound();
 
-        byte[] eom = new byte[NetconfMessageConstants.END_OF_MESSAGE.length];
-        recievedOutbound.getBytes(recievedOutbound.readableBytes() - NetconfMessageConstants.END_OF_MESSAGE.length,
-                eom);
-        assertArrayEquals(NetconfMessageConstants.END_OF_MESSAGE, eom);
+        byte[] endOfMsgBytes = NetconfMessageConstants.END_OF_MESSAGE.getBytes(StandardCharsets.UTF_8);
+        byte[] eom = new byte[endOfMsgBytes.length];
+        recievedOutbound.getBytes(recievedOutbound.readableBytes() - endOfMsgBytes.length, eom);
+        assertArrayEquals(endOfMsgBytes, eom);
 
         testChunkChannel.writeInbound(recievedOutbound);
         NetconfMessage receivedMessage = (NetconfMessage) testChunkChannel.readInbound();

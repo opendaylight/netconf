@@ -10,7 +10,6 @@ package org.opendaylight.netconf.notifications.impl.ops;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
@@ -69,12 +68,7 @@ public final class NotificationsTransformUtil {
 
     private static RpcDefinition findCreateSubscriptionRpc() {
         return Iterables.getFirst(Collections2.filter(NOTIFICATIONS_SCHEMA_CTX.getOperations(),
-            new Predicate<RpcDefinition>() {
-                @Override
-                public boolean apply(final RpcDefinition input) {
-                    return input.getQName().getLocalName().equals(CreateSubscription.CREATE_SUBSCRIPTION);
-                }
-            }), null);
+            input -> input.getQName().getLocalName().equals(CreateSubscription.CREATE_SUBSCRIPTION)), null);
     }
 
     /**

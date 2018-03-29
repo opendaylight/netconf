@@ -126,7 +126,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         return remoteAddress.toString();
     }
 
-    private class DeviceConfig implements DataTreeChangeListener<Device> {
+    private static class DeviceConfig implements DataTreeChangeListener<Device> {
 
         private final AuthorizedKeysDecoder keyDecoder = new AuthorizedKeysDecoder();
 
@@ -189,7 +189,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         }
     }
 
-    private class DeviceOp implements DataTreeChangeListener<Device> {
+    private static class DeviceOp implements DataTreeChangeListener<Device> {
 
         private final ConcurrentMap<String, Device> byPublicKey = new ConcurrentHashMap<>();
 
@@ -242,7 +242,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         }
     }
 
-    private class GlobalConfig implements DataTreeChangeListener<Global> {
+    private static class GlobalConfig implements DataTreeChangeListener<Global> {
 
         private volatile Global current = null;
 

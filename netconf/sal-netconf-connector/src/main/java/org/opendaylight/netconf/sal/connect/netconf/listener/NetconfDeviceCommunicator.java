@@ -275,7 +275,7 @@ public class NetconfDeviceCommunicator
         try {
             request = requests.peek();
             if (request != null && request.future.isUncancellable()) {
-                requests.poll();
+                request = requests.poll();
                 // we have just removed one request from the queue
                 // we can also release one permit
                 if (semaphore != null) {
@@ -343,18 +343,15 @@ public class NetconfDeviceCommunicator
     @Override
     public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message, final QName rpc) {
         sessionLock.lock();
-
-        if (semaphore != null && !semaphore.tryAcquire()) {
-            LOG.warn("Limit of concurrent rpc messages was reached (limit :"
-                    + concurentRpcMsgs + "). Rpc reply message is needed. Discarding request of Netconf device with id"
-                    + id.getName());
-            sessionLock.unlock();
-            return Futures.immediateFailedFuture(new NetconfDocumentedException(
-                    "Limit of rpc messages was reached (Limit :" + concurentRpcMsgs
-                            + ") waiting for emptying the queue of Netconf device with id" + id.getName()));
-        }
-
         try {
+            if (semaphore != null && !semaphore.tryAcquire()) {
+                LOG.warn("Limit of concurrent rpc messages was reached (limit :" + concurentRpcMsgs
+                    + "). Rpc reply message is needed. Discarding request of Netconf device with id" + id.getName());
+                return Futures.immediateFailedFuture(new NetconfDocumentedException(
+                        "Limit of rpc messages was reached (Limit :" + concurentRpcMsgs
+                        + ") waiting for emptying the queue of Netconf device with id" + id.getName()));
+            }
+
             return sendRequestWithLock(message, rpc);
         } finally {
             sessionLock.unlock();

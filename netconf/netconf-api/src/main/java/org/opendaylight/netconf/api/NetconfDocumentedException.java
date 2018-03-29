@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.api;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.w3c.dom.Document;
@@ -43,6 +44,7 @@ public class NetconfDocumentedException extends DocumentedException {
         super(message, cause, errorType, errorTag, errorSeverity, errorInfo);
     }
 
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
     public NetconfDocumentedException(final DocumentedException exception) {
         super(exception.getMessage(), (Exception) exception.getCause(), exception.getErrorType(),
                 exception.getErrorTag(), exception.getErrorSeverity(), exception.getErrorInfo());

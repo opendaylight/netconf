@@ -11,7 +11,6 @@ package org.opendaylight.netconf.test.tool.client.http.perf;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.HttpResponseStatus;
-import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import java.util.ArrayList;
@@ -39,7 +38,6 @@ public class AsyncExecutionStrategy implements ExecutionStrategy {
 
     @Override
     public void invoke() {
-        final ArrayList<ListenableFuture<Response>> futures = new ArrayList<>();
         LOG.info("Begin sending async requests");
 
         for (final Request request : payloads) {
@@ -48,7 +46,7 @@ public class AsyncExecutionStrategy implements ExecutionStrategy {
             } catch (InterruptedException e) {
                 LOG.warn("Semaphore acquire interrupted");
             }
-            futures.add(asyncHttpClient.executeRequest(request, new AsyncCompletionHandler<Response>() {
+            asyncHttpClient.executeRequest(request, new AsyncCompletionHandler<Response>() {
                 @Override
                 public STATE onStatusReceived(HttpResponseStatus status) throws Exception {
                     super.onStatusReceived(status);
@@ -64,7 +62,7 @@ public class AsyncExecutionStrategy implements ExecutionStrategy {
                     semaphore.release();
                     return response;
                 }
-            }));
+            });
         }
         LOG.info("Requests sent, waiting for responses");
 

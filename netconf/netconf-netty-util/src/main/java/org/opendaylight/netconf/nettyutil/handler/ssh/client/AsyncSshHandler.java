@@ -119,9 +119,10 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
             session = future.getSession();
             final AuthFuture authenticateFuture = authenticationHandler.authenticate(session);
+            final ClientSession localSession = session;
             authenticateFuture.addListener(future1 -> {
                 if (future1.isSuccess()) {
-                    handleSshAuthenticated(session, ctx);
+                    handleSshAuthenticated(localSession, ctx);
                 } else {
                     // Exception does not have to be set in the future, add simple exception in such case
                     final Throwable exception = future1.getException() == null
@@ -164,8 +165,9 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
         // TODO we should also read from error stream and at least log from that
 
+        ClientChannel localChannel = channel;
         sshReadAsyncListener = new AsyncSshHandlerReader(() -> AsyncSshHandler.this.disconnect(ctx, ctx.newPromise()),
-            msg -> ctx.fireChannelRead(msg), channel.toString(), channel.getAsyncOut());
+            msg -> ctx.fireChannelRead(msg), localChannel.toString(), localChannel.getAsyncOut());
 
         // if readAsyncListener receives immediate close,
         // it will close this handler and closing this handler sets channel variable to null
@@ -198,10 +200,9 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         this.connectPromise = promise;
 
         if (negotiationFuture != null) {
-
             negotiationFutureListener = future -> {
                 if (future.isSuccess()) {
-                    connectPromise.setSuccess();
+                    promise.setSuccess();
                 }
             };
             //complete connection promise with netconf negotiation future
@@ -249,10 +250,12 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
         if (session != null && !session.isClosed() && !session.isClosing()) {
             session.close(false).addListener(future -> {
-                if (!future.isClosed()) {
-                    session.close(true);
+                synchronized (this) {
+                    if (!future.isClosed()) {
+                        session.close(true);
+                    }
+                    session = null;
                 }
-                session = null;
             });
         }
 

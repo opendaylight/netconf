@@ -10,17 +10,15 @@ package org.opendaylight.netconf.sal.connect.netconf.listener;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.AbstractFuture;
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.GuardedBy;
 
 final class UncancellableFuture<V> extends AbstractFuture<V> {
-    @GuardedBy("this")
-    private boolean uncancellable = false;
+    private volatile boolean uncancellable = false;
 
     UncancellableFuture(final boolean uncancellable) {
         this.uncancellable = uncancellable;
     }
 
-    public synchronized boolean setUncancellable() {
+    public boolean setUncancellable() {
         if (isCancelled()) {
             return false;
         }
@@ -29,17 +27,17 @@ final class UncancellableFuture<V> extends AbstractFuture<V> {
         return true;
     }
 
-    public synchronized boolean isUncancellable() {
+    public boolean isUncancellable() {
         return uncancellable;
     }
 
     @Override
-    public synchronized boolean cancel(final boolean mayInterruptIfRunning) {
+    public boolean cancel(final boolean mayInterruptIfRunning) {
         return !uncancellable && super.cancel(mayInterruptIfRunning);
     }
 
     @Override
-    public synchronized boolean set(@Nullable final V value) {
+    public boolean set(@Nullable final V value) {
         Preconditions.checkState(uncancellable);
         return super.set(value);
     }
