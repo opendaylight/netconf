@@ -60,7 +60,7 @@ public class NetconfDisconnectDeviceCommand extends AbstractAction {
         if (!Strings.isNullOrEmpty(deviceId)) {
             status = service.disconnectDevice(deviceId);
         } else {
-            if (!NetconfCommandUtils.isIpValid(deviceIp) && !NetconfCommandUtils.isPortValid(devicePort)) {
+            if (!NetconfCommandUtils.isIpValid(deviceIp) || !NetconfCommandUtils.isPortValid(devicePort)) {
                 return "Invalid IP:" + deviceIp + " or Port:" + devicePort + "Please enter a valid entry to proceed.";
             }
             status = service.disconnectDevice(deviceIp, devicePort);
