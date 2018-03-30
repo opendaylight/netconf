@@ -174,16 +174,4 @@
     <tag>HEAD</tag>
     <url>https://wiki.opendaylight.org/view/OpenDaylight_Controller:MD-SAL</url>
   </scm>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <propertyExpansion>checkstyle.violationSeverity=error</propertyExpansion>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
