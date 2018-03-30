@@ -10,6 +10,7 @@ package org.opendaylight.netconf.console.commands;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -18,17 +19,24 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.opendaylight.netconf.console.api.NetconfCommands;
 import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(Strings.class)
 public class NetconfCommandsImplCallsTest {
 
     @Mock
@@ -48,6 +56,8 @@ public class NetconfCommandsImplCallsTest {
 
         netconfConnectDeviceCommand = new NetconfConnectDeviceCommand(netconfCommands, "192.168.1.1", "7777");
 
+        PowerMockito.mockStatic(Strings.class);
+        given(Strings.isNullOrEmpty(any())).willReturn(false);
         netconfConnectDeviceCommand.doExecute();
         doNothing().when(netconfCommands).connectDevice(any(), any());
         verify(netconfCommands, times(1)).connectDevice(any(), any());
