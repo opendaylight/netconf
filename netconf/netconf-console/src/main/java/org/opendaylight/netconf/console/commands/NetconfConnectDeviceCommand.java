@@ -9,6 +9,10 @@
 package org.opendaylight.netconf.console.commands;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
+
+import java.util.Arrays;
+
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.apache.karaf.shell.console.AbstractAction;
@@ -17,8 +21,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol.Name;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.ProtocolBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.protocol.specification.TlsCase;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.protocol.specification.TlsCaseBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.protocol.specification.tls._case.TlsBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
 
@@ -55,14 +63,14 @@ public class NetconfConnectDeviceCommand extends AbstractAction {
     @Option(name = "-U",
             aliases = { "--username" },
             description = "Username for netconf connection",
-            required = true,
+            required = false,
             multiValued = false)
     private String username;
 
     @Option(name = "-P",
             aliases = { "--password" },
             description = "Password for netconf connection",
-            required = true,
+            required = false,
             multiValued = false)
     private String password;
 
@@ -72,6 +80,20 @@ public class NetconfConnectDeviceCommand extends AbstractAction {
             required = false,
             multiValued = false)
     private String connectionType = "false";
+
+    @Option(name = "-pr",
+            aliases = { "--protocol" },
+            description = "Which protocol to be used, ssh or tls",
+            required = false,
+            multiValued = false)
+    private String protocol = "ssh";
+
+    @Option(name = "-ev",
+            aliases = { "--excluded-versions" },
+            description = "TLS versions not supported by target device",
+            required = false,
+            multiValued = false)
+    private String excludedTlsVersions;
 
     @Option(name = "-sl",
             aliases = { "--schemaless" },
@@ -95,18 +117,41 @@ public class NetconfConnectDeviceCommand extends AbstractAction {
 
         final boolean isTcpOnly = connectionType.equals("true");
         final boolean isSchemaless = schemaless.equals("true");
-        final Credentials credentials =
-                new LoginPasswordBuilder().setPassword(password).setUsername(username).build();
 
-        final NetconfNode netconfNode = new NetconfNodeBuilder()
-                                        .setHost(new Host(new IpAddress(new Ipv4Address(deviceIp))))
-                                        .setPort(new PortNumber(Integer.decode(devicePort)))
-                                        .setTcpOnly(isTcpOnly)
-                                        .setSchemaless(isSchemaless)
-                                        .setCredentials(credentials)
-                                        .build();
+        final NetconfNodeBuilder netconfNodeBuilder = new NetconfNodeBuilder();
+        netconfNodeBuilder.setHost(new Host(new IpAddress(new Ipv4Address(deviceIp))))
+                          .setPort(new PortNumber(Integer.decode(devicePort)))
+                          .setTcpOnly(isTcpOnly)
+                          .setSchemaless(isSchemaless);
 
-        service.connectDevice(netconfNode, deviceId);
+        if (isTcpOnly || protocol.equalsIgnoreCase("ssh")) {
+            if (Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password)) {
+                return "Empty Username:" + username + " or Password:" + password
+                        + ". In TCP or SSH mode, you must provide valid username and password.";
+            }
+            final Credentials credentials =
+                    new LoginPasswordBuilder().setPassword(password).setUsername(username).build();
+            netconfNodeBuilder.setCredentials(credentials);
+            if (!isTcpOnly) {
+                netconfNodeBuilder.setProtocol(new ProtocolBuilder().setName(Name.SSH).build());
+            }
+        } else if (protocol.equalsIgnoreCase("tls")) {
+            TlsCase tlsCase = null;
+            if (!Strings.isNullOrEmpty(excludedTlsVersions)) {
+                tlsCase = new TlsCaseBuilder()
+                            .setTls(new TlsBuilder()
+                                    .setExcludedVersions(Arrays.asList(excludedTlsVersions.split(","))).build())
+                            .build();
+            }
+            netconfNodeBuilder.setProtocol(new ProtocolBuilder()
+                                            .setName(Name.TLS)
+                                            .setSpecification(tlsCase)
+                                            .build());
+        } else {
+            return "Invalid protocol: " + protocol + ". Only SSH and TLS are supported.";
+        }
+
+        service.connectDevice(netconfNodeBuilder.build(), deviceId);
         final String message = "Netconf connector added succesfully";
         return message;
     }
