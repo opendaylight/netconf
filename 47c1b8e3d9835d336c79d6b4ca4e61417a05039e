@@ -1,0 +1,510 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d971c13b_2a6544ce",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/AuthorizedKeysDecoder.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "\"Reliance on default encoding\"",
+      "range": {
+        "startLine": 67,
+        "startChar": 60,
+        "endLine": 67,
+        "endChar": 82
+      },
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8bd3d46e_e5b738dc",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/AuthorizedKeysDecoder.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Alleviates \"Unchecked/unconfirmed cast\"",
+      "range": {
+        "startLine": 145,
+        "startChar": 66,
+        "endLine": 145,
+        "endChar": 102
+      },
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4a365a81_d492a2a6",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/RuntimeRpc.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "\"Parameter must be non-null but is marked as nullable\"",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2ec06e0_2f9e42ca",
+        "filename": "netconf/messagebus-netconf/src/main/java/org/opendaylight/netconf/messagebus/eventsources/netconf/NetconfEventSource.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "\"Inefficient use of keySet iterator instead of entrySet iterator\"",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "11d9a558_fb8e1650",
+        "filename": "netconf/netconf-api/src/main/java/org/opendaylight/netconf/api/util/NetconfConstants.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "\"Field is a mutable collection which should be package protected\"",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d9148895_6458ccc8",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/SimpleNetconfClientSessionListener.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "OK to ignore return value in this case.",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "27f92527_ff4c78d7",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/TcpClientChannelInitializer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "\"Field not initialized in constructor but dereferenced without null check\"",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "076b0a01_da822704",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/conf/NetconfClientConfiguration.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Rewritten to avoid \"Switch statement found where one case falls through to the next case\"",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "583e1305_e21ce2c8",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/NetconfServerSessionNegotiator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "FB doesn\u0027t see the actual parameterized type of getSessionPreferences() due to erasure.",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8d6f8990_0ff33480",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/MessageParts.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Defines packaged-scoped byte[] constants to avoid \"Field should be package protected - mutable public static field could be changed by malicious code or by accident\" in NetconfMessageConstants.",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cf2f5299_04e4501c",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "\"Inconsistent synchronization\"",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bd5834b2_12114262",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "\"closed\" changed to AtomicBoolean - \"fixes \"Inconsistent synchronization\"",
+      "range": {
+        "startLine": 169,
+        "startChar": 13,
+        "endLine": 169,
+        "endChar": 19
+      },
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "caeceff9_d01ba374",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Fixes \"Boxed value is unboxed and then immediately reboxed\"",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b2e1821f_a0c95e3d",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Avoids \"Load of known null value\"",
+      "range": {
+        "startLine": 356,
+        "startChar": 43,
+        "endLine": 356,
+        "endChar": 60
+      },
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "92adf46b_86186994",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/CreateInitialMasterActorData.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Fixes \"Non-transient non-serializable instance field in serializable class\" - serialization would fail if attempted anyway so don\u0027t bother having it Serializable.",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4019cebd_a112eefc",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/SchemaPathMessage.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Unfortunately FB doesn\u0027t recognize that this class delegates serialization via writeReplace.",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f728703d_09089b7b",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/SchemaPathMessage.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "The default ctor needs to public for Externalizable (but then we also need to suppress the CS violation that \u0027public\u0027 isn\u0027t needed (ie is redundant)).",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "39f2e2dd_971a9d1d",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/messages/NetconfMessageConstants.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "These byte[] constants were changed to String to avoid \"Field should be package protected - mutable public static field could be changed by malicious code or by accident\". The byte[] constants were moved to a new package-scoped MessageParts class.",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0baf8384_045c9472",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/LibraryModulesSchemas.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Avoids \"Exception is never thrown ...\"",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cff316d0_c44cae62",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/LibraryModulesSchemas.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Avoids \"Redundant nullcheck of value known to be non-null\"",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "56d7b605_965c7b47",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Fixes \"Method does not release lock on all exception paths\"",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7773c5ea_b6100d1f",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/UncancellableFuture.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Fixes \"Inconsistent synchronization\" - just make it volatile",
+      "range": {
+        "startLine": 15,
+        "startChar": 12,
+        "endLine": 15,
+        "endChar": 20
+      },
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9082638f_7216435f",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Fixes \"Redundant nullcheck of value known to be non-null\"",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ea2f7ef8_85e85d0b",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Main.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "\"Format string should use %n rather than \\n\"",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "761536fe_c0170651",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Fixes \"Possible null pointer dereference\" below.",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a64a5750_50600edb",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Fixes \"Method ignores return value\"",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e4e7d026_0bfff47d",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Fixes \"Method concatenates strings using + in a loop\"",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8b09ae2f_02d1f19f",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/customrpc/RpcMapping.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 1,
+      "message": "Fixes \"Repeated conditional tests\" - assume second conditional was intended to check e2Children.",
+      "revId": "47c1b8e3d9835d336c79d6b4ca4e61417a05039e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}

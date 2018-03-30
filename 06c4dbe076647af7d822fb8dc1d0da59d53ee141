@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dba39253_2ee31cbf",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/BaseCallHomeTopology.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 0,
+      "message": "\"Class defines field that masks a superclass field\"",
+      "revId": "06c4dbe076647af7d822fb8dc1d0da59d53ee141",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aae9197e_ce26e70d",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Execution.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 0,
+      "message": "\"Useless object created\"",
+      "range": {
+        "startLine": 115,
+        "startChar": 52,
+        "endLine": 115,
+        "endChar": 59
+      },
+      "revId": "06c4dbe076647af7d822fb8dc1d0da59d53ee141",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e37b2c81_754c1812",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/rpc/SimulatedGetConfig.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-03-30T14:45:25Z",
+      "side": 0,
+      "message": "\"Dead store to local variable\"",
+      "revId": "06c4dbe076647af7d822fb8dc1d0da59d53ee141",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
