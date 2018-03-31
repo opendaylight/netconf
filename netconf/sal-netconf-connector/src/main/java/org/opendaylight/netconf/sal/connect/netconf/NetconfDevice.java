@@ -29,6 +29,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import javax.annotation.concurrent.GuardedBy;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
@@ -149,7 +150,7 @@ public class NetconfDevice
 
         final FutureCallback<DeviceSources> resolvedSourceCallback = new FutureCallback<DeviceSources>() {
             @Override
-            public void onSuccess(final DeviceSources result) {
+            public void onSuccess(@Nonnull final DeviceSources result) {
                 addProvidedSourcesToSchemaRegistry(result);
                 setUpSchema(result);
             }
@@ -250,7 +251,7 @@ public class NetconfDevice
         updateTransformer(null);
     }
 
-    private void updateTransformer(final MessageTransformer<NetconfMessage> transformer) {
+    private synchronized void updateTransformer(final MessageTransformer<NetconfMessage> transformer) {
         messageTransformer = transformer;
     }
 
@@ -511,7 +512,7 @@ public class NetconfDevice
 
                     if (cause instanceof MissingSchemaSourceException) {
                         requiredSources = handleMissingSchemaSourceException(
-                                requiredSources, (MissingSchemaSourceException) e.getCause());
+                                requiredSources, (MissingSchemaSourceException) cause);
                         continue;
                     }
                     if (cause instanceof SchemaResolutionException) {

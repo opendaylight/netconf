@@ -41,9 +41,6 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaListenerRegistration
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceListener;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -191,11 +188,5 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
     private static OptionalRevision getRevisionForModule(final SourceIdentifier sourceIdentifier) {
         return sourceIdentifier.getRevision().map(rev -> new OptionalRevision(new RevisionIdentifier(rev.toString())))
                 .orElse(NO_REVISION);
-    }
-
-    private <T> T getObjectFromBundleContext(final Class<T> type, final String serviceRefName) {
-        final BundleContext bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
-        final ServiceReference<?> serviceReference = bundleContext.getServiceReference(serviceRefName);
-        return (T) bundleContext.getService(serviceReference);
     }
 }

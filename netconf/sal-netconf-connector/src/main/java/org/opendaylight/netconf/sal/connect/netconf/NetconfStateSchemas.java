@@ -256,9 +256,8 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
         private static Optional<String> getValueOfSimpleNode(
                 final NormalizedNode<? extends YangInstanceIdentifier.PathArgument, ?> node) {
-            final Object value = node.getValue();
-            return value == null || Strings.isNullOrEmpty(value.toString())
-                    ? Optional.empty() : Optional.of(value.toString().trim());
+            final String valueStr = node.getValue().toString();
+            return Strings.isNullOrEmpty(valueStr) ? Optional.empty() : Optional.of(valueStr.trim());
         }
 
         @Override

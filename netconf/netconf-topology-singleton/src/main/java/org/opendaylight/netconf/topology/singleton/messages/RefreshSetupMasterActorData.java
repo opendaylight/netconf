@@ -8,16 +8,13 @@
 
 package org.opendaylight.netconf.topology.singleton.messages;
 
-import java.io.Serializable;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 
 /**
  * Master sends this message to the own actor to refresh setup data.
  */
-public class RefreshSetupMasterActorData implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class RefreshSetupMasterActorData {
     private final NetconfTopologySetup netconfTopologyDeviceSetup;
     private final RemoteDeviceId remoteDeviceId;
 

@@ -13,7 +13,6 @@ import static org.junit.Assert.assertEquals;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.junit.Test;
-import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
 
 public class EOMFramingMechanismEncoderTest {
 
@@ -24,6 +23,6 @@ public class EOMFramingMechanismEncoderTest {
         final ByteBuf destination = Unpooled.buffer();
         new EOMFramingMechanismEncoder().encode(null, source, destination);
 
-        assertEquals(Unpooled.wrappedBuffer(source.array(), NetconfMessageConstants.END_OF_MESSAGE), destination);
+        assertEquals(Unpooled.wrappedBuffer(source.array(), MessageParts.END_OF_MESSAGE), destination);
     }
 }

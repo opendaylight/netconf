@@ -8,27 +8,22 @@
 
 package org.opendaylight.netconf.util.messages;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-public final class NetconfMessageConstants {
-
-    private NetconfMessageConstants(){}
+public interface NetconfMessageConstants {
 
     /**
      * The NETCONF 1.0 old-style message separator. This is framing mechanism
      * is used by default.
      */
-    public static final byte[] END_OF_MESSAGE = "]]>]]>".getBytes(UTF_8);
+    String END_OF_MESSAGE = "]]>]]>";
 
     // bytes
 
-    public static final int MIN_HEADER_LENGTH = 4;
+    int MIN_HEADER_LENGTH = 4;
 
     // bytes
 
-    public static final int MAX_HEADER_LENGTH = 13;
+    int MAX_HEADER_LENGTH = 13;
 
-    public static final byte[] START_OF_CHUNK = "\n#".getBytes(UTF_8);
-    public static final byte[] END_OF_CHUNK = "\n##\n".getBytes(UTF_8);
-
+    String START_OF_CHUNK = "\n#";
+    String END_OF_CHUNK = "\n##\n";
 }

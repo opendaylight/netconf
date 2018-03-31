@@ -49,7 +49,7 @@ class TcpClientChannelInitializer extends AbstractChannelInitializer<NetconfClie
 
                 negotiationFutureListener = future -> {
                     if (future.isSuccess()) {
-                        connectPromise.setSuccess();
+                        channelPromise.setSuccess();
                     }
                 };
 
@@ -58,7 +58,7 @@ class TcpClientChannelInitializer extends AbstractChannelInitializer<NetconfClie
                         //complete connection promise with netconf negotiation future
                         negotiationFuture.addListener(negotiationFutureListener);
                     } else {
-                        connectPromise.setFailure(future.cause());
+                        channelPromise.setFailure(future.cause());
                     }
                 });
                 ctx.connect(remoteAddress, localAddress, tcpConnectFuture);
@@ -66,6 +66,10 @@ class TcpClientChannelInitializer extends AbstractChannelInitializer<NetconfClie
 
             @Override
             public void disconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) throws Exception {
+                if (connectPromise == null) {
+                    return;
+                }
+
                 // If we have already succeeded and the session was dropped after, we need to fire inactive to notify
                 // reconnect logic
                 if (connectPromise.isSuccess()) {

@@ -40,8 +40,7 @@ public class NetconfListDevicesCommand extends AbstractAction {
         table.column(NetconfConsoleConstants.NETCONF_PORT).alignLeft();
         table.column(NetconfConsoleConstants.STATUS).alignLeft();
 
-        for (final String nodeIds : allDevices.keySet()) {
-            final Map<String, String> attributes = allDevices.get(nodeIds);
+        for (final Map<String, String> attributes : allDevices.values()) {
             table.addRow().addContent(attributes.get(NetconfConsoleConstants.NETCONF_ID),
                     attributes.get(NetconfConsoleConstants.NETCONF_IP),
                     attributes.get(NetconfConsoleConstants.NETCONF_PORT),

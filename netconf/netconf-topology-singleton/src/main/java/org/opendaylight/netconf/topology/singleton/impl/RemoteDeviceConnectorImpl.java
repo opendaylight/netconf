@@ -153,11 +153,11 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
                                                  final ActorRef deviceContextActorRef) {
         //setup default values since default value is not supported in mdsal
-        final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
+        final long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
                 ? NetconfTopologyUtils.DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
-        final Long keepaliveDelay = node.getKeepaliveDelay() == null
+        final long keepaliveDelay = node.getKeepaliveDelay() == null
                 ? NetconfTopologyUtils.DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
-        final Boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
+        final boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
                 ? NetconfTopologyUtils.DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade = new MasterSalFacade(remoteDeviceId,
@@ -352,11 +352,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         @Override
         public ReconnectStrategy createReconnectStrategy() {
-            final Long maxSleep = null;
-            final Long deadline = null;
-
             return new TimedReconnectStrategy(executor, minSleep,
-                    minSleep, sleepFactor, maxSleep, connectionAttempts, deadline);
+                    minSleep, sleepFactor, null /*maxSleep*/, connectionAttempts, null /*deadline*/);
         }
     }
 }

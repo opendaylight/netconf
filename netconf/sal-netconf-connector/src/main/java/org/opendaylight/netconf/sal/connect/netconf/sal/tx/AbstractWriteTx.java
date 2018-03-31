@@ -18,7 +18,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
@@ -48,7 +48,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
     protected final List<ListenableFuture<DOMRpcResult>> resultsFutures;
     private final List<TxListener> listeners = new CopyOnWriteArrayList<>();
     // Allow commit to be called only once
-    protected boolean finished = false;
+    protected volatile boolean finished = false;
 
     public AbstractWriteTx(final NetconfBaseOps netOps, final RemoteDeviceId id, final boolean rollbackSupport) {
         this.netOps = netOps;
@@ -153,13 +153,13 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         final ListenableFuture<RpcResult<Void>> result = performCommit();
         Futures.addCallback(result, new FutureCallback<RpcResult<Void>>() {
             @Override
-            public void onSuccess(@Nullable final RpcResult<Void> result) {
-                if (result != null && result.isSuccessful()) {
+            public void onSuccess(@Nonnull final RpcResult<Void> rpcResult) {
+                if (rpcResult.isSuccessful()) {
                     listeners.forEach(txListener -> txListener.onTransactionSuccessful(AbstractWriteTx.this));
                 } else {
                     final TransactionCommitFailedException cause =
                             new TransactionCommitFailedException("Transaction failed",
-                                    result.getErrors().toArray(new RpcError[result.getErrors().size()]));
+                                    rpcResult.getErrors().toArray(new RpcError[rpcResult.getErrors().size()]));
                     listeners.forEach(listener -> listener.onTransactionFailed(AbstractWriteTx.this, cause));
                 }
             }
@@ -189,7 +189,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
 
         Futures.addCallback(Futures.allAsList(resultsFutures), new FutureCallback<List<DOMRpcResult>>() {
             @Override
-            public void onSuccess(final List<DOMRpcResult> domRpcResults) {
+            public void onSuccess(@Nonnull final List<DOMRpcResult> domRpcResults) {
                 domRpcResults.forEach(domRpcResult -> {
                     if (!domRpcResult.getErrors().isEmpty() && !transformed.isDone()) {
                         final NetconfDocumentedException exception =

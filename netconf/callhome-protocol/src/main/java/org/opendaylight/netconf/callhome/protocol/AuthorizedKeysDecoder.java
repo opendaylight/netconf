@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -63,7 +64,7 @@ public class AuthorizedKeysDecoder {
 
         // look for the Base64 encoded part of the line to decode
         // both ssh-rsa and ssh-dss begin with "AAAA" due to the length bytes
-        bytes = Base64.getDecoder().decode(keyLine.getBytes());
+        bytes = Base64.getDecoder().decode(keyLine.getBytes(StandardCharsets.UTF_8));
         if (bytes.length == 0) {
             throw new IllegalArgumentException("No Base64 part to decode in " + keyLine);
         }
@@ -121,7 +122,7 @@ public class AuthorizedKeysDecoder {
 
     private String decodeType() {
         int len = decodeInt();
-        String type = new String(bytes, pos, len);
+        String type = new String(bytes, pos, len, StandardCharsets.UTF_8);
         pos += len;
         return type;
     }
@@ -140,23 +141,22 @@ public class AuthorizedKeysDecoder {
     }
 
     public static String encodePublicKey(final PublicKey publicKey) throws IOException {
-        String publicKeyEncoded;
         ByteArrayOutputStream byteOs = new ByteArrayOutputStream();
-        if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_RSA)) {
+        if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_RSA) && publicKey instanceof RSAPublicKey) {
             RSAPublicKey rsaPublicKey = (RSAPublicKey) publicKey;
             DataOutputStream dout = new DataOutputStream(byteOs);
-            dout.writeInt(KEY_TYPE_RSA.getBytes().length);
-            dout.write(KEY_TYPE_RSA.getBytes());
+            dout.writeInt(KEY_TYPE_RSA.getBytes(StandardCharsets.UTF_8).length);
+            dout.write(KEY_TYPE_RSA.getBytes(StandardCharsets.UTF_8));
             dout.writeInt(rsaPublicKey.getPublicExponent().toByteArray().length);
             dout.write(rsaPublicKey.getPublicExponent().toByteArray());
             dout.writeInt(rsaPublicKey.getModulus().toByteArray().length);
             dout.write(rsaPublicKey.getModulus().toByteArray());
-        } else if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_DSA)) {
+        } else if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_DSA) && publicKey instanceof DSAPublicKey) {
             DSAPublicKey dsaPublicKey = (DSAPublicKey) publicKey;
             DSAParams dsaParams = dsaPublicKey.getParams();
             DataOutputStream dout = new DataOutputStream(byteOs);
-            dout.writeInt(KEY_TYPE_DSA.getBytes().length);
-            dout.write(KEY_TYPE_DSA.getBytes());
+            dout.writeInt(KEY_TYPE_DSA.getBytes(StandardCharsets.UTF_8).length);
+            dout.write(KEY_TYPE_DSA.getBytes(StandardCharsets.UTF_8));
             dout.writeInt(dsaParams.getP().toByteArray().length);
             dout.write(dsaParams.getP().toByteArray());
             dout.writeInt(dsaParams.getQ().toByteArray().length);
@@ -165,13 +165,13 @@ public class AuthorizedKeysDecoder {
             dout.write(dsaParams.getG().toByteArray());
             dout.writeInt(dsaPublicKey.getY().toByteArray().length);
             dout.write(dsaPublicKey.getY().toByteArray());
-        } else if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_ECDSA)) {
+        } else if (publicKey.getAlgorithm().equals(KEY_FACTORY_TYPE_ECDSA) && publicKey instanceof BCECPublicKey) {
             BCECPublicKey ecPublicKey = (BCECPublicKey) publicKey;
             DataOutputStream dout = new DataOutputStream(byteOs);
-            dout.writeInt(KEY_TYPE_ECDSA.getBytes().length);
-            dout.write(KEY_TYPE_ECDSA.getBytes());
-            dout.writeInt(ECDSA_SUPPORTED_CURVE_NAME.getBytes().length);
-            dout.write(ECDSA_SUPPORTED_CURVE_NAME.getBytes());
+            dout.writeInt(KEY_TYPE_ECDSA.getBytes(StandardCharsets.UTF_8).length);
+            dout.write(KEY_TYPE_ECDSA.getBytes(StandardCharsets.UTF_8));
+            dout.writeInt(ECDSA_SUPPORTED_CURVE_NAME.getBytes(StandardCharsets.UTF_8).length);
+            dout.write(ECDSA_SUPPORTED_CURVE_NAME.getBytes(StandardCharsets.UTF_8));
 
             byte[] coordX = ecPublicKey.getQ().getAffineXCoord().getEncoded();
             byte[] coordY = ecPublicKey.getQ().getAffineYCoord().getEncoded();
@@ -182,7 +182,6 @@ public class AuthorizedKeysDecoder {
         } else {
             throw new IllegalArgumentException("Unknown public key encoding: " + publicKey.getAlgorithm());
         }
-        publicKeyEncoded = new String(Base64.getEncoder().encodeToString(byteOs.toByteArray()));
-        return publicKeyEncoded;
+        return Base64.getEncoder().encodeToString(byteOs.toByteArray());
     }
 }

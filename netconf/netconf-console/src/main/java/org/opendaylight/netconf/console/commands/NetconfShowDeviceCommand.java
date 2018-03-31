@@ -12,6 +12,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import javax.annotation.Nonnull;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
@@ -75,7 +76,7 @@ public class NetconfShowDeviceCommand extends AbstractAction {
         }
 
         if (!NetconfCommandUtils.isIpValid(deviceIp)
-                || (devicePort != null && !NetconfCommandUtils.isPortValid(devicePort))) {
+                || devicePort != null && !NetconfCommandUtils.isPortValid(devicePort)) {
             return "Invalid IP:" + deviceIp + " or Port:" + devicePort + "Please enter a valid entry to proceed.";
         }
 
@@ -93,8 +94,9 @@ public class NetconfShowDeviceCommand extends AbstractAction {
         table.column(NetconfConsoleConstants.STATUS).alignLeft();
         table.column(NetconfConsoleConstants.AVAILABLE_CAPABILITIES).alignLeft();
 
-        for (final String nodeId : devices.keySet()) {
-            final Map<String, List<String>> device = devices.get(nodeId);
+        for (final Entry<String, Map<String, List<String>>> entry : devices.entrySet()) {
+            final String nodeId = entry.getKey();
+            final Map<String, List<String>> device = entry.getValue();
             table.addRow().addContent(nodeId,
                     device.get(NetconfConsoleConstants.NETCONF_IP).get(NetconfConsoleConstants.DEFAULT_INDEX),
                     device.get(NetconfConsoleConstants.NETCONF_PORT).get(NetconfConsoleConstants.DEFAULT_INDEX),

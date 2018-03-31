@@ -11,7 +11,6 @@ package org.opendaylight.netconf.client;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Future;
-import java.io.Closeable;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.protocol.framework.AbstractDispatcher;
@@ -19,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClientSession, NetconfClientSessionListener>
-        implements NetconfClientDispatcher, Closeable {
+        implements NetconfClientDispatcher {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfClientDispatcherImpl.class);
 

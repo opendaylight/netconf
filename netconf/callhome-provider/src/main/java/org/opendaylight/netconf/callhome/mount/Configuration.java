@@ -69,16 +69,13 @@ public class Configuration {
         }
     }
 
-    private final String path;
     private Properties properties;
 
     public Configuration() {
-        path = "<no-path>";
         properties = new Properties();
     }
 
     public Configuration(final String path) throws ConfigurationException {
-        this.path = path;
         try {
             this.properties = readFromPath(path);
         } catch (IOException ioe) {
