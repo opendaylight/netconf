@@ -12,11 +12,9 @@ import com.siemens.ct.exi.exceptions.UnsupportedOption;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.DefaultChannelPromise;
+import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.FutureListener;
 import java.io.IOException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.netconf.api.NetconfExiSession;
@@ -75,29 +73,17 @@ public abstract class AbstractNetconfSession<S extends NetconfSession,L extends 
         // Restconf writes to a netconf mountpoint execute multiple messages
         // and one of these was executed from a restconf thread thus breaking ordering so
         // we need to execute all messages from an EventLoop thread.
-        final DefaultChannelPromise proxyFuture = new DefaultChannelPromise(channel);
-        channel.eventLoop().execute(new Runnable() {
-            @Override
-            public void run() {
-                final ChannelFuture future = channel.writeAndFlush(netconfMessage);
-                future.addListener(new FutureListener<Void>() {
-                    @Override
-                    public void operationComplete(final Future<Void> future) throws Exception {
-                        if (future.isSuccess()) {
-                            proxyFuture.setSuccess();
-                        } else {
-                            proxyFuture.setFailure(future.cause());
-                        }
-                    }
-                });
-                if (delayedEncoder != null) {
-                    replaceMessageEncoder(delayedEncoder);
-                    delayedEncoder = null;
-                }
+
+        final ChannelPromise promise = channel.newPromise();
+        channel.eventLoop().execute(() -> {
+            channel.writeAndFlush(netconfMessage, promise);
+            if (delayedEncoder != null) {
+                replaceMessageEncoder(delayedEncoder);
+                delayedEncoder = null;
             }
         });
 
-        return proxyFuture;
+        return promise;
     }
 
     @Override
