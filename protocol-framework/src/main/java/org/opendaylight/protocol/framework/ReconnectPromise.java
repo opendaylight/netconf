@@ -14,7 +14,6 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import java.net.InetSocketAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +52,7 @@ final class ReconnectPromise<S extends ProtocolSession<?>, L extends SessionList
             channel.pipeline().addLast(new ClosedChannelHandler(ReconnectPromise.this));
         });
 
-        pending.addListener((GenericFutureListener<Future<Object>>) future -> {
+        pending.addListener(future -> {
             if (!future.isSuccess() && !ReconnectPromise.this.isDone()) {
                 ReconnectPromise.this.setFailure(future.cause());
             }

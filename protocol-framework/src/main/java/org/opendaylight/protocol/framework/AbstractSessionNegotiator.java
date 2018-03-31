@@ -7,16 +7,13 @@
  */
 package org.opendaylight.protocol.framework;
 
+import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.concurrent.Promise;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
 
 /**
  * Abstract base class for session negotiators. It implements the basic
@@ -27,7 +24,8 @@ import com.google.common.base.Preconditions;
  * @param <S> Protocol session type, has to extend {@code ProtocolSession<M>}
  */
 @Deprecated
-public abstract class AbstractSessionNegotiator<M, S extends AbstractProtocolSession<?>> extends ChannelInboundHandlerAdapter implements SessionNegotiator<S> {
+public abstract class AbstractSessionNegotiator<M, S extends AbstractProtocolSession<?>>
+        extends ChannelInboundHandlerAdapter implements SessionNegotiator<S> {
     private final Logger LOG = LoggerFactory.getLogger(AbstractSessionNegotiator.class);
     private final Promise<S> promise;
     protected final Channel channel;
@@ -59,15 +57,14 @@ public abstract class AbstractSessionNegotiator<M, S extends AbstractProtocolSes
      * @param msg Message which should be sent.
      */
     protected final void sendMessage(final M msg) {
-        this.channel.writeAndFlush(msg).addListener(
-                (ChannelFutureListener) f -> {
-                    if (!f.isSuccess()) {
-                        LOG.info("Failed to send message {}", msg, f.cause());
-                        negotiationFailed(f.cause());
-                    } else {
-                        LOG.trace("Message {} sent to socket", msg);
-                    }
-                });
+        this.channel.writeAndFlush(msg).addListener(f -> {
+            if (!f.isSuccess()) {
+                LOG.info("Failed to send message {}", msg, f.cause());
+                negotiationFailed(f.cause());
+            } else {
+                LOG.trace("Message {} sent to socket", msg);
+            }
+        });
     }
 
     @Override
