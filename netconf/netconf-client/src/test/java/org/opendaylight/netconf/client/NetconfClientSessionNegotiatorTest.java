@@ -23,12 +23,12 @@ import static org.mockito.Mockito.verify;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelProgressivePromise;
+import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.HashedWheelTimer;
@@ -40,13 +40,11 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
@@ -60,14 +58,13 @@ public class NetconfClientSessionNegotiatorTest {
 
     private NetconfHelloMessage helloMessage;
     private ChannelPipeline pipeline;
-    private ChannelFuture future;
+    private ChannelPromise future;
     private Channel channel;
     private ChannelInboundHandlerAdapter channelInboundHandlerAdapter;
 
     @Before
     public void setUp() throws Exception {
-        helloMessage = NetconfHelloMessage.createClientHello(Sets.newSet("exi:1.0"), Optional
-                .<NetconfHelloMessageAdditionalHeader>absent());
+        helloMessage = NetconfHelloMessage.createClientHello(Sets.newSet("exi:1.0"), Optional.absent());
         pipeline = mockChannelPipeline();
         future = mockChannelFuture();
         channel = mockChannel();
@@ -83,8 +80,10 @@ public class NetconfClientSessionNegotiatorTest {
         Channel ret = mock(Channel.class);
         ChannelHandler channelHandler = mockChannelHandler();
         doReturn("").when(ret).toString();
+        doReturn(future).when(ret).newPromise();
         doReturn(future).when(ret).close();
         doReturn(future).when(ret).writeAndFlush(anyObject());
+        doReturn(future).when(ret).writeAndFlush(anyObject(), anyObject());
         doReturn(true).when(ret).isOpen();
         doReturn(pipeline).when(ret).pipeline();
         doReturn("").when(pipeline).toString();
@@ -93,8 +92,8 @@ public class NetconfClientSessionNegotiatorTest {
         return ret;
     }
 
-    private static ChannelFuture mockChannelFuture() {
-        ChannelFuture future = mock(ChannelFuture.class);
+    private static ChannelPromise mockChannelFuture() {
+        ChannelPromise future = mock(ChannelPromise.class);
         doReturn(future).when(future).addListener(any(GenericFutureListener.class));
         return future;
     }
@@ -118,14 +117,9 @@ public class NetconfClientSessionNegotiatorTest {
     private void mockEventLoop() {
         final EventLoop eventLoop = mock(EventLoop.class);
         doReturn(eventLoop).when(channel).eventLoop();
-        doAnswer(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                final Object[] args = invocation.getArguments();
-                final Runnable runnable = (Runnable) args[0];
-                runnable.run();
-                return null;
-            }
+        doAnswer(invocation -> {
+            invocation.getArgumentAt(0, Runnable.class).run();
+            return null;
         }).when(eventLoop).execute(any(Runnable.class));
     }
 
@@ -142,21 +136,21 @@ public class NetconfClientSessionNegotiatorTest {
         return new NetconfClientSessionNegotiator(preferences, promise, channel, timer, sessionListener, timeout);
     }
 
-    private NetconfHelloMessage createHelloMsg(final String name) throws Exception {
+    private static NetconfHelloMessage createHelloMsg(final String name) throws Exception {
         final InputStream stream = NetconfClientSessionNegotiatorTest.class.getResourceAsStream(name);
         final Document doc = XmlUtil.readXmlToDocument(stream);
 
         return new NetconfHelloMessage(doc);
     }
 
-    private Set<String> createCapabilities(String name) throws Exception {
+    private static Set<String> createCapabilities(final String name) throws Exception {
         NetconfHelloMessage hello = createHelloMsg(name);
 
         return ImmutableSet.copyOf(NetconfMessageUtil.extractCapabilitiesFromHello(hello.getDocument()));
     }
 
     @Test
-    public void testNetconfClientSessionNegotiator() throws Exception {
+    public void testNetconfClientSessionNegotiator() throws NetconfDocumentedException {
         Promise<NetconfClientSession> promise = mock(Promise.class);
         doReturn(promise).when(promise).setSuccess(anyObject());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
@@ -179,12 +173,9 @@ public class NetconfClientSessionNegotiatorTest {
         Set<String> caps = Sets.newSet("exi:1.0");
         NetconfHelloMessage message = NetconfHelloMessage.createServerHello(caps, 10);
 
-        doAnswer(new Answer<Object>() {
-            @Override
-            public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
-                channelInboundHandlerAdapter = ((ChannelInboundHandlerAdapter) invocationOnMock.getArguments()[2]);
-                return null;
-            }
+        doAnswer(invocationOnMock -> {
+            channelInboundHandlerAdapter = (ChannelInboundHandlerAdapter) invocationOnMock.getArguments()[2];
+            return null;
         }).when(pipeline).addAfter(anyString(), anyString(), any(ChannelHandler.class));
 
         ChannelHandlerContext handlerContext = mock(ChannelHandlerContext.class);

@@ -19,7 +19,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -27,15 +27,14 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.util.collections.Sets;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 
 public class SimpleNetconfClientSessionListenerTest {
 
     private Channel channel;
-    private ChannelFuture channelFuture;
+    private ChannelPromise channelFuture;
     Set<String> caps;
     private NetconfHelloMessage helloMessage;
     private NetconfMessage message;
@@ -43,11 +42,13 @@ public class SimpleNetconfClientSessionListenerTest {
     private NetconfClientSession clientSession;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws NetconfDocumentedException {
         channel = mock(Channel.class);
-        channelFuture = mock(ChannelFuture.class);
+        channelFuture = mock(ChannelPromise.class);
         mockEventLoop();
+        doReturn(channelFuture).when(channel).newPromise();
         doReturn(channelFuture).when(channel).writeAndFlush(anyObject());
+        doReturn(channelFuture).when(channel).writeAndFlush(anyObject(), any(ChannelPromise.class));
         doReturn(channelFuture).when(channelFuture).addListener(any(GenericFutureListener.class));
         caps = Sets.newSet("a", "b");
         helloMessage = NetconfHelloMessage.createServerHello(caps, 10);
@@ -59,14 +60,9 @@ public class SimpleNetconfClientSessionListenerTest {
     private void mockEventLoop() {
         final EventLoop eventLoop = mock(EventLoop.class);
         doReturn(eventLoop).when(channel).eventLoop();
-        doAnswer(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                final Object[] args = invocation.getArguments();
-                final Runnable runnable = (Runnable) args[0];
-                runnable.run();
-                return null;
-            }
+        doAnswer(invocation -> {
+            invocation.getArgumentAt(0, Runnable.class).run();
+            return null;
         }).when(eventLoop).execute(any(Runnable.class));
     }
 
@@ -75,29 +71,29 @@ public class SimpleNetconfClientSessionListenerTest {
         SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
         final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
-        verify(channel, times(1)).writeAndFlush(anyObject());
+        verify(channel, times(1)).writeAndFlush(anyObject(), anyObject());
 
         simpleListener.onSessionDown(clientSession, new Exception());
         assertFalse(promise.isSuccess());
     }
 
     @Test
-    public void testSendRequest() throws Exception {
+    public void testSendRequest() {
         SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
         final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
-        verify(channel, times(1)).writeAndFlush(anyObject());
+        verify(channel, times(1)).writeAndFlush(anyObject(), anyObject());
 
         simpleListener.sendRequest(message);
         assertFalse(promise.isSuccess());
     }
 
     @Test
-    public void testOnMessage() throws Exception {
+    public void testOnMessage() {
         SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
         final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
-        verify(channel, times(1)).writeAndFlush(anyObject());
+        verify(channel, times(1)).writeAndFlush(anyObject(), anyObject());
 
         simpleListener.onMessage(clientSession, message);
         assertTrue(promise.isSuccess());

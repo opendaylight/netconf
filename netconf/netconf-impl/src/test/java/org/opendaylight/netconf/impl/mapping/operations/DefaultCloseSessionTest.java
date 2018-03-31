@@ -19,6 +19,7 @@ import static org.mockito.Mockito.verify;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.junit.Test;
@@ -39,9 +40,7 @@ public class DefaultCloseSessionTest {
         final EventLoop eventLoop = mock(EventLoop.class);
         doReturn(eventLoop).when(channel).eventLoop();
         doAnswer(invocation -> {
-            final Object[] args = invocation.getArguments();
-            final Runnable runnable = (Runnable) args[0];
-            runnable.run();
+            invocation.getArgumentAt(0, Runnable.class).run();
             return null;
         }).when(eventLoop).execute(any(Runnable.class));
         doReturn(true).when(eventLoop).inEventLoop();
@@ -61,12 +60,13 @@ public class DefaultCloseSessionTest {
         doReturn(channelFuture).when(channel).close();
         doReturn(channelFuture).when(channelFuture).addListener(any(GenericFutureListener.class));
 
-        final ChannelFuture sendFuture = mock(ChannelFuture.class);
+        final ChannelPromise sendFuture = mock(ChannelPromise.class);
         doAnswer(invocation -> {
-            ((GenericFutureListener) invocation.getArguments()[0]).operationComplete(sendFuture);
+            invocation.getArgumentAt(0, GenericFutureListener.class).operationComplete(sendFuture);
             return null;
         }).when(sendFuture).addListener(any(GenericFutureListener.class));
-        doReturn(sendFuture).when(channel).writeAndFlush(anyObject());
+        doReturn(sendFuture).when(channel).newPromise();
+        doReturn(sendFuture).when(channel).writeAndFlush(anyObject(), anyObject());
         doReturn(true).when(sendFuture).isSuccess();
         final NetconfServerSessionListener listener = mock(NetconfServerSessionListener.class);
         doNothing().when(listener).onSessionTerminated(any(NetconfServerSession.class),
@@ -90,8 +90,7 @@ public class DefaultCloseSessionTest {
         AutoCloseable res = mock(AutoCloseable.class);
         doThrow(NetconfDocumentedException.class).when(res).close();
         DefaultCloseSession session = new DefaultCloseSession("", res);
-        Document doc = XmlUtil.newDocument();
         XmlElement elem = XmlElement.fromDomElement(XmlUtil.readXmlToElement("<elem/>"));
-        session.handleWithNoSubsequentOperations(doc, elem);
+        session.handleWithNoSubsequentOperations(XmlUtil.newDocument(), elem);
     }
 }
