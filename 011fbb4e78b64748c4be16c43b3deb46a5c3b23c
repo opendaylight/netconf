@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dc303591_b46289bf",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2018-04-04T10:36:14Z",
+      "side": 1,
+      "message": "Should\u0027ve read \u0027Optional.absent()\u0027 AFAICT.",
+      "range": {
+        "startLine": 109,
+        "startChar": 69,
+        "endLine": 109,
+        "endChar": 100
+      },
+      "revId": "011fbb4e78b64748c4be16c43b3deb46a5c3b23c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
