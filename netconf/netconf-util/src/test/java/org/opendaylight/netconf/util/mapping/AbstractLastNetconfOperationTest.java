@@ -15,8 +15,8 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.config.util.xml.XmlElement;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.w3c.dom.Document;

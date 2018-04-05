@@ -13,12 +13,12 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-import org.opendaylight.controller.config.util.xml.XmlElement;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.xml.XmlElement;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
@@ -74,7 +74,7 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfM
         final DOMResult result = domResult;
 
         try {
-            NetconfMessageTransformUtil.writeNormalizedRpc(((ContainerNode) payload), result,
+            NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result,
                     inputPath, SCHEMA_CONTEXT);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize " + inputPath, e);

@@ -10,10 +10,10 @@ package org.opendaylight.netconf.util.messages;
 
 import com.google.common.base.Optional;
 import java.util.Map;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.config.util.xml.XmlElement;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.util.mapping.AbstractNetconfOperation.OperationNameAndNamespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

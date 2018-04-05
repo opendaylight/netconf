@@ -15,7 +15,7 @@ import static org.junit.Assert.fail;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import org.junit.Test;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.w3c.dom.Element;
 
 public class XMLNetconfUtilTest {

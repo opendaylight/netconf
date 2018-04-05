@@ -51,9 +51,9 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.config.util.xml.XmlMappingConstants;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
@@ -258,7 +258,7 @@ public class NetconfDeviceCommunicatorTest {
             throws ParserConfigurationException {
         Document doc = UntrustedXML.newDocumentBuilder().newDocument();
         Element rpcReply =
-                doc.createElementNS(URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlMappingConstants.RPC_REPLY_KEY);
+                doc.createElementNS(URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0, XmlNetconfConstants.RPC_REPLY_KEY);
         rpcReply.setAttribute("message-id", messageID);
         Element element = doc.createElementNS("ns", "data");
         element.setTextContent(messageID);

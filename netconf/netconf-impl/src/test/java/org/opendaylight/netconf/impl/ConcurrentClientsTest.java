@@ -47,16 +47,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.opendaylight.controller.config.util.capability.Capability;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.monitoring.SessionEvent;
 import org.opendaylight.netconf.api.monitoring.SessionListener;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
 import org.opendaylight.netconf.client.SimpleNetconfClientSessionListener;
@@ -88,9 +88,9 @@ public class ConcurrentClientsTest {
     private static final int CONCURRENCY = 32;
     private static final InetSocketAddress NETCONF_ADDRESS = new InetSocketAddress("127.0.0.1", 8303);
 
-    private int nettyThreads;
-    private Class<? extends Runnable> clientRunnable;
-    private Set<String> serverCaps;
+    private final int nettyThreads;
+    private final Class<? extends Runnable> clientRunnable;
+    private final Set<String> serverCaps;
 
     public ConcurrentClientsTest(int nettyThreads, Class<? extends Runnable> clientRunnable, Set<String> serverCaps) {
         this.nettyThreads = nettyThreads;
@@ -124,11 +124,8 @@ public class ConcurrentClientsTest {
         doNothing().when(sessionListener).onSessionUp(any(NetconfServerSession.class));
         doNothing().when(sessionListener).onSessionDown(any(NetconfServerSession.class));
         doNothing().when(sessionListener).onSessionEvent(any(SessionEvent.class));
-        doReturn(new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
+        doReturn((AutoCloseable) () -> {
 
-            }
         }).when(monitoring).registerCapabilitiesListener(any(NetconfMonitoringService.CapabilitiesListener.class));
         doReturn(sessionListener).when(monitoring).getSessionListener();
         doReturn(new CapabilitiesBuilder().setCapability(Collections.<Uri>emptyList()).build()).when(monitoring)
@@ -289,10 +286,7 @@ public class ConcurrentClientsTest {
 
         @Override
         public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-            return new AutoCloseable() {
-                @Override
-                public void close() throws Exception {
-                }
+            return () -> {
             };
         }
 

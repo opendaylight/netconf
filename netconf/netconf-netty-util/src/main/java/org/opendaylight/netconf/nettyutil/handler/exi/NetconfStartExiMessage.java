@@ -11,9 +11,9 @@ package org.opendaylight.netconf.nettyutil.handler.exi;
 import com.google.common.annotations.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

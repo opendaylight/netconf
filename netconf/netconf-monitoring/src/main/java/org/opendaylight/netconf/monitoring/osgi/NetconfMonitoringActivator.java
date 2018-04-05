@@ -10,7 +10,7 @@ package org.opendaylight.netconf.monitoring.osgi;
 
 import java.util.Collections;
 import java.util.Set;
-import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
@@ -48,11 +48,8 @@ public class NetconfMonitoringActivator implements BundleActivator {
 
         private final NetconfMonitoringOperationService operationService;
 
-        private static final AutoCloseable AUTO_CLOSEABLE = new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-                // NOOP
-            }
+        private static final AutoCloseable AUTO_CLOSEABLE = () -> {
+            // NOOP
         };
 
         public NetconfMonitoringOperationServiceFactory(final NetconfMonitoringOperationService operationService) {

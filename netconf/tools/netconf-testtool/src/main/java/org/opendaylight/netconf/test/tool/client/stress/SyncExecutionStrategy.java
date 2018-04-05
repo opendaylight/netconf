@@ -15,8 +15,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.slf4j.Logger;
@@ -30,13 +30,14 @@ class SyncExecutionStrategy extends AbstractExecutionStrategy {
         super(params, preparedMessages, sessionListener);
     }
 
+    @Override
     public void invoke() {
         final AtomicInteger responseCounter = new AtomicInteger(0);
 
         int batchI = 0;
         for (final Integer editBatch : getEditBatches()) {
             for (int i = 0; i < editBatch; i++) {
-                final int msgId = i + (batchI * getParams().editBatchSize);
+                final int msgId = i + batchI * getParams().editBatchSize;
                 final NetconfMessage msg = getPreparedMessages().get(msgId);
                 LOG.debug("Sending message {}", msgId);
                 if (LOG.isDebugEnabled()) {

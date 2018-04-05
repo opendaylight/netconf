@@ -16,7 +16,7 @@ import com.siemens.ct.exi.FidelityOptions;
 import com.siemens.ct.exi.exceptions.UnsupportedOption;
 import com.siemens.ct.exi.helpers.DefaultEXIFactory;
 import java.util.Objects;
-import org.opendaylight.controller.config.util.xml.XmlElement;
+import org.opendaylight.netconf.api.xml.XmlElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;

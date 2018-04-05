@@ -13,10 +13,10 @@ import static org.junit.Assert.fail;
 import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYangResources;
 
 import org.junit.Test;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
+import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
+import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.w3c.dom.Document;

@@ -9,7 +9,7 @@
 package org.opendaylight.netconf.api.monitoring;
 
 import java.util.Set;
-import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.netconf.api.capability.Capability;
 
 public interface CapabilityListener {
 

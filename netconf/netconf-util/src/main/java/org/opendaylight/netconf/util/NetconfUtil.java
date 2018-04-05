@@ -13,11 +13,10 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.config.util.xml.XmlElement;
-import org.opendaylight.controller.config.util.xml.XmlMappingConstants;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
@@ -42,7 +41,7 @@ public final class NetconfUtil {
 
     public static Document checkIsMessageOk(final Document response) throws DocumentedException {
         XmlElement element = XmlElement.fromDomDocument(response);
-        Preconditions.checkState(element.getName().equals(XmlMappingConstants.RPC_REPLY_KEY));
+        Preconditions.checkState(element.getName().equals(XmlNetconfConstants.RPC_REPLY_KEY));
         element = element.getOnlyChildElement();
         if (element.getName().equals(XmlNetconfConstants.OK)) {
             return response;

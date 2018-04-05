@@ -21,7 +21,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

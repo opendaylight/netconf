@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
@@ -95,15 +95,12 @@ public class AggregatedNetconfOperationServiceFactory
         }
         listeners.add(listener);
 
-        return new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-                synchronized (AggregatedNetconfOperationServiceFactory.this) {
-                    listeners.remove(listener);
-                    CloseableUtil.closeAll(regs.values());
-                    for (final Map.Entry<NetconfOperationServiceFactory, AutoCloseable> reg : regs.entrySet()) {
-                        registrations.remove(reg.getKey(), reg.getValue());
-                    }
+        return () -> {
+            synchronized (AggregatedNetconfOperationServiceFactory.this) {
+                listeners.remove(listener);
+                CloseableUtil.closeAll(regs.values());
+                for (final Map.Entry<NetconfOperationServiceFactory, AutoCloseable> reg : regs.entrySet()) {
+                    registrations.remove(reg.getKey(), reg.getValue());
                 }
             }
         };

@@ -20,16 +20,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.config.util.capability.BasicCapability;
-import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.netconf.api.capability.BasicCapability;
+import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 
 
 public class AggregatedNetconfOperationServiceFactoryTest {
 
-    private Set<Capability> factory1Caps = new HashSet<>();
-    private Set<Capability> factory2Caps = new HashSet<>();
+    private final Set<Capability> factory1Caps = new HashSet<>();
+    private final Set<Capability> factory2Caps = new HashSet<>();
 
     @Mock
     private CapabilityListener listener1;

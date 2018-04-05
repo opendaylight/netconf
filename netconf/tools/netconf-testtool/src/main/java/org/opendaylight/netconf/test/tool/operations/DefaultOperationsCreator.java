@@ -11,7 +11,7 @@ package org.opendaylight.netconf.test.tool.operations;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import java.util.Set;
-import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;

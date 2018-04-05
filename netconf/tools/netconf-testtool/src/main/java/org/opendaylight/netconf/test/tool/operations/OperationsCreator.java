@@ -9,7 +9,7 @@
 package org.opendaylight.netconf.test.tool.operations;
 
 import java.util.Set;
-import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 

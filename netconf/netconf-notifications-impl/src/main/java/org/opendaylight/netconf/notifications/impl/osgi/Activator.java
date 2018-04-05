@@ -14,8 +14,8 @@ import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Set;
-import org.opendaylight.controller.config.util.capability.BasicCapability;
-import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.netconf.api.capability.BasicCapability;
+import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.api.util.NetconfConstants;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
@@ -62,12 +62,7 @@ public class Activator implements BundleActivator {
             @Override
             public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
                 listener.onCapabilitiesChanged(capabilities, Collections.<Capability>emptySet());
-                return new AutoCloseable() {
-                    @Override
-                    public void close() {
-                        listener.onCapabilitiesChanged(Collections.<Capability>emptySet(), capabilities);
-                    }
-                };
+                return () -> listener.onCapabilitiesChanged(Collections.<Capability>emptySet(), capabilities);
             }
 
             @Override

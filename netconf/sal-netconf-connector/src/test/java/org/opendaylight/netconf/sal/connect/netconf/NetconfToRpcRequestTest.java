@@ -17,8 +17,8 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;

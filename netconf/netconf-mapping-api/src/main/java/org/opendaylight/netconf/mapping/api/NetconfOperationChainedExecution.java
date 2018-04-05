@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.mapping.api;
 
-import org.opendaylight.controller.config.util.xml.DocumentedException;
+import org.opendaylight.netconf.api.DocumentedException;
 import org.w3c.dom.Document;
 
 /**

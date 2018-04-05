@@ -12,12 +12,11 @@ import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.config.util.xml.XmlMappingConstants;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
@@ -66,8 +65,8 @@ public final class SendErrorExceptionUtil {
                     "Missing %s element", XmlNetconfConstants.RPC_KEY);
 
             final Element rpcReply = errorDocument.getDocumentElement();
-            Preconditions.checkState(rpcReply.getTagName().equals(XmlMappingConstants.RPC_REPLY_KEY),
-                    "Missing %s element", XmlMappingConstants.RPC_REPLY_KEY);
+            Preconditions.checkState(rpcReply.getTagName().equals(XmlNetconfConstants.RPC_REPLY_KEY),
+                    "Missing %s element", XmlNetconfConstants.RPC_REPLY_KEY);
 
             final NamedNodeMap incomingAttributes = incommingRpc.getAttributes();
             for (int i = 0; i < incomingAttributes.getLength(); i++) {

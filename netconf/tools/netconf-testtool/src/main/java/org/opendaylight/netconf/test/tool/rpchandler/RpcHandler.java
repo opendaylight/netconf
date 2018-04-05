@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.test.tool.rpchandler;
 
 import java.util.Optional;
-import org.opendaylight.controller.config.util.xml.XmlElement;
+import org.opendaylight.netconf.api.xml.XmlElement;
 import org.w3c.dom.Document;
 
 public interface RpcHandler {

@@ -18,9 +18,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.xml.bind.JAXB;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.config.util.xml.XmlElement;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.xml.XmlElement;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 

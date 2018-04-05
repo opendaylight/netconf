@@ -12,7 +12,7 @@ import com.google.common.collect.Maps;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import java.util.Map;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
+import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.util.messages.SendErrorExceptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
+import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverImpl;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;

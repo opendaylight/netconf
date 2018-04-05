@@ -1,11 +1,11 @@
-error=org.opendaylight.controller.config.util.xml.DocumentedException
+error=org.opendaylight.netconf.api.DocumentedException
 success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot
 success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot/choiceList
 success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot/maincontent
 success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot/choiceList
 success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot
 success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot/(urn:dummy:aug?revision=1999-08-17)augmented-leaf
-error=org.opendaylight.controller.config.util.xml.DocumentedException
+error=org.opendaylight.netconf.api.DocumentedException
 success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot/choiceList/choiceList[{(urn:dummy:mod-0?revision=2016-03-01)name=aaa}]
 success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot/multi-key-list
 success=/(urn:dummy:mod-0?revision=2016-03-01)mainroot/multi-key-list/multi-key-list[{(urn:dummy:mod-0?revision=2016-03-01)id1=aaa, (urn:dummy:mod-0?revision=2016-03-01)id2=bbb}]

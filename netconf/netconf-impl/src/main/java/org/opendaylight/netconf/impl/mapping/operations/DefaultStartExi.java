@@ -7,14 +7,14 @@
  */
 package org.opendaylight.netconf.impl.mapping.operations;
 
-import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType;
-import org.opendaylight.controller.config.util.xml.XmlElement;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
+import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
+import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.impl.NetconfServerSession;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;

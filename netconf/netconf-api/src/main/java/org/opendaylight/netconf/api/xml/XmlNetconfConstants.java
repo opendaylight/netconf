@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.api.xml;
 
-import org.opendaylight.controller.config.util.xml.XmlMappingConstants;
-
 public final class XmlNetconfConstants {
 
     private XmlNetconfConstants() {}
@@ -25,6 +23,7 @@ public final class XmlNetconfConstants {
     public static final String RPC_KEY = "rpc";
     public static final String NOTIFICATION_ELEMENT_NAME = "notification";
     public static final String EVENT_TIME = "eventTime";
+    public static final String PREFIX = "prefix";
 
     public static final String MESSAGE_ID = "message-id";
     public static final String SESSION_ID = "session-id";
@@ -32,8 +31,9 @@ public final class XmlNetconfConstants {
     public static final String GET = "get";
     public static final String GET_CONFIG = "get-config";
 
-    public static final String URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0 =
-            XmlMappingConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
+    public static final String RPC_REPLY_KEY = "rpc-reply";
+
+    public static final String URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0 = "urn:ietf:params:xml:ns:netconf:base:1.0";
     public static final String URN_IETF_PARAMS_NETCONF_BASE_1_0 = "urn:ietf:params:netconf:base:1.0";
     public static final String URN_IETF_PARAMS_NETCONF_BASE_1_1 = "urn:ietf:params:netconf:base:1.1";
     public static final String URN_IETF_PARAMS_XML_NS_NETCONF_EXI_1_0 = "urn:ietf:params:xml:ns:netconf:exi:1.0";

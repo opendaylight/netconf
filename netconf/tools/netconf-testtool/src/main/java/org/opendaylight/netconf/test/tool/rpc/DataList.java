@@ -10,7 +10,7 @@ package org.opendaylight.netconf.test.tool.rpc;
 
 import java.util.Collections;
 import java.util.List;
-import org.opendaylight.controller.config.util.xml.XmlElement;
+import org.opendaylight.netconf.api.xml.XmlElement;
 
 public class DataList {
 

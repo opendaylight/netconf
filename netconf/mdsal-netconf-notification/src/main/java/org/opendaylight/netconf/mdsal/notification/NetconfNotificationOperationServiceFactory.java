@@ -10,8 +10,8 @@ package org.opendaylight.netconf.mdsal.notification;
 
 import java.util.Collections;
 import java.util.Set;
-import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.sal.common.util.NoopAutoCloseable;
+import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;

@@ -11,8 +11,8 @@ package org.opendaylight.netconf.util.mapping;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.config.util.xml.XmlElement;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

@@ -8,7 +8,7 @@
 
 package org.opendaylight.netconf.impl.osgi;
 
-import org.opendaylight.controller.config.util.xml.DocumentedException;
+import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.impl.NetconfServerSession;
 import org.w3c.dom.Document;
 

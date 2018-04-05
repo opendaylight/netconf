@@ -13,7 +13,7 @@ import com.google.common.collect.Sets;
 import java.io.File;
 import java.util.Collections;
 import java.util.Set;
-import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
@@ -51,10 +51,7 @@ class SimulatedOperationProvider implements NetconfOperationServiceFactory {
     public AutoCloseable registerCapabilityListener(
             final CapabilityListener listener) {
         listener.onCapabilitiesChanged(caps, Collections.<Capability>emptySet());
-        return new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-            }
+        return () -> {
         };
     }
 

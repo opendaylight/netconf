@@ -10,7 +10,6 @@ package org.opendaylight.netconf.api;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.w3c.dom.Document;
 
 /**

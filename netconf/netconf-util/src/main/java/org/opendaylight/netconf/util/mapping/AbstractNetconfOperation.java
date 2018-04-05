@@ -10,11 +10,10 @@ package org.opendaylight.netconf.util.mapping;
 
 import com.google.common.base.Optional;
 import java.util.Map;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.config.util.xml.XmlElement;
-import org.opendaylight.controller.config.util.xml.XmlMappingConstants;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
@@ -102,7 +101,7 @@ public abstract class AbstractNetconfOperation implements NetconfOperation {
         Map<String, Attr> attributes = requestElement.getAttributes();
 
         Element response = handle(document, operationElement, subsequentOperation);
-        Element rpcReply = XmlUtil.createElement(document, XmlMappingConstants.RPC_REPLY_KEY,
+        Element rpcReply = XmlUtil.createElement(document, XmlNetconfConstants.RPC_REPLY_KEY,
                 Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
 
         if (XmlElement.fromDomElement(response).hasNamespace()) {

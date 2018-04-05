@@ -10,7 +10,7 @@ package org.opendaylight.netconf.test.tool.operations;
 
 import java.util.Collections;
 import java.util.Set;
-import org.opendaylight.controller.config.util.capability.Capability;
+import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
@@ -45,10 +45,7 @@ public class OperationsProvider implements NetconfOperationServiceFactory {
     public AutoCloseable registerCapabilityListener(
         final CapabilityListener listener) {
         listener.onCapabilitiesChanged(caps, Collections.<Capability>emptySet());
-        return new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-            }
+        return () -> {
         };
     }
 

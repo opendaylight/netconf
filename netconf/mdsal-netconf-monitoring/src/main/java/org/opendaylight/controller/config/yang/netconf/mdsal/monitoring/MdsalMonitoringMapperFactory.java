@@ -9,8 +9,8 @@ package org.opendaylight.controller.config.yang.netconf.mdsal.monitoring;
 
 import java.util.Collections;
 import java.util.Set;
-import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.sal.common.util.NoopAutoCloseable;
+import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;

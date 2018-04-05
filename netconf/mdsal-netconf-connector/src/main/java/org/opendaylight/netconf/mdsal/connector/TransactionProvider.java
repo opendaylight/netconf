@@ -13,13 +13,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.util.ArrayList;
 import java.util.List;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
+import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
+import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +81,7 @@ public class TransactionProvider implements AutoCloseable {
             future.checkedGet();
         } catch (final TransactionCommitFailedException e) {
             LOG.debug("Transaction {} failed on", candidateTransaction, e);
-            final String cause = e.getCause() != null ? (" Cause: " + e.getCause().getMessage()) : "";
+            final String cause = e.getCause() != null ? " Cause: " + e.getCause().getMessage() : "";
             throw new DocumentedException(
                     "Transaction commit failed on " + e.getMessage() + " " + netconfSessionIdForReporting + cause, e,
                     ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);

@@ -21,18 +21,17 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-import org.opendaylight.controller.config.util.xml.DocumentedException;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeverity;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
-import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType;
-import org.opendaylight.controller.config.util.xml.XmlElement;
-import org.opendaylight.controller.config.util.xml.XmlMappingConstants;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
+import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
+import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
+import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
@@ -182,7 +181,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final Map<String, Attr> attributes = requestElement.getAttributes();
 
         final Element response = handle(document, operationElement, subsequentOperation);
-        final Element rpcReply = XmlUtil.createElement(document, XmlMappingConstants.RPC_REPLY_KEY,
+        final Element rpcReply = XmlUtil.createElement(document, XmlNetconfConstants.RPC_REPLY_KEY,
                 Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
 
         if (XmlElement.fromDomElement(response).hasNamespace()) {
@@ -207,7 +206,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
     private Node transformNormalizedNode(final Document document, final NormalizedNode<?, ?> data,
                                          final SchemaPath rpcOutputPath) {
-        final DOMResult result = new DOMResult(document.createElement(XmlMappingConstants.RPC_REPLY_KEY));
+        final DOMResult result = new DOMResult(document.createElement(XmlNetconfConstants.RPC_REPLY_KEY));
 
         final XMLStreamWriter xmlWriter = getXmlStreamWriter(result);
 

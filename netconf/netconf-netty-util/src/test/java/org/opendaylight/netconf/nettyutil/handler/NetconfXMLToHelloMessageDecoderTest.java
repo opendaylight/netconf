@@ -20,8 +20,8 @@ import io.netty.buffer.Unpooled;
 import java.util.List;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
-import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 
 public class NetconfXMLToHelloMessageDecoderTest {
 
