@@ -66,14 +66,6 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
-        <!-- Netconf server without config connector is just an empty shell -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>odl-config-netconf-connector</artifactId>
-            <version>${project.version}</version>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
         <!-- Netconf will not provide schemas without monitoring -->
         <dependency>
             <groupId>org.opendaylight.controller</groupId>

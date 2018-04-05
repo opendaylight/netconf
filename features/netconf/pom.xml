@@ -24,7 +24,6 @@
     <module>features-netconf</module>
     <module>odl-aaa-netconf-plugin</module>
     <module>odl-aaa-netconf-plugin-no-cluster</module>
-    <module>odl-config-netconf-connector</module>
     <module>odl-netconf-all</module>
     <module>odl-netconf-api</module>
     <module>odl-netconf-client</module>

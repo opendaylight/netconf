@@ -66,12 +66,6 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>odl-config-netconf-connector</artifactId>
-      <type>xml</type>
-      <classifier>features</classifier>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>odl-netconf-all</artifactId>
       <type>xml</type>
       <classifier>features</classifier>

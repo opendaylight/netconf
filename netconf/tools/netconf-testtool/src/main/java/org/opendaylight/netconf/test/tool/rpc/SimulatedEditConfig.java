@@ -13,20 +13,19 @@ import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.confignetconfconnector.operations.AbstractConfigNetconfOperation;
-import org.opendaylight.netconf.confignetconfconnector.operations.editconfig.EditConfigXmlParser;
+import org.opendaylight.netconf.util.mapping.AbstractLastNetconfOperation;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class SimulatedEditConfig extends AbstractConfigNetconfOperation {
+public class SimulatedEditConfig extends AbstractLastNetconfOperation {
     private static final String DELETE_EDIT_CONFIG = "delete";
     private static final String OPERATION = "operation";
     private static final String REMOVE_EDIT_CONFIG = "remove";
     private final DataList storage;
 
     public SimulatedEditConfig(final String netconfSessionIdForReporting, final DataList storage) {
-        super(null, netconfSessionIdForReporting);
+        super(netconfSessionIdForReporting);
         this.storage = storage;
     }
 
@@ -47,7 +46,7 @@ public class SimulatedEditConfig extends AbstractConfigNetconfOperation {
 
     @Override
     protected String getOperationName() {
-        return EditConfigXmlParser.EDIT_CONFIG;
+        return "edit-config";
     }
 
     private boolean containsDelete(final XmlElement element) {

@@ -16,14 +16,14 @@ import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.confignetconfconnector.operations.AbstractConfigNetconfOperation;
+import org.opendaylight.netconf.util.mapping.AbstractLastNetconfOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-public class SimulatedGetConfig extends AbstractConfigNetconfOperation {
+public class SimulatedGetConfig extends AbstractLastNetconfOperation {
 
     private final DataList storage;
     private static final Logger LOG = LoggerFactory
@@ -31,7 +31,7 @@ public class SimulatedGetConfig extends AbstractConfigNetconfOperation {
 
     public SimulatedGetConfig(final String netconfSessionIdForReporting, final DataList storage,
                               final Optional<File> initialConfigXMLFile) {
-        super(null, netconfSessionIdForReporting);
+        super(netconfSessionIdForReporting);
 
         if (initialConfigXMLFile.isPresent()) {
             LOG.info("File is present: {}", initialConfigXMLFile.get()

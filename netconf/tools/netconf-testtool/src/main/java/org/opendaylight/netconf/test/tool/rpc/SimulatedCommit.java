@@ -13,14 +13,14 @@ import org.opendaylight.controller.config.util.xml.DocumentedException;
 import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.confignetconfconnector.operations.AbstractConfigNetconfOperation;
+import org.opendaylight.netconf.util.mapping.AbstractLastNetconfOperation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class SimulatedCommit extends AbstractConfigNetconfOperation {
+public class SimulatedCommit extends AbstractLastNetconfOperation {
 
     public SimulatedCommit(final String netconfSessionIdForReporting) {
-        super(null, netconfSessionIdForReporting);
+        super(netconfSessionIdForReporting);
     }
 
     @Override
