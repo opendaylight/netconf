@@ -14,15 +14,11 @@
       binding-class="org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig"/>
 
   <reference id="dataBroker" interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"/>
-  <reference id="yangLibRestAppService" interface="org.opendaylight.yanglib.api.YangLibRestAppService"/>
 
   <bean id="yangLibProvider" class="org.opendaylight.yanglib.impl.YangLibProvider"
           init-method="init" destroy-method="close">
     <argument ref="yanglibConfig"/>
     <argument ref="dataBroker"/>
-    <argument>
-      <bean factory-ref="yangLibRestAppService" factory-method="getYangLibService"/>
-    </argument>
   </bean>
 
 </blueprint>

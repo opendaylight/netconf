@@ -61,21 +61,18 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
         input -> YangTextSchemaSource.class.isAssignableFrom(input.getRepresentation());
 
     private final DataBroker dataBroker;
-    private final YangLibServiceImpl yangLibService;
     private final YanglibConfig yanglibConfig;
     private SchemaListenerRegistration schemaListenerRegistration;
     private SharedSchemaRepository schemaRepository;
 
-    public YangLibProvider(final YanglibConfig yanglibConfig, final DataBroker dataBroker,
-            final YangLibServiceImpl yangLibService) {
+    public YangLibProvider(final YanglibConfig yanglibConfig, final DataBroker dataBroker) {
         this.yanglibConfig = Preconditions.checkNotNull(yanglibConfig);
         this.dataBroker = Preconditions.checkNotNull(dataBroker);
-        this.yangLibService = Preconditions.checkNotNull(yangLibService);
     }
 
     @Override
     public void close() {
-        yangLibService.setSchemaRepository(null);
+        YangLibServiceImpl.setSchemaRepository(null);
         if (schemaListenerRegistration != null) {
             schemaListenerRegistration.close();
         }
@@ -98,7 +95,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
         schemaRepository.registerSchemaSourceListener(cache);
 
         schemaListenerRegistration = schemaRepository.registerSchemaSourceListener(this);
-        yangLibService.setSchemaRepository(schemaRepository);
+        YangLibServiceImpl.setSchemaRepository(schemaRepository);
 
         LOG.info("Started yang library with sources from {}", cacheFolderFile);
     }

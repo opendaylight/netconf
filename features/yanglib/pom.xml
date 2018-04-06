@@ -21,11 +21,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <!-- Temporarily disable features-yanglib and odl-yanglib
-             Refer to https://jira.opendaylight.org/browse/RELENG-85 for details.
         <module>features-yanglib</module>
         <module>odl-yanglib</module>
-        -->
     </modules>
 
     <scm>
