@@ -27,7 +27,6 @@
         <module>restconf</module>
 
         <module>features</module>
-        <module>karaf</module>
     </modules>
 
     <properties>
@@ -99,6 +98,15 @@
             </activation>
             <modules>
                 <!-- module>opendaylight/netconf/netconf-it</module -->
+            </modules>
+        </profile>
+        <profile>
+            <id>karaf</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>karaf</module>
             </modules>
         </profile>
     </profiles>
