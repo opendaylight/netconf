@@ -24,11 +24,21 @@
     <name>${project.artifactId}</name>
 
     <modules>
-        <module>features</module>
-        <module>karaf</module>
-        <module>netconf</module>
         <module>protocol-framework</module>
+        <module>netconf</module>
         <module>restconf</module>
+        <module>features</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>karaf</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>karaf</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
