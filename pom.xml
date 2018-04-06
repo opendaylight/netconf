@@ -26,10 +26,20 @@
 
     <modules>
         <module>features</module>
-        <module>karaf</module>
         <module>netconf</module>
         <module>protocol-framework</module>
         <module>restconf</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>karaf</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>karaf</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>
