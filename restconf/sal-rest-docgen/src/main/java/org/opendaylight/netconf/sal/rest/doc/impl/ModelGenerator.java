@@ -520,7 +520,8 @@ public class ModelGenerator {
     private String processTypeDef(final TypeDefinition<?> leafTypeDef, final DataSchemaNode node,
                                   final ObjectNode property, final SchemaContext schemaContext) {
         final String jsonType;
-        if (leafTypeDef.getDefaultValue() == null) {
+        final Object defValue = leafTypeDef.getDefaultValue().orElse(null);
+        if (defValue == null) {
             if (leafTypeDef instanceof BinaryTypeDefinition) {
                 jsonType = processBinaryType(property);
 
@@ -561,7 +562,7 @@ public class ModelGenerator {
 
             }
         } else {
-            jsonType = String.valueOf(leafTypeDef.getDefaultValue());
+            jsonType = String.valueOf(defValue);
         }
         putIfNonNull(property, TYPE_KEY, jsonType);
         return jsonType;
