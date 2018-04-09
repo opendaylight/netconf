@@ -468,7 +468,7 @@ public class ModelGenerator {
     private String processTypeDef(final TypeDefinition<?> leafTypeDef, final DataSchemaNode node,
                                   final ObjectNode property, final SchemaContext schemaContext) {
         final String jsonType;
-        if (leafTypeDef.getDefaultValue() == null) {
+        if (!leafTypeDef.getDefaultValue().isPresent()) {
             if (leafTypeDef instanceof BinaryTypeDefinition) {
                 jsonType = processBinaryType(property);
 
