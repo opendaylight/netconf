@@ -8,6 +8,8 @@
 package org.opendaylight.netconf.client.conf;
 
 import java.net.InetSocketAddress;
+import java.util.List;
+
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
@@ -28,6 +30,8 @@ public class NetconfClientConfigurationBuilder {
     private AuthenticationHandler authHandler;
     private NetconfClientConfiguration.NetconfClientProtocol clientProtocol = DEFAULT_CLIENT_PROTOCOL;
     private SslHandlerFactory sslHandlerFactory;
+    private List<String> odlHelloCapabilities;
+
 
     protected NetconfClientConfigurationBuilder() {
     }
@@ -86,6 +90,12 @@ public class NetconfClientConfigurationBuilder {
         return this;
     }
 
+    @SuppressWarnings("checkstyle:hiddenField")
+    public NetconfClientConfigurationBuilder withOdlHelloCapabilities(final List<String> odlHelloCapabilities) {
+        this.odlHelloCapabilities = odlHelloCapabilities;
+        return this;
+    }
+
     final InetSocketAddress getAddress() {
         return address;
     }
@@ -118,8 +128,12 @@ public class NetconfClientConfigurationBuilder {
         return sslHandlerFactory;
     }
 
+    final List<String> getOdlHelloCapabilities() {
+        return odlHelloCapabilities;
+    }
+
     public NetconfClientConfiguration build() {
         return new NetconfClientConfiguration(clientProtocol, address, connectionTimeoutMillis, additionalHeader,
-                sessionListener, reconnectStrategy, authHandler, sslHandlerFactory);
+                sessionListener, reconnectStrategy, authHandler, sslHandlerFactory, odlHelloCapabilities);
     }
 }

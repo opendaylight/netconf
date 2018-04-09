@@ -209,6 +209,15 @@ module netconf-node-topology {
                     default 5;
                     description "Time that slave actor will wait for response from master.";
         }
+
+        container odl-hello-message-capabilities {
+            config true;
+            leaf-list capability {
+                type string;
+                description "Certain devices are non-accepting of ODL's hello message.  This allows specification of
+                             a custom ODL hello message based on a list of supported capabilities.";
+            }
+        }
     }
 
     grouping netconf-node-connection-status {

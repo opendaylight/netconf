@@ -10,6 +10,8 @@ package org.opendaylight.netconf.client.conf;
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.base.Preconditions;
 import java.net.InetSocketAddress;
+import java.util.List;
+
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
@@ -28,9 +30,10 @@ public final class NetconfReconnectingClientConfiguration extends NetconfClientC
                                            final ReconnectStrategy reconnectStrategy,
                                            final ReconnectStrategyFactory connectStrategyFactory,
                                            final AuthenticationHandler authHandler,
-                                           final SslHandlerFactory sslHandlerFactory) {
+                                           final SslHandlerFactory sslHandlerFactory,
+                                           final List<String> odlHelloCapabilities) {
         super(clientProtocol, address, connectionTimeoutMillis, additionalHeader, sessionListener, reconnectStrategy,
-                authHandler, sslHandlerFactory);
+                authHandler, sslHandlerFactory, odlHelloCapabilities);
         this.connectStrategyFactory = connectStrategyFactory;
         validateReconnectConfiguration();
     }

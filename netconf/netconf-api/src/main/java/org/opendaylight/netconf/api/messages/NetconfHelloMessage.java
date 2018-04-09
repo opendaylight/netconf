@@ -22,7 +22,8 @@ import org.w3c.dom.Element;
 
 /**
  * NetconfMessage that can carry additional header with session metadata.
- * @see {@code NetconfHelloMessageAdditionalHeader}
+ *
+ * @see NetconfHelloMessageAdditionalHeader
  */
 public final class NetconfHelloMessage extends NetconfMessage {
 

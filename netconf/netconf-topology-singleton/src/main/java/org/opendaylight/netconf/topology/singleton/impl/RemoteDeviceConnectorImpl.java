@@ -291,6 +291,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         final AuthenticationHandler authHandler = getHandlerFromCredentials(node.getCredentials());
 
+        final List<String> odlHelloCapabilities = node.getOdlHelloMessageCapabilities().getCapability();
+
         return NetconfReconnectingClientConfigurationBuilder.create()
                 .withAddress(socketAddress)
                 .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
@@ -301,6 +303,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                         : NetconfClientConfiguration.NetconfClientProtocol.SSH)
                 .withConnectStrategyFactory(sf)
                 .withSessionListener(listener)
+                .withOdlHelloCapabilities(odlHelloCapabilities)
                 .build();
     }
 

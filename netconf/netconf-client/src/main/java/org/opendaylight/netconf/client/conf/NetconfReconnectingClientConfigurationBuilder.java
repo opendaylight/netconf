@@ -8,6 +8,8 @@
 package org.opendaylight.netconf.client.conf;
 
 import java.net.InetSocketAddress;
+import java.util.List;
+
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
@@ -37,7 +39,7 @@ public final class NetconfReconnectingClientConfigurationBuilder extends Netconf
     public NetconfReconnectingClientConfiguration build() {
         return new NetconfReconnectingClientConfiguration(getProtocol(), getAddress(), getConnectionTimeoutMillis(),
                 getAdditionalHeader(), getSessionListener(), getReconnectStrategy(), connectStrategyFactory,
-                getAuthHandler(), getSslHandlerFactory());
+                getAuthHandler(), getSslHandlerFactory(), getOdlHelloCapabilities());
     }
 
     // Override setter methods to return subtype
@@ -87,5 +89,10 @@ public final class NetconfReconnectingClientConfigurationBuilder extends Netconf
     public NetconfReconnectingClientConfigurationBuilder withSslHandlerFactory(
             final SslHandlerFactory sslHandlerFactory) {
         return (NetconfReconnectingClientConfigurationBuilder) super.withSslHandlerFactory(sslHandlerFactory);
+    }
+
+    @Override
+    public NetconfReconnectingClientConfigurationBuilder withOdlHelloCapabilities(List<String> odlHelloCapabilities) {
+        return (NetconfReconnectingClientConfigurationBuilder) super.withOdlHelloCapabilities(odlHelloCapabilities);
     }
 }

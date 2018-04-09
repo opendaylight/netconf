@@ -12,6 +12,8 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.net.InetSocketAddress;
+import java.util.List;
+
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
@@ -36,12 +38,15 @@ public class NetconfClientConfiguration {
     private final AuthenticationHandler authHandler;
     private final SslHandlerFactory sslHandlerFactory;
 
+    private final List<String> odlHelloCapabilities;
+
     NetconfClientConfiguration(final NetconfClientProtocol protocol, final InetSocketAddress address,
                                final Long connectionTimeoutMillis,
                                final NetconfHelloMessageAdditionalHeader additionalHeader,
                                final NetconfClientSessionListener sessionListener,
                                final ReconnectStrategy reconnectStrategy, final AuthenticationHandler authHandler,
-                               final SslHandlerFactory sslHandlerFactory) {
+                               final SslHandlerFactory sslHandlerFactory,
+                               final List<String> odlHelloCapabilities) {
         this.address = address;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.additionalHeader = additionalHeader;
@@ -50,6 +55,7 @@ public class NetconfClientConfiguration {
         this.reconnectStrategy = reconnectStrategy;
         this.authHandler = authHandler;
         this.sslHandlerFactory = sslHandlerFactory;
+        this.odlHelloCapabilities = odlHelloCapabilities;
         validateConfiguration();
     }
 
@@ -83,6 +89,10 @@ public class NetconfClientConfiguration {
 
     public SslHandlerFactory getSslHandlerFactory() {
         return sslHandlerFactory;
+    }
+
+    public List<String> getOdlHelloCapabilities() {
+        return odlHelloCapabilities;
     }
 
     private void validateConfiguration() {

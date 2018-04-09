@@ -17,6 +17,9 @@ import org.opendaylight.protocol.framework.AbstractDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
+import java.util.List;
+
 public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClientSession, NetconfClientSessionListener>
         implements NetconfClientDispatcher {
 
@@ -122,7 +125,13 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
     }
 
     protected NetconfClientSessionNegotiatorFactory getNegotiatorFactory(final NetconfClientConfiguration cfg) {
-        return new NetconfClientSessionNegotiatorFactory(timer, cfg.getAdditionalHeader(),
-                cfg.getConnectionTimeoutMillis());
+        final List<String> odlHelloCapabilities = cfg.getOdlHelloCapabilities();
+        if(odlHelloCapabilities == null || odlHelloCapabilities.isEmpty()) {
+            return new NetconfClientSessionNegotiatorFactory(timer, cfg.getAdditionalHeader(),
+                    cfg.getConnectionTimeoutMillis());
+        } else {
+            return new NetconfClientSessionNegotiatorFactory(timer, cfg.getAdditionalHeader(),
+                    cfg.getConnectionTimeoutMillis(), new HashSet(odlHelloCapabilities));
+        }
     }
 }
