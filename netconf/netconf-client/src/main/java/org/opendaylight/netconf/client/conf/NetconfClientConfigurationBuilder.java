@@ -8,10 +8,12 @@
 package org.opendaylight.netconf.client.conf;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 
 public class NetconfClientConfigurationBuilder {
 
@@ -26,6 +28,7 @@ public class NetconfClientConfigurationBuilder {
     private ReconnectStrategy reconnectStrategy;
     private AuthenticationHandler authHandler;
     private NetconfClientConfiguration.NetconfClientProtocol clientProtocol = DEFAULT_CLIENT_PROTOCOL;
+    private List<Uri> odlHelloCapabilities;
 
     protected NetconfClientConfigurationBuilder() {
     }
@@ -78,6 +81,12 @@ public class NetconfClientConfigurationBuilder {
         return this;
     }
 
+    @SuppressWarnings("checkstyle:hiddenField")
+    public NetconfClientConfigurationBuilder withOdlHelloCapabilities(final List<Uri> odlHelloCapabilities) {
+        this.odlHelloCapabilities = odlHelloCapabilities;
+        return this;
+    }
+
     final InetSocketAddress getAddress() {
         return address;
     }
@@ -106,8 +115,12 @@ public class NetconfClientConfigurationBuilder {
         return clientProtocol;
     }
 
+    final List<Uri> getOdlHelloCapabilities() {
+        return odlHelloCapabilities;
+    }
+
     public NetconfClientConfiguration build() {
         return new NetconfClientConfiguration(clientProtocol, address, connectionTimeoutMillis, additionalHeader,
-                sessionListener, reconnectStrategy, authHandler);
+                sessionListener, reconnectStrategy, authHandler, odlHelloCapabilities);
     }
 }
