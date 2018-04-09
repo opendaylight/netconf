@@ -12,10 +12,12 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.net.InetSocketAddress;
+import java.util.List;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,11 +36,15 @@ public class NetconfClientConfiguration {
 
     private final AuthenticationHandler authHandler;
 
+    private final List<Uri> odlHelloCapabilities;
+
     NetconfClientConfiguration(final NetconfClientProtocol protocol, final InetSocketAddress address,
                                final Long connectionTimeoutMillis,
                                final NetconfHelloMessageAdditionalHeader additionalHeader,
                                final NetconfClientSessionListener sessionListener,
-                               final ReconnectStrategy reconnectStrategy, final AuthenticationHandler authHandler) {
+
+                               final ReconnectStrategy reconnectStrategy, final AuthenticationHandler authHandler,
+                               final List<Uri> odlHelloCapabilities) {
         this.address = address;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.additionalHeader = additionalHeader;
@@ -46,6 +52,7 @@ public class NetconfClientConfiguration {
         this.clientProtocol = protocol;
         this.reconnectStrategy = reconnectStrategy;
         this.authHandler = authHandler;
+        this.odlHelloCapabilities = odlHelloCapabilities;
         validateConfiguration();
     }
 
@@ -77,7 +84,10 @@ public class NetconfClientConfiguration {
         return clientProtocol;
     }
 
-    @SuppressWarnings("checkstyle:FallThrough")
+    public List<Uri> getOdlHelloCapabilities() {
+        return odlHelloCapabilities;
+    }
+
     private void validateConfiguration() {
         Preconditions.checkNotNull(clientProtocol, " ");
         switch (clientProtocol) {
