@@ -60,7 +60,9 @@ import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
 import org.opendaylight.protocol.framework.TimedReconnectStrategy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.OdlHelloMessageCapabilities;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.KeyAuth;
@@ -291,17 +293,31 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         final AuthenticationHandler authHandler = getHandlerFromCredentials(node.getCredentials());
 
-        return NetconfReconnectingClientConfigurationBuilder.create()
-                .withAddress(socketAddress)
-                .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
-                .withReconnectStrategy(strategy)
-                .withAuthHandler(authHandler)
-                .withProtocol(node.isTcpOnly()
-                        ? NetconfClientConfiguration.NetconfClientProtocol.TCP
-                        : NetconfClientConfiguration.NetconfClientProtocol.SSH)
-                .withConnectStrategyFactory(sf)
-                .withSessionListener(listener)
-                .build();
+        final NetconfReconnectingClientConfigurationBuilder builder =
+                NetconfReconnectingClientConfigurationBuilder.create()
+                        .withAddress(socketAddress)
+                        .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
+                        .withReconnectStrategy(strategy)
+                        .withAuthHandler(authHandler)
+                        .withProtocol(node.isTcpOnly()
+                                ? NetconfClientConfiguration.NetconfClientProtocol.TCP
+                                : NetconfClientConfiguration.NetconfClientProtocol.SSH)
+                        .withConnectStrategyFactory(sf)
+                        .withSessionListener(listener);
+
+        final List<Uri> odlHelloCapabilities = getOdlHelloCapabilities(node);
+        if (odlHelloCapabilities != null) {
+            builder.withOdlHelloCapabilities(odlHelloCapabilities);
+        }
+        return builder.build();
+    }
+
+    private List<Uri> getOdlHelloCapabilities(final NetconfNode node) {
+        final OdlHelloMessageCapabilities helloCapabilities = node.getOdlHelloMessageCapabilities();
+        if (helloCapabilities != null) {
+            return helloCapabilities.getCapability();
+        }
+        return null;
     }
 
     private AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {

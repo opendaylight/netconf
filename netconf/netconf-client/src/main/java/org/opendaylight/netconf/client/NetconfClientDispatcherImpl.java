@@ -11,9 +11,14 @@ package org.opendaylight.netconf.client;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Future;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.protocol.framework.AbstractDispatcher;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,7 +127,19 @@ public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClien
     }
 
     protected NetconfClientSessionNegotiatorFactory getNegotiatorFactory(final NetconfClientConfiguration cfg) {
-        return new NetconfClientSessionNegotiatorFactory(timer, cfg.getAdditionalHeader(),
-                cfg.getConnectionTimeoutMillis());
+        final List<Uri> odlHelloCapabilities = cfg.getOdlHelloCapabilities();
+        if (odlHelloCapabilities == null || odlHelloCapabilities.isEmpty()) {
+            return new NetconfClientSessionNegotiatorFactory(timer, cfg.getAdditionalHeader(),
+                    cfg.getConnectionTimeoutMillis());
+        } else {
+            // LinkedHashSet since perhaps the device cares about order of hello message capabilities.
+            // This allows user control of the order while complying with the existing interface.
+            final Set<String> stringCapabilities = new LinkedHashSet<>();
+            for (final Uri uri : odlHelloCapabilities) {
+                stringCapabilities.add(uri.getValue());
+            }
+            return new NetconfClientSessionNegotiatorFactory(timer, cfg.getAdditionalHeader(),
+                    cfg.getConnectionTimeoutMillis(), stringCapabilities);
+        }
     }
 }

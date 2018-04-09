@@ -15,17 +15,50 @@ module netconf-node-topology {
         }
     }
 
-    grouping netconf-node-credentials {
+    grouping username-password {
+        leaf username {
+            type string;
+        }
 
+        leaf password {
+            type string;
+        }
+    }
+
+    grouping netconf-node-credentials {
         choice credentials {
             config true;
             case login-password {
-                leaf username {
-                    type string;
-                }
+                description "Deprecated way of storing credentials, unencrypted.";
 
-                leaf password {
-                    type string;
+                status deprecated;
+                uses username-password;
+            }
+            case login-pw {
+                description "login-password credentials, encrypted.";
+
+                container login-password {
+                    uses username-password;
+                }
+            }
+            case login-pw-unencrypted {
+                description "login-password credentials, not encrypted.";
+
+                container login-password-unencrypted {
+                    uses username-password;
+                }
+            }
+            case key-auth {
+                description "key-based authentication, use the id for the pair thats stored in the keystore.";
+
+                container key-based {
+                    leaf key-id {
+                        type string;
+                    }
+
+                    leaf username {
+                        type string;
+                    }
                 }
             }
         }
@@ -167,6 +200,24 @@ module netconf-node-topology {
             description "Limit of concurrent messages that can be send before reply messages are received.
                          If value <1 is provided, no limit will be enforced";
         }
+
+        leaf actor-response-wait-time {
+                    config true;
+                    type uint16 {
+                      range "1..max";
+                    }
+                    default 5;
+                    description "Time that slave actor will wait for response from master.";
+        }
+
+        container odl-hello-message-capabilities {
+            config true;
+            leaf-list capability {
+                type inet:uri;
+                description "Certain devices are non-accepting of ODL's hello message.  This allows specification of
+                             a custom ODL hello message based on a list of supported capabilities.";
+            }
+        }
     }
 
     grouping netconf-node-connection-status {
@@ -193,6 +244,10 @@ module netconf-node-topology {
                         enum failed;
                     }
                 }
+            }
+            leaf netconf-master-node {
+                config false;
+                type string;
             }
         }
 
@@ -283,10 +338,28 @@ module netconf-node-topology {
 
     }
 
+    rpc create-device {
+        input {
+            uses netconf-node-fields;
+            leaf node-id {
+                type string;
+            }
+        }
+    }
+
+    rpc delete-device {
+        input {
+            leaf node-id {
+                type string;
+            }
+        }
+    }
+
     augment "/nt:network-topology/nt:topology/nt:node" {
         when "../../nt:topology-types/topology-netconf";
         ext:augment-identifier "netconf-node";
 
         uses netconf-node-fields;
     }
+
 }
