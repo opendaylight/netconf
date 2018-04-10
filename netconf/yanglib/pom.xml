@@ -31,6 +31,13 @@
                 <configuration>
                     <instructions>
                         <Bundle-Name>YangLib</Bundle-Name>
+                        <Import-Package>
+                            com.sun.jersey.spi.container.servlet,
+                            org.eclipse.jetty.servlets,
+                            !javax.annotation,
+                            javax.ws.rs.*;version="[1.1.0,2.0.0)",
+                            *
+                        </Import-Package>
                         <Import-Package>*,
                             com.sun.jersey.spi.container.servlet, org.eclipse.jetty.servlets</Import-Package>
                         <Web-ContextPath>/yanglib</Web-ContextPath>
