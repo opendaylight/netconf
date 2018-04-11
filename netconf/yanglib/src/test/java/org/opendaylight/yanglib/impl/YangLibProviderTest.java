@@ -89,7 +89,7 @@ public class YangLibProviderTest {
 
         final YanglibConfig yanglibConfig = new YanglibConfigBuilder().setBindingAddr("www.fake.com")
                 .setBindingPort(300L).setCacheFolder(CACHE_DIR.getAbsolutePath()).build();
-        yangLibProvider = new YangLibProvider(yanglibConfig, dataBroker, new YangLibServiceImpl());
+        yangLibProvider = new YangLibProvider(yanglibConfig, dataBroker);
     }
 
     @Test
