@@ -1,0 +1,10 @@
+Code-Review+1: Tom Pantelis <tompantelis@gmail.com>
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Robert Varga <nite@hq.sk>
+Code-Review+1: Thanh Ha <thanh.ha@linuxfoundation.org>
+Code-Review+2: Jakub Morvay <jakub.morvay@gmail.com>
+Submitted-by: Jakub Morvay <jakub.morvay@gmail.com>
+Submitted-at: Wed, 11 Apr 2018 05:09:23 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/70726
+Project: netconf
+Branch: refs/heads/stable/oxygen
