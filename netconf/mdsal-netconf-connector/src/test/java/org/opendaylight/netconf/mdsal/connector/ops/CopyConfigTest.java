@@ -44,6 +44,7 @@ import org.opendaylight.controller.sal.core.spi.data.DOMStore;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
+import org.opendaylight.netconf.mdsal.connector.NetconfDataBrokerAdapter;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
@@ -93,7 +94,7 @@ public class CopyConfigTest {
             16, 16, "CommitFutures", CopyConfigTest.class);
 
         final ConcurrentDOMDataBroker cdb = new ConcurrentDOMDataBroker(datastores, listenableFutureExecutor);
-        transactionProvider = new TransactionProvider(cdb, SESSION_ID_FOR_REPORTING);
+        transactionProvider = new TransactionProvider(new NetconfDataBrokerAdapter(cdb), SESSION_ID_FOR_REPORTING);
     }
 
     @Test

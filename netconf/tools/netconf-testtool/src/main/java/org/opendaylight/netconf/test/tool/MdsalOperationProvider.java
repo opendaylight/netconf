@@ -31,6 +31,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
+import org.opendaylight.netconf.mdsal.connector.NetconfDataBrokerAdapter;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.Commit;
 import org.opendaylight.netconf.mdsal.connector.ops.DiscardChanges;
@@ -124,7 +125,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
         @Override
         public Set<NetconfOperation> getNetconfOperations() {
             TransactionProvider transactionProvider = new TransactionProvider(
-                dataBroker, String.valueOf(currentSessionId));
+                new NetconfDataBrokerAdapter(dataBroker), String.valueOf(currentSessionId));
             CurrentSchemaContext currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
 
             ContainerNode netconf = createNetconfState();

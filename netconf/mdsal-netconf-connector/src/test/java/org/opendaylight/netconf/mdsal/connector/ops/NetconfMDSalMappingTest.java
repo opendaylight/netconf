@@ -48,6 +48,7 @@ import org.opendaylight.controller.sal.core.spi.data.DOMStore;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
+import org.opendaylight.netconf.mdsal.connector.NetconfDataBrokerAdapter;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
@@ -145,7 +146,7 @@ public class NetconfMDSalMappingTest {
                 16, 16, "CommitFutures", NetconfMDSalMappingTest.class);
 
         final ConcurrentDOMDataBroker cdb = new ConcurrentDOMDataBroker(datastores, listenableFutureExecutor);
-        this.transactionProvider = new TransactionProvider(cdb, SESSION_ID_FOR_REPORTING);
+        this.transactionProvider = new TransactionProvider(new NetconfDataBrokerAdapter(cdb), SESSION_ID_FOR_REPORTING);
 
         doAnswer(invocationOnMock -> {
             final SourceIdentifier sId = (SourceIdentifier) invocationOnMock.getArguments()[0];

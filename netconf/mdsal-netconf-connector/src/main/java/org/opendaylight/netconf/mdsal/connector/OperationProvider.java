@@ -10,7 +10,6 @@ package org.opendaylight.netconf.mdsal.connector;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.Set;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mdsal.connector.ops.Commit;
@@ -20,6 +19,7 @@ import org.opendaylight.netconf.mdsal.connector.ops.EditConfig;
 import org.opendaylight.netconf.mdsal.connector.ops.Lock;
 import org.opendaylight.netconf.mdsal.connector.ops.RuntimeRpc;
 import org.opendaylight.netconf.mdsal.connector.ops.Unlock;
+import org.opendaylight.netconf.mdsal.connector.ops.Validate;
 import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 
@@ -28,7 +28,7 @@ final class OperationProvider {
     private final Set<NetconfOperation> operations;
 
     OperationProvider(final String netconfSessionIdForReporting, final CurrentSchemaContext schemaContext,
-                      final DOMDataBroker dataBroker, final DOMRpcService rpcService) {
+                      final NetconfDataBroker dataBroker, final DOMRpcService rpcService) {
         final TransactionProvider transactionProvider = new TransactionProvider(dataBroker,
             netconfSessionIdForReporting);
 
@@ -41,7 +41,8 @@ final class OperationProvider {
             new GetConfig(netconfSessionIdForReporting, schemaContext, transactionProvider),
             new Lock(netconfSessionIdForReporting),
             new Unlock(netconfSessionIdForReporting),
-            new RuntimeRpc(netconfSessionIdForReporting, schemaContext, rpcService));
+            new RuntimeRpc(netconfSessionIdForReporting, schemaContext, rpcService),
+            new Validate(netconfSessionIdForReporting, transactionProvider));
     }
 
     Set<NetconfOperation> getOperations() {

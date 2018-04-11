@@ -18,7 +18,6 @@ import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorSeve
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorTag;
 import org.opendaylight.controller.config.util.xml.DocumentedException.ErrorType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,31 +26,31 @@ public class TransactionProvider implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransactionProvider.class);
 
-    private final DOMDataBroker dataBroker;
+    private final NetconfDataBroker dataBroker;
 
-    private DOMDataReadWriteTransaction candidateTransaction = null;
-    private DOMDataReadWriteTransaction runningTransaction = null;
-    private final List<DOMDataReadWriteTransaction> allOpenReadWriteTransactions = new ArrayList<>();
+    private NetconfReadWriteTransaction candidateTransaction = null;
+    private NetconfReadWriteTransaction runningTransaction = null;
+    private final List<NetconfReadWriteTransaction> allOpenReadWriteTransactions = new ArrayList<>();
 
     private final String netconfSessionIdForReporting;
 
     private static final String NO_TRANSACTION_FOUND_FOR_SESSION = "No candidateTransaction found for session ";
 
-    public TransactionProvider(final DOMDataBroker dataBroker, final String netconfSessionIdForReporting) {
+    public TransactionProvider(final NetconfDataBroker dataBroker, final String netconfSessionIdForReporting) {
         this.dataBroker = dataBroker;
         this.netconfSessionIdForReporting = netconfSessionIdForReporting;
     }
 
     @Override
     public synchronized void close() throws Exception {
-        for (final DOMDataReadWriteTransaction rwt : allOpenReadWriteTransactions) {
+        for (final NetconfReadWriteTransaction rwt : allOpenReadWriteTransactions) {
             rwt.cancel();
         }
 
         allOpenReadWriteTransactions.clear();
     }
 
-    public synchronized Optional<DOMDataReadWriteTransaction> getCandidateTransaction() {
+    public synchronized Optional<NetconfReadWriteTransaction> getCandidateTransaction() {
         if (candidateTransaction == null) {
             return Optional.absent();
         }
@@ -59,7 +58,7 @@ public class TransactionProvider implements AutoCloseable {
         return Optional.of(candidateTransaction);
     }
 
-    public synchronized DOMDataReadWriteTransaction getOrCreateTransaction() {
+    public synchronized NetconfReadWriteTransaction getOrCreateTransaction() {
         if (getCandidateTransaction().isPresent()) {
             return getCandidateTransaction().get();
         }
@@ -95,7 +94,7 @@ public class TransactionProvider implements AutoCloseable {
 
     public synchronized void abortTransaction() {
         LOG.debug("Aborting current candidateTransaction");
-        final Optional<DOMDataReadWriteTransaction> otx = getCandidateTransaction();
+        final Optional<NetconfReadWriteTransaction> otx = getCandidateTransaction();
         if (!otx.isPresent()) {
             LOG.warn("discard-changes triggerd on an empty transaction for session: {}", netconfSessionIdForReporting);
             return;
@@ -105,7 +104,7 @@ public class TransactionProvider implements AutoCloseable {
         candidateTransaction = null;
     }
 
-    public synchronized DOMDataReadWriteTransaction createRunningTransaction() {
+    public synchronized NetconfReadWriteTransaction createRunningTransaction() {
         runningTransaction = dataBroker.newReadWriteTransaction();
         allOpenReadWriteTransactions.add(runningTransaction);
         return runningTransaction;

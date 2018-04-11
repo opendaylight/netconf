@@ -39,7 +39,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
 
     private static final Logger LOG = LoggerFactory.getLogger(MdsalNetconfOperationServiceFactory.class);
 
-    private final DOMDataBroker dataBroker;
+    private final NetconfDataBroker dataBroker;
     private final DOMRpcService rpcService;
 
     private final CurrentSchemaContext currentSchemaContext;
@@ -52,13 +52,23 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
             final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
             final DOMDataBroker dataBroker,
             final DOMRpcService rpcService) {
+        this(schemaService, rootSchemaSourceProviderDependency, netconfOperationServiceFactoryListener,
+            new NetconfDataBrokerAdapter(dataBroker), rpcService);
+    }
+
+    public MdsalNetconfOperationServiceFactory(
+        final SchemaService schemaService,
+        final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency,
+        final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
+        final NetconfDataBroker dataBroker,
+        final DOMRpcService rpcService) {
 
         this.dataBroker = dataBroker;
         this.rpcService = rpcService;
 
         this.rootSchemaSourceProviderDependency = rootSchemaSourceProviderDependency;
         this.currentSchemaContext = new CurrentSchemaContext(Preconditions.checkNotNull(schemaService),
-                rootSchemaSourceProviderDependency);
+            rootSchemaSourceProviderDependency);
         this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
         this.netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(this);
     }
