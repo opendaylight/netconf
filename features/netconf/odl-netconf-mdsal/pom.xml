@@ -45,28 +45,30 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-all</artifactId>
-            <version>${netconf.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-tcp</artifactId>
-            <version>${netconf.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-ssh</artifactId>
-            <version>${netconf.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-client</artifactId>
-            <version>${netconf.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>odl-netconf-yanglib-api</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
