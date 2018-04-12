@@ -13,13 +13,14 @@ import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
 import org.opendaylight.yangtools.yang.common.QName;
 
 /**
  * Default implementation resolving schemas QNames from netconf-state or from modules-state.
  */
 public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchemasResolver {
+    private static final QName IETF_YANG_LIBRARY = QName.create(ModulesState.QNAME, "ietf-yang-library");
 
     @Override
     public NetconfDeviceSchemas resolve(final NetconfDeviceRpc deviceRpc,
@@ -27,8 +28,7 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
                                         final RemoteDeviceId id) {
         if (remoteSessionCapabilities.isMonitoringSupported()) {
             return NetconfStateSchemas.create(deviceRpc, remoteSessionCapabilities, id);
-        } else if (remoteSessionCapabilities.containsModuleCapability(QName.create(ModulesState.QNAME,
-                "ietf-yang-library"))) {
+        } else if (remoteSessionCapabilities.containsModuleCapability(IETF_YANG_LIBRARY)) {
             return LibraryModulesSchemas.create(deviceRpc, id);
         }
         return NetconfStateSchemas.EMPTY;

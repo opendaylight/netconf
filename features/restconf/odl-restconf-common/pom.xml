@@ -103,14 +103,16 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-netconf-yanglib-api</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
 
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>ietf-restconf</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>ietf-yang-library</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
