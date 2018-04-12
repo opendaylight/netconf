@@ -47,7 +47,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>ietf-netconf-yang-library</artifactId>
+            <artifactId>rfc7895-api</artifactId>
             <version>1.5.0-SNAPSHOT</version>
         </dependency>
 

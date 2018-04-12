@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,15 +22,14 @@ import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesStateBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.OptionalRevision;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.Module.ConformanceType;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.ModuleBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.module.Submodules;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.module.SubmodulesBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.module.submodules.Submodule;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.module.submodules.SubmoduleBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesStateBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.RevisionIdentifier;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.CommonLeafs.Revision;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module.ConformanceType;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.ModuleBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.module.Submodule;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.module.SubmoduleBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -97,7 +97,7 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
 
     private ModulesState createModuleStateFromModules(final Set<Module> modules) {
         final ModulesStateBuilder modulesStateBuilder = new ModulesStateBuilder();
-        final List<org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list
+        final List<org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list
                 .Module> moduleList =
                 Lists.newArrayList();
 
@@ -109,7 +109,7 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
                 .build();
     }
 
-    private org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.Module
+    private org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module
         createModuleEntryFromModule(final Module module) {
         final ModuleBuilder moduleBuilder = new ModuleBuilder();
 
@@ -117,25 +117,24 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
         // TODO Add also deviations and features lists to module entries
         moduleBuilder.setName(new YangIdentifier(module.getName()));
 
-        module.getQNameModule().getRevision().ifPresent(rev -> moduleBuilder.setRevision(
-            new OptionalRevision(rev.toString())));
+        module.getQNameModule().getRevision().ifPresent(
+            rev -> moduleBuilder.setRevision(new Revision(new RevisionIdentifier(rev.toString()))));
 
         return moduleBuilder.setNamespace(new Uri(module.getNamespace().toString()))
                 .setConformanceType(ConformanceType.Implement)
-                .setSubmodules(createSubmodulesForModule(module))
+                .setSubmodule(createSubmodulesForModule(module))
                 .build();
     }
 
-    private static Submodules createSubmodulesForModule(final Module module) {
-        final List<Submodule> submodulesList = Lists.newArrayList();
+    private static List<Submodule> createSubmodulesForModule(final Module module) {
+        final List<Submodule> submodulesList = new ArrayList<>();
         for (final Module subModule : module.getSubmodules()) {
             final SubmoduleBuilder subModuleEntryBuilder = new SubmoduleBuilder()
                     .setName(new YangIdentifier(subModule.getName()));
             subModule.getQNameModule().getRevision().ifPresent(
-                rev -> subModuleEntryBuilder.setRevision(new OptionalRevision(rev.toString())));
+                rev -> subModuleEntryBuilder.setRevision(new Revision(new RevisionIdentifier(rev.toString()))));
             submodulesList.add(subModuleEntryBuilder.build());
         }
-
-        return new SubmodulesBuilder().setSubmodule(submodulesList).build();
+        return submodulesList;
     }
 }

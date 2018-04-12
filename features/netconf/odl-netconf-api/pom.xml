@@ -83,7 +83,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>ietf-netconf-yang-library</artifactId>
+            <artifactId>rfc7895-api</artifactId>
         </dependency>
     </dependencies>
 </project>

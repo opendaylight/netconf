@@ -30,6 +30,7 @@
         <module>netconf</module>
         <module>protocol-framework</module>
         <module>restconf</module>
+        <module>rfc7895-api</module>
     </modules>
 
 </project>
