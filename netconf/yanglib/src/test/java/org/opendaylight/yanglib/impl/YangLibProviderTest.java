@@ -16,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import java.io.File;
 import java.io.IOException;
@@ -34,18 +35,17 @@ import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesStateBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.OptionalRevision;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.RevisionIdentifier;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.Module;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.ModuleBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.ModuleKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesStateBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.RevisionUtils;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.CommonLeafsRevisionBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.ModuleBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.ModuleKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfigBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YinSchemaSourceRepresentation;
@@ -107,29 +107,22 @@ public class YangLibProviderTest {
 
         list.add(
                 PotentialSchemaSource.create(
-                        RevisionSourceIdentifier.create("with-revision", Revision.of("2016-04-28")),
+                        RevisionSourceIdentifier.create("with-revision",
+                            org.opendaylight.yangtools.yang.common.Revision.of("2016-04-28")),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         when(writeTransaction.submit()).thenReturn(Futures.immediateCheckedFuture(null));
         yangLibProvider.schemaSourceRegistered(list);
 
-        List<Module> newModulesList = new ArrayList<>();
-
-        Module newModule = new ModuleBuilder()
-                .setName(new YangIdentifier("no-revision"))
-                .setRevision(new OptionalRevision(""))
-                .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/no-revision/"))
-                .build();
-
-        newModulesList.add(newModule);
-
-        newModule = new ModuleBuilder()
-                .setName(new YangIdentifier("with-revision"))
-                .setRevision(new OptionalRevision(new RevisionIdentifier("2016-04-28")))
-                .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/with-revision/2016-04-28"))
-                .build();
-
-        newModulesList.add(newModule);
+        List<Module> newModulesList = ImmutableList.of(
+            new ModuleBuilder().setName(new YangIdentifier("no-revision"))
+            .setRevision(RevisionUtils.emptyRevision())
+            .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/no-revision/"))
+            .build(),
+            new ModuleBuilder().setName(new YangIdentifier("with-revision"))
+            .setRevision(CommonLeafsRevisionBuilder.getDefaultInstance("2016-04-28"))
+            .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/with-revision/2016-04-28"))
+            .build());
 
         verify(dataBroker).newWriteOnlyTransaction();
         verify(writeTransaction).merge(eq(LogicalDatastoreType.OPERATIONAL),
@@ -219,23 +212,23 @@ public class YangLibProviderTest {
                 eq(InstanceIdentifier.create(ModulesState.class)
                         .child(Module.class,
                                 new ModuleKey(new YangIdentifier("unregistered-yang-schema-without-revision"),
-                                        new OptionalRevision("")))));
+                                        RevisionUtils.emptyRevision()))));
 
         verify(writeTransaction).submit();
 
         yangUnregistererSource =
                 PotentialSchemaSource.create(
-                        RevisionSourceIdentifier.create("unregistered-yang-with-revision", Revision.of("2016-04-28")),
+                        RevisionSourceIdentifier.create("unregistered-yang-with-revision",
+                            org.opendaylight.yangtools.yang.common.Revision.of("2016-04-28")),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.LOCAL_IO.getValue());
 
         yangLibProvider.schemaSourceUnregistered(yangUnregistererSource);
 
         verify(dataBroker, times(2)).newWriteOnlyTransaction();
         verify(writeTransaction).delete(eq(LogicalDatastoreType.OPERATIONAL),
-                eq(InstanceIdentifier.create(ModulesState.class)
-                        .child(Module.class,
-                                new ModuleKey(new YangIdentifier("unregistered-yang-with-revision"),
-                                        new OptionalRevision(new RevisionIdentifier("2016-04-28"))))));
+            eq(InstanceIdentifier.create(ModulesState.class)
+                .child(Module.class, new ModuleKey(new YangIdentifier("unregistered-yang-with-revision"),
+                    CommonLeafsRevisionBuilder.getDefaultInstance("2016-04-28")))));
 
         verify(writeTransaction, times(2)).submit();
     }

@@ -162,10 +162,9 @@
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>ietf-netconf-yang-library</artifactId>
+                <artifactId>rfc7895-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>yanglib</artifactId>
