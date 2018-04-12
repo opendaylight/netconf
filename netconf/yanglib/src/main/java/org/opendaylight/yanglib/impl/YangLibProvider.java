@@ -22,17 +22,16 @@ import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesStateBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.OptionalRevision;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.RevisionIdentifier;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.Module;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.ModuleBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.ModuleKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesStateBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.RevisionUtils;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.CommonLeafs.Revision;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.ModuleBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.ModuleKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -53,7 +52,6 @@ import org.slf4j.LoggerFactory;
 public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
     private static final Logger LOG = LoggerFactory.getLogger(YangLibProvider.class);
 
-    private static final OptionalRevision NO_REVISION = new OptionalRevision("");
     private static final Predicate<PotentialSchemaSource<?>> YANG_SCHEMA_SOURCE =
         input -> YangTextSchemaSource.class.isAssignableFrom(input.getRepresentation());
 
@@ -107,17 +105,11 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
         final List<Module> newModules = new ArrayList<>();
 
         for (PotentialSchemaSource<?> potentialYangSource : Iterables.filter(sources, YANG_SCHEMA_SOURCE)) {
-            final YangIdentifier moduleName = new YangIdentifier(potentialYangSource.getSourceIdentifier().getName());
-
-            final OptionalRevision moduleRevision = getRevisionForModule(potentialYangSource.getSourceIdentifier());
-
-            final Module newModule = new ModuleBuilder()
-                    .setName(moduleName)
-                    .setRevision(moduleRevision)
-                    .setSchema(getUrlForModule(potentialYangSource.getSourceIdentifier()))
-                    .build();
-
-            newModules.add(newModule);
+            newModules.add(new ModuleBuilder()
+                .setName(new YangIdentifier(potentialYangSource.getSourceIdentifier().getName()))
+                .setRevision(getRevisionForModule(potentialYangSource.getSourceIdentifier()))
+                .setSchema(getUrlForModule(potentialYangSource.getSourceIdentifier()))
+                .build());
         }
 
         if (newModules.isEmpty()) {
@@ -179,11 +171,10 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
     }
 
     private static String revString(final SourceIdentifier id) {
-        return id.getRevision().map(Revision::toString).orElse("");
+        return id.getRevision().map(org.opendaylight.yangtools.yang.common.Revision::toString).orElse("");
     }
 
-    private static OptionalRevision getRevisionForModule(final SourceIdentifier sourceIdentifier) {
-        return sourceIdentifier.getRevision().map(rev -> new OptionalRevision(new RevisionIdentifier(rev.toString())))
-                .orElse(NO_REVISION);
+    private static Revision getRevisionForModule(final SourceIdentifier sourceIdentifier) {
+        return RevisionUtils.fromYangCommon(sourceIdentifier.getRevision());
     }
 }
