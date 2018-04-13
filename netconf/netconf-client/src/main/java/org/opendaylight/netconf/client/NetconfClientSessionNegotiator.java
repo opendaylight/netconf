@@ -64,20 +64,9 @@ public class NetconfClientSessionNegotiator extends
         super(sessionPreferences, promise, channel, timer, sessionListener, connectionTimeoutMillis);
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     protected void handleMessage(final NetconfHelloMessage netconfMessage) throws NetconfDocumentedException {
-        if (!ifNegotiatedAlready()) {
-            LOG.debug("Server hello message received, starting negotiation on channel {}", channel);
-            try {
-                startNegotiation();
-            } catch (final Exception e) {
-                LOG.warn("Unexpected negotiation failure", e);
-                negotiationFailed(e);
-                return;
-            }
-        }
         final NetconfClientSession session = getSessionForHelloMessage(netconfMessage);
         replaceHelloMessageInboundHandler(session);
 
