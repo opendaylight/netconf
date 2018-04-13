@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.codecs;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -247,6 +248,8 @@ public final class RestCodec {
             return identityValuesDTO;
         }
 
+        @SuppressFBWarnings(value = {"NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE",
+                "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"}, justification = "Unrecognised NullableDecl")
         @Override
         public YangInstanceIdentifier deserialize(final IdentityValuesDTO data) {
             final List<PathArgument> result = new ArrayList<>();

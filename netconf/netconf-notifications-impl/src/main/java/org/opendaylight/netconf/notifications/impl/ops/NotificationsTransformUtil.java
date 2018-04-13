@@ -12,6 +12,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
@@ -66,6 +67,7 @@ public final class NotificationsTransformUtil {
                 NOTIFICATIONS_SCHEMA_CTX));
     }
 
+    @SuppressFBWarnings(value = "NP_NONNULL_PARAM_VIOLATION", justification = "Unrecognised NullableDecl")
     private static RpcDefinition findCreateSubscriptionRpc() {
         return Iterables.getFirst(Collections2.filter(NOTIFICATIONS_SCHEMA_CTX.getOperations(),
             input -> input.getQName().getLocalName().equals(CreateSubscription.CREATE_SUBSCRIPTION)), null);

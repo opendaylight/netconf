@@ -13,6 +13,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -528,6 +529,7 @@ public class ControllerContext implements SchemaContextListener {
         return object == null ? "" : URLEncoder.encode(codec.serialize(object).toString(), URI_ENCODING_CHARSET.name());
     }
 
+    @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE", justification = "Unrecognised NullableDecl")
     private InstanceIdentifierContext<?> collectPathArguments(final InstanceIdentifierBuilder builder,
             final List<String> strings, final DataNodeContainer parentNode, final DOMMountPoint mountPoint,
             final boolean returnJustMountPoint) {

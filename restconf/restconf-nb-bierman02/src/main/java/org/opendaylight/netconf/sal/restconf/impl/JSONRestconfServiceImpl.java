@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -133,6 +134,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
+    @SuppressFBWarnings(value = "NP_NULL_PARAM_DEREF", justification = "Unrecognised NullableDecl")
     @Override
     public Optional<String> invokeRpc(final String uriPath, final Optional<String> input)
             throws OperationFailedException {
