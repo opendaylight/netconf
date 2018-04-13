@@ -11,12 +11,8 @@ import com.google.common.base.Preconditions;
 import java.math.BigInteger;
 import org.opendaylight.controller.md.sal.common.util.jmx.AbstractMXBean;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.sal.rest.api.RestConnector;
 import org.opendaylight.netconf.sal.restconf.impl.jmx.Config;
 import org.opendaylight.netconf.sal.restconf.impl.jmx.Delete;
@@ -29,50 +25,35 @@ import org.opendaylight.netconf.sal.restconf.impl.jmx.Rpcs;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 
 public class RestconfProviderImpl extends AbstractMXBean
         implements AutoCloseable, RestConnector, RestConnectorRuntimeMXBean {
     private final DOMDataBroker domDataBroker;
-    private final SchemaService schemaService;
     private final DOMRpcService rpcService;
     private final DOMNotificationService notificationService;
-    private final DOMMountPointService mountPointService;
     private final IpAddress websocketAddress;
     private final PortNumber websocketPort;
     private final StatisticsRestconfServiceWrapper stats = StatisticsRestconfServiceWrapper.getInstance();
-    private final DOMSchemaService domSchemaService;
-    private ListenerRegistration<SchemaContextListener> listenerRegistration;
+    private final ControllerContext controllerContext;
     private Thread webSocketServerThread;
 
-    public RestconfProviderImpl(DOMDataBroker domDataBroker, SchemaService schemaService, DOMRpcService rpcService,
-            DOMNotificationService notificationService, DOMMountPointService mountPointService,
-            DOMSchemaService domSchemaService, IpAddress websocketAddress, PortNumber websocketPort) {
+    public RestconfProviderImpl(DOMDataBroker domDataBroker, DOMRpcService rpcService,
+            DOMNotificationService notificationService, ControllerContext controllerContext,
+            IpAddress websocketAddress, PortNumber websocketPort) {
         super("Draft02ProviderStatistics", "restconf-connector", null);
         this.domDataBroker = Preconditions.checkNotNull(domDataBroker);
-        this.schemaService = Preconditions.checkNotNull(schemaService);
         this.rpcService = Preconditions.checkNotNull(rpcService);
         this.notificationService = Preconditions.checkNotNull(notificationService);
-        this.mountPointService = Preconditions.checkNotNull(mountPointService);
         this.websocketAddress = Preconditions.checkNotNull(websocketAddress);
         this.websocketPort = Preconditions.checkNotNull(websocketPort);
-        this.domSchemaService = Preconditions.checkNotNull(domSchemaService);
+        this.controllerContext = Preconditions.checkNotNull(controllerContext);
     }
 
     public void start() {
-        this.listenerRegistration = schemaService.registerSchemaContextListener(ControllerContext.getInstance());
-
         BrokerFacade.getInstance().setDomDataBroker(domDataBroker);
         BrokerFacade.getInstance().setRpcService(rpcService);
         BrokerFacade.getInstance().setDomNotificationService(notificationService);
-
-        ControllerContext.getInstance().setSchemas(schemaService.getGlobalContext());
-        ControllerContext.getInstance().setMountService(mountPointService);
-        final DOMYangTextSourceProvider domSchemaServiceExtension =
-                (DOMYangTextSourceProvider) domSchemaService.getSupportedExtensions()
-                        .get(DOMYangTextSourceProvider.class);
-        ControllerContext.getInstance().setYangTextSourceProvider(domSchemaServiceExtension);
+        BrokerFacade.getInstance().setControllerContext(controllerContext);
 
         this.webSocketServerThread = new Thread(WebSocketServer.createInstance(
                 new String(websocketAddress.getValue()), websocketPort.getValue()));
@@ -85,10 +66,6 @@ public class RestconfProviderImpl extends AbstractMXBean
     @Override
     public void close() {
         BrokerFacade.getInstance().setDomDataBroker(null);
-
-        if (this.listenerRegistration != null) {
-            this.listenerRegistration.close();
-        }
 
         WebSocketServer.destroyInstance();
         if (this.webSocketServerThread != null) {

@@ -653,7 +653,7 @@ public final class RestconfImpl implements RestconfService {
                         .withChild(ImmutableNodes.leafNode(streamNameQname, streamName)).build();
 
         if (!Notificator.existListenerFor(streamName)) {
-            Notificator.createListener(pathIdentifier, streamName, outputType);
+            Notificator.createListener(pathIdentifier, streamName, outputType, controllerContext);
         }
 
         final DOMRpcResult defaultDOMRpcResult = new DefaultDOMRpcResult(output);
@@ -1158,9 +1158,9 @@ public final class RestconfImpl implements RestconfService {
      * @return {@link InstanceIdentifierContext} of location leaf for
      *         notification
      */
-    private static InstanceIdentifierContext<?> prepareIIDSubsStreamOutput() {
+    private InstanceIdentifierContext<?> prepareIIDSubsStreamOutput() {
         final QName qnameBase = QName.create("subscribe:to:notification", "2016-10-28", "notifi");
-        final SchemaContext schemaCtx = ControllerContext.getInstance().getGlobalSchema();
+        final SchemaContext schemaCtx = controllerContext.getGlobalSchema();
         final DataSchemaNode location = ((ContainerSchemaNode) schemaCtx
                 .findModule(qnameBase.getModule()).orElse(null)
                 .getDataChildByName(qnameBase)).getDataChildByName(QName.create(qnameBase, "location"));
@@ -1493,7 +1493,7 @@ public final class RestconfImpl implements RestconfService {
      *            contains list of qnames of notifications
      * @return - checked future object
      */
-    private static CheckedFuture<DOMRpcResult, DOMRpcException> invokeSalRemoteRpcNotifiStrRPC(
+    private CheckedFuture<DOMRpcResult, DOMRpcException> invokeSalRemoteRpcNotifiStrRPC(
             final NormalizedNodeContext payload) {
         final ContainerNode data = (ContainerNode) payload.getData();
         LeafSetNode leafSet = null;
@@ -1514,8 +1514,7 @@ public final class RestconfImpl implements RestconfService {
         final Iterator<LeafSetEntryNode> iterator = entryNodes.iterator();
         while (iterator.hasNext()) {
             final QName valueQName = QName.create((String) iterator.next().getValue());
-            final Module module =
-                    ControllerContext.getInstance().findModuleByNamespace(valueQName.getModule().getNamespace());
+            final Module module = controllerContext.findModuleByNamespace(valueQName.getModule().getNamespace());
             Preconditions.checkNotNull(module,
                     "Module for namespace " + valueQName.getModule().getNamespace() + " does not exist");
             NotificationDefinition notifiDef = null;
@@ -1546,7 +1545,7 @@ public final class RestconfImpl implements RestconfService {
                         .withChild(ImmutableNodes.leafNode(streamNameQname, streamName)).build();
 
         if (!Notificator.existNotificationListenerFor(streamName)) {
-            Notificator.createNotificationListener(paths, streamName, outputType);
+            Notificator.createNotificationListener(paths, streamName, outputType, controllerContext);
         }
 
         final DOMRpcResult defaultDOMRpcResult = new DefaultDOMRpcResult(output);

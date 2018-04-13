@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
+import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -70,6 +71,10 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
         implements MessageBodyReader<NormalizedNodeContext> {
 
     private static final Logger LOG = LoggerFactory.getLogger(XmlNormalizedNodeBodyReader.class);
+
+    public XmlNormalizedNodeBodyReader(ControllerContext controllerContext) {
+        super(controllerContext);
+    }
 
     @Override
     public boolean isReadable(final Class<?> type, final Type genericType, final Annotation[] annotations,

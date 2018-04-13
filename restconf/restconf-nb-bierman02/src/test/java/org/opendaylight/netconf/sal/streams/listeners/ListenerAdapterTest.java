@@ -19,6 +19,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
@@ -27,6 +28,7 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.PatchCont;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1;
@@ -54,16 +56,23 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     private static YangInstanceIdentifier PATCH_CONT_YIID =
             YangInstanceIdentifier.create(new YangInstanceIdentifier.NodeIdentifier(PatchCont.QNAME));
 
+    private static SchemaContext schemaContext;
+
     private DataBroker dataBroker;
     private DOMDataBroker domDataBroker;
+    private ControllerContext controllerContext;
+
+    @BeforeClass
+    public static void init() {
+        schemaContext = YangParserTestUtils.parseYangResource(
+                "/instanceidentifier/yang/instance-identifier-patch-module.yang");
+    }
 
     @Before
     public void setUp() throws Exception {
         dataBroker = getDataBroker();
         domDataBroker = getDomBroker();
-        SchemaContext sc = YangParserTestUtils.parseYangResource(
-                "/instanceidentifier/yang/instance-identifier-patch-module.yang");
-        ControllerContext.getInstance().setGlobalSchema(sc);
+        controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
     }
 
     class ListenerAdapterTester extends ListenerAdapter {
@@ -73,7 +82,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         ListenerAdapterTester(final YangInstanceIdentifier path, final String streamName,
                               final NotificationOutputTypeGrouping.NotificationOutputType outputType,
                               final boolean leafNodesOnly) {
-            super(path, streamName, outputType);
+            super(path, streamName, outputType, controllerContext);
             setQueryParams(EPOCH, Optional.empty(), Optional.empty(), leafNodesOnly);
         }
 

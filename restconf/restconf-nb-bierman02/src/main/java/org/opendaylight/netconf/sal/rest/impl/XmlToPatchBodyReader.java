@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
+import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -78,6 +79,10 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
         MessageBodyReader<PatchContext> {
 
     private static final Logger LOG = LoggerFactory.getLogger(XmlToPatchBodyReader.class);
+
+    public XmlToPatchBodyReader(ControllerContext controllerContext) {
+        super(controllerContext);
+    }
 
     @Override
     public boolean isReadable(final Class<?> type, final Type genericType,

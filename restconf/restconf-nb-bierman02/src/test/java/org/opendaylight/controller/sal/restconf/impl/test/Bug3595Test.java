@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import java.io.FileNotFoundException;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -27,19 +28,17 @@ public class Bug3595Test {
     private static final QName CONT_QNAME = QName.create("leafref:module", "2014-04-17", "cont");
     private static final QName LST_WITH_LFREF_KEY_QNAME = QName.create(CONT_QNAME, "lst-with-lfref-key");
     private static final QName LFREF_KEY_QNAME = QName.create(CONT_QNAME, "lfref-key");
+    private static SchemaContext schemaContext;
 
-
-    private static ControllerContext controllerContext = ControllerContext.getInstance();
+    private final ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
 
     @BeforeClass
     public static void initialize() throws FileNotFoundException {
-        final SchemaContext schemaContext = TestUtils.loadSchemaContext("/leafref/yang");
+        schemaContext = TestUtils.loadSchemaContext("/leafref/yang");
         Module module = TestUtils.findModule(schemaContext.getModules(), "leafref-module");
         assertNotNull(module);
         module = TestUtils.findModule(schemaContext.getModules(), "referenced-module");
         assertNotNull(module);
-
-        controllerContext.setGlobalSchema(schemaContext);
     }
 
     @Test

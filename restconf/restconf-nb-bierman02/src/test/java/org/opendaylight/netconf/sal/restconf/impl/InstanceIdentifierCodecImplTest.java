@@ -11,7 +11,9 @@ package org.opendaylight.netconf.sal.restconf.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.io.FileNotFoundException;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.RestCodec.InstanceIdentifierCodecImpl;
@@ -23,19 +25,24 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class InstanceIdentifierCodecImplTest {
+    private static SchemaContext schemaContext;
 
     private Codec<IdentityValuesDTO, YangInstanceIdentifier> instanceIdentifierDTO;
     private YangInstanceIdentifier instanceIdentifierBadNamespace;
     private YangInstanceIdentifier instanceIdentifierOKList;
     private YangInstanceIdentifier instanceIdentifierOKLeafList;
-    private SchemaContext schemaContext;
+
+    @BeforeClass
+    public static void init() throws FileNotFoundException {
+        schemaContext = YangParserTestUtils.parseYangFiles(
+                TestRestconfUtils.loadFiles("/restconf/parser/deserializer"));
+    }
 
     @Before
     public void setUp() throws Exception {
-        this.schemaContext =
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/restconf/parser/deserializer"));
-        this.instanceIdentifierDTO = new InstanceIdentifierCodecImpl(null);
-        ControllerContext.getInstance().setGlobalSchema(this.schemaContext);
+        ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
+
+        this.instanceIdentifierDTO = new InstanceIdentifierCodecImpl(null, controllerContext);
 
         final QName baseQName = QName.create("deserializer:test", "2016-06-06", "deserializer-test");
         final QName contA = QName.create(baseQName, "contA");

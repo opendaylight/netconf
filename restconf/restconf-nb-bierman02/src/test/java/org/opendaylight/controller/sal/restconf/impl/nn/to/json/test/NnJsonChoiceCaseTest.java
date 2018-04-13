@@ -26,15 +26,14 @@ public class NnJsonChoiceCaseTest extends AbstractBodyReaderTest {
     private static SchemaContext schemaContext;
     private final NormalizedNodeJsonBodyWriter jsonBodyWriter;
 
-    public NnJsonChoiceCaseTest() throws NoSuchFieldException,
-            SecurityException {
+    public NnJsonChoiceCaseTest()  {
+        super(schemaContext, null);
         jsonBodyWriter = new NormalizedNodeJsonBodyWriter();
     }
 
     @BeforeClass
     public static void initialization() {
         schemaContext = schemaContextLoader("/nn-to-json/choice", schemaContext);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     /**
@@ -167,7 +166,7 @@ public class NnJsonChoiceCaseTest extends AbstractBodyReaderTest {
     private String getJson(final String xmlPath) throws Exception {
         final String uri = "choice-case-test:cont";
         final NormalizedNodeContext testNN = TestRestconfUtils
-                .loadNormalizedContextFromXmlFile(xmlPath, uri);
+                .loadNormalizedContextFromXmlFile(xmlPath, uri, controllerContext);
 
         final OutputStream output = new ByteArrayOutputStream();
         jsonBodyWriter.writeTo(testNN, null, null, null, mediaType, null,

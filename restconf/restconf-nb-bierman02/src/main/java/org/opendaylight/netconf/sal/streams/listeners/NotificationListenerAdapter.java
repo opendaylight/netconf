@@ -48,6 +48,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationListenerAdapter.class);
 
+    private final ControllerContext controllerContext;
     private final String streamName;
     private final SchemaPath path;
     private final String outputType;
@@ -65,12 +66,14 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      * @param outputType
      *             type of output on notification (JSON, XML)
      */
-    NotificationListenerAdapter(final SchemaPath path, final String streamName, final String outputType) {
+    NotificationListenerAdapter(final SchemaPath path, final String streamName, final String outputType,
+            final ControllerContext controllerContext) {
         register(this);
         this.outputType = Preconditions.checkNotNull(outputType);
         this.path = Preconditions.checkNotNull(path);
         Preconditions.checkArgument(streamName != null && !streamName.isEmpty());
         this.streamName = streamName;
+        this.controllerContext = controllerContext;
     }
 
     /**
@@ -86,7 +89,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     @Override
     @SuppressWarnings("checkstyle:hiddenField")
     public void onNotification(final DOMNotification notification) {
-        this.schemaContext = ControllerContext.getInstance().getGlobalSchema();
+        this.schemaContext = controllerContext.getGlobalSchema();
         this.notification = notification;
 
         final String xml = prepareXml();

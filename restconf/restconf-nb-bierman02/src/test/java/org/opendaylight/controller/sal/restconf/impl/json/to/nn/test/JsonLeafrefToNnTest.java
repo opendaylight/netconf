@@ -25,15 +25,14 @@ public class JsonLeafrefToNnTest extends AbstractBodyReaderTest {
     private final JsonNormalizedNodeBodyReader jsonBodyReader;
     private static SchemaContext schemaContext;
 
-    public JsonLeafrefToNnTest() throws NoSuchFieldException, SecurityException {
-        this.jsonBodyReader = new JsonNormalizedNodeBodyReader();
+    public JsonLeafrefToNnTest() {
+        super(schemaContext, null);
+        this.jsonBodyReader = new JsonNormalizedNodeBodyReader(controllerContext);
     }
 
     @BeforeClass
     public static void initialize() {
-        schemaContext = schemaContextLoader("/json-to-nn/leafref",
-                schemaContext);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
+        schemaContext = schemaContextLoader("/json-to-nn/leafref", schemaContext);
     }
 
     @Test

@@ -17,14 +17,15 @@ import static org.mockito.Mockito.when;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.io.FileNotFoundException;
-import java.net.URI;
 import java.util.List;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.controller.sal.restconf.impl.test.TestUtils;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -53,24 +54,22 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class RestPutListDataTest {
+    private static SchemaContext schemaContextTestModule;
 
     private static BrokerFacade brokerFacade;
     private static RestconfImpl restconfImpl;
-    private static SchemaContext schemaContextTestModule;
 
     private static final String TEST_MODULE_NS_STRING = "test:module";
-    private static final URI TEST_MODULE_NS;
     private static final String TEST_MODULE_REVISION = "2014-01-09";
 
-    static {
-        TEST_MODULE_NS = URI.create("test:module");
+    @BeforeClass
+    public static void staticSetup() throws FileNotFoundException {
+        schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
     }
 
     @Before
     public void initialize() throws FileNotFoundException {
-        final ControllerContext controllerContext = ControllerContext.getInstance();
-        schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
-        controllerContext.setSchemas(schemaContextTestModule);
+        final ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContextTestModule);
         brokerFacade = mock(BrokerFacade.class);
         restconfImpl = RestconfImpl.getInstance();
         restconfImpl.setBroker(brokerFacade);

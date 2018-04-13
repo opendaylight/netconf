@@ -16,7 +16,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import com.google.common.base.Optional;
@@ -32,7 +31,6 @@ import java.util.Set;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -40,6 +38,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
@@ -71,30 +70,29 @@ import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class InvokeRpcMethodTest {
 
-    private RestconfImpl restconfImpl = null;
-    private static ControllerContext controllerContext = null;
     private static UriInfo uriInfo;
+    private static SchemaContext schemaContext;
 
+    private final RestconfImpl restconfImpl = RestconfImpl.getInstance();
+    private final ControllerContext controllerContext;
+
+    public InvokeRpcMethodTest() {
+        controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
+        restconfImpl.setControllerContext(controllerContext);
+    }
 
     @BeforeClass
     public static void init() throws FileNotFoundException, ReactorException {
-        final SchemaContext schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs", "/invoke-rpc");
+        schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs", "/invoke-rpc");
         final Set<Module> allModules = schemaContext.getModules();
         assertNotNull(allModules);
         final Module module = TestUtils.resolveModule("invoke-rpc-module", allModules);
         assertNotNull(module);
-        controllerContext = spy(ControllerContext.getInstance());
-        controllerContext.setSchemas(schemaContext);
+
         uriInfo = mock(UriInfo.class);
         final MultivaluedMap<String, String> map = new MultivaluedHashMap<>();
         map.put("prettyPrint", Collections.singletonList("true"));
         when(uriInfo.getQueryParameters(any(Boolean.class))).thenReturn(map);
-    }
-
-    @Before
-    public void initMethod() {
-        this.restconfImpl = RestconfImpl.getInstance();
-        this.restconfImpl.setControllerContext(controllerContext);
     }
 
     /**
@@ -105,28 +103,26 @@ public class InvokeRpcMethodTest {
     @Test
     @Ignore
     public void invokeRpcMethodTest() {
-        final ControllerContext contContext = controllerContext;
         try {
-            contContext.findModuleNameByNamespace(new URI("invoke:rpc:module"));
+            controllerContext.findModuleNameByNamespace(new URI("invoke:rpc:module"));
         } catch (final URISyntaxException e) {
             assertTrue("Uri wasn't created sucessfuly", false);
         }
 
         final BrokerFacade mockedBrokerFacade = mock(BrokerFacade.class);
 
-        final RestconfImpl restconf = RestconfImpl.getInstance();
-        restconf.setBroker(mockedBrokerFacade);
-        restconf.setControllerContext(contContext);
+        restconfImpl.setBroker(mockedBrokerFacade);
 
         final NormalizedNodeContext payload = prepareDomPayload();
 
-        final NormalizedNodeContext rpcResponse = restconf.invokeRpc("invoke-rpc-module:rpc-test", payload, uriInfo);
+        final NormalizedNodeContext rpcResponse =
+                restconfImpl.invokeRpc("invoke-rpc-module:rpc-test", payload, uriInfo);
         assertTrue(rpcResponse != null);
         assertTrue(rpcResponse.getData() == null);
 
     }
 
-    private static NormalizedNodeContext prepareDomPayload() {
+    private NormalizedNodeContext prepareDomPayload() {
         final SchemaContext schema = controllerContext.getGlobalSchema();
         final Module rpcModule = schema.findModules("invoke-rpc-module").iterator().next();
         assertNotNull(rpcModule);
@@ -289,7 +285,6 @@ public class InvokeRpcMethodTest {
         final SchemaPath path = SchemaPath.create(true,
                 QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)make-toast"));
 
-        final SchemaContext schemaContext = controllerContext.getGlobalSchema();
         final Module rpcModule = schemaContext.findModules("toaster").iterator().next();
         assertNotNull(rpcModule);
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), "make-toast");

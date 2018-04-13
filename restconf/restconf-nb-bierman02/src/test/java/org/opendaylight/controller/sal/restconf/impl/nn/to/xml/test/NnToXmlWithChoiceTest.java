@@ -40,15 +40,14 @@ public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
     private final NormalizedNodeXmlBodyWriter xmlBodyWriter;
     private static SchemaContext schemaContext;
 
-    public NnToXmlWithChoiceTest() throws NoSuchFieldException,
-            SecurityException {
+    public NnToXmlWithChoiceTest() {
+        super(schemaContext, null);
         xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
     }
 
     @BeforeClass
     public static void initialization() {
         schemaContext = schemaContextLoader("/nn-to-xml/choice", schemaContext);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test

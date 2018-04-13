@@ -31,12 +31,18 @@ public class AbstractIdentifierAwareJaxRsProvider {
     @Context
     private Request request;
 
+    private final ControllerContext controllerContext;
+
+    protected AbstractIdentifierAwareJaxRsProvider(ControllerContext controllerContext) {
+        this.controllerContext = controllerContext;
+    }
+
     protected final String getIdentifier() {
         return this.uriInfo.getPathParameters(false).getFirst(RestconfConstants.IDENTIFIER);
     }
 
     protected InstanceIdentifierContext<?> getInstanceIdentifierContext() {
-        return ControllerContext.getInstance().toInstanceIdentifier(getIdentifier());
+        return controllerContext.toInstanceIdentifier(getIdentifier());
     }
 
     protected UriInfo getUriInfo() {
@@ -45,6 +51,10 @@ public class AbstractIdentifierAwareJaxRsProvider {
 
     protected boolean isPost() {
         return POST.equals(this.request.getMethod());
+    }
+
+    protected ControllerContext getControllerContext() {
+        return controllerContext;
     }
 
     Request getRequest() {

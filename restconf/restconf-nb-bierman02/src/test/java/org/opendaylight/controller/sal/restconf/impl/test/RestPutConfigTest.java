@@ -10,11 +10,13 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
+import java.io.FileNotFoundException;
 import java.util.HashSet;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -39,19 +41,22 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 @RunWith(MockitoJUnitRunner.class)
 public class RestPutConfigTest {
 
+    private static SchemaContext schemaContext;
     private RestconfImpl restconfService;
     private ControllerContext controllerCx;
-    private SchemaContext schemaCx;
 
     @Mock
     private BrokerFacade brokerFacade;
 
+    @BeforeClass
+    public static void staticInit() throws FileNotFoundException {
+        schemaContext = TestRestconfUtils.loadSchemaContext("/test-config-data/yang1/", null);
+    }
+
     @Before
     public void init() {
         this.restconfService = RestconfImpl.getInstance();
-        this.controllerCx = ControllerContext.getInstance();
-        this.schemaCx = TestRestconfUtils.loadSchemaContext("/test-config-data/yang1/", null);
-        this.controllerCx.setSchemas(this.schemaCx);
+        this.controllerCx = TestRestconfUtils.newControllerContext(schemaContext);
         this.restconfService.setControllerContext(this.controllerCx);
     }
 
@@ -131,7 +136,7 @@ public class RestPutConfigTest {
         final PutResult result = Mockito.mock(PutResult.class);
         final CheckedFuture<Void, TransactionCommitFailedException> checkedFuture =
                 Futures.immediateCheckedFuture(null);
-        Mockito.when(this.brokerFacade.commitConfigurationDataPut(this.schemaCx, yii, data, null, null))
+        Mockito.when(this.brokerFacade.commitConfigurationDataPut(this.schemaContext, yii, data, null, null))
                 .thenReturn(result);
         Mockito.when(result.getFutureOfPutData()).thenReturn(checkedFuture);
         Mockito.when(result.getStatus()).thenReturn(Status.OK);

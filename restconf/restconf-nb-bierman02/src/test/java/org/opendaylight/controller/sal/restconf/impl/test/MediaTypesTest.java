@@ -31,22 +31,19 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
-import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
-import org.opendaylight.netconf.sal.rest.impl.RestconfDocumentedExceptionMapper;
-import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 
 public class MediaTypesTest extends JerseyTest {
 
-    private static RestconfService restconfService;
     private static String jsonData;
     private static String xmlData;
 
+    private RestconfService restconfService;
+
     @BeforeClass
     public static void init() throws IOException {
-        restconfService = mock(RestconfService.class);
         final String jsonPath = RestconfImplTest.class.getResource("/parts/ietf-interfaces_interfaces.json").getPath();
         jsonData = TestUtils.loadTextFile(jsonPath);
         final InputStream xmlStream =
@@ -60,11 +57,11 @@ public class MediaTypesTest extends JerseyTest {
         // enable(TestProperties.LOG_TRAFFIC);
         // enable(TestProperties.DUMP_ENTITY);
         // enable(TestProperties.RECORD_LOG_LEVEL);
-        // set(TestProperties.RECORD_LOG_LEVEL, Level.ALL.intValue());
+        // set(TestProperties.RECORD_LOG_LEVEL, Level.ALL.intValue());'
+        restconfService = mock(RestconfService.class);
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig = resourceConfig.registerInstances(restconfService,  new NormalizedNodeJsonBodyWriter(),
-            new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(), new JsonNormalizedNodeBodyReader());
-        resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
+            new NormalizedNodeXmlBodyWriter());
         return resourceConfig;
     }
 
@@ -249,12 +246,12 @@ public class MediaTypesTest extends JerseyTest {
     private int post(final String uri, final String acceptMediaType, final String contentTypeMediaType,
                      final String data) {
         if (acceptMediaType == null) {
-            if ((contentTypeMediaType == null) || (data == null)) {
+            if (contentTypeMediaType == null || data == null) {
                 return target(uri).request().post(null).getStatus();
             }
             return target(uri).request().post(Entity.entity(data, contentTypeMediaType)).getStatus();
         }
-        if ((contentTypeMediaType == null) || (data == null)) {
+        if (contentTypeMediaType == null || data == null) {
             return target(uri).request(acceptMediaType).post(null).getStatus();
         }
         return target(uri).request(acceptMediaType).post(Entity.entity(data, contentTypeMediaType)).getStatus();

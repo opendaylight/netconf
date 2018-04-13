@@ -8,6 +8,11 @@
 
 package org.opendaylight.controller.md.sal.rest.common;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,11 +25,16 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.rest.impl.test.providers.TestJsonBodyWriter;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
@@ -51,6 +61,27 @@ public final class TestRestconfUtils {
         throw new UnsupportedOperationException("Test utility class");
     }
 
+    public static ControllerContext newControllerContext(SchemaContext schemaContext) {
+        return newControllerContext(schemaContext, null);
+    }
+
+    public static ControllerContext newControllerContext(SchemaContext schemaContext, DOMMountPoint mountInstance) {
+        if (mountInstance != null) {
+            doReturn(schemaContext).when(mountInstance).getSchemaContext();
+        }
+
+        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
+        doReturn(Optional.fromNullable(mountInstance)).when(mockMountService)
+            .getMountPoint(any(YangInstanceIdentifier.class));
+
+        SchemaService mockSchemaService = mock(SchemaService.class);
+        doReturn(schemaContext).when(mockSchemaService).getGlobalContext();
+
+        DOMSchemaService mockDomSchemaService = mock(DOMSchemaService.class);
+
+        return ControllerContext.newInstance(mockSchemaService, mockMountService, mockDomSchemaService);
+    }
+
     @SuppressWarnings("checkstyle:IllegalCatch")
     public static SchemaContext loadSchemaContext(final String yangPath, final SchemaContext schemaContext) {
         try {
@@ -73,8 +104,8 @@ public final class TestRestconfUtils {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     public static NormalizedNodeContext loadNormalizedContextFromXmlFile(final String pathToInputFile,
-            final String uri) {
-        final InstanceIdentifierContext<?> iiContext = ControllerContext.getInstance().toInstanceIdentifier(uri);
+            final String uri, final ControllerContext controllerContext) {
+        final InstanceIdentifierContext<?> iiContext = controllerContext.toInstanceIdentifier(uri);
         final InputStream inputStream = TestJsonBodyWriter.class.getResourceAsStream(pathToInputFile);
         try {
             final Document doc = UntrustedXML.newDocumentBuilder().parse(inputStream);

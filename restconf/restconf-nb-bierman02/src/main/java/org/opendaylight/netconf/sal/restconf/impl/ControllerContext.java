@@ -14,6 +14,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.Closeable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -36,6 +37,8 @@ import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizat
 import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizer;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.Draft02.RestConfModule;
@@ -45,6 +48,7 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.yangtools.concepts.Codec;
+import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -74,7 +78,7 @@ import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ControllerContext implements SchemaContextListener {
+public final class ControllerContext implements SchemaContextListener, Closeable {
     // FIXME: this should be in md-sal somewhere
     public static final String MOUNT = "yang-ext:mount";
 
@@ -95,42 +99,64 @@ public class ControllerContext implements SchemaContextListener {
 
     private final AtomicReference<Map<QName, RpcDefinition>> qnameToRpc = new AtomicReference<>(Collections.emptyMap());
 
-    // FIXME; these three should be final
+    private DOMMountPointService mountService;
+    private DOMYangTextSourceProvider yangTextSourceProvider;
+    private ListenerRegistration<SchemaContextListener> listenerRegistration;
     private volatile SchemaContext globalSchema;
-    private volatile DOMMountPointService mountService;
-    private volatile DOMYangTextSourceProvider yangTextSourceProvider;
-    private DataNormalizer dataNormalizer;
+    private volatile DataNormalizer dataNormalizer;
 
+    private ControllerContext(SchemaService schemaService, DOMMountPointService mountService,
+            DOMYangTextSourceProvider yangTextSourceProvider) {
+        this.mountService = mountService;
+        this.yangTextSourceProvider = yangTextSourceProvider;
 
-    public void setGlobalSchema(final SchemaContext globalSchema) {
-        this.globalSchema = globalSchema;
-        this.dataNormalizer = new DataNormalizer(globalSchema);
+        setGlobalSchema(schemaService.getGlobalContext());
+        listenerRegistration = schemaService.registerSchemaContextListener(this);
     }
 
-    public void setMountService(final DOMMountPointService mountService) {
-        this.mountService = mountService;
+    // Temporary until the static instance is removed.
+    @Deprecated
+    private ControllerContext() {
+    }
+
+    public static ControllerContext newInstance(SchemaService schemaService, DOMMountPointService mountService,
+            DOMSchemaService domSchemaService) {
+        final DOMYangTextSourceProvider yangTextSourceProvider =
+            (DOMYangTextSourceProvider) domSchemaService.getSupportedExtensions().get(DOMYangTextSourceProvider.class);
+
+        INSTANCE.mountService = mountService;
+        INSTANCE.yangTextSourceProvider = yangTextSourceProvider;
+
+        INSTANCE.onGlobalContextUpdated(schemaService.getGlobalContext());
+        INSTANCE.listenerRegistration = schemaService.registerSchemaContextListener(INSTANCE);
+
+        return INSTANCE;
+        //return new ControllerContext(schemaService, mountService, domSchemaServiceExtension);
+    }
+
+    @Deprecated
+    public static ControllerContext getInstance() {
+        return INSTANCE;
+    }
+
+    private void setGlobalSchema(final SchemaContext globalSchema) {
+        this.globalSchema = globalSchema;
+        this.dataNormalizer = new DataNormalizer(globalSchema);
     }
 
     public DOMYangTextSourceProvider getYangTextSourceProvider() {
         return yangTextSourceProvider;
     }
 
-    public void setYangTextSourceProvider(DOMYangTextSourceProvider yangTextSourceProvider) {
-        this.yangTextSourceProvider = yangTextSourceProvider;
-    }
-
-    ControllerContext() {
-
-    }
-
-    public static ControllerContext getInstance() {
-        return INSTANCE;
-    }
-
     private void checkPreconditions() {
         if (this.globalSchema == null) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
+    }
+
+    @Override
+    public void close() {
+        listenerRegistration.close();
     }
 
     public void setSchemas(final SchemaContext schemas) {
@@ -522,9 +548,9 @@ public class ControllerContext implements SchemaContextListener {
         return ret;
     }
 
-    private static String toUriString(final Object object, final LeafSchemaNode leafNode, final DOMMountPoint mount)
+    private String toUriString(final Object object, final LeafSchemaNode leafNode, final DOMMountPoint mount)
             throws UnsupportedEncodingException {
-        final Codec<Object, Object> codec = RestCodec.from(leafNode.getType(), mount);
+        final Codec<Object, Object> codec = RestCodec.from(leafNode.getType(), mount, this);
         // FIXME: UrlEncoder looks up a well-known charset, we need something that will use it directly
         return object == null ? "" : URLEncoder.encode(codec.serialize(object).toString(), URI_ENCODING_CHARSET.name());
     }
@@ -626,11 +652,10 @@ public class ControllerContext implements SchemaContextListener {
             if (targetNode == null && parentNode instanceof Module) {
                 final RpcDefinition rpc;
                 if (mountPoint == null) {
-                    rpc = ControllerContext.getInstance().getRpcDefinition(head, module.getRevision());
+                    rpc = getRpcDefinition(head, module.getRevision());
                 } else {
                     final String rpcName = toNodeName(head);
-                    ControllerContext.getInstance();
-                    rpc = ControllerContext.getRpcDefinition(module, rpcName);
+                    rpc = getRpcDefinition(module, rpcName);
                 }
                 if (rpc != null) {
                     return new InstanceIdentifierContext<>(builder.build(), rpc, mountPoint,
@@ -782,7 +807,7 @@ public class ControllerContext implements SchemaContextListener {
         if (baseType instanceof LeafrefTypeDefinition) {
             typedef = SchemaContextUtil.getBaseTypeForLeafRef((LeafrefTypeDefinition) baseType, schemaContext, node);
         }
-        final Codec<Object, Object> codec = RestCodec.from(typedef, mountPoint);
+        final Codec<Object, Object> codec = RestCodec.from(typedef, mountPoint, this);
         Object decoded = codec.deserialize(urlDecoded);
         String additionalInfo = "";
         if (decoded == null) {
@@ -1000,5 +1025,4 @@ public class ControllerContext implements SchemaContextListener {
     public DataNormalizationOperation<?> getRootOperation() {
         return this.dataNormalizer.getRootOperation();
     }
-
 }

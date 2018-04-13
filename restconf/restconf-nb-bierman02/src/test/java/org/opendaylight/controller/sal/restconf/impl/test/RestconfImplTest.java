@@ -42,6 +42,7 @@ import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
@@ -73,18 +74,16 @@ import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
  */
 public class RestconfImplTest {
 
-    private RestconfImpl restconfImpl = null;
-    private static ControllerContext controllerContext = null;
+    private static SchemaContext schemaContext;
+
+    private RestconfImpl restconfImpl;
+    private final ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
 
     @BeforeClass
     public static void init() throws FileNotFoundException, ReactorException {
-        final SchemaContext schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
-
+        schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
         final Set<Module> allModules = schemaContext.getModules();
         assertNotNull(allModules);
-
-        controllerContext = ControllerContext.getInstance();
-        controllerContext.setSchemas(schemaContext);
     }
 
     @Before
@@ -214,7 +213,7 @@ public class RestconfImplTest {
         // register test notification stream
         final SchemaPath path = SchemaPath.create(
                 true, QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"));
-        Notificator.createNotificationListener(Lists.newArrayList(path), identifier, "XML");
+        Notificator.createNotificationListener(Lists.newArrayList(path), identifier, "XML", controllerContext);
 
         final UriInfo uriInfo = mock(UriInfo.class);
         final UriBuilder uriBuilder = mock(UriBuilder.class);

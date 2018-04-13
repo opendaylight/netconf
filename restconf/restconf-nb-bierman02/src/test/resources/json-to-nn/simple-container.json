@@ -1,15 +1,15 @@
 {
-	"cont":{
-		"cont1":{
-		},
-		"lst1": [
-			{
-			}
-		],
-		"lflst1":[
-			"lflst1_1",
-			"lflst1_2"
-		],
-		"lf1":"lf1"
-	}
+    "simple-container-yang:cont":{
+        "cont1":{
+        },
+        "lst1": [
+            {
+            }
+        ],
+        "lflst1":[
+            "lflst1_1",
+            "lflst1_2"
+        ],
+        "lf1":"lf1"
+    }
 }

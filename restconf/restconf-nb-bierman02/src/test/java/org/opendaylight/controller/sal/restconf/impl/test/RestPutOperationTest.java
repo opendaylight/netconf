@@ -14,7 +14,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
@@ -35,7 +34,7 @@ import org.junit.Test;
 import org.opendaylight.controller.md.sal.common.api.data.OptimisticLockFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
@@ -59,21 +58,17 @@ public class RestPutOperationTest extends JerseyTest {
     private static String xmlData2;
     private static String xmlData3;
 
-    private static BrokerFacade brokerFacade;
-    private static RestconfImpl restconfImpl;
     private static SchemaContext schemaContextYangsIetf;
     private static SchemaContext schemaContextTestModule;
+
+    private BrokerFacade brokerFacade;
+    private RestconfImpl restconfImpl;
+    private DOMMountPoint mountInstance;
 
     @BeforeClass
     public static void init() throws IOException, ReactorException {
         schemaContextYangsIetf = TestUtils.loadSchemaContext("/full-versions/yangs");
         schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
-        final ControllerContext controllerContext = ControllerContext.getInstance();
-        controllerContext.setSchemas(schemaContextYangsIetf);
-        brokerFacade = mock(BrokerFacade.class);
-        restconfImpl = RestconfImpl.getInstance();
-        restconfImpl.setBroker(brokerFacade);
-        restconfImpl.setControllerContext(controllerContext);
         loadData();
     }
 
@@ -96,10 +91,20 @@ public class RestPutOperationTest extends JerseyTest {
         // enable(TestProperties.DUMP_ENTITY);
         // enable(TestProperties.RECORD_LOG_LEVEL);
         // set(TestProperties.RECORD_LOG_LEVEL, Level.ALL.intValue());
+
+        mountInstance = mock(DOMMountPoint.class);
+        final ControllerContext controllerContext =
+                TestRestconfUtils.newControllerContext(schemaContextYangsIetf, mountInstance);
+        brokerFacade = mock(BrokerFacade.class);
+        restconfImpl = RestconfImpl.getInstance();
+        restconfImpl.setBroker(brokerFacade);
+        restconfImpl.setControllerContext(controllerContext);
+
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig = resourceConfig.registerInstances(restconfImpl,new XmlNormalizedNodeBodyReader(),
-            new NormalizedNodeXmlBodyWriter(), new JsonNormalizedNodeBodyReader(), new NormalizedNodeJsonBodyWriter());
-        resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
+        resourceConfig = resourceConfig.registerInstances(restconfImpl,
+                new XmlNormalizedNodeBodyReader(controllerContext), new NormalizedNodeXmlBodyWriter(),
+                new JsonNormalizedNodeBodyReader(controllerContext), new NormalizedNodeJsonBodyWriter(),
+                new RestconfDocumentedExceptionMapper(controllerContext));
         return resourceConfig;
     }
 
@@ -138,12 +143,7 @@ public class RestPutOperationTest extends JerseyTest {
         when(result.getFutureOfPutData()).thenReturn(dummyFuture);
         when(result.getStatus()).thenReturn(Status.OK);
 
-        final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
-        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        when(mockMountService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountInstance));
-
-        ControllerContext.getInstance().setMountService(mockMountService);
 
         String uri = "/config/ietf-interfaces:interfaces/interface/0/yang-ext:mount/test-module:cont";
         assertEquals(200, put(uri, MediaType.APPLICATION_XML, xmlData2));
@@ -161,12 +161,7 @@ public class RestPutOperationTest extends JerseyTest {
         when(result.getFutureOfPutData()).thenReturn(dummyFuture);
         when(result.getStatus()).thenReturn(Status.OK);
 
-        final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
-        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        when(mockMountService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountInstance));
-
-        ControllerContext.getInstance().setMountService(mockMountService);
 
         final String uri = "/config/ietf-interfaces:interfaces/yang-ext:mount";
         assertEquals(200, put(uri, MediaType.APPLICATION_XML, xmlData3));
@@ -205,7 +200,7 @@ public class RestPutOperationTest extends JerseyTest {
         return target(uri).request(mediaType).put(Entity.entity(data, mediaType)).getStatus();
     }
 
-    private static void mockCommitConfigurationDataPutMethod(final boolean noErrors) {
+    private void mockCommitConfigurationDataPutMethod(final boolean noErrors) {
         final PutResult putResMock = mock(PutResult.class);
         if (noErrors) {
             doReturn(putResMock).when(brokerFacade).commitConfigurationDataPut(

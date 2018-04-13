@@ -49,8 +49,9 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
         URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
 
-    public TestXmlBodyReader() throws Exception {
-        this.xmlBodyReader = new XmlNormalizedNodeBodyReader();
+    public TestXmlBodyReader() {
+        super(schemaContext, null);
+        this.xmlBodyReader = new XmlNormalizedNodeBodyReader(controllerContext);
     }
 
     @Override
@@ -64,7 +65,6 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
         testFiles.addAll(TestRestconfUtils.loadFiles("/foo-xml-test/yang"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test

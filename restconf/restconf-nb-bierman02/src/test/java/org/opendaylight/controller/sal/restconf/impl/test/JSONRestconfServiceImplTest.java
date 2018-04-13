@@ -19,7 +19,6 @@ import static org.mockito.Matchers.notNull;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,11 +40,11 @@ import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.JSONRestconfServiceImpl;
@@ -106,21 +105,27 @@ public class JSONRestconfServiceImplTest {
     static final QName TEST_OUTPUT_QNAME = QName.create(TOASTER_MODULE_NS, TOASTER_MODULE_VERSION, "testOutput");
     static final QName TEXT_OUT_QNAME = QName.create(TOASTER_MODULE_NS, TOASTER_MODULE_VERSION, "textOut");
 
-    private static BrokerFacade brokerFacade;
+    private static SchemaContext schemaContext;
 
-    private final JSONRestconfServiceImpl service = new JSONRestconfServiceImpl();
+    private final BrokerFacade brokerFacade = mock(BrokerFacade.class);
+    private final DOMMountPoint mockMountPoint = mock(DOMMountPoint.class);
+    private JSONRestconfServiceImpl service;
 
     @BeforeClass
     public static void init() throws IOException, ReactorException {
-        ControllerContext.getInstance().setSchemas(TestUtils.loadSchemaContext("/full-versions/yangs"));
-        brokerFacade = mock(BrokerFacade.class);
-        RestconfImpl.getInstance().setBroker(brokerFacade);
-        RestconfImpl.getInstance().setControllerContext(ControllerContext.getInstance());
+        schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
     }
 
     @Before
-    public void setup() {
-        reset(brokerFacade);
+    public void setup() throws FileNotFoundException {
+        final SchemaContext mountPointSchemaContext = TestUtils.loadSchemaContext("/full-versions/test-module");
+        final ControllerContext controllerContext =
+                TestRestconfUtils.newControllerContext(schemaContext, mockMountPoint);
+        doReturn(mountPointSchemaContext).when(mockMountPoint).getSchemaContext();
+
+        service = new JSONRestconfServiceImpl(controllerContext);
+        RestconfImpl.getInstance().setBroker(brokerFacade);
+        RestconfImpl.getInstance().setControllerContext(controllerContext);
     }
 
     private static String loadData(final String path) throws IOException {
@@ -164,7 +169,6 @@ public class JSONRestconfServiceImplTest {
     @SuppressWarnings("rawtypes")
     @Test
     public void testPutBehindMountPoint() throws Exception {
-        final DOMMountPoint mockMountPoint = setupTestMountPoint();
         final PutResult result = mock(PutResult.class);
         when(brokerFacade.commitMountPointDataPut(notNull(DOMMountPoint.class),
                 notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), Mockito.anyString(),
@@ -253,7 +257,6 @@ public class JSONRestconfServiceImplTest {
     @SuppressWarnings("rawtypes")
     @Test
     public void testPostBehindMountPoint() throws Exception {
-        final DOMMountPoint mockMountPoint = setupTestMountPoint();
         doReturn(Futures.immediateCheckedFuture(null)).when(brokerFacade).commitConfigurationDataPost(
                 notNull(DOMMountPoint.class), notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class),
                 Mockito.anyString(), Mockito.anyString());
@@ -323,7 +326,6 @@ public class JSONRestconfServiceImplTest {
     @SuppressWarnings("rawtypes")
     @Test
     public void testPatchBehindMountPoint() throws Exception {
-        final DOMMountPoint mockMountPoint = setupTestMountPoint();
         final PatchStatusContext result = mock(PatchStatusContext.class);
         when(brokerFacade.patchConfigurationDataWithinTransaction(notNull(PatchContext.class)))
             .thenReturn(result);
@@ -525,19 +527,6 @@ public class JSONRestconfServiceImplTest {
 
         verifyPath(capturedPath.getValue(), INTERFACES_QNAME, INTERFACE_QNAME,
                 new Object[]{INTERFACE_QNAME, NAME_QNAME, "eth0"});
-    }
-
-    DOMMountPoint setupTestMountPoint() throws FileNotFoundException, ReactorException {
-        final SchemaContext schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
-        final DOMMountPoint mockMountPoint = mock(DOMMountPoint.class);
-        doReturn(schemaContextTestModule).when(mockMountPoint).getSchemaContext();
-
-        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        doReturn(Optional.of(mockMountPoint))
-                .when(mockMountService).getMountPoint(notNull(YangInstanceIdentifier.class));
-
-        ControllerContext.getInstance().setMountService(mockMountService);
-        return mockMountPoint;
     }
 
     void verifyLeafNode(final DataContainerNode<?> parent, final QName leafType, final Object leafValue) {

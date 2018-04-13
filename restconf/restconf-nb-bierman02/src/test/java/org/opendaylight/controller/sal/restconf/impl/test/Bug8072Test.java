@@ -9,11 +9,9 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +19,7 @@ import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
@@ -40,21 +38,33 @@ public class Bug8072Test {
     private static final QName TYPE_QNAME = QName.create("test:module", "2014-01-09", "type");
     private static final QName MODULE_TYPE_QNAME = QName.create("test:module", "2014-01-09", "module-type");
 
-    private static final ControllerContext CONTROLLER_CONTEXT = ControllerContext.getInstance();
+    private static SchemaContext schemaContext;
+
+    private final ControllerContext controllerContext;
+
+    public Bug8072Test() throws FileNotFoundException {
+        final SchemaContext mountPointContext = TestUtils.loadSchemaContext("/full-versions/test-module");
+        final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
+        controllerContext = TestRestconfUtils.newControllerContext(schemaContext, mountInstance);
+        doReturn(mountPointContext).when(mountInstance).getSchemaContext();
+
+        final BrokerFacade brokerFacade = mock(BrokerFacade.class);
+        final RestconfImpl restconfImpl = RestconfImpl.getInstance();
+        restconfImpl.setBroker(brokerFacade);
+        restconfImpl.setControllerContext(controllerContext);
+    }
 
     @BeforeClass
     public static void init() throws FileNotFoundException, ReactorException {
-        final SchemaContext globalContext = TestUtils.loadSchemaContext("/full-versions/yangs");
-        assertEquals(0, globalContext.findModules(EXTERNAL_MODULE_NAME).size());
-        final Set<Module> allModules = globalContext.getModules();
+        schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
+        assertEquals(0, schemaContext.findModules(EXTERNAL_MODULE_NAME).size());
+        final Set<Module> allModules = schemaContext.getModules();
         assertNotNull(allModules);
-        CONTROLLER_CONTEXT.setSchemas(globalContext);
     }
 
     @Test
     public void testIdentityRefFromExternalModule() throws FileNotFoundException, ReactorException {
-        initMountService();
-        final InstanceIdentifierContext<?> ctx = CONTROLLER_CONTEXT.toInstanceIdentifier(
+        final InstanceIdentifierContext<?> ctx = controllerContext.toInstanceIdentifier(
                 "simple-nodes:users/yang-ext:mount/test-module:modules/module/test-module:module-type/name");
 
         final Map<QName, Object> keyValues = new HashMap<>();
@@ -64,18 +74,5 @@ public class Bug8072Test {
             .node(new YangInstanceIdentifier.NodeIdentifierWithPredicates(MODULE_QNAME, keyValues));
 
         assertEquals(expectedYII, ctx.getInstanceIdentifier());
-    }
-
-    private void initMountService() throws FileNotFoundException, ReactorException {
-        final DOMMountPointService mountService = mock(DOMMountPointService.class);
-        CONTROLLER_CONTEXT.setMountService(mountService);
-        final BrokerFacade brokerFacade = mock(BrokerFacade.class);
-        final RestconfImpl restconfImpl = RestconfImpl.getInstance();
-        restconfImpl.setBroker(brokerFacade);
-        restconfImpl.setControllerContext(CONTROLLER_CONTEXT);
-        final SchemaContext mountPointContext = TestUtils.loadSchemaContext("/full-versions/test-module");
-        final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
-        when(mountInstance.getSchemaContext()).thenReturn(mountPointContext);
-        when(mountService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountInstance));
     }
 }

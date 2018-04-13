@@ -28,7 +28,8 @@ public class TestXmlBodyWriter extends AbstractBodyReaderTest {
     private final NormalizedNodeXmlBodyWriter xmlBodyWriter;
     private static SchemaContext schemaContext;
 
-    public TestXmlBodyWriter() throws NoSuchFieldException, SecurityException {
+    public TestXmlBodyWriter() {
+        super(schemaContext, null);
         this.xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
     }
 
@@ -42,7 +43,6 @@ public class TestXmlBodyWriter extends AbstractBodyReaderTest {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class TestXmlBodyWriter extends AbstractBodyReaderTest {
         final String uri = "invoke-rpc-module:rpc-test";
         final String pathToInputFile = "/invoke-rpc/xml/rpc-output.xml";
         final NormalizedNodeContext nnContext = TestRestconfUtils
-                .loadNormalizedContextFromXmlFile(pathToInputFile, uri);
+                .loadNormalizedContextFromXmlFile(pathToInputFile, uri, controllerContext);
         final OutputStream output = new ByteArrayOutputStream();
         this.xmlBodyWriter.writeTo(nnContext, null, null, null, this.mediaType, null,
                 output);

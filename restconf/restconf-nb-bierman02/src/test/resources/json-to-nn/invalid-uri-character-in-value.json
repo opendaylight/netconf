@@ -1,6 +1,6 @@
 {
-    "cont":{
-    	"lf1":"module<Name:value lf1",
-    	"lf2":"module>Name:value lf2"
-	}
+    "array-with-null-yang:cont":{
+        "lf1":"module<Name:value lf1",
+        "lf2":"module>Name:value lf2"
+    }
 }

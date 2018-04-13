@@ -19,7 +19,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import java.net.URI;
@@ -43,11 +42,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
-import org.opendaylight.netconf.sal.rest.impl.RestconfApplication;
 import org.opendaylight.netconf.sal.rest.impl.RestconfDocumentedExceptionMapper;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
@@ -86,15 +84,18 @@ public class RestGetOperationTest extends JerseyTest {
         }
     }
 
-    private static BrokerFacade brokerFacade;
-    private static RestconfImpl restconfImpl;
     private static SchemaContext schemaContextYangsIetf;
     private static SchemaContext schemaContextTestModule;
+    private static SchemaContext schemaContextModules;
+    private static SchemaContext schemaContextBehindMountPoint;
+
     @SuppressWarnings("rawtypes")
     private static NormalizedNode answerFromGet;
 
-    private static SchemaContext schemaContextModules;
-    private static SchemaContext schemaContextBehindMountPoint;
+    private BrokerFacade brokerFacade;
+    private RestconfImpl restconfImpl;
+    private ControllerContext controllerContext;
+    private DOMMountPoint mountInstance;
 
     private static final String RESTCONF_NS = "urn:ietf:params:xml:ns:yang:ietf-restconf";
 
@@ -102,13 +103,10 @@ public class RestGetOperationTest extends JerseyTest {
     public static void init() throws Exception {
         schemaContextYangsIetf = TestUtils.loadSchemaContext("/full-versions/yangs");
         schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
-        brokerFacade = mock(BrokerFacade.class);
-        restconfImpl = RestconfImpl.getInstance();
-        restconfImpl.setBroker(brokerFacade);
-        answerFromGet = TestUtils.prepareNormalizedNodeWithIetfInterfacesInterfacesData();
-
         schemaContextModules = TestUtils.loadSchemaContext("/modules");
         schemaContextBehindMountPoint = TestUtils.loadSchemaContext("/modules/modules-behind-mount-point");
+
+        answerFromGet = TestUtils.prepareNormalizedNodeWithIetfInterfacesInterfacesData();
     }
 
     @Override
@@ -118,18 +116,24 @@ public class RestGetOperationTest extends JerseyTest {
         // enable(TestProperties.DUMP_ENTITY);
         // enable(TestProperties.RECORD_LOG_LEVEL);
         // set(TestProperties.RECORD_LOG_LEVEL, Level.ALL.intValue());
+
+        mountInstance = mock(DOMMountPoint.class);
+        controllerContext = TestRestconfUtils.newControllerContext(schemaContextYangsIetf, mountInstance);
+        brokerFacade = mock(BrokerFacade.class);
+        restconfImpl = RestconfImpl.getInstance();
+        restconfImpl.setBroker(brokerFacade);
+        restconfImpl.setControllerContext(controllerContext);
+
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig = resourceConfig.registerInstances(restconfImpl, new NormalizedNodeJsonBodyWriter(),
-            new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(), new JsonNormalizedNodeBodyReader());
-        resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
-        resourceConfig.registerClasses(new RestconfApplication().getClasses());
+            new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(controllerContext),
+            new JsonNormalizedNodeBodyReader(controllerContext),
+            new RestconfDocumentedExceptionMapper(controllerContext));
         return resourceConfig;
     }
 
-    private static void setControllerContext(final SchemaContext schemaContext) {
-        final ControllerContext controllerContext = ControllerContext.getInstance();
+    private void setControllerContext(final SchemaContext schemaContext) {
         controllerContext.setSchemas(schemaContext);
-        restconfImpl.setControllerContext(controllerContext);
     }
 
     /**
@@ -169,12 +173,7 @@ public class RestGetOperationTest extends JerseyTest {
         when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
                 Mockito.anyString())).thenReturn(
                 prepareCnDataForMountPointTest(false));
-        final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
-        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        when(mockMountService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountInstance));
-
-        ControllerContext.getInstance().setMountService(mockMountService);
 
         String uri = "/config/ietf-interfaces:interfaces/interface/0/yang-ext:mount/test-module:cont/cont1";
         assertEquals(200, get(uri, MediaType.APPLICATION_XML));
@@ -196,12 +195,8 @@ public class RestGetOperationTest extends JerseyTest {
         final YangInstanceIdentifier awaitedInstanceIdentifier = prepareInstanceIdentifierForList();
         when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), eq(awaitedInstanceIdentifier),
                 Mockito.anyString())).thenReturn(prepareCnDataForSlashesBehindMountPointTest());
-        final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
-        when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
-        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        when(mockMountService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountInstance));
 
-        ControllerContext.getInstance().setMountService(mockMountService);
+        when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
 
         final String uri = "/config/ietf-interfaces:interfaces/interface/0/yang-ext:mount/"
                 + "test-module:cont/lst1/GigabitEthernet0%2F0%2F0%2F0";
@@ -231,12 +226,8 @@ public class RestGetOperationTest extends JerseyTest {
         when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
                 Mockito.anyString())).thenReturn(
                 prepareCnDataForMountPointTest(true));
-        final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
-        when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
-        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        when(mockMountService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountInstance));
 
-        ControllerContext.getInstance().setMountService(mockMountService);
+        when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
 
         final String uri = "/config/ietf-interfaces:interfaces/interface/0/yang-ext:mount/test-module:cont";
         assertEquals(200, get(uri, MediaType.APPLICATION_XML));
@@ -269,9 +260,7 @@ public class RestGetOperationTest extends JerseyTest {
     // /modules
     @Test
     public void getModulesTest() throws Exception {
-        final ControllerContext controllerContext = ControllerContext.getInstance();
-        controllerContext.setGlobalSchema(schemaContextModules);
-        restconfImpl.setControllerContext(controllerContext);
+        setControllerContext(schemaContextModules);
 
         final String uri = "/modules";
 
@@ -379,43 +368,13 @@ public class RestGetOperationTest extends JerseyTest {
         }
     }
 
-    private static Matcher validateOperationsResponseXml(final String searchIn, final String rpcName,
-                                                         final String namespace) {
-        final StringBuilder regex = new StringBuilder();
-
-        regex.append("^");
-
-        regex.append(".*<operations");
-        regex.append(".*xmlns=\"urn:ietf:params:xml:ns:yang:ietf-restconf\"");
-        regex.append(".*>");
-
-        regex.append(".*<");
-        regex.append(".*" + rpcName);
-        regex.append(".*" + namespace);
-        regex.append(".*/");
-        regex.append(".*>");
-
-        regex.append(".*</operations.*");
-        regex.append(".*>");
-
-        regex.append(".*");
-        regex.append("$");
-        final Pattern ptrn = Pattern.compile(regex.toString(), Pattern.DOTALL);
-        return ptrn.matcher(searchIn);
-    }
-
     // /operations/pathToMountPoint/yang-ext:mount
     @Ignore
     @Test
     public void getOperationsBehindMountPointTest() throws Exception {
         setControllerContext(schemaContextModules);
 
-        final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextBehindMountPoint);
-        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        when(mockMountService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountInstance));
-
-        ControllerContext.getInstance().setMountService(mockMountService);
 
         final String uri = "/operations/ietf-interfaces:interfaces/interface/0/yang-ext:mount/";
 
@@ -449,12 +408,7 @@ public class RestGetOperationTest extends JerseyTest {
     public void getModulesBehindMountPoint() throws Exception {
         setControllerContext(schemaContextModules);
 
-        final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextBehindMountPoint);
-        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        when(mockMountService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountInstance));
-
-        ControllerContext.getInstance().setMountService(mockMountService);
 
         final String uri = "/modules/ietf-interfaces:interfaces/interface/0/yang-ext:mount/";
 
@@ -482,12 +436,7 @@ public class RestGetOperationTest extends JerseyTest {
     public void getModuleBehindMountPoint() throws Exception {
         setControllerContext(schemaContextModules);
 
-        final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextBehindMountPoint);
-        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        when(mockMountService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountInstance));
-
-        ControllerContext.getInstance().setMountService(mockMountService);
 
         final String uri = "/modules/module/ietf-interfaces:interfaces/interface/0/yang-ext:mount/"
                 + "module1-behind-mount-point/2014-02-03";
@@ -657,12 +606,12 @@ public class RestGetOperationTest extends JerseyTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static void mockReadOperationalDataMethod() {
+    private void mockReadOperationalDataMethod() {
         when(brokerFacade.readOperationalData(any(YangInstanceIdentifier.class))).thenReturn(answerFromGet);
     }
 
     @SuppressWarnings("unchecked")
-    private static void mockReadConfigurationDataMethod() {
+    private void mockReadConfigurationDataMethod() {
         when(brokerFacade.readConfigurationData(any(YangInstanceIdentifier.class), Mockito.anyString()))
                 .thenReturn(answerFromGet);
     }
@@ -735,7 +684,7 @@ public class RestGetOperationTest extends JerseyTest {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static void getDataWithInvalidDepthParameterTest(final UriInfo uriInfo) {
+    private void getDataWithInvalidDepthParameterTest(final UriInfo uriInfo) {
         try {
             final QName qNameDepth1Cont = QName.create("urn:nested:module", "2014-06-3", "depth1-cont");
             final YangInstanceIdentifier ii = YangInstanceIdentifier.builder().node(qNameDepth1Cont).build();

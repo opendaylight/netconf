@@ -25,7 +25,7 @@ public class RestCodecExceptionsTest {
 
     @Test
     public void serializeExceptionTest() {
-        final Codec<Object, Object> codec = RestCodec.from(BaseTypes.bitsTypeBuilder(PATH).build(), null);
+        final Codec<Object, Object> codec = RestCodec.from(BaseTypes.bitsTypeBuilder(PATH).build(), null, null);
         final String serializedValue = (String) codec.serialize("incorrect value"); // set
                                                                               // expected
         assertEquals("incorrect value", serializedValue);
@@ -35,7 +35,7 @@ public class RestCodecExceptionsTest {
     public void deserializeExceptionTest() {
         final IdentityrefTypeDefinition mockedIidentityrefType = mock(IdentityrefTypeDefinition.class);
 
-        final Codec<Object, Object> codec = RestCodec.from(mockedIidentityrefType, null);
+        final Codec<Object, Object> codec = RestCodec.from(mockedIidentityrefType, null, null);
         assertNull(codec.deserialize("incorrect value"));
     }
 

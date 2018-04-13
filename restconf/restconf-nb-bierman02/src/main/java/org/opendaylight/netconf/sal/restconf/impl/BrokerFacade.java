@@ -96,6 +96,7 @@ public class BrokerFacade {
 
     private DOMDataBroker domDataBroker;
     private DOMNotificationService domNotification;
+    private ControllerContext controllerContext;
 
     BrokerFacade() {
 
@@ -107,6 +108,10 @@ public class BrokerFacade {
 
     public void setDomNotificationService(final DOMNotificationService service) {
         this.domNotification = service;
+    }
+
+    public void setControllerContext(ControllerContext controllerContext) {
+        this.controllerContext = controllerContext;
     }
 
     public static BrokerFacade getInstance() {
@@ -569,7 +574,7 @@ public class BrokerFacade {
                 throw new RestconfDocumentedException("Bad value used with with-defaults parameter : " + withDefa);
         }
 
-        final SchemaContext ctx = ControllerContext.getInstance().getGlobalSchema();
+        final SchemaContext ctx = controllerContext.getGlobalSchema();
         final DataSchemaContextTree baseSchemaCtxTree = DataSchemaContextTree.from(ctx);
         final DataSchemaNode baseSchemaNode = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
         if (result instanceof ContainerNode) {
@@ -791,13 +796,12 @@ public class BrokerFacade {
         }
     }
 
-    private static void insertWithPointLeafListPost(final DOMDataReadWriteTransaction rwTransaction,
+    private void insertWithPointLeafListPost(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
             final boolean before) {
         rwTransaction.delete(datastore, path.getParent().getParent());
-        final InstanceIdentifierContext<?> instanceIdentifier =
-                ControllerContext.getInstance().toInstanceIdentifier(point);
+        final InstanceIdentifierContext<?> instanceIdentifier = controllerContext.toInstanceIdentifier(point);
         int lastItemPosition = 0;
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
@@ -824,13 +828,12 @@ public class BrokerFacade {
         }
     }
 
-    private static void insertWithPointListPost(final DOMDataReadWriteTransaction rwTransaction,
+    private void insertWithPointListPost(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
             final String point, final MapNode readList, final boolean before) {
         rwTransaction.delete(datastore, path.getParent().getParent());
-        final InstanceIdentifierContext<?> instanceIdentifier =
-                ControllerContext.getInstance().toInstanceIdentifier(point);
+        final InstanceIdentifierContext<?> instanceIdentifier = controllerContext.toInstanceIdentifier(point);
         int lastItemPosition = 0;
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
             if (mapEntryNode.getIdentifier()
@@ -1102,13 +1105,12 @@ public class BrokerFacade {
         }
     }
 
-    private static void insertWithPointLeafListPut(final DOMDataWriteTransaction tx,
+    private void insertWithPointLeafListPut(final DOMDataWriteTransaction tx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
             final boolean before) {
         tx.delete(datastore, path.getParent());
-        final InstanceIdentifierContext<?> instanceIdentifier =
-                ControllerContext.getInstance().toInstanceIdentifier(point);
+        final InstanceIdentifierContext<?> instanceIdentifier = controllerContext.toInstanceIdentifier(point);
         int index1 = 0;
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
@@ -1133,12 +1135,11 @@ public class BrokerFacade {
         }
     }
 
-    private static void insertWithPointListPut(final DOMDataWriteTransaction tx, final LogicalDatastoreType datastore,
+    private void insertWithPointListPut(final DOMDataWriteTransaction tx, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
             final String point, final OrderedMapNode readList, final boolean before) {
         tx.delete(datastore, path.getParent());
-        final InstanceIdentifierContext<?> instanceIdentifier =
-                ControllerContext.getInstance().toInstanceIdentifier(point);
+        final InstanceIdentifierContext<?> instanceIdentifier = controllerContext.toInstanceIdentifier(point);
         int index1 = 0;
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
             if (mapEntryNode.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {

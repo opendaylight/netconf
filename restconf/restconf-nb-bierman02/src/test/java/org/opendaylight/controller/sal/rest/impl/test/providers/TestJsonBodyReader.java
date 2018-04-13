@@ -46,8 +46,9 @@ public class TestJsonBodyReader extends AbstractBodyReaderTest {
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
         URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
 
-    public TestJsonBodyReader() throws NoSuchFieldException, SecurityException {
-        this.jsonBodyReader = new JsonNormalizedNodeBodyReader();
+    public TestJsonBodyReader() {
+        super(schemaContext, null);
+        this.jsonBodyReader = new JsonNormalizedNodeBodyReader(controllerContext);
     }
 
     @Override
@@ -61,7 +62,6 @@ public class TestJsonBodyReader extends AbstractBodyReaderTest {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test

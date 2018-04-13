@@ -30,6 +30,7 @@ import javax.ws.rs.core.UriInfo;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
@@ -73,6 +74,9 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
     private NormalizedNode<?, ?> globalPayload;
     private static SchemaContext schemaContextModules;
 
+    private final ControllerContext controllerContext =
+            TestRestconfUtils.newControllerContext(schemaContextModules, null);
+
     @Path("/")
     public class RestImpl {
 
@@ -82,8 +86,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
         public NormalizedNodeContext getData(@Encoded @PathParam("identifier") final String identifier,
                                              @Context final UriInfo uriInfo) {
 
-            final InstanceIdentifierContext<?> iiWithData = ControllerContext.getInstance().toInstanceIdentifier(
-                    identifier);
+            final InstanceIdentifierContext<?> iiWithData = controllerContext.toInstanceIdentifier(identifier);
 
             NormalizedNode<?, ?> data = null;
             if (identifier.equals("nested-module:depth1-cont/depth2-cont1")) {
@@ -167,7 +170,6 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
     }
 
     public void getDataWithUriDepthParameter(final String mediaType) throws WebApplicationException, IOException {
-        ControllerContext.getInstance().setGlobalSchema(schemaContextModules);
         Response response;
 
         // Test config with depth 1

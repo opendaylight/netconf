@@ -88,6 +88,12 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
     @Context
     private HttpHeaders headers;
 
+    private final ControllerContext controllerContext;
+
+    public RestconfDocumentedExceptionMapper(ControllerContext controllerContext) {
+        this.controllerContext = Preconditions.checkNotNull(controllerContext);
+    }
+
     @Override
     public Response toResponse(final RestconfDocumentedException exception) {
 
@@ -121,8 +127,8 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
         final int status = errors.iterator().next().getErrorTag().getStatusCode();
 
-        final ControllerContext context = ControllerContext.getInstance();
-        final DataNodeContainer errorsSchemaNode = (DataNodeContainer) context.getRestconfModuleErrorsSchemaNode();
+        final DataNodeContainer errorsSchemaNode =
+                (DataNodeContainer) controllerContext.getRestconfModuleErrorsSchemaNode();
 
         if (errorsSchemaNode == null) {
             return Response.status(status).type(MediaType.TEXT_PLAIN_TYPE).entity(exception.getMessage()).build();
@@ -148,7 +154,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         errContBuild.withChild(listErorsBuilder.build());
 
         final NormalizedNodeContext errContext =  new NormalizedNodeContext(new InstanceIdentifierContext<>(null,
-                (DataSchemaNode) errorsSchemaNode, null, context.getGlobalSchema()), errContBuild.build());
+                (DataSchemaNode) errorsSchemaNode, null, controllerContext.getGlobalSchema()), errContBuild.build());
 
         Object responseBody;
         if (mediaType.getSubtype().endsWith("json")) {

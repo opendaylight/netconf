@@ -31,9 +31,10 @@ public class TestJsonBodyWriter extends AbstractBodyReaderTest {
     private final NormalizedNodeJsonBodyWriter jsonBodyWriter;
     private static SchemaContext schemaContext;
 
-    public TestJsonBodyWriter() throws NoSuchFieldException, SecurityException {
+    public TestJsonBodyWriter() {
+        super(schemaContext, null);
         this.jsonBodyWriter = new NormalizedNodeJsonBodyWriter();
-        this.jsonBodyReader = new JsonNormalizedNodeBodyReader();
+        this.jsonBodyReader = new JsonNormalizedNodeBodyReader(controllerContext);
     }
 
     @Override
@@ -46,7 +47,6 @@ public class TestJsonBodyWriter extends AbstractBodyReaderTest {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test

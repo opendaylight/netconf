@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
@@ -79,8 +80,8 @@ public final class Notificator {
      *         {@link YangInstanceIdentifier} path and stream name.
      */
     public static ListenerAdapter createListener(final YangInstanceIdentifier path, final String streamName,
-            final NotificationOutputType outputType) {
-        final ListenerAdapter listener = new ListenerAdapter(path, streamName, outputType);
+            final NotificationOutputType outputType, final ControllerContext controllerContext) {
+        final ListenerAdapter listener = new ListenerAdapter(path, streamName, outputType, controllerContext);
         try {
             LOCK.lock();
             dataChangeListener.put(streamName, listener);
@@ -180,10 +181,11 @@ public final class Notificator {
      * @return List of {@link NotificationListenerAdapter} by paths
      */
     public static List<NotificationListenerAdapter> createNotificationListener(final List<SchemaPath> paths,
-            final String streamName, final String outputType) {
+            final String streamName, final String outputType, final ControllerContext controllerContext) {
         final List<NotificationListenerAdapter> listListeners = new ArrayList<>();
         for (final SchemaPath path : paths) {
-            final NotificationListenerAdapter listener = new NotificationListenerAdapter(path, streamName, outputType);
+            final NotificationListenerAdapter listener =
+                    new NotificationListenerAdapter(path, streamName, outputType, controllerContext);
             listListeners.add(listener);
         }
         try {

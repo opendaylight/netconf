@@ -50,6 +50,12 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
 
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
 
+    private final ControllerContext controllerContext;
+
+    public JSONRestconfServiceImpl(ControllerContext controllerContext) {
+        this.controllerContext = controllerContext;
+    }
+
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void put(final String uriPath, final String payload) throws OperationFailedException {
@@ -58,7 +64,8 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         LOG.debug("put: uriPath: {}, payload: {}", uriPath, payload);
 
         final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
-        final NormalizedNodeContext context = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, false);
+        final NormalizedNodeContext context = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, false,
+                controllerContext);
 
         LOG.debug("Parsed YangInstanceIdentifier: {}", context.getInstanceIdentifierContext().getInstanceIdentifier());
         LOG.debug("Parsed NormalizedNode: {}", context.getData());
@@ -79,7 +86,8 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         LOG.debug("post: uriPath: {}, payload: {}", uriPath, payload);
 
         final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
-        final NormalizedNodeContext context = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, true);
+        final NormalizedNodeContext context = JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, true,
+                controllerContext);
 
         LOG.debug("Parsed YangInstanceIdentifier: {}", context.getInstanceIdentifierContext().getInstanceIdentifier());
         LOG.debug("Parsed NormalizedNode: {}", context.getData());
@@ -150,7 +158,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
             if (actualInput != null) {
                 final InputStream entityStream = new ByteArrayInputStream(actualInput.getBytes(StandardCharsets.UTF_8));
                 final NormalizedNodeContext inputContext =
-                        JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, true);
+                        JsonNormalizedNodeBodyReader.readFrom(uriPath, entityStream, true, controllerContext);
 
                 LOG.debug("Parsed YangInstanceIdentifier: {}", inputContext.getInstanceIdentifierContext()
                         .getInstanceIdentifier());
@@ -183,7 +191,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
 
         final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
 
-        JsonToPatchBodyReader jsonToPatchBodyReader = new JsonToPatchBodyReader();
+        JsonToPatchBodyReader jsonToPatchBodyReader = new JsonToPatchBodyReader(controllerContext);
         final PatchContext context = jsonToPatchBodyReader.readFrom(uriPath, entityStream);
 
         LOG.debug("Parsed YangInstanceIdentifier: {}", context.getInstanceIdentifierContext().getInstanceIdentifier());

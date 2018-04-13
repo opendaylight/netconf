@@ -15,16 +15,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.controller.sal.restconf.impl.test.RestOperationUtils.XML;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.Set;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
@@ -37,7 +34,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
@@ -49,39 +46,29 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class RestPostOperationTest extends JerseyTest {
 
-    private static String xmlDataAbsolutePath;
-    private static String xmlDataInterfaceAbsolutePath;
-    private static String xmlDataRpcInput;
     private static String xmlBlockData;
-    private static String xmlTestInterface;
     private static String xmlData3;
     private static String xmlData4;
 
-    private static BrokerFacade brokerFacade;
-    private static RestconfImpl restconfImpl;
     private static SchemaContext schemaContextYangsIetf;
     private static SchemaContext schemaContextTestModule;
     private static SchemaContext schemaContext;
 
-    private static DOMMountPointService mountService;
+    private BrokerFacade brokerFacade;
+    private RestconfImpl restconfImpl;
+    private ControllerContext controllerContext;
+    private DOMMountPoint mountInstance;
 
     @BeforeClass
     public static void init() throws URISyntaxException, IOException, ReactorException {
         schemaContextYangsIetf = TestUtils.loadSchemaContext("/full-versions/yangs");
         schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
-        brokerFacade = mock(BrokerFacade.class);
-        restconfImpl = RestconfImpl.getInstance();
-        restconfImpl.setBroker(brokerFacade);
-
         schemaContext = TestUtils.loadSchemaContext("/test-config-data/yang1");
-        final Set<Module> modules = schemaContext.getModules();
-
         loadData();
     }
 
@@ -92,17 +79,24 @@ public class RestPostOperationTest extends JerseyTest {
         // enable(TestProperties.DUMP_ENTITY);
         // enable(TestProperties.RECORD_LOG_LEVEL);
         // set(TestProperties.RECORD_LOG_LEVEL, Level.ALL.intValue());
+
+        mountInstance = mock(DOMMountPoint.class);
+        controllerContext = TestRestconfUtils.newControllerContext(schemaContext, mountInstance);
+        brokerFacade = mock(BrokerFacade.class);
+        restconfImpl = RestconfImpl.getInstance();
+        restconfImpl.setBroker(brokerFacade);
+        restconfImpl.setControllerContext(controllerContext);
+
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig = resourceConfig.registerInstances(restconfImpl, new XmlNormalizedNodeBodyReader(),
-            new NormalizedNodeXmlBodyWriter(), new JsonNormalizedNodeBodyReader(), new NormalizedNodeJsonBodyWriter());
-        resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
+        resourceConfig = resourceConfig.registerInstances(restconfImpl,
+                new XmlNormalizedNodeBodyReader(controllerContext), new NormalizedNodeXmlBodyWriter(),
+                new JsonNormalizedNodeBodyReader(controllerContext), new NormalizedNodeJsonBodyWriter(),
+                new RestconfDocumentedExceptionMapper(controllerContext));
         return resourceConfig;
     }
 
-    private static void setSchemaControllerContext(final SchemaContext schema) {
-        final ControllerContext context = ControllerContext.getInstance();
-        context.setSchemas(schema);
-        restconfImpl.setControllerContext(context);
+    private void setSchemaControllerContext(final SchemaContext schema) {
+        controllerContext.setSchemas(schema);
     }
 
     @SuppressWarnings("unchecked")
@@ -110,16 +104,10 @@ public class RestPostOperationTest extends JerseyTest {
     @Ignore /// xmlData* need netconf-yang
     public void postDataViaUrlMountPoint() throws UnsupportedEncodingException {
         setSchemaControllerContext(schemaContextYangsIetf);
-        when(
-                brokerFacade.commitConfigurationDataPost(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
-                        any(NormalizedNode.class), null, null)).thenReturn(mock(CheckedFuture.class));
+        when(brokerFacade.commitConfigurationDataPost(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
+                any(NormalizedNode.class), null, null)).thenReturn(mock(CheckedFuture.class));
 
-        final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
-        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        when(mockMountService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountInstance));
-
-        ControllerContext.getInstance().setMountService(mockMountService);
 
         String uri = "/config/ietf-interfaces:interfaces/interface/0/";
         assertEquals(204, post(uri, Draft02.MediaTypes.DATA + XML, xmlData4));
@@ -134,7 +122,6 @@ public class RestPostOperationTest extends JerseyTest {
     @Ignore //jenkins has problem with JerseyTest
     // - we expecting problems with singletons ControllerContext as schemaContext holder
     public void createConfigurationDataTest() throws UnsupportedEncodingException, ParseException {
-        initMocking();
         when(brokerFacade.commitConfigurationDataPost((SchemaContext) null, any(YangInstanceIdentifier.class),
                 any(NormalizedNode.class), null, null))
                 .thenReturn(mock(CheckedFuture.class));
@@ -166,8 +153,6 @@ public class RestPostOperationTest extends JerseyTest {
 
     @Test
     public void createConfigurationDataNullTest() throws UnsupportedEncodingException {
-        initMocking();
-
         when(brokerFacade.commitConfigurationDataPost(any(SchemaContext.class), any(YangInstanceIdentifier.class),
                 any(NormalizedNode.class), Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(Futures.<Void, TransactionCommitFailedException>immediateCheckedFuture(null));
@@ -180,38 +165,14 @@ public class RestPostOperationTest extends JerseyTest {
         assertEquals(204, post(URI_2, Draft02.MediaTypes.DATA + XML, xmlBlockData));
     }
 
-    private static void initMocking() {
-        final ControllerContext controllerContext = ControllerContext.getInstance();
-        controllerContext.setSchemas(schemaContext);
-        mountService = mock(DOMMountPointService.class);
-        controllerContext.setMountService(mountService);
-        brokerFacade = mock(BrokerFacade.class);
-        restconfImpl = RestconfImpl.getInstance();
-        restconfImpl.setBroker(brokerFacade);
-        restconfImpl.setControllerContext(controllerContext);
-    }
-
     private int post(final String uri, final String mediaType, final String data) {
         return target(uri).request(mediaType).post(Entity.entity(data, mediaType)).getStatus();
     }
 
     private static void loadData() throws IOException, URISyntaxException {
-        InputStream xmlStream = RestconfImplTest.class
-                .getResourceAsStream("/parts/ietf-interfaces_interfaces_absolute_path.xml");
-        xmlDataAbsolutePath = TestUtils.getDocumentInPrintableForm(TestUtils.loadDocumentFrom(xmlStream));
-        xmlStream = RestconfImplTest.class
-                .getResourceAsStream("/parts/ietf-interfaces_interfaces_interface_absolute_path.xml");
-        xmlDataInterfaceAbsolutePath = TestUtils.getDocumentInPrintableForm(TestUtils.loadDocumentFrom(xmlStream));
-        final String xmlPathRpcInput =
-                RestconfImplTest.class.getResource("/full-versions/test-data2/data-rpc-input.xml").getPath();
-        xmlDataRpcInput = TestUtils.loadTextFile(xmlPathRpcInput);
         final String xmlPathBlockData =
                 RestconfImplTest.class.getResource("/test-config-data/xml/block-data.xml").getPath();
         xmlBlockData = TestUtils.loadTextFile(xmlPathBlockData);
-        final String xmlPathTestInterface =
-                RestconfImplTest.class.getResource("/test-config-data/xml/test-interface.xml").getPath();
-        xmlTestInterface = TestUtils.loadTextFile(xmlPathTestInterface);
-//        cnSnDataOutput = prepareCnSnRpcOutput();
         final String data3Input = RestconfImplTest.class.getResource("/full-versions/test-data2/data3.xml").getPath();
         xmlData3 = TestUtils.loadTextFile(data3Input);
         final String data4Input = RestconfImplTest.class.getResource("/full-versions/test-data2/data7.xml").getPath();

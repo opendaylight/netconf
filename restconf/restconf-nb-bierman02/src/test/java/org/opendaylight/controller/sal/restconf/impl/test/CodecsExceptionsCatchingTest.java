@@ -17,9 +17,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
@@ -32,15 +33,14 @@ import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class CodecsExceptionsCatchingTest extends JerseyTest {
 
-    private static RestconfImpl restConf;
-    private static ControllerContext controllerContext = ControllerContext.getInstance();
+    private RestconfImpl restConf;
+    private ControllerContext controllerContext;
 
-    @BeforeClass
-    public static void init() throws FileNotFoundException, ReactorException {
+    @Before
+    public void init() throws FileNotFoundException, ReactorException {
         restConf = RestconfImpl.getInstance();
-        controllerContext = ControllerContext.getInstance();
         final SchemaContext schemaContext = TestUtils.loadSchemaContext("/decoding-exception/yang");
-        controllerContext.setGlobalSchema(schemaContext);
+        controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
         restConf.setControllerContext(controllerContext);
     }
 
@@ -53,7 +53,8 @@ public class CodecsExceptionsCatchingTest extends JerseyTest {
         // set(TestProperties.RECORD_LOG_LEVEL, Level.ALL.intValue());
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig = resourceConfig.registerInstances(restConf, new NormalizedNodeJsonBodyWriter(),
-            new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(), new JsonNormalizedNodeBodyReader());
+            new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(controllerContext),
+            new JsonNormalizedNodeBodyReader(controllerContext));
         resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
         return resourceConfig;
     }

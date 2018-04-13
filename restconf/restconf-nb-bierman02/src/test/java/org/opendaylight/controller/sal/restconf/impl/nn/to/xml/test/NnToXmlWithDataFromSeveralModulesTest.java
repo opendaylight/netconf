@@ -42,16 +42,14 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
     private final NormalizedNodeXmlBodyWriter xmlBodyWriter;
     private static SchemaContext schemaContext;
 
-    public NnToXmlWithDataFromSeveralModulesTest() throws NoSuchFieldException,
-            SecurityException {
+    public NnToXmlWithDataFromSeveralModulesTest() {
+        super(schemaContext, null);
         xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
     }
 
     @BeforeClass
     public static void initialize() {
-        schemaContext = schemaContextLoader(
-                "/nn-to-xml/data-of-several-modules/yang", schemaContext);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
+        schemaContext = schemaContextLoader("/nn-to-xml/data-of-several-modules/yang", schemaContext);
     }
 
     @Test

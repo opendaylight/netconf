@@ -27,6 +27,7 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
@@ -42,23 +43,17 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class RestDeleteOperationTest extends JerseyTest {
+    private static SchemaContext schemaContext;
 
-    private static ControllerContext controllerContext;
-    private static BrokerFacade brokerFacade;
-    private static RestconfImpl restconfImpl;
+    private ControllerContext controllerContext;
+    private BrokerFacade brokerFacade;
+    private RestconfImpl restconfImpl;
 
     @BeforeClass
     public static void init() throws FileNotFoundException, ReactorException {
-        final SchemaContext schemaContext = TestUtils.loadSchemaContext("/test-config-data/yang1");
+        schemaContext = TestUtils.loadSchemaContext("/test-config-data/yang1");
         final Set<Module> allModules = schemaContext.getModules();
         assertNotNull(allModules);
-
-        controllerContext = ControllerContext.getInstance();
-        controllerContext.setSchemas(schemaContext);
-        brokerFacade = mock(BrokerFacade.class);
-        restconfImpl = RestconfImpl.getInstance();
-        restconfImpl.setBroker(brokerFacade);
-        restconfImpl.setControllerContext(controllerContext);
     }
 
     @Override
@@ -68,10 +63,18 @@ public class RestDeleteOperationTest extends JerseyTest {
         // enable(TestProperties.DUMP_ENTITY);
         // enable(TestProperties.RECORD_LOG_LEVEL);
         // set(TestProperties.RECORD_LOG_LEVEL, Level.ALL.intValue());
+        controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
+        controllerContext.setSchemas(schemaContext);
+        brokerFacade = mock(BrokerFacade.class);
+        restconfImpl = RestconfImpl.getInstance();
+        restconfImpl.setBroker(brokerFacade);
+        restconfImpl.setControllerContext(controllerContext);
+
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig = resourceConfig.registerInstances(restconfImpl, new NormalizedNodeJsonBodyWriter(),
-            new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(), new JsonNormalizedNodeBodyReader());
-        resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
+            new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(controllerContext),
+            new JsonNormalizedNodeBodyReader(controllerContext),
+            new RestconfDocumentedExceptionMapper(controllerContext));
         return resourceConfig;
     }
 

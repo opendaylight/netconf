@@ -48,16 +48,14 @@ public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
     private static SchemaContext schemaContext;
     NormalizedNodeXmlBodyWriter xmlBodyWriter;
 
-    public NnInstanceIdentifierToXmlTest() throws NoSuchFieldException,
-            SecurityException {
+    public NnInstanceIdentifierToXmlTest() {
+        super(schemaContext, null);
         xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
     }
 
     @BeforeClass
     public static void initialization() throws URISyntaxException {
-        schemaContext = schemaContextLoader("/instanceidentifier/yang",
-                schemaContext);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
+        schemaContext = schemaContextLoader("/instanceidentifier/yang", schemaContext);
     }
 
     @Test

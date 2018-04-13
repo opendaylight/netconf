@@ -61,6 +61,10 @@ public class JsonNormalizedNodeBodyReader
 
     private static final Logger LOG = LoggerFactory.getLogger(JsonNormalizedNodeBodyReader.class);
 
+    public JsonNormalizedNodeBodyReader(ControllerContext controllerContext) {
+        super(controllerContext);
+    }
+
     @Override
     public boolean isReadable(final Class<?> type, final Type genericType, final Annotation[] annotations,
             final MediaType mediaType) {
@@ -83,10 +87,10 @@ public class JsonNormalizedNodeBodyReader
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     public static NormalizedNodeContext readFrom(final String uriPath, final InputStream entityStream,
-                                                 final boolean isPost) throws RestconfDocumentedException {
+            final boolean isPost, final ControllerContext controllerContext) throws RestconfDocumentedException {
 
         try {
-            return readFrom(ControllerContext.getInstance().toInstanceIdentifier(uriPath), entityStream, isPost);
+            return readFrom(controllerContext.toInstanceIdentifier(uriPath), entityStream, isPost);
         } catch (final Exception e) {
             propagateExceptionAs(e);
             return null; // no-op

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -66,7 +67,10 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
         implements MessageBodyReader<PatchContext> {
 
     private static final Logger LOG = LoggerFactory.getLogger(JsonToPatchBodyReader.class);
-    private String patchId;
+
+    public JsonToPatchBodyReader(ControllerContext controllerContext) {
+        super(controllerContext);
+    }
 
     @Override
     public boolean isReadable(final Class<?> type, final Type genericType,
@@ -91,7 +95,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
     public PatchContext readFrom(final String uriPath, final InputStream entityStream) throws
             RestconfDocumentedException {
         try {
-            return readFrom(ControllerContext.getInstance().toInstanceIdentifier(uriPath), entityStream);
+            return readFrom(getControllerContext().toInstanceIdentifier(uriPath), entityStream);
         } catch (final Exception e) {
             propagateExceptionAs(e);
             return null; // no-op
@@ -107,10 +111,11 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
 
         final JsonReader jsonReader = new JsonReader(new InputStreamReader(nonEmptyInputStreamOptional.get(),
                 StandardCharsets.UTF_8));
-        final List<PatchEntity> resultList = read(jsonReader, path);
+        AtomicReference<String> patchId = new AtomicReference<>();
+        final List<PatchEntity> resultList = read(jsonReader, path, patchId);
         jsonReader.close();
 
-        return new PatchContext(path, resultList, this.patchId);
+        return new PatchContext(path, resultList, patchId.get());
     }
 
     private static RuntimeException propagateExceptionAs(final Exception exception) throws RestconfDocumentedException {
@@ -127,7 +132,8 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
                 ErrorTag.MALFORMED_MESSAGE, exception);
     }
 
-    private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext<?> path) throws IOException {
+    private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext<?> path,
+            final AtomicReference<String> patchId) throws IOException {
         final List<PatchEntity> resultCollection = new ArrayList<>();
         final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
                 path.getSchemaContext());
@@ -154,7 +160,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
                 case END_DOCUMENT:
                     break;
                 case NAME:
-                    parseByName(in.nextName(), edit, in, path, codec, resultCollection);
+                    parseByName(in.nextName(), edit, in, path, codec, resultCollection, patchId);
                     break;
                 case END_OBJECT:
                     in.endObject();
@@ -185,7 +191,8 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
     private void parseByName(@Nonnull final String name, @Nonnull final PatchEdit edit,
                              @Nonnull final JsonReader in, @Nonnull final InstanceIdentifierContext<?> path,
                              @Nonnull final StringModuleInstanceIdentifierCodec codec,
-                             @Nonnull final List<PatchEntity> resultCollection) throws IOException {
+                             @Nonnull final List<PatchEntity> resultCollection,
+                             @Nonnull final AtomicReference<String> patchId) throws IOException {
         switch (name) {
             case "edit" :
                 if (in.peek() == JsonToken.BEGIN_ARRAY) {
@@ -206,7 +213,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
 
                 break;
             case "patch-id" :
-                this.patchId = in.nextString();
+                patchId.set(in.nextString());
                 break;
             default:
                 break;

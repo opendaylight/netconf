@@ -16,23 +16,24 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class RestGetAugmentedElementWhenEqualNamesTest {
 
-    private static ControllerContext controllerContext = ControllerContext.getInstance();
+    private static SchemaContext schemaContext;
+
+    private final ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
     @BeforeClass
-    public static void init() throws FileNotFoundException, ReactorException {
-        final SchemaContext schemaContextTestModule = TestUtils.loadSchemaContext("/common/augment/yang");
-        controllerContext.setSchemas(schemaContextTestModule);
+    public static void init() throws FileNotFoundException {
+        schemaContext = TestUtils.loadSchemaContext("/common/augment/yang");
     }
 
     @Test

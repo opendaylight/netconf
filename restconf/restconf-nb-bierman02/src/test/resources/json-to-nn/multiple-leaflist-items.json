@@ -1,5 +1,5 @@
 {
-	"multiple-leaflist:lst": {
-		"lflst1":[45,55,66]
-	}
+    "simple-list-yang1:lst": {
+        "lflst1":[45,55,66]
+    }
 }

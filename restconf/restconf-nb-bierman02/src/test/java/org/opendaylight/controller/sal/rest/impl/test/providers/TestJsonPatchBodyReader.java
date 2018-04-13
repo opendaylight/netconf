@@ -26,8 +26,9 @@ public class TestJsonPatchBodyReader extends AbstractBodyReaderTest {
     private final JsonToPatchBodyReader jsonToPatchBodyReader;
     private static SchemaContext schemaContext;
 
-    public TestJsonPatchBodyReader() throws NoSuchFieldException, SecurityException {
-        jsonToPatchBodyReader = new JsonToPatchBodyReader();
+    public TestJsonPatchBodyReader() {
+        super(schemaContext, null);
+        jsonToPatchBodyReader = new JsonToPatchBodyReader(controllerContext);
     }
 
     @Override
@@ -38,7 +39,6 @@ public class TestJsonPatchBodyReader extends AbstractBodyReaderTest {
     @BeforeClass
     public static void initialization() {
         schemaContext = schemaContextLoader("/instanceidentifier/yang", schemaContext);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test

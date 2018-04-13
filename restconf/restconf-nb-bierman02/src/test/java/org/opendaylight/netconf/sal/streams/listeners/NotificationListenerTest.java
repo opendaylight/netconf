@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,9 +23,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.controller.sal.restconf.impl.test.TestUtils;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
@@ -48,13 +51,19 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 public class NotificationListenerTest {
     private static final QNameModule MODULE = QNameModule.create(URI.create("notifi:mod"), Revision.of("2016-11-23"));
 
-    private SchemaContext schmeaCtx;
+    private static SchemaContext schemaContext;
+
+    private ControllerContext controllerContext;
+
+    @BeforeClass
+    public static void staticInit() throws FileNotFoundException {
+        schemaContext = TestUtils.loadSchemaContext("/notifications");
+    }
 
     @Before
     public void init() throws Exception {
         MockitoAnnotations.initMocks(this);
-        ControllerContext.getInstance().setGlobalSchema(TestUtils.loadSchemaContext("/notifications"));
-        this.schmeaCtx = ControllerContext.getInstance().getGlobalSchema();
+        controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
     }
 
     @Test
@@ -222,10 +231,11 @@ public class NotificationListenerTest {
         final List<SchemaPath> paths = new ArrayList<>();
         paths.add(schemaPathNotifi);
         final List<NotificationListenerAdapter> listNotifi =
-                Notificator.createNotificationListener(paths, "stream-name", NotificationOutputType.JSON.toString());
+                Notificator.createNotificationListener(paths, "stream-name", NotificationOutputType.JSON.toString(),
+                        controllerContext);
         final NotificationListenerAdapter notifi = listNotifi.get(0);
         notifi.setNotification(notificationData);
-        notifi.setSchemaContext(this.schmeaCtx);
+        notifi.setSchemaContext(schemaContext);
         final String result = notifi.prepareJson();
         return Preconditions.checkNotNull(result);
     }

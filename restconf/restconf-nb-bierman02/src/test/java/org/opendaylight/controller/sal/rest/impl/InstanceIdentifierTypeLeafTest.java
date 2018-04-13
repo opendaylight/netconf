@@ -25,9 +25,9 @@ public class InstanceIdentifierTypeLeafTest {
     public void stringToInstanceIdentifierTest() throws Exception {
         final SchemaContext schemaContext =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/instanceidentifier"));
-        ControllerContext.getInstance().setGlobalSchema(schemaContext);
+        ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
         final InstanceIdentifierContext<?> instanceIdentifier =
-                ControllerContext.getInstance().toInstanceIdentifier(
+                controllerContext.toInstanceIdentifier(
                         "/iid-value-module:cont-iid/iid-list/%2Fiid-value-module%3Acont-iid%2Fiid-value-module%3A"
                                 + "values-iid%5Biid-value-module:value-iid='value'%5D");
         final YangInstanceIdentifier yiD = instanceIdentifier.getInstanceIdentifier();

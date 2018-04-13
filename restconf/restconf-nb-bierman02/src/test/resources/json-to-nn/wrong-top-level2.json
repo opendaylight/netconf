@@ -1,9 +1,9 @@
 {
 
-	"lst": {
-	},
-	"lst1":[
-		{
-		}
-	]
+    "simple-list-yang1:lst": {
+    },
+    "lst1":[
+        {
+        }
+    ]
 }

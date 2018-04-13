@@ -10,21 +10,16 @@ package org.opendaylight.controller.sal.rest.impl.test.providers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
 import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.sal.rest.impl.XmlToPatchBodyReader;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class TestXmlPatchBodyReaderMountPoint extends AbstractBodyReaderTest {
@@ -33,8 +28,9 @@ public class TestXmlPatchBodyReaderMountPoint extends AbstractBodyReaderTest {
     private static SchemaContext schemaContext;
     private static final String MOUNT_POINT = "instance-identifier-module:cont/yang-ext:mount";
 
-    public TestXmlPatchBodyReaderMountPoint() throws NoSuchFieldException, SecurityException {
-        xmlToPatchBodyReader = new XmlToPatchBodyReader();
+    public TestXmlPatchBodyReaderMountPoint() {
+        super(schemaContext, mock(DOMMountPoint.class));
+        xmlToPatchBodyReader = new XmlToPatchBodyReader(controllerContext);
     }
 
     @Override
@@ -45,15 +41,6 @@ public class TestXmlPatchBodyReaderMountPoint extends AbstractBodyReaderTest {
     @BeforeClass
     public static void initialization() throws NoSuchFieldException, SecurityException {
         schemaContext = schemaContextLoader("/instanceidentifier/yang", schemaContext);
-
-        final DOMMountPoint mockMountPoint = mock(DOMMountPoint.class);
-        when(mockMountPoint.getSchemaContext()).thenReturn(schemaContext);
-        final DOMMountPointService mockMountPointService = mock(DOMMountPointService.class);
-        when(mockMountPointService.getMountPoint(any(YangInstanceIdentifier.class)))
-                .thenReturn(Optional.of(mockMountPoint));
-
-        CONTROLLER_CONTEXT.setMountService(mockMountPointService);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test

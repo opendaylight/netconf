@@ -48,6 +48,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
 
     private static final Logger LOG = LoggerFactory.getLogger(ListenerAdapter.class);
 
+    private final ControllerContext controllerContext;
     private final YangInstanceIdentifier path;
     private final String streamName;
     private final NotificationOutputType outputType;
@@ -66,12 +67,13 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      *            Type of output on notification (JSON, XML)
      */
     ListenerAdapter(final YangInstanceIdentifier path, final String streamName,
-            final NotificationOutputType outputType) {
+            final NotificationOutputType outputType, final ControllerContext controllerContext) {
         register(this);
         this.outputType = Preconditions.checkNotNull(outputType);
         this.path = Preconditions.checkNotNull(path);
         Preconditions.checkArgument(streamName != null && !streamName.isEmpty());
         this.streamName = streamName;
+        this.controllerContext = controllerContext;
     }
 
     @Override
@@ -132,7 +134,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      * @return Data in printable form.
      */
     private String prepareXml() {
-        final SchemaContext schemaContext = ControllerContext.getInstance().getGlobalSchema();
+        final SchemaContext schemaContext = controllerContext.getGlobalSchema();
         final DataSchemaContextTree dataContextTree = DataSchemaContextTree.from(schemaContext);
         final Document doc = createDocument();
         final Element notificationElement = basePartDoc(doc);
@@ -202,7 +204,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
         YangInstanceIdentifier yiid = YangInstanceIdentifier.builder(parentYiid)
                                                             .append(normalizedNode.getIdentifier()).build();
 
-        boolean isNodeMixin = ControllerContext.getInstance().isNodeMixin(yiid);
+        boolean isNodeMixin = controllerContext.isNodeMixin(yiid);
         boolean isSkippedNonLeaf = getLeafNodesOnly() && !(normalizedNode instanceof LeafNode);
         if (!isNodeMixin && !isSkippedNonLeaf) {
             Node node = null;
@@ -238,17 +240,17 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      *
      * @param doc
      *            {@link Document}
-     * @param path
+     * @param dataPath
      *            Path to data in data store.
      * @param operation
      *            {@link Operation}
      * @return {@link Node} node represented by changed event element.
      */
-    private static Node createDataChangeEventElement(final Document doc, final YangInstanceIdentifier path,
+    private Node createDataChangeEventElement(final Document doc, final YangInstanceIdentifier dataPath,
             final Operation operation) {
         final Element dataChangeEventElement = doc.createElement("data-change-event");
         final Element pathElement = doc.createElement("path");
-        addPathAsValueToElement(path, pathElement);
+        addPathAsValueToElement(dataPath, pathElement);
         dataChangeEventElement.appendChild(pathElement);
 
         final Element operationElement = doc.createElement("operation");
@@ -294,14 +296,14 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     /**
      * Adds path as value to element.
      *
-     * @param path
+     * @param dataPath
      *            Path to data in data store.
      * @param element
      *            {@link Element}
      */
     @SuppressWarnings("rawtypes")
-    private static void addPathAsValueToElement(final YangInstanceIdentifier path, final Element element) {
-        final YangInstanceIdentifier normalizedPath = ControllerContext.getInstance().toXpathRepresentation(path);
+    private void addPathAsValueToElement(final YangInstanceIdentifier dataPath, final Element element) {
+        final YangInstanceIdentifier normalizedPath = controllerContext.toXpathRepresentation(dataPath);
         final StringBuilder textContent = new StringBuilder();
 
         for (final PathArgument pathArgument : normalizedPath.getPathArguments()) {
@@ -342,9 +344,9 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      * @param qualifiedName
      *            QName
      */
-    private static void writeIdentifierWithNamespacePrefix(final Element element, final StringBuilder textContent,
+    private void writeIdentifierWithNamespacePrefix(final Element element, final StringBuilder textContent,
             final QName qualifiedName) {
-        final Module module = ControllerContext.getInstance().getGlobalSchema().findModule(qualifiedName.getModule())
+        final Module module = controllerContext.getGlobalSchema().findModule(qualifiedName.getModule())
                 .get();
 
         textContent.append(module.getName());

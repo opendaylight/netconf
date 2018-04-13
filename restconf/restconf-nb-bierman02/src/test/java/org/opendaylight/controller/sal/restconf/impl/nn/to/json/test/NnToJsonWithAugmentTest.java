@@ -29,16 +29,14 @@ public class NnToJsonWithAugmentTest extends AbstractBodyReaderTest {
     private static SchemaContext schemaContext;
     private final NormalizedNodeJsonBodyWriter xmlBodyWriter;
 
-    public NnToJsonWithAugmentTest() throws NoSuchFieldException,
-            SecurityException {
+    public NnToJsonWithAugmentTest() {
+        super(schemaContext, null);
         xmlBodyWriter = new NormalizedNodeJsonBodyWriter();
     }
 
     @BeforeClass
     public static void initialize() {
-        schemaContext = schemaContextLoader("/nn-to-json/augmentation",
-                schemaContext);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
+        schemaContext = schemaContextLoader("/nn-to-json/augmentation", schemaContext);
     }
 
     @Test
@@ -48,7 +46,7 @@ public class NnToJsonWithAugmentTest extends AbstractBodyReaderTest {
         final String pathToInputFile = "/nn-to-json/augmentation/xml/data.xml";
 
         final NormalizedNodeContext testNN = TestRestconfUtils
-                .loadNormalizedContextFromXmlFile(pathToInputFile, uri);
+                .loadNormalizedContextFromXmlFile(pathToInputFile, uri, controllerContext);
 
         final OutputStream output = new ByteArrayOutputStream();
         xmlBodyWriter

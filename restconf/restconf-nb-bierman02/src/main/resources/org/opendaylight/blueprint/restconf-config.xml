@@ -53,14 +53,19 @@
     <argument value="${websocket-address}"/>
   </bean>
 
+  <bean id="controllerContext" class="org.opendaylight.netconf.sal.restconf.impl.ControllerContext"
+      factory-method="newInstance" destroy-method="close">
+    <argument ref="schemaService"/>
+    <argument ref="domMountPointService"/>
+    <argument ref="domSchemaService"/>
+  </bean>
+
   <bean id="restconfProviderDraft02" class="org.opendaylight.netconf.sal.restconf.impl.RestconfProviderImpl"
           init-method="start" destroy-method="close">
     <argument ref="domDataBroker"/>
-    <argument ref="schemaService"/>
     <argument ref="domRpcService"/>
     <argument ref="domNotificationService"/>
-    <argument ref="domMountPointService"/>
-    <argument ref="domSchemaService"/>
+    <argument ref="controllerContext"/>
     <argument ref="webSocketAddress"/>
     <argument ref="webSocketPort"/>
   </bean>
@@ -68,7 +73,9 @@
   <!-- JSONRestconfService -->
   <bean id="jsonRestconfServiceDraft02"
       class="org.opendaylight.netconf.sal.restconf.impl.JSONRestconfServiceImpl"
-      destroy-method="close"/>
+      destroy-method="close">
+    <argument ref="controllerContext"/>
+  </bean>
 
   <service ref="jsonRestconfServiceDraft02" odl:type="default"
       interface="org.opendaylight.netconf.sal.restconf.api.JSONRestconfService" />

@@ -7,6 +7,7 @@
  */
 package org.opendaylight.controller.sal.restconf.impl.test;
 
+import java.io.FileNotFoundException;
 import java.time.Instant;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -37,11 +39,14 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class RestconfImplNotificationSubscribingTest {
 
     private final String identifier = "data-change-event-subscription/datastore=OPERATIONAL/scope=ONE";
+
+    private static SchemaContext schemaContext;
 
     @Mock
     private BrokerFacade broker;
@@ -52,19 +57,27 @@ public class RestconfImplNotificationSubscribingTest {
     @Mock
     private UriInfo uriInfo;
 
+    private ControllerContext controllerContext;
+
+    @BeforeClass
+    public static void init() throws FileNotFoundException {
+        schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications"));
+    }
+
     @Before
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
         this.broker.setDomDataBroker(this.domDataBroker);
         RestconfImpl.getInstance().setBroker(this.broker);
-        ControllerContext.getInstance()
-                .setGlobalSchema(YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications")));
+
+        controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
+        RestconfImpl.getInstance().setControllerContext(controllerContext);
 
         final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
         final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-12-14", "localName"));
         Mockito.when(path.getLastPathArgument()).thenReturn(pathValue);
-        Notificator.createListener(path, this.identifier, NotificationOutputType.XML);
+        Notificator.createListener(path, this.identifier, NotificationOutputType.XML, controllerContext);
     }
 
     @Test
@@ -198,7 +211,8 @@ public class RestconfImplNotificationSubscribingTest {
         final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
         final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-12-14", "localName"));
         Mockito.when(path.getLastPathArgument()).thenReturn(pathValue);
-        final ListenerAdapter listener = Notificator.createListener(path, this.identifier, NotificationOutputType.XML);
+        final ListenerAdapter listener = Notificator.createListener(path, this.identifier, NotificationOutputType.XML,
+                controllerContext);
 
         final List<Entry<String, List<String>>> list = new ArrayList<>();
         final List<String> time = new ArrayList<>();
@@ -208,7 +222,7 @@ public class RestconfImplNotificationSubscribingTest {
 
         subscribe(list);
 
-        ArrayList<DataTreeCandidate> candidates = new ArrayList<DataTreeCandidate>(0);
+        ArrayList<DataTreeCandidate> candidates = new ArrayList<>(0);
         Instant startOrig = listener.getStart();
         Assert.assertNotNull(startOrig);
         listener.onDataTreeChanged(candidates);

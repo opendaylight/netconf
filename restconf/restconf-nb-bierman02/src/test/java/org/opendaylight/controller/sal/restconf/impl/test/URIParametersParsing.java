@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
@@ -65,8 +66,8 @@ public class URIParametersParsing {
     public void init() throws FileNotFoundException, ReactorException {
         this.restconf = RestconfImpl.getInstance();
         this.mockedBrokerFacade = mock(BrokerFacade.class);
-        this.controllerContext = ControllerContext.getInstance();
-        this.controllerContext.setSchemas(TestUtils.loadSchemaContext("/datastore-and-scope-specification"));
+        this.controllerContext = TestRestconfUtils.newControllerContext(
+                TestUtils.loadSchemaContext("/datastore-and-scope-specification"));
         this.restconf.setControllerContext(this.controllerContext);
         this.restconf.setBroker(this.mockedBrokerFacade);
     }
@@ -90,7 +91,7 @@ public class URIParametersParsing {
         final String datastoreValue = datastore == null ? "CONFIGURATION" : datastore;
         final String scopeValue = scope == null ? "BASE" : scope + "";
         Notificator.createListener(iiBuilder.build(), "dummyStreamName/datastore=" + datastoreValue + "/scope="
-                + scopeValue, NotificationOutputType.XML);
+                + scopeValue, NotificationOutputType.XML, controllerContext);
 
         final UriInfo mockedUriInfo = mock(UriInfo.class);
         @SuppressWarnings("unchecked")

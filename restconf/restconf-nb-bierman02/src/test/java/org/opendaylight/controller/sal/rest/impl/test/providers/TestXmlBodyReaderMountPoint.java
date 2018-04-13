@@ -11,11 +11,8 @@ package org.opendaylight.controller.sal.rest.impl.test.providers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
@@ -25,10 +22,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
-import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -52,8 +47,9 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
         URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
 
-    public TestXmlBodyReaderMountPoint() throws Exception {
-        this.xmlBodyReader = new XmlNormalizedNodeBodyReader();
+    public TestXmlBodyReaderMountPoint() {
+        super(schemaContext, mock(DOMMountPoint.class));
+        this.xmlBodyReader = new XmlNormalizedNodeBodyReader(controllerContext);
     }
 
     @Override
@@ -66,15 +62,6 @@ public class TestXmlBodyReaderMountPoint extends AbstractBodyReaderTest {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
-
-        final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
-        when(mountInstance.getSchemaContext()).thenReturn(schemaContext);
-        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        when(mockMountService.getMountPoint(any(YangInstanceIdentifier.class)))
-                .thenReturn(Optional.of(mountInstance));
-
-        ControllerContext.getInstance().setMountService(mockMountService);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test

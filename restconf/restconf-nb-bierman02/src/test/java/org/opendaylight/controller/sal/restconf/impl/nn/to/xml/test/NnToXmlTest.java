@@ -52,14 +52,14 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     private final NormalizedNodeXmlBodyWriter xmlBodyWriter;
     private static SchemaContext schemaContext;
 
-    public NnToXmlTest() throws NoSuchFieldException, SecurityException {
+    public NnToXmlTest() {
+        super(schemaContext, null);
         this.xmlBodyWriter = new NormalizedNodeXmlBodyWriter();
     }
 
     @BeforeClass
     public static void initialization() {
         schemaContext = schemaContextLoader("/nn-to-xml/yang", schemaContext);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test

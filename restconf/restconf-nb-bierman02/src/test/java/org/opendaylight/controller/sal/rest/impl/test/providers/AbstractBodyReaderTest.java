@@ -20,6 +20,7 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.rest.impl.AbstractIdentifierAwareJaxRsProvider;
@@ -29,20 +30,29 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public abstract class AbstractBodyReaderTest {
-
-    protected static final ControllerContext CONTROLLER_CONTEXT = ControllerContext.getInstance();
-    protected final MediaType mediaType;
     private static Field uriField;
     private static Field requestField;
 
-    public AbstractBodyReaderTest() throws NoSuchFieldException {
-        uriField = AbstractIdentifierAwareJaxRsProvider.class
-                .getDeclaredField("uriInfo");
-        uriField.setAccessible(true);
-        requestField = AbstractIdentifierAwareJaxRsProvider.class
-                .getDeclaredField("request");
-        requestField.setAccessible(true);
+    static {
+        try {
+            uriField = AbstractIdentifierAwareJaxRsProvider.class
+                    .getDeclaredField("uriInfo");
+            uriField.setAccessible(true);
+            requestField = AbstractIdentifierAwareJaxRsProvider.class
+                    .getDeclaredField("request");
+            requestField.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected final ControllerContext controllerContext;
+    protected final MediaType mediaType;
+
+    protected AbstractBodyReaderTest(SchemaContext schemaContext, DOMMountPoint mountInstance) {
         this.mediaType = getMediaType();
+
+        controllerContext = TestRestconfUtils.newControllerContext(schemaContext, mountInstance);
     }
 
     protected abstract MediaType getMediaType();

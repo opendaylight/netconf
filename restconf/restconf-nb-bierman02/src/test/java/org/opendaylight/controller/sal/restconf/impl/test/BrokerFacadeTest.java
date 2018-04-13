@@ -28,7 +28,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
-
 import java.util.HashMap;
 import java.util.concurrent.Future;
 import org.junit.Before;
@@ -53,6 +52,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.PutResult;
@@ -107,22 +107,26 @@ public class BrokerFacadeTest {
     private final QName qname = TestUtils.buildQName("interfaces","test:module", "2014-01-09");
     private final SchemaPath type = SchemaPath.create(true, this.qname);
     private final YangInstanceIdentifier instanceID = YangInstanceIdentifier.builder().node(this.qname).build();
+    private ControllerContext controllerContext;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+
+        controllerContext = TestRestconfUtils.newControllerContext(
+                TestUtils.loadSchemaContext("/full-versions/test-module", "/modules"));
+
         this.brokerFacade.setDomDataBroker(this.domDataBroker);
         this.brokerFacade.setDomNotificationService(this.domNotification);
         this.brokerFacade.setRpcService(this.mockRpcService);
+        this.brokerFacade.setControllerContext(controllerContext);
+
         when(this.domDataBroker.newReadOnlyTransaction()).thenReturn(this.readTransaction);
         when(this.domDataBroker.newWriteOnlyTransaction()).thenReturn(this.writeTransaction);
         when(this.domDataBroker.newReadWriteTransaction()).thenReturn(this.rwTransaction);
         HashMap extensions = new HashMap();
         extensions.put(DOMDataTreeChangeService.class, Mockito.mock(DOMDataTreeChangeService.class));
         when(this.domDataBroker.getSupportedExtensions()).thenReturn(extensions);
-
-        ControllerContext.getInstance()
-                .setSchemas(TestUtils.loadSchemaContext("/full-versions/test-module", "/modules"));
     }
 
     private static CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> wrapDummyNode(
@@ -331,7 +335,7 @@ public class BrokerFacadeTest {
     @Test
     public void testRegisterToListenDataChanges() {
         final ListenerAdapter listener = Notificator.createListener(this.instanceID, "stream",
-                NotificationOutputType.XML);
+                NotificationOutputType.XML, controllerContext);
 
         @SuppressWarnings("unchecked")
         final ListenerRegistration<ListenerAdapter> mockRegistration = mock(ListenerRegistration.class);
@@ -362,7 +366,7 @@ public class BrokerFacadeTest {
         final String identifier = "create-notification-stream/toaster:toastDone";
         final SchemaPath path = SchemaPath.create(true,
                 QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "toastDone"));
-        Notificator.createNotificationListener(Lists.newArrayList(path), identifier, "XML");
+        Notificator.createNotificationListener(Lists.newArrayList(path), identifier, "XML", controllerContext);
         final NotificationListenerAdapter listener = Notificator.getNotificationListenerFor(identifier).get(0);
 
         // mock registration

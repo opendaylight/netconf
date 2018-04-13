@@ -53,6 +53,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
@@ -67,6 +68,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -122,9 +124,11 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
     static XPathExpression ERROR_APP_TAG;
     static XPathExpression ERROR_INFO;
 
+    private static SchemaContext schemaContext;
+
     @BeforeClass
     public static void init() throws Exception {
-        ControllerContext.getInstance().setGlobalSchema(TestUtils.loadSchemaContext("/modules"));
+        schemaContext = TestUtils.loadSchemaContext("/modules");
 
         final NamespaceContext nsContext = new NamespaceContext() {
             @Override
@@ -162,9 +166,11 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
     @Override
     protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig();
-        resourceConfig = resourceConfig.registerInstances(mockRestConf, new XmlNormalizedNodeBodyReader(),
-            new JsonNormalizedNodeBodyReader(), new NormalizedNodeJsonBodyWriter(), new NormalizedNodeXmlBodyWriter());
-        resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
+        ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
+        resourceConfig = resourceConfig.registerInstances(mockRestConf,
+                new XmlNormalizedNodeBodyReader(controllerContext), new JsonNormalizedNodeBodyReader(controllerContext),
+                new NormalizedNodeJsonBodyWriter(), new NormalizedNodeXmlBodyWriter(),
+                new RestconfDocumentedExceptionMapper(controllerContext));
         return resourceConfig;
     }
 

@@ -24,11 +24,6 @@ public class RestconfApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         return ImmutableSet.<Class<?>>builder()
-                .add(RestconfDocumentedExceptionMapper.class)
-                .add(XmlNormalizedNodeBodyReader.class)
-                .add(JsonNormalizedNodeBodyReader.class)
-                .add(JsonToPatchBodyReader.class)
-                .add(XmlToPatchBodyReader.class)
                 .add(PatchJsonBodyWriter.class)
                 .add(PatchXmlBodyWriter.class)
                 .add(NormalizedNodeJsonBodyWriter.class)
@@ -51,6 +46,11 @@ public class RestconfApplication extends Application {
         singletons.add(brokerFacade);
         singletons.add(schemaRetrieval);
         singletons.add(new RestconfCompositeWrapper(StatisticsRestconfServiceWrapper.getInstance(), schemaRetrieval));
+        singletons.add(new RestconfDocumentedExceptionMapper(controllerContext));
+        singletons.add(new XmlNormalizedNodeBodyReader(controllerContext));
+        singletons.add(new JsonNormalizedNodeBodyReader(controllerContext));
+        singletons.add(new XmlToPatchBodyReader(controllerContext));
+        singletons.add(new JsonToPatchBodyReader(controllerContext));
 //        singletons.add(StructuredDataToXmlProvider.INSTANCE);
 //        singletons.add(StructuredDataToJsonProvider.INSTANCE);
 //        singletons.add(JsonToCompositeNodeProvider.INSTANCE);

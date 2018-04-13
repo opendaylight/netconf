@@ -28,15 +28,14 @@ public class NnToJsonLeafrefType extends AbstractBodyReaderTest {
     private static SchemaContext schemaContext;
     private final NormalizedNodeJsonBodyWriter jsonBodyWriter;
 
-    public NnToJsonLeafrefType() throws NoSuchFieldException, SecurityException {
+    public NnToJsonLeafrefType() {
+        super(schemaContext, null);
         jsonBodyWriter = new NormalizedNodeJsonBodyWriter();
     }
 
     @BeforeClass
     public static void initialization() {
-        schemaContext = schemaContextLoader("/nn-to-json/leafref",
-                schemaContext);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
+        schemaContext = schemaContextLoader("/nn-to-json/leafref", schemaContext);
     }
 
     @Test
@@ -91,7 +90,7 @@ public class NnToJsonLeafrefType extends AbstractBodyReaderTest {
         final String pathToInputFile = xmlDataPath;
 
         final NormalizedNodeContext testNN = TestRestconfUtils
-                .loadNormalizedContextFromXmlFile(pathToInputFile, uri);
+                .loadNormalizedContextFromXmlFile(pathToInputFile, uri, controllerContext);
 
         final OutputStream output = new ByteArrayOutputStream();
         jsonBodyWriter.writeTo(testNN, null, null, null, mediaType, null,

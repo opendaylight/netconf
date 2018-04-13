@@ -25,16 +25,14 @@ public class JsonIdentityrefToNnTest extends AbstractBodyReaderTest {
     private final JsonNormalizedNodeBodyReader jsonBodyReader;
     private static SchemaContext schemaContext;
 
-    public JsonIdentityrefToNnTest() throws NoSuchFieldException,
-            SecurityException {
-        this.jsonBodyReader = new JsonNormalizedNodeBodyReader();
+    public JsonIdentityrefToNnTest() {
+        super(schemaContext, null);
+        this.jsonBodyReader = new JsonNormalizedNodeBodyReader(controllerContext);
     }
 
     @BeforeClass
     public static void initialize() {
-        schemaContext = schemaContextLoader("/json-to-nn/identityref",
-                schemaContext);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
+        schemaContext = schemaContextLoader("/json-to-nn/identityref", schemaContext);
     }
 
     @Test

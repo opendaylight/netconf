@@ -25,8 +25,9 @@ public class TestXmlPatchBodyReader extends AbstractBodyReaderTest {
     private final XmlToPatchBodyReader xmlToPatchBodyReader;
     private static SchemaContext schemaContext;
 
-    public TestXmlPatchBodyReader() throws NoSuchFieldException, SecurityException {
-        xmlToPatchBodyReader = new XmlToPatchBodyReader();
+    public TestXmlPatchBodyReader() {
+        super(schemaContext, null);
+        xmlToPatchBodyReader = new XmlToPatchBodyReader(controllerContext);
     }
 
     @Override
@@ -37,7 +38,6 @@ public class TestXmlPatchBodyReader extends AbstractBodyReaderTest {
     @BeforeClass
     public static void initialization() throws NoSuchFieldException, SecurityException {
         schemaContext = schemaContextLoader("/instanceidentifier/yang", schemaContext);
-        CONTROLLER_CONTEXT.setSchemas(schemaContext);
     }
 
     @Test
