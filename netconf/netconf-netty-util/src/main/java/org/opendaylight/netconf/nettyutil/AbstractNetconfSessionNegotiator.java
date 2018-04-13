@@ -99,7 +99,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         }
     }
 
-    protected final boolean ifNegotiatedAlready() {
+    protected final synchronized boolean ifNegotiatedAlready() {
         // Indicates whether negotiation already started
         return this.state != State.IDLE;
     }
