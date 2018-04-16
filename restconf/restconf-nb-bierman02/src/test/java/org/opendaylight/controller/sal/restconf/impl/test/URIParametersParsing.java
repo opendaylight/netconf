@@ -64,12 +64,10 @@ public class URIParametersParsing {
 
     @Before
     public void init() throws FileNotFoundException, ReactorException {
-        this.restconf = RestconfImpl.getInstance();
         this.mockedBrokerFacade = mock(BrokerFacade.class);
         this.controllerContext = TestRestconfUtils.newControllerContext(
                 TestUtils.loadSchemaContext("/datastore-and-scope-specification"));
-        this.restconf.setControllerContext(this.controllerContext);
-        this.restconf.setBroker(this.mockedBrokerFacade);
+        this.restconf = RestconfImpl.newInstance(mockedBrokerFacade, controllerContext);
     }
 
     @Test

@@ -20,9 +20,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -47,11 +45,6 @@ public class Bug8072Test {
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         controllerContext = TestRestconfUtils.newControllerContext(schemaContext, mountInstance);
         doReturn(mountPointContext).when(mountInstance).getSchemaContext();
-
-        final BrokerFacade brokerFacade = mock(BrokerFacade.class);
-        final RestconfImpl restconfImpl = RestconfImpl.getInstance();
-        restconfImpl.setBroker(brokerFacade);
-        restconfImpl.setControllerContext(controllerContext);
     }
 
     @BeforeClass

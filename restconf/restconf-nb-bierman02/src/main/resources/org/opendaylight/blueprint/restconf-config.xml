@@ -68,8 +68,20 @@
     <argument ref="controllerContext"/>
   </bean>
 
+  <bean id="restconfImpl" class="org.opendaylight.netconf.sal.restconf.impl.RestconfImpl"
+      factory-method="newInstance">
+    <argument ref="brokerFacade"/>
+    <argument ref="controllerContext"/>
+  </bean>
+
+  <bean id="statsServiceWrapper" class="org.opendaylight.netconf.sal.restconf.impl.StatisticsRestconfServiceWrapper"
+      factory-method="newInstance">
+    <argument ref="restconfImpl"/>
+  </bean>
+
   <bean id="restconfProviderDraft02" class="org.opendaylight.netconf.sal.restconf.impl.RestconfProviderImpl"
           init-method="start" destroy-method="close">
+    <argument ref="statsServiceWrapper"/>
     <argument ref="webSocketAddress"/>
     <argument ref="webSocketPort"/>
   </bean>
@@ -79,6 +91,7 @@
       class="org.opendaylight.netconf.sal.restconf.impl.JSONRestconfServiceImpl"
       destroy-method="close">
     <argument ref="controllerContext"/>
+    <argument ref="restconfImpl"/>
   </bean>
 
   <service ref="jsonRestconfServiceDraft02" odl:type="default"

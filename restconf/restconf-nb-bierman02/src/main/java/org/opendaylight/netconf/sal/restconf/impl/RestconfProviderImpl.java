@@ -27,11 +27,13 @@ public class RestconfProviderImpl extends AbstractMXBean
         implements AutoCloseable, RestConnector, RestConnectorRuntimeMXBean {
     private final IpAddress websocketAddress;
     private final PortNumber websocketPort;
-    private final StatisticsRestconfServiceWrapper stats = StatisticsRestconfServiceWrapper.getInstance();
+    private final StatisticsRestconfServiceWrapper stats;
     private Thread webSocketServerThread;
 
-    public RestconfProviderImpl(IpAddress websocketAddress, PortNumber websocketPort) {
+    public RestconfProviderImpl(StatisticsRestconfServiceWrapper stats, IpAddress websocketAddress,
+            PortNumber websocketPort) {
         super("Draft02ProviderStatistics", "restconf-connector", null);
+        this.stats = Preconditions.checkNotNull(stats);
         this.websocketAddress = Preconditions.checkNotNull(websocketAddress);
         this.websocketPort = Preconditions.checkNotNull(websocketPort);
     }

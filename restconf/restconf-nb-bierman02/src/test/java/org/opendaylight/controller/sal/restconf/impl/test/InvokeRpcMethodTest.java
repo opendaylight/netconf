@@ -73,12 +73,13 @@ public class InvokeRpcMethodTest {
     private static UriInfo uriInfo;
     private static SchemaContext schemaContext;
 
-    private final RestconfImpl restconfImpl = RestconfImpl.getInstance();
+    private final RestconfImpl restconfImpl;
     private final ControllerContext controllerContext;
+    private final BrokerFacade brokerFacade = mock(BrokerFacade.class);
 
     public InvokeRpcMethodTest() {
         controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
-        restconfImpl.setControllerContext(controllerContext);
+        restconfImpl = RestconfImpl.newInstance(brokerFacade, controllerContext);
     }
 
     @BeforeClass
@@ -108,10 +109,6 @@ public class InvokeRpcMethodTest {
         } catch (final URISyntaxException e) {
             assertTrue("Uri wasn't created sucessfuly", false);
         }
-
-        final BrokerFacade mockedBrokerFacade = mock(BrokerFacade.class);
-
-        restconfImpl.setBroker(mockedBrokerFacade);
 
         final NormalizedNodeContext payload = prepareDomPayload();
 
@@ -164,14 +161,10 @@ public class InvokeRpcMethodTest {
         final DOMRpcException exception = new DOMRpcImplementationNotAvailableException("testExeption");
         final CheckedFuture<DOMRpcResult, DOMRpcException> future = Futures.immediateFailedCheckedFuture(exception);
 
-        final BrokerFacade brokerFacade = mock(BrokerFacade.class);
-
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
         final SchemaPath type = SchemaPath.create(true, qname);
 
         when(brokerFacade.invokeRpc(eq(type), any(NormalizedNode.class))).thenReturn(future);
-
-        this.restconfImpl.setBroker(brokerFacade);
 
         try {
             this.restconfImpl.invokeRpc("toaster:cancel-toast", "", uriInfo);
@@ -218,10 +211,7 @@ public class InvokeRpcMethodTest {
         final SchemaPath path = SchemaPath.create(true,
                 QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast"));
 
-        final BrokerFacade brokerFacade = mock(BrokerFacade.class);
         when(brokerFacade.invokeRpc(eq(path), any(NormalizedNode.class))).thenReturn(future);
-
-        this.restconfImpl.setBroker(brokerFacade);
 
         try {
             this.restconfImpl.invokeRpc("toaster:cancel-toast", "", uriInfo);
@@ -243,10 +233,7 @@ public class InvokeRpcMethodTest {
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
         final SchemaPath path = SchemaPath.create(true, qname);
 
-        final BrokerFacade brokerFacade = mock(BrokerFacade.class);
         when(brokerFacade.invokeRpc(eq(path), any(NormalizedNode.class))).thenReturn(future);
-
-        this.restconfImpl.setBroker(brokerFacade);
 
         final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:cancel-toast", "", uriInfo);
         assertNotNull(output);
@@ -311,9 +298,7 @@ public class InvokeRpcMethodTest {
                 new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpcInputSchemaNode,
                 null, schemaContext), containerBuilder.build());
 
-        final BrokerFacade brokerFacade = mock(BrokerFacade.class);
         when(brokerFacade.invokeRpc(eq(path), any(NormalizedNode.class))).thenReturn(future);
-        this.restconfImpl.setBroker(brokerFacade);
 
         final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:make-toast", payload, uriInfo);
         assertNotNull(output);
@@ -367,10 +352,7 @@ public class InvokeRpcMethodTest {
         final DOMRpcResult result = new DefaultDOMRpcResult(container);
         final CheckedFuture<DOMRpcResult, DOMRpcException> future = Futures.immediateCheckedFuture(result);
 
-        final BrokerFacade brokerFacade = mock(BrokerFacade.class);
         when(brokerFacade.invokeRpc(eq(rpcDef.getPath()), any(NormalizedNode.class))).thenReturn(future);
-
-        this.restconfImpl.setBroker(brokerFacade);
 
         final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:testOutput", "", uriInfo);
         assertNotNull(output);

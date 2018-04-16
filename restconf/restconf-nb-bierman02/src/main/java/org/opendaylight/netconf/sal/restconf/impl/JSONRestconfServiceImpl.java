@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.JsonToPatchBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
@@ -51,9 +52,11 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
 
     private final ControllerContext controllerContext;
+    private final RestconfService restconfService;
 
-    public JSONRestconfServiceImpl(ControllerContext controllerContext) {
+    public JSONRestconfServiceImpl(ControllerContext controllerContext, RestconfService restconfService) {
         this.controllerContext = controllerContext;
+        this.restconfService = restconfService;
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
@@ -71,7 +74,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         LOG.debug("Parsed NormalizedNode: {}", context.getData());
 
         try {
-            RestconfImpl.getInstance().updateConfigurationData(uriPath, context, new SimpleUriInfo(uriPath));
+            restconfService.updateConfigurationData(uriPath, context, new SimpleUriInfo(uriPath));
         } catch (final Exception e) {
             propagateExceptionAs(uriPath, e, "PUT");
         }
@@ -93,7 +96,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         LOG.debug("Parsed NormalizedNode: {}", context.getData());
 
         try {
-            RestconfImpl.getInstance().createConfigurationData(uriPath, context, new SimpleUriInfo(uriPath));
+            restconfService.createConfigurationData(uriPath, context, new SimpleUriInfo(uriPath));
         } catch (final Exception e) {
             propagateExceptionAs(uriPath, e, "POST");
         }
@@ -105,7 +108,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         LOG.debug("delete: uriPath: {}", uriPath);
 
         try {
-            RestconfImpl.getInstance().deleteConfigurationData(uriPath);
+            restconfService.deleteConfigurationData(uriPath);
         } catch (final Exception e) {
             propagateExceptionAs(uriPath, e, "DELETE");
         }
@@ -121,9 +124,9 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
             NormalizedNodeContext readData;
             final SimpleUriInfo uriInfo = new SimpleUriInfo(uriPath);
             if (datastoreType == LogicalDatastoreType.CONFIGURATION) {
-                readData = RestconfImpl.getInstance().readConfigurationData(uriPath, uriInfo);
+                readData = restconfService.readConfigurationData(uriPath, uriInfo);
             } else {
-                readData = RestconfImpl.getInstance().readOperationalData(uriPath, uriInfo);
+                readData = restconfService.readOperationalData(uriPath, uriInfo);
             }
 
             final Optional<String> result = Optional.of(toJson(readData));
@@ -164,9 +167,9 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
                         .getInstanceIdentifier());
                 LOG.debug("Parsed NormalizedNode: {}", inputContext.getData());
 
-                outputContext = RestconfImpl.getInstance().invokeRpc(uriPath, inputContext, null);
+                outputContext = restconfService.invokeRpc(uriPath, inputContext, null);
             } else {
-                outputContext = RestconfImpl.getInstance().invokeRpc(uriPath, "", null);
+                outputContext = restconfService.invokeRpc(uriPath, "", null);
             }
 
             if (outputContext.getData() != null) {
@@ -198,7 +201,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         LOG.debug("Parsed NormalizedNode: {}", context.getData());
 
         try {
-            PatchStatusContext patchStatusContext = RestconfImpl.getInstance()
+            PatchStatusContext patchStatusContext = restconfService
                 .patchConfigurationData(context, new SimpleUriInfo(uriPath));
             output = toJson(patchStatusContext);
         } catch (final Exception e) {

@@ -71,9 +71,7 @@ public class RestPutListDataTest {
     public void initialize() throws FileNotFoundException {
         final ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContextTestModule);
         brokerFacade = mock(BrokerFacade.class);
-        restconfImpl = RestconfImpl.getInstance();
-        restconfImpl.setBroker(brokerFacade);
-        restconfImpl.setControllerContext(controllerContext);
+        restconfImpl = RestconfImpl.newInstance(brokerFacade, controllerContext);
         final PutResult result = mock(PutResult.class);
         when(brokerFacade.commitConfigurationDataPut(any(SchemaContext.class), any(YangInstanceIdentifier.class),
                 any(NormalizedNode.class), Mockito.anyString(), Mockito.anyString()))

@@ -35,7 +35,6 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -76,20 +75,15 @@ public class RestconfImplTest {
 
     private static SchemaContext schemaContext;
 
-    private RestconfImpl restconfImpl;
+    private final BrokerFacade brokerFacade = mock(BrokerFacade.class);
     private final ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
+    private final RestconfImpl restconfImpl = RestconfImpl.newInstance(brokerFacade, controllerContext);
 
     @BeforeClass
     public static void init() throws FileNotFoundException, ReactorException {
         schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
         final Set<Module> allModules = schemaContext.getModules();
         assertNotNull(allModules);
-    }
-
-    @Before
-    public void initMethod() {
-        this.restconfImpl = RestconfImpl.getInstance();
-        this.restconfImpl.setControllerContext(controllerContext);
     }
 
     @Test
@@ -135,7 +129,6 @@ public class RestconfImplTest {
     public void testExample() throws FileNotFoundException, ParseException {
         @SuppressWarnings("rawtypes")
         final NormalizedNode normalizedNodeData = TestUtils.prepareNormalizedNodeWithIetfInterfacesInterfacesData();
-        final BrokerFacade brokerFacade = mock(BrokerFacade.class);
         when(brokerFacade.readOperationalData(any(YangInstanceIdentifier.class))).thenReturn(normalizedNodeData);
         assertEquals(normalizedNodeData,
                 brokerFacade.readOperationalData(null));
@@ -226,9 +219,6 @@ public class RestconfImplTest {
         final Set<Entry<String, List<String>>> set = new HashSet<>();
         when(map.entrySet()).thenReturn(set);
         when(uriInfo.getQueryParameters()).thenReturn(map);
-
-        final BrokerFacade brokerFacade = mock(BrokerFacade.class);
-        this.restconfImpl.setBroker(brokerFacade);
 
         // subscribe to stream and verify response
         final NormalizedNodeContext response = this.restconfImpl.subscribeToStream(identifier, uriInfo);

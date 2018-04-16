@@ -55,9 +55,8 @@ public class RestPutConfigTest {
 
     @Before
     public void init() {
-        this.restconfService = RestconfImpl.getInstance();
         this.controllerCx = TestRestconfUtils.newControllerContext(schemaContext);
-        this.restconfService.setControllerContext(this.controllerCx);
+        this.restconfService = RestconfImpl.newInstance(brokerFacade, controllerCx);
     }
 
     @Test
@@ -140,6 +139,5 @@ public class RestPutConfigTest {
                 .thenReturn(result);
         Mockito.when(result.getFutureOfPutData()).thenReturn(checkedFuture);
         Mockito.when(result.getStatus()).thenReturn(Status.OK);
-        this.restconfService.setBroker(this.brokerFacade);
     }
 }

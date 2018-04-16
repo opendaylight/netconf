@@ -22,9 +22,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
-import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -150,11 +148,6 @@ public class URITest {
     }
 
     public void initMountService(final boolean withSchema) throws FileNotFoundException, ReactorException {
-        final BrokerFacade brokerFacade = mock(BrokerFacade.class);
-        final RestconfImpl restconfImpl = RestconfImpl.getInstance();
-        restconfImpl.setBroker(brokerFacade);
-        restconfImpl.setControllerContext(controllerContext);
-
         if (withSchema) {
             when(mountInstance.getSchemaContext()).thenReturn(mountSchemaContext);
         } else {

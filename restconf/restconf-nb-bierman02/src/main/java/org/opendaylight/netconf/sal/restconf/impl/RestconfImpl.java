@@ -117,9 +117,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class RestconfImpl implements RestconfService {
-
-    private static final RestconfImpl INSTANCE = new RestconfImpl();
-
     /**
      * Notifications are served on port 8181.
      */
@@ -174,23 +171,17 @@ public final class RestconfImpl implements RestconfService {
             .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
             .appendOffset("+HH:MM", "Z").toFormatter();
 
-    private BrokerFacade broker;
+    private final BrokerFacade broker;
 
-    private ControllerContext controllerContext;
+    private final ControllerContext controllerContext;
 
-    public void setBroker(final BrokerFacade broker) {
+    private RestconfImpl(BrokerFacade broker, ControllerContext controllerContext) {
         this.broker = broker;
-    }
-
-    public void setControllerContext(final ControllerContext controllerContext) {
         this.controllerContext = controllerContext;
     }
 
-    private RestconfImpl() {
-    }
-
-    public static RestconfImpl getInstance() {
-        return INSTANCE;
+    public static RestconfImpl newInstance(BrokerFacade broker, ControllerContext controllerContext) {
+        return new RestconfImpl(broker, controllerContext);
     }
 
     @Override

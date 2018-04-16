@@ -120,9 +120,7 @@ public class RestGetOperationTest extends JerseyTest {
         mountInstance = mock(DOMMountPoint.class);
         controllerContext = TestRestconfUtils.newControllerContext(schemaContextYangsIetf, mountInstance);
         brokerFacade = mock(BrokerFacade.class);
-        restconfImpl = RestconfImpl.getInstance();
-        restconfImpl.setBroker(brokerFacade);
-        restconfImpl.setControllerContext(controllerContext);
+        restconfImpl = RestconfImpl.newInstance(brokerFacade, controllerContext);
 
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig = resourceConfig.registerInstances(restconfImpl, new NormalizedNodeJsonBodyWriter(),

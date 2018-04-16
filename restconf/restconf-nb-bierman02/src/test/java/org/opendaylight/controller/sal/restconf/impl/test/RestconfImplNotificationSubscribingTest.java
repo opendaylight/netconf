@@ -58,6 +58,7 @@ public class RestconfImplNotificationSubscribingTest {
     private UriInfo uriInfo;
 
     private ControllerContext controllerContext;
+    private RestconfImpl restconfImpl;
 
     @BeforeClass
     public static void init() throws FileNotFoundException {
@@ -68,10 +69,8 @@ public class RestconfImplNotificationSubscribingTest {
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        RestconfImpl.getInstance().setBroker(this.broker);
-
         controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
-        RestconfImpl.getInstance().setControllerContext(controllerContext);
+        restconfImpl = RestconfImpl.newInstance(broker, controllerContext);
 
         final YangInstanceIdentifier path = Mockito.mock(YangInstanceIdentifier.class);
         final PathArgument pathValue = NodeIdentifier.create(QName.create("module", "2016-12-14", "localName"));
@@ -240,7 +239,7 @@ public class RestconfImplNotificationSubscribingTest {
             set.add(entry);
         }
         Mockito.when(map.entrySet()).thenReturn(set);
-        RestconfImpl.getInstance().subscribeToStream(this.identifier, this.uriInfo);
+        restconfImpl.subscribeToStream(this.identifier, this.uriInfo);
     }
 
 }

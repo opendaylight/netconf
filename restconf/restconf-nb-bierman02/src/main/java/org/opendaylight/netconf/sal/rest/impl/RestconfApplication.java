@@ -16,7 +16,6 @@ import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYinBodyWri
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaRetrievalServiceImpl;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
-import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.netconf.sal.restconf.impl.StatisticsRestconfServiceWrapper;
 
 public class RestconfApplication extends Application {
@@ -38,10 +37,7 @@ public class RestconfApplication extends Application {
         final Set<Object> singletons = new HashSet<>();
         final ControllerContext controllerContext = ControllerContext.getInstance();
         final BrokerFacade brokerFacade = BrokerFacade.getInstance();
-        final RestconfImpl restconfImpl = RestconfImpl.getInstance();
         final SchemaRetrievalServiceImpl schemaRetrieval = new SchemaRetrievalServiceImpl(controllerContext);
-        restconfImpl.setBroker(brokerFacade);
-        restconfImpl.setControllerContext(controllerContext);
         singletons.add(controllerContext);
         singletons.add(brokerFacade);
         singletons.add(schemaRetrieval);

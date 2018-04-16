@@ -123,9 +123,8 @@ public class JSONRestconfServiceImplTest {
                 TestRestconfUtils.newControllerContext(schemaContext, mockMountPoint);
         doReturn(mountPointSchemaContext).when(mockMountPoint).getSchemaContext();
 
-        service = new JSONRestconfServiceImpl(controllerContext);
-        RestconfImpl.getInstance().setBroker(brokerFacade);
-        RestconfImpl.getInstance().setControllerContext(controllerContext);
+        service = new JSONRestconfServiceImpl(controllerContext,
+                RestconfImpl.newInstance(brokerFacade, controllerContext));
     }
 
     private static String loadData(final String path) throws IOException {

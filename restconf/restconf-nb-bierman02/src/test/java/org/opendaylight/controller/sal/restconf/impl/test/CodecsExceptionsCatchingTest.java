@@ -9,6 +9,7 @@
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.io.FileNotFoundException;
 import javax.ws.rs.client.Entity;
@@ -24,8 +25,8 @@ import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
-import org.opendaylight.netconf.sal.rest.impl.RestconfDocumentedExceptionMapper;
 import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
+import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -38,10 +39,9 @@ public class CodecsExceptionsCatchingTest extends JerseyTest {
 
     @Before
     public void init() throws FileNotFoundException, ReactorException {
-        restConf = RestconfImpl.getInstance();
+        restConf = RestconfImpl.newInstance(mock(BrokerFacade.class), controllerContext);
         final SchemaContext schemaContext = TestUtils.loadSchemaContext("/decoding-exception/yang");
         controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
-        restConf.setControllerContext(controllerContext);
     }
 
     @Override
@@ -55,7 +55,6 @@ public class CodecsExceptionsCatchingTest extends JerseyTest {
         resourceConfig = resourceConfig.registerInstances(restConf, new NormalizedNodeJsonBodyWriter(),
             new NormalizedNodeXmlBodyWriter(), new XmlNormalizedNodeBodyReader(controllerContext),
             new JsonNormalizedNodeBodyReader(controllerContext));
-        resourceConfig.registerClasses(RestconfDocumentedExceptionMapper.class);
         return resourceConfig;
     }
 

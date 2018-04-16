@@ -66,9 +66,7 @@ public class RestDeleteOperationTest extends JerseyTest {
         controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
         controllerContext.setSchemas(schemaContext);
         brokerFacade = mock(BrokerFacade.class);
-        restconfImpl = RestconfImpl.getInstance();
-        restconfImpl.setBroker(brokerFacade);
-        restconfImpl.setControllerContext(controllerContext);
+        restconfImpl = RestconfImpl.newInstance(brokerFacade, controllerContext);
 
         ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig = resourceConfig.registerInstances(restconfImpl, new NormalizedNodeJsonBodyWriter(),
