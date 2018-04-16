@@ -68,7 +68,6 @@ public class RestconfImplNotificationSubscribingTest {
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        this.broker.setDomDataBroker(this.domDataBroker);
         RestconfImpl.getInstance().setBroker(this.broker);
 
         controllerContext = TestRestconfUtils.newControllerContext(schemaContext);

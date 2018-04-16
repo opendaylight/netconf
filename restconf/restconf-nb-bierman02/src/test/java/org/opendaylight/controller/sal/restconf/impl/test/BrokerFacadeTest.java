@@ -100,7 +100,7 @@ public class BrokerFacadeTest {
     @Mock
     private DOMDataReadWriteTransaction rwTransaction;
 
-    private final BrokerFacade brokerFacade = BrokerFacade.getInstance();
+    private BrokerFacade brokerFacade;
     private final NormalizedNode<?, ?> dummyNode = createDummyNode("test:module", "2014-01-09", "interfaces");
     private final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> dummyNodeInFuture =
             wrapDummyNode(this.dummyNode);
@@ -116,10 +116,7 @@ public class BrokerFacadeTest {
         controllerContext = TestRestconfUtils.newControllerContext(
                 TestUtils.loadSchemaContext("/full-versions/test-module", "/modules"));
 
-        this.brokerFacade.setDomDataBroker(this.domDataBroker);
-        this.brokerFacade.setDomNotificationService(this.domNotification);
-        this.brokerFacade.setRpcService(this.mockRpcService);
-        this.brokerFacade.setControllerContext(controllerContext);
+        brokerFacade = BrokerFacade.newInstance(mockRpcService, domDataBroker, domNotification, controllerContext);
 
         when(this.domDataBroker.newReadOnlyTransaction()).thenReturn(this.readTransaction);
         when(this.domDataBroker.newWriteOnlyTransaction()).thenReturn(this.writeTransaction);
@@ -169,7 +166,7 @@ public class BrokerFacadeTest {
 
     @Test(expected = RestconfDocumentedException.class)
     public void testReadOperationalDataWithNoDataBroker() {
-        this.brokerFacade.setDomDataBroker(null);
+        this.brokerFacade.close();
 
         this.brokerFacade.readOperationalData(this.instanceID);
     }
@@ -209,7 +206,7 @@ public class BrokerFacadeTest {
 
     @Test(expected = RestconfDocumentedException.class)
     public void testInvokeRpcWithNoConsumerSession() {
-        brokerFacade.setDomDataBroker(null);
+        brokerFacade.close();
         this.brokerFacade.invokeRpc(this.type, this.dummyNode);
     }
 

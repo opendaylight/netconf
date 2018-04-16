@@ -17,6 +17,7 @@ import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -88,7 +89,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BrokerFacade {
+@SuppressWarnings("checkstyle:FinalClass")
+public class BrokerFacade implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(BrokerFacade.class);
     private static final BrokerFacade INSTANCE = new BrokerFacade();
 
@@ -98,24 +100,37 @@ public class BrokerFacade {
     private DOMNotificationService domNotification;
     private ControllerContext controllerContext;
 
-    BrokerFacade() {
-
+    // Temporary until the static instance is removed.
+    @Deprecated
+    private BrokerFacade() {
     }
 
-    public void setRpcService(final DOMRpcService router) {
-        this.rpcService = router;
-    }
-
-    public void setDomNotificationService(final DOMNotificationService service) {
-        this.domNotification = service;
-    }
-
-    public void setControllerContext(ControllerContext controllerContext) {
+    private BrokerFacade(DOMRpcService rpcService, DOMDataBroker domDataBroker, DOMNotificationService domNotification,
+            ControllerContext controllerContext) {
+        this.rpcService = rpcService;
+        this.domDataBroker = domDataBroker;
+        this.domNotification = domNotification;
         this.controllerContext = controllerContext;
     }
 
+    @Deprecated
     public static BrokerFacade getInstance() {
         return BrokerFacade.INSTANCE;
+    }
+
+    public static BrokerFacade newInstance(DOMRpcService rpcService, DOMDataBroker domDataBroker,
+            DOMNotificationService domNotification, ControllerContext controllerContext) {
+        INSTANCE.rpcService = rpcService;
+        INSTANCE.domDataBroker = domDataBroker;
+        INSTANCE.controllerContext = controllerContext;
+        INSTANCE.domNotification = domNotification;
+        return INSTANCE;
+        //return new BrokerFacade(pcService, domDataBroker, controllerContext);
+    }
+
+    @Override
+    public void close() {
+        domDataBroker = null;
     }
 
     private void checkPreconditions() {
@@ -1209,10 +1224,6 @@ public class BrokerFacade {
         // Since YANG Patch provides the option to specify what kind of operation for each edit,
         // OpenDaylight should not change it.
         tx.merge(datastore, path, payload);
-    }
-
-    public void setDomDataBroker(final DOMDataBroker domDataBroker) {
-        this.domDataBroker = domDataBroker;
     }
 
     public void registerToListenNotification(final NotificationListenerAdapter listener) {

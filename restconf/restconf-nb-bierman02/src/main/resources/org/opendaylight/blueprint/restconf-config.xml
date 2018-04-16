@@ -60,12 +60,16 @@
     <argument ref="domSchemaService"/>
   </bean>
 
-  <bean id="restconfProviderDraft02" class="org.opendaylight.netconf.sal.restconf.impl.RestconfProviderImpl"
-          init-method="start" destroy-method="close">
-    <argument ref="domDataBroker"/>
+  <bean id="brokerFacade" class="org.opendaylight.netconf.sal.restconf.impl.BrokerFacade"
+      factory-method="newInstance" destroy-method="close">
     <argument ref="domRpcService"/>
+    <argument ref="domDataBroker"/>
     <argument ref="domNotificationService"/>
     <argument ref="controllerContext"/>
+  </bean>
+
+  <bean id="restconfProviderDraft02" class="org.opendaylight.netconf.sal.restconf.impl.RestconfProviderImpl"
+          init-method="start" destroy-method="close">
     <argument ref="webSocketAddress"/>
     <argument ref="webSocketPort"/>
   </bean>
