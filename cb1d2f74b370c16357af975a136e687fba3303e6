@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a7b87090_2d1bbfaa",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/RestconfApplication.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2018-04-18T10:11:41Z",
+      "side": 1,
+      "message": "I\u0027ve done a similar change in project Neutron, but since realized, without being a JAX RS expert at all, that perhaps this changes the lifecycle - I don\u0027t know if the getClasses() are singletons or names of classes for which instances are created for every request?  If all of these have no state, then it makes no real difference, but it may be worthwhile to double check that indeed they do not.  Just FYI in Neutron some of these use a \"@Context UriInfo uriInfo\", which does appear to contain state from the request, and I\u0027m not 100% sure having them as Singleton is really multi thread (HTTP request) safe - do you happen to know more about JAX RS?",
+      "revId": "cb1d2f74b370c16357af975a136e687fba3303e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}

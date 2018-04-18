@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "350e636f_33393709",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPatchBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2018-04-18T10:11:41Z",
+      "side": 0,
+      "message": "changing this patchId from a field to an AtomicRef local impacts the lifecycle of course, but I\u0027m assuming that is OK and intentional and a Good Thing here - but I don\u0027t understand enough about netconf, and JAX RS, to be 100% sure.",
+      "revId": "72bcb09b111b10f7db3af61b9e4a628291eec209",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
