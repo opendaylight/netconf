@@ -29,6 +29,8 @@
         <module>restconf-common-models</module>
         <module>restconf-common</module>
         <module>restconf-nb-bierman02</module>
+        <module>restconf-nb-bierman02-auth</module>
+        <module>restconf-nb-bierman02-noauth</module>
         <module>restconf-nb-rfc8040</module>
         <module>sal-rest-connector-config</module>
         <module>sal-rest-docgen</module>

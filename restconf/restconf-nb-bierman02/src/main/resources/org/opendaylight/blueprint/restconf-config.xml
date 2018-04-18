@@ -34,9 +34,6 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <!-- We need the AAAService available even though we don't use it -->
-  <reference interface="org.opendaylight.aaa.api.AAAService"/>
-
   <reference id="schemaService" interface="org.opendaylight.controller.sal.core.api.model.SchemaService"/>
   <reference id="domRpcService" interface="org.opendaylight.controller.md.sal.dom.api.DOMRpcService"/>
   <reference id="domMountPointService" interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"/>
@@ -86,6 +83,12 @@
     <argument ref="webSocketPort"/>
   </bean>
 
+  <bean id="restconfApplication" class="org.opendaylight.netconf.sal.rest.impl.RestconfApplication">
+    <argument ref="controllerContext"/>
+    <argument ref="brokerFacade"/>
+    <argument ref="statsServiceWrapper"/>
+  </bean>
+
   <!-- JSONRestconfService -->
   <bean id="jsonRestconfServiceDraft02"
       class="org.opendaylight.netconf.sal.restconf.impl.JSONRestconfServiceImpl"
@@ -96,5 +99,25 @@
 
   <service ref="jsonRestconfServiceDraft02" odl:type="default"
       interface="org.opendaylight.netconf.sal.restconf.api.JSONRestconfService" />
+
+  <!-- Bierman02WebRegistrar -->
+
+  <reference id="customFilterAdapterConfig"
+      interface="org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration"/>
+
+  <reference id="webServer" interface="org.opendaylight.aaa.web.WebServer" />
+
+  <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer" />
+
+  <bean id="webRegistrar" class="org.opendaylight.netconf.sal.restconf.web.Bierman02WebRegistrarImpl"
+          destroy-method="close">
+    <argument ref="webServer"/>
+    <argument ref="webContextSecurer"/>
+    <argument ref="restconfApplication"/>
+    <argument ref="customFilterAdapterConfig"/>
+  </bean>
+
+  <service ref="webRegistrar"
+      interface="org.opendaylight.netconf.sal.restconf.web.Bierman02WebRegistrar" />
 
 </blueprint>

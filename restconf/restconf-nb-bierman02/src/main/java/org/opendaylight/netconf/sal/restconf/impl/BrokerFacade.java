@@ -92,18 +92,12 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("checkstyle:FinalClass")
 public class BrokerFacade implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(BrokerFacade.class);
-    private static final BrokerFacade INSTANCE = new BrokerFacade();
 
     private volatile DOMRpcService rpcService;
 
     private DOMDataBroker domDataBroker;
-    private DOMNotificationService domNotification;
-    private ControllerContext controllerContext;
-
-    // Temporary until the static instance is removed.
-    @Deprecated
-    private BrokerFacade() {
-    }
+    private final DOMNotificationService domNotification;
+    private final ControllerContext controllerContext;
 
     private BrokerFacade(DOMRpcService rpcService, DOMDataBroker domDataBroker, DOMNotificationService domNotification,
             ControllerContext controllerContext) {
@@ -113,19 +107,9 @@ public class BrokerFacade implements Closeable {
         this.controllerContext = controllerContext;
     }
 
-    @Deprecated
-    public static BrokerFacade getInstance() {
-        return BrokerFacade.INSTANCE;
-    }
-
     public static BrokerFacade newInstance(DOMRpcService rpcService, DOMDataBroker domDataBroker,
             DOMNotificationService domNotification, ControllerContext controllerContext) {
-        INSTANCE.rpcService = rpcService;
-        INSTANCE.domDataBroker = domDataBroker;
-        INSTANCE.controllerContext = controllerContext;
-        INSTANCE.domNotification = domNotification;
-        return INSTANCE;
-        //return new BrokerFacade(pcService, domDataBroker, controllerContext);
+        return new BrokerFacade(rpcService, domDataBroker, domNotification, controllerContext);
     }
 
     @Override
