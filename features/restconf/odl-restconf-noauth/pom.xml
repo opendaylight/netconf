@@ -38,22 +38,15 @@
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf-common</artifactId>
+            <artifactId>odl-restconf-base</artifactId>
+            <version>${project.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
-
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-nb-bierman02</artifactId>
+            <artifactId>restconf-nb-bierman02-noauth</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>sal-rest-connector-config</artifactId>
-            <version>${project.version}</version>
-            <type>cfg</type>
-            <classifier>restconf</classifier>
         </dependency>
     </dependencies>
 </project>

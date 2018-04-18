@@ -36,27 +36,14 @@ public final class StatisticsRestconfServiceWrapper implements RestconfService {
     AtomicLong failurePut = new AtomicLong();
     AtomicLong failureDelete = new AtomicLong();
 
-    private static final StatisticsRestconfServiceWrapper INSTANCE = new StatisticsRestconfServiceWrapper();
-
-    private RestconfService delegate;
-
-    @Deprecated
-    private StatisticsRestconfServiceWrapper() {
-    }
+    private final RestconfService delegate;
 
     private StatisticsRestconfServiceWrapper(final RestconfService delegate) {
         this.delegate = delegate;
     }
 
-    @Deprecated
-    public static StatisticsRestconfServiceWrapper getInstance() {
-        return INSTANCE;
-    }
-
     public static StatisticsRestconfServiceWrapper newInstance(RestconfService delegate) {
-        INSTANCE.delegate = delegate;
-        return INSTANCE;
-        //return new StatisticsRestconfServiceWrapper(delegate);
+        return new StatisticsRestconfServiceWrapper(delegate);
     }
 
     @Override

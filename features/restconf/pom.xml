@@ -23,6 +23,7 @@
         <module>features-restconf</module>
         <module>odl-mdsal-apidocs</module>
         <module>odl-restconf</module>
+        <module>odl-restconf-base</module>
         <module>odl-restconf-all</module>
         <module>odl-restconf-common</module>
         <module>odl-restconf-noauth</module>

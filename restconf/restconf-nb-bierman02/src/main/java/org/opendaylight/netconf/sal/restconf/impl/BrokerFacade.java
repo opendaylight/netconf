@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Response.Status;
@@ -92,51 +93,28 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("checkstyle:FinalClass")
 public class BrokerFacade implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(BrokerFacade.class);
-    private static final BrokerFacade INSTANCE = new BrokerFacade();
 
     private volatile DOMRpcService rpcService;
 
-    private DOMDataBroker domDataBroker;
-    private DOMNotificationService domNotification;
-    private ControllerContext controllerContext;
-
-    // Temporary until the static instance is removed.
-    @Deprecated
-    private BrokerFacade() {
-    }
+    private final DOMDataBroker domDataBroker;
+    private final DOMNotificationService domNotification;
+    private final ControllerContext controllerContext;
 
     private BrokerFacade(DOMRpcService rpcService, DOMDataBroker domDataBroker, DOMNotificationService domNotification,
             ControllerContext controllerContext) {
-        this.rpcService = rpcService;
-        this.domDataBroker = domDataBroker;
-        this.domNotification = domNotification;
-        this.controllerContext = controllerContext;
-    }
-
-    @Deprecated
-    public static BrokerFacade getInstance() {
-        return BrokerFacade.INSTANCE;
+        this.rpcService = Objects.requireNonNull(rpcService);
+        this.domDataBroker = Objects.requireNonNull(domDataBroker);
+        this.domNotification = Objects.requireNonNull(domNotification);
+        this.controllerContext = Objects.requireNonNull(controllerContext);
     }
 
     public static BrokerFacade newInstance(DOMRpcService rpcService, DOMDataBroker domDataBroker,
             DOMNotificationService domNotification, ControllerContext controllerContext) {
-        INSTANCE.rpcService = rpcService;
-        INSTANCE.domDataBroker = domDataBroker;
-        INSTANCE.controllerContext = controllerContext;
-        INSTANCE.domNotification = domNotification;
-        return INSTANCE;
-        //return new BrokerFacade(pcService, domDataBroker, controllerContext);
+        return new BrokerFacade(rpcService, domDataBroker, domNotification, controllerContext);
     }
 
     @Override
     public void close() {
-        domDataBroker = null;
-    }
-
-    private void checkPreconditions() {
-        if (this.domDataBroker == null) {
-            throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
-        }
     }
 
     /**
@@ -160,7 +138,6 @@ public class BrokerFacade implements Closeable {
      * @return read date
      */
     public NormalizedNode<?, ?> readConfigurationData(final YangInstanceIdentifier path, final String withDefa) {
-        checkPreconditions();
         try (DOMDataReadOnlyTransaction tx = this.domDataBroker.newReadOnlyTransaction()) {
             return readDataViaTransaction(tx, CONFIGURATION, path, withDefa);
         }
@@ -212,8 +189,6 @@ public class BrokerFacade implements Closeable {
      * @return read data
      */
     public NormalizedNode<?, ?> readOperationalData(final YangInstanceIdentifier path) {
-        checkPreconditions();
-
         try (DOMDataReadOnlyTransaction tx = this.domDataBroker.newReadOnlyTransaction()) {
             return readDataViaTransaction(tx, OPERATIONAL, path);
         }
@@ -265,8 +240,6 @@ public class BrokerFacade implements Closeable {
         Preconditions.checkNotNull(globalSchema);
         Preconditions.checkNotNull(path);
         Preconditions.checkNotNull(payload);
-
-        checkPreconditions();
 
         final DOMDataReadWriteTransaction newReadWriteTransaction = this.domDataBroker.newReadWriteTransaction();
         final Status status = readDataViaTransaction(newReadWriteTransaction, CONFIGURATION, path) != null ? Status.OK
@@ -479,7 +452,6 @@ public class BrokerFacade implements Closeable {
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPost(
             final SchemaContext globalSchema, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final String insert, final String point) {
-        checkPreconditions();
         return postDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload,
                 globalSchema, insert, point);
     }
@@ -500,7 +472,6 @@ public class BrokerFacade implements Closeable {
     // DELETE configuration
     public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataDelete(
             final YangInstanceIdentifier path) {
-        checkPreconditions();
         return deleteDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path);
     }
 
@@ -518,7 +489,6 @@ public class BrokerFacade implements Closeable {
     // RPC
     public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(final SchemaPath type,
                                                                   final NormalizedNode<?, ?> input) {
-        checkPreconditions();
         if (this.rpcService == null) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
@@ -528,8 +498,6 @@ public class BrokerFacade implements Closeable {
 
     public void registerToListenDataChanges(final LogicalDatastoreType datastore, final DataChangeScope scope,
             final ListenerAdapter listener) {
-        checkPreconditions();
-
         if (listener.isListening()) {
             return;
         }
@@ -1227,8 +1195,6 @@ public class BrokerFacade implements Closeable {
     }
 
     public void registerToListenNotification(final NotificationListenerAdapter listener) {
-        checkPreconditions();
-
         if (listener.isListening()) {
             return;
         }

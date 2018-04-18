@@ -164,13 +164,6 @@ public class BrokerFacadeTest {
         assertSame("readOperationalData", this.dummyNode, actualNode);
     }
 
-    @Test(expected = RestconfDocumentedException.class)
-    public void testReadOperationalDataWithNoDataBroker() {
-        this.brokerFacade.close();
-
-        this.brokerFacade.readOperationalData(this.instanceID);
-    }
-
     @Test
     public void test503() throws Exception {
         final RpcError error = RpcResultBuilder.newError(
@@ -202,12 +195,6 @@ public class BrokerFacadeTest {
         assertNotNull("Future is null", actualFuture);
         final DOMRpcResult actualResult = actualFuture.get();
         assertSame("invokeRpc", expResult, actualResult);
-    }
-
-    @Test(expected = RestconfDocumentedException.class)
-    public void testInvokeRpcWithNoConsumerSession() {
-        brokerFacade.close();
-        this.brokerFacade.invokeRpc(this.type, this.dummyNode);
     }
 
     @Test

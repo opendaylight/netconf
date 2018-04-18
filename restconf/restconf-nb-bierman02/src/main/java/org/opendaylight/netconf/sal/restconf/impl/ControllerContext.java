@@ -84,9 +84,6 @@ public final class ControllerContext implements SchemaContextListener, Closeable
 
     private static final Logger LOG = LoggerFactory.getLogger(ControllerContext.class);
 
-    // FIXME: this should be the current instance which is mutated
-    private static final ControllerContext INSTANCE = new ControllerContext();
-
     private static final String NULL_VALUE = "null";
 
     private static final String MOUNT_MODULE = "yang-ext";
@@ -99,9 +96,9 @@ public final class ControllerContext implements SchemaContextListener, Closeable
 
     private final AtomicReference<Map<QName, RpcDefinition>> qnameToRpc = new AtomicReference<>(Collections.emptyMap());
 
-    private DOMMountPointService mountService;
-    private DOMYangTextSourceProvider yangTextSourceProvider;
-    private ListenerRegistration<SchemaContextListener> listenerRegistration;
+    private final DOMMountPointService mountService;
+    private final DOMYangTextSourceProvider yangTextSourceProvider;
+    private final ListenerRegistration<SchemaContextListener> listenerRegistration;
     private volatile SchemaContext globalSchema;
     private volatile DataNormalizer dataNormalizer;
 
@@ -110,13 +107,8 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         this.mountService = mountService;
         this.yangTextSourceProvider = yangTextSourceProvider;
 
-        setGlobalSchema(schemaService.getGlobalContext());
+        onGlobalContextUpdated(schemaService.getGlobalContext());
         listenerRegistration = schemaService.registerSchemaContextListener(this);
-    }
-
-    // Temporary until the static instance is removed.
-    @Deprecated
-    private ControllerContext() {
     }
 
     public static ControllerContext newInstance(SchemaService schemaService, DOMMountPointService mountService,
@@ -124,19 +116,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         final DOMYangTextSourceProvider yangTextSourceProvider =
             (DOMYangTextSourceProvider) domSchemaService.getSupportedExtensions().get(DOMYangTextSourceProvider.class);
 
-        INSTANCE.mountService = mountService;
-        INSTANCE.yangTextSourceProvider = yangTextSourceProvider;
-
-        INSTANCE.onGlobalContextUpdated(schemaService.getGlobalContext());
-        INSTANCE.listenerRegistration = schemaService.registerSchemaContextListener(INSTANCE);
-
-        return INSTANCE;
-        //return new ControllerContext(schemaService, mountService, domSchemaServiceExtension);
-    }
-
-    @Deprecated
-    public static ControllerContext getInstance() {
-        return INSTANCE;
+        return new ControllerContext(schemaService, mountService, yangTextSourceProvider);
     }
 
     private void setGlobalSchema(final SchemaContext globalSchema) {
