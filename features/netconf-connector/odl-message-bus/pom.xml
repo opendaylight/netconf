@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-message-bus</artifactId>
-    <version>1.4.1-SNAPSHOT</version>
+    <version>1.4.1</version>
     <packaging>feature</packaging>
 
     <!-- messagebus endpoint for netconf connector-->
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-message-bus-collector</artifactId>
-            <version>1.7.1-SNAPSHOT</version>
+            <version>1.7.1</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

@@ -19,13 +19,13 @@
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-mdsal</artifactId>
     <!-- This matches controller -->
-    <version>1.7.1-SNAPSHOT</version>
+    <version>1.7.1</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Netconf :: Mdsal</name>
 
     <properties>
-        <netconf.version>1.4.1-SNAPSHOT</netconf.version>
+        <netconf.version>1.4.1</netconf.version>
         <controller.mdsal.version>${project.version}</controller.mdsal.version>
     </properties>
 
@@ -45,14 +45,14 @@
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-config-all</artifactId>
-            <version>0.8.1-SNAPSHOT</version>
+            <version>0.8.1</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-config-netty</artifactId>
-            <version>0.8.1-SNAPSHOT</version>
+            <version>0.8.1</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
