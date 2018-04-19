@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.handlers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 
 import com.google.common.util.concurrent.CheckedFuture;
 import org.junit.Before;
@@ -19,7 +18,9 @@ import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -33,6 +34,7 @@ public class SchemaContextHandlerTest {
 
     private SchemaContextHandler schemaContextHandler;
     private SchemaContext schemaContext;
+    private final DOMSchemaService mockDOMSchemaService = Mockito.mock(DOMSchemaService.class);
 
     @Before
     public void setup() throws Exception {
@@ -44,7 +46,9 @@ public class SchemaContextHandlerTest {
         final CheckedFuture<Void,TransactionCommitFailedException> checked = Mockito.mock(CheckedFuture.class);
         Mockito.when(wTx.submit()).thenReturn(checked);
         Mockito.when(checked.checkedGet()).thenReturn(null);
-        this.schemaContextHandler = new SchemaContextHandler(txHandler);
+
+
+        this.schemaContextHandler = SchemaContextHandler.newInstance(txHandler, mockDOMSchemaService);
 
         this.schemaContext =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_ACTUAL_SCHEMA_CONTEXT));
@@ -52,11 +56,21 @@ public class SchemaContextHandlerTest {
     }
 
     /**
-     * Testing init of {@link SchemaContextHandler}.
+     * Testing init and close.
      */
     @Test
-    public void schemaContextHandlerImplInitTest() {
-        assertNotNull("Handler should be created and not null", this.schemaContextHandler);
+    public void testInitAndClose() {
+        ListenerRegistration<?> mockListenerReg = Mockito.mock(ListenerRegistration.class);
+        Mockito.doReturn(mockListenerReg).when(mockDOMSchemaService)
+            .registerSchemaContextListener(schemaContextHandler);
+
+        schemaContextHandler.init();
+
+        Mockito.verify(mockDOMSchemaService).registerSchemaContextListener(schemaContextHandler);
+
+        schemaContextHandler.close();
+
+        Mockito.verify(mockListenerReg).close();
     }
 
     /**

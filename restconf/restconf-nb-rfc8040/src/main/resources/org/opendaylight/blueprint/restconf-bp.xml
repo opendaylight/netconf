@@ -44,6 +44,12 @@
     <argument ref="domDataBroker"/>
   </bean>
 
+  <bean id="schemaContextHandler" class="org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler"
+      factory-method="newInstance" init-method="init" destroy-method="close">
+    <argument ref="transactionChainHandler"/>
+    <argument ref="domSchemaService"/>
+  </bean>
+
   <bean id="restconfProvider" class="org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider"
           init-method="start" destroy-method="close">
     <argument ref="domDataBroker"/>
@@ -52,6 +58,7 @@
     <argument ref="domNotificationService"/>
     <argument ref="domMountPointService"/>
     <argument ref="transactionChainHandler"/>
+    <argument ref="schemaContextHandler"/>
     <argument ref="wrapper"/>
   </bean>
 
@@ -66,6 +73,7 @@
     <argument>
       <bean factory-ref="restconfProvider" factory-method="getMountPointServiceHandler" />
     </argument>
+    <argument ref="schemaContextHandler"/>
   </bean>
 
   <service ref="jsonRestconfService" odl:type="rfc8040"

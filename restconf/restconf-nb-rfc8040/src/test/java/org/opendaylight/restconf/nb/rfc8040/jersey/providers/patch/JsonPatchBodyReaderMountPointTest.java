@@ -24,7 +24,6 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.JsonBodyReaderTest;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -37,7 +36,8 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
     private final JsonToPatchBodyReader jsonToPatchBodyReader;
 
     public JsonPatchBodyReaderMountPointTest() throws Exception {
-        jsonToPatchBodyReader = new JsonToPatchBodyReader();
+        super(schemaContext);
+        jsonToPatchBodyReader = new JsonToPatchBodyReader(schemaContextHandler);
     }
 
     @Override
@@ -55,7 +55,6 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
         when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mountPointService);
         when(mountPointService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountPoint));
         when(mountPoint.getSchemaContext()).thenReturn(schemaContext);
-        SchemaContextHandler.setSchemaContext(schemaContext);
     }
 
     @Test

@@ -10,15 +10,11 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 
 import com.google.common.util.concurrent.Futures;
-import java.lang.reflect.Field;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -31,7 +27,6 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
-import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -47,23 +42,6 @@ public class DeleteDataTransactionUtilTest {
     private DOMDataBroker mockDataBroker;
 
     private TransactionChainHandler transactionChainHandler;
-
-    // Fields used when delete operation fails to reset transaction chain
-    private static Field broker;
-
-    @BeforeClass
-    public static void setup() throws Exception {
-        DeleteDataTransactionUtilTest.broker = RestConnectorProvider.class.getDeclaredField("dataBroker");
-
-        DeleteDataTransactionUtilTest.broker.setAccessible(true);
-        DeleteDataTransactionUtilTest.broker.set(RestConnectorProvider.class, mock(DOMDataBroker.class));
-    }
-
-    @AfterClass
-    public static void clean() throws Exception {
-        DeleteDataTransactionUtilTest.broker.set(RestConnectorProvider.class, null);
-        DeleteDataTransactionUtilTest.broker.setAccessible(false);
-    }
 
     @Before
     public void init() throws Exception {

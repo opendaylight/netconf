@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -49,7 +48,8 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
 
     public JsonBodyReaderTest() throws Exception {
-        this.jsonBodyReader = new JsonNormalizedNodeBodyReader();
+        super(schemaContext);
+        this.jsonBodyReader = new JsonNormalizedNodeBodyReader(schemaContextHandler);
     }
 
     @Override
@@ -64,7 +64,6 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
         when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mock(DOMMountPointService.class));
-        SchemaContextHandler.setSchemaContext(schemaContext);
     }
 
     @Test

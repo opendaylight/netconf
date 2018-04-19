@@ -129,9 +129,6 @@ public class JSONRestconfServiceRfc8040ImplTest {
     private DOMMountPointService mockMountPointService;
 
     @Mock
-    private SchemaContextHandler mockSchemaContextHandler;
-
-    @Mock
     private DOMDataBroker mockDOMDataBroker;
 
     @Mock
@@ -142,10 +139,11 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
     private JSONRestconfServiceRfc8040Impl service;
 
+    private final SchemaContextHandler schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
+
     @BeforeClass
     public static void init() throws IOException, ReactorException {
         schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
-        SchemaContextHandler.setSchemaContext(schemaContext);
     }
 
     @SuppressWarnings("resource")
@@ -177,25 +175,22 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         doReturn(mockTxChain).when(mockDOMDataBroker).createTransactionChain(any());
 
-        doReturn(schemaContext).when(mockSchemaContextHandler).get();
-
         final TransactionChainHandler txChainHandler = new TransactionChainHandler(mockDOMDataBroker);
 
         final DOMMountPointServiceHandler mountPointServiceHandler =
                 new DOMMountPointServiceHandler(mockMountPointService);
 
         final DOMNotificationService mockNotificationService = mock(DOMNotificationService.class);
-        ServicesWrapperImpl.getInstance().setHandlers(mockSchemaContextHandler, mountPointServiceHandler,
+        ServicesWrapperImpl.getInstance().setHandlers(schemaContextHandler, mountPointServiceHandler,
                 txChainHandler, new DOMDataBrokerHandler(mockDOMDataBroker),
                 new RpcServiceHandler(mockRpcService),
                 new NotificationServiceHandler(mockNotificationService), domSchemaService);
 
-        service = new JSONRestconfServiceRfc8040Impl(ServicesWrapperImpl.getInstance(), mountPointServiceHandler);
+        service = new JSONRestconfServiceRfc8040Impl(ServicesWrapperImpl.getInstance(), mountPointServiceHandler,
+                schemaContextHandler);
 
         new RestConnectorProvider<>(mockDOMDataBroker, domSchemaService, mockRpcService, mockNotificationService,
-                mockMountPointService, txChainHandler, null).start();
-
-        SchemaContextHandler.setSchemaContext(schemaContext);
+                mockMountPointService, txChainHandler, schemaContextHandler, null).start();
     }
 
     private static String loadData(final String path) throws IOException {

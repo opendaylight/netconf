@@ -22,8 +22,6 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServiceWrapper;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,15 +42,13 @@ public class RestConnectorProvider<T extends ServiceWrapper> implements Restconf
     private final DOMSchemaService domSchemaService;
     private final TransactionChainHandler transactionChainHandler;
     private final DOMDataBroker dataBroker;
-
-    private ListenerRegistration<SchemaContextListener> listenerRegistration;
-    private SchemaContextHandler schemaCtxHandler;
+    private final SchemaContextHandler schemaCtxHandler;
     private final T wrapperServices;
 
     public RestConnectorProvider(final DOMDataBroker domDataBroker, final DOMSchemaService domSchemaService,
             final DOMRpcService rpcService, final DOMNotificationService notificationService,
             final DOMMountPointService mountPointService, final TransactionChainHandler transactionChainHandler,
-            final T wrapperServices) {
+            final SchemaContextHandler schemaCtxHandler, final T wrapperServices) {
         this.wrapperServices = wrapperServices;
         this.domSchemaService = Preconditions.checkNotNull(domSchemaService);
         this.rpcService = Preconditions.checkNotNull(rpcService);
@@ -60,15 +56,13 @@ public class RestConnectorProvider<T extends ServiceWrapper> implements Restconf
         this.mountPointService = Preconditions.checkNotNull(mountPointService);
         this.transactionChainHandler = Preconditions.checkNotNull(transactionChainHandler);
         this.dataBroker = Preconditions.checkNotNull(domDataBroker);
+        this.schemaCtxHandler = Preconditions.checkNotNull(schemaCtxHandler);
     }
 
     public synchronized void start() {
         mountPointServiceHandler = new DOMMountPointServiceHandler(mountPointService);
 
         final DOMDataBrokerHandler brokerHandler = new DOMDataBrokerHandler(dataBroker);
-
-        this.schemaCtxHandler = new SchemaContextHandler(transactionChainHandler);
-        this.listenerRegistration = domSchemaService.registerSchemaContextListener(this.schemaCtxHandler);
 
         final RpcServiceHandler rpcServiceHandler = new RpcServiceHandler(rpcService);
 
@@ -95,12 +89,7 @@ public class RestConnectorProvider<T extends ServiceWrapper> implements Restconf
     }
 
     @Override
-    public void close() throws Exception {
-        // close registration
-        if (this.listenerRegistration != null) {
-            this.listenerRegistration.close();
-        }
-
+    public void close() {
         mountPointServiceHandler = null;
     }
 }

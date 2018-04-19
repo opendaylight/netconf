@@ -12,7 +12,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.CREATE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.DELETE;
@@ -21,7 +20,6 @@ import static org.opendaylight.restconf.common.patch.PatchEditOperation.REMOVE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REPLACE;
 
 import com.google.common.util.concurrent.Futures;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -38,7 +36,6 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
-import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
@@ -76,20 +73,12 @@ public class PatchDataTransactionUtilTest {
     private YangInstanceIdentifier targetNodeMerge;
     private MapNode buildArtistList;
 
-    // Fields used when delete operation fails to reset transaction chain
-    private static Field broker;
-
     @Before
     public void setUp() throws Exception {
         initMocks(this);
 
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
-
-        PatchDataTransactionUtilTest.broker = RestConnectorProvider.class.getDeclaredField("dataBroker");
-
-        PatchDataTransactionUtilTest.broker.setAccessible(true);
-        PatchDataTransactionUtilTest.broker.set(RestConnectorProvider.class, mock(DOMDataBroker.class));
 
         this.refSchemaCtx = new SchemaContextRef(
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));

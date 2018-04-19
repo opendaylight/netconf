@@ -23,6 +23,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
@@ -61,7 +62,8 @@ public class RestconfInvokeOperationsServiceImplTest {
         final CheckedFuture<Void, TransactionCommitFailedException> checked = Mockito.mock(CheckedFuture.class);
         Mockito.when(wTx.submit()).thenReturn(checked);
         Mockito.when(checked.checkedGet()).thenReturn(null);
-        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler);
+        final SchemaContextHandler schemaContextHandler =
+                SchemaContextHandler.newInstance(txHandler, Mockito.mock(DOMSchemaService.class));
         schemaContextHandler.onGlobalContextUpdated(contextRef.get());
         this.invokeOperationsService =
                 new RestconfInvokeOperationsServiceImpl(this.rpcServiceHandler, schemaContextHandler);
