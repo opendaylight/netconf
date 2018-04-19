@@ -15,7 +15,6 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
@@ -108,7 +107,7 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
               https://bugs.opendaylight.org/show_bug.cgi?id=7728
             */
             LOG.warn("Ignoring that another cluster node is already putting the same data to DS.", e);
-            RestConnectorProvider.resetTransactionChainForAdapaters(this.transactionChainHandler.get());
+            this.transactionChainHandler.reset();
         }
     }
 }
