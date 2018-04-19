@@ -27,7 +27,6 @@ import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
-import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PatchData;
@@ -146,7 +145,7 @@ public final class PatchDataTransactionUtil {
             return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), true, null);
         } else {
             tx.cancel();
-            RestConnectorProvider.resetTransactionChainForAdapaters(transactionNode.getTransactionChain());
+            transactionNode.getTransactionChainHandler().reset();
             return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection),
                     false, null);
         }

@@ -16,8 +16,10 @@ import com.google.common.util.concurrent.Futures;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -26,6 +28,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -52,8 +55,10 @@ public class PutDataTransactionUtilTest {
     private DOMDataReadOnlyTransaction read;
     @Mock
     private DOMDataWriteTransaction write;
+    @Mock
+    private DOMDataBroker mockDataBroker;
 
-
+    private TransactionChainHandler transactionChainHandler;
     private SchemaContextRef refSchemaCtx;
     private LeafNode buildLeaf;
     private ContainerNode buildBaseCont;
@@ -152,6 +157,8 @@ public class PutDataTransactionUtilTest {
                 .withChild(buildList)
                 .build();
 
+        Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
+        transactionChainHandler = new TransactionChainHandler(mockDataBroker);
     }
 
     @Test
@@ -214,7 +221,7 @@ public class PutDataTransactionUtilTest {
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
 
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain), null,
+                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
                 null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
@@ -238,7 +245,7 @@ public class PutDataTransactionUtilTest {
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
 
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain), null,
+                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
                 null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier());
@@ -261,7 +268,7 @@ public class PutDataTransactionUtilTest {
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain), null,
+                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
                 null);
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iid2, payload.getData());

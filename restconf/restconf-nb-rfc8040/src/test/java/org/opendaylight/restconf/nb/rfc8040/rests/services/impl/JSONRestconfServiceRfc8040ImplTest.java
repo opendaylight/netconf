@@ -179,7 +179,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         doReturn(schemaContext).when(mockSchemaContextHandler).get();
 
-        final TransactionChainHandler txChainHandler = new TransactionChainHandler(mockTxChain);
+        final TransactionChainHandler txChainHandler = new TransactionChainHandler(mockDOMDataBroker);
 
         final DOMMountPointServiceHandler mountPointServiceHandler =
                 new DOMMountPointServiceHandler(mockMountPointService);
@@ -193,7 +193,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         service = new JSONRestconfServiceRfc8040Impl(ServicesWrapperImpl.getInstance(), mountPointServiceHandler);
 
         new RestConnectorProvider<>(mockDOMDataBroker, domSchemaService, mockRpcService, mockNotificationService,
-                mockMountPointService).start();
+                mockMountPointService, txChainHandler, null).start();
 
         SchemaContextHandler.setSchemaContext(schemaContext);
     }

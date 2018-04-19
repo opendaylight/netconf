@@ -27,6 +27,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
@@ -62,6 +63,10 @@ public class PatchDataTransactionUtilTest {
     @Mock
     private DOMDataReadWriteTransaction rwTransaction;
 
+    @Mock
+    private DOMDataBroker mockDataBroker;
+
+    private TransactionChainHandler transactionChainHandler;
     private SchemaContextRef refSchemaCtx;
     private YangInstanceIdentifier instanceIdContainer;
     private YangInstanceIdentifier instanceIdCreateAndDelete;
@@ -72,18 +77,16 @@ public class PatchDataTransactionUtilTest {
     private MapNode buildArtistList;
 
     // Fields used when delete operation fails to reset transaction chain
-    private static Field handler;
     private static Field broker;
 
     @Before
     public void setUp() throws Exception {
         initMocks(this);
 
-        PatchDataTransactionUtilTest.handler = RestConnectorProvider.class.getDeclaredField("transactionChainHandler");
-        PatchDataTransactionUtilTest.broker = RestConnectorProvider.class.getDeclaredField("dataBroker");
+        Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
+        transactionChainHandler = new TransactionChainHandler(mockDataBroker);
 
-        PatchDataTransactionUtilTest.handler.setAccessible(true);
-        PatchDataTransactionUtilTest.handler.set(RestConnectorProvider.class, mock(TransactionChainHandler.class));
+        PatchDataTransactionUtilTest.broker = RestConnectorProvider.class.getDeclaredField("dataBroker");
 
         PatchDataTransactionUtilTest.broker.setAccessible(true);
         PatchDataTransactionUtilTest.broker.set(RestConnectorProvider.class, mock(DOMDataBroker.class));
@@ -190,7 +193,7 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdMerge, null, null, this.refSchemaCtx.get());
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchRMRm");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChainHandler);
         final PatchStatusContext patchStatusContext =
                 PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
@@ -219,7 +222,7 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx.get());
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchCD");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChainHandler);
         final PatchStatusContext patchStatusContext =
                 PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
@@ -243,7 +246,7 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx.get());
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchD");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChainHandler);
         final PatchStatusContext patchStatusContext =
                 PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
@@ -268,7 +271,7 @@ public class PatchDataTransactionUtilTest {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.instanceIdCreateAndDelete, null, null, this.refSchemaCtx.get());
         final PatchContext patchContext = new PatchContext(iidContext, entities, "patchM");
-        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, this.transactionChain);
+        final TransactionVarsWrapper wrapper = new TransactionVarsWrapper(iidContext, null, transactionChainHandler);
         final PatchStatusContext patchStatusContext =
                 PatchDataTransactionUtil.patchData(patchContext, wrapper, this.refSchemaCtx);
 
