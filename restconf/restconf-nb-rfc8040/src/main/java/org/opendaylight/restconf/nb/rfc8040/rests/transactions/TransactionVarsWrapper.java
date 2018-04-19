@@ -11,6 +11,7 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
+import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 
 /**
  * This class represent delegation wrapper for transaction variables.
@@ -22,6 +23,7 @@ public final class TransactionVarsWrapper {
     private final DOMMountPoint mountPoint;
     private LogicalDatastoreType configuration = null;
     private final DOMTransactionChain transactionChain;
+    private final TransactionChainHandler transactionChainHandler;
 
     /**
      * Set base type of variables, which ones we need for transaction.
@@ -32,15 +34,16 @@ public final class TransactionVarsWrapper {
      *             {@link InstanceIdentifierContext} of data for transaction
      * @param mountPoint
      *             mount point if is present
-     * @param transactionChain
-     *             transaction chain for creating specific type of transaction
-     *            in specific operation
+     * @param transactionChainHandler
+     *             used to obtain the transaction chain for creating specific type of transaction
+     *             in specific operation
      */
     public TransactionVarsWrapper(final InstanceIdentifierContext<?> instanceIdentifier, final DOMMountPoint mountPoint,
-            final DOMTransactionChain transactionChain) {
+            final TransactionChainHandler transactionChainHandler) {
         this.instanceIdentifier = instanceIdentifier;
         this.mountPoint = mountPoint;
-        this.transactionChain = transactionChain;
+        this.transactionChainHandler = transactionChainHandler;
+        transactionChain = transactionChainHandler.get();
     }
 
     /**
@@ -89,5 +92,13 @@ public final class TransactionVarsWrapper {
      */
     public DOMTransactionChain getTransactionChain() {
         return this.transactionChain;
+    }
+
+    public void resetTransactionChain() {
+        transactionChainHandler.reset();
+    }
+
+    public TransactionChainHandler getTransactionChainHandler() {
+        return transactionChainHandler;
     }
 }
