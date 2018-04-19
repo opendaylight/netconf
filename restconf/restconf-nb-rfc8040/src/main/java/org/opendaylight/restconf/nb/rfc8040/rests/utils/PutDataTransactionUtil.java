@@ -19,13 +19,13 @@ import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.validation.RestconfValidationUtils;
+import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -173,7 +173,7 @@ public final class PutDataTransactionUtil {
         final ResponseFactory responseFactory =
                 new ResponseFactory(existsResponse.result ? Status.NO_CONTENT : Status.CREATED);
         final CheckedFuture<Void, TransactionCommitFailedException> submitData = submitData(path, schemaContext,
-                transactionNode.getTransactionChain(), readWriteTransaction, payload.getData(), insert, point);
+                transactionNode.getTransactionChainHandler(), readWriteTransaction, payload.getData(), insert, point);
         FutureCallbackTx.addCallback(submitData, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, responseFactory);
         return responseFactory.build();
     }
@@ -185,7 +185,7 @@ public final class PutDataTransactionUtil {
      *             path of data
      * @param schemaContext
      *             {@link SchemaContext}
-     * @param domTransactionChain
+     * @param transactionChainHandler
      *             write transaction
      * @param data
      *             data
@@ -196,7 +196,7 @@ public final class PutDataTransactionUtil {
      * @return {@link CheckedFuture}
      */
     private static CheckedFuture<Void, TransactionCommitFailedException> submitData(final YangInstanceIdentifier path,
-            final SchemaContext schemaContext, final DOMTransactionChain domTransactionChain,
+            final SchemaContext schemaContext, final TransactionChainHandler transactionChainHandler,
             final DOMDataReadWriteTransaction readWriteTransaction,
             final NormalizedNode<?, ?> data, final String insert, final String point) {
         if (insert == null) {
@@ -207,7 +207,7 @@ public final class PutDataTransactionUtil {
                 case "first":
                     if (schemaNode instanceof ListSchemaNode) {
                         final NormalizedNode<?, ?> readData =
-                                readList(path, schemaContext, domTransactionChain, schemaNode);
+                                readList(path, schemaContext, transactionChainHandler, schemaNode);
                         final OrderedMapNode readList = (OrderedMapNode) readData;
                         if (readList == null || readList.getValue().isEmpty()) {
                             return makePut(path, schemaContext, readWriteTransaction, data);
@@ -221,7 +221,7 @@ public final class PutDataTransactionUtil {
                         }
                     } else {
                         final NormalizedNode<?, ?> readData =
-                                readList(path, schemaContext, domTransactionChain, schemaNode);
+                                readList(path, schemaContext, transactionChainHandler, schemaNode);
 
                         final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
                         if (readLeafList == null || readLeafList.getValue().isEmpty()) {
@@ -240,7 +240,7 @@ public final class PutDataTransactionUtil {
                 case "before":
                     if (schemaNode instanceof ListSchemaNode) {
                         final NormalizedNode<?, ?> readData =
-                                readList(path, schemaContext, domTransactionChain, schemaNode);
+                                readList(path, schemaContext, transactionChainHandler, schemaNode);
                         final OrderedMapNode readList = (OrderedMapNode) readData;
                         if (readList == null || readList.getValue().isEmpty()) {
                             return makePut(path, schemaContext, readWriteTransaction, data);
@@ -251,7 +251,7 @@ public final class PutDataTransactionUtil {
                         }
                     } else {
                         final NormalizedNode<?, ?> readData =
-                                readList(path, schemaContext, domTransactionChain, schemaNode);
+                                readList(path, schemaContext, transactionChainHandler, schemaNode);
 
                         final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
                         if (readLeafList == null || readLeafList.getValue().isEmpty()) {
@@ -265,7 +265,7 @@ public final class PutDataTransactionUtil {
                 case "after":
                     if (schemaNode instanceof ListSchemaNode) {
                         final NormalizedNode<?, ?> readData =
-                                readList(path, schemaContext, domTransactionChain, schemaNode);
+                                readList(path, schemaContext, transactionChainHandler, schemaNode);
                         final OrderedMapNode readList = (OrderedMapNode) readData;
                         if (readList == null || readList.getValue().isEmpty()) {
                             return makePut(path, schemaContext, readWriteTransaction, data);
@@ -276,7 +276,7 @@ public final class PutDataTransactionUtil {
                         }
                     } else {
                         final NormalizedNode<?, ?> readData =
-                                readList(path, schemaContext, domTransactionChain, schemaNode);
+                                readList(path, schemaContext, transactionChainHandler, schemaNode);
 
                         final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
                         if (readLeafList == null || readLeafList.getValue().isEmpty()) {
@@ -296,11 +296,10 @@ public final class PutDataTransactionUtil {
     }
 
     public static NormalizedNode<?, ?> readList(final YangInstanceIdentifier path, final SchemaContext schemaContext,
-            final DOMTransactionChain domTransactionChain, final DataSchemaNode schemaNode) {
+            final TransactionChainHandler transactionChainHandler, final DataSchemaNode schemaNode) {
         final InstanceIdentifierContext<?> iid = new InstanceIdentifierContext<SchemaNode>(
                 path.getParent(), schemaNode, null, schemaContext);
-        final TransactionVarsWrapper transactionNode =
-                new TransactionVarsWrapper(iid, null, domTransactionChain);
+        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(iid, null, transactionChainHandler);
         final NormalizedNode<?, ?> readData = ReadDataTransactionUtil
                 .readData(RestconfDataServiceConstant.ReadData.CONFIG, transactionNode, schemaContext);
         return readData;

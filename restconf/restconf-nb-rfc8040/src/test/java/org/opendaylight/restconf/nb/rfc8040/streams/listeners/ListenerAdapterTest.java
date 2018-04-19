@@ -24,12 +24,10 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.binding.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeIdentifier;
@@ -73,8 +71,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         SchemaContext sc = YangParserTestUtils.parseYangResource(
                 "/instanceidentifier/yang/instance-identifier-patch-module.yang");
 
-        transactionChainHandler = new TransactionChainHandler(domDataBroker.createTransactionChain(
-                Mockito.mock(TransactionChainListener.class)));
+        transactionChainHandler = new TransactionChainHandler(domDataBroker);
         schemaContextHandler = new SchemaContextHandler(transactionChainHandler);
         SchemaContextHandler.setSchemaContext(sc);
     }

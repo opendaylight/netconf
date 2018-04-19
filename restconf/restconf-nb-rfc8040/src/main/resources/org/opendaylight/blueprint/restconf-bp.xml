@@ -39,6 +39,11 @@
   <bean id="wrapper" class="org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl"
           factory-method="getInstance" />
 
+  <bean id="transactionChainHandler" class="org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler"
+          destroy-method="close">
+    <argument ref="domDataBroker"/>
+  </bean>
+
   <bean id="restconfProvider" class="org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider"
           init-method="start" destroy-method="close">
     <argument ref="domDataBroker"/>
@@ -46,6 +51,7 @@
     <argument ref="domRpcService"/>
     <argument ref="domNotificationService"/>
     <argument ref="domMountPointService"/>
+    <argument ref="transactionChainHandler"/>
     <argument ref="wrapper"/>
   </bean>
 

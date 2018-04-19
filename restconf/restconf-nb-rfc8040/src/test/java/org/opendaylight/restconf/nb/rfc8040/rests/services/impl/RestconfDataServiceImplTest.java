@@ -15,16 +15,13 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.CREATE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.DELETE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REMOVE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REPLACE;
 
 import com.google.common.base.Optional;
-import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -41,7 +38,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
@@ -55,7 +51,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
@@ -92,9 +87,8 @@ public class RestconfDataServiceImplTest {
     private ContainerNode buildPlayerCont;
     private ContainerNode buildLibraryCont;
     private MapNode buildPlaylistList;
-
-    @Mock
     private TransactionChainHandler transactionChainHandler;
+
     @Mock
     private DOMTransactionChain domTransactionChain;
     @Mock
@@ -114,7 +108,7 @@ public class RestconfDataServiceImplTest {
     @Mock
     private DOMDataBroker mountDataBroker;
     @Mock
-    private DOMTransactionChain transactionChain;
+    private DOMTransactionChain mountTransactionChain;
     @Mock
     private RestconfStreamsSubscriptionService delegRestconfSubscrService;
 
@@ -178,32 +172,32 @@ public class RestconfDataServiceImplTest {
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
         this.schemaNode = DataSchemaContextTree.from(this.contextRef.get()).getChild(this.iidBase).getDataSchemaNode();
 
-        final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
-        final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
-        Mockito.when(txHandler.get()).thenReturn(domTx);
-        final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
-        Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        final CheckedFuture<Void, TransactionCommitFailedException> checked = Mockito.mock(CheckedFuture.class);
-        Mockito.when(wTx.submit()).thenReturn(checked);
-        Mockito.when(checked.checkedGet()).thenReturn(null);
-        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler);
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.write).submit();
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
+
+        doReturn(this.read).when(domTransactionChain).newReadOnlyTransaction();
+        doReturn(this.readWrite).when(domTransactionChain).newReadWriteTransaction();
+        doReturn(this.write).when(domTransactionChain).newWriteOnlyTransaction();
+
+        DOMDataBroker mockDataBroker = Mockito.mock(DOMDataBroker.class);
+        Mockito.doReturn(domTransactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
+
+        transactionChainHandler = new TransactionChainHandler(mockDataBroker);
+
+        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(transactionChainHandler);
 
         schemaContextHandler.onGlobalContextUpdated(this.contextRef.get());
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,
                 this.mountPointServiceHandler, this.delegRestconfSubscrService);
-        doReturn(this.domTransactionChain).when(this.transactionChainHandler).get();
-        doReturn(this.read).when(this.domTransactionChain).newReadOnlyTransaction();
-        doReturn(this.readWrite).when(this.domTransactionChain).newReadWriteTransaction();
-        doReturn(this.write).when(this.domTransactionChain).newWriteOnlyTransaction();
         doReturn(this.mountPointService).when(this.mountPointServiceHandler).get();
         doReturn(Optional.of(this.mountPoint)).when(this.mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(this.contextRef.get()).when(this.mountPoint).getSchemaContext();
         doReturn(Optional.of(this.mountDataBroker)).when(this.mountPoint).getService(DOMDataBroker.class);
-        doReturn(this.transactionChain).when(this.mountDataBroker)
+        doReturn(this.mountTransactionChain).when(this.mountDataBroker)
                 .createTransactionChain(any(TransactionChainListener.class));
-        doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
-        doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
+        doReturn(this.read).when(this.mountTransactionChain).newReadOnlyTransaction();
+        doReturn(this.readWrite).when(this.mountTransactionChain).newReadWriteTransaction();
     }
 
     @Test
@@ -325,7 +319,6 @@ public class RestconfDataServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(Boolean.TRUE)).when(this.readWrite)
                 .exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, payload.getData());
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         final Response response = this.dataService.putData(null, payload, this.uriInfo);
         assertNotNull(response);
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
@@ -333,10 +326,10 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testPutDataWithMountPoint() {
-        final DOMDataBroker dataBroker = Mockito.mock(DOMDataBroker.class);
-        doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
-        doReturn(this.transactionChainHandler.get()).when(dataBroker)
-                .createTransactionChain(RestConnectorProvider.TRANSACTION_CHAIN_LISTENER);
+//        final DOMDataBroker dataBroker = Mockito.mock(DOMDataBroker.class);
+//        doReturn(Optional.of(dataBroker)).when(mountPoint).getService(DOMDataBroker.class);
+//        doReturn(this.transactionChainHandler.get()).when(dataBroker)
+//                .createTransactionChain(RestConnectorProvider.TRANSACTION_CHAIN_LISTENER);
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, mountPoint, this.contextRef.get());
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
@@ -344,7 +337,6 @@ public class RestconfDataServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(Boolean.TRUE)).when(this.readWrite)
                 .exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, payload.getData());
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         final Response response = this.dataService.putData(null, payload, this.uriInfo);
         assertNotNull(response);
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
@@ -388,7 +380,6 @@ public class RestconfDataServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(false))
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         doReturn(UriBuilder.fromUri("http://localhost:8181/restconf/15/")).when(this.uriInfo).getBaseUriBuilder();
 
         final Response response = this.dataService.postData(null, payload, this.uriInfo);
@@ -398,7 +389,6 @@ public class RestconfDataServiceImplTest {
     @Test
     public void testDeleteData() {
         doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, this.iidBase);
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         doReturn(Futures.immediateCheckedFuture(true))
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         final Response response = this.dataService.deleteData("example-jukebox:jukebox");
@@ -412,7 +402,6 @@ public class RestconfDataServiceImplTest {
     @Test
     public void testDeleteDataMountPoint() {
         doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, this.iidBase);
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         doReturn(Futures.immediateCheckedFuture(true))
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         final Response response =
@@ -438,9 +427,7 @@ public class RestconfDataServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseCont))).when(this.read)
                 .read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, this.buildBaseCont);
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.write).submit();
         doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         doReturn(Futures.immediateCheckedFuture(false))
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doReturn(Futures.immediateCheckedFuture(true))
@@ -468,9 +455,7 @@ public class RestconfDataServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseCont))).when(this.read)
                 .read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, this.buildBaseCont);
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.write).submit();
         doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         doReturn(Futures.immediateCheckedFuture(false))
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doReturn(Futures.immediateCheckedFuture(true))
@@ -484,14 +469,6 @@ public class RestconfDataServiceImplTest {
 
     @Test
     public void testPatchDataDeleteNotExist() throws Exception {
-        final Field handler = RestConnectorProvider.class.getDeclaredField("transactionChainHandler");
-        final Field broker = RestConnectorProvider.class.getDeclaredField("dataBroker");
-
-        handler.setAccessible(true);
-        handler.set(RestConnectorProvider.class, mock(TransactionChainHandler.class));
-
-        broker.setAccessible(true);
-        broker.set(RestConnectorProvider.class, mock(DOMDataBroker.class));
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iidBase, this.schemaNode, null, this.contextRef.get());
         final List<PatchEntity> entity = new ArrayList<>();
@@ -507,21 +484,13 @@ public class RestconfDataServiceImplTest {
         doReturn(Futures.immediateCheckedFuture(Optional.of(this.buildBaseCont))).when(this.read)
                 .read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doNothing().when(this.write).put(LogicalDatastoreType.CONFIGURATION, this.iidBase, this.buildBaseCont);
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.write).submit();
         doNothing().when(this.readWrite).delete(LogicalDatastoreType.CONFIGURATION, iidleaf);
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         doReturn(Futures.immediateCheckedFuture(false))
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         doReturn(Futures.immediateCheckedFuture(false))
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, iidleaf);
         doReturn(true).when(this.readWrite).cancel();
         final PatchStatusContext status = this.dataService.patchData(patch, this.uriInfo);
-
-        handler.set(RestConnectorProvider.class, null);
-        handler.setAccessible(false);
-
-        broker.set(RestConnectorProvider.class, null);
-        broker.setAccessible(false);
 
         assertFalse(status.isOk());
         assertEquals(3, status.getEditCollection().size());

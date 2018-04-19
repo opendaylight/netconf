@@ -17,11 +17,10 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
-import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
+import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -84,13 +83,13 @@ public final class TransactionUtil {
     /**
      * Check if items already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
      * data does NOT already exists.
-     * @param transactionChain Transaction chain
+     * @param transactionChainHandler Transaction chain handler
      * @param rwTransaction Transaction
      * @param store Datastore
      * @param path Path to be checked
      * @param operationType Type of operation (READ, POST, PUT, DELETE...)
      */
-    public static void checkItemExists(final DOMTransactionChain transactionChain,
+    public static void checkItemExists(final TransactionChainHandler transactionChainHandler,
                                        final DOMDataReadWriteTransaction rwTransaction,
                                        final LogicalDatastoreType store, final YangInstanceIdentifier path,
                                        final String operationType) {
@@ -102,7 +101,7 @@ public final class TransactionUtil {
         if (!response.result) {
             // close transaction and reset transaction chain
             rwTransaction.cancel();
-            RestConnectorProvider.resetTransactionChainForAdapaters(transactionChain);
+            transactionChainHandler.reset();
 
             // throw error
             final String errMsg = "Operation via Restconf was not executed because data does not exist";
@@ -115,13 +114,13 @@ public final class TransactionUtil {
     /**
      * Check if items do NOT already exists at specified {@code path}. Throws {@link RestconfDocumentedException} if
      * data already exists.
-     * @param transactionChain Transaction chain
+     * @param transactionChainHandler Transaction chain handler
      * @param rwTransaction Transaction
      * @param store Datastore
      * @param path Path to be checked
      * @param operationType Type of operation (READ, POST, PUT, DELETE...)
      */
-    public static void checkItemDoesNotExists(final DOMTransactionChain transactionChain,
+    public static void checkItemDoesNotExists(final TransactionChainHandler transactionChainHandler,
                                               final DOMDataReadWriteTransaction rwTransaction,
                                               final LogicalDatastoreType store, final YangInstanceIdentifier path,
                                               final String operationType) {
@@ -133,7 +132,7 @@ public final class TransactionUtil {
         if (response.result) {
             // close transaction and reset transaction chain
             rwTransaction.cancel();
-            RestConnectorProvider.resetTransactionChainForAdapaters(transactionChain);
+            transactionChainHandler.reset();
 
             // throw error
             final String errMsg = "Operation via Restconf was not executed because data already exists";
