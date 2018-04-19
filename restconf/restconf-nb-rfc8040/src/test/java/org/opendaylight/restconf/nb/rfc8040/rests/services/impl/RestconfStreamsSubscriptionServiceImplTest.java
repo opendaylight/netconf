@@ -42,6 +42,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
@@ -70,9 +71,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     private UriInfo uriInfo;
     @Mock
     private NotificationServiceHandler notificationServiceHandler;
-    @Mock
-    private TransactionChainHandler transactionHandler;
 
+    private TransactionChainHandler transactionHandler;
     private SchemaContextHandler schemaHandler;
 
     @SuppressWarnings("unchecked")
@@ -80,10 +80,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        final TransactionChainHandler txHandler = mock(TransactionChainHandler.class);
         final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
-        Mockito.when(this.transactionHandler.get()).thenReturn(domTx);
-        Mockito.when(txHandler.get()).thenReturn(domTx);
         final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
         Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
         final DOMDataReadWriteTransaction rwTx = Mockito.mock(DOMDataReadWriteTransaction.class);
@@ -96,9 +93,12 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         final CheckedFuture<Void, TransactionCommitFailedException> checked = mock(CheckedFuture.class);
         Mockito.when(wTx.submit()).thenReturn(checked);
         Mockito.when(checked.checkedGet()).thenReturn(null);
-        this.schemaHandler = new SchemaContextHandler(txHandler);
 
         final DOMDataBroker dataBroker = mock(DOMDataBroker.class);
+        doReturn(domTx).when(dataBroker).createTransactionChain(any());
+
+        transactionHandler = new TransactionChainHandler(dataBroker);
+        schemaHandler = SchemaContextHandler.newInstance(transactionHandler, Mockito.mock(DOMSchemaService.class));
 
         DOMDataTreeChangeService dataTreeChangeService = mock(DOMDataTreeChangeService.class);
         doReturn(mock(ListenerRegistration.class)).when(dataTreeChangeService)

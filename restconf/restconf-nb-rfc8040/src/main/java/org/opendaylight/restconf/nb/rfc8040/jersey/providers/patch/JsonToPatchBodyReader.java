@@ -21,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -57,7 +58,9 @@ import org.slf4j.LoggerFactory;
 public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(JsonToPatchBodyReader.class);
 
-    private String patchId;
+    public JsonToPatchBodyReader(SchemaContextHandler schemaContextHandler) {
+        super(schemaContextHandler);
+    }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
@@ -73,10 +76,11 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
     private PatchContext readFrom(final InstanceIdentifierContext<?> path, final InputStream entityStream)
             throws IOException {
         final JsonReader jsonReader = new JsonReader(new InputStreamReader(entityStream, StandardCharsets.UTF_8));
-        final List<PatchEntity> resultList = read(jsonReader, path);
+        AtomicReference<String> patchId = new AtomicReference<>();
+        final List<PatchEntity> resultList = read(jsonReader, path, patchId);
         jsonReader.close();
 
-        return new PatchContext(path, resultList, patchId);
+        return new PatchContext(path, resultList, patchId.get());
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
@@ -84,7 +88,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
             RestconfDocumentedException {
         try {
             return readFrom(
-                    ParserIdentifier.toInstanceIdentifier(uriPath, SchemaContextHandler.getSchemaContext(),
+                    ParserIdentifier.toInstanceIdentifier(uriPath, getSchemaContext(),
                             Optional.of(RestConnectorProvider.getMountPointService())), entityStream);
         } catch (final Exception e) {
             propagateExceptionAs(e);
@@ -106,7 +110,8 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
                 ErrorTag.MALFORMED_MESSAGE, exception);
     }
 
-    private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext<?> path) throws IOException {
+    private List<PatchEntity> read(final JsonReader in, final InstanceIdentifierContext<?> path,
+            final AtomicReference<String> patchId) throws IOException {
         final List<PatchEntity> resultCollection = new ArrayList<>();
         final StringModuleInstanceIdentifierCodec codec = new StringModuleInstanceIdentifierCodec(
                 path.getSchemaContext());
@@ -133,7 +138,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
                 case END_DOCUMENT:
                     break;
                 case NAME:
-                    parseByName(in.nextName(), edit, in, path, codec, resultCollection);
+                    parseByName(in.nextName(), edit, in, path, codec, resultCollection, patchId);
                     break;
                 case END_OBJECT:
                     in.endObject();
@@ -164,7 +169,8 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
     private void parseByName(@Nonnull final String name, @Nonnull final PatchEdit edit,
                              @Nonnull final JsonReader in, @Nonnull final InstanceIdentifierContext<?> path,
                              @Nonnull final StringModuleInstanceIdentifierCodec codec,
-                             @Nonnull final List<PatchEntity> resultCollection) throws IOException {
+                             @Nonnull final List<PatchEntity> resultCollection,
+                             @Nonnull final AtomicReference<String> patchId) throws IOException {
         switch (name) {
             case "edit":
                 if (in.peek() == JsonToken.BEGIN_ARRAY) {
@@ -185,7 +191,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
 
                 break;
             case "patch-id":
-                this.patchId = in.nextString();
+                patchId.set(in.nextString());
                 break;
             default:
                 break;

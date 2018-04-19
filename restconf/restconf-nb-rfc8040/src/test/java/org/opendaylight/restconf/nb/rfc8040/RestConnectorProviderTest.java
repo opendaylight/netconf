@@ -57,9 +57,11 @@ public class RestConnectorProviderTest {
         doReturn(mockRegistration).when(domSchemaService).registerSchemaContextListener(
                 Mockito.any(SchemaContextHandler.class));
 
+        final TransactionChainHandler transactionChainHandler = new TransactionChainHandler(mockDataBroker);
         this.connectorProvider = new RestConnectorProvider<>(mockDataBroker, domSchemaService, mockRpcService,
-                mockNotificationService, mockMountPointService,
-                new TransactionChainHandler(mockDataBroker), ServicesWrapperImpl.getInstance());
+                mockNotificationService, mockMountPointService, transactionChainHandler,
+                SchemaContextHandler.newInstance(transactionChainHandler, domSchemaService),
+                ServicesWrapperImpl.getInstance());
     }
 
     /**
@@ -72,7 +74,6 @@ public class RestConnectorProviderTest {
 
         // verify interactions
         verify(mockDataBroker).createTransactionChain(Mockito.any());
-        verify(domSchemaService).registerSchemaContextListener(Mockito.any(SchemaContextHandler.class));
     }
 
     /**
@@ -93,8 +94,5 @@ public class RestConnectorProviderTest {
 
         // close
         this.connectorProvider.close();
-
-        // verify interaction
-        verify(this.mockRegistration).close();
     }
 }

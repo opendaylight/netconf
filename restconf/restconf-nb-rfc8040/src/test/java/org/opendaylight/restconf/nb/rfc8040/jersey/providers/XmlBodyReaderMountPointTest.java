@@ -30,7 +30,6 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -54,7 +53,8 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
 
     public XmlBodyReaderMountPointTest() throws Exception {
-        this.xmlBodyReader = new XmlNormalizedNodeBodyReader();
+        super(schemaContext);
+        this.xmlBodyReader = new XmlNormalizedNodeBodyReader(schemaContextHandler);
     }
 
     @Override
@@ -74,7 +74,6 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mountPointService);
         when(mountPointService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountPoint));
         when(mountPoint.getSchemaContext()).thenReturn(schemaContext);
-        SchemaContextHandler.setSchemaContext(schemaContext);
     }
 
     @Test

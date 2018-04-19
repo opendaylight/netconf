@@ -11,23 +11,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.util.concurrent.Futures;
 import java.net.URI;
 import java.util.Set;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -55,15 +51,7 @@ public class RestconfOperationsServiceTest {
     public void init() throws Exception {
         MockitoAnnotations.initMocks(this);
         this.schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
-
-        final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
-        final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
-        Mockito.when(txHandler.get()).thenReturn(domTx);
-        final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
-        Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        Mockito.when(wTx.submit()).thenReturn(Futures.immediateCheckedFuture(null));
-        this.schemaContextHandler = new SchemaContextHandler(txHandler);
-        this.schemaContextHandler.onGlobalContextUpdated(this.schemaContext);
+        this.schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
 
         this.domMountPointServiceHandler = new DOMMountPointServiceHandler(this.domMountPointService);
 

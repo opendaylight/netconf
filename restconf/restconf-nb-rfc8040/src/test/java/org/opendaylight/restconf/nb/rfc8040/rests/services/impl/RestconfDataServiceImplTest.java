@@ -45,6 +45,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -184,7 +185,8 @@ public class RestconfDataServiceImplTest {
 
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
 
-        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(transactionChainHandler);
+        final SchemaContextHandler schemaContextHandler = SchemaContextHandler.newInstance(transactionChainHandler,
+                Mockito.mock(DOMSchemaService.class));
 
         schemaContextHandler.onGlobalContextUpdated(this.contextRef.get());
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,

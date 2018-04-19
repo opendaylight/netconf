@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.Application;
+import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeXmlBodyWriter;
@@ -24,14 +25,13 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.schema.SchemaExport
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl;
 
 public class RestconfApplication extends Application {
+    private final SchemaContextHandler schemaContextHandler = SchemaContextHandler.instance();
 
     @Override
     public Set<Class<?>> getClasses() {
         return ImmutableSet.<Class<?>>builder()
                 .add(NormalizedNodeJsonBodyWriter.class).add(NormalizedNodeXmlBodyWriter.class)
-                .add(JsonNormalizedNodeBodyReader.class).add(XmlNormalizedNodeBodyReader.class)
                 .add(SchemaExportContentYinBodyWriter.class).add(SchemaExportContentYangBodyWriter.class)
-                .add(JsonToPatchBodyReader.class).add(XmlToPatchBodyReader.class)
                 .add(PatchJsonBodyWriter.class).add(PatchXmlBodyWriter.class)
                 .build();
     }
@@ -40,6 +40,10 @@ public class RestconfApplication extends Application {
     public Set<Object> getSingletons() {
         final Set<Object> singletons = new HashSet<>();
         singletons.add(ServicesWrapperImpl.getInstance());
+        singletons.add(new JsonNormalizedNodeBodyReader(schemaContextHandler));
+        singletons.add(new JsonToPatchBodyReader(schemaContextHandler));
+        singletons.add(new XmlNormalizedNodeBodyReader(schemaContextHandler));
+        singletons.add(new XmlToPatchBodyReader(schemaContextHandler));
         return singletons;
     }
 }

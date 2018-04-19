@@ -7,18 +7,13 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.services.simple.impl;
 
-import com.google.common.util.concurrent.CheckedFuture;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -29,18 +24,7 @@ public class RestconfImplTest {
     public void restImplTest() throws Exception {
         final SchemaContext schemaContext =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/restconf/impl"));
-
-        final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
-        final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
-        Mockito.when(txHandler.get()).thenReturn(domTx);
-        final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
-        Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        final CheckedFuture<Void, TransactionCommitFailedException> checked = Mockito.mock(CheckedFuture.class);
-        Mockito.when(wTx.submit()).thenReturn(checked);
-        Mockito.when(checked.checkedGet()).thenReturn(null);
-        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler);
-        schemaContextHandler.onGlobalContextUpdated(schemaContext);
-
+        final SchemaContextHandler schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
         final RestconfImpl restconfImpl = new RestconfImpl(schemaContextHandler);
         final NormalizedNodeContext libraryVersion = restconfImpl.getLibraryVersion();
         final LeafNode<?> value = (LeafNode<?>) libraryVersion.getData();

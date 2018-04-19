@@ -23,7 +23,9 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -34,14 +36,17 @@ public abstract class AbstractBodyReaderTest {
             mock(DOMMountPointServiceHandler.class);
 
     protected final MediaType mediaType;
+    protected final SchemaContextHandler schemaContextHandler;
 
-    protected AbstractBodyReaderTest() throws NoSuchFieldException, IllegalAccessException {
+    protected AbstractBodyReaderTest(SchemaContext schemaContext) throws NoSuchFieldException, IllegalAccessException {
         mediaType = getMediaType();
 
         final Field mountPointServiceHandlerField =
                 RestConnectorProvider.class.getDeclaredField("mountPointServiceHandler");
         mountPointServiceHandlerField.setAccessible(true);
         mountPointServiceHandlerField.set(RestConnectorProvider.class, MOUNT_POINT_SERVICE_HANDLER);
+
+        schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
     }
 
     protected abstract MediaType getMediaType();
