@@ -23,7 +23,7 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.PatchXmlBodyW
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.XmlToPatchBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.schema.SchemaExportContentYangBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.schema.SchemaExportContentYinBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl;
+import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
 
 public class RestconfApplication extends Application {
     private final SchemaContextHandler schemaContextHandler = SchemaContextHandler.instance();
@@ -41,7 +41,7 @@ public class RestconfApplication extends Application {
     @Override
     public Set<Object> getSingletons() {
         final Set<Object> singletons = new HashSet<>();
-        singletons.add(ServicesWrapperImpl.getInstance());
+        singletons.add(ServicesWrapper.getInstance());
         singletons.add(new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler));
         singletons.add(new JsonToPatchBodyReader(schemaContextHandler, mountPointServiceHandler));
         singletons.add(new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler));

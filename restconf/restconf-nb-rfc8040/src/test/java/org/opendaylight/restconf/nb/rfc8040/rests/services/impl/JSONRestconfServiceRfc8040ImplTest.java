@@ -58,7 +58,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl;
+import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -180,12 +180,12 @@ public class JSONRestconfServiceRfc8040ImplTest {
                 DOMMountPointServiceHandler.newInstance(mockMountPointService);
 
         final DOMNotificationService mockNotificationService = mock(DOMNotificationService.class);
-        ServicesWrapperImpl.getInstance().setHandlers(schemaContextHandler, mountPointServiceHandler,
-                txChainHandler, new DOMDataBrokerHandler(mockDOMDataBroker),
-                new RpcServiceHandler(mockRpcService),
-                new NotificationServiceHandler(mockNotificationService), domSchemaService);
+        final ServicesWrapper servicesWrapper = ServicesWrapper.newInstance(schemaContextHandler,
+                mountPointServiceHandler, txChainHandler, new DOMDataBrokerHandler(mockDOMDataBroker),
+                new RpcServiceHandler(mockRpcService), new NotificationServiceHandler(mockNotificationService),
+                domSchemaService);
 
-        service = new JSONRestconfServiceRfc8040Impl(ServicesWrapperImpl.getInstance(), mountPointServiceHandler,
+        service = new JSONRestconfServiceRfc8040Impl(servicesWrapper, mountPointServiceHandler,
                 schemaContextHandler);
     }
 
