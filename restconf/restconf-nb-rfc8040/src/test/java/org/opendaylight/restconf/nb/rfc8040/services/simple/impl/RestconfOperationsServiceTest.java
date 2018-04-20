@@ -53,7 +53,7 @@ public class RestconfOperationsServiceTest {
         this.schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules"));
         this.schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
 
-        this.domMountPointServiceHandler = new DOMMountPointServiceHandler(this.domMountPointService);
+        this.domMountPointServiceHandler = DOMMountPointServiceHandler.newInstance(this.domMountPointService);
 
         final QNameModule module1 = QNameModule.create(URI.create("module:1"));
         final QNameModule module2 = QNameModule.create(URI.create("module:2"));

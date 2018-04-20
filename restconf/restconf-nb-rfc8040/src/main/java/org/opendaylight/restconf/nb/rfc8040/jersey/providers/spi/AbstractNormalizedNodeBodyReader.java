@@ -12,6 +12,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
+import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 
 /**
@@ -22,8 +23,9 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 @Beta
 public abstract class AbstractNormalizedNodeBodyReader
         extends AbstractIdentifierAwareJaxRsProvider<NormalizedNodeContext> {
-    protected AbstractNormalizedNodeBodyReader(SchemaContextHandler schemaContextHandler) {
-        super(schemaContextHandler);
+    protected AbstractNormalizedNodeBodyReader(SchemaContextHandler schemaContextHandler,
+            DOMMountPointServiceHandler mountPointServiceHandler) {
+        super(schemaContextHandler, mountPointServiceHandler);
     }
 
     public final void injectParams(final UriInfo uriInfo, final Request request) {

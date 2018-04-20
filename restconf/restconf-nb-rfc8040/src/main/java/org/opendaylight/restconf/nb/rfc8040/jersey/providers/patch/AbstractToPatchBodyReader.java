@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
 
@@ -18,8 +19,9 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentif
  * @author Robert Varga
  */
 abstract class AbstractToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider<PatchContext> {
-    protected AbstractToPatchBodyReader(SchemaContextHandler schemaContextHandler) {
-        super(schemaContextHandler);
+    protected AbstractToPatchBodyReader(SchemaContextHandler schemaContextHandler,
+            DOMMountPointServiceHandler mountPointServiceHandler) {
+        super(schemaContextHandler, mountPointServiceHandler);
     }
 
     @Override

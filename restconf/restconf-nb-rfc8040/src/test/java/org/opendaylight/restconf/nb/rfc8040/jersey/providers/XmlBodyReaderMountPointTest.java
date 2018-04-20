@@ -11,11 +11,7 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
@@ -25,7 +21,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -54,7 +49,7 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
     public XmlBodyReaderMountPointTest() throws Exception {
         super(schemaContext);
-        this.xmlBodyReader = new XmlNormalizedNodeBodyReader(schemaContextHandler);
+        this.xmlBodyReader = new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler);
     }
 
     @Override
@@ -67,13 +62,6 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/invoke-rpc"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
-
-        final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
-        final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
-
-        when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mountPointService);
-        when(mountPointService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountPoint));
-        when(mountPoint.getSchemaContext()).thenReturn(schemaContext);
     }
 
     @Test

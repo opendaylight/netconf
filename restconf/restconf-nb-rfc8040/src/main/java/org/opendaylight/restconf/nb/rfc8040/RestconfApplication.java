@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.Application;
+import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeJsonBodyWriter;
@@ -26,6 +27,7 @@ import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl
 
 public class RestconfApplication extends Application {
     private final SchemaContextHandler schemaContextHandler = SchemaContextHandler.instance();
+    private final DOMMountPointServiceHandler mountPointServiceHandler = DOMMountPointServiceHandler.instance();
 
     @Override
     public Set<Class<?>> getClasses() {
@@ -40,10 +42,10 @@ public class RestconfApplication extends Application {
     public Set<Object> getSingletons() {
         final Set<Object> singletons = new HashSet<>();
         singletons.add(ServicesWrapperImpl.getInstance());
-        singletons.add(new JsonNormalizedNodeBodyReader(schemaContextHandler));
-        singletons.add(new JsonToPatchBodyReader(schemaContextHandler));
-        singletons.add(new XmlNormalizedNodeBodyReader(schemaContextHandler));
-        singletons.add(new XmlToPatchBodyReader(schemaContextHandler));
+        singletons.add(new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler));
+        singletons.add(new JsonToPatchBodyReader(schemaContextHandler, mountPointServiceHandler));
+        singletons.add(new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler));
+        singletons.add(new XmlToPatchBodyReader(schemaContextHandler, mountPointServiceHandler));
         return singletons;
     }
 }

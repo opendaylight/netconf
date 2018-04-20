@@ -195,7 +195,8 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
 
         final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
 
-        JsonToPatchBodyReader jsonToPatchBodyReader = new JsonToPatchBodyReader(schemaContextHandler);
+        JsonToPatchBodyReader jsonToPatchBodyReader =
+                new JsonToPatchBodyReader(schemaContextHandler, mountPointServiceHandler);
         final PatchContext context = jsonToPatchBodyReader.readFrom(uriPath, entityStream);
 
         LOG.debug("Parsed YangInstanceIdentifier: {}", context.getInstanceIdentifierContext().getInstanceIdentifier());

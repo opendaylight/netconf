@@ -22,8 +22,9 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
+import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
-import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
+import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
@@ -38,9 +39,12 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
     private Request request;
 
     private final SchemaContextHandler schemaContextHandler;
+    private final DOMMountPointServiceHandler mountPointServiceHandler;
 
-    protected AbstractIdentifierAwareJaxRsProvider(SchemaContextHandler schemaContextHandler) {
+    protected AbstractIdentifierAwareJaxRsProvider(SchemaContextHandler schemaContextHandler,
+            DOMMountPointServiceHandler mountPointServiceHandler) {
         this.schemaContextHandler = schemaContextHandler;
+        this.mountPointServiceHandler = mountPointServiceHandler;
     }
 
     @Override
@@ -86,7 +90,7 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
 
     private InstanceIdentifierContext<?> getInstanceIdentifierContext() {
         return ParserIdentifier.toInstanceIdentifier(getIdentifier(), getSchemaContext(),
-                Optional.of(RestConnectorProvider.getMountPointService()));
+                Optional.fromNullable(getMountPointService()));
     }
 
     protected UriInfo getUriInfo() {
@@ -95,6 +99,10 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
 
     protected SchemaContext getSchemaContext() {
         return schemaContextHandler.get();
+    }
+
+    protected DOMMountPointService getMountPointService() {
+        return mountPointServiceHandler.get();
     }
 
     protected boolean isPost() {

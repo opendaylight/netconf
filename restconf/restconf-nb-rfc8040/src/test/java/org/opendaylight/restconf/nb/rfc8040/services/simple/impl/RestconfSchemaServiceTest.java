@@ -63,8 +63,6 @@ public class RestconfSchemaServiceTest {
     @Mock
     private SchemaContextHandler mockContextHandler;
     @Mock
-    private DOMMountPointServiceHandler mockMountPointHandler;
-    @Mock
     private DOMYangTextSourceProvider sourceProvider;
 
     // schema context with modules
@@ -107,10 +105,9 @@ public class RestconfSchemaServiceTest {
         this.mountPointService = new DOMMountPointServiceImpl();
         ((DOMMountPointServiceImpl) this.mountPointService).registerMountPoint(this.mountPoint);
         ((DOMMountPointServiceImpl) this.mountPointService).registerMountPoint(this.mountPointWithNullSchemaContext);
-        when(this.mockMountPointHandler.get()).thenReturn(this.mountPointService);
 
-        this.schemaService = new RestconfSchemaServiceImpl(this.mockContextHandler, this.mockMountPointHandler,
-                sourceProvider);
+        this.schemaService = new RestconfSchemaServiceImpl(this.mockContextHandler,
+                DOMMountPointServiceHandler.newInstance(mountPointService), sourceProvider);
     }
 
     /**

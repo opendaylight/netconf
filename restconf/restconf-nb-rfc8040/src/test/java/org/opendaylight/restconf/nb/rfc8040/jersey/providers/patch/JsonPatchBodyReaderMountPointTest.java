@@ -11,22 +11,15 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
 import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.JsonBodyReaderTest;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
@@ -37,7 +30,7 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
     public JsonPatchBodyReaderMountPointTest() throws Exception {
         super(schemaContext);
-        jsonToPatchBodyReader = new JsonToPatchBodyReader(schemaContextHandler);
+        jsonToPatchBodyReader = new JsonToPatchBodyReader(schemaContextHandler, mountPointServiceHandler);
     }
 
     @Override
@@ -48,13 +41,6 @@ public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
     @BeforeClass
     public static void initialization() {
         schemaContext = schemaContextLoader("/instanceidentifier/yang", schemaContext);
-
-        final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
-        final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
-
-        when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mountPointService);
-        when(mountPointService.getMountPoint(any(YangInstanceIdentifier.class))).thenReturn(Optional.of(mountPoint));
-        when(mountPoint.getSchemaContext()).thenReturn(schemaContext);
     }
 
     @Test

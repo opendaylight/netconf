@@ -101,8 +101,6 @@ public class RestconfDataServiceImplTest {
     @Mock
     private DOMDataWriteTransaction write;
     @Mock
-    private DOMMountPointServiceHandler mountPointServiceHandler;
-    @Mock
     private DOMMountPointService mountPointService;
     @Mock
     private DOMMountPoint mountPoint;
@@ -190,8 +188,7 @@ public class RestconfDataServiceImplTest {
 
         schemaContextHandler.onGlobalContextUpdated(this.contextRef.get());
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,
-                this.mountPointServiceHandler, this.delegRestconfSubscrService);
-        doReturn(this.mountPointService).when(this.mountPointServiceHandler).get();
+                DOMMountPointServiceHandler.newInstance(mountPointService), this.delegRestconfSubscrService);
         doReturn(Optional.of(this.mountPoint)).when(this.mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(this.contextRef.get()).when(this.mountPoint).getSchemaContext();

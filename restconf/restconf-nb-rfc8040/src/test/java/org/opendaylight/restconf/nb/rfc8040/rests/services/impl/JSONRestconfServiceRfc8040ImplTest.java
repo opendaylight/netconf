@@ -51,7 +51,6 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
@@ -178,7 +177,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         final TransactionChainHandler txChainHandler = new TransactionChainHandler(mockDOMDataBroker);
 
         final DOMMountPointServiceHandler mountPointServiceHandler =
-                new DOMMountPointServiceHandler(mockMountPointService);
+                DOMMountPointServiceHandler.newInstance(mockMountPointService);
 
         final DOMNotificationService mockNotificationService = mock(DOMNotificationService.class);
         ServicesWrapperImpl.getInstance().setHandlers(schemaContextHandler, mountPointServiceHandler,
@@ -188,9 +187,6 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         service = new JSONRestconfServiceRfc8040Impl(ServicesWrapperImpl.getInstance(), mountPointServiceHandler,
                 schemaContextHandler);
-
-        new RestConnectorProvider<>(mockDOMDataBroker, domSchemaService, mockRpcService, mockNotificationService,
-                mockMountPointService, txChainHandler, schemaContextHandler, null).start();
     }
 
     private static String loadData(final String path) throws IOException {

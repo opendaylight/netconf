@@ -24,6 +24,7 @@ import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl;
@@ -59,8 +60,9 @@ public class RestConnectorProviderTest {
 
         final TransactionChainHandler transactionChainHandler = new TransactionChainHandler(mockDataBroker);
         this.connectorProvider = new RestConnectorProvider<>(mockDataBroker, domSchemaService, mockRpcService,
-                mockNotificationService, mockMountPointService, transactionChainHandler,
+                mockNotificationService, transactionChainHandler,
                 SchemaContextHandler.newInstance(transactionChainHandler, domSchemaService),
+                DOMMountPointServiceHandler.newInstance(mockMountPointService),
                 ServicesWrapperImpl.getInstance());
     }
 

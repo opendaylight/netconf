@@ -10,8 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
 import java.io.File;
@@ -22,7 +20,6 @@ import java.util.Collection;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
@@ -49,7 +46,7 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
 
     public JsonBodyReaderTest() throws Exception {
         super(schemaContext);
-        this.jsonBodyReader = new JsonNormalizedNodeBodyReader(schemaContextHandler);
+        this.jsonBodyReader = new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler);
     }
 
     @Override
@@ -63,7 +60,6 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
         final Collection<File> testFiles = TestRestconfUtils.loadFiles("/instanceidentifier/yang");
         testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
-        when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mock(DOMMountPointService.class));
     }
 
     @Test

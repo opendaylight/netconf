@@ -34,6 +34,7 @@ import org.opendaylight.restconf.common.patch.PatchEditOperation;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.codecs.StringModuleInstanceIdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
@@ -67,8 +68,9 @@ public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(XmlToPatchBodyReader.class);
     private static final Splitter SLASH_SPLITTER = Splitter.on('/');
 
-    public XmlToPatchBodyReader(SchemaContextHandler schemaContextHandler) {
-        super(schemaContextHandler);
+    public XmlToPatchBodyReader(SchemaContextHandler schemaContextHandler,
+            DOMMountPointServiceHandler mountPointServiceHandler) {
+        super(schemaContextHandler, mountPointServiceHandler);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
