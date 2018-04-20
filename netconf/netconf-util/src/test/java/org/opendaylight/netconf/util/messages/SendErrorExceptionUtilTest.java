@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.util.messages;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -19,11 +20,13 @@ import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class SendErrorExceptionUtilTest {
 
@@ -61,5 +64,16 @@ public class SendErrorExceptionUtilTest {
         Document helloMessage = XmlFileLoader.xmlFileToDocument("netconfMessages/rpc.xml");
         SendErrorExceptionUtil.sendErrorMessage(netconfSession, exception, new NetconfMessage(helloMessage));
         verify(channelFuture, times(1)).addListener(any(GenericFutureListener.class));
+    }
+
+    @Test
+    public void testSendErrorMessage4() throws Exception {
+        Document helloMessage = XmlFileLoader.xmlFileToDocument("netconfMessages/rpc_ns.xml");
+        SendErrorExceptionUtil.sendErrorMessage(netconfSession, exception, new NetconfMessage(helloMessage));
+        final ArgumentCaptor<NetconfMessage> messageCaptor = ArgumentCaptor.forClass(NetconfMessage.class);
+        verify(netconfSession, times(1)).sendMessage(messageCaptor.capture());
+        final Element rpcReply = messageCaptor.getValue().getDocument().getDocumentElement();
+        assertEquals("Invalid value of message-id attribute in the reply message", "a",
+            rpcReply.getAttribute("message-id"));
     }
 }

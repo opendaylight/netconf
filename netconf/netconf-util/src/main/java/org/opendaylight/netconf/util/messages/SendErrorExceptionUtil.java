@@ -61,7 +61,7 @@ public final class SendErrorExceptionUtil {
             final DocumentedException sendErrorException) {
         try {
             final Element incommingRpc = incommingDocument.getDocumentElement();
-            Preconditions.checkState(incommingRpc.getTagName().equals(XmlNetconfConstants.RPC_KEY),
+            Preconditions.checkState(incommingRpc.getLocalName().equals(XmlNetconfConstants.RPC_KEY),
                     "Missing %s element", XmlNetconfConstants.RPC_KEY);
 
             final Element rpcReply = errorDocument.getDocumentElement();
