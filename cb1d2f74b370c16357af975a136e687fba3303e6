@@ -34,6 +34,24 @@
       "revId": "cb1d2f74b370c16357af975a136e687fba3303e6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6f08074f_b7494c3d",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/RestconfApplication.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2018-04-20T10:35:15Z",
+      "side": 1,
+      "message": "https://stackoverflow.com/questions/30591733/request-scoped-context-field-injections-into-resteasy-singletons seems to confirm this.",
+      "parentUuid": "d9a7b3d2_0421a87a",
+      "revId": "cb1d2f74b370c16357af975a136e687fba3303e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
