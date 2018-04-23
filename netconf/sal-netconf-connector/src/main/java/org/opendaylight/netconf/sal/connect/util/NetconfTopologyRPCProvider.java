@@ -14,13 +14,16 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import java.util.concurrent.Future;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.CreateDeviceInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.CreateDeviceOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.CreateDeviceOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.DeleteDeviceInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.DeleteDeviceOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.DeleteDeviceOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeTopologyService;
@@ -43,10 +46,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyRPCProvider.class);
+
     private final AAAEncryptionService encryptionService;
     private final DataBroker dataBroker;
     private final String topologyId;
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyRPCProvider.class);
 
     public NetconfTopologyRPCProvider(final DataBroker dataBroker,
                                       final AAAEncryptionService encryptionService,
@@ -57,9 +61,9 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
     }
 
     @Override
-    public Future<RpcResult<Void>> createDevice(final CreateDeviceInput input) {
+    public ListenableFuture<RpcResult<CreateDeviceOutput>> createDevice(final CreateDeviceInput input) {
         final NetconfNode node = this.encryptPassword(input);
-        final SettableFuture<RpcResult<Void>> futureResult = SettableFuture.create();
+        final SettableFuture<RpcResult<CreateDeviceOutput>> futureResult = SettableFuture.create();
         final NodeId nodeId = new NodeId(input.getNodeId());
         writeToConfigDS(node, nodeId, futureResult);
         return futureResult;
@@ -92,7 +96,7 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
     }
 
     private void writeToConfigDS(final NetconfNode node, final NodeId nodeId,
-                                 final SettableFuture<RpcResult<Void>> futureResult) {
+            final SettableFuture<RpcResult<CreateDeviceOutput>> futureResult) {
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         final InstanceIdentifier<NetworkTopology> networkTopologyId =
@@ -107,7 +111,7 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
             @Override
             public void onSuccess(final Void result) {
                 LOG.info("add-netconf-node RPC: Added netconf node successfully.");
-                futureResult.set(RpcResultBuilder.<Void>success().build());
+                futureResult.set(RpcResultBuilder.success(new CreateDeviceOutputBuilder().build()).build());
             }
 
             @Override
@@ -120,7 +124,7 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
 
 
     @Override
-    public Future<RpcResult<Void>> deleteDevice(final DeleteDeviceInput input) {
+    public ListenableFuture<RpcResult<DeleteDeviceOutput>> deleteDevice(final DeleteDeviceInput input) {
         final NodeId nodeId = new NodeId(input.getNodeId());
 
         final InstanceIdentifier<NetworkTopology> networkTopologyId =
@@ -133,14 +137,14 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
         wtx.delete(LogicalDatastoreType.CONFIGURATION, niid);
 
         final ListenableFuture<Void> future = wtx.submit();
-        final SettableFuture<RpcResult<Void>> rpcFuture = SettableFuture.create();
+        final SettableFuture<RpcResult<DeleteDeviceOutput>> rpcFuture = SettableFuture.create();
 
         Futures.addCallback(future, new FutureCallback<Void>() {
 
             @Override
             public void onSuccess(final Void result) {
                 LOG.info("delete-device RPC: Removed netconf node successfully.");
-                rpcFuture.set(RpcResultBuilder.<Void>success().build());
+                rpcFuture.set(RpcResultBuilder.success(new DeleteDeviceOutputBuilder().build()).build());
             }
 
             @Override

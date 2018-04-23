@@ -16,6 +16,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
@@ -44,6 +44,8 @@ import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.even
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventaggregator.rev141202.TopicId;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventaggregator.rev141202.TopicNotification;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.DisJoinTopicInput;
+import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.DisJoinTopicOutput;
+import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.DisJoinTopicOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.JoinTopicInput;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.JoinTopicOutput;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.JoinTopicOutputBuilder;
@@ -149,7 +151,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
     }
 
     @Override
-    public Future<RpcResult<JoinTopicOutput>> joinTopic(final JoinTopicInput input) {
+    public ListenableFuture<RpcResult<JoinTopicOutput>> joinTopic(final JoinTopicInput input) {
         LOG.debug("Join topic {} on {}", input.getTopicId().getValue(), mount.getNodeId());
         final NotificationPattern notificationPattern = input.getNotificationPattern();
         final List<SchemaPath> matchingNotifications = getMatchingNotifications(notificationPattern);
@@ -158,14 +160,14 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
     }
 
     @Override
-    public Future<RpcResult<Void>> disJoinTopic(final DisJoinTopicInput input) {
+    public ListenableFuture<RpcResult<DisJoinTopicOutput>> disJoinTopic(final DisJoinTopicInput input) {
         for (NotificationTopicRegistration reg : notificationTopicRegistrations.values()) {
             reg.unRegisterNotificationTopic(input.getTopicId());
         }
-        return Util.resultRpcSuccessFor((Void) null);
+        return Util.resultRpcSuccessFor(new DisJoinTopicOutputBuilder().build());
     }
 
-    private synchronized Future<RpcResult<JoinTopicOutput>> registerTopic(
+    private synchronized ListenableFuture<RpcResult<JoinTopicOutput>> registerTopic(
             final TopicId topicId,
             final List<SchemaPath> notificationsToSubscribe) {
         Preconditions.checkNotNull(notificationsToSubscribe);
