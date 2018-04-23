@@ -11,10 +11,10 @@ package org.opendaylight.netconf.sal.connect.util;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -23,14 +23,26 @@ import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntryInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntryOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddKeystoreEntryOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddTrustedCertificateOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.KeystoreBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.NetconfKeystoreService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemoveKeystoreEntryInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemoveKeystoreEntryOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemoveKeystoreEntryOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemovePrivateKeyInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemovePrivateKeyOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemovePrivateKeyOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemoveTrustedCertificateInput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemoveTrustedCertificateOutput;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.RemoveTrustedCertificateOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017._private.keys.PrivateKeyKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
@@ -80,7 +92,8 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
     }
 
     @Override
-    public Future<RpcResult<Void>> removeKeystoreEntry(final RemoveKeystoreEntryInput input) {
+    public ListenableFuture<RpcResult<RemoveKeystoreEntryOutput>> removeKeystoreEntry(
+            final RemoveKeystoreEntryInput input) {
         LOG.debug("Removing keypairs: {}", input);
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
@@ -91,15 +104,14 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
                     keystoreIid.child(KeyCredential.class, new KeyCredentialKey(id)));
         }
 
-        final SettableFuture<RpcResult<Void>> rpcResult = SettableFuture.create();
+        final SettableFuture<RpcResult<RemoveKeystoreEntryOutput>> rpcResult = SettableFuture.create();
 
-        final CheckedFuture<Void, TransactionCommitFailedException> submit = writeTransaction.submit();
+        final ListenableFuture<Void> submit = writeTransaction.submit();
         Futures.addCallback(submit, new FutureCallback<Void>() {
             @Override
             public void onSuccess(@Nullable final Void result) {
                 LOG.debug("remove-key-pair success. Input: {}");
-                final RpcResult<Void> success = RpcResultBuilder.<Void>success().build();
-                rpcResult.set(success);
+                rpcResult.set(RpcResultBuilder.success(new RemoveKeystoreEntryOutputBuilder().build()).build());
             }
 
             @Override
@@ -113,7 +125,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
     }
 
     @Override
-    public Future<RpcResult<Void>> addKeystoreEntry(final AddKeystoreEntryInput input) {
+    public ListenableFuture<RpcResult<AddKeystoreEntryOutput>> addKeystoreEntry(final AddKeystoreEntryInput input) {
         LOG.debug("Adding keypairs: {}", input);
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
@@ -128,15 +140,14 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
                     keystoreIid.child(KeyCredential.class, keypair.getKey()), keypair);
         }
 
-        final SettableFuture<RpcResult<Void>> rpcResult = SettableFuture.create();
+        final SettableFuture<RpcResult<AddKeystoreEntryOutput>> rpcResult = SettableFuture.create();
 
-        final CheckedFuture<Void, TransactionCommitFailedException> submit = writeTransaction.submit();
+        final ListenableFuture<Void> submit = writeTransaction.submit();
         Futures.addCallback(submit, new FutureCallback<Void>() {
             @Override
             public void onSuccess(@Nullable final Void result) {
                 LOG.debug("add-key-pair success. Input: {}");
-                final RpcResult<Void> success = RpcResultBuilder.<Void>success().build();
-                rpcResult.set(success);
+                rpcResult.set(RpcResultBuilder.success(new AddKeystoreEntryOutputBuilder().build()).build());
             }
 
             @Override
@@ -150,7 +161,8 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
     }
 
     @Override
-    public Future<RpcResult<Void>> addTrustedCertificate(AddTrustedCertificateInput input) {
+    public ListenableFuture<RpcResult<AddTrustedCertificateOutput>> addTrustedCertificate(
+            final AddTrustedCertificateInput input) {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
 
         for (TrustedCertificate certificate : input.getTrustedCertificate()) {
@@ -158,15 +170,14 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
                     keystoreIid.child(TrustedCertificate.class, certificate.getKey()), certificate);
         }
 
-        final SettableFuture<RpcResult<Void>> rpcResult = SettableFuture.create();
+        final SettableFuture<RpcResult<AddTrustedCertificateOutput>> rpcResult = SettableFuture.create();
 
-        final CheckedFuture<Void, TransactionCommitFailedException> submit = writeTransaction.submit();
+        final ListenableFuture<Void> submit = writeTransaction.submit();
         Futures.addCallback(submit, new FutureCallback<Void>() {
             @Override
-            public void onSuccess(@Nullable Void result) {
+            public void onSuccess(@Nullable final Void result) {
                 LOG.debug("add-trusted-certificate success. Input: {}", input);
-                final RpcResult<Void> success = RpcResultBuilder.<Void>success().build();
-                rpcResult.set(success);
+                rpcResult.set(RpcResultBuilder.success(new AddTrustedCertificateOutputBuilder().build()).build());
             }
 
             @Override
@@ -180,7 +191,8 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
     }
 
     @Override
-    public Future<RpcResult<Void>> removeTrustedCertificate(RemoveTrustedCertificateInput input) {
+    public ListenableFuture<RpcResult<RemoveTrustedCertificateOutput>> removeTrustedCertificate(
+            final RemoveTrustedCertificateInput input) {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         final List<String> names = input.getName();
 
@@ -189,15 +201,14 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
                     keystoreIid.child(TrustedCertificate.class, new TrustedCertificateKey(name)));
         }
 
-        final SettableFuture<RpcResult<Void>> rpcResult = SettableFuture.create();
+        final SettableFuture<RpcResult<RemoveTrustedCertificateOutput>> rpcResult = SettableFuture.create();
 
-        final CheckedFuture<Void, TransactionCommitFailedException> submit = writeTransaction.submit();
+        final ListenableFuture<Void> submit = writeTransaction.submit();
         Futures.addCallback(submit, new FutureCallback<Void>() {
             @Override
-            public void onSuccess(@Nullable Void result) {
+            public void onSuccess(@Nullable final Void result) {
                 LOG.debug("remove-trusted-certificate success. Input: {}", input);
-                final RpcResult<Void> success = RpcResultBuilder.<Void>success().build();
-                rpcResult.set(success);
+                rpcResult.set(RpcResultBuilder.success(new RemoveTrustedCertificateOutputBuilder().build()).build());
             }
 
             @Override
@@ -211,7 +222,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
     }
 
     @Override
-    public Future<RpcResult<Void>> addPrivateKey(AddPrivateKeyInput input) {
+    public ListenableFuture<RpcResult<AddPrivateKeyOutput>> addPrivateKey(final AddPrivateKeyInput input) {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
 
         for (PrivateKey key: input.getPrivateKey()) {
@@ -219,15 +230,14 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
                     keystoreIid.child(PrivateKey.class, key.getKey()), key);
         }
 
-        final SettableFuture<RpcResult<Void>> rpcResult = SettableFuture.create();
+        final SettableFuture<RpcResult<AddPrivateKeyOutput>> rpcResult = SettableFuture.create();
 
-        final CheckedFuture<Void, TransactionCommitFailedException> submit = writeTransaction.submit();
+        final ListenableFuture<Void> submit = writeTransaction.submit();
         Futures.addCallback(submit, new FutureCallback<Void>() {
             @Override
-            public void onSuccess(@Nullable Void result) {
+            public void onSuccess(@Nullable final Void result) {
                 LOG.debug("add-private-key success. Input: {}", input);
-                final RpcResult<Void> success = RpcResultBuilder.<Void>success().build();
-                rpcResult.set(success);
+                rpcResult.set(RpcResultBuilder.success(new AddPrivateKeyOutputBuilder().build()).build());
             }
 
             @Override
@@ -241,7 +251,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
     }
 
     @Override
-    public Future<RpcResult<Void>> removePrivateKey(RemovePrivateKeyInput input) {
+    public ListenableFuture<RpcResult<RemovePrivateKeyOutput>> removePrivateKey(final RemovePrivateKeyInput input) {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         final List<String> names = input.getName();
 
@@ -250,15 +260,14 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
                     keystoreIid.child(PrivateKey.class, new PrivateKeyKey(name)));
         }
 
-        final SettableFuture<RpcResult<Void>> rpcResult = SettableFuture.create();
+        final SettableFuture<RpcResult<RemovePrivateKeyOutput>> rpcResult = SettableFuture.create();
 
-        final CheckedFuture<Void, TransactionCommitFailedException> submit = writeTransaction.submit();
+        final ListenableFuture<Void> submit = writeTransaction.submit();
         Futures.addCallback(submit, new FutureCallback<Void>() {
             @Override
-            public void onSuccess(@Nullable Void result) {
+            public void onSuccess(@Nullable final Void result) {
                 LOG.debug("remove-private-key success. Input: {}", input);
-                final RpcResult<Void> success = RpcResultBuilder.<Void>success().build();
-                rpcResult.set(success);
+                rpcResult.set(RpcResultBuilder.success(new RemovePrivateKeyOutputBuilder().build()).build());
             }
 
             @Override
