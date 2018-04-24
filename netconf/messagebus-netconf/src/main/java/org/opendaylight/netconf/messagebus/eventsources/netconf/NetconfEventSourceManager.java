@@ -79,7 +79,7 @@ public final class NetconfEventSourceManager implements DataTreeChangeListener<N
     }
 
     @Override
-    public void onDataTreeChanged(Collection<DataTreeModification<Node>> changes) {
+    public void onDataTreeChanged(final Collection<DataTreeModification<Node>> changes) {
         for (DataTreeModification<Node> change: changes) {
             LOG.debug("DataTreeModification: {}", change);
             final DataObjectModification<Node> rootNode = change.getRootNode();
@@ -123,11 +123,8 @@ public final class NetconfEventSourceManager implements DataTreeChangeListener<N
         }
     }
 
-    private boolean validateNode(final Node node) {
-        if (node == null) {
-            return false;
-        }
-        return isNetconfNode(node);
+    private static boolean validateNode(final Node node) {
+        return node == null ? false : isNetconfNode(node);
     }
 
     Map<String, String> getStreamMap() {
@@ -151,12 +148,12 @@ public final class NetconfEventSourceManager implements DataTreeChangeListener<N
      *
      * @param streamMap Stream map
      */
-    public void setStreamMap(Map<String, String> streamMap) {
+    public void setStreamMap(final Map<String, String> streamMap) {
         this.streamMap = streamMap;
     }
 
-    private boolean isNetconfNode(final Node node) {
-        return node.getAugmentation(NetconfNode.class) != null;
+    private static boolean isNetconfNode(final Node node) {
+        return node.augmentation(NetconfNode.class) != null;
     }
 
     @Override

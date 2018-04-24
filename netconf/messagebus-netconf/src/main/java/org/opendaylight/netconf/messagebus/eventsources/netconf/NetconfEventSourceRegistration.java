@@ -60,7 +60,7 @@ public final class NetconfEventSourceRegistration implements AutoCloseable {
     }
 
     private static boolean isEventSource(final Node node) {
-        final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
+        final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
         if (netconfNode == null) {
             return false;
         }
@@ -92,7 +92,7 @@ public final class NetconfEventSourceRegistration implements AutoCloseable {
     }
 
     NetconfNode getNetconfNode() {
-        return node.getAugmentation(NetconfNode.class);
+        return node.augmentation(NetconfNode.class);
     }
 
     void updateStatus() {
@@ -104,12 +104,12 @@ public final class NetconfEventSourceRegistration implements AutoCloseable {
         changeStatus(netconfConnStatus);
     }
 
-    private boolean checkConnectionStatusType(ConnectionStatus status) {
+    private static boolean checkConnectionStatusType(final ConnectionStatus status) {
         return status == ConnectionStatus.Connected || status == ConnectionStatus.Connecting
                 || status == ConnectionStatus.UnableToConnect;
     }
 
-    private void changeStatus(ConnectionStatus newStatus) {
+    private void changeStatus(final ConnectionStatus newStatus) {
         Preconditions.checkNotNull(newStatus);
         Preconditions.checkState(this.currentNetconfConnStatus != null);
         if (!checkConnectionStatusType(newStatus)) {
@@ -155,7 +155,7 @@ public final class NetconfEventSourceRegistration implements AutoCloseable {
         this.eventSourceRegistration = registration;
     }
 
-    private YangInstanceIdentifier domMountPath(final NodeId nodeId) {
+    private static YangInstanceIdentifier domMountPath(final NodeId nodeId) {
         return YangInstanceIdentifier.builder(NETCONF_DEVICE_DOM_PATH)
                 .nodeWithKey(Node.QNAME, NODE_ID_QNAME, nodeId.getValue()).build();
     }

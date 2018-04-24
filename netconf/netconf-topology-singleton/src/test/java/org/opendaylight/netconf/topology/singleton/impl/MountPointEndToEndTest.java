@@ -451,7 +451,7 @@ public class MountPointEndToEndTest {
                 Optional<Node> node = readTx.read(LogicalDatastoreType.OPERATIONAL,
                         NODE_INSTANCE_ID).get(5, TimeUnit.SECONDS);
                 assertTrue(node.isPresent());
-                final NetconfNode netconfNode = node.get().getAugmentation(NetconfNode.class);
+                final NetconfNode netconfNode = node.get().augmentation(NetconfNode.class);
                 return netconfNode.getConnectionStatus() != NetconfNodeConnectionStatus.ConnectionStatus.Connected;
             }
         });

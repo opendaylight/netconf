@@ -171,7 +171,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
 
                 builder.setLocation(transformLocations(cap.getLocation()));
 
-                builder.setKey(new SchemaKey(Yang.class, identifier, version));
+                builder.withKey(new SchemaKey(Yang.class, identifier, version));
 
                 schemas.add(builder.build());
             }

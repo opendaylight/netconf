@@ -42,14 +42,14 @@ public final class NetconfConsoleUtils {
         List<Node> nodes = new ArrayList<>();
         if (isNetconfNodesPresent(topology)) {
             for (Node node : topology.getNode()) {
-                final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
+                final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
                 if (netconfNode != null
                         && netconfNode.getHost().getIpAddress().getIpv4Address().getValue().equals(deviceIp)) {
                     nodes.add(node);
                 }
             }
         }
-        return (nodes.isEmpty()) ? null : nodes;
+        return nodes.isEmpty() ? null : nodes;
     }
 
     /**
@@ -78,7 +78,7 @@ public final class NetconfConsoleUtils {
         final Topology topology = read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.NETCONF_TOPOLOGY_IID, db);
         if (isNetconfNodesPresent(topology)) {
             for (Node node : topology.getNode()) {
-                final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
+                final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
                 if (netconfNode != null
                         && netconfNode.getHost().getIpAddress().getIpv4Address().getValue().equals(deviceIp)
                         && devicePort.equals(netconfNode.getPort().getValue().toString())) {

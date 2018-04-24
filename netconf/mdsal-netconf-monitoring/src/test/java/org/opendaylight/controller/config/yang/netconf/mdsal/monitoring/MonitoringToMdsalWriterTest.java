@@ -108,7 +108,7 @@ public class MonitoringToMdsalWriterTest {
         final InstanceIdentifier<Session> id =
                 InstanceIdentifier.create(NetconfState.class)
                         .child(Sessions.class)
-                        .child(Session.class, session.getKey());
+                        .child(Session.class, session.key());
         writer.start();
         writer.onSessionStarted(session);
         InOrder inOrder = inOrder(writeTransaction);
@@ -124,7 +124,7 @@ public class MonitoringToMdsalWriterTest {
         final InstanceIdentifier<Session> id =
                 InstanceIdentifier.create(NetconfState.class)
                         .child(Sessions.class)
-                        .child(Session.class, session.getKey());
+                        .child(Session.class, session.key());
         writer.start();
         writer.onSessionEnded(session);
         InOrder inOrder = inOrder(writeTransaction);
@@ -146,11 +146,11 @@ public class MonitoringToMdsalWriterTest {
         final InstanceIdentifier<Session> id1 =
                 InstanceIdentifier.create(NetconfState.class)
                         .child(Sessions.class)
-                        .child(Session.class, session1.getKey());
+                        .child(Session.class, session1.key());
         final InstanceIdentifier<Session> id2 =
                 InstanceIdentifier.create(NetconfState.class)
                         .child(Sessions.class)
-                        .child(Session.class, session2.getKey());
+                        .child(Session.class, session2.key());
         writer.start();
         writer.onSessionsUpdated(sessions);
         InOrder inOrder = inOrder(writeTransaction);
