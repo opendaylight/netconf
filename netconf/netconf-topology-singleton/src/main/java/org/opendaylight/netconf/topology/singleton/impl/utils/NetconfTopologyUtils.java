@@ -113,7 +113,7 @@ public final class NetconfTopologyUtils {
     }
 
     public static NetconfDevice.SchemaResourcesDTO setupSchemaCacheDTO(final Node node) {
-        final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
+        final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
         final String moduleSchemaCacheDirectory = netconfNode.getSchemaCacheDirectory();
         final RemoteDeviceId deviceId = createRemoteDeviceId(node.getNodeId(), netconfNode);
 

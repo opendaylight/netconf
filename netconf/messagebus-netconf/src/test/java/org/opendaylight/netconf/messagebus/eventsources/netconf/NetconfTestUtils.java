@@ -51,8 +51,8 @@ public final class NetconfTestUtils {
     private NetconfTestUtils() {
     }
 
-    public static Node getNetconfNode(String nodeIdent, String hostName, ConnectionStatus cs,
-                                      String notificationCapabilityPrefix) {
+    public static Node getNetconfNode(final String nodeIdent, final String hostName, final ConnectionStatus cs,
+                                      final String notificationCapabilityPrefix) {
 
         DomainName dn = new DomainName(hostName);
         Host host = new Host(dn);
@@ -67,28 +67,28 @@ public final class NetconfTestUtils {
         NodeId nodeId = new NodeId(nodeIdent);
         NodeKey nk = new NodeKey(nodeId);
         NodeBuilder nb = new NodeBuilder();
-        nb.setKey(nk);
+        nb.withKey(nk);
 
         nb.addAugmentation(NetconfNode.class, nn);
         return nb.build();
     }
 
-    public static Node getNode(String nodeIdent) {
+    public static Node getNode(final String nodeIdent) {
         NodeId nodeId = new NodeId(nodeIdent);
         NodeKey nk = new NodeKey(nodeId);
         NodeBuilder nb = new NodeBuilder();
-        nb.setKey(nk);
+        nb.withKey(nk);
         return nb.build();
     }
 
-    public static InstanceIdentifier<Node> getInstanceIdentifier(Node node) {
+    public static InstanceIdentifier<Node> getInstanceIdentifier(final Node node) {
         TopologyKey netconfTopologyKey = new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName()));
         InstanceIdentifier<Node> nodeII = InstanceIdentifier.create(NetworkTopology.class)
-                .child(Topology.class, netconfTopologyKey).child(Node.class, node.getKey());
+                .child(Topology.class, netconfTopologyKey).child(Node.class, node.key());
         return nodeII;
     }
 
-    public static Optional<Streams> getAvailableStream(String name, boolean replaySupport) {
+    public static Optional<Streams> getAvailableStream(final String name, final boolean replaySupport) {
         Stream stream = new StreamBuilder().setName(new StreamNameType(name)).setReplaySupport(replaySupport).build();
         List<Stream> streamList = new ArrayList<>();
         streamList.add(stream);
@@ -96,7 +96,7 @@ public final class NetconfTestUtils {
         return Optional.of(streams);
     }
 
-    public static NormalizedNode<?, ?> getStreamsNode(String... streamName) {
+    public static NormalizedNode<?, ?> getStreamsNode(final String... streamName) {
         QName nameNode = QName.create(Stream.QNAME, "name");
         Set<MapEntryNode> streamSet = new HashSet<>();
         for (String s : streamName) {

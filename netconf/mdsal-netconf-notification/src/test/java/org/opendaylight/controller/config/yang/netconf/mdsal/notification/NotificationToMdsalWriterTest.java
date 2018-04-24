@@ -69,8 +69,8 @@ public class NotificationToMdsalWriterTest {
     public void testStreamRegisteration() {
         final StreamNameType testStreamName = new StreamNameType("TESTSTREAM");
         final Stream testStream = new StreamBuilder().setName(testStreamName).build();
-        final InstanceIdentifier streamIdentifier = InstanceIdentifier.create(Netconf.class).child(Streams.class)
-                .builder().child(Stream.class, testStream.getKey()).build();
+        final InstanceIdentifier<Stream> streamIdentifier = InstanceIdentifier.create(Netconf.class)
+                .child(Streams.class).child(Stream.class, testStream.key());
 
         writer.onStreamRegistered(testStream);
 
@@ -86,7 +86,7 @@ public class NotificationToMdsalWriterTest {
     public void testClose() {
         doNothing().when(notificationRegistration).close();
 
-        final InstanceIdentifier streamIdentifier = InstanceIdentifier.create(Netconf.class);
+        final InstanceIdentifier<Netconf> streamIdentifier = InstanceIdentifier.create(Netconf.class);
 
         writer.close();
 

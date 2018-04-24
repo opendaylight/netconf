@@ -68,7 +68,7 @@ public class NetconfCommandsImpl implements NetconfCommands {
         }
         final Map<String, Map<String, String>> netconfNodes = new HashMap<>();
         for (final Node node : topology.getNode()) {
-            final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
+            final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
             final Map<String, String> attributes = new HashMap<>();
             attributes.put(NetconfConsoleConstants.NETCONF_ID, node.getNodeId().getValue());
             attributes.put(NetconfConsoleConstants.NETCONF_IP,
@@ -93,7 +93,7 @@ public class NetconfCommandsImpl implements NetconfCommands {
         if (nodeList != null) {
             for (final Node node : nodeList) {
                 if (node != null) {
-                    final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
+                    final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
                     final Map<String, List<String>> attributes = new HashMap<>();
                     attributes.put(NetconfConsoleConstants.NETCONF_ID, ImmutableList.of(node.getNodeId().getValue()));
                     attributes.put(NetconfConsoleConstants.NETCONF_IP,
@@ -123,7 +123,7 @@ public class NetconfCommandsImpl implements NetconfCommands {
         final List<Node> nodeList = NetconfConsoleUtils.getNetconfNodeFromId(deviceId, dataBroker);
         if (nodeList != null && nodeList.size() > 0) {
             for (final Node node : nodeList) {
-                final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
+                final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
                 final Map<String, List<String>> attributes = new HashMap<>();
                 attributes.put(NetconfConsoleConstants.NETCONF_ID, ImmutableList.of(node.getNodeId().getValue()));
                 attributes.put(NetconfConsoleConstants.NETCONF_IP,
@@ -146,7 +146,7 @@ public class NetconfCommandsImpl implements NetconfCommands {
     }
 
     @Override
-    public void connectDevice(NetconfNode netconfNode, String netconfNodeId) {
+    public void connectDevice(final NetconfNode netconfNode, final String netconfNodeId) {
         final NodeId nodeId;
         if (!Strings.isNullOrEmpty(netconfNodeId)) {
             nodeId = new NodeId(netconfNodeId);
@@ -154,7 +154,7 @@ public class NetconfCommandsImpl implements NetconfCommands {
             nodeId = new NodeId(UUID.randomUUID().toString().replace("-", ""));
         }
         final Node node = new NodeBuilder()
-                .setKey(new NodeKey(nodeId))
+                .withKey(new NodeKey(nodeId))
                 .setNodeId(nodeId)
                 .addAugmentation(NetconfNode.class, netconfNode)
                 .build();
@@ -165,12 +165,12 @@ public class NetconfCommandsImpl implements NetconfCommands {
         Futures.addCallback(transaction.submit(), new FutureCallback<Void>() {
 
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(final Void result) {
                 LOG.debug("NetconfNode={} created successfully", netconfNode);
             }
 
             @Override
-            public void onFailure(Throwable throwable) {
+            public void onFailure(final Throwable throwable) {
                 LOG.error("Failed to created NetconfNode={}", netconfNode);
                 throw new RuntimeException(throwable);
             }
@@ -178,7 +178,7 @@ public class NetconfCommandsImpl implements NetconfCommands {
     }
 
     @Override
-    public boolean disconnectDevice(String netconfNodeId) {
+    public boolean disconnectDevice(final String netconfNodeId) {
         boolean result = false;
         final WriteTransaction transaction = dataBroker.newWriteOnlyTransaction();
         InstanceIdentifier<Node> iid = NetconfIidFactory.netconfNodeIid(netconfNodeId);
@@ -202,13 +202,13 @@ public class NetconfCommandsImpl implements NetconfCommands {
     }
 
     @Override
-    public String updateDevice(final String netconfNodeId, String username, String password,
-                               Map<String, String> updated) {
+    public String updateDevice(final String netconfNodeId, final String username, final String password,
+                               final Map<String, String> updated) {
         final Node node = NetconfConsoleUtils
                 .read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.netconfNodeIid(netconfNodeId), dataBroker);
 
-        if (node != null && node.getAugmentation(NetconfNode.class) != null) {
-            final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
+        if (node != null && node.augmentation(NetconfNode.class) != null) {
+            final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
 
             // Get NETCONF attributes to update if present else get their original values from NetconfNode instance
             final String deviceIp = Strings.isNullOrEmpty(updated.get(NetconfConsoleConstants.NETCONF_IP))
@@ -235,7 +235,7 @@ public class NetconfCommandsImpl implements NetconfCommands {
                     .build();
 
             final Node updatedNode = new NodeBuilder()
-                    .setKey(node.getKey())
+                    .withKey(node.key())
                     .setNodeId(node.getNodeId())
                     .addAugmentation(NetconfNode.class, updatedNetconfNode)
                     .build();
@@ -247,12 +247,12 @@ public class NetconfCommandsImpl implements NetconfCommands {
             Futures.addCallback(transaction.submit(), new FutureCallback<Void>() {
 
                 @Override
-                public void onSuccess(Void result) {
+                public void onSuccess(final Void result) {
                     LOG.debug("NetconfNode={} updated successfully", netconfNode);
                 }
 
                 @Override
-                public void onFailure(Throwable throwable) {
+                public void onFailure(final Throwable throwable) {
                     LOG.error("Failed to updated NetconfNode={}", netconfNode);
                     throw new RuntimeException(throwable);
                 }
