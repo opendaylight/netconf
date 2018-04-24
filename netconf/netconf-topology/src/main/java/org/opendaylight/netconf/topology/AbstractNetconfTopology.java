@@ -243,7 +243,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     protected ListenableFuture<NetconfDeviceCapabilities> setupConnection(final NodeId nodeId,
                                                                           final Node configNode) {
-        final NetconfNode netconfNode = configNode.getAugmentation(NetconfNode.class);
+        final NetconfNode netconfNode = configNode.augmentation(NetconfNode.class);
 
         Preconditions.checkNotNull(netconfNode.getHost());
         Preconditions.checkNotNull(netconfNode.getPort());

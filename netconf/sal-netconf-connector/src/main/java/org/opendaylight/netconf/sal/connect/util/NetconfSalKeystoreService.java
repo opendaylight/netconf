@@ -137,13 +137,12 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
 
         for (KeyCredential keypair : keypairs) {
             writeTransaction.merge(LogicalDatastoreType.CONFIGURATION,
-                    keystoreIid.child(KeyCredential.class, keypair.getKey()), keypair);
+                    keystoreIid.child(KeyCredential.class, keypair.key()), keypair);
         }
 
         final SettableFuture<RpcResult<AddKeystoreEntryOutput>> rpcResult = SettableFuture.create();
 
-        final ListenableFuture<Void> submit = writeTransaction.submit();
-        Futures.addCallback(submit, new FutureCallback<Void>() {
+        Futures.addCallback(writeTransaction.submit(), new FutureCallback<Void>() {
             @Override
             public void onSuccess(@Nullable final Void result) {
                 LOG.debug("add-key-pair success. Input: {}");
@@ -167,13 +166,12 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
 
         for (TrustedCertificate certificate : input.getTrustedCertificate()) {
             writeTransaction.merge(LogicalDatastoreType.CONFIGURATION,
-                    keystoreIid.child(TrustedCertificate.class, certificate.getKey()), certificate);
+                    keystoreIid.child(TrustedCertificate.class, certificate.key()), certificate);
         }
 
         final SettableFuture<RpcResult<AddTrustedCertificateOutput>> rpcResult = SettableFuture.create();
 
-        final ListenableFuture<Void> submit = writeTransaction.submit();
-        Futures.addCallback(submit, new FutureCallback<Void>() {
+        Futures.addCallback(writeTransaction.submit(), new FutureCallback<Void>() {
             @Override
             public void onSuccess(@Nullable final Void result) {
                 LOG.debug("add-trusted-certificate success. Input: {}", input);
@@ -203,8 +201,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
 
         final SettableFuture<RpcResult<RemoveTrustedCertificateOutput>> rpcResult = SettableFuture.create();
 
-        final ListenableFuture<Void> submit = writeTransaction.submit();
-        Futures.addCallback(submit, new FutureCallback<Void>() {
+        Futures.addCallback(writeTransaction.submit(), new FutureCallback<Void>() {
             @Override
             public void onSuccess(@Nullable final Void result) {
                 LOG.debug("remove-trusted-certificate success. Input: {}", input);
@@ -227,13 +224,12 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
 
         for (PrivateKey key: input.getPrivateKey()) {
             writeTransaction.merge(LogicalDatastoreType.CONFIGURATION,
-                    keystoreIid.child(PrivateKey.class, key.getKey()), key);
+                    keystoreIid.child(PrivateKey.class, key.key()), key);
         }
 
         final SettableFuture<RpcResult<AddPrivateKeyOutput>> rpcResult = SettableFuture.create();
 
-        final ListenableFuture<Void> submit = writeTransaction.submit();
-        Futures.addCallback(submit, new FutureCallback<Void>() {
+        Futures.addCallback(writeTransaction.submit(), new FutureCallback<Void>() {
             @Override
             public void onSuccess(@Nullable final Void result) {
                 LOG.debug("add-private-key success. Input: {}", input);
@@ -262,8 +258,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
 
         final SettableFuture<RpcResult<RemovePrivateKeyOutput>> rpcResult = SettableFuture.create();
 
-        final ListenableFuture<Void> submit = writeTransaction.submit();
-        Futures.addCallback(submit, new FutureCallback<Void>() {
+        Futures.addCallback(writeTransaction.submit(), new FutureCallback<Void>() {
             @Override
             public void onSuccess(@Nullable final Void result) {
                 LOG.debug("remove-private-key success. Input: {}", input);

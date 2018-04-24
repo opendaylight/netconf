@@ -8,7 +8,6 @@
 
 package org.opendaylight.controller.config.yang.netconf.mdsal.notification;
 
-import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -35,6 +34,8 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
         .NetconfNotificationStreamListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationToMdsalWriter.class);
+    private static final InstanceIdentifier<Streams> STREAMS = InstanceIdentifier.builder(Netconf.class)
+            .child(Streams.class).build();
 
     private final NetconfNotificationCollector netconfNotificationCollector;
     private final DataBroker dataBroker;
@@ -50,16 +51,15 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
     public void close() {
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(Netconf.class));
-        final CheckedFuture<Void, TransactionCommitFailedException> submit = tx.submit();
 
-        Futures.addCallback(submit, new FutureCallback<Void>() {
+        Futures.addCallback(tx.submit(), new FutureCallback<Void>() {
             @Override
-            public void onSuccess(Void avoid) {
+            public void onSuccess(final Void avoid) {
                 LOG.debug("Streams cleared successfully");
             }
 
             @Override
-            public void onFailure(Throwable throwable) {
+            public void onFailure(final Throwable throwable) {
                 LOG.warn("Unable to clear streams", throwable);
             }
         }, MoreExecutors.directExecutor());
@@ -75,11 +75,10 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
     }
 
     @Override
-    public void onStreamRegistered(Stream stream) {
+    public void onStreamRegistered(final Stream stream) {
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
 
-        final InstanceIdentifier streamIdentifier = InstanceIdentifier.create(Netconf.class).child(Streams.class)
-                .builder().child(Stream.class, stream.getKey()).build();
+        final InstanceIdentifier<Stream> streamIdentifier = STREAMS.child(Stream.class, stream.key());
         tx.merge(LogicalDatastoreType.OPERATIONAL, streamIdentifier, stream, true);
 
         try {
@@ -91,12 +90,10 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
     }
 
     @Override
-    public void onStreamUnregistered(StreamNameType stream) {
+    public void onStreamUnregistered(final StreamNameType stream) {
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
 
-        final StreamKey streamKey = new StreamKey(stream);
-        final InstanceIdentifier streamIdentifier = InstanceIdentifier.create(Netconf.class).child(Streams.class)
-                .builder().child(Stream.class, streamKey).build();
+        final InstanceIdentifier<Stream> streamIdentifier = STREAMS.child(Stream.class, new StreamKey(stream));
 
         tx.delete(LogicalDatastoreType.OPERATIONAL, streamIdentifier);
 

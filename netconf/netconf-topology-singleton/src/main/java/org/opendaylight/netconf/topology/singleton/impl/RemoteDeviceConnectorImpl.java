@@ -113,7 +113,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     @Override
     public void startRemoteDeviceConnection(final ActorRef deviceContextActorRef) {
 
-        final NetconfNode netconfNode = netconfTopologyDeviceSetup.getNode().getAugmentation(NetconfNode.class);
+        final NetconfNode netconfNode = netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class);
         final NodeId nodeId = netconfTopologyDeviceSetup.getNode().getNodeId();
         Preconditions.checkNotNull(netconfNode.getHost());
         Preconditions.checkNotNull(netconfNode.getPort());
