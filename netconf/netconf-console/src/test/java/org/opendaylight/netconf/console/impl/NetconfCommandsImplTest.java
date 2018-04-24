@@ -169,11 +169,11 @@ public class NetconfCommandsImplTest {
         assertEquals(2, nodes.size());
 
         final Optional<Node> storedNode = nodes.stream().filter(node ->
-                node.getKey().getNodeId().getValue().equals("netconf-ID")).findFirst();
+                node.key().getNodeId().getValue().equals("netconf-ID")).findFirst();
 
         assertTrue(storedNode.isPresent());
 
-        NetconfNode storedNetconfNode = storedNode.get().getAugmentation(NetconfNode.class);
+        NetconfNode storedNetconfNode = storedNode.get().augmentation(NetconfNode.class);
         assertEquals(7777, storedNetconfNode.getPort().getValue().longValue());
         assertEquals("10.10.1.1", storedNetconfNode.getHost().getIpAddress().getIpv4Address().getValue());
 
@@ -185,7 +185,7 @@ public class NetconfCommandsImplTest {
         assertEquals(1, nodesDeleted.size());
 
         final Optional<Node> storedNodeDeleted = nodesDeleted.stream().filter(node ->
-                node.getKey().getNodeId().getValue().equals("netconf-ID")).findFirst();
+                node.key().getNodeId().getValue().equals("netconf-ID")).findFirst();
 
         assertFalse(storedNodeDeleted.isPresent());
     }
@@ -210,10 +210,10 @@ public class NetconfCommandsImplTest {
         assertEquals(1, nodes.size());
 
         final Optional<Node> storedNode = nodes.stream().filter(node ->
-                node.getKey().getNodeId().getValue().equals(NODE_ID)).findFirst();
+                node.key().getNodeId().getValue().equals(NODE_ID)).findFirst();
         assertTrue(storedNode.isPresent());
 
-        NetconfNode storedNetconfNode = storedNode.get().getAugmentation(NetconfNode.class);
+        NetconfNode storedNetconfNode = storedNode.get().augmentation(NetconfNode.class);
         assertEquals("7.7.7.7", storedNetconfNode.getHost().getIpAddress().getIpv4Address().getValue());
     }
 
@@ -234,7 +234,7 @@ public class NetconfCommandsImplTest {
         nodes.add(node);
 
         final Topology topology = new TopologyBuilder()
-                .setKey(new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())))
+                .withKey(new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())))
                 .setTopologyId(new TopologyId(TopologyNetconf.QNAME.getLocalName())).setNode(nodes).build();
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
@@ -260,7 +260,7 @@ public class NetconfCommandsImplTest {
         final NodeId nodeId = new NodeId(nodeIdent);
         final NodeKey nk = new NodeKey(nodeId);
         final NodeBuilder nb = new NodeBuilder();
-        nb.setKey(nk);
+        nb.withKey(nk);
         nb.setNodeId(nodeId);
         nb.addAugmentation(NetconfNode.class, nn);
         return nb.build();

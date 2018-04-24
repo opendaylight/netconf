@@ -93,7 +93,7 @@ public class JaxBSerializerTest {
                 String.format(SESSION_XML, IPV6)));
     }
 
-    private Schema getMockSchema(final String id, final String version, final Class<Yang> format) {
+    private static Schema getMockSchema(final String id, final String version, final Class<Yang> format) {
         final Schema mock = mock(Schema.class);
 
         doReturn(format).when(mock).getFormat();
@@ -101,23 +101,23 @@ public class JaxBSerializerTest {
         doReturn(new Uri("localhost")).when(mock).getNamespace();
         doReturn(version).when(mock).getVersion();
         doReturn(Lists.newArrayList(new Schema.Location(Schema.Location.Enumeration.NETCONF))).when(mock).getLocation();
-        doReturn(new SchemaKey(format, id, version)).when(mock).getKey();
+        doReturn(new SchemaKey(format, id, version)).when(mock).key();
         return mock;
     }
 
-    private Session getMockIPv4Session(final Class<? extends Transport> transportType) {
+    private static Session getMockIPv4Session(final Class<? extends Transport> transportType) {
         final Session mocked = getMockSession(transportType);
         doReturn(new Host(new IpAddress(new Ipv4Address(IPV4)))).when(mocked).getSourceHost();
         return mocked;
     }
 
-    private Session getMockIPv6Session(final Class<? extends Transport> transportType) {
+    private static Session getMockIPv6Session(final Class<? extends Transport> transportType) {
         final Session mocked = getMockSession(transportType);
         doReturn(new Host(new IpAddress(new Ipv6Address(IPV6)))).when(mocked).getSourceHost();
         return mocked;
     }
 
-    private Session getMockSession(final Class<? extends Transport> transportType) {
+    private static Session getMockSession(final Class<? extends Transport> transportType) {
         final Session mocked = mock(Session.class);
         final Session1 mockedSession1 = mock(Session1.class);
         doReturn("client").when(mockedSession1).getSessionIdentifier();
@@ -129,7 +129,7 @@ public class JaxBSerializerTest {
         doReturn(new ZeroBasedCounter32(0L)).when(mocked).getOutRpcErrors();
         doReturn(transportType).when(mocked).getTransport();
         doReturn("username").when(mocked).getUsername();
-        doReturn(mockedSession1).when(mocked).getAugmentation(Session1.class);
+        doReturn(mockedSession1).when(mocked).augmentation(Session1.class);
         return mocked;
     }
 }

@@ -166,7 +166,7 @@ public class NetconfKeystoreAdapterTest {
             }
 
             final PrivateKey privateKey = new PrivateKeyBuilder()
-                    .setKey(new PrivateKeyKey(keyName))
+                    .withKey(new PrivateKeyKey(keyName))
                     .setName(keyName)
                     .setData(keyData)
                     .setCertificateChain(certChain)
@@ -191,7 +191,7 @@ public class NetconfKeystoreAdapterTest {
             final String certData = element.getElementsByTagName(XML_ELEMENT_CERT).item(0).getTextContent();
 
             final TrustedCertificate certificate = new TrustedCertificateBuilder()
-                    .setKey(new TrustedCertificateKey(certName))
+                    .withKey(new TrustedCertificateKey(certName))
                     .setName(certName)
                     .setCertificate(certData)
                     .build();

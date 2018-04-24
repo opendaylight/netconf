@@ -53,7 +53,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
     static {
         BASE_NETCONF_STREAM = new StreamBuilder()
                 .setName(BASE_STREAM_NAME)
-                .setKey(new StreamKey(BASE_STREAM_NAME))
+                .withKey(new StreamKey(BASE_STREAM_NAME))
                 .setReplaySupport(false)
                 .setDescription("Default Event Stream")
                 .build();
@@ -138,12 +138,9 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
             listener.onStreamRegistered(availableStream);
         }
 
-        return new NotificationRegistration() {
-            @Override
-            public void close() {
-                synchronized (NetconfNotificationManager.this) {
-                    streamListeners.remove(listener);
-                }
+        return () -> {
+            synchronized (NetconfNotificationManager.this) {
+                streamListeners.remove(listener);
             }
         };
     }
@@ -277,7 +274,8 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
             baseRegistration.close();
         }
 
-        private static NetconfNotification serializeNotification(final Notification notification, SchemaPath path) {
+        private static NetconfNotification serializeNotification(final Notification notification,
+                final SchemaPath path) {
             return NotificationsTransformUtil.transform(notification, path);
         }
 
@@ -288,12 +286,12 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
         }
 
         @Override
-        public void onSessionStarted(NetconfSessionStart start) {
+        public void onSessionStarted(final NetconfSessionStart start) {
             baseRegistration.onNotification(BASE_STREAM_NAME, serializeNotification(start, SESSION_START_PATH));
         }
 
         @Override
-        public void onSessionEnded(NetconfSessionEnd end) {
+        public void onSessionEnded(final NetconfSessionEnd end) {
             baseRegistration.onNotification(BASE_STREAM_NAME, serializeNotification(end, SESSION_END_PATH));
         }
     }

@@ -46,14 +46,15 @@ public class DummyMonitoringService implements NetconfMonitoringService {
     private static final Function<Capability, Schema> CAPABILITY_SCHEMA_FUNCTION = new Function<Capability, Schema>() {
         @Nullable
         @Override
-        public Schema apply(@Nonnull Capability capability) {
+        public Schema apply(@Nonnull final Capability capability) {
             return new SchemaBuilder()
                     .setIdentifier(capability.getModuleName().get())
                     .setNamespace(new Uri(capability.getModuleNamespace().get()))
                     .setFormat(Yang.class)
                     .setVersion(capability.getRevision().get())
                     .setLocation(Collections.singletonList(new Location(Enumeration.NETCONF)))
-                    .setKey(new SchemaKey(Yang.class, capability.getModuleName().get(), capability.getRevision().get()))
+                    .withKey(new SchemaKey(Yang.class, capability.getModuleName().get(),
+                        capability.getRevision().get()))
                     .build();
         }
     };
@@ -62,7 +63,7 @@ public class DummyMonitoringService implements NetconfMonitoringService {
     private final ArrayListMultimap<String, Capability> capabilityMultiMap;
     private final Schemas schemas;
 
-    public DummyMonitoringService(Set<Capability> capabilities) {
+    public DummyMonitoringService(final Set<Capability> capabilities) {
 
         this.capabilities = new CapabilitiesBuilder().setCapability(
                 Lists.newArrayList(Collections2.transform(capabilities, CAPABILITY_URI_FUNCTION))).build();
@@ -89,17 +90,17 @@ public class DummyMonitoringService implements NetconfMonitoringService {
     public SessionListener getSessionListener() {
         return new SessionListener() {
             @Override
-            public void onSessionUp(NetconfManagementSession session) {
+            public void onSessionUp(final NetconfManagementSession session) {
                 //no op
             }
 
             @Override
-            public void onSessionDown(NetconfManagementSession session) {
+            public void onSessionDown(final NetconfManagementSession session) {
                 //no op
             }
 
             @Override
-            public void onSessionEvent(SessionEvent event) {
+            public void onSessionEvent(final SessionEvent event) {
                 //no op
             }
         };
@@ -111,7 +112,7 @@ public class DummyMonitoringService implements NetconfMonitoringService {
     }
 
     @Override
-    public String getSchemaForCapability(String moduleName, Optional<String> revision) {
+    public String getSchemaForCapability(final String moduleName, final Optional<String> revision) {
 
         for (Capability capability : capabilityMultiMap.get(moduleName)) {
             if (capability.getRevision().get().equals(revision.get())) {
@@ -128,12 +129,12 @@ public class DummyMonitoringService implements NetconfMonitoringService {
     }
 
     @Override
-    public AutoCloseable registerCapabilitiesListener(CapabilitiesListener listener) {
+    public AutoCloseable registerCapabilitiesListener(final CapabilitiesListener listener) {
         return null;
     }
 
     @Override
-    public AutoCloseable registerSessionsListener(SessionsListener listener) {
+    public AutoCloseable registerSessionsListener(final SessionsListener listener) {
         return null;
     }
 

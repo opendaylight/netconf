@@ -206,7 +206,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         Device1 devStatus = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.DISCONNECTED).build();
         if (opDevGet.isPresent()) {
             Device opDevice = opDevGet.get();
-            devStatus = opDevice.getAugmentation(Device1.class);
+            devStatus = opDevice.augmentation(Device1.class);
         }
 
         cfgDevice = new DeviceBuilder().addAugmentation(Device1.class, devStatus)
