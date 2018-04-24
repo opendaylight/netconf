@@ -26,8 +26,16 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.schema.SchemaExport
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
 
 public class RestconfApplication extends Application {
-    private final SchemaContextHandler schemaContextHandler = SchemaContextHandler.instance();
-    private final DOMMountPointServiceHandler mountPointServiceHandler = DOMMountPointServiceHandler.instance();
+    private final SchemaContextHandler schemaContextHandler;
+    private final DOMMountPointServiceHandler mountPointServiceHandler;
+    private final ServicesWrapper servicesWrapper;
+
+    public RestconfApplication(SchemaContextHandler schemaContextHandler,
+            DOMMountPointServiceHandler mountPointServiceHandler, ServicesWrapper servicesWrapper) {
+        this.schemaContextHandler = schemaContextHandler;
+        this.mountPointServiceHandler = mountPointServiceHandler;
+        this.servicesWrapper = servicesWrapper;
+    }
 
     @Override
     public Set<Class<?>> getClasses() {
@@ -41,7 +49,7 @@ public class RestconfApplication extends Application {
     @Override
     public Set<Object> getSingletons() {
         final Set<Object> singletons = new HashSet<>();
-        singletons.add(ServicesWrapper.getInstance());
+        singletons.add(servicesWrapper);
         singletons.add(new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler));
         singletons.add(new JsonToPatchBodyReader(schemaContextHandler, mountPointServiceHandler));
         singletons.add(new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler));
