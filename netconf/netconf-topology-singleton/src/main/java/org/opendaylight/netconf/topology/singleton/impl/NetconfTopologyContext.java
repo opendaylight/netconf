@@ -60,7 +60,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
         this.mountService = mountService;
 
         remoteDeviceId = NetconfTopologyUtils.createRemoteDeviceId(netconfTopologyDeviceSetup.getNode().getNodeId(),
-                netconfTopologyDeviceSetup.getNode().getAugmentation(NetconfNode.class));
+                netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class));
 
         remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId,
                 actorResponseWaitTime, mountService);
@@ -103,7 +103,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
         }
         stopDeviceConnectorAndActor();
 
-        return Futures.immediateCheckedFuture(null);
+        return Futures.immediateFuture(null);
     }
 
     @Override
@@ -115,7 +115,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
         final NetconfNodeManager ndm =
                 new NetconfNodeManager(netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime, mountService);
         ndm.registerDataTreeChangeListener(netconfTopologyDeviceSetup.getTopologyId(),
-                netconfTopologyDeviceSetup.getNode().getKey());
+                netconfTopologyDeviceSetup.getNode().key());
 
         return ndm;
     }
@@ -137,7 +137,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
     void refresh(@Nonnull final NetconfTopologySetup setup) {
         netconfTopologyDeviceSetup = Preconditions.checkNotNull(setup);
         remoteDeviceId = NetconfTopologyUtils.createRemoteDeviceId(netconfTopologyDeviceSetup.getNode().getNodeId(),
-                netconfTopologyDeviceSetup.getNode().getAugmentation(NetconfNode.class));
+                netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class));
 
         if (isMaster) {
             remoteDeviceConnector.stopRemoteDeviceConnection();

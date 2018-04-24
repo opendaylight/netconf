@@ -125,13 +125,12 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
 
         for (KeyCredential keypair : keypairs) {
             writeTransaction.merge(LogicalDatastoreType.CONFIGURATION,
-                    keystoreIid.child(KeyCredential.class, keypair.getKey()), keypair);
+                    keystoreIid.child(KeyCredential.class, keypair.key()), keypair);
         }
 
         final SettableFuture<RpcResult<Void>> rpcResult = SettableFuture.create();
 
-        final CheckedFuture<Void, TransactionCommitFailedException> submit = writeTransaction.submit();
-        Futures.addCallback(submit, new FutureCallback<Void>() {
+        Futures.addCallback(writeTransaction.submit(), new FutureCallback<Void>() {
             @Override
             public void onSuccess(@Nullable final Void result) {
                 LOG.debug("add-key-pair success. Input: {}");
@@ -150,20 +149,19 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
     }
 
     @Override
-    public Future<RpcResult<Void>> addTrustedCertificate(AddTrustedCertificateInput input) {
+    public Future<RpcResult<Void>> addTrustedCertificate(final AddTrustedCertificateInput input) {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
 
         for (TrustedCertificate certificate : input.getTrustedCertificate()) {
             writeTransaction.merge(LogicalDatastoreType.CONFIGURATION,
-                    keystoreIid.child(TrustedCertificate.class, certificate.getKey()), certificate);
+                    keystoreIid.child(TrustedCertificate.class, certificate.key()), certificate);
         }
 
         final SettableFuture<RpcResult<Void>> rpcResult = SettableFuture.create();
 
-        final CheckedFuture<Void, TransactionCommitFailedException> submit = writeTransaction.submit();
-        Futures.addCallback(submit, new FutureCallback<Void>() {
+        Futures.addCallback(writeTransaction.submit(), new FutureCallback<Void>() {
             @Override
-            public void onSuccess(@Nullable Void result) {
+            public void onSuccess(@Nullable final Void result) {
                 LOG.debug("add-trusted-certificate success. Input: {}", input);
                 final RpcResult<Void> success = RpcResultBuilder.<Void>success().build();
                 rpcResult.set(success);
@@ -180,7 +178,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
     }
 
     @Override
-    public Future<RpcResult<Void>> removeTrustedCertificate(RemoveTrustedCertificateInput input) {
+    public Future<RpcResult<Void>> removeTrustedCertificate(final RemoveTrustedCertificateInput input) {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         final List<String> names = input.getName();
 
@@ -191,10 +189,9 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
 
         final SettableFuture<RpcResult<Void>> rpcResult = SettableFuture.create();
 
-        final CheckedFuture<Void, TransactionCommitFailedException> submit = writeTransaction.submit();
-        Futures.addCallback(submit, new FutureCallback<Void>() {
+        Futures.addCallback(writeTransaction.submit(), new FutureCallback<Void>() {
             @Override
-            public void onSuccess(@Nullable Void result) {
+            public void onSuccess(@Nullable final Void result) {
                 LOG.debug("remove-trusted-certificate success. Input: {}", input);
                 final RpcResult<Void> success = RpcResultBuilder.<Void>success().build();
                 rpcResult.set(success);
@@ -211,20 +208,19 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
     }
 
     @Override
-    public Future<RpcResult<Void>> addPrivateKey(AddPrivateKeyInput input) {
+    public Future<RpcResult<Void>> addPrivateKey(final AddPrivateKeyInput input) {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
 
         for (PrivateKey key: input.getPrivateKey()) {
             writeTransaction.merge(LogicalDatastoreType.CONFIGURATION,
-                    keystoreIid.child(PrivateKey.class, key.getKey()), key);
+                    keystoreIid.child(PrivateKey.class, key.key()), key);
         }
 
         final SettableFuture<RpcResult<Void>> rpcResult = SettableFuture.create();
 
-        final CheckedFuture<Void, TransactionCommitFailedException> submit = writeTransaction.submit();
-        Futures.addCallback(submit, new FutureCallback<Void>() {
+        Futures.addCallback(writeTransaction.submit(), new FutureCallback<Void>() {
             @Override
-            public void onSuccess(@Nullable Void result) {
+            public void onSuccess(@Nullable final Void result) {
                 LOG.debug("add-private-key success. Input: {}", input);
                 final RpcResult<Void> success = RpcResultBuilder.<Void>success().build();
                 rpcResult.set(success);
@@ -241,7 +237,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
     }
 
     @Override
-    public Future<RpcResult<Void>> removePrivateKey(RemovePrivateKeyInput input) {
+    public Future<RpcResult<Void>> removePrivateKey(final RemovePrivateKeyInput input) {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         final List<String> names = input.getName();
 
@@ -252,10 +248,9 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
 
         final SettableFuture<RpcResult<Void>> rpcResult = SettableFuture.create();
 
-        final CheckedFuture<Void, TransactionCommitFailedException> submit = writeTransaction.submit();
-        Futures.addCallback(submit, new FutureCallback<Void>() {
+        Futures.addCallback(writeTransaction.submit(), new FutureCallback<Void>() {
             @Override
-            public void onSuccess(@Nullable Void result) {
+            public void onSuccess(@Nullable final Void result) {
                 LOG.debug("remove-private-key success. Input: {}", input);
                 final RpcResult<Void> success = RpcResultBuilder.<Void>success().build();
                 rpcResult.set(success);

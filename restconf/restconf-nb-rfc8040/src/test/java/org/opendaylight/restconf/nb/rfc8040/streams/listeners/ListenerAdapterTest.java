@@ -148,7 +148,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_CREATE));
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder = new MyList1Builder().setKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
+        builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
         writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
         writeTransaction.submit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_UPDATE));
@@ -179,7 +179,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         adapter.assertGot(getNotifJson(JSON_NOTIF_CREATE));
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
-        builder = new MyList1Builder().setKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
+        builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
         writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
         writeTransaction.submit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_UPDATE));

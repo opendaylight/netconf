@@ -282,7 +282,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
 
     @Override
     public NodeKey getSourceNodeKey() {
-        return mount.getNode().getKey();
+        return mount.getNode().key();
     }
 
     @Override

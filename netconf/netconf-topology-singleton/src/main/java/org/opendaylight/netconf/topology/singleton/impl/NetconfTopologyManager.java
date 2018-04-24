@@ -152,7 +152,7 @@ public class NetconfTopologyManager
     // TODO change to a specific documented Exception when changed in ClusterSingletonServiceProvider
     @SuppressWarnings("checkstyle:IllegalCatch")
     private void startNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
-        final NetconfNode netconfNode = node.getAugmentation(NetconfNode.class);
+        final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
         Preconditions.checkNotNull(netconfNode);
         Preconditions.checkNotNull(netconfNode.getHost());
         Preconditions.checkNotNull(netconfNode.getHost().getIpAddress());
@@ -231,14 +231,14 @@ public class NetconfTopologyManager
     /**
      * Sets the private key path from location specified in configuration file using blueprint.
      */
-    public void setPrivateKeyPath(String privateKeyPath) {
+    public void setPrivateKeyPath(final String privateKeyPath) {
         this.privateKeyPath = privateKeyPath;
     }
 
     /**
      * Sets the private key passphrase from location specified in configuration file using blueprint.
      */
-    public void setPrivateKeyPassphrase(String privateKeyPassphrase) {
+    public void setPrivateKeyPassphrase(final String privateKeyPassphrase) {
         this.privateKeyPassphrase = privateKeyPassphrase;
     }
 
