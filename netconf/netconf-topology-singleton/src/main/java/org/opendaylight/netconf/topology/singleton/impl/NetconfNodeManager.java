@@ -158,7 +158,7 @@ class NetconfNodeManager
         }
 
         @SuppressWarnings("ConstantConditions")
-        final NetconfNode netconfNodeAfter = rootNode.getDataAfter().getAugmentation(NetconfNode.class);
+        final NetconfNode netconfNodeAfter = rootNode.getDataAfter().augmentation(NetconfNode.class);
 
         if (NetconfNodeConnectionStatus.ConnectionStatus.Connected.equals(netconfNodeAfter.getConnectionStatus())) {
             lastUpdateCount++;

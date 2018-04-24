@@ -12,7 +12,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.net.InetAddresses;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.net.Inet4Address;
@@ -97,12 +96,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
         }
         // delayed close was set, close after the message was sent
         if (delayedClose) {
-            channelFuture.addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(final ChannelFuture future) throws Exception {
-                    close();
-                }
-            });
+            channelFuture.addListener(future -> close());
         }
         return channelFuture;
     }
@@ -150,7 +144,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
 
         builder.setOutNotifications(new ZeroBasedCounter32(outNotification));
 
-        builder.setKey(new SessionKey(getSessionId()));
+        builder.withKey(new SessionKey(getSessionId()));
 
         Session1Builder builder1 = new Session1Builder();
         builder1.setSessionIdentifier(header.getSessionIdentifier());

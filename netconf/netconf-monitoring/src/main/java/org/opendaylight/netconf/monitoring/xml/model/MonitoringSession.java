@@ -21,14 +21,14 @@ final class MonitoringSession {
     @XmlTransient
     private Session managementSession;
 
-    MonitoringSession(Session managementSession) {
+    MonitoringSession(final Session managementSession) {
         this.managementSession = managementSession;
     }
 
     MonitoringSession() {
     }
 
-    public void setManagementSession(Session managementSession) {
+    public void setManagementSession(final Session managementSession) {
         this.managementSession = managementSession;
     }
 
@@ -90,7 +90,7 @@ final class MonitoringSession {
 
     @XmlElement(name = "session-identifier", namespace = MonitoringConstants.EXTENSION_NAMESPACE)
     public String getSessionType() {
-        return managementSession.getAugmentation(Session1.class).getSessionIdentifier();
+        return managementSession.augmentation(Session1.class).getSessionIdentifier();
     }
 
     @XmlElement(name = "username")

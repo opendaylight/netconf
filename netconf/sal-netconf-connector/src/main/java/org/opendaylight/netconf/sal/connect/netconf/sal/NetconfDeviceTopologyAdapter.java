@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
@@ -229,9 +227,8 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
     private void commitTransaction(final WriteTransaction transaction, final String txType) {
         LOG.trace("{}: Committing Transaction {}:{}", id, txType,
                 transaction.getIdentifier());
-        final CheckedFuture<Void, TransactionCommitFailedException> result = transaction.submit();
 
-        Futures.addCallback(result, new FutureCallback<Void>() {
+        Futures.addCallback(transaction.submit(), new FutureCallback<Void>() {
             @Override
             public void onSuccess(final Void result) {
                 LOG.trace("{}: Transaction({}) {} SUCCESSFUL", id, txType,
@@ -250,7 +247,7 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
 
     private static NodeBuilder getNodeIdBuilder(final RemoteDeviceId id) {
         final NodeBuilder nodeBuilder = new NodeBuilder();
-        nodeBuilder.setKey(new NodeKey(new NodeId(id.getName())));
+        nodeBuilder.withKey(new NodeKey(new NodeId(id.getName())));
         return nodeBuilder;
     }
 
