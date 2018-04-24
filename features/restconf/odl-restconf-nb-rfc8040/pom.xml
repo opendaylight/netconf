@@ -23,21 +23,28 @@
 
     <name>OpenDaylight :: Restconf NB - RFC8040</name>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>restconf-artifacts</artifactId>
+                <version>1.8.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
-        <!-- Enables AAA through aaa-shiro-act -->
         <dependency>
-            <groupId>org.opendaylight.aaa</groupId>
-            <artifactId>odl-aaa-shiro-act</artifactId>
-            <version>0.8.0-SNAPSHOT</version>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>odl-restconf-common</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf-nb-rfc8040-noauth</artifactId>
-            <version>${project.version}</version>
-            <type>xml</type>
-            <classifier>features</classifier>
+            <artifactId>restconf-nb-rfc8040</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -26,9 +26,6 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <!-- We need the AAAService available even though we don't use it -->
-  <reference interface="org.opendaylight.aaa.api.AAAService"/>
-
   <reference id="domRpcService" interface="org.opendaylight.controller.md.sal.dom.api.DOMRpcService"/>
   <reference id="domMountPointService" interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"/>
   <reference id="domNotificationService" interface="org.opendaylight.controller.md.sal.dom.api.DOMNotificationService"/>
@@ -75,6 +72,12 @@
     <argument ref="domSchemaService"/>
   </bean>
 
+  <bean id="restconfApplication" class="org.opendaylight.restconf.nb.rfc8040.RestconfApplication">
+    <argument ref="schemaContextHandler"/>
+    <argument ref="mountPointServiceHandler"/>
+    <argument ref="servicesWrapper"/>
+  </bean>
+
   <!-- JSONRestconfService -->
   <bean id="jsonRestconfService"
       class="org.opendaylight.restconf.nb.rfc8040.rests.services.impl.JSONRestconfServiceRfc8040Impl"
@@ -86,5 +89,22 @@
 
   <service ref="jsonRestconfService" odl:type="rfc8040"
       interface="org.opendaylight.restconf.nb.rfc8040.rests.services.api.JSONRestconfService" />
+
+  <!-- Web app registration -->
+
+  <reference id="customFilterAdapterConfig"
+      interface="org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration"/>
+
+  <reference id="webServer" interface="org.opendaylight.aaa.web.WebServer" />
+
+  <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer" />
+
+  <bean id="webRegistrar" class="org.opendaylight.restconf.nb.rfc8040.web.WebRegistrar"
+          destroy-method="close">
+    <argument ref="webServer"/>
+    <argument ref="webContextSecurer"/>
+    <argument ref="restconfApplication"/>
+    <argument ref="customFilterAdapterConfig"/>
+  </bean>
 
 </blueprint>

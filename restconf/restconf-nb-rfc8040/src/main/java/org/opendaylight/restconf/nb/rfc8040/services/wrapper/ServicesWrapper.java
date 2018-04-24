@@ -48,24 +48,24 @@ import org.opendaylight.restconf.nb.rfc8040.services.simple.impl.RestconfSchemaS
 @Path("/")
 public final class ServicesWrapper implements BaseServicesWrapper, TransactionServicesWrapper {
 
-    private RestconfDataService delegRestconfDataService;
-    private RestconfInvokeOperationsService delegRestconfInvokeOpsService;
-    private RestconfStreamsSubscriptionService delegRestconfSubscrService;
-    private RestconfOperationsService delegRestOpsService;
-    private RestconfSchemaService delegRestSchService;
-    private RestconfService delegRestService;
+    private final RestconfDataService delegRestconfDataService;
+    private final RestconfInvokeOperationsService delegRestconfInvokeOpsService;
+    private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
+    private final RestconfOperationsService delegRestOpsService;
+    private final RestconfSchemaService delegRestSchService;
+    private final RestconfService delegRestService;
 
-    @Deprecated
-    private ServicesWrapper() {
-    }
-
-    private static class InstanceHolder {
-        public static final ServicesWrapper INSTANCE = new ServicesWrapper();
-    }
-
-    @Deprecated
-    public static ServicesWrapper getInstance() {
-        return InstanceHolder.INSTANCE;
+    private ServicesWrapper(RestconfDataService delegRestconfDataService,
+            RestconfInvokeOperationsService delegRestconfInvokeOpsService,
+            RestconfStreamsSubscriptionService delegRestconfSubscrService,
+            RestconfOperationsService delegRestOpsService, RestconfSchemaService delegRestSchService,
+            RestconfService delegRestService) {
+        this.delegRestconfDataService = delegRestconfDataService;
+        this.delegRestconfInvokeOpsService = delegRestconfInvokeOpsService;
+        this.delegRestconfSubscrService = delegRestconfSubscrService;
+        this.delegRestOpsService = delegRestOpsService;
+        this.delegRestSchService = delegRestSchService;
+        this.delegRestService = delegRestService;
     }
 
     public static ServicesWrapper newInstance(final SchemaContextHandler schemaCtxHandler,
@@ -73,24 +73,25 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
             final TransactionChainHandler transactionChainHandler, final DOMDataBrokerHandler domDataBrokerHandler,
             final RpcServiceHandler rpcServiceHandler, final NotificationServiceHandler notificationServiceHandler,
             final DOMSchemaService domSchemaService) {
-        InstanceHolder.INSTANCE.delegRestOpsService =
+        RestconfOperationsService restconfOpsService =
                 new RestconfOperationsServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
         final DOMYangTextSourceProvider yangTextSourceProvider =
                 (DOMYangTextSourceProvider) domSchemaService.getSupportedExtensions()
                         .get(DOMYangTextSourceProvider.class);
-        InstanceHolder.INSTANCE.delegRestSchService =
+        RestconfSchemaService restconfSchemaService =
                 new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler,
                 yangTextSourceProvider);
-        InstanceHolder.INSTANCE.delegRestconfSubscrService =
+        RestconfStreamsSubscriptionService restconfSubscrService =
                 new RestconfStreamsSubscriptionServiceImpl(domDataBrokerHandler,
                 notificationServiceHandler, schemaCtxHandler, transactionChainHandler);
-        InstanceHolder.INSTANCE.delegRestconfDataService =
+        RestconfDataService restconfDataService =
                 new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler, domMountPointServiceHandler,
-                        InstanceHolder.INSTANCE.delegRestconfSubscrService);
-        InstanceHolder.INSTANCE.delegRestconfInvokeOpsService =
+                        restconfSubscrService);
+        RestconfInvokeOperationsService restconfInvokeOpsService =
                 new RestconfInvokeOperationsServiceImpl(rpcServiceHandler, schemaCtxHandler);
-        InstanceHolder.INSTANCE.delegRestService = new RestconfImpl(schemaCtxHandler);
-        return InstanceHolder.INSTANCE;
+        RestconfService restconfService = new RestconfImpl(schemaCtxHandler);
+        return new ServicesWrapper(restconfDataService, restconfInvokeOpsService,
+                restconfSubscrService, restconfOpsService, restconfSchemaService, restconfService);
     }
 
     @Override

@@ -40,12 +40,10 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
 
     private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);
 
-    private static final SchemaContextHandler INSTANCE = new SchemaContextHandler();
-
     private final AtomicInteger moduleSetId = new AtomicInteger(0);
 
-    private TransactionChainHandler transactionChainHandler;
-    private DOMSchemaService domSchemaService;
+    private final TransactionChainHandler transactionChainHandler;
+    private final DOMSchemaService domSchemaService;
     private ListenerRegistration<SchemaContextListener> listenerRegistration;
 
     private volatile SchemaContext schemaContext;
@@ -61,20 +59,9 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
         this.domSchemaService = domSchemaService;
     }
 
-    @Deprecated
-    private SchemaContextHandler() {
-    }
-
-    @Deprecated
-    public static SchemaContextHandler instance() {
-        return INSTANCE;
-    }
-
     public static SchemaContextHandler newInstance(TransactionChainHandler transactionChainHandler,
             DOMSchemaService domSchemaService) {
-        INSTANCE.transactionChainHandler = transactionChainHandler;
-        INSTANCE.domSchemaService = domSchemaService;
-        return INSTANCE;
+        return new SchemaContextHandler(transactionChainHandler, domSchemaService);
     }
 
     public void init() {
