@@ -111,7 +111,7 @@ public class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<K
         return keyStore;
     }
 
-    private java.security.PrivateKey getJavaPrivateKey(final String base64PrivateKey)
+    private static java.security.PrivateKey getJavaPrivateKey(final String base64PrivateKey)
             throws GeneralSecurityException {
         final byte[] encodedKey = base64Decode(base64PrivateKey);
         final PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encodedKey);
@@ -128,7 +128,7 @@ public class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<K
         return key;
     }
 
-    private List<X509Certificate> getCertificateChain(final String[] base64Certificates)
+    private static List<X509Certificate> getCertificateChain(final String[] base64Certificates)
             throws GeneralSecurityException {
         final CertificateFactory factory = CertificateFactory.getInstance("X.509");
         final List<X509Certificate> certificates = new ArrayList<>();
@@ -141,7 +141,7 @@ public class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<K
         return certificates;
     }
 
-    private byte[] base64Decode(final String base64) {
+    private static byte[] base64Decode(final String base64) {
         return Base64.getMimeDecoder().decode(base64.getBytes(java.nio.charset.StandardCharsets.US_ASCII));
     }
 
@@ -158,7 +158,7 @@ public class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<K
 
                     pairs.clear();
                     if (dataAfter != null) {
-                        dataAfter.getKeyCredential().forEach(pair -> pairs.put(pair.getKey().getKeyId(), pair));
+                        dataAfter.getKeyCredential().forEach(pair -> pairs.put(pair.key().getKeyId(), pair));
                     }
                     break;
 

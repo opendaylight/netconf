@@ -78,7 +78,7 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
                     if (isNetconfNode(rootNode.getDataAfter())) {
                         NodeId nodeId = getNodeId(identifier);
                         if (nodeId != null) {
-                            NetconfNode nnode = rootNode.getDataAfter().getAugmentation(NetconfNode.class);
+                            NetconfNode nnode = rootNode.getDataAfter().augmentation(NetconfNode.class);
                             handledNetconfNode(nodeId, nnode);
                         }
                     }
@@ -98,7 +98,7 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
     }
 
     private static boolean isNetconfNode(final Node node) {
-        return node.getAugmentation(NetconfNode.class) != null;
+        return node.augmentation(NetconfNode.class) != null;
     }
 
     private static NodeId getNodeId(final InstanceIdentifier<?> path) {
@@ -197,7 +197,7 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
         Device1 d1 = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.FAILEDNOTALLOWED).build();
         DeviceBuilder builder = new DeviceBuilder()
                 .setUniqueId(id)
-                .setKey(new DeviceKey(id))
+                .withKey(new DeviceKey(id))
                 .setSshHostKey(sshEncodedKey)
                 .addAugmentation(Device1.class, d1);
 
@@ -262,7 +262,7 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
         InstanceIdentifier<Device> deviceIId =
                 InstanceIdentifier.create(NetconfCallhomeServer.class)
                         .child(AllowedDevices.class)
-                        .child(Device.class, device.getKey());
+                        .child(Device.class, device.key());
 
         tx.merge(LogicalDatastoreType.OPERATIONAL, deviceIId, device);
         tx.submit();
