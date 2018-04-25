@@ -103,6 +103,14 @@
       <artifactId>aaa-encrypt-service</artifactId>
       <version>0.7.2-SNAPSHOT</version>
     </dependency>
+
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>netconf-util</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
