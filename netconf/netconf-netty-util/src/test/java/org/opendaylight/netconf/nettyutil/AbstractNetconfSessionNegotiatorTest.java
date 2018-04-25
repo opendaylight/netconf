@@ -22,14 +22,12 @@ import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETC
 import com.google.common.base.Optional;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOutboundHandler;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.HashedWheelTimer;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
 import java.util.ArrayList;
@@ -41,7 +39,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
@@ -165,31 +162,4 @@ public class AbstractNetconfSessionNegotiatorTest {
         channel.pipeline().fireExceptionCaught(cause);
         verify(promise).setFailure(cause);
     }
-
-    private static class TestSessionNegotiator extends
-            AbstractNetconfSessionNegotiator<NetconfSessionPreferences,
-                    TestingNetconfSession, NetconfSessionListener<TestingNetconfSession>> {
-
-
-        TestSessionNegotiator(final NetconfSessionPreferences sessionPreferences,
-                              final Promise<TestingNetconfSession> promise, final Channel channel,
-                              final Timer timer,
-                              final NetconfSessionListener<TestingNetconfSession> sessionListener,
-                              final long connectionTimeoutMillis) {
-            super(sessionPreferences, promise, channel, timer, sessionListener, connectionTimeoutMillis);
-        }
-
-        @Override
-        protected TestingNetconfSession getSession(final NetconfSessionListener sessionListener, final Channel channel,
-                                               final NetconfHelloMessage message) throws NetconfDocumentedException {
-            return new TestingNetconfSession(sessionListener, channel, 0L);
-        }
-
-        @Override
-        protected void handleMessage(final NetconfHelloMessage netconfHelloMessage) throws Exception {
-
-        }
-    }
-
-
 }
