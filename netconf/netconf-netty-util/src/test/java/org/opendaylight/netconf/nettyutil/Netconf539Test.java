@@ -14,11 +14,9 @@ import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETC
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER;
 
 import com.google.common.base.Optional;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.HashedWheelTimer;
-import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.util.Collections;
 import org.junit.Assert;
@@ -26,7 +24,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
@@ -89,31 +86,5 @@ public class Netconf539Test {
             channel.pipeline().get(NETCONF_MESSAGE_AGGREGATOR) instanceof NetconfChunkAggregator);
         Assert.assertTrue("ChunkedFramingMechanismEncoder was not installed in the Netconf pipeline",
             channel.pipeline().get(NETCONF_MESSAGE_FRAME_ENCODER) instanceof ChunkedFramingMechanismEncoder);
-    }
-
-    private static class TestSessionNegotiator extends
-        AbstractNetconfSessionNegotiator<NetconfSessionPreferences,
-            TestingNetconfSession, NetconfSessionListener<TestingNetconfSession>> {
-
-
-        TestSessionNegotiator(final NetconfSessionPreferences sessionPreferences,
-                              final Promise<TestingNetconfSession> promise, final Channel channel,
-                              final Timer timer,
-                              final NetconfSessionListener<TestingNetconfSession> sessionListener,
-                              final long connectionTimeoutMillis) {
-            super(sessionPreferences, promise, channel, timer, sessionListener, connectionTimeoutMillis);
-        }
-
-        @Override
-        protected TestingNetconfSession getSession(final NetconfSessionListener sessionListener, final Channel channel,
-                                                   final NetconfHelloMessage message)
-            throws NetconfDocumentedException {
-            return new TestingNetconfSession(sessionListener, channel, 0L);
-        }
-
-        @Override
-        protected void handleMessage(final NetconfHelloMessage netconfHelloMessage) throws Exception {
-
-        }
     }
 }
