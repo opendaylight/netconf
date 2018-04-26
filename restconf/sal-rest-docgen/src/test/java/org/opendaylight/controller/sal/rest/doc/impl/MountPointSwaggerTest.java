@@ -13,7 +13,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.base.Optional;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +23,7 @@ import org.junit.Test;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorDraft02;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Api;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
@@ -46,12 +46,27 @@ public class MountPointSwaggerTest {
     private DocGenTestHelper helper;
     private SchemaContext schemaContext;
 
+    @SuppressWarnings("resource")
     @Before
     public void setUp() throws Exception {
-        this.swagger = new MountPointSwagger();
         this.helper = new DocGenTestHelper();
         this.helper.setUp();
         this.schemaContext = this.helper.getSchemaContext();
+
+        // We are sharing the global schema service and the mount schema service
+        // in our test.
+        // OK for testing - real thing would have seperate instances.
+        final SchemaContext context = this.helper.createMockSchemaContext();
+        final SchemaService schemaService = this.helper.createMockSchemaService(context);
+
+        final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
+        when(mountPoint.getSchemaContext()).thenReturn(context);
+
+        final DOMMountPointService service = mock(DOMMountPointService.class);
+        when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
+
+        MountPointSwaggerGeneratorDraft02 generator = new MountPointSwaggerGeneratorDraft02(schemaService, service);
+        this.swagger = generator.getMountPointSwagger();
     }
 
     @Test()
@@ -63,8 +78,6 @@ public class MountPointSwaggerTest {
 
     @Test()
     public void getInstanceIdentifiers() throws Exception {
-        final UriInfo mockInfo = setUpSwaggerForDocGeneration();
-
         assertEquals(0, this.swagger.getInstanceIdentifiers().size());
         this.swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of
                                                  // mount points
@@ -80,7 +93,7 @@ public class MountPointSwaggerTest {
 
     @Test
     public void testGetResourceListGoodId() throws Exception {
-        final UriInfo mockInfo = setUpSwaggerForDocGeneration();
+        final UriInfo mockInfo = this.helper.createMockUriInfo(HTTP_URL);
         this.swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of
                                                  // mount points
         final ResourceList resourceList = this.swagger.getResourceList(mockInfo, 1L);
@@ -96,7 +109,7 @@ public class MountPointSwaggerTest {
 
     @Test
     public void testGetDataStoreApi() throws Exception {
-        final UriInfo mockInfo = setUpSwaggerForDocGeneration();
+        final UriInfo mockInfo = this.helper.createMockUriInfo(HTTP_URL);
         this.swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of
                                                  // mount points
 
@@ -116,29 +129,9 @@ public class MountPointSwaggerTest {
                     .getNotes());
         }
         final Set<String> expectedApis = new TreeSet<>(Arrays.asList(new String[] {
-            "/config" + INSTANCE_URL + "yang-ext:mount",
-            "/operational" + INSTANCE_URL + "yang-ext:mount",
-            "/operations" + INSTANCE_URL + "yang-ext:mount",}));
+            "/restconf/config" + INSTANCE_URL + "yang-ext:mount",
+            "/restconf/operational" + INSTANCE_URL + "yang-ext:mount",
+            "/restconf/operations" + INSTANCE_URL + "yang-ext:mount",}));
         assertEquals(expectedApis, actualApis);
     }
-
-    protected UriInfo setUpSwaggerForDocGeneration() throws URISyntaxException {
-        final UriInfo mockInfo = this.helper.createMockUriInfo(HTTP_URL);
-        // We are sharing the global schema service and the mount schema service
-        // in our test.
-        // OK for testing - real thing would have seperate instances.
-        final SchemaContext context = this.helper.createMockSchemaContext();
-        final SchemaService schemaService = this.helper.createMockSchemaService(context);
-
-        final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
-        when(mountPoint.getSchemaContext()).thenReturn(context);
-
-        final DOMMountPointService service = mock(DOMMountPointService.class);
-        when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
-        this.swagger.setMountService(service);
-        this.swagger.setGlobalSchema(schemaService);
-
-        return mockInfo;
-    }
-
 }
