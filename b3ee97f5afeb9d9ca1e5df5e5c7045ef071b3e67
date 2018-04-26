@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "00dc1b7c_1cf83242",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/DOMDataTransactionValidator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-04-26T11:46:14Z",
+      "side": 1,
+      "message": "a CheckedFuture..\n\noperation. The future blocks..",
+      "revId": "b3ee97f5afeb9d9ca1e5df5e5c7045ef071b3e67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b98471d2_30a2c693",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/DOMDataTransactionValidator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-04-26T11:46:14Z",
+      "side": 1,
+      "message": "with a { (just one space is enough",
+      "range": {
+        "startLine": 39,
+        "startChar": 17,
+        "endLine": 39,
+        "endChar": 18
+      },
+      "revId": "b3ee97f5afeb9d9ca1e5df5e5c7045ef071b3e67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "270b8251_6586324d",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/DOMDataTransactionValidator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-04-26T11:46:14Z",
+      "side": 1,
+      "message": "CheckedFuture is deprecated in the latest version of Guava. I would prefer not to use deprecated types in a newly defined API. Please use different return type if possible.",
+      "revId": "b3ee97f5afeb9d9ca1e5df5e5c7045ef071b3e67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
