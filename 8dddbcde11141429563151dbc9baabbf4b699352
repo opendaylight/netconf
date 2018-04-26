@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a729f4c_064839f8",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-04-26T11:08:54Z",
+      "side": 1,
+      "message": "Maybe we should use the right namespace urn:ietf:params:xml:ns:netconf:base:1.0 here directly.",
+      "revId": "8dddbcde11141429563151dbc9baabbf4b699352",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
