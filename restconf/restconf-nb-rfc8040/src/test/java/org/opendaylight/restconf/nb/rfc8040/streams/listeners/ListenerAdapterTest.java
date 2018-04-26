@@ -29,10 +29,10 @@ import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.binding.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.PatchCont;
@@ -73,10 +73,10 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         SchemaContext sc = YangParserTestUtils.parseYangResource(
                 "/instanceidentifier/yang/instance-identifier-patch-module.yang");
 
-        transactionChainHandler = new TransactionChainHandler(domDataBroker.createTransactionChain(
-                Mockito.mock(TransactionChainListener.class)));
-        schemaContextHandler = new SchemaContextHandler(transactionChainHandler);
-        SchemaContextHandler.setSchemaContext(sc);
+        transactionChainHandler = new TransactionChainHandler(domDataBroker);
+        schemaContextHandler = SchemaContextHandler.newInstance(transactionChainHandler,
+                Mockito.mock(DOMSchemaService.class));
+        schemaContextHandler.onGlobalContextUpdated(sc);
     }
 
     class ListenerAdapterTester extends ListenerAdapter {

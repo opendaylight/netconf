@@ -11,6 +11,8 @@ import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.Application;
+import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
+import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeXmlBodyWriter;
@@ -21,17 +23,17 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.PatchXmlBodyW
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.XmlToPatchBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.schema.SchemaExportContentYangBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.schema.SchemaExportContentYinBodyWriter;
-import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl;
+import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
 
 public class RestconfApplication extends Application {
+    private final SchemaContextHandler schemaContextHandler = SchemaContextHandler.instance();
+    private final DOMMountPointServiceHandler mountPointServiceHandler = DOMMountPointServiceHandler.instance();
 
     @Override
     public Set<Class<?>> getClasses() {
         return ImmutableSet.<Class<?>>builder()
                 .add(NormalizedNodeJsonBodyWriter.class).add(NormalizedNodeXmlBodyWriter.class)
-                .add(JsonNormalizedNodeBodyReader.class).add(XmlNormalizedNodeBodyReader.class)
                 .add(SchemaExportContentYinBodyWriter.class).add(SchemaExportContentYangBodyWriter.class)
-                .add(JsonToPatchBodyReader.class).add(XmlToPatchBodyReader.class)
                 .add(PatchJsonBodyWriter.class).add(PatchXmlBodyWriter.class)
                 .build();
     }
@@ -39,7 +41,11 @@ public class RestconfApplication extends Application {
     @Override
     public Set<Object> getSingletons() {
         final Set<Object> singletons = new HashSet<>();
-        singletons.add(ServicesWrapperImpl.getInstance());
+        singletons.add(ServicesWrapper.getInstance());
+        singletons.add(new JsonNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler));
+        singletons.add(new JsonToPatchBodyReader(schemaContextHandler, mountPointServiceHandler));
+        singletons.add(new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler));
+        singletons.add(new XmlToPatchBodyReader(schemaContextHandler, mountPointServiceHandler));
         return singletons;
     }
 }

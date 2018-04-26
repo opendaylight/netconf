@@ -51,7 +51,6 @@ import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
@@ -59,7 +58,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl;
+import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -129,9 +128,6 @@ public class JSONRestconfServiceRfc8040ImplTest {
     private DOMMountPointService mockMountPointService;
 
     @Mock
-    private SchemaContextHandler mockSchemaContextHandler;
-
-    @Mock
     private DOMDataBroker mockDOMDataBroker;
 
     @Mock
@@ -142,10 +138,11 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
     private JSONRestconfServiceRfc8040Impl service;
 
+    private final SchemaContextHandler schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
+
     @BeforeClass
     public static void init() throws IOException, ReactorException {
         schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
-        SchemaContextHandler.setSchemaContext(schemaContext);
     }
 
     @SuppressWarnings("resource")
@@ -177,25 +174,19 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         doReturn(mockTxChain).when(mockDOMDataBroker).createTransactionChain(any());
 
-        doReturn(schemaContext).when(mockSchemaContextHandler).get();
-
-        final TransactionChainHandler txChainHandler = new TransactionChainHandler(mockTxChain);
+        final TransactionChainHandler txChainHandler = new TransactionChainHandler(mockDOMDataBroker);
 
         final DOMMountPointServiceHandler mountPointServiceHandler =
-                new DOMMountPointServiceHandler(mockMountPointService);
+                DOMMountPointServiceHandler.newInstance(mockMountPointService);
 
         final DOMNotificationService mockNotificationService = mock(DOMNotificationService.class);
-        ServicesWrapperImpl.getInstance().setHandlers(mockSchemaContextHandler, mountPointServiceHandler,
-                txChainHandler, new DOMDataBrokerHandler(mockDOMDataBroker),
-                new RpcServiceHandler(mockRpcService),
-                new NotificationServiceHandler(mockNotificationService), domSchemaService);
+        final ServicesWrapper servicesWrapper = ServicesWrapper.newInstance(schemaContextHandler,
+                mountPointServiceHandler, txChainHandler, new DOMDataBrokerHandler(mockDOMDataBroker),
+                new RpcServiceHandler(mockRpcService), new NotificationServiceHandler(mockNotificationService),
+                domSchemaService);
 
-        service = new JSONRestconfServiceRfc8040Impl(ServicesWrapperImpl.getInstance(), mountPointServiceHandler);
-
-        new RestConnectorProvider<>(mockDOMDataBroker, domSchemaService, mockRpcService, mockNotificationService,
-                mockMountPointService).start();
-
-        SchemaContextHandler.setSchemaContext(schemaContext);
+        service = new JSONRestconfServiceRfc8040Impl(servicesWrapper, mountPointServiceHandler,
+                schemaContextHandler);
     }
 
     private static String loadData(final String path) throws IOException {

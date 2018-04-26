@@ -11,17 +11,13 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.JsonBodyReaderTest;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -32,7 +28,8 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
     private static SchemaContext schemaContext;
 
     public JsonPatchBodyReaderTest() throws Exception {
-        jsonToPatchBodyReader = new JsonToPatchBodyReader();
+        super(schemaContext);
+        jsonToPatchBodyReader = new JsonToPatchBodyReader(schemaContextHandler, mountPointServiceHandler);
     }
 
     @Override
@@ -43,8 +40,6 @@ public class JsonPatchBodyReaderTest extends AbstractBodyReaderTest {
     @BeforeClass
     public static void initialization() {
         schemaContext = schemaContextLoader("/instanceidentifier/yang", schemaContext);
-        when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mock(DOMMountPointService.class));
-        SchemaContextHandler.setSchemaContext(schemaContext);
     }
 
     @Test

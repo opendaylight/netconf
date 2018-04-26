@@ -46,7 +46,7 @@ import org.opendaylight.restconf.nb.rfc8040.services.simple.impl.RestconfSchemaS
  *
  */
 @Path("/")
-public final class ServicesWrapperImpl implements BaseServicesWrapper, TransactionServicesWrapper, ServiceWrapper {
+public final class ServicesWrapper implements BaseServicesWrapper, TransactionServicesWrapper {
 
     private RestconfDataService delegRestconfDataService;
     private RestconfInvokeOperationsService delegRestconfInvokeOpsService;
@@ -55,14 +55,41 @@ public final class ServicesWrapperImpl implements BaseServicesWrapper, Transacti
     private RestconfSchemaService delegRestSchService;
     private RestconfService delegRestService;
 
-    private ServicesWrapperImpl() {
+    @Deprecated
+    private ServicesWrapper() {
     }
 
     private static class InstanceHolder {
-        public static final ServicesWrapperImpl INSTANCE = new ServicesWrapperImpl();
+        public static final ServicesWrapper INSTANCE = new ServicesWrapper();
     }
 
-    public static ServicesWrapperImpl getInstance() {
+    @Deprecated
+    public static ServicesWrapper getInstance() {
+        return InstanceHolder.INSTANCE;
+    }
+
+    public static ServicesWrapper newInstance(final SchemaContextHandler schemaCtxHandler,
+            final DOMMountPointServiceHandler domMountPointServiceHandler,
+            final TransactionChainHandler transactionChainHandler, final DOMDataBrokerHandler domDataBrokerHandler,
+            final RpcServiceHandler rpcServiceHandler, final NotificationServiceHandler notificationServiceHandler,
+            final DOMSchemaService domSchemaService) {
+        InstanceHolder.INSTANCE.delegRestOpsService =
+                new RestconfOperationsServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
+        final DOMYangTextSourceProvider yangTextSourceProvider =
+                (DOMYangTextSourceProvider) domSchemaService.getSupportedExtensions()
+                        .get(DOMYangTextSourceProvider.class);
+        InstanceHolder.INSTANCE.delegRestSchService =
+                new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler,
+                yangTextSourceProvider);
+        InstanceHolder.INSTANCE.delegRestconfSubscrService =
+                new RestconfStreamsSubscriptionServiceImpl(domDataBrokerHandler,
+                notificationServiceHandler, schemaCtxHandler, transactionChainHandler);
+        InstanceHolder.INSTANCE.delegRestconfDataService =
+                new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler, domMountPointServiceHandler,
+                        InstanceHolder.INSTANCE.delegRestconfSubscrService);
+        InstanceHolder.INSTANCE.delegRestconfInvokeOpsService =
+                new RestconfInvokeOperationsServiceImpl(rpcServiceHandler, schemaCtxHandler);
+        InstanceHolder.INSTANCE.delegRestService = new RestconfImpl(schemaCtxHandler);
         return InstanceHolder.INSTANCE;
     }
 
@@ -135,27 +162,5 @@ public final class ServicesWrapperImpl implements BaseServicesWrapper, Transacti
     @Override
     public NormalizedNodeContext getLibraryVersion() {
         return this.delegRestService.getLibraryVersion();
-    }
-
-    @Override
-    public void setHandlers(final SchemaContextHandler schemaCtxHandler,
-            final DOMMountPointServiceHandler domMountPointServiceHandler,
-            final TransactionChainHandler transactionChainHandler, final DOMDataBrokerHandler domDataBrokerHandler,
-            final RpcServiceHandler rpcServiceHandler, final NotificationServiceHandler notificationServiceHandler,
-            final DOMSchemaService domSchemaService) {
-        this.delegRestOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
-        final DOMYangTextSourceProvider yangTextSourceProvider =
-                (DOMYangTextSourceProvider) domSchemaService.getSupportedExtensions()
-                        .get(DOMYangTextSourceProvider.class);
-        this.delegRestSchService = new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler,
-                yangTextSourceProvider);
-        this.delegRestconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(domDataBrokerHandler,
-                notificationServiceHandler, schemaCtxHandler, transactionChainHandler);
-        this.delegRestconfDataService =
-                new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler, domMountPointServiceHandler,
-                        this.delegRestconfSubscrService);
-        this.delegRestconfInvokeOpsService =
-                new RestconfInvokeOperationsServiceImpl(rpcServiceHandler, schemaCtxHandler);
-        this.delegRestService = new RestconfImpl(schemaCtxHandler);
     }
 }

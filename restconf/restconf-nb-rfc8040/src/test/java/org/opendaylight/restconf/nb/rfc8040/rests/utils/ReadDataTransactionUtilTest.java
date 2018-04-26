@@ -27,6 +27,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -34,6 +35,7 @@ import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
+import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -82,7 +84,9 @@ public class ReadDataTransactionUtilTest {
         when(containerChildNode.getQName()).thenReturn(containerChildQName);
         when(containerSchemaNode.getDataChildByName(containerChildQName)).thenReturn(containerChildNode);
 
-        wrapper = new TransactionVarsWrapper(this.context, null, this.transactionChain);
+        DOMDataBroker mockDataBroker = Mockito.mock(DOMDataBroker.class);
+        Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
+        wrapper = new TransactionVarsWrapper(this.context, null, new TransactionChainHandler(mockDataBroker));
     }
 
     @Test

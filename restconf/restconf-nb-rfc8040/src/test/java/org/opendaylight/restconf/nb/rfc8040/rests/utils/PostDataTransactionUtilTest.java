@@ -22,8 +22,10 @@ import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -32,6 +34,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.yangtools.util.SingletonSet;
@@ -63,7 +66,10 @@ public class PostDataTransactionUtilTest {
     private UriInfo uriInfo;
     @Mock
     private UriBuilder uriBuilder;
+    @Mock
+    private DOMDataBroker mockDataBroker;
 
+    private TransactionChainHandler transactionChainHandler;
     private SchemaContextRef refSchemaCtx;
     private ContainerNode buildBaseCont;
     private SchemaContext schema;
@@ -122,6 +128,9 @@ public class PostDataTransactionUtilTest {
         doReturn(UriBuilder.fromUri("http://localhost:8181/restconf/16/")).when(this.uriInfo).getBaseUriBuilder();
         doReturn(this.readWrite).when(this.transactionChain).newReadWriteTransaction();
         doReturn(this.read).when(this.transactionChain).newReadOnlyTransaction();
+
+        Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
+        transactionChainHandler = new TransactionChainHandler(mockDataBroker);
     }
 
     @Test
@@ -141,7 +150,7 @@ public class PostDataTransactionUtilTest {
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         final TransactionVarsWrapper wrapper =
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain);
+                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler);
         final Response response =
                 PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
         assertEquals(201, response.getStatus());
@@ -166,7 +175,7 @@ public class PostDataTransactionUtilTest {
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
         doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
         final TransactionVarsWrapper wrapper =
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain);
+                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler);
         final Response response =
                 PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
         assertEquals(201, response.getStatus());
@@ -193,7 +202,7 @@ public class PostDataTransactionUtilTest {
         final DOMException domException = new DOMException((short) 414, "Post request failed");
         doReturn(Futures.immediateFailedCheckedFuture(domException)).when(this.readWrite).submit();
         final TransactionVarsWrapper wrapper =
-                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, this.transactionChain);
+                new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler);
 
         try {
             PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);

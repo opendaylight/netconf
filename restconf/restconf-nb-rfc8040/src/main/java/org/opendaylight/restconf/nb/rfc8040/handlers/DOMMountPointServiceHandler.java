@@ -14,8 +14,10 @@ import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
  * Implementation of {@link DOMMountPointServiceHandler}.
  *
  */
-public class DOMMountPointServiceHandler implements Handler<DOMMountPointService> {
-    private final DOMMountPointService domMountPointService;
+public final class DOMMountPointServiceHandler implements Handler<DOMMountPointService> {
+    private static final DOMMountPointServiceHandler INSTANCE = new DOMMountPointServiceHandler();
+
+    private DOMMountPointService domMountPointService;
 
     /**
      * Prepare mount point service for Restconf services.
@@ -23,8 +25,22 @@ public class DOMMountPointServiceHandler implements Handler<DOMMountPointService
      * @param domMountPointService
      *             mount point service
      */
-    public DOMMountPointServiceHandler(final DOMMountPointService domMountPointService) {
+    private DOMMountPointServiceHandler(final DOMMountPointService domMountPointService) {
         this.domMountPointService = Objects.requireNonNull(domMountPointService);
+    }
+
+    @Deprecated
+    private DOMMountPointServiceHandler() {
+    }
+
+    @Deprecated
+    public static DOMMountPointServiceHandler instance() {
+        return INSTANCE;
+    }
+
+    public static DOMMountPointServiceHandler newInstance(DOMMountPointService domMountPointService) {
+        INSTANCE.domMountPointService = domMountPointService;
+        return INSTANCE;
     }
 
     @Override

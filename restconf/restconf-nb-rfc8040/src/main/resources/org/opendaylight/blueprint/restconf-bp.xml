@@ -36,30 +36,52 @@
           ext:filter="(type=@{databroker-service-type})"/>
   <reference id="domSchemaService" interface="org.opendaylight.mdsal.dom.api.DOMSchemaService"/>
 
-  <bean id="wrapper" class="org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapperImpl"
-          factory-method="getInstance" />
-
-  <bean id="restconfProvider" class="org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider"
-          init-method="start" destroy-method="close">
+  <bean id="transactionChainHandler" class="org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler"
+          destroy-method="close">
     <argument ref="domDataBroker"/>
-    <argument ref="domSchemaService"/>
-    <argument ref="domRpcService"/>
-    <argument ref="domNotificationService"/>
-    <argument ref="domMountPointService"/>
-    <argument ref="wrapper"/>
   </bean>
 
-  <service ref="restconfProvider"
-      interface="org.opendaylight.restconf.nb.rfc8040.RestconfConnector" />
+  <bean id="schemaContextHandler" class="org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler"
+      factory-method="newInstance" init-method="init" destroy-method="close">
+    <argument ref="transactionChainHandler"/>
+    <argument ref="domSchemaService"/>
+  </bean>
+
+  <bean id="mountPointServiceHandler" class="org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler"
+      factory-method="newInstance">
+    <argument ref="domMountPointService"/>
+  </bean>
+
+  <bean id="dataBrokerHandler" class="org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler">
+    <argument ref="domDataBroker"/>
+  </bean>
+
+  <bean id="rpcServiceHandler" class="org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler">
+    <argument ref="domRpcService"/>
+  </bean>
+
+  <bean id="notificationServiceHandler" class="org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler">
+    <argument ref="domNotificationService"/>
+  </bean>
+
+  <bean id="servicesWrapper" class="org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper"
+      factory-method="newInstance">
+    <argument ref="schemaContextHandler"/>
+    <argument ref="mountPointServiceHandler"/>
+    <argument ref="transactionChainHandler"/>
+    <argument ref="dataBrokerHandler"/>
+    <argument ref="rpcServiceHandler"/>
+    <argument ref="notificationServiceHandler"/>
+    <argument ref="domSchemaService"/>
+  </bean>
 
   <!-- JSONRestconfService -->
-  <bean id="jsonRestconfService" depends-on="restconfProvider"
+  <bean id="jsonRestconfService"
       class="org.opendaylight.restconf.nb.rfc8040.rests.services.impl.JSONRestconfServiceRfc8040Impl"
       destroy-method="close">
-    <argument ref="wrapper"/>
-    <argument>
-      <bean factory-ref="restconfProvider" factory-method="getMountPointServiceHandler" />
-    </argument>
+    <argument ref="servicesWrapper"/>
+    <argument ref="mountPointServiceHandler"/>
+    <argument ref="schemaContextHandler"/>
   </bean>
 
   <service ref="jsonRestconfService" odl:type="rfc8040"

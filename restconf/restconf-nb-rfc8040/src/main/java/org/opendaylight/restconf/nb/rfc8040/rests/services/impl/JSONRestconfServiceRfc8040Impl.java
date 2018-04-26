@@ -60,11 +60,14 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
 
     private final TransactionServicesWrapper services;
     private final DOMMountPointServiceHandler mountPointServiceHandler;
+    private final SchemaContextHandler schemaContextHandler;
 
     public JSONRestconfServiceRfc8040Impl(final TransactionServicesWrapper services,
-            final DOMMountPointServiceHandler mountPointServiceHandler) {
+            final DOMMountPointServiceHandler mountPointServiceHandler,
+            final SchemaContextHandler schemaContextHandler) {
         this.services = services;
         this.mountPointServiceHandler = mountPointServiceHandler;
+        this.schemaContextHandler = schemaContextHandler;
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
@@ -192,7 +195,8 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
 
         final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
 
-        JsonToPatchBodyReader jsonToPatchBodyReader = new JsonToPatchBodyReader();
+        JsonToPatchBodyReader jsonToPatchBodyReader =
+                new JsonToPatchBodyReader(schemaContextHandler, mountPointServiceHandler);
         final PatchContext context = jsonToPatchBodyReader.readFrom(uriPath, entityStream);
 
         LOG.debug("Parsed YangInstanceIdentifier: {}", context.getInstanceIdentifierContext().getInstanceIdentifier());
@@ -214,8 +218,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
     private NormalizedNodeContext toNormalizedNodeContext(final String uriPath, @Nullable final String payload,
             final boolean isPost) throws OperationFailedException {
         final InstanceIdentifierContext<?> instanceIdentifierContext = ParserIdentifier.toInstanceIdentifier(
-                uriPath, SchemaContextHandler.getSchemaContext(),
-                Optional.of(mountPointServiceHandler.get()));
+                uriPath, schemaContextHandler.get(), Optional.of(mountPointServiceHandler.get()));
 
         if (payload == null) {
             return new NormalizedNodeContext(instanceIdentifierContext, null);

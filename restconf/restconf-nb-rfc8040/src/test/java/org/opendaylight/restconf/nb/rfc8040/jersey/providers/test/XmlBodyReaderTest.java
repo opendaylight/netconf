@@ -12,8 +12,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
 import java.io.File;
@@ -24,12 +22,10 @@ import javax.ws.rs.core.MediaType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyReader;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -53,7 +49,8 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
 
     public XmlBodyReaderTest() throws Exception {
-        this.xmlBodyReader = new XmlNormalizedNodeBodyReader();
+        super(schemaContext);
+        this.xmlBodyReader = new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler);
     }
 
     @Override
@@ -67,8 +64,6 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
         testFiles.addAll(TestRestconfUtils.loadFiles("/modules"));
         testFiles.addAll(TestRestconfUtils.loadFiles("/foo-xml-test/yang"));
         schemaContext = YangParserTestUtils.parseYangFiles(testFiles);
-        when(MOUNT_POINT_SERVICE_HANDLER.get()).thenReturn(mock(DOMMountPointService.class));
-        SchemaContextHandler.setSchemaContext(schemaContext);
     }
 
     @Test

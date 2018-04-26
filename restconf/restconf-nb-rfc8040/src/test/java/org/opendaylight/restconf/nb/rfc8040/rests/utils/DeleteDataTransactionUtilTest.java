@@ -10,15 +10,11 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 
 import com.google.common.util.concurrent.Futures;
-import java.lang.reflect.Field;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -31,7 +27,6 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
-import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -43,31 +38,10 @@ public class DeleteDataTransactionUtilTest {
     private InstanceIdentifierContext<?> context;
     @Mock
     private DOMDataReadWriteTransaction readWrite;
+    @Mock
+    private DOMDataBroker mockDataBroker;
 
-    // Fields used when delete operation fails to reset transaction chain
-    private static Field handler;
-    private static Field broker;
-
-    @BeforeClass
-    public static void setup() throws Exception {
-        DeleteDataTransactionUtilTest.handler = RestConnectorProvider.class.getDeclaredField("transactionChainHandler");
-        DeleteDataTransactionUtilTest.broker = RestConnectorProvider.class.getDeclaredField("dataBroker");
-
-        DeleteDataTransactionUtilTest.handler.setAccessible(true);
-        DeleteDataTransactionUtilTest.handler.set(RestConnectorProvider.class, mock(TransactionChainHandler.class));
-
-        DeleteDataTransactionUtilTest.broker.setAccessible(true);
-        DeleteDataTransactionUtilTest.broker.set(RestConnectorProvider.class, mock(DOMDataBroker.class));
-    }
-
-    @AfterClass
-    public static void clean() throws Exception {
-        DeleteDataTransactionUtilTest.handler.set(RestConnectorProvider.class, null);
-        DeleteDataTransactionUtilTest.handler.setAccessible(false);
-
-        DeleteDataTransactionUtilTest.broker.set(RestConnectorProvider.class, null);
-        DeleteDataTransactionUtilTest.broker.setAccessible(false);
-    }
+    private TransactionChainHandler transactionChainHandler;
 
     @Before
     public void init() throws Exception {
@@ -75,6 +49,9 @@ public class DeleteDataTransactionUtilTest {
         Mockito.when(this.transactionChain.newReadWriteTransaction()).thenReturn(this.readWrite);
         Mockito.when(this.readWrite.submit()).thenReturn(Futures.immediateCheckedFuture(null));
         Mockito.when(this.context.getInstanceIdentifier()).thenReturn(YangInstanceIdentifier.EMPTY);
+
+        Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
+        transactionChainHandler = new TransactionChainHandler(mockDataBroker);
     }
 
     /**
@@ -89,7 +66,7 @@ public class DeleteDataTransactionUtilTest {
 
         // test
         final Response response = DeleteDataTransactionUtil.deleteData(
-                new TransactionVarsWrapper(this.context, null, this.transactionChain));
+                new TransactionVarsWrapper(this.context, null, transactionChainHandler));
 
         // assert success
         assertEquals("Not expected response received", Status.NO_CONTENT.getStatusCode(), response.getStatus());
@@ -107,7 +84,8 @@ public class DeleteDataTransactionUtilTest {
 
         // test and assert error
         try {
-            DeleteDataTransactionUtil.deleteData(new TransactionVarsWrapper(this.context, null, this.transactionChain));
+            DeleteDataTransactionUtil.deleteData(new TransactionVarsWrapper(this.context, null,
+                    transactionChainHandler));
             fail("Delete operation should fail due to missing data");
         } catch (final RestconfDocumentedException e) {
             assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());

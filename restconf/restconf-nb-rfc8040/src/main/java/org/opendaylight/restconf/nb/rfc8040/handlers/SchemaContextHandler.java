@@ -8,17 +8,17 @@
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
 import com.google.common.base.Preconditions;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.restconf.nb.rfc8040.RestConnectorProvider;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
+import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
@@ -27,6 +27,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.ConflictingModificationAppliedException;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,25 +35,57 @@ import org.slf4j.LoggerFactory;
  * Implementation of {@link SchemaContextHandler}.
  *
  */
-public class SchemaContextHandler implements SchemaContextListenerHandler {
+@SuppressWarnings("checkstyle:FinalClass")
+public class SchemaContextHandler implements SchemaContextListenerHandler, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);
 
-    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
-    private static volatile SchemaContext schemaContext;
-
-    private final TransactionChainHandler transactionChainHandler;
+    private static final SchemaContextHandler INSTANCE = new SchemaContextHandler();
 
     private final AtomicInteger moduleSetId = new AtomicInteger(0);
+
+    private TransactionChainHandler transactionChainHandler;
+    private DOMSchemaService domSchemaService;
+    private ListenerRegistration<SchemaContextListener> listenerRegistration;
+
+    private volatile SchemaContext schemaContext;
 
     /**
      * Constructor.
      *
      * @param transactionChainHandler Transaction chain handler
      */
-    public SchemaContextHandler(final TransactionChainHandler transactionChainHandler) {
+    private SchemaContextHandler(final TransactionChainHandler transactionChainHandler,
+            final DOMSchemaService domSchemaService) {
         this.transactionChainHandler = transactionChainHandler;
-        schemaContext = null;
+        this.domSchemaService = domSchemaService;
+    }
+
+    @Deprecated
+    private SchemaContextHandler() {
+    }
+
+    @Deprecated
+    public static SchemaContextHandler instance() {
+        return INSTANCE;
+    }
+
+    public static SchemaContextHandler newInstance(TransactionChainHandler transactionChainHandler,
+            DOMSchemaService domSchemaService) {
+        INSTANCE.transactionChainHandler = transactionChainHandler;
+        INSTANCE.domSchemaService = domSchemaService;
+        return INSTANCE;
+    }
+
+    public void init() {
+        listenerRegistration = domSchemaService.registerSchemaContextListener(this);
+    }
+
+    @Override
+    public void close() {
+        if (listenerRegistration != null) {
+            listenerRegistration.close();
+        }
     }
 
     @Override
@@ -63,28 +96,25 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
 
         final Module ietfYangLibraryModule =
                 context.findModule(IetfYangLibrary.MODULE_QNAME).orElse(null);
-        NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
-                RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(context.getModules(), ietfYangLibraryModule,
-                        context, String.valueOf(this.moduleSetId.incrementAndGet()));
-        putData(normNode);
+        if (ietfYangLibraryModule != null) {
+            NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
+                    RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(context.getModules(), ietfYangLibraryModule,
+                            context, String.valueOf(this.moduleSetId.incrementAndGet()));
+            putData(normNode);
+        }
 
         final Module monitoringModule =
                 schemaContext.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
-        normNode = RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
-        putData(normNode);
+        if (monitoringModule != null) {
+            NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
+                    RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
+            putData(normNode);
+        }
     }
 
     @Override
     public SchemaContext get() {
         return schemaContext;
-    }
-
-    public static SchemaContext getSchemaContext() {
-        return schemaContext;
-    }
-
-    public static void setSchemaContext(final SchemaContext context) {
-        schemaContext = context;
     }
 
     private void putData(
@@ -108,7 +138,7 @@ public class SchemaContextHandler implements SchemaContextListenerHandler {
               https://bugs.opendaylight.org/show_bug.cgi?id=7728
             */
             LOG.warn("Ignoring that another cluster node is already putting the same data to DS.", e);
-            RestConnectorProvider.resetTransactionChainForAdapaters(this.transactionChainHandler.get());
+            this.transactionChainHandler.reset();
         }
     }
 }
