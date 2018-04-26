@@ -16,6 +16,24 @@
       "revId": "8dddbcde11141429563151dbc9baabbf4b699352",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c7b31789_25959709",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 5719
+      },
+      "writtenOn": "2018-04-26T12:14:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a729f4c_064839f8",
+      "revId": "8dddbcde11141429563151dbc9baabbf4b699352",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
