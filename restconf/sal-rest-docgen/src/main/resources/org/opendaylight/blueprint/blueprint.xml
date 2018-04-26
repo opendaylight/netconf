@@ -11,15 +11,46 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
            xmlns:odl="http://opendaylight.org/xmlns/blueprint/v1.0.0"
            odl:use-default-for-reference-types="true">
 
-    <!-- AAAService is used in web.xml and is needed here -->
-    <reference id="aaaService" interface="org.opendaylight.aaa.api.AAAService" />
-
     <reference id="schemaService" interface="org.opendaylight.controller.sal.core.api.model.SchemaService"/>
     <reference id="domMountPointService" interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"/>
+    <reference id="webServer" interface="org.opendaylight.aaa.web.WebServer"/>
+    <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer"/>
 
-    <bean id="provider" class="org.opendaylight.netconf.sal.rest.doc.DocProvider" destroy-method="close">
+    <bean id="mountPointDraft02" class="org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorDraft02"
+            destroy-method="close">
         <argument ref="schemaService" />
         <argument ref="domMountPointService" />
     </bean>
 
+    <bean id="mountPointRFC8040" class="org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorRFC8040"
+            destroy-method="close">
+        <argument ref="schemaService" />
+        <argument ref="domMountPointService" />
+    </bean>
+
+    <bean id="apiDocDraftO2" class="org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGeneratorDraftO2">
+        <argument ref="schemaService" />
+    </bean>
+
+    <bean id="apiDocRFC8040" class="org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGeneratorRFC8040">
+        <argument ref="schemaService" />
+    </bean>
+
+    <bean id="apiDocService" class="org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl">
+        <argument ref="mountPointDraft02" />
+        <argument ref="mountPointRFC8040" />
+        <argument ref="apiDocDraftO2" />
+        <argument ref="apiDocRFC8040" />
+    </bean>
+
+    <bean id="apiDocApplication" class="org.opendaylight.netconf.sal.rest.doc.jaxrs.ApiDocApplication">
+        <argument ref="apiDocService" />
+    </bean>
+
+    <bean id="webInitializer" class="org.opendaylight.netconf.sal.rest.doc.jaxrs.WebInitializer"
+            destroy-method="close">
+        <argument ref="webServer"/>
+        <argument ref="webContextSecurer"/>
+        <argument ref="apiDocApplication"/>
+  </bean>
 </blueprint>

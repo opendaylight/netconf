@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.function.Function;
 import javax.ws.rs.core.UriInfo;
 import org.apache.maven.project.MavenProject;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGenerator;
+import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGeneratorDraft02;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
@@ -37,11 +37,16 @@ import org.slf4j.LoggerFactory;
 /**
  * This class gathers all yang defined {@link Module}s and generates Swagger compliant documentation.
  */
-public class StaticDocGenerator extends ApiDocGenerator implements BasicCodeGenerator, MavenProjectAware {
+public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
+        implements BasicCodeGenerator, MavenProjectAware {
     private static final Logger LOG = LoggerFactory.getLogger(StaticDocGenerator.class);
 
     private static final String DEFAULT_OUTPUT_BASE_DIR_PATH = "target" + File.separator + "generated-resources"
         + File.separator + "swagger-api-documentation";
+
+    public StaticDocGenerator() {
+        super(Optional.empty());
+    }
 
     @Override
     @SuppressFBWarnings("DM_DEFAULT_ENCODING")
@@ -115,7 +120,7 @@ public class StaticDocGenerator extends ApiDocGenerator implements BasicCodeGene
     }
 
     @Override
-    protected String generatePath(final UriInfo uriInfo, final String name, final String revision) {
+    public String generatePath(final UriInfo uriInfo, final String name, final String revision) {
         if (uriInfo == null) {
             return name + "(" + revision + ")";
         }
@@ -123,7 +128,7 @@ public class StaticDocGenerator extends ApiDocGenerator implements BasicCodeGene
     }
 
     @Override
-    protected String createBasePathFromUriInfo(final UriInfo uriInfo) {
+    public String createBasePathFromUriInfo(final UriInfo uriInfo) {
         if (uriInfo == null) {
             return RESTCONF_CONTEXT_ROOT;
         }
