@@ -21,11 +21,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.ws.rs.core.UriInfo;
+import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Delete;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Get;
@@ -39,6 +41,9 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -49,24 +54,33 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BaseYangSwaggerGenerator {
+public abstract class BaseYangSwaggerGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseYangSwaggerGenerator.class);
 
     protected static final String API_VERSION = "1.0.0";
     protected static final String SWAGGER_VERSION = "1.2";
-    protected static final String RESTCONF_CONTEXT_ROOT = "restconf";
-    private static final String RESTCONF_DRAFT = "18";
 
     static final String MODULE_NAME_SUFFIX = "_module";
     private final ModelGenerator jsonConverter = new ModelGenerator();
 
     // private Map<String, ApiDeclaration> MODULE_DOC_CACHE = new HashMap<>()
     private final ObjectMapper mapper = new ObjectMapper();
-    private volatile boolean newDraft;
+    private final SchemaService schemaService;
 
-    protected BaseYangSwaggerGenerator() {
+    protected BaseYangSwaggerGenerator(SchemaService schemaService) {
+        this.schemaService = schemaService;
         this.mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+    }
+
+    public SchemaService getSchemaService() {
+        return schemaService;
+    }
+
+    public ResourceList getResourceListing(final UriInfo uriInfo) {
+        final SchemaContext schemaContext = schemaService.getGlobalContext();
+        Preconditions.checkState(schemaContext != null);
+        return getResourceListing(uriInfo, schemaContext, "");
     }
 
     /**
@@ -103,16 +117,22 @@ public class BaseYangSwaggerGenerator {
         return resourceList;
     }
 
-    protected ResourceList createResourceList() {
+    public ResourceList createResourceList() {
         final ResourceList resourceList = new ResourceList();
         resourceList.setApiVersion(API_VERSION);
         resourceList.setSwaggerVersion(SWAGGER_VERSION);
         return resourceList;
     }
 
-    protected String generatePath(final UriInfo uriInfo, final String name, final String revision) {
+    public String generatePath(final UriInfo uriInfo, final String name, final String revision) {
         final URI uri = uriInfo.getRequestUriBuilder().path(generateCacheKey(name, revision)).build();
         return uri.toASCIIString();
+    }
+
+    public ApiDeclaration getApiDeclaration(final String module, final String revision, final UriInfo uriInfo) {
+        final SchemaContext schemaContext = schemaService.getGlobalContext();
+        Preconditions.checkState(schemaContext != null);
+        return getApiDeclaration(module, revision, uriInfo, schemaContext, "");
     }
 
     public ApiDeclaration getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
@@ -143,7 +163,7 @@ public class BaseYangSwaggerGenerator {
         return null;
     }
 
-    protected String createBasePathFromUriInfo(final UriInfo uriInfo) {
+    public String createBasePathFromUriInfo(final UriInfo uriInfo) {
         String portPart = "";
         final int port = uriInfo.getBaseUri().getPort();
         if (port != -1) {
@@ -151,7 +171,7 @@ public class BaseYangSwaggerGenerator {
         }
         final String basePath =
                 new StringBuilder(uriInfo.getBaseUri().getScheme()).append("://").append(uriInfo.getBaseUri().getHost())
-                        .append(portPart).append("/").append(RESTCONF_CONTEXT_ROOT).toString();
+                        .append(portPart).toString();
         return basePath;
     }
 
@@ -240,7 +260,7 @@ public class BaseYangSwaggerGenerator {
         }
     }
 
-    protected ApiDeclaration createApiDeclaration(final String basePath) {
+    public ApiDeclaration createApiDeclaration(final String basePath) {
         final ApiDeclaration doc = new ApiDeclaration();
         doc.setApiVersion(API_VERSION);
         doc.setSwaggerVersion(SWAGGER_VERSION);
@@ -249,16 +269,7 @@ public class BaseYangSwaggerGenerator {
         return doc;
     }
 
-    protected String getDataStorePath(final String dataStore, final String context) {
-        if (newDraft) {
-            if ("config".contains(dataStore) || "operational".contains(dataStore)) {
-                return "/" + RESTCONF_DRAFT + "/data" + context;
-            }
-            return "/" + RESTCONF_DRAFT + "/operations" + context;
-        }
-
-        return "/" + dataStore + context;
-    }
+    public abstract String getDataStorePath(String dataStore, String context);
 
     private static String generateCacheKey(final String module, final String revision) {
         return module + "(" + revision + ")";
@@ -294,19 +305,7 @@ public class BaseYangSwaggerGenerator {
         }
     }
 
-    protected String getContent(final String dataStore) {
-        if (newDraft) {
-            if ("operational".contains(dataStore)) {
-                return "?content=nonconfig";
-            } else if ("config".contains(dataStore)) {
-                return "?content=config";
-            } else {
-                return "";
-            }
-        } else {
-            return "";
-        }
-    }
+    public abstract String getContent(String dataStore);
 
     private static boolean containsListOrContainer(final Iterable<DataSchemaNode> nodes) {
         for (final DataSchemaNode child : nodes) {
@@ -351,6 +350,8 @@ public class BaseYangSwaggerGenerator {
         return operations;
     }
 
+    protected abstract ListPathBuilder newListPathBuilder();
+
     private String createPath(final DataSchemaNode schemaNode, final List<Parameter> pathParams,
             final SchemaContext schemaContext) {
         final StringBuilder path = new StringBuilder();
@@ -359,19 +360,11 @@ public class BaseYangSwaggerGenerator {
 
         if (schemaNode instanceof ListSchemaNode) {
             final List<QName> listKeys = ((ListSchemaNode) schemaNode).getKeyDefinition();
-            StringBuilder keyBuilder = null;
-            if (newDraft) {
-                keyBuilder = new StringBuilder("=");
-            }
-
             for (final QName listKey : listKeys) {
+                final ListPathBuilder keyBuilder = newListPathBuilder();
                 final DataSchemaNode dataChildByName = ((DataNodeContainer) schemaNode).getDataChildByName(listKey);
-                final String pathParamIdentifier;
-                if (newDraft) {
-                    pathParamIdentifier = keyBuilder.append("{").append(listKey.getLocalName()).append("}").toString();
-                } else {
-                    pathParamIdentifier = "/{" + listKey.getLocalName() + "}";
-                }
+                final String pathParamIdentifier = keyBuilder.nextParamIdentifier(listKey.getLocalName());
+
                 path.append(pathParamIdentifier);
 
                 final Parameter pathParam = new Parameter();
@@ -381,9 +374,6 @@ public class BaseYangSwaggerGenerator {
                 pathParam.setParamType("path");
 
                 pathParams.add(pathParam);
-                if (newDraft) {
-                    keyBuilder = new StringBuilder(",");
-                }
             }
         }
         return path.toString();
@@ -440,11 +430,29 @@ public class BaseYangSwaggerGenerator {
         return sortedModules;
     }
 
-    public void setDraft(final boolean draft) {
-        this.newDraft = draft;
+    protected abstract void appendPathKeyValue(StringBuilder builder, Object value);
+
+    public String generateUrlPrefixFromInstanceID(final YangInstanceIdentifier key, final String moduleName) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("/");
+        if (moduleName != null) {
+            builder.append(moduleName).append(':');
+        }
+        for (final PathArgument arg : key.getPathArguments()) {
+            final String name = arg.getNodeType().getLocalName();
+            if (arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates) {
+                final NodeIdentifierWithPredicates nodeId = (NodeIdentifierWithPredicates) arg;
+                for (final Entry<QName, Object> entry : nodeId.getKeyValues().entrySet()) {
+                    appendPathKeyValue(builder, entry.getValue());
+                }
+            } else {
+                builder.append(name).append('/');
+            }
+        }
+        return builder.toString();
     }
 
-    protected boolean isNewDraft() {
-        return newDraft;
+    protected interface ListPathBuilder {
+        String nextParamIdentifier(String key);
     }
 }

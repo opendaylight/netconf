@@ -15,6 +15,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
+import java.util.Objects;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
@@ -37,10 +38,20 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
  */
 public class ApiDocServiceImpl implements ApiDocService {
 
-    private static final ApiDocService INSTANCE = new ApiDocServiceImpl();
+    private final MountPointSwagger mountPointSwaggerDraft02;
+    private final MountPointSwagger mountPointSwaggerRFC8040;
+    private final ApiDocGeneratorDraftO2 apiDocGeneratorDraft02;
+    private final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040;
 
-    public static ApiDocService getInstance() {
-        return INSTANCE;
+    public ApiDocServiceImpl(MountPointSwaggerGeneratorDraft02 mountPointSwaggerGeneratorDraft02,
+            MountPointSwaggerGeneratorRFC8040 mountPointSwaggerGeneratorRFC8040,
+            ApiDocGeneratorDraftO2 apiDocGeneratorDraft02, ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040) {
+        this.mountPointSwaggerDraft02 =
+                Objects.requireNonNull(mountPointSwaggerGeneratorDraft02).getMountPointSwagger();
+        this.mountPointSwaggerRFC8040 =
+                Objects.requireNonNull(mountPointSwaggerGeneratorRFC8040).getMountPointSwagger();
+        this.apiDocGeneratorDraft02 = Objects.requireNonNull(apiDocGeneratorDraft02);
+        this.apiDocGeneratorRFC8040 = Objects.requireNonNull(apiDocGeneratorRFC8040);
     }
 
     /**
@@ -50,13 +61,12 @@ public class ApiDocServiceImpl implements ApiDocService {
      */
     @Override
     public synchronized Response getRootDoc(final UriInfo uriInfo) {
-        final ApiDocGenerator generator = ApiDocGenerator.getInstance();
+        final ResourceList rootDoc;
         if (isNew(uriInfo)) {
-            generator.setDraft(true);
+            rootDoc = apiDocGeneratorRFC8040.getResourceListing(uriInfo);
         } else {
-            generator.setDraft(false);
+            rootDoc = apiDocGeneratorDraft02.getResourceListing(uriInfo);
         }
-        final ResourceList rootDoc = generator.getResourceListing(uriInfo);
 
         return Response.ok(rootDoc).build();
     }
@@ -66,13 +76,13 @@ public class ApiDocServiceImpl implements ApiDocService {
      */
     @Override
     public synchronized Response getDocByModule(final String module, final String revision, final UriInfo uriInfo) {
-        final ApiDocGenerator generator = ApiDocGenerator.getInstance();
+        final ApiDeclaration doc;
         if (isNew(uriInfo)) {
-            generator.setDraft(true);
+            doc = apiDocGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo);
         } else {
-            generator.setDraft(false);
+            doc = apiDocGeneratorDraft02.getApiDeclaration(module, revision, uriInfo);
         }
-        final ApiDeclaration doc = generator.getApiDeclaration(module, revision, uriInfo);
+
         return Response.ok(doc).build();
     }
 
@@ -90,7 +100,7 @@ public class ApiDocServiceImpl implements ApiDocService {
         try (OutputStreamWriter streamWriter = new OutputStreamWriter(baos, StandardCharsets.UTF_8)) {
             JsonGenerator writer = new JsonFactory().createGenerator(streamWriter);
             writer.writeStartArray();
-            for (final Entry<String, Long> entry : MountPointSwagger.getInstance().getInstanceIdentifiers()
+            for (final Entry<String, Long> entry : mountPointSwaggerDraft02.getInstanceIdentifiers()
                     .entrySet()) {
                 writer.writeStartObject();
                 writer.writeObjectField("instance", entry.getKey());
@@ -115,9 +125,9 @@ public class ApiDocServiceImpl implements ApiDocService {
     public synchronized Response getMountRootDoc(final String instanceNum, final UriInfo uriInfo) {
         final ResourceList resourceList;
         if (isNew(uriInfo)) {
-            resourceList = MountPointSwagger.getInstanceDraft18().getResourceList(uriInfo, Long.parseLong(instanceNum));
+            resourceList = mountPointSwaggerRFC8040.getResourceList(uriInfo, Long.parseLong(instanceNum));
         } else {
-            resourceList = MountPointSwagger.getInstance().getResourceList(uriInfo, Long.parseLong(instanceNum));
+            resourceList = mountPointSwaggerDraft02.getResourceList(uriInfo, Long.parseLong(instanceNum));
         }
         return Response.ok(resourceList).build();
     }
@@ -127,11 +137,9 @@ public class ApiDocServiceImpl implements ApiDocService {
             final String revision, final UriInfo uriInfo) {
         final ApiDeclaration api;
         if (isNew(uriInfo)) {
-            api = MountPointSwagger.getInstanceDraft18().getMountPointApi(uriInfo, Long.parseLong(instanceNum), module,
-                    revision);
+            api = mountPointSwaggerRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision);
         } else {
-            api = MountPointSwagger.getInstance().getMountPointApi(uriInfo, Long.parseLong(instanceNum), module,
-                    revision);
+            api = mountPointSwaggerDraft02.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision);
         }
         return Response.ok(api).build();
     }

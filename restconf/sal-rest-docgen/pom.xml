@@ -104,6 +104,15 @@
       <artifactId>aaa-shiro</artifactId>
       <version>0.8.0-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>org.opendaylight.aaa.web</groupId>
+      <artifactId>web-api</artifactId>
+      <version>0.8.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-servlet</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -117,21 +126,9 @@
           <instructions>
             <Bundle-Name>MD SAL Rest Api Doc Generator</Bundle-Name>
             <Embed-Dependency>generex, automaton</Embed-Dependency>
-            <!-- needed for web.xml. Remove once we have Jersey 2 -->
-            <Import-Package>
-              *,
-              com.sun.jersey.spi.container.servlet,
-              org.eclipse.jetty.servlets,
-              org.opendaylight.aaa.shiro.filters,
-              org.opendaylight.aaa.shiro.realm,
-              org.opendaylight.aaa.shiro.web.env,
-              org.apache.shiro.web.env,
-              org.opendaylight.aaa.api
-            </Import-Package>
             <Export-Package>
               com.fasterxml.jackson.datatype.*
             </Export-Package>
-            <Web-ContextPath>/apidoc</Web-ContextPath>
           </instructions>
 
         </configuration>
