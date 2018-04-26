@@ -12,7 +12,7 @@
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
     <artifactId>odlparent</artifactId>
-    <version>2.0.5</version>
+    <version>2.0.7</version>
     <relativePath/>
   </parent>
 
@@ -146,7 +146,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <configuration></configuration>
+        <configuration/>
         <executions>
           <execution>
             <goals>
