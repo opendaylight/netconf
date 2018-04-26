@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "de16fb78_9ae3c73f",
+        "filename": "features/restconf/features-restconf/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-04-26T17:44:40Z",
+      "side": 0,
+      "message": "This was discussed in the Kernel project call. I am all up to simplify things in restconf wiring and drop the -noauth feature for rfc8040 restconf implementation.\n\nCan you just please send an email to netconf-dev and possibly controller-dev mailing lists and we can drop this..",
+      "revId": "73bc92edf590d470c6f5c7bfde33bdd79c572b6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
