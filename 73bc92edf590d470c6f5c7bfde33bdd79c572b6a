@@ -34,6 +34,24 @@
       "revId": "73bc92edf590d470c6f5c7bfde33bdd79c572b6a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2e44d057_637a1368",
+        "filename": "features/restconf/features-restconf/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-04-27T07:10:39Z",
+      "side": 0,
+      "message": "Thanks",
+      "parentUuid": "d69f2bb6_474cb9ea",
+      "revId": "73bc92edf590d470c6f5c7bfde33bdd79c572b6a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
