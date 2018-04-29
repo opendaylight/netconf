@@ -11,22 +11,29 @@ package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.MappingCheckedFuture;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yangtools.util.concurrent.ExceptionMapper;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -144,6 +151,44 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
                         Optional.of(ModifyAction.DELETE), path);
         editConfig(path, Optional.<NormalizedNode<?, ?>>absent(),
                 editStructure, Optional.of(ModifyAction.NONE), "delete");
+    }
+
+    @Override
+    public CheckedFuture<Void, TransactionCommitFailedException> submit() {
+        return MappingCheckedFuture.create(commit().transform(ignored -> null, MoreExecutors.directExecutor()),
+            new ExceptionMapper<TransactionCommitFailedException>("commit", TransactionCommitFailedException.class) {
+                @Override
+                protected TransactionCommitFailedException newWithCause(String message, Throwable cause) {
+                    return new TransactionCommitFailedException(message, cause);
+                }
+            });
+    }
+
+    @Override
+    public @NonNull FluentFuture<? extends @NonNull CommitInfo> commit() {
+        final SettableFuture<CommitInfo> resultFuture = SettableFuture.create();
+        Futures.addCallback(commitConfiguration(), new FutureCallback<RpcResult<Void>>() {
+            @Override
+            public void onSuccess(RpcResult<Void> result) {
+                if (!result.isSuccessful()) {
+                    final Collection<RpcError> errors = result.getErrors();
+                    resultFuture.setException(new TransactionCommitFailedException(
+                        String.format("Commit of transaction %s failed", getIdentifier()),
+                            errors.toArray(new RpcError[errors.size()])));
+                    return;
+                }
+
+                resultFuture.set(CommitInfo.empty());
+            }
+
+            @Override
+            public void onFailure(Throwable failure) {
+                resultFuture.setException(new TransactionCommitFailedException(
+                        String.format("Commit of transaction %s failed", getIdentifier()), failure));
+            }
+        }, MoreExecutors.directExecutor());
+
+        return FluentFuture.from(resultFuture);
     }
 
     protected final ListenableFuture<RpcResult<Void>> commitConfiguration() {

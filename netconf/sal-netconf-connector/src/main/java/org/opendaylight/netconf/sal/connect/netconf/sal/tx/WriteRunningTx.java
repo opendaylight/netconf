@@ -8,15 +8,10 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.List;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
@@ -68,16 +63,6 @@ public class WriteRunningTx extends AbstractWriteTx {
     @Override
     protected void cleanup() {
         unlock();
-    }
-
-    @Override
-    public synchronized CheckedFuture<Void, TransactionCommitFailedException> submit() {
-        final ListenableFuture<Void> commmitFutureAsVoid = Futures.transform(commitConfiguration(),
-                (Function<RpcResult<Void>, Void>) input -> null, MoreExecutors.directExecutor());
-
-        return Futures.makeChecked(commmitFutureAsVoid,
-            input -> new TransactionCommitFailedException("Submit of transaction " + getIdentifier() + " failed",
-                input));
     }
 
     @Override
