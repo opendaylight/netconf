@@ -14,16 +14,12 @@ import akka.util.Timeout;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FluentFuture;
-import com.google.common.util.concurrent.MoreExecutors;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
-import org.opendaylight.mdsal.common.api.MappingCheckedFuture;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.util.concurrent.ExceptionMapper;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -71,17 +67,6 @@ public class ProxyReadWriteTransaction implements DOMDataReadWriteTransaction {
     @Override
     public void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         delegateWrite.delete(store, path);
-    }
-
-    @Override
-    public CheckedFuture<Void, TransactionCommitFailedException> submit() {
-        return MappingCheckedFuture.create(commit().transform(ignored -> null, MoreExecutors.directExecutor()),
-            new ExceptionMapper<TransactionCommitFailedException>("commit", TransactionCommitFailedException.class) {
-                @Override
-                protected TransactionCommitFailedException newWithCause(String message, Throwable cause) {
-                    return new TransactionCommitFailedException(message, cause);
-                }
-            });
     }
 
     @Override
