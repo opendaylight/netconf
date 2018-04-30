@@ -51,8 +51,8 @@ public class ReadWriteTxTest {
         verify(delegateWriteTx).merge(LogicalDatastoreType.CONFIGURATION, id2, leafNode);
         tx.delete(LogicalDatastoreType.CONFIGURATION, id2);
         verify(delegateWriteTx).delete(LogicalDatastoreType.CONFIGURATION, id2);
-        tx.submit();
-        verify(delegateWriteTx).submit();
+        tx.commit();
+        verify(delegateWriteTx).commit();
     }
 
     @Test

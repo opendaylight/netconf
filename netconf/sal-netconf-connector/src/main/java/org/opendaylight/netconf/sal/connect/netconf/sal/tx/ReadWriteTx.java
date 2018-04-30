@@ -14,7 +14,6 @@ import com.google.common.util.concurrent.FluentFuture;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
@@ -52,11 +51,6 @@ public class ReadWriteTx implements DOMDataReadWriteTransaction {
     @Override
     public void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         delegateWriteTx.delete(store, path);
-    }
-
-    @Override
-    public CheckedFuture<Void, TransactionCommitFailedException> submit() {
-        return delegateWriteTx.submit();
     }
 
     @Override
