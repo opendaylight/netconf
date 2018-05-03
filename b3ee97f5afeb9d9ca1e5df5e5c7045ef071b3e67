@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "67b0a7b9_80592b85",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/DOMDataTransactionValidator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5719
+      },
+      "writtenOn": "2018-05-03T09:06:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "00dc1b7c_1cf83242",
+      "revId": "b3ee97f5afeb9d9ca1e5df5e5c7045ef071b3e67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b98471d2_30a2c693",
         "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/DOMDataTransactionValidator.java",
         "patchSetId": 3
@@ -30,6 +48,30 @@
       "writtenOn": "2018-04-26T11:46:14Z",
       "side": 1,
       "message": "with a { (just one space is enough",
+      "range": {
+        "startLine": 39,
+        "startChar": 17,
+        "endLine": 39,
+        "endChar": 18
+      },
+      "revId": "b3ee97f5afeb9d9ca1e5df5e5c7045ef071b3e67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0ed528c1_717894a8",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/DOMDataTransactionValidator.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5719
+      },
+      "writtenOn": "2018-05-03T09:06:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b98471d2_30a2c693",
       "range": {
         "startLine": 39,
         "startChar": 17,
