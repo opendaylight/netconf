@@ -14,11 +14,32 @@
       binding-class="org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig"/>
 
   <reference id="dataBroker" interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"/>
+  <reference id="webServer" interface="org.opendaylight.aaa.web.WebServer"/>
+  <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer"/>
+
+  <bean id="schemaRepository" class="org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository">
+    <argument value="yang-library"/>
+  </bean>
+
+  <bean id="yangLibService" class="org.opendaylight.yanglib.impl.YangLibServiceImpl">
+    <argument ref="schemaRepository"/>
+  </bean>
+
+  <bean id="yangLibRestApp" class="org.opendaylight.yanglib.impl.YangLibRestApp">
+    <argument ref="yangLibService"/>
+  </bean>
 
   <bean id="yangLibProvider" class="org.opendaylight.yanglib.impl.YangLibProvider"
           init-method="init" destroy-method="close">
     <argument ref="yanglibConfig"/>
     <argument ref="dataBroker"/>
+    <argument ref="schemaRepository"/>
   </bean>
 
+  <bean id="webInitializer" class="org.opendaylight.yanglib.impl.WebInitializer"
+      destroy-method="close">
+    <argument ref="webServer"/>
+    <argument ref="webContextSecurer"/>
+    <argument ref="yangLibRestApp"/>
+  </bean>
 </blueprint>

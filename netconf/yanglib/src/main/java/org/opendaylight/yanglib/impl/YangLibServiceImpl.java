@@ -29,15 +29,10 @@ import org.slf4j.LoggerFactory;
 public class YangLibServiceImpl implements YangLibService {
     private static final Logger LOG = LoggerFactory.getLogger(YangLibServiceImpl.class);
 
-    private static volatile SchemaRepository schemaRepository;
+    private final SchemaRepository schemaRepository;
 
-    public YangLibServiceImpl() {
-
-    }
-
-    public static void setSchemaRepository(final SchemaRepository schemaRepository) {
-        LOG.debug("Setting schema repository {}", schemaRepository);
-        YangLibServiceImpl.schemaRepository = schemaRepository;
+    public YangLibServiceImpl(final SchemaRepository schemaRepository) {
+        this.schemaRepository = schemaRepository;
     }
 
     @Override

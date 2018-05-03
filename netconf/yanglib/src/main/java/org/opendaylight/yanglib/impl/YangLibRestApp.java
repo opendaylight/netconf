@@ -11,18 +11,17 @@ package org.opendaylight.yanglib.impl;
 import java.util.Collections;
 import java.util.Set;
 import javax.ws.rs.core.Application;
-import org.opendaylight.yanglib.api.YangLibRestAppService;
+import org.opendaylight.yanglib.api.YangLibService;
 
-public class YangLibRestApp extends Application implements YangLibRestAppService {
-    private final YangLibServiceImpl yangLibService = new YangLibServiceImpl();
+public class YangLibRestApp extends Application {
+    private final YangLibService yangLibService;
+
+    public YangLibRestApp(YangLibService yangLibService) {
+        this.yangLibService = yangLibService;
+    }
 
     @Override
     public Set<Object> getSingletons() {
         return Collections.<Object>singleton(this.yangLibService);
-    }
-
-    @Override
-    public YangLibServiceImpl getYangLibService() {
-        return yangLibService;
     }
 }

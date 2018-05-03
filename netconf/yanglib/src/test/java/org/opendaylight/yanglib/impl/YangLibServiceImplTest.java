@@ -36,8 +36,7 @@ public class YangLibServiceImplTest {
     public void testSchema() throws SchemaSourceException {
 
         final SchemaRepository schemaRepository = mock(SchemaRepository.class);
-        final YangLibServiceImpl yangLibService = new YangLibServiceImpl();
-        yangLibService.setSchemaRepository(schemaRepository);
+        final YangLibServiceImpl yangLibService = new YangLibServiceImpl(schemaRepository);
 
         final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("name", Revision.of("2016-01-01"));
 
