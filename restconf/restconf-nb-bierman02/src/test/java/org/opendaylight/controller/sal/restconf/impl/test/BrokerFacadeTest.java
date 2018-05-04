@@ -36,7 +36,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
@@ -329,15 +328,13 @@ public class BrokerFacadeTest {
         DOMDataTreeIdentifier loc = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, this.instanceID);
         when(changeService.registerDataTreeChangeListener(eq(loc), eq(listener))).thenReturn(mockRegistration);
 
-        this.brokerFacade.registerToListenDataChanges(
-                LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE, listener);
+        this.brokerFacade.registerToListenDataChanges(LogicalDatastoreType.CONFIGURATION, listener);
 
         verify(changeService).registerDataTreeChangeListener(loc, listener);
 
         assertEquals("isListening", true, listener.isListening());
 
-        this.brokerFacade.registerToListenDataChanges(
-                LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE, listener);
+        this.brokerFacade.registerToListenDataChanges(LogicalDatastoreType.CONFIGURATION, listener);
         verifyNoMoreInteractions(changeService);
     }
 

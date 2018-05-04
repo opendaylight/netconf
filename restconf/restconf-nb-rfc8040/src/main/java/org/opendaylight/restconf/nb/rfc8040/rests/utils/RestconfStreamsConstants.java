@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants;
@@ -36,17 +35,11 @@ public final class RestconfStreamsConstants {
         ImmutableSet.of(QName.create(SAL_REMOTE_AUGMENT, "scope"), QName.create(SAL_REMOTE_AUGMENT, "datastore"),
             QName.create(SAL_REMOTE_AUGMENT, "notification-output-type")));
 
-    public static final DataChangeScope DEFAULT_SCOPE = DataChangeScope.BASE;
-
     public static final LogicalDatastoreType DEFAULT_DS = LogicalDatastoreType.CONFIGURATION;
-
-    public static final String SCOPE_PARAM_NAME = "scope";
 
     public static final char EQUAL = ParserBuilderConstants.Deserializer.EQUAL;
 
     public static final String DS_URI = RestconfConstants.SLASH + DATASTORE_PARAM_NAME + EQUAL;
-
-    public static final String SCOPE_URI = RestconfConstants.SLASH + SCOPE_PARAM_NAME + EQUAL;
 
     public static final int NOTIFICATION_PORT = 8181;
 

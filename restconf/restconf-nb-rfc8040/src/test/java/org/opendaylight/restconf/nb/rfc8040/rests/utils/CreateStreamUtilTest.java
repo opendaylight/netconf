@@ -61,7 +61,7 @@ public class CreateStreamUtilTest {
         final NormalizedNode<?, ?> testedNn = result.getResult();
         assertNotNull(testedNn);
         final NormalizedNodeContext contextRef = prepareDomPayload("create-data-change-event-subscription", "output",
-                "data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=BASE", "stream-name");
+                "data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION", "stream-name");
         assertEquals(contextRef.getData(), testedNn);
     }
 

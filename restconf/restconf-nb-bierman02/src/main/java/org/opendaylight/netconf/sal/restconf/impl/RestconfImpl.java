@@ -48,7 +48,6 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.OptimisticLockFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
@@ -127,8 +126,6 @@ public final class RestconfImpl implements RestconfService {
     private static final String SAL_REMOTE_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote";
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfImpl.class);
-
-    private static final DataChangeScope DEFAULT_SCOPE = DataChangeScope.BASE;
 
     private static final LogicalDatastoreType DEFAULT_DATASTORE = LogicalDatastoreType.CONFIGURATION;
 
@@ -620,14 +617,11 @@ public final class RestconfImpl implements RestconfService {
                     parseEnumTypeParameter(value, LogicalDatastoreType.class, DATASTORE_PARAM_NAME);
             datastore = datastore == null ? DEFAULT_DATASTORE : datastore;
 
-            DataChangeScope scope = parseEnumTypeParameter(value, DataChangeScope.class, SCOPE_PARAM_NAME);
-            scope = scope == null ? DEFAULT_SCOPE : scope;
-
             outputType = parseEnumTypeParameter(value, NotificationOutputType.class, OUTPUT_TYPE_PARAM_NAME);
             outputType = outputType == null ? NotificationOutputType.XML : outputType;
 
             streamName = Notificator
-                    .createStreamNameFromUri(fullRestconfIdentifier + "/datastore=" + datastore + "/scope=" + scope);
+                    .createStreamNameFromUri(fullRestconfIdentifier + "/datastore=" + datastore);
         }
 
         if (Strings.isNullOrEmpty(streamName)) {
@@ -1253,14 +1247,8 @@ public final class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("Stream name doesn't contains datastore value (pattern /datastore=)",
                     ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
         }
-        final DataChangeScope scope =
-                parserURIEnumParameter(DataChangeScope.class, paramToValues.get(SCOPE_PARAM_NAME));
-        if (scope == null) {
-            throw new RestconfDocumentedException("Stream name doesn't contains datastore value (pattern /scope=)",
-                    ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
-        }
 
-        this.broker.registerToListenDataChanges(datastore, scope, listener);
+        this.broker.registerToListenDataChanges(datastore, listener);
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
 
