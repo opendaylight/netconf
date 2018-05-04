@@ -12,7 +12,6 @@ import com.google.common.util.concurrent.CheckedFuture;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
@@ -138,13 +137,10 @@ public final class CreateStreamUtil {
                 RestconfStreamsConstants.DATASTORE_PARAM_NAME);
         ds = ds == null ? RestconfStreamsConstants.DEFAULT_DS : ds;
 
-        DataChangeScope scope = parseEnum(data, DataChangeScope.class, RestconfStreamsConstants.SCOPE_PARAM_NAME);
-        scope = scope == null ? RestconfStreamsConstants.DEFAULT_SCOPE : scope;
-
         final String streamName = RestconfStreamsConstants.DATA_SUBSCR + "/"
                 + Notificator
                 .createStreamNameFromUri(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext)
-                + RestconfStreamsConstants.DS_URI + ds + RestconfStreamsConstants.SCOPE_URI + scope);
+                + RestconfStreamsConstants.DS_URI + ds);
         return streamName;
     }
 

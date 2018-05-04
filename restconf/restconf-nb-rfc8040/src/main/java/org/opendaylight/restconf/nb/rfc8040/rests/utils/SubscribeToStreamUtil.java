@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
@@ -202,14 +201,6 @@ public final class SubscribeToStreamUtil {
             throw new RestconfDocumentedException(msg, ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
         }
 
-        final DataChangeScope scope = SubscribeToStreamUtil.parseURIEnum(DataChangeScope.class,
-                mapOfValues.get(RestconfStreamsConstants.SCOPE_PARAM_NAME));
-        if (scope == null) {
-            final String msg = "Stream name doesn't contains datastore value (pattern /scope=)";
-            LOG.warn(msg);
-            throw new RestconfDocumentedException(msg, ErrorType.APPLICATION, ErrorTag.MISSING_ATTRIBUTE);
-        }
-
         final String streamName = Notificator.createStreamNameFromUri(identifier);
 
         final ListenerAdapter listener = Notificator.getListenerFor(streamName);
@@ -219,7 +210,7 @@ public final class SubscribeToStreamUtil {
                 notificationQueryParams.getFilter(), false);
         listener.setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
 
-        registration(ds, scope, listener, handlersHolder.getDomDataBrokerHandler().get());
+        registration(ds, listener, handlersHolder.getDomDataBrokerHandler().get());
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
 
@@ -318,14 +309,12 @@ public final class SubscribeToStreamUtil {
      *
      * @param ds
      *             {@link LogicalDatastoreType}
-     * @param scope
-     *             {@link DataChangeScope}
      * @param listener
      *             listener on specific stream
      * @param domDataBroker
      *             data broker for register data change listener
      */
-    private static void registration(final LogicalDatastoreType ds, final DataChangeScope scope,
+    private static void registration(final LogicalDatastoreType ds,
             final ListenerAdapter listener, final DOMDataBroker domDataBroker) {
         if (listener.isListening()) {
             return;

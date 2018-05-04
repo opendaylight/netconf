@@ -22,7 +22,6 @@ import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
@@ -72,16 +71,16 @@ public class URIParametersParsing {
 
     @Test
     public void resolveURIParametersConcreteValues() {
-        resolveURIParameters("OPERATIONAL", "SUBTREE", LogicalDatastoreType.OPERATIONAL, DataChangeScope.SUBTREE);
+        resolveURIParameters("OPERATIONAL", "SUBTREE", LogicalDatastoreType.OPERATIONAL);
     }
 
     @Test
     public void resolveURIParametersDefaultValues() {
-        resolveURIParameters(null, null, LogicalDatastoreType.CONFIGURATION, DataChangeScope.BASE);
+        resolveURIParameters(null, null, LogicalDatastoreType.CONFIGURATION);
     }
 
     private void resolveURIParameters(final String datastore, final String scope,
-            final LogicalDatastoreType datastoreExpected, final DataChangeScope scopeExpected) {
+            final LogicalDatastoreType datastoreExpected) {
 
         final InstanceIdentifierBuilder iiBuilder = YangInstanceIdentifier.builder();
         iiBuilder.node(QName.create("", "dummyStreamName"));

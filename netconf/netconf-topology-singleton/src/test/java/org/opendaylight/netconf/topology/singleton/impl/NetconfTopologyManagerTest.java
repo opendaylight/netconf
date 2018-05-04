@@ -112,7 +112,6 @@ public class NetconfTopologyManagerTest {
         doReturn(wtx).when(dataBroker).newWriteOnlyTransaction();
         doNothing().when(wtx).merge(any(), any(), any());
         doReturn(Futures.immediateCheckedFuture(null)).when(wtx).submit();
-        doReturn(null).when(dataBroker).registerDataChangeListener(any(), any(), any(), any());
 
         netconfTopologyManager.init();
 

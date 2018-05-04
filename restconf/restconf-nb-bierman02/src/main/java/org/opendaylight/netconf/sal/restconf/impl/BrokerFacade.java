@@ -27,7 +27,6 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.Response.Status;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncDataBroker.DataChangeScope;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
@@ -496,8 +495,7 @@ public class BrokerFacade implements Closeable {
         return this.rpcService.invokeRpc(type, input);
     }
 
-    public void registerToListenDataChanges(final LogicalDatastoreType datastore, final DataChangeScope scope,
-            final ListenerAdapter listener) {
+    public void registerToListenDataChanges(final LogicalDatastoreType datastore, final ListenerAdapter listener) {
         if (listener.isListening()) {
             return;
         }
