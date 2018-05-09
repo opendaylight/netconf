@@ -26,8 +26,7 @@ import javax.ws.rs.core.UriInfo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
-import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGenerator;
+import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGeneratorDraftO2;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Api;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Operation;
@@ -45,18 +44,18 @@ public class ApiDocGeneratorTest {
     private static final Date DATE = Date.valueOf(STRING_DATE);
     private static final String NAMESPACE_2 = "http://netconfcentral.org/ns/toaster";
     private static final Date REVISION_2 = Date.valueOf(STRING_DATE);
-    private ApiDocGenerator generator;
+    private ApiDocGeneratorDraftO2 generator;
     private DocGenTestHelper helper;
     private SchemaContext schemaContext;
 
     @Before
     public void setUp() throws Exception {
-        this.generator = new ApiDocGenerator();
-        generator.setDraft(false);
         this.helper = new DocGenTestHelper();
         this.helper.setUp();
 
         this.schemaContext = this.helper.getSchemaContext();
+
+        this.generator = new ApiDocGeneratorDraftO2(this.helper.createMockSchemaService(this.schemaContext));
     }
 
     @After
@@ -325,9 +324,6 @@ public class ApiDocGeneratorTest {
     @Test
     public void testGetResourceListing() throws Exception {
         final UriInfo info = this.helper.createMockUriInfo(HTTP_HOST);
-        final SchemaService mockSchemaService = this.helper.createMockSchemaService(this.schemaContext);
-
-        this.generator.setSchemaService(mockSchemaService);
 
         final ResourceList resourceListing = this.generator.getResourceListing(info);
 
