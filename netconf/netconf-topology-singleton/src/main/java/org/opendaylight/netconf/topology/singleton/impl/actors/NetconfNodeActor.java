@@ -10,6 +10,8 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
+import akka.actor.Status.Failure;
+import akka.actor.Status.Success;
 import akka.actor.UntypedActor;
 import akka.util.Timeout;
 import com.google.common.util.concurrent.CheckedFuture;
@@ -43,6 +45,7 @@ import org.opendaylight.netconf.topology.singleton.messages.AskForMasterMountPoi
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.MasterActorDataInitialized;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
+import org.opendaylight.netconf.topology.singleton.messages.NotMasterException;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSlaveActor;
 import org.opendaylight.netconf.topology.singleton.messages.RegisterMountPoint;
@@ -117,6 +120,8 @@ public final class NetconfNodeActor extends UntypedActor {
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void onReceive(final Object message) throws Exception {
+        LOG.debug("{}: Received message {}", id, message);
+
         if (message instanceof CreateInitialMasterActorData) { // master
 
             final CreateInitialMasterActorData masterActorData = (CreateInitialMasterActorData) message;
@@ -135,9 +140,16 @@ public final class NetconfNodeActor extends UntypedActor {
             id = ((RefreshSetupMasterActorData) message).getRemoteDeviceId();
             sender().tell(new MasterActorDataInitialized(), self());
         } else if (message instanceof AskForMasterMountPoint) { // master
+            AskForMasterMountPoint askForMasterMountPoint = (AskForMasterMountPoint)message;
+
             // only master contains reference to deviceDataBroker
             if (deviceDataBroker != null) {
-                getSender().tell(new RegisterMountPoint(sourceIdentifiers), getSelf());
+                LOG.debug("{}: Sending RegisterMountPoint reply to {}", id, askForMasterMountPoint.getSlaveActorRef());
+                askForMasterMountPoint.getSlaveActorRef().tell(new RegisterMountPoint(sourceIdentifiers, self()),
+                        sender());
+            } else {
+                LOG.warn("{}: Received {} but we don't appear to be the master", id, askForMasterMountPoint);
+                sender().tell(new Failure(new NotMasterException(self())), self());
             }
 
         } else if (message instanceof YangTextSchemaSourceRequest) { // master
@@ -167,15 +179,14 @@ public final class NetconfNodeActor extends UntypedActor {
                 sender().tell(t, self());
             }
         } else if (message instanceof InvokeRpcMessage) { // master
-
             final InvokeRpcMessage invokeRpcMessage = (InvokeRpcMessage) message;
             invokeSlaveRpc(invokeRpcMessage.getSchemaPath(), invokeRpcMessage.getNormalizedNodeMessage(), sender());
 
         } else if (message instanceof RegisterMountPoint) { //slaves
-
-            sourceIdentifiers = ((RegisterMountPoint) message).getSourceIndentifiers();
-            registerSlaveMountPoint(getSender());
-
+            RegisterMountPoint registerMountPoint = (RegisterMountPoint)message;
+            sourceIdentifiers = registerMountPoint.getSourceIndentifiers();
+            registerSlaveMountPoint(registerMountPoint.getMasterActorRef());
+            sender().tell(new Success(null), self());
         } else if (message instanceof UnregisterSlaveMountPoint) { //slaves
             if (slaveSalManager != null) {
                 slaveSalManager.close();
@@ -266,7 +277,7 @@ public final class NetconfNodeActor extends UntypedActor {
 
             @Override
             public void onFailure(@Nonnull final Throwable throwable) {
-                LOG.error("{}: Failed to register mount point: {}", id, throwable);
+                LOG.error("{}: Failed to register mount point", id, throwable);
             }
         }, MoreExecutors.directExecutor());
     }

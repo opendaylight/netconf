@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.topology.singleton.messages;
 
+import akka.actor.ActorRef;
 import java.io.Serializable;
 import java.util.List;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -19,13 +20,24 @@ public class RegisterMountPoint implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final List<SourceIdentifier> allSourceIdentifiers;
+    private final ActorRef masterActorRef;
 
-    public RegisterMountPoint(final List<SourceIdentifier> allSourceIdentifiers) {
+    public RegisterMountPoint(final List<SourceIdentifier> allSourceIdentifiers, ActorRef masterActorRef) {
         this.allSourceIdentifiers = allSourceIdentifiers;
+        this.masterActorRef = masterActorRef;
     }
 
     public List<SourceIdentifier> getSourceIndentifiers() {
         return allSourceIdentifiers;
     }
 
+    public ActorRef getMasterActorRef() {
+        return masterActorRef;
+    }
+
+    @Override
+    public String toString() {
+        return "RegisterMountPoint [allSourceIdentifiers=" + allSourceIdentifiers + ", masterActorRef=" + masterActorRef
+                + "]";
+    }
 }

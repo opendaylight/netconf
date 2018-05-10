@@ -65,7 +65,6 @@ public class SlaveSalFacade {
             LOG.warn("{}: Exception in closing slave sal facade: {}", id, exception);
         }
 
+        LOG.info("{}: Slave mount point unregistered.", id);
     }
-
-
 }

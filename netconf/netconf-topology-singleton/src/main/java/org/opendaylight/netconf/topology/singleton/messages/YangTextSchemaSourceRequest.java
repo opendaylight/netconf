@@ -27,4 +27,9 @@ public class YangTextSchemaSourceRequest implements Serializable {
     public SourceIdentifier getSourceIdentifier() {
         return sourceIdentifier;
     }
+
+    @Override
+    public String toString() {
+        return "YangTextSchemaSourceRequest [sourceIdentifier=" + sourceIdentifier + "]";
+    }
 }

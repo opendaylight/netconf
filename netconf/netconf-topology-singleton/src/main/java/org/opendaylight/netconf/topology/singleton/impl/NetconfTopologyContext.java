@@ -47,9 +47,9 @@ class NetconfTopologyContext implements ClusterSingletonService {
     private RemoteDeviceConnector remoteDeviceConnector;
     private NetconfNodeManager netconfNodeManager;
     private ActorRef masterActorRef;
-    private boolean finalClose = false;
+    private final AtomicBoolean finalClose = new AtomicBoolean(false);
     private final AtomicBoolean closed = new AtomicBoolean(false);
-    private boolean isMaster;
+    private volatile boolean isMaster;
 
     NetconfTopologyContext(final NetconfTopologySetup netconfTopologyDeviceSetup,
                            final ServiceGroupIdentifier serviceGroupIdent,
@@ -80,7 +80,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
             netconfNodeManager = null;
         }
 
-        if (!finalClose) {
+        if (!finalClose.get()) {
             final String masterAddress =
                     Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
             masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
@@ -97,7 +97,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
     @Override
     public ListenableFuture<Void> closeServiceInstance() {
 
-        if (!finalClose) {
+        if (!finalClose.get()) {
             // in case that master changes role to slave, new NodeDeviceManager must be created and listener registered
             netconfNodeManager = createNodeDeviceManager();
         }
@@ -121,7 +121,9 @@ class NetconfTopologyContext implements ClusterSingletonService {
     }
 
     void closeFinal() throws Exception {
-        finalClose = true;
+        if (!finalClose.compareAndSet(false, true)) {
+            return;
+        }
 
         if (netconfNodeManager != null) {
             netconfNodeManager.close();
