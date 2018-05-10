@@ -9,7 +9,11 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import akka.actor.PoisonPill;
+import akka.dispatch.OnComplete;
+import akka.pattern.AskTimeoutException;
+import akka.pattern.Patterns;
 import akka.util.Timeout;
 import java.util.Collection;
 import javax.annotation.Nonnull;
@@ -37,6 +41,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.concurrent.Future;
 
 /**
  * Managing and reacting on data tree changes in specific netconf node when master writes status to the operational
@@ -76,21 +81,22 @@ class NetconfNodeManager
             final NodeId nodeId = NetconfTopologyUtils.getNodeId(rootNode.getIdentifier());
             switch (rootNode.getModificationType()) {
                 case SUBTREE_MODIFIED:
-                    LOG.debug("{}: Operational for node {} updated. Trying to register slave mount point", id, nodeId);
+                    LOG.debug("{}: Operational state for node {} - subtree modified from {} to {}",
+                            id, nodeId, rootNode.getDataBefore(), rootNode.getDataAfter());
                     handleSlaveMountPoint(rootNode);
                     break;
                 case WRITE:
                     if (rootNode.getDataBefore() != null) {
-                        LOG.debug("{}: Operational for node {} rewrited. Trying to register slave mount point",
-                                id, nodeId);
+                        LOG.debug("{}: Operational state for node {} updated from {} to {}",
+                                id, nodeId, rootNode.getDataBefore(), rootNode.getDataAfter());
                     } else {
-                        LOG.debug("{}: Operational for node {} created. Trying to register slave mount point",
-                                id, nodeId);
+                        LOG.debug("{}: Operational state for node {} created: {}",
+                                id, nodeId, rootNode.getDataAfter());
                     }
                     handleSlaveMountPoint(rootNode);
                     break;
                 case DELETE:
-                    LOG.debug("{}: Operational for node {} deleted.", id, nodeId);
+                    LOG.debug("{}: Operational state for node {} deleted.", id, nodeId);
                     unregisterSlaveMountpoint();
                     break;
                 default:
@@ -137,14 +143,42 @@ class NetconfNodeManager
 
         if (NetconfNodeConnectionStatus.ConnectionStatus.Connected.equals(netconfNodeAfter.getConnectionStatus())) {
             createOrUpdateActorRef();
+
             final String masterAddress = netconfNodeAfter.getClusteredConnectionStatus().getNetconfMasterNode();
-            final String path = NetconfTopologyUtils.createActorPath(masterAddress,
+            final String masterActorPath = NetconfTopologyUtils.createActorPath(masterAddress,
                     NetconfTopologyUtils.createMasterActorName(id.getName(),
                             netconfNodeAfter.getClusteredConnectionStatus().getNetconfMasterNode()));
-            setup.getActorSystem().actorSelection(path).tell(new AskForMasterMountPoint(), slaveActorRef);
+
+            final AskForMasterMountPoint askForMasterMountPoint = new AskForMasterMountPoint(slaveActorRef);
+            final ActorSelection masterActor = setup.getActorSystem().actorSelection(masterActorPath);
+
+            sendAskForMasterMountPointWithRetries(askForMasterMountPoint, masterActor, 1);
         } else {
             unregisterSlaveMountpoint();
         }
+    }
+
+    private void sendAskForMasterMountPointWithRetries(AskForMasterMountPoint askForMasterMountPoint,
+            ActorSelection masterActor, int tries) {
+        final Future<Object> future = Patterns.ask(masterActor, askForMasterMountPoint, actorResponseWaitTime);
+        future.onComplete(new OnComplete<Object>() {
+            @Override
+            public void onComplete(final Throwable failure, final Object response) {
+                if (failure instanceof AskTimeoutException) {
+                    if (tries <= 5 || tries % 10 == 0) {
+                        LOG.warn("{}: Failed to send message to {} - retrying...", id, masterActor, failure);
+                    }
+                    sendAskForMasterMountPointWithRetries(askForMasterMountPoint, masterActor, tries + 1);
+                } else if (failure != null) {
+                    LOG.error("{}: Failed to send message {} to {}. Slave mount point could not be created",
+                            id, askForMasterMountPoint, masterActor, failure);
+                } else {
+                    LOG.debug("{}: {} message to {} succeeded", id, askForMasterMountPoint, masterActor);
+                }
+            }
+        }, setup.getActorSystem().dispatcher());
+
+        LOG.debug("{}: Sent {} message to master {}", id, askForMasterMountPoint, masterActor);
     }
 
     private void createOrUpdateActorRef() {
