@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-protocol-framework</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4-SNAPSHOT</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Protocol Framework</name>
@@ -27,14 +27,14 @@
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-config-api</artifactId>
-            <version>0.7.3-SNAPSHOT</version>
+            <version>0.7.4-SNAPSHOT</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-config-netty-config-api</artifactId>
-            <version>0.7.3-SNAPSHOT</version>
+            <version>0.7.4-SNAPSHOT</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
