@@ -18,6 +18,7 @@ import akka.util.Timeout;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonService;
@@ -46,9 +47,9 @@ class NetconfTopologyContext implements ClusterSingletonService {
     private RemoteDeviceConnector remoteDeviceConnector;
     private NetconfNodeManager netconfNodeManager;
     private ActorRef masterActorRef;
-    private boolean finalClose = false;
-    private boolean closed = false;
-    private boolean isMaster;
+    private final AtomicBoolean finalClose = new AtomicBoolean(false);
+    private final AtomicBoolean closed = new AtomicBoolean(false);
+    private volatile boolean isMaster;
 
     NetconfTopologyContext(final NetconfTopologySetup netconfTopologyDeviceSetup,
                            final ServiceGroupIdentifier serviceGroupIdent,
@@ -79,7 +80,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
             netconfNodeManager = null;
         }
 
-        if (!finalClose) {
+        if (!finalClose.get()) {
             final String masterAddress =
                     Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
             masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
@@ -96,7 +97,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
     @Override
     public ListenableFuture<Void> closeServiceInstance() {
 
-        if (!finalClose) {
+        if (!finalClose.get()) {
             // in case that master changes role to slave, new NodeDeviceManager must be created and listener registered
             netconfNodeManager = createNodeDeviceManager();
         }
@@ -120,7 +121,9 @@ class NetconfTopologyContext implements ClusterSingletonService {
     }
 
     void closeFinal() throws Exception {
-        finalClose = true;
+        if (!finalClose.compareAndSet(false, true)) {
+            return;
+        }
 
         if (netconfNodeManager != null) {
             netconfNodeManager.close();
@@ -164,8 +167,8 @@ class NetconfTopologyContext implements ClusterSingletonService {
         }
     }
 
-    private synchronized void stopDeviceConnectorAndActor() {
-        if (closed) {
+    private void stopDeviceConnectorAndActor() {
+        if (!closed.compareAndSet(false, true)) {
             return;
         }
         if (remoteDeviceConnector != null) {
@@ -176,6 +179,5 @@ class NetconfTopologyContext implements ClusterSingletonService {
             netconfTopologyDeviceSetup.getActorSystem().stop(masterActorRef);
             masterActorRef = null;
         }
-        closed = true;
     }
 }
