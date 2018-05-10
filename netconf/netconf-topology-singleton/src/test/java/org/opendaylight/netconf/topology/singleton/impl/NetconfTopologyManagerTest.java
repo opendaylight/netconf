@@ -274,7 +274,7 @@ public class NetconfTopologyManagerTest {
         }
     }
 
-    private class CustomTreeModification  implements DataTreeModification<Node> {
+    static class CustomTreeModification  implements DataTreeModification<Node> {
 
         private final DataTreeIdentifier<Node> rootPath;
         private final DataObjectModification<Node> rootNode;

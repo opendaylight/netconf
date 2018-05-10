@@ -10,8 +10,11 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
-import akka.actor.UntypedActor;
+import akka.actor.Status.Failure;
+import akka.actor.Status.Success;
+import akka.pattern.AskTimeoutException;
 import akka.util.Timeout;
+import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -23,6 +26,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.controller.cluster.common.actor.AbstractUntypedActor;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
@@ -43,6 +47,7 @@ import org.opendaylight.netconf.topology.singleton.messages.AskForMasterMountPoi
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.MasterActorDataInitialized;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
+import org.opendaylight.netconf.topology.singleton.messages.NotMasterException;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSlaveActor;
 import org.opendaylight.netconf.topology.singleton.messages.RegisterMountPoint;
@@ -68,13 +73,9 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.Duration;
 
-public final class NetconfNodeActor extends UntypedActor {
-
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeActor.class);
+public class NetconfNodeActor extends AbstractUntypedActor {
 
     private final Duration writeTxIdleTimeout;
     private final DOMMountPointService mountPointService;
@@ -101,10 +102,10 @@ public final class NetconfNodeActor extends UntypedActor {
                         mountPointService));
     }
 
-    private NetconfNodeActor(final NetconfTopologySetup setup,
-                             final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
-                             final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime,
-                             final DOMMountPointService mountPointService) {
+    protected NetconfNodeActor(final NetconfTopologySetup setup,
+                               final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
+                               final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime,
+                               final DOMMountPointService mountPointService) {
         this.setup = setup;
         this.id = id;
         this.schemaRegistry = schemaRegistry;
@@ -116,7 +117,9 @@ public final class NetconfNodeActor extends UntypedActor {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public void onReceive(final Object message) throws Exception {
+    public void handleReceive(final Object message) throws Exception {
+        LOG.debug("{}:  received message {}", id, message);
+
         if (message instanceof CreateInitialMasterActorData) { // master
 
             final CreateInitialMasterActorData masterActorData = (CreateInitialMasterActorData) message;
@@ -135,9 +138,16 @@ public final class NetconfNodeActor extends UntypedActor {
             id = ((RefreshSetupMasterActorData) message).getRemoteDeviceId();
             sender().tell(new MasterActorDataInitialized(), self());
         } else if (message instanceof AskForMasterMountPoint) { // master
+            AskForMasterMountPoint askForMasterMountPoint = (AskForMasterMountPoint)message;
+
             // only master contains reference to deviceDataBroker
             if (deviceDataBroker != null) {
-                getSender().tell(new RegisterMountPoint(sourceIdentifiers), getSelf());
+                LOG.debug("{}: Sending RegisterMountPoint reply to {}", id, askForMasterMountPoint.getSlaveActorRef());
+                askForMasterMountPoint.getSlaveActorRef().tell(new RegisterMountPoint(sourceIdentifiers, self()),
+                        sender());
+            } else {
+                LOG.warn("{}: Received {} but we don't appear to be the master", id, askForMasterMountPoint);
+                sender().tell(new Failure(new NotMasterException(self())), self());
             }
 
         } else if (message instanceof YangTextSchemaSourceRequest) { // master
@@ -167,20 +177,16 @@ public final class NetconfNodeActor extends UntypedActor {
                 sender().tell(t, self());
             }
         } else if (message instanceof InvokeRpcMessage) { // master
-
             final InvokeRpcMessage invokeRpcMessage = (InvokeRpcMessage) message;
             invokeSlaveRpc(invokeRpcMessage.getSchemaPath(), invokeRpcMessage.getNormalizedNodeMessage(), sender());
 
         } else if (message instanceof RegisterMountPoint) { //slaves
-
-            sourceIdentifiers = ((RegisterMountPoint) message).getSourceIndentifiers();
-            registerSlaveMountPoint(getSender());
-
+            RegisterMountPoint registerMountPoint = (RegisterMountPoint)message;
+            sourceIdentifiers = registerMountPoint.getSourceIndentifiers();
+            registerSlaveMountPoint(registerMountPoint.getMasterActorRef());
+            sender().tell(new Success(null), self());
         } else if (message instanceof UnregisterSlaveMountPoint) { //slaves
-            if (slaveSalManager != null) {
-                slaveSalManager.close();
-                slaveSalManager = null;
-            }
+            unregisterSlaveMountPoint();
         } else if (message instanceof RefreshSlaveActor) { //slave
             actorResponseWaitTime = ((RefreshSlaveActor) message).getActorResponseWaitTime();
             id = ((RefreshSlaveActor) message).getId();
@@ -193,7 +199,19 @@ public final class NetconfNodeActor extends UntypedActor {
 
     @Override
     public void postStop() throws Exception {
-        super.postStop();
+        try {
+            super.postStop();
+        } finally {
+            unregisterSlaveMountPoint();
+        }
+    }
+
+    private void unregisterSlaveMountPoint() {
+        if (slaveSalManager != null) {
+            slaveSalManager.close();
+            slaveSalManager = null;
+        }
+
         closeSchemaSourceRegistrations();
     }
 
@@ -250,33 +268,18 @@ public final class NetconfNodeActor extends UntypedActor {
         if (this.slaveSalManager != null) {
             slaveSalManager.close();
         }
+
         closeSchemaSourceRegistrations();
-        slaveSalManager = new SlaveSalFacade(id, setup.getActorSystem(), actorResponseWaitTime,
-                mountPointService);
+        slaveSalManager = new SlaveSalFacade(id, setup.getActorSystem(), actorResponseWaitTime, mountPointService);
 
-        final ListenableFuture<SchemaContext> remoteSchemaContext = getSchemaContext(masterReference);
-        final DOMRpcService deviceRpcService = getDOMRpcService(masterReference);
-
-        Futures.addCallback(remoteSchemaContext, new FutureCallback<SchemaContext>() {
-            @Override
-            public void onSuccess(@Nonnull final SchemaContext result) {
-                LOG.info("{}: Schema context resolved: {}", id, result.getModules());
-                slaveSalManager.registerSlaveMountPoint(result, deviceRpcService, masterReference);
-            }
-
-            @Override
-            public void onFailure(@Nonnull final Throwable throwable) {
-                LOG.error("{}: Failed to register mount point: {}", id, throwable);
-            }
-        }, MoreExecutors.directExecutor());
+        resolveSchemaContext(createSchemaContextFactory(masterReference), slaveSalManager, masterReference, 1);
     }
 
     private DOMRpcService getDOMRpcService(final ActorRef masterReference) {
         return new ProxyDOMRpcService(setup.getActorSystem(), masterReference, id, actorResponseWaitTime);
     }
 
-    private ListenableFuture<SchemaContext> getSchemaContext(final ActorRef masterReference) {
-
+    private SchemaContextFactory createSchemaContextFactory(final ActorRef masterReference) {
         final RemoteYangTextSourceProvider remoteYangTextSourceProvider =
                 new ProxyYangTextSourceProvider(masterReference, getContext(), actorResponseWaitTime);
         final RemoteSchemaProvider remoteProvider = new RemoteSchemaProvider(remoteYangTextSourceProvider,
@@ -288,10 +291,48 @@ public final class NetconfNodeActor extends UntypedActor {
                                 YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())))
                 .collect(Collectors.toList());
 
-        final SchemaContextFactory schemaContextFactory
-                = schemaRepository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
+        return schemaRepository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
+    }
 
-        return schemaContextFactory.createSchemaContext(sourceIdentifiers);
+    private void resolveSchemaContext(final SchemaContextFactory schemaContextFactory,
+            final SlaveSalFacade localSlaveSalManager, final ActorRef masterReference, int tries) {
+        final ListenableFuture<SchemaContext> schemaContextFuture =
+                schemaContextFactory.createSchemaContext(sourceIdentifiers);
+        Futures.addCallback(schemaContextFuture, new FutureCallback<SchemaContext>() {
+            @Override
+            public void onSuccess(@Nonnull final SchemaContext result) {
+                executeInSelf(() -> {
+                    // Make sure the slaveSalManager instance hasn't changed since we initiated the schema context
+                    // resolution.
+                    if (slaveSalManager == localSlaveSalManager) {
+                        LOG.info("{}: Schema context resolved: {} - registering slave mount point",
+                                id, result.getModules());
+                        slaveSalManager.registerSlaveMountPoint(result, getDOMRpcService(masterReference),
+                                masterReference);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(@Nonnull final Throwable throwable) {
+                executeInSelf(() -> {
+                    if (slaveSalManager == localSlaveSalManager) {
+                        final Throwable cause = Throwables.getRootCause(throwable);
+                        if (cause instanceof AskTimeoutException) {
+                            if (tries <= 5 || tries % 10 == 0) {
+                                LOG.warn("{}: Failed to resolve schema context - retrying...", id, throwable);
+                            }
+
+                            resolveSchemaContext(schemaContextFactory, localSlaveSalManager,
+                                    masterReference, tries + 1);
+                        } else {
+                            LOG.error("{}: Failed to resolve schema context - unable to register slave mount point",
+                                    id, throwable);
+                        }
+                    }
+                });
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     private void closeSchemaSourceRegistrations() {
