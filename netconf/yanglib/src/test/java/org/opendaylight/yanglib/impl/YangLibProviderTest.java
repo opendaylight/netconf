@@ -50,6 +50,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YinSchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
+import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.ASTSchemaSource;
 
 public class YangLibProviderTest {
@@ -89,7 +90,7 @@ public class YangLibProviderTest {
 
         final YanglibConfig yanglibConfig = new YanglibConfigBuilder().setBindingAddr("www.fake.com")
                 .setBindingPort(300L).setCacheFolder(CACHE_DIR.getAbsolutePath()).build();
-        yangLibProvider = new YangLibProvider(yanglibConfig, dataBroker);
+        yangLibProvider = new YangLibProvider(yanglibConfig, dataBroker, new SharedSchemaRepository("yang-library"));
     }
 
     @Test

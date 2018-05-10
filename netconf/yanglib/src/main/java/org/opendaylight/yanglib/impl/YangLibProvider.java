@@ -59,17 +59,18 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
 
     private final DataBroker dataBroker;
     private final YanglibConfig yanglibConfig;
+    private final SharedSchemaRepository schemaRepository;
     private SchemaListenerRegistration schemaListenerRegistration;
-    private SharedSchemaRepository schemaRepository;
 
-    public YangLibProvider(final YanglibConfig yanglibConfig, final DataBroker dataBroker) {
+    public YangLibProvider(final YanglibConfig yanglibConfig, final DataBroker dataBroker,
+            final SharedSchemaRepository schemaRepository) {
         this.yanglibConfig = Preconditions.checkNotNull(yanglibConfig);
         this.dataBroker = Preconditions.checkNotNull(dataBroker);
+        this.schemaRepository = Preconditions.checkNotNull(schemaRepository);
     }
 
     @Override
     public void close() {
-        YangLibServiceImpl.setSchemaRepository(null);
         if (schemaListenerRegistration != null) {
             schemaListenerRegistration.close();
         }
@@ -86,13 +87,11 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
         Preconditions.checkArgument(cacheFolderFile.isDirectory(), "cache-folder %s is not a directory",
                 cacheFolderFile);
 
-        schemaRepository = new SharedSchemaRepository("yang-library");
         final FilesystemSchemaSourceCache<YangTextSchemaSource> cache =
                 new FilesystemSchemaSourceCache<>(schemaRepository, YangTextSchemaSource.class, cacheFolderFile);
         schemaRepository.registerSchemaSourceListener(cache);
 
         schemaListenerRegistration = schemaRepository.registerSchemaSourceListener(this);
-        YangLibServiceImpl.setSchemaRepository(schemaRepository);
 
         LOG.info("Started yang library with sources from {}", cacheFolderFile);
     }
