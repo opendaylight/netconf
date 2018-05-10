@@ -11,6 +11,7 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
@@ -28,6 +29,7 @@ public class SlaveSalFacade {
     private final NetconfDeviceSalProvider salProvider;
     private final ActorSystem actorSystem;
     private final Timeout actorResponseWaitTime;
+    private final AtomicBoolean registered = new AtomicBoolean(false);
 
     public SlaveSalFacade(final RemoteDeviceId id,
                           final ActorSystem actorSystem,
@@ -41,6 +43,10 @@ public class SlaveSalFacade {
 
     public void registerSlaveMountPoint(final SchemaContext remoteSchemaContext, final DOMRpcService deviceRpc,
                                         final ActorRef masterActorRef) {
+        if (!registered.compareAndSet(false, true)) {
+            return;
+        }
+
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
         final ProxyDOMDataBroker netconfDeviceDataBroker =
@@ -52,20 +58,13 @@ public class SlaveSalFacade {
         LOG.info("{}: Slave mount point registered.", id);
     }
 
-    public void unregisterSlaveMountPoint() {
-        salProvider.getMountInstance().onTopologyDeviceDisconnected();
-    }
-
-    @SuppressWarnings("checkstyle:IllegalCatch")
     public void close() {
-        unregisterSlaveMountPoint();
-        try {
-            salProvider.getMountInstance().close();
-        } catch (final Exception exception) {
-            LOG.warn("{}: Exception in closing slave sal facade: {}", id, exception);
+        if (!registered.compareAndSet(true, false)) {
+            return;
         }
 
+        salProvider.getMountInstance().onTopologyDeviceDisconnected();
+
+        LOG.info("{}: Slave mount point unregistered.", id);
     }
-
-
 }

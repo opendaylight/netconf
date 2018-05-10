@@ -27,6 +27,7 @@ import akka.actor.Props;
 import akka.pattern.Patterns;
 import akka.testkit.JavaTestKit;
 import akka.testkit.TestActorRef;
+import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
@@ -181,14 +182,13 @@ public class NetconfNodeActorTest {
 
         // test if slave get right identifiers from master
 
-        final Future<Object> registerMountPointFuture =
-                Patterns.ask(masterRef, new AskForMasterMountPoint(),
-                        TIMEOUT);
+        final TestKit kit = new TestKit(system);
 
-        final RegisterMountPoint success =
-                (RegisterMountPoint) Await.result(registerMountPointFuture, TIMEOUT.duration());
+        masterRef.tell(new AskForMasterMountPoint(kit.getRef()), ActorRef.noSender());
 
-        assertEquals(sourceIdentifiers, success.getSourceIndentifiers());
+        final RegisterMountPoint registerMountPoint = kit.expectMsgClass(RegisterMountPoint.class);
+
+        assertEquals(sourceIdentifiers, registerMountPoint.getSourceIndentifiers());
 
     }
 
@@ -213,7 +213,7 @@ public class NetconfNodeActorTest {
                 system.actorOf(NetconfNodeActor.props(setup, remoteDeviceId, registry, schemaRepository, TIMEOUT,
                         mountPointService));
         final List<SourceIdentifier> sources = ImmutableList.of(yang1, yang2);
-        slaveRef.tell(new RegisterMountPoint(sources), masterRef);
+        slaveRef.tell(new RegisterMountPoint(sources, masterRef), masterRef);
 
         verify(registry, timeout(1000)).registerSchemaSource(any(), withSourceId(yang1));
         verify(registry, timeout(1000)).registerSchemaSource(any(), withSourceId(yang2));
