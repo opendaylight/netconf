@@ -36,7 +36,9 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
+import org.opendaylight.yangtools.yang.model.repo.util.InMemorySchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
+import org.opendaylight.yangtools.yang.parser.rfc7950.repo.ASTSchemaSource;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToASTTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +79,9 @@ public final class NetconfTopologyUtils {
             new FilesystemSchemaSourceCache<>(DEFAULT_SCHEMA_REPOSITORY, YangTextSchemaSource.class,
                     new File(QUALIFIED_DEFAULT_CACHE_DIRECTORY));
 
+    public static final InMemorySchemaSourceCache<ASTSchemaSource> DEFAULT_AST_CACHE =
+            InMemorySchemaSourceCache.createSoftCache(DEFAULT_SCHEMA_REPOSITORY, ASTSchemaSource.class);
+
     // The default factory for creating <code>SchemaContext</code> instances.
     public static final SchemaContextFactory DEFAULT_SCHEMA_CONTEXT_FACTORY =
             DEFAULT_SCHEMA_REPOSITORY.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
@@ -98,6 +103,7 @@ public final class NetconfTopologyUtils {
                 new NetconfDevice.SchemaResourcesDTO(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY,
                         DEFAULT_SCHEMA_CONTEXT_FACTORY, new NetconfStateSchemasResolverImpl()));
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_CACHE);
+        DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_AST_CACHE);
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(
                 TextToASTTransformer.create(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY));
     }
@@ -164,6 +170,8 @@ public final class NetconfTopologyUtils {
         final FilesystemSchemaSourceCache<YangTextSchemaSource> deviceCache =
                 createDeviceFilesystemCache(moduleSchemaCacheDirectory, repository);
         repository.registerSchemaSourceListener(deviceCache);
+        repository.registerSchemaSourceListener(InMemorySchemaSourceCache.createSoftCache(repository,
+                ASTSchemaSource.class));
         return new NetconfDevice.SchemaResourcesDTO(repository, repository, schemaContextFactory,
                 new NetconfStateSchemasResolverImpl());
     }

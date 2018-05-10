@@ -537,12 +537,12 @@ public class NetconfDevice
                 final Collection<SourceIdentifier> requiredSources, final MissingSchemaSourceException exception) {
             // In case source missing, try without it
             final SourceIdentifier missingSource = exception.getSourceId();
-            LOG.warn("{}: Unable to build schema context, missing source {}, will reattempt without it", id,
-                    missingSource);
+            LOG.warn("{}: Unable to build schema context, missing source {}, will reattempt without it",
+                id, missingSource);
             LOG.debug("{}: Unable to build schema context, missing source {}, will reattempt without it",
-                    exception);
+                id, missingSource, exception);
             final Collection<QName> qNameOfMissingSource =
-                    getQNameFromSourceIdentifiers(Sets.newHashSet(missingSource));
+                getQNameFromSourceIdentifiers(Sets.newHashSet(missingSource));
             if (!qNameOfMissingSource.isEmpty()) {
                 capabilities.addUnresolvedCapabilities(
                         qNameOfMissingSource, UnavailableCapability.FailureReason.MissingSource);
@@ -559,21 +559,22 @@ public class NetconfDevice
                 // flawed model - exclude it
                 final SourceIdentifier failedSourceId = resolutionException.getFailedSource();
                 LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
-                        id, failedSourceId);
+                    id, failedSourceId);
                 LOG.warn("{}: Unable to build schema context, failed to resolve source {}, will reattempt without it",
-                        id, resolutionException);
-                capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(
-                        Collections.singleton(failedSourceId)), UnavailableCapability.FailureReason.UnableToResolve);
+                    id, failedSourceId, resolutionException);
+                capabilities.addUnresolvedCapabilities(
+                        getQNameFromSourceIdentifiers(Collections.singleton(failedSourceId)),
+                        UnavailableCapability.FailureReason.UnableToResolve);
                 return stripUnavailableSource(requiredSources, resolutionException.getFailedSource());
             }
             // unsatisfied imports
             final Set<SourceIdentifier> unresolvedSources = resolutionException.getUnsatisfiedImports().keySet();
-            capabilities.addUnresolvedCapabilities(
-                getQNameFromSourceIdentifiers(unresolvedSources), UnavailableCapability.FailureReason.UnableToResolve);
+            capabilities.addUnresolvedCapabilities(getQNameFromSourceIdentifiers(unresolvedSources),
+                UnavailableCapability.FailureReason.UnableToResolve);
             LOG.warn("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only",
-                    id, resolutionException.getUnsatisfiedImports());
+                id, resolutionException.getUnsatisfiedImports());
             LOG.debug("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only",
-                    resolutionException);
+                id, resolutionException.getUnsatisfiedImports(), resolutionException);
             return resolutionException.getResolvedSources();
         }
 
