@@ -69,7 +69,6 @@ import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
-import org.opendaylight.yangtools.yang.parser.rfc7950.repo.ASTSchemaSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -469,7 +468,7 @@ public class NetconfDevice
         private Collection<SourceIdentifier> filterMissingSources(final Collection<SourceIdentifier> requiredSources) {
             return requiredSources.parallelStream().filter(sourceIdentifier -> {
                 try {
-                    schemaRepository.getSchemaSource(sourceIdentifier, ASTSchemaSource.class).get();
+                    schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class).get();
                     return false;
                 } catch (InterruptedException | ExecutionException e) {
                     return true;
