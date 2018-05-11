@@ -8,29 +8,37 @@
 
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import static junit.framework.TestCase.assertFalse;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.opendaylight.controller.md.sal.binding.api.DataObjectModification.ModificationType.DELETE;
+import static org.opendaylight.controller.md.sal.binding.api.DataObjectModification.ModificationType.SUBTREE_MODIFIED;
 import static org.opendaylight.controller.md.sal.binding.api.DataObjectModification.ModificationType.WRITE;
 
-import com.google.common.util.concurrent.Futures;
+import akka.util.Timeout;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 import io.netty.util.concurrent.EventExecutor;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import javax.annotation.Nonnull;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
@@ -40,13 +48,16 @@ import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
-import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
+import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
+import org.opendaylight.controller.md.sal.binding.test.ConstantSchemaAbstractDataBrokerTest;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
+import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -56,27 +67,48 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.ConfigBuilder;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.yang.binding.Identifier;
+import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
+import org.opendaylight.yangtools.yang.binding.util.BindingReflections;
 
 public class NetconfTopologyManagerTest {
+    private static final int ACTOR_RESPONSE_WAIT_TIME = 10;
+    private static final String TOPOLOGY_ID = "topologyID";
 
-    private final String topologyId = "topologyID";
     private NetconfTopologyManager netconfTopologyManager;
-
-    @Mock
-    private DataBroker dataBroker;
 
     @Mock
     private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
 
+    @Mock
+    private ListenerRegistration<?> mockListenerReg;
+
+    private DataBroker dataBroker;
+
+    private final Map<InstanceIdentifier<Node>, Function<NetconfTopologySetup, NetconfTopologyContext>>
+            mockContextMap = new HashMap<>();
+
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         initMocks(this);
+
+        ConstantSchemaAbstractDataBrokerTest dataBrokerTest = new ConstantSchemaAbstractDataBrokerTest(false) {
+            @Override
+            protected Iterable<YangModuleInfo> getModuleInfos() throws Exception {
+                return ImmutableSet.of(BindingReflections.getModuleInfo(NetworkTopology.class),
+                        BindingReflections.getModuleInfo(Topology.class));
+            }
+        };
+
+        dataBrokerTest.setup();
+        dataBroker = spy(dataBrokerTest.getDataBroker());
 
         final RpcProviderRegistry rpcProviderRegistry = mock(RpcProviderRegistry.class);
         final ScheduledThreadPool keepaliveExecutor = mock(ScheduledThreadPool.class);
@@ -90,188 +122,251 @@ public class NetconfTopologyManagerTest {
         final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(0).build();
         netconfTopologyManager = new NetconfTopologyManager(dataBroker, rpcProviderRegistry,
                 clusterSingletonServiceProvider, keepaliveExecutor, processingExecutor,
-                actorSystemProvider, eventExecutor, clientDispatcher, topologyId, config,
-                mountPointService, encryptionService);
+                actorSystemProvider, eventExecutor, clientDispatcher, TOPOLOGY_ID, config,
+                mountPointService, encryptionService) {
+            @Override
+            protected NetconfTopologyContext newNetconfTopologyContext(NetconfTopologySetup setup,
+                    ServiceGroupIdentifier serviceGroupIdent, Timeout actorResponseWaitTime) {
+                assertEquals(ACTOR_RESPONSE_WAIT_TIME, actorResponseWaitTime.duration().toSeconds());
+                return Objects.requireNonNull(mockContextMap.get(setup.getInstanceIdentifier()),
+                        "No mock context for " + setup.getInstanceIdentifier()).apply(setup);
+            }
+        };
+
+        doNothing().when(mockListenerReg).close();
+        doReturn(mockListenerReg).when(dataBroker).registerDataTreeChangeListener(any(), any());
     }
 
     @Test
-    public void testWriteConfiguration() throws Exception {
-        writeConfiguration(false);
-    }
-
-    @Test
-    public void testWriteConfigurationFail() throws Exception {
-        writeConfiguration(true);
-    }
-
-    @Test
-    public void testRegisterDataTreeChangeListener() {
-
-        final WriteTransaction wtx = mock(WriteTransaction.class);
-
-        doReturn(wtx).when(dataBroker).newWriteOnlyTransaction();
-        doNothing().when(wtx).merge(any(), any(), any());
-        doReturn(Futures.immediateCheckedFuture(null)).when(wtx).submit();
+    public void testRegisterDataTreeChangeListener() throws Exception {
 
         netconfTopologyManager.init();
 
-        // verify if listener is called with right parameters = registered on right path
+        await().atMost(5, TimeUnit.SECONDS).until(() -> {
+            ReadOnlyTransaction readTx = dataBroker.newReadOnlyTransaction();
+            Optional<Topology> config = readTx.read(LogicalDatastoreType.CONFIGURATION,
+                    NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
+            Optional<Topology> oper = readTx.read(LogicalDatastoreType.OPERATIONAL,
+                    NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
+            return config.isPresent() && oper.isPresent();
+        });
 
-        verify(dataBroker, times(1)).registerDataTreeChangeListener(
+        // verify registration is called with right parameters
+
+        verify(dataBroker).registerDataTreeChangeListener(
                 new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, NetconfTopologyUtils
-                        .createTopologyListPath(topologyId).child(Node.class)), netconfTopologyManager);
+                        .createTopologyListPath(TOPOLOGY_ID).child(Node.class)), netconfTopologyManager);
 
+        netconfTopologyManager.close();
+        verify(mockListenerReg).close();
+
+        netconfTopologyManager.close();
+        verifyNoMoreInteractions(mockListenerReg);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testOnDataTreeChanged() throws Exception {
+
+        // Notify of 2 created Node objects.
+
+        final NodeId nodeId1 = new NodeId("node-id-1");
+        final InstanceIdentifier<Node> nodeInstanceId1 = NetconfTopologyUtils.createTopologyNodeListPath(
+                new NodeKey(nodeId1), TOPOLOGY_ID);
+
+        final NodeId nodeId2 = new NodeId("node-id-2");
+        final InstanceIdentifier<Node> nodeInstanceId2 = NetconfTopologyUtils.createTopologyNodeListPath(
+                new NodeKey(nodeId2), TOPOLOGY_ID);
+
+        final NetconfNode netconfNode1 = new NetconfNodeBuilder()
+                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                .setPort(new PortNumber(1111))
+                .setActorResponseWaitTime(ACTOR_RESPONSE_WAIT_TIME)
+                .build();
+        final Node node1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(NetconfNode.class,
+                netconfNode1).build();
+
+        final DataObjectModification<Node> dataObjectModification1 = mock(DataObjectModification.class);
+        doReturn(WRITE).when(dataObjectModification1).getModificationType();
+        doReturn(node1).when(dataObjectModification1).getDataAfter();
+        doReturn(new InstanceIdentifier.IdentifiableItem<>(Node.class, new NodeKey(nodeId1)))
+                .when(dataObjectModification1).getIdentifier();
+
+        final NetconfNode netconfNode2 = new NetconfNodeBuilder()
+                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                .setPort(new PortNumber(2222))
+                .setActorResponseWaitTime(ACTOR_RESPONSE_WAIT_TIME)
+                .build();
+        final Node node2 = new NodeBuilder().setNodeId(nodeId2).addAugmentation(NetconfNode.class,
+                netconfNode2).build();
+
+        final DataObjectModification<Node> dataObjectModification2 = mock(DataObjectModification.class);
+        doReturn(WRITE).when(dataObjectModification2).getModificationType();
+        doReturn(node2).when(dataObjectModification2).getDataAfter();
+        doReturn(new InstanceIdentifier.IdentifiableItem<>(Node.class, new NodeKey(nodeId2)))
+                .when(dataObjectModification2).getIdentifier();
+
+        final NetconfTopologyContext mockContext1 = mock(NetconfTopologyContext.class);
+        mockContextMap.put(nodeInstanceId1, setup -> {
+            assertEquals(node1, setup.getNode());
+            assertEquals(TOPOLOGY_ID, setup.getTopologyId());
+            return mockContext1;
+        });
+
+        final NetconfTopologyContext mockContext2 = mock(NetconfTopologyContext.class);
+        mockContextMap.put(nodeInstanceId2, setup -> {
+            assertEquals(node2, setup.getNode());
+            assertEquals(TOPOLOGY_ID, setup.getTopologyId());
+            return mockContext2;
+        });
+
+        ClusterSingletonServiceRegistration mockClusterRegistration1 = mock(ClusterSingletonServiceRegistration.class);
+        ClusterSingletonServiceRegistration mockClusterRegistration2 = mock(ClusterSingletonServiceRegistration.class);
+
+        doReturn(mockClusterRegistration1).when(clusterSingletonServiceProvider)
+                .registerClusterSingletonService(mockContext1);
+        doReturn(mockClusterRegistration2).when(clusterSingletonServiceProvider)
+                .registerClusterSingletonService(mockContext2);
+
+        netconfTopologyManager.onDataTreeChanged(Arrays.asList(
+                new CustomTreeModification(new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                        nodeInstanceId1), dataObjectModification1),
+                new CustomTreeModification(new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                        nodeInstanceId2), dataObjectModification2)));
+
+        verify(clusterSingletonServiceProvider).registerClusterSingletonService(mockContext1);
+        verify(clusterSingletonServiceProvider).registerClusterSingletonService(mockContext2);
+
+        // Notify of Node 1 replaced and Node 2 subtree modified.
+
+        mockContextMap.clear();
+
+        final NetconfNode updatedNetconfNode1 = new NetconfNodeBuilder(netconfNode1)
+                .setPort(new PortNumber(33333)).build();
+        final Node updatedNode1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(NetconfNode.class,
+                updatedNetconfNode1).build();
+
+        doReturn(WRITE).when(dataObjectModification1).getModificationType();
+        doReturn(node1).when(dataObjectModification1).getDataBefore();
+        doReturn(updatedNode1).when(dataObjectModification1).getDataAfter();
+
+        doReturn(SUBTREE_MODIFIED).when(dataObjectModification2).getModificationType();
+        doReturn(node2).when(dataObjectModification2).getDataBefore();
+        doReturn(node2).when(dataObjectModification2).getDataAfter();
+
+        doNothing().when(mockContext1).refresh(any());
+        doNothing().when(mockContext2).refresh(any());
+
+        netconfTopologyManager.onDataTreeChanged(Arrays.asList(
+                new CustomTreeModification(new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                        nodeInstanceId1), dataObjectModification1),
+                new CustomTreeModification(new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                        nodeInstanceId2), dataObjectModification2)));
+
+        ArgumentCaptor<NetconfTopologySetup> mockContext1Setup = ArgumentCaptor.forClass(NetconfTopologySetup.class);
+        verify(mockContext1).refresh(mockContext1Setup.capture());
+        assertEquals(updatedNode1, mockContext1Setup.getValue().getNode());
+
+        verify(mockContext2).refresh(any());
+
+        verifyNoMoreInteractions(clusterSingletonServiceProvider);
+
+        // Notify of Node 1 deleted.
+
+        doReturn(DELETE).when(dataObjectModification1).getModificationType();
+        doReturn(updatedNode1).when(dataObjectModification1).getDataBefore();
+        doReturn(null).when(dataObjectModification1).getDataAfter();
+
+        netconfTopologyManager.onDataTreeChanged(Arrays.asList(
+                new CustomTreeModification(new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                        nodeInstanceId1), dataObjectModification1)));
+
+        verify(mockClusterRegistration1).close();
+        verify(mockContext1).close();
+        verifyNoMoreInteractions(clusterSingletonServiceProvider, mockClusterRegistration2, mockContext2);
+
+        // Notify of Node 1 created again.
+
+        reset(clusterSingletonServiceProvider);
+
+        final NetconfTopologyContext newMockContext1 = mock(NetconfTopologyContext.class);
+        final ClusterSingletonServiceRegistration newMockClusterRegistration1 =
+                mock(ClusterSingletonServiceRegistration.class);
+
+        doThrow(new RuntimeException("mock error")).doReturn(newMockClusterRegistration1)
+                .when(clusterSingletonServiceProvider).registerClusterSingletonService(newMockContext1);
+
+        doReturn(WRITE).when(dataObjectModification1).getModificationType();
+        doReturn(null).when(dataObjectModification1).getDataBefore();
+        doReturn(node1).when(dataObjectModification1).getDataAfter();
+
+        mockContextMap.put(nodeInstanceId1, setup -> {
+            assertEquals(node1, setup.getNode());
+            assertEquals(TOPOLOGY_ID, setup.getTopologyId());
+            return newMockContext1;
+        });
+
+        netconfTopologyManager.onDataTreeChanged(Arrays.asList(
+                new CustomTreeModification(new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                        nodeInstanceId1), dataObjectModification1)));
+
+        verify(clusterSingletonServiceProvider, times(2)).registerClusterSingletonService(newMockContext1);
+
+        verifyNoMoreInteractions(mockClusterRegistration1, mockContext1, mockClusterRegistration2, mockContext2,
+                newMockContext1, newMockClusterRegistration1, clusterSingletonServiceProvider);
+
+        // Test close.
+
+        netconfTopologyManager.close();
+
+        verify(newMockClusterRegistration1).close();
+        verify(newMockContext1).close();
+        verify(mockClusterRegistration2).close();
+        verify(mockContext2).close();
+
+        netconfTopologyManager.close();
+
+        verifyNoMoreInteractions(mockClusterRegistration1, mockContext1, mockClusterRegistration2, mockContext2,
+                newMockContext1, newMockClusterRegistration1, clusterSingletonServiceProvider);
     }
 
     @Test
-    public void testClose() throws Exception {
-
-        final Field fieldContexts = NetconfTopologyManager.class.getDeclaredField("contexts");
-        fieldContexts.setAccessible(true);
-        @SuppressWarnings("unchecked") final Map<InstanceIdentifier<Node>, NetconfTopologyContext> contexts =
-                (Map<InstanceIdentifier<Node>, NetconfTopologyContext>) fieldContexts.get(netconfTopologyManager);
-
-        final Field fieldClusterRegistrations =
-                NetconfTopologyManager.class.getDeclaredField("clusterRegistrations");
-        fieldClusterRegistrations.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        final Map<InstanceIdentifier<Node>, ClusterSingletonServiceRegistration> clusterRegistrations =
-                (Map<InstanceIdentifier<Node>, ClusterSingletonServiceRegistration>)
-                        fieldClusterRegistrations.get(netconfTopologyManager);
-
-        final InstanceIdentifier<Node> instanceIdentifier = NetconfTopologyUtils.createTopologyNodeListPath(
-                new NodeKey(new NodeId("node-id-1")), "topology-1");
-
-
-        final NetconfTopologyContext context = mock(NetconfTopologyContext.class);
-        final ClusterSingletonServiceRegistration clusterRegistration =
-                mock(ClusterSingletonServiceRegistration.class);
-        contexts.put(instanceIdentifier, context);
-        clusterRegistrations.put(instanceIdentifier, clusterRegistration);
-
-        doNothing().when(context).closeFinal();
-        doNothing().when(clusterRegistration).close();
-
-        netconfTopologyManager.close();
-        verify(context, times(1)).closeFinal();
-        verify(clusterRegistration, times(1)).close();
-
-        assertTrue(contexts.isEmpty());
-        assertTrue(clusterRegistrations.isEmpty());
-
-    }
-
-    private void writeConfiguration(final boolean fail) throws Exception {
-
-        final ClusterSingletonServiceRegistration clusterRegistration = mock(ClusterSingletonServiceRegistration.class);
-
-        final Field fieldContexts = NetconfTopologyManager.class.getDeclaredField("contexts");
-        fieldContexts.setAccessible(true);
-        @SuppressWarnings("unchecked") final Map<InstanceIdentifier<Node>, NetconfTopologyContext> contexts =
-                (Map<InstanceIdentifier<Node>, NetconfTopologyContext>) fieldContexts.get(netconfTopologyManager);
-
-        final Field fieldClusterRegistrations =
-                NetconfTopologyManager.class.getDeclaredField("clusterRegistrations");
-        fieldClusterRegistrations.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        final Map<InstanceIdentifier<Node>, ClusterSingletonServiceRegistration> clusterRegistrations =
-                (Map<InstanceIdentifier<Node>, ClusterSingletonServiceRegistration>)
-                        fieldClusterRegistrations.get(netconfTopologyManager);
-
-        final Collection<DataTreeModification<Node>> changes = new ArrayList<>();
-
-        final InstanceIdentifier<Node> instanceIdentifier = NetconfTopologyUtils.createTopologyNodeListPath(
-                new NodeKey(new NodeId("node-id-1")), "topology-1");
-
-        final InstanceIdentifier<Node> instanceIdentifierDiferent = NetconfTopologyUtils.createTopologyNodeListPath(
-                new NodeKey(new NodeId("node-id-2")), "topology-2");
-
-        final DataTreeIdentifier<Node> rootIdentifier =
-                new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, instanceIdentifier);
-
-        final DataTreeIdentifier<Node> rootIdentifierDifferent =
-                new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, instanceIdentifierDiferent);
-
-        @SuppressWarnings("unchecked") final DataObjectModification<Node> objectModification =
-                mock(DataObjectModification.class);
+    public void testClusterSingletonServiceRegistrationFailure() throws Exception {
+        final NodeId nodeId = new NodeId("node-id");
+        final InstanceIdentifier<Node> nodeInstanceId = NetconfTopologyUtils.createTopologyNodeListPath(
+                new NodeKey(nodeId), TOPOLOGY_ID);
 
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(9999))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(1000L)
-                .setBetweenAttemptsTimeoutMillis(100)
-                .setSchemaless(false)
-                .setTcpOnly(false)
-                .setActorResponseWaitTime(10)
-                .build();
-        final Node node = new NodeBuilder().setNodeId(new NodeId("node-id"))
-                .addAugmentation(NetconfNode.class, netconfNode).build();
+                .setPort(new PortNumber(10))
+                .setActorResponseWaitTime(ACTOR_RESPONSE_WAIT_TIME).build();
+        final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(NetconfNode.class,
+                netconfNode).build();
 
-        final Identifier key = new NodeKey(new NodeId("node-id"));
+        final DataObjectModification<Node> dataObjectModification = mock(DataObjectModification.class);
+        doReturn(WRITE).when(dataObjectModification).getModificationType();
+        doReturn(node).when(dataObjectModification).getDataAfter();
+        doReturn(new InstanceIdentifier.IdentifiableItem<>(Node.class, new NodeKey(nodeId)))
+                .when(dataObjectModification).getIdentifier();
 
-        @SuppressWarnings("unchecked") final InstanceIdentifier.IdentifiableItem<Node, NodeKey> pathArgument =
-                new InstanceIdentifier.IdentifiableItem(Node.class, key);
+        final NetconfTopologyContext mockContext = mock(NetconfTopologyContext.class);
+        mockContextMap.put(nodeInstanceId, setup -> mockContext);
 
+        doThrow(new RuntimeException("mock error")).when(clusterSingletonServiceProvider)
+                .registerClusterSingletonService(mockContext);
 
-        // testing WRITE on two identical rootIdentifiers and one different
-        if (fail) {
-            changes.add(new CustomTreeModification(rootIdentifier, objectModification));
-        } else {
-            changes.add(new CustomTreeModification(rootIdentifier, objectModification));
-            changes.add(new CustomTreeModification(rootIdentifier, objectModification));
-            changes.add(new CustomTreeModification(rootIdentifierDifferent, objectModification));
-        }
-        doReturn(WRITE).when(objectModification).getModificationType();
-        doReturn(node).when(objectModification).getDataAfter();
-        doReturn(pathArgument).when(objectModification).getIdentifier();
+        netconfTopologyManager.init();
 
-        if (fail) {
-            doThrow(new RuntimeException("error")).when(clusterSingletonServiceProvider)
-                    .registerClusterSingletonService(any());
-        } else {
-            doReturn(clusterRegistration).when(clusterSingletonServiceProvider).registerClusterSingletonService(any());
-        }
-        netconfTopologyManager.onDataTreeChanged(changes);
+        netconfTopologyManager.onDataTreeChanged(Arrays.asList(
+                new CustomTreeModification(new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                        nodeInstanceId), dataObjectModification)));
 
-        if (fail) {
-            verify(clusterSingletonServiceProvider, times(3))
-                    .registerClusterSingletonService(any());
-            assertTrue(contexts.isEmpty());
-            assertTrue(clusterRegistrations.isEmpty());
-        } else {
-            verify(clusterSingletonServiceProvider, times(2))
-                    .registerClusterSingletonService(any());
+        verify(clusterSingletonServiceProvider, times(3)).registerClusterSingletonService(mockContext);
+        verify(mockContext).close();
+        verifyNoMoreInteractions(mockListenerReg);
 
-            // only two created contexts
-            assertEquals(2, contexts.size());
-            assertTrue(contexts.containsKey(rootIdentifier.getRootIdentifier()));
-            assertTrue(contexts.containsKey(rootIdentifierDifferent.getRootIdentifier()));
-
-            // only two created cluster registrations
-            assertEquals(2, clusterRegistrations.size());
-            assertTrue(clusterRegistrations.containsKey(rootIdentifier.getRootIdentifier()));
-            assertTrue(clusterRegistrations.containsKey(rootIdentifierDifferent.getRootIdentifier()));
-
-            // after delete there should be no context and clustered registrations
-            doReturn(DELETE).when(objectModification).getModificationType();
-
-            doNothing().when(clusterRegistration).close();
-
-            netconfTopologyManager.onDataTreeChanged(changes);
-
-            verify(clusterRegistration, times(2)).close();
-
-            // empty map of contexts
-            assertTrue(contexts.isEmpty());
-            assertFalse(contexts.containsKey(rootIdentifier.getRootIdentifier()));
-            assertFalse(contexts.containsKey(rootIdentifierDifferent.getRootIdentifier()));
-
-            // empty map of clustered registrations
-            assertTrue(clusterRegistrations.isEmpty());
-            assertFalse(clusterRegistrations.containsKey(rootIdentifier.getRootIdentifier()));
-            assertFalse(clusterRegistrations.containsKey(rootIdentifierDifferent.getRootIdentifier()));
-        }
+        netconfTopologyManager.close();
+        verifyNoMoreInteractions(mockContext);
     }
 
     static class CustomTreeModification  implements DataTreeModification<Node> {
