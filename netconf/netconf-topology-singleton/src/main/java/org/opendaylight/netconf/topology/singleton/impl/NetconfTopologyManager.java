@@ -10,14 +10,15 @@ package org.opendaylight.netconf.topology.singleton.impl;
 
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -62,9 +63,9 @@ public class NetconfTopologyManager
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyManager.class);
 
-    private final Map<InstanceIdentifier<Node>, NetconfTopologyContext> contexts = new HashMap<>();
+    private final Map<InstanceIdentifier<Node>, NetconfTopologyContext> contexts = new ConcurrentHashMap<>();
     private final Map<InstanceIdentifier<Node>, ClusterSingletonServiceRegistration>
-            clusterRegistrations = new HashMap<>();
+            clusterRegistrations = new ConcurrentHashMap<>();
 
     private final DataBroker dataBroker;
     private final RpcProviderRegistry rpcProviderRegistry;
@@ -163,9 +164,8 @@ public class NetconfTopologyManager
         final ServiceGroupIdentifier serviceGroupIdent =
                 ServiceGroupIdentifier.create(instanceIdentifier.toString());
 
-        final NetconfTopologyContext newNetconfTopologyContext =
-                new NetconfTopologyContext(createSetup(instanceIdentifier, node), serviceGroupIdent,
-                        actorResponseWaitTime, mountPointService);
+        final NetconfTopologyContext newNetconfTopologyContext = newNetconfTopologyContext(
+                createSetup(instanceIdentifier, node), serviceGroupIdent, actorResponseWaitTime);
 
         int tries = 3;
         while (true) {
@@ -181,51 +181,50 @@ public class NetconfTopologyManager
                 if (--tries <= 0) {
                     LOG.error("Unable to register cluster singleton service {} - done trying, closing topology context",
                             newNetconfTopologyContext, e);
-                    close();
+                    close(newNetconfTopologyContext);
                     break;
                 }
             }
         }
-
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     private void stopNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier) {
-        if (contexts.containsKey(instanceIdentifier)) {
-            try {
-                clusterRegistrations.get(instanceIdentifier).close();
-                contexts.get(instanceIdentifier).closeFinal();
-            } catch (final Exception e) {
-                LOG.warn("Error at closing topology context. InstanceIdentifier: " + instanceIdentifier);
-            }
-            contexts.remove(instanceIdentifier);
-            clusterRegistrations.remove(instanceIdentifier);
+        final NetconfTopologyContext netconfTopologyContext = contexts.remove(instanceIdentifier);
+        if (netconfTopologyContext != null) {
+            close(clusterRegistrations.remove(instanceIdentifier));
+            close(netconfTopologyContext);
         }
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
+    @VisibleForTesting
+    protected NetconfTopologyContext newNetconfTopologyContext(NetconfTopologySetup setup,
+            ServiceGroupIdentifier serviceGroupIdent, Timeout actorResponseWaitTime) {
+        return new NetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime, mountPointService);
+    }
+
     @Override
     public void close() {
         if (dataChangeListenerRegistration != null) {
             dataChangeListenerRegistration.close();
             dataChangeListenerRegistration = null;
         }
-        contexts.forEach((instanceIdentifier, netconfTopologyContext) -> {
-            try {
-                netconfTopologyContext.closeFinal();
-            } catch (final Exception e) {
-                LOG.error("Error at closing topology context. InstanceIdentifier: " + instanceIdentifier, e);
-            }
-        });
-        clusterRegistrations.forEach((instanceIdentifier, clusterSingletonServiceRegistration) -> {
-            try {
-                clusterSingletonServiceRegistration.close();
-            } catch (final Exception e) {
-                LOG.error("Error at unregistering from cluster. InstanceIdentifier: " + instanceIdentifier, e);
-            }
-        });
+
+        contexts.values().forEach(netconfTopologyContext -> close(netconfTopologyContext));
+
+        clusterRegistrations.values().forEach(
+            clusterSingletonServiceRegistration -> close(clusterSingletonServiceRegistration));
+
         contexts.clear();
         clusterRegistrations.clear();
+    }
+
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    private void close(AutoCloseable closeable) {
+        try {
+            closeable.close();
+        } catch (Exception e) {
+            LOG.warn("Error closing {}", closeable, e);
+        }
     }
 
     /**

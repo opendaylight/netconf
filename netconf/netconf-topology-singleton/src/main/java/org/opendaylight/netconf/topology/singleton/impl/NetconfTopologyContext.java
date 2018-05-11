@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
 
-class NetconfTopologyContext implements ClusterSingletonService {
+class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyContext.class);
 
@@ -47,8 +47,8 @@ class NetconfTopologyContext implements ClusterSingletonService {
     private RemoteDeviceConnector remoteDeviceConnector;
     private NetconfNodeManager netconfNodeManager;
     private ActorRef masterActorRef;
-    private final AtomicBoolean finalClose = new AtomicBoolean(false);
     private final AtomicBoolean closed = new AtomicBoolean(false);
+    private final AtomicBoolean stopped = new AtomicBoolean(false);
     private volatile boolean isMaster;
 
     NetconfTopologyContext(final NetconfTopologySetup netconfTopologyDeviceSetup,
@@ -80,7 +80,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
             netconfNodeManager = null;
         }
 
-        if (!finalClose.get()) {
+        if (!closed.get()) {
             final String masterAddress =
                     Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
             masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
@@ -97,13 +97,13 @@ class NetconfTopologyContext implements ClusterSingletonService {
     @Override
     public ListenableFuture<Void> closeServiceInstance() {
 
-        if (!finalClose.get()) {
+        if (!closed.get()) {
             // in case that master changes role to slave, new NodeDeviceManager must be created and listener registered
             netconfNodeManager = createNodeDeviceManager();
         }
         stopDeviceConnectorAndActor();
 
-        return Futures.immediateCheckedFuture(null);
+        return Futures.immediateFuture(null);
     }
 
     @Override
@@ -120,8 +120,9 @@ class NetconfTopologyContext implements ClusterSingletonService {
         return ndm;
     }
 
-    void closeFinal() throws Exception {
-        if (!finalClose.compareAndSet(false, true)) {
+    @Override
+    public void close() throws Exception {
+        if (!closed.compareAndSet(false, true)) {
             return;
         }
 
@@ -168,7 +169,7 @@ class NetconfTopologyContext implements ClusterSingletonService {
     }
 
     private void stopDeviceConnectorAndActor() {
-        if (!closed.compareAndSet(false, true)) {
+        if (!stopped.compareAndSet(false, true)) {
             return;
         }
         if (remoteDeviceConnector != null) {
