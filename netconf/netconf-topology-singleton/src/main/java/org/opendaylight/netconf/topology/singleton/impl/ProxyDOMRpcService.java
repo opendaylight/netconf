@@ -13,7 +13,6 @@ import akka.actor.ActorSystem;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import com.google.common.base.Function;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
@@ -66,58 +65,39 @@ public class ProxyDOMRpcService implements DOMRpcService {
 
         final NormalizedNodeMessage normalizedNodeMessage =
                 new NormalizedNodeMessage(YangInstanceIdentifier.EMPTY, input);
-        final Future<Object> scalaFuture =
-                Patterns.ask(masterActorRef,
-                        new InvokeRpcMessage(new SchemaPathMessage(type), normalizedNodeMessage),
-                        actorResponseWaitTime);
+        final Future<Object> scalaFuture = Patterns.ask(masterActorRef,
+                new InvokeRpcMessage(new SchemaPathMessage(type), normalizedNodeMessage), actorResponseWaitTime);
 
         final SettableFuture<DOMRpcResult> settableFuture = SettableFuture.create();
 
-        final CheckedFuture<DOMRpcResult, DOMRpcException> checkedFuture = Futures.makeChecked(settableFuture,
-                new Function<Exception, DOMRpcException>() {
-
-                @Nullable
-                @Override
-                public DOMRpcException apply(@Nullable final Exception exception) {
-                    return new ClusteringRpcException(id + ": Exception during remote rpc invocation.",
-                            exception);
-                }
-            });
-
         scalaFuture.onComplete(new OnComplete<Object>() {
             @Override
-            public void onComplete(final Throwable failure, final Object success) throws Throwable {
+            public void onComplete(final Throwable failure, final Object response) {
                 if (failure != null) {
                     settableFuture.setException(failure);
                     return;
                 }
-                if (success instanceof Throwable) {
-                    settableFuture.setException((Throwable) success);
-                    return;
-                }
-                if (success instanceof EmptyResultResponse || success == null) {
+
+                if (response instanceof EmptyResultResponse) {
                     settableFuture.set(null);
                     return;
                 }
-                final Collection<RpcError> errors = ((InvokeRpcMessageReply) success).getRpcErrors();
+
+                final Collection<RpcError> errors = ((InvokeRpcMessageReply) response).getRpcErrors();
                 final NormalizedNodeMessage normalizedNodeMessageResult =
-                        ((InvokeRpcMessageReply) success).getNormalizedNodeMessage();
+                        ((InvokeRpcMessageReply) response).getNormalizedNodeMessage();
                 final DOMRpcResult result;
                 if (normalizedNodeMessageResult == null) {
                     result = new DefaultDOMRpcResult(errors);
                 } else {
-                    if (errors == null) {
-                        result = new DefaultDOMRpcResult(normalizedNodeMessageResult.getNode());
-                    } else {
-                        result = new DefaultDOMRpcResult(normalizedNodeMessageResult.getNode(), errors);
-                    }
+                    result = new DefaultDOMRpcResult(normalizedNodeMessageResult.getNode(), errors);
                 }
                 settableFuture.set(result);
             }
         }, actorSystem.dispatcher());
 
-        return checkedFuture;
-
+        return Futures.makeChecked(settableFuture,
+            ex -> new ClusteringRpcException(id + ": Exception during remote rpc invocation.", ex));
     }
 
     @Nonnull

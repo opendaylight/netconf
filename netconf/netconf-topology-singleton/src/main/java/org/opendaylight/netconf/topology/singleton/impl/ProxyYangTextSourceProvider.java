@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import akka.actor.ActorContext;
 import akka.actor.ActorRef;
 import akka.dispatch.Futures;
 import akka.dispatch.OnComplete;
@@ -21,19 +20,20 @@ import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceP
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
 import org.opendaylight.netconf.topology.singleton.messages.YangTextSchemaSourceRequest;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import scala.concurrent.ExecutionContext;
 import scala.concurrent.Future;
 import scala.concurrent.impl.Promise;
 
 public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider {
 
     private final ActorRef masterRef;
-    private final ActorContext actorContext;
+    private final ExecutionContext executionContext;
     private final Timeout actorResponseWaitTime;
 
-    public ProxyYangTextSourceProvider(final ActorRef masterRef, final ActorContext actorContext,
+    public ProxyYangTextSourceProvider(final ActorRef masterRef, final ExecutionContext executionContext,
                                        final Timeout actorResponseWaitTime) {
         this.masterRef = masterRef;
-        this.actorContext = actorContext;
+        this.executionContext = executionContext;
         this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
@@ -59,15 +59,11 @@ public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider
                     promise.failure(failure);
                     return;
                 }
-                if (success instanceof Throwable) {
-                    promise.failure((Throwable) success);
-                    return;
-                }
+
                 promise.success((YangTextSchemaSourceSerializationProxy) success);
             }
-        }, actorContext.dispatcher());
+        }, executionContext);
 
         return promise.future();
-
     }
 }
