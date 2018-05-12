@@ -45,6 +45,12 @@ public class InvokeRpcMessage implements Serializable {
         return new Proxy(this);
     }
 
+    @Override
+    public String toString() {
+        return "InvokeRpcMessage [schemaPathMessage=" + schemaPathMessage + ", normalizedNodeMessage="
+                + normalizedNodeMessage + "]";
+    }
+
     private static class Proxy implements Externalizable {
         private static final long serialVersionUID = 2L;
 

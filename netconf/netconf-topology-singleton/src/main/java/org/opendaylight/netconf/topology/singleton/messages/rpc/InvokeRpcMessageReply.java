@@ -16,6 +16,9 @@ import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.yangtools.yang.common.RpcError;
 
@@ -26,16 +29,18 @@ public class InvokeRpcMessageReply implements Serializable {
     private final Collection<RpcError> rpcErrors;
     private final NormalizedNodeMessage normalizedNodeMessage;
 
-    public InvokeRpcMessageReply(final NormalizedNodeMessage normalizedNodeMessage,
-                                 final Collection<RpcError> rpcErrors) {
+    public InvokeRpcMessageReply(@Nullable final NormalizedNodeMessage normalizedNodeMessage,
+                                 @Nonnull final Collection<RpcError> rpcErrors) {
         this.normalizedNodeMessage = normalizedNodeMessage;
-        this.rpcErrors = rpcErrors;
+        this.rpcErrors = Objects.requireNonNull(rpcErrors);
     }
 
+    @Nullable
     public NormalizedNodeMessage getNormalizedNodeMessage() {
         return normalizedNodeMessage;
     }
 
+    @Nonnull
     public Collection<RpcError> getRpcErrors() {
         return rpcErrors;
     }

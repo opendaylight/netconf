@@ -52,6 +52,11 @@ public class NormalizedNodeMessage implements Externalizable {
         SerializationUtils.deserializePathAndNode(in, this, APPLIER);
     }
 
+    @Override
+    public String toString() {
+        return "NormalizedNodeMessage [identifier=" + identifier + ", node=" + node + "]";
+    }
+
     private static final SerializationUtils.Applier<NormalizedNodeMessage> APPLIER = (instance, path, node) -> {
         instance.identifier = path;
         instance.node = node;
