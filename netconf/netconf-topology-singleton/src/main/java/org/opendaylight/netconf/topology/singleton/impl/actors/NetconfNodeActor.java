@@ -216,22 +216,22 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     }
 
     private void sendYangTextSchemaSourceProxy(final SourceIdentifier sourceIdentifier, final ActorRef sender) {
-        final ListenableFuture<@NonNull YangTextSchemaSource> yangTextSchemaSource =
+        final ListenableFuture<@NonNull YangTextSchemaSource> schemaSourceFuture =
                 schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class);
 
-        Futures.addCallback(yangTextSchemaSource, new FutureCallback<YangTextSchemaSource>() {
+        Futures.addCallback(schemaSourceFuture, new FutureCallback<YangTextSchemaSource>() {
             @Override
             public void onSuccess(final YangTextSchemaSource yangTextSchemaSource) {
                 try {
                     sender.tell(new YangTextSchemaSourceSerializationProxy(yangTextSchemaSource), getSelf());
-                } catch (final IOException exception) {
-                    sender.tell(exception.getCause(), getSelf());
+                } catch (IOException e) {
+                    sender.tell(new Failure(e), getSelf());
                 }
             }
 
             @Override
             public void onFailure(@Nonnull final Throwable throwable) {
-                sender.tell(throwable, getSelf());
+                sender.tell(new Failure(throwable), getSelf());
             }
         }, MoreExecutors.directExecutor());
     }
@@ -259,7 +259,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
 
             @Override
             public void onFailure(@Nonnull final Throwable throwable) {
-                recipient.tell(throwable, getSelf());
+                recipient.tell(new Failure(throwable), getSelf());
             }
         }, MoreExecutors.directExecutor());
     }
@@ -278,7 +278,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
 
     private SchemaContextFactory createSchemaContextFactory(final ActorRef masterReference) {
         final RemoteYangTextSourceProvider remoteYangTextSourceProvider =
-                new ProxyYangTextSourceProvider(masterReference, getContext(), actorResponseWaitTime);
+                new ProxyYangTextSourceProvider(masterReference, getContext().dispatcher(), actorResponseWaitTime);
         final RemoteSchemaProvider remoteProvider = new RemoteSchemaProvider(remoteYangTextSourceProvider,
                 getContext().dispatcher());
 
@@ -325,6 +325,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                         } else {
                             LOG.error("{}: Failed to resolve schema context - unable to register slave mount point",
                                     id, throwable);
+                            closeSchemaSourceRegistrations();
                         }
                     }
                 });

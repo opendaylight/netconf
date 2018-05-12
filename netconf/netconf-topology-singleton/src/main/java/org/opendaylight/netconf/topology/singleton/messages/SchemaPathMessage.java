@@ -34,6 +34,11 @@ public class SchemaPathMessage implements Serializable {
         return new Proxy(this);
     }
 
+    @Override
+    public String toString() {
+        return "SchemaPathMessage [schemaPath=" + schemaPath + "]";
+    }
+
     private static class Proxy implements Externalizable {
         private static final long serialVersionUID = 2L;
 
