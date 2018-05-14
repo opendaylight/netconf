@@ -194,11 +194,53 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
             public void onSuccess(final List<DOMRpcResult> domRpcResults) {
                 domRpcResults.forEach(domRpcResult -> {
                     if (!domRpcResult.getErrors().isEmpty() && !transformed.isDone()) {
-                        final NetconfDocumentedException exception =
+                        final NetconfDocumentedException exception;
+                        if (domRpcResult.getErrors().iterator().hasNext()) {
+                            final RpcError error = domRpcResult.getErrors().iterator().next();
+                            final RpcError.ErrorType errorType = error.getErrorType();
+                            final DocumentedException.ErrorType eType;
+                            switch (errorType) {
+                                case RPC:
+                                    eType = DocumentedException.ErrorType.RPC;
+                                    break;
+                                case PROTOCOL:
+                                    eType = DocumentedException.ErrorType.PROTOCOL;
+                                    break;
+                                case TRANSPORT:
+                                    eType = DocumentedException.ErrorType.TRANSPORT;
+                                    break;
+                                case APPLICATION:
+                                    eType = DocumentedException.ErrorType.APPLICATION;
+                                    break;
+                                default:
+                                    eType = DocumentedException.ErrorType.APPLICATION;
+                                    break;
+                            }
+                            final RpcError.ErrorSeverity severity = error.getSeverity();
+                            final DocumentedException.ErrorSeverity eSeverity;
+                            switch (severity) {
+                                case ERROR:
+                                    eSeverity = DocumentedException.ErrorSeverity.ERROR;
+                                    break;
+                                case WARNING:
+                                    eSeverity = DocumentedException.ErrorSeverity.WARNING;
+                                    break;
+                                default:
+                                    eSeverity = DocumentedException.ErrorSeverity.ERROR;
+                                    break;
+                            }
+                            exception = new NetconfDocumentedException(id + ":RPC during tx failed with message:\n" +
+                                    error.getMessage(),
+                                    eType,
+                                    DocumentedException.ErrorTag.from(error.getTag()),
+                                    eSeverity);
+                        } else {
+                         exception =
                                 new NetconfDocumentedException(id + ":RPC during tx failed",
                                         DocumentedException.ErrorType.APPLICATION,
                                         DocumentedException.ErrorTag.OPERATION_FAILED,
                                         DocumentedException.ErrorSeverity.ERROR);
+                        }
                         transformed.setException(exception);
                     }
                 });
