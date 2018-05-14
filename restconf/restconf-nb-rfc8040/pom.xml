@@ -181,6 +181,11 @@
       <version>2.6</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-api</artifactId>
+      <version>1.4.2-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <build>
