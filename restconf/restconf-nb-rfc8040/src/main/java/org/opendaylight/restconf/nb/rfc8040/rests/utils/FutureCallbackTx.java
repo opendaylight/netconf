@@ -10,9 +10,13 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 import com.google.common.util.concurrent.CheckedFuture;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.slf4j.Logger;
@@ -58,9 +62,21 @@ final class FutureCallbackTx {
                 rpcErrorList.add(
                         RpcResultBuilder.newError(RpcError.ErrorType.RPC, "operation-failed", e.getMessage()));
                 dataFactory.setResult((T) new DefaultDOMRpcResult(rpcErrorList));
+            } else if (e instanceof TransactionCommitFailedException) {
+                Throwable error = e.getCause();
+                if (error instanceof ExecutionException) {
+                    error = error.getCause();
+                    if (error instanceof NetconfDocumentedException) {
+                        throw new RestconfDocumentedException(error.getMessage(),
+                                RestconfError.ErrorType.valueOfCaseInsensitive(
+                                        ((NetconfDocumentedException) error).getErrorType().getTypeValue()),
+                                RestconfError.ErrorTag.valueOfCaseInsensitive(
+                                        ((NetconfDocumentedException) error).getErrorTag().getTagValue()), e);
+                    }
+                }
+                throw new RestconfDocumentedException("Transaction(" + txType + ") not committed correctly", e);
             } else {
-                throw new RestconfDocumentedException(
-                        "Transaction(" + txType + ") not committed correctly", e);
+                throw new RestconfDocumentedException("Transaction failed", e);
             }
         }
     }
