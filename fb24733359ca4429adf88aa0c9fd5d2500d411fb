@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "91746b31_2ce61f75",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMRpcService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-05-15T10:46:47Z",
+      "side": 0,
+      "message": "Moved inline to line 99",
+      "revId": "fb24733359ca4429adf88aa0c9fd5d2500d411fb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6c97e550_efde9fd4",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMRpcService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-05-15T10:46:47Z",
+      "side": 0,
+      "message": "Exceptions are now only returned via Failure response to simplify",
+      "revId": "fb24733359ca4429adf88aa0c9fd5d2500d411fb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8df4223c_9bcefb5c",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMRpcService.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-05-15T10:46:47Z",
+      "side": 0,
+      "message": "This can\u0027t be null via DOMRpcResult API contract.",
+      "revId": "fb24733359ca4429adf88aa0c9fd5d2500d411fb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}

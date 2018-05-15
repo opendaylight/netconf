@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2c40e641_5ca674b1",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyYangTextSourceProvider.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-05-15T10:46:47Z",
+      "side": 1,
+      "message": "We only need an ExecutionContext so pass that instead of entire ActorSystem",
+      "revId": "3eac4fad8be9aae42fd76037e1c0a8ef5dc7b608",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bbcfae39_329f111a",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfNodeActor.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-05-15T10:46:47Z",
+      "side": 1,
+      "message": "Wrap exceptions in Failure - akka automatically unwraps in Future callbacks and ask pattern.",
+      "revId": "3eac4fad8be9aae42fd76037e1c0a8ef5dc7b608",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
