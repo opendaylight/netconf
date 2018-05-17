@@ -36,7 +36,8 @@ import org.slf4j.LoggerFactory;
  * Listens on capabilities changes in data store and publishes them to base
  * netconf notification stream listener.
  */
-public final class CapabilityChangeNotificationProducer extends OperationalDatastoreListener<Capabilities> {
+public final class CapabilityChangeNotificationProducer extends OperationalDatastoreListener<Capabilities>
+    implements AutoCloseable {
 
     private static final InstanceIdentifier<Capabilities> CAPABILITIES_INSTANCE_IDENTIFIER =
             InstanceIdentifier.create(NetconfState.class).child(Capabilities.class);
