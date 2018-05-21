@@ -12,22 +12,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
 import com.google.common.net.InetAddresses;
 import com.google.common.util.concurrent.Futures;
 import io.netty.util.concurrent.EventExecutor;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,6 +46,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfConnectorDTO;
@@ -132,6 +131,7 @@ public class RemoteDeviceConnectorImplTest {
         builder.setTopologyId(TOPOLOGY_ID);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testStopRemoteDeviceConnection() {
         final Credentials credentials = new LoginPasswordBuilder()
@@ -152,15 +152,12 @@ public class RemoteDeviceConnectorImplTest {
 
 
         final NetconfDeviceCommunicator communicator = mock(NetconfDeviceCommunicator.class);
-        final RemoteDeviceHandler salFacade = mock(RemoteDeviceHandler.class);
+        final RemoteDeviceHandler<NetconfSessionPreferences> salFacade = mock(RemoteDeviceHandler.class);
 
         final TestingRemoteDeviceConnectorImpl remoteDeviceConnection =
-                new TestingRemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, communicator, salFacade, TIMEOUT,
-                        mountPointService);
+                new TestingRemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, communicator);
 
-        final ActorRef masterRef = mock(ActorRef.class);
-
-        remoteDeviceConnection.startRemoteDeviceConnection(masterRef);
+        remoteDeviceConnection.startRemoteDeviceConnection(salFacade);
 
         remoteDeviceConnection.stopRemoteDeviceConnection();
 
@@ -169,37 +166,7 @@ public class RemoteDeviceConnectorImplTest {
 
     }
 
-    @Test
-    public void testMasterSalFacade() throws UnknownHostException {
-        final ExecutorService executorService = mock(ExecutorService.class);
-        doReturn(executorService).when(processingExecutor).getExecutor();
-
-        final Credentials credentials = new LoginPasswordBuilder()
-                .setPassword("admin").setUsername("admin").build();
-        final NetconfNode netconfNode = new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(9999))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(1000L)
-                .setBetweenAttemptsTimeoutMillis(100)
-                .setSchemaless(false)
-                .setTcpOnly(false)
-                .setCredentials(credentials)
-                .build();
-
-        final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(NetconfNode.class, netconfNode).build();
-        builder.setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node));
-        final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT, mountPointService);
-
-        final ActorRef masterRef = mock(ActorRef.class);
-
-        final NetconfConnectorDTO connectorDTO =
-                remoteDeviceConnection.createDeviceCommunicator(NODE_ID, netconfNode, masterRef);
-
-        assertTrue(connectorDTO.getFacade() instanceof MasterSalFacade);
-    }
-
+    @SuppressWarnings("unchecked")
     @Test
     public void testKeapAliveFacade() {
         final ExecutorService executorService = mock(ExecutorService.class);
@@ -223,12 +190,12 @@ public class RemoteDeviceConnectorImplTest {
         builder.setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node));
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT, mountPointService);
+                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId);
 
-        final ActorRef masterRef = mock(ActorRef.class);
+        final RemoteDeviceHandler<NetconfSessionPreferences> salFacade = mock(RemoteDeviceHandler.class);
 
         final NetconfConnectorDTO connectorDTO =
-                remoteDeviceConnection.createDeviceCommunicator(NODE_ID, netconfNode, masterRef);
+                remoteDeviceConnection.createDeviceCommunicator(NODE_ID, netconfNode, salFacade);
 
         assertTrue(connectorDTO.getFacade() instanceof KeepaliveSalFacade);
     }
@@ -250,7 +217,7 @@ public class RemoteDeviceConnectorImplTest {
                 .build();
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, TIMEOUT, mountPointService);
+                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId);
 
         final NetconfReconnectingClientConfiguration defaultClientConfig =
                 remoteDeviceConnection.getClientConfig(listener, testingNode);
