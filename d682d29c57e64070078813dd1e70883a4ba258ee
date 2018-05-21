@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5ffcedac_815d53d1",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfNodeActor.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-05-21T15:40:04Z",
+      "side": 1,
+      "message": "Well there\u0027s no official guidelines for final local vars. And if we ever enable error-prone in this project then all the finals will have to be removed. That said it wasn\u0027t my intention to omit it - but It really doesn\u0027t add any value here and I have 5 more patches behind this one so I\u0027d rather not have to rebase them all just to add a useless final here.",
+      "parentUuid": "112543d8_c0ad4c97",
+      "revId": "d682d29c57e64070078813dd1e70883a4ba258ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0cd1dd6_62cfb10f",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfNodeActor.java",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2018-05-21T15:15:36Z",
       "side": 1,
       "message": "Should be final.",
+      "revId": "d682d29c57e64070078813dd1e70883a4ba258ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "73f22c7c_e65e1a2c",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfNodeActor.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-05-21T15:40:04Z",
+      "side": 1,
+      "message": "same as above",
+      "parentUuid": "b0cd1dd6_62cfb10f",
       "revId": "d682d29c57e64070078813dd1e70883a4ba258ee",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false

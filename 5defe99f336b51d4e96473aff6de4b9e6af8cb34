@@ -22,6 +22,30 @@
       "revId": "5defe99f336b51d4e96473aff6de4b9e6af8cb34",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f8ade6a1_08b7fe88",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfNodeActor.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-05-21T15:40:04Z",
+      "side": 0,
+      "message": "It is extended in NetconfNodeManagerTest hence this change",
+      "parentUuid": "9848fbcf_ab262e90",
+      "range": {
+        "startLine": 75,
+        "startChar": 7,
+        "endLine": 75,
+        "endChar": 12
+      },
+      "revId": "5defe99f336b51d4e96473aff6de4b9e6af8cb34",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
