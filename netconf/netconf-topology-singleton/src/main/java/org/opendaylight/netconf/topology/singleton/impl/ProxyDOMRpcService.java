@@ -32,6 +32,7 @@ import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessage
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.util.concurrent.ExceptionMapper;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -43,6 +44,14 @@ import scala.concurrent.Future;
 public class ProxyDOMRpcService implements DOMRpcService {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyManager.class);
+
+    private final ExceptionMapper<DOMRpcException> domRpcExceptionMapper =
+        new ExceptionMapper<DOMRpcException>("invokeRpc", DOMRpcException.class) {
+            @Override
+            protected DOMRpcException newWithCause(String message, Throwable cause) {
+                return new ClusteringRpcException(id + ": Exception during remote rpc invocation.", cause);
+            }
+        };
 
     private final ActorRef masterActorRef;
     private final ActorSystem actorSystem;
@@ -63,8 +72,8 @@ public class ProxyDOMRpcService implements DOMRpcService {
                                                                   @Nullable final NormalizedNode<?, ?> input) {
         LOG.trace("{}: Rpc operation invoked with schema type: {} and node: {}.", id, type, input);
 
-        final NormalizedNodeMessage normalizedNodeMessage =
-                new NormalizedNodeMessage(YangInstanceIdentifier.EMPTY, input);
+        final NormalizedNodeMessage normalizedNodeMessage = input != null
+                ? new NormalizedNodeMessage(YangInstanceIdentifier.EMPTY, input) : null;
         final Future<Object> scalaFuture = Patterns.ask(masterActorRef,
                 new InvokeRpcMessage(new SchemaPathMessage(type), normalizedNodeMessage), actorResponseWaitTime);
 
@@ -96,8 +105,7 @@ public class ProxyDOMRpcService implements DOMRpcService {
             }
         }, actorSystem.dispatcher());
 
-        return Futures.makeChecked(settableFuture,
-            ex -> new ClusteringRpcException(id + ": Exception during remote rpc invocation.", ex));
+        return Futures.makeChecked(settableFuture, domRpcExceptionMapper);
     }
 
     @Nonnull

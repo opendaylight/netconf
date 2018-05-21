@@ -8,8 +8,6 @@
 
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import akka.actor.ActorRef;
-import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -28,7 +26,6 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
@@ -86,8 +83,6 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
     private final NetconfTopologySetup netconfTopologyDeviceSetup;
     private final RemoteDeviceId remoteDeviceId;
-    private final DOMMountPointService mountService;
-    private final Timeout actorResponseWaitTime;
     private final String privateKeyPath;
     private final String privateKeyPassphrase;
     private final AAAEncryptionService encryptionService;
@@ -95,13 +90,10 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     private final NetconfKeystoreAdapter keystoreAdapter;
 
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
-                                     final RemoteDeviceId remoteDeviceId, final Timeout actorResponseWaitTime,
-                                     final DOMMountPointService mountService) {
+                                     final RemoteDeviceId remoteDeviceId) {
 
         this.netconfTopologyDeviceSetup = Preconditions.checkNotNull(netconfTopologyDeviceSetup);
         this.remoteDeviceId = remoteDeviceId;
-        this.actorResponseWaitTime = actorResponseWaitTime;
-        this.mountService = mountService;
         this.privateKeyPath = netconfTopologyDeviceSetup.getPrivateKeyPath();
         this.privateKeyPassphrase = netconfTopologyDeviceSetup.getPrivateKeyPassphrase();
         this.encryptionService = netconfTopologyDeviceSetup.getEncryptionService();
@@ -109,7 +101,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     }
 
     @Override
-    public void startRemoteDeviceConnection(final ActorRef deviceContextActorRef) {
+    public void startRemoteDeviceConnection(final RemoteDeviceHandler<NetconfSessionPreferences> deviceHandler) {
 
         final NetconfNode netconfNode = netconfTopologyDeviceSetup.getNode().getAugmentation(NetconfNode.class);
         final NodeId nodeId = netconfTopologyDeviceSetup.getNode().getNodeId();
@@ -117,7 +109,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         Preconditions.checkNotNull(netconfNode.getPort());
         Preconditions.checkNotNull(netconfNode.isTcpOnly());
 
-        this.deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, deviceContextActorRef);
+        this.deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, deviceHandler);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
         final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
         final NetconfReconnectingClientConfiguration clientConfig =
@@ -141,17 +133,18 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void stopRemoteDeviceConnection() {
-        Preconditions.checkNotNull(deviceCommunicatorDTO, remoteDeviceId + ": Device communicator was not created.");
-        try {
-            deviceCommunicatorDTO.close();
-        } catch (final Exception e) {
-            LOG.error("{}: Error at closing device communicator.", remoteDeviceId, e);
+        if (deviceCommunicatorDTO != null) {
+            try {
+                deviceCommunicatorDTO.close();
+            } catch (final Exception e) {
+                LOG.error("{}: Error at closing device communicator.", remoteDeviceId, e);
+            }
         }
     }
 
     @VisibleForTesting
     NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
-                                                 final ActorRef deviceContextActorRef) {
+                                                 final RemoteDeviceHandler<NetconfSessionPreferences> deviceHandler) {
         //setup default values since default value is not supported in mdsal
         final Long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
                 ? NetconfTopologyUtils.DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
@@ -160,9 +153,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final Boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
                 ? NetconfTopologyUtils.DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
 
-        RemoteDeviceHandler<NetconfSessionPreferences> salFacade = new MasterSalFacade(remoteDeviceId,
-                netconfTopologyDeviceSetup.getActorSystem(), deviceContextActorRef, actorResponseWaitTime,
-                mountService, netconfTopologyDeviceSetup.getDataBroker());
+        RemoteDeviceHandler<NetconfSessionPreferences> salFacade = deviceHandler;
         if (keepaliveDelay > 0) {
             LOG.info("{}: Adding keepalive facade.", remoteDeviceId);
             salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade,
@@ -171,7 +162,6 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         }
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = netconfTopologyDeviceSetup.getSchemaResourcesDTO();
-
 
         // pre register yang library sources as fallback schemas to schema registry
         final List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
