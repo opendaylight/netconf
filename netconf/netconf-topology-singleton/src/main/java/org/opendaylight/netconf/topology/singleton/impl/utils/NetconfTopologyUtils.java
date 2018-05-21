@@ -224,8 +224,8 @@ public final class NetconfTopologyUtils {
         return createTopologyListPath(topologyId).child(Node.class);
     }
 
-    public static DocumentedException createMasterIsDownException(final RemoteDeviceId id) {
-        return new DocumentedException(id + ":Master is down. Please try again.",
+    public static DocumentedException createMasterIsDownException(final RemoteDeviceId id, final Exception cause) {
+        return new DocumentedException(id + ":Master is down. Please try again.", cause,
                 DocumentedException.ErrorType.APPLICATION, DocumentedException.ErrorTag.OPERATION_FAILED,
                 DocumentedException.ErrorSeverity.WARNING);
     }
