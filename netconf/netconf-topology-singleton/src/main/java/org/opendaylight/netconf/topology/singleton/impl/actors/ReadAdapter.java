@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import akka.actor.ActorRef;
+import akka.actor.Status.Failure;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
@@ -66,7 +67,7 @@ class ReadAdapter {
 
             @Override
             public void onFailure(@Nonnull final Throwable throwable) {
-                sender.tell(throwable, self);
+                sender.tell(new Failure(throwable), self);
             }
         }, MoreExecutors.directExecutor());
     }
@@ -86,7 +87,7 @@ class ReadAdapter {
 
             @Override
             public void onFailure(@Nonnull final Throwable throwable) {
-                sender.tell(throwable, self);
+                sender.tell(new Failure(throwable), self);
             }
         }, MoreExecutors.directExecutor());
     }
