@@ -62,8 +62,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         remoteDeviceId = NetconfTopologyUtils.createRemoteDeviceId(netconfTopologyDeviceSetup.getNode().getNodeId(),
                 netconfTopologyDeviceSetup.getNode().getAugmentation(NetconfNode.class));
 
-        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId,
-                actorResponseWaitTime, mountService);
+        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId);
 
         netconfNodeManager = createNodeDeviceManager();
     }
@@ -88,7 +87,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
                     actorResponseWaitTime, mountService),
                     NetconfTopologyUtils.createMasterActorName(remoteDeviceId.getName(), masterAddress));
 
-            remoteDeviceConnector.startRemoteDeviceConnection(masterActorRef);
+            remoteDeviceConnector.startRemoteDeviceConnection(newMasterSalFacade());
         }
 
     }
@@ -148,8 +147,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         if (!isMaster) {
             netconfNodeManager.refreshDevice(netconfTopologyDeviceSetup, remoteDeviceId);
         }
-        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId,
-                actorResponseWaitTime, mountService);
+        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId);
 
         if (isMaster) {
             final Future<Object> future = Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(
@@ -162,7 +160,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
                         LOG.error("Failed to refresh master actor data: {}", failure);
                         return;
                     }
-                    remoteDeviceConnector.startRemoteDeviceConnection(masterActorRef);
+                    remoteDeviceConnector.startRemoteDeviceConnection(newMasterSalFacade());
                 }
             }, netconfTopologyDeviceSetup.getActorSystem().dispatcher());
         }
@@ -180,5 +178,10 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             netconfTopologyDeviceSetup.getActorSystem().stop(masterActorRef);
             masterActorRef = null;
         }
+    }
+
+    protected MasterSalFacade newMasterSalFacade() {
+        return new MasterSalFacade(remoteDeviceId, netconfTopologyDeviceSetup.getActorSystem(), masterActorRef,
+                actorResponseWaitTime, mountService, netconfTopologyDeviceSetup.getDataBroker());
     }
 }
