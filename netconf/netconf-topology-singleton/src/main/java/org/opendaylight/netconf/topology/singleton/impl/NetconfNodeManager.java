@@ -38,6 +38,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.slf4j.Logger;
@@ -145,10 +146,10 @@ class NetconfNodeManager
     }
 
     void registerDataTreeChangeListener(final String topologyId, final NodeKey key) {
-        LOG.debug("{}: Registering data tree change listener on node {}", id, key);
+        final InstanceIdentifier<Node> path = NetconfTopologyUtils.createTopologyNodeListPath(key, topologyId);
+        LOG.debug("{}: Registering data tree change listener on path {}", id, path);
         dataChangeListenerRegistration = setup.getDataBroker().registerDataTreeChangeListener(
-                new DataTreeIdentifier<>(LogicalDatastoreType.OPERATIONAL,
-                        NetconfTopologyUtils.createTopologyNodeListPath(key, topologyId)), this);
+                new DataTreeIdentifier<>(LogicalDatastoreType.OPERATIONAL, path), this);
     }
 
     private synchronized void handleSlaveMountPoint(final DataObjectModification<Node> rootNode) {

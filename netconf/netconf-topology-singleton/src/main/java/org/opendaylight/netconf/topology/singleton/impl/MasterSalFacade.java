@@ -67,24 +67,26 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     }
 
     @Override
-    @SuppressWarnings("checkstyle:hiddenField")
     public void onDeviceConnected(final SchemaContext remoteSchemaContext,
-                                  final NetconfSessionPreferences netconfSessionPreferences,
-                                  final DOMRpcService deviceRpc) {
+                                  final NetconfSessionPreferences sessionPreferences,
+                                  final DOMRpcService domRpcService) {
         this.currentSchemaContext = remoteSchemaContext;
-        this.netconfSessionPreferences = netconfSessionPreferences;
-        this.deviceRpc = deviceRpc;
+        this.netconfSessionPreferences = sessionPreferences;
+        this.deviceRpc = domRpcService;
+
+        LOG.info("Device {} connected - registering master mount point", id);
 
         registerMasterMountPoint();
 
         sendInitialDataToActor().onComplete(new OnComplete<Object>() {
             @Override
-            public void onComplete(final Throwable failure, final Object success) throws Throwable {
+            public void onComplete(final Throwable failure, final Object success) {
                 if (failure == null) {
                     updateDeviceData();
                     return;
                 }
-                throw failure;
+
+                LOG.error("{}: CreateInitialMasterActorData to {} failed", id, masterActorRef, failure);
             }
         }, actorSystem.dispatcher());
 
@@ -92,6 +94,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
     @Override
     public void onDeviceDisconnected() {
+        LOG.info("Device {} disconnected - unregistering master mount point", id);
         salProvider.getTopologyDatastoreAdapter().updateDeviceData(false, new NetconfDeviceCapabilities());
         unregisterMasterMountPoint();
     }
@@ -122,9 +125,8 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
-        LOG.info("{}: Creating master data broker for device", id);
+        deviceDataBroker = newDeviceDataBroker();
 
-        deviceDataBroker = new NetconfDeviceDataBroker(id, currentSchemaContext, deviceRpc, netconfSessionPreferences);
         // We need to create ProxyDOMDataBroker so accessing mountpoint
         // on leader node would be same as on follower node
         final ProxyDOMDataBroker proxyDataBroker =
@@ -133,20 +135,28 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
                 .onTopologyDeviceConnected(currentSchemaContext, proxyDataBroker, deviceRpc, notificationService);
     }
 
+    protected DOMDataBroker newDeviceDataBroker() {
+        return new NetconfDeviceDataBroker(id, currentSchemaContext, deviceRpc, netconfSessionPreferences);
+    }
+
     private Future<Object> sendInitialDataToActor() {
         final List<SourceIdentifier> sourceIdentifiers =
                 SchemaContextUtil.getConstituentModuleIdentifiers(currentSchemaContext).stream()
                 .map(mi -> RevisionSourceIdentifier.create(mi.getName(), mi.getRevision()))
                 .collect(Collectors.toList());
 
-        // send initial data to master actor and create actor for providing it
+        LOG.debug("{}: Sending CreateInitialMasterActorData with sourceIdentifiers {} to {}",
+                id, sourceIdentifiers, masterActorRef);
+
+        // send initial data to master actor
         return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, sourceIdentifiers,
                 deviceRpc), actorResponseWaitTime);
     }
 
     private void updateDeviceData() {
-        final Cluster cluster = Cluster.get(actorSystem);
-        salProvider.getTopologyDatastoreAdapter().updateClusteredDeviceData(true, cluster.selfAddress().toString(),
+        final String masterAddress = Cluster.get(actorSystem).selfAddress().toString();
+        LOG.debug("{}: updateDeviceData with master address {}", id, masterAddress);
+        salProvider.getTopologyDatastoreAdapter().updateClusteredDeviceData(true, masterAddress,
                 netconfSessionPreferences.getNetconfDeviceCapabilities());
     }
 
