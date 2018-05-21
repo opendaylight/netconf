@@ -50,7 +50,7 @@ public class SlaveSalFacade {
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
         final ProxyDOMDataBroker netconfDeviceDataBroker =
-                new ProxyDOMDataBroker(actorSystem, id, masterActorRef, actorResponseWaitTime);
+                new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(), actorResponseWaitTime);
 
         salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, netconfDeviceDataBroker,
                 deviceRpc, notificationService);

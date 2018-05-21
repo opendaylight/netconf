@@ -56,11 +56,8 @@ import org.opendaylight.netconf.topology.singleton.messages.YangTextSchemaSource
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessage;
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
-import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadTransactionReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadTransactionRequest;
-import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadWriteTransactionReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadWriteTransactionRequest;
-import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionRequest;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -156,25 +153,23 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             sendYangTextSchemaSourceProxy(yangTextSchemaSourceRequest.getSourceIdentifier(), sender());
 
         } else if (message instanceof NewReadTransactionRequest) { // master
-
-            sender().tell(new NewReadTransactionReply(readTxActor), self());
-
+            sender().tell(new Success(readTxActor), self());
         } else if (message instanceof NewWriteTransactionRequest) { // master
             try {
                 final DOMDataWriteTransaction tx = deviceDataBroker.newWriteOnlyTransaction();
                 final ActorRef txActor = context().actorOf(WriteTransactionActor.props(tx, writeTxIdleTimeout));
-                sender().tell(new NewWriteTransactionReply(txActor), self());
+                sender().tell(new Success(txActor), self());
             } catch (final Exception t) {
-                sender().tell(t, self());
+                sender().tell(new Failure(t), self());
             }
 
         } else if (message instanceof NewReadWriteTransactionRequest) {
             try {
                 final DOMDataReadWriteTransaction tx = deviceDataBroker.newReadWriteTransaction();
                 final ActorRef txActor = context().actorOf(ReadWriteTransactionActor.props(tx, writeTxIdleTimeout));
-                sender().tell(new NewReadWriteTransactionReply(txActor), self());
+                sender().tell(new Success(txActor), self());
             } catch (final Exception t) {
-                sender().tell(t, self());
+                sender().tell(new Failure(t), self());
             }
         } else if (message instanceof InvokeRpcMessage) { // master
             final InvokeRpcMessage invokeRpcMessage = (InvokeRpcMessage) message;
@@ -223,6 +218,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             @Override
             public void onSuccess(final YangTextSchemaSource yangTextSchemaSource) {
                 try {
+                    LOG.debug("{}: getSchemaSource for {} succeeded", id, sourceIdentifier);
                     sender.tell(new YangTextSchemaSourceSerializationProxy(yangTextSchemaSource), getSelf());
                 } catch (IOException e) {
                     sender.tell(new Failure(e), getSelf());
@@ -231,6 +227,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
 
             @Override
             public void onFailure(@Nonnull final Throwable throwable) {
+                LOG.debug("{}: getSchemaSource for {} failed", id, sourceIdentifier, throwable);
                 sender.tell(new Failure(throwable), getSelf());
             }
         }, MoreExecutors.directExecutor());
