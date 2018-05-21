@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "112543d8_c0ad4c97",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfNodeActor.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2018-05-21T15:15:36Z",
+      "side": 1,
+      "message": "Should be final if you are complying with existing style guidelines.",
+      "revId": "d682d29c57e64070078813dd1e70883a4ba258ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0cd1dd6_62cfb10f",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfNodeActor.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2018-05-21T15:15:36Z",
+      "side": 1,
+      "message": "Should be final.",
+      "revId": "d682d29c57e64070078813dd1e70883a4ba258ee",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
