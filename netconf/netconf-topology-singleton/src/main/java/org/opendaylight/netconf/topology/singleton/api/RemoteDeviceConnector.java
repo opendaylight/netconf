@@ -8,7 +8,8 @@
 
 package org.opendaylight.netconf.topology.singleton.api;
 
-import akka.actor.ActorRef;
+import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 
 /**
  * Provides API for connection odl (master) with device.
@@ -17,9 +18,8 @@ public interface RemoteDeviceConnector {
 
     /**
      * Create device communicator and open device connection.
-     * @param masterActorRef master actor reference
      */
-    void startRemoteDeviceConnection(ActorRef masterActorRef);
+    void startRemoteDeviceConnection(RemoteDeviceHandler<NetconfSessionPreferences> deviceHandler);
 
     /**
      * Stop device communicator.
