@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
+import javax.annotation.Nullable;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.SchemaPathMessage;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -24,7 +25,7 @@ public class InvokeRpcMessage implements Serializable {
     private final NormalizedNodeMessage normalizedNodeMessage;
 
     public InvokeRpcMessage(final SchemaPathMessage schemaPathMessage,
-                            final NormalizedNodeMessage normalizedNodeMessage) {
+                            @Nullable final NormalizedNodeMessage normalizedNodeMessage) {
         this.schemaPathMessage = schemaPathMessage;
         this.normalizedNodeMessage = normalizedNodeMessage;
     }
@@ -37,6 +38,7 @@ public class InvokeRpcMessage implements Serializable {
         return schemaPathMessage.getSchemaPath();
     }
 
+    @Nullable
     public NormalizedNodeMessage getNormalizedNodeMessage() {
         return normalizedNodeMessage;
     }
