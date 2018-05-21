@@ -11,6 +11,8 @@ package org.opendaylight.netconf.topology.singleton.impl.utils;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 
 public class ClusteringRpcException extends DOMRpcException {
+    private static final long serialVersionUID = 1L;
+
     public ClusteringRpcException(String message) {
         super(message);
     }

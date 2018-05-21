@@ -52,7 +52,8 @@ public class InvokeRpcMessageReply implements Serializable {
 
         private InvokeRpcMessageReply invokeRpcMessageReply;
 
-        Proxy() {
+        @SuppressWarnings("checkstyle:RedundantModifier")
+        public Proxy() {
             //due to Externalizable
         }
 

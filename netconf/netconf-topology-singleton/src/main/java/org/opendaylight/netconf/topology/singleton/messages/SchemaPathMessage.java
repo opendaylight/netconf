@@ -20,7 +20,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 public class SchemaPathMessage implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private SchemaPath schemaPath;
+    private final SchemaPath schemaPath;
 
     public SchemaPathMessage(final SchemaPath schemaPath) {
         this.schemaPath = schemaPath;
@@ -44,7 +44,8 @@ public class SchemaPathMessage implements Serializable {
 
         private SchemaPathMessage schemaPathMessage;
 
-        Proxy() {
+        @SuppressWarnings("checkstyle:RedundantModifier")
+        public Proxy() {
             //due to Externalizable
         }
 
