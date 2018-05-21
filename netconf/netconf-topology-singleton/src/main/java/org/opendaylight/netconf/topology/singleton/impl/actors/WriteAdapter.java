@@ -10,6 +10,8 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import akka.actor.ActorContext;
 import akka.actor.ActorRef;
+import akka.actor.Status.Failure;
+import akka.actor.Status.Success;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -22,8 +24,6 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelR
 import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.MergeRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.PutRequest;
-import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitFailedReply;
-import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,12 +50,12 @@ class WriteAdapter {
         Futures.addCallback(submitFuture, new FutureCallback<Void>() {
             @Override
             public void onSuccess(final Void result) {
-                requester.tell(new SubmitReply(), self);
+                requester.tell(new Success(null), self);
             }
 
             @Override
             public void onFailure(@Nonnull final Throwable throwable) {
-                requester.tell(new SubmitFailedReply(throwable), self);
+                requester.tell(new Failure(throwable), self);
             }
         }, MoreExecutors.directExecutor());
     }
