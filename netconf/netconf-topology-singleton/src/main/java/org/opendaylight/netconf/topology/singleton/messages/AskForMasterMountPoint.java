@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.topology.singleton.messages;
 
+import akka.actor.ActorRef;
 import java.io.Serializable;
 
 /**
@@ -16,4 +17,19 @@ import java.io.Serializable;
  */
 public class AskForMasterMountPoint implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    private final ActorRef slaveActorRef;
+
+    public AskForMasterMountPoint(ActorRef slaveActorRef) {
+        this.slaveActorRef = slaveActorRef;
+    }
+
+    public ActorRef getSlaveActorRef() {
+        return slaveActorRef;
+    }
+
+    @Override
+    public String toString() {
+        return "AskForMasterMountPoint [slaveActorRef=" + slaveActorRef + "]";
+    }
 }
