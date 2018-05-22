@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8cad0852_3a986410",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2018-05-22T15:34:04Z",
+      "side": 1,
+      "message": "this lambda is *huge*, and ...",
+      "range": {
+        "startLine": 195,
+        "startChar": 16,
+        "endLine": 195,
+        "endChar": 55
+      },
+      "revId": "71c8dcde0075b23a742132016f8fe812a3aad6cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9c7949c3_8f3f726c",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2018-05-22T15:34:04Z",
+      "side": 1,
+      "message": "... this is an indication we really want a for-loop with break.\n\nSo factor out the body of onSuccess() into a separate method, which will get the results and the exception to be completed.\n\nInside just iterate the list, looking for a failure, if found setException() + return;, if not set().",
+      "range": {
+        "startLine": 196,
+        "startChar": 63,
+        "endLine": 196,
+        "endChar": 84
+      },
+      "revId": "71c8dcde0075b23a742132016f8fe812a3aad6cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "575dfad6_850ab948",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2018-05-22T15:34:04Z",
+      "side": 1,
+      "message": "this is the same check as\n\n!domRpcResult.getErrors().isEmpty()\n\njust two lines above.",
+      "range": {
+        "startLine": 198,
+        "startChar": 28,
+        "endLine": 198,
+        "endChar": 73
+      },
+      "revId": "71c8dcde0075b23a742132016f8fe812a3aad6cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
