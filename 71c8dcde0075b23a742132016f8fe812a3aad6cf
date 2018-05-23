@@ -114,6 +114,30 @@
       "revId": "71c8dcde0075b23a742132016f8fe812a3aad6cf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "598c001e_e13fcf76",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/FutureCallbackTx.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2018-05-23T11:24:10Z",
+      "side": 1,
+      "message": "I can t use catch statements here since Exception is generic \"static \u003cT, X extends Exception\u003e void addCallback\" and that doesn t let me to catch DOMRpcException saying \"exception is never thrown in coresponding try block\"",
+      "parentUuid": "7c457b31_0824f707",
+      "range": {
+        "startLine": 60,
+        "startChar": 0,
+        "endLine": 80,
+        "endChar": 13
+      },
+      "revId": "71c8dcde0075b23a742132016f8fe812a3aad6cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
