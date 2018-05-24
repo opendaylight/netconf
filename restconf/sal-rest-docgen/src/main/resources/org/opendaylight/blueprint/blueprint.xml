@@ -15,6 +15,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
     <reference id="domMountPointService" interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"/>
     <reference id="webServer" interface="org.opendaylight.aaa.web.WebServer"/>
     <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer"/>
+    <reference id="servletSupport" interface="org.opendaylight.aaa.web.servlet.ServletSupport" />
 
     <bean id="mountPointDraft02" class="org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorDraft02"
             destroy-method="close">
@@ -51,6 +52,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
             destroy-method="close">
         <argument ref="webServer"/>
         <argument ref="webContextSecurer"/>
+        <argument ref="servletSupport"/>
         <argument ref="apiDocApplication"/>
   </bean>
 </blueprint>

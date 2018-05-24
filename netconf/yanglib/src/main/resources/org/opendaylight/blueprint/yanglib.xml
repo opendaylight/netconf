@@ -16,6 +16,7 @@
   <reference id="dataBroker" interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"/>
   <reference id="webServer" interface="org.opendaylight.aaa.web.WebServer"/>
   <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer"/>
+  <reference id="servletSupport" interface="org.opendaylight.aaa.web.servlet.ServletSupport" />
 
   <bean id="schemaRepository" class="org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository">
     <argument value="yang-library"/>
@@ -40,6 +41,7 @@
       destroy-method="close">
     <argument ref="webServer"/>
     <argument ref="webContextSecurer"/>
+    <argument ref="servletSupport"/>
     <argument ref="yangLibRestApp"/>
   </bean>
 </blueprint>
