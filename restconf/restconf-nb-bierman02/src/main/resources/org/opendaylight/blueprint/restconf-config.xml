@@ -109,10 +109,13 @@
 
   <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer" />
 
+  <reference id="servletSupport" interface="org.opendaylight.aaa.web.servlet.ServletSupport" />
+
   <bean id="webRegistrar" class="org.opendaylight.netconf.sal.restconf.web.Bierman02WebRegistrarImpl"
           destroy-method="close">
     <argument ref="webServer"/>
     <argument ref="webContextSecurer"/>
+    <argument ref="servletSupport"/>
     <argument ref="restconfApplication"/>
     <argument ref="customFilterAdapterConfig"/>
   </bean>
