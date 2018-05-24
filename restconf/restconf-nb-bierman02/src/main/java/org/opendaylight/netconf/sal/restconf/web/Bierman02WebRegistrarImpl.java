@@ -18,6 +18,7 @@ import org.opendaylight.aaa.web.WebContextBuilder;
 import org.opendaylight.aaa.web.WebContextRegistration;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
+import org.opendaylight.aaa.web.servlet.ServletSupport;
 
 /**
  * Implementation of Bierman02WebRegistrar.
@@ -29,13 +30,16 @@ public class Bierman02WebRegistrarImpl implements Bierman02WebRegistrar {
     private WebContextRegistration registraton;
     private final WebServer webServer;
     private final WebContextSecurer webContextSecurer;
+    private final ServletSupport servletSupport;
     private final Application webApp;
     private final CustomFilterAdapterConfiguration customFilterAdapterConfig;
 
     public Bierman02WebRegistrarImpl(WebServer webServer,  WebContextSecurer webContextSecurer,
-            Application webApp, CustomFilterAdapterConfiguration customFilterAdapterConfig) {
+            ServletSupport servletSupport, Application webApp,
+            CustomFilterAdapterConfiguration customFilterAdapterConfig) {
         this.webServer = webServer;
         this.webContextSecurer = webContextSecurer;
+        this.servletSupport = servletSupport;
         this.webApp = webApp;
         this.customFilterAdapterConfig = customFilterAdapterConfig;
     }
@@ -58,8 +62,7 @@ public class Bierman02WebRegistrarImpl implements Bierman02WebRegistrar {
 
     private void register(boolean authenticate) {
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath("restconf").supportsSessions(true)
-                .addServlet(ServletDetails.builder().servlet(
-                        new com.sun.jersey.spi.container.servlet.ServletContainer(webApp))
+                .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
                     .addUrlPattern("/*").build())
 
                 // Allows user to add javax.servlet.Filter(s) in front of REST services

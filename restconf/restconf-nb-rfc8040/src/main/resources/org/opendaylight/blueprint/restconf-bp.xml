@@ -99,10 +99,13 @@
 
   <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer" />
 
+  <reference id="servletSupport" interface="org.opendaylight.aaa.web.servlet.ServletSupport" />
+
   <bean id="webInitializer" class="org.opendaylight.restconf.nb.rfc8040.web.WebInitializer"
           destroy-method="close">
     <argument ref="webServer"/>
     <argument ref="webContextSecurer"/>
+    <argument ref="servletSupport"/>
     <argument ref="restconfApplication"/>
     <argument ref="customFilterAdapterConfig"/>
   </bean>

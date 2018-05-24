@@ -16,6 +16,7 @@ import org.opendaylight.aaa.web.WebContextBuilder;
 import org.opendaylight.aaa.web.WebContextRegistration;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
+import org.opendaylight.aaa.web.servlet.ServletSupport;
 
 /**
  * Initializes the wep app.
@@ -25,11 +26,10 @@ import org.opendaylight.aaa.web.WebServer;
 public class WebInitializer {
     private final WebContextRegistration registration;
 
-    public WebInitializer(WebServer webServer,  WebContextSecurer webContextSecurer, Application webApp)
-            throws ServletException {
+    public WebInitializer(WebServer webServer,  WebContextSecurer webContextSecurer, ServletSupport servletSupport,
+            Application webApp) throws ServletException {
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath("apidoc").supportsSessions(true)
-            .addServlet(ServletDetails.builder().servlet(
-                new com.sun.jersey.spi.container.servlet.ServletContainer(webApp))
+            .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
                     .addUrlPattern("/apis/*").addUrlPattern("/18/apis/*").build())
             .addResource(ResourceDetails.builder().name("/explorer").build())
             .addResource(ResourceDetails.builder().name("/18/explorer").build());
