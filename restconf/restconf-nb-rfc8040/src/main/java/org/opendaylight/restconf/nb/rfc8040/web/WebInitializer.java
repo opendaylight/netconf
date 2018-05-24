@@ -18,6 +18,7 @@ import org.opendaylight.aaa.web.WebContextBuilder;
 import org.opendaylight.aaa.web.WebContextRegistration;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
+import org.opendaylight.aaa.web.servlet.ServletSupport;
 
 /**
  * Initializes the rfc8040 web app endpoint.
@@ -27,11 +28,10 @@ import org.opendaylight.aaa.web.WebServer;
 public class WebInitializer {
     private final WebContextRegistration registration;
 
-    public WebInitializer(WebServer webServer,  WebContextSecurer webContextSecurer,
+    public WebInitializer(WebServer webServer,  WebContextSecurer webContextSecurer, ServletSupport servletSupport,
             Application webApp, CustomFilterAdapterConfiguration customFilterAdapterConfig) throws ServletException {
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath("rests").supportsSessions(true)
-                .addServlet(ServletDetails.builder().servlet(
-                        new com.sun.jersey.spi.container.servlet.ServletContainer(webApp))
+                .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
                     .addUrlPattern("/*").build())
 
                 // Allows user to add javax.servlet.Filter(s) in front of REST services
