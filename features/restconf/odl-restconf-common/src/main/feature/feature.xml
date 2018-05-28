@@ -9,6 +9,6 @@
 <features name="odl-netconf-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
     <feature name="odl-restconf-common" version="${project.version}">
         <feature version="[3.1.0,4)">odl-karaf-feat-jetty</feature>
-        <feature version="[2.0.3,3)">odl-yangtools-export</feature>
+        <feature version="[2.0.5,3)">odl-yangtools-export</feature>
     </feature>
 </features>
