@@ -26,15 +26,19 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>restconf-common-models</artifactId>
-      </dependency>
+    </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>restconf-common</artifactId>
-      </dependency>
+    </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>ietf-yang-library</artifactId>
-      </dependency>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>netconf-api</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
