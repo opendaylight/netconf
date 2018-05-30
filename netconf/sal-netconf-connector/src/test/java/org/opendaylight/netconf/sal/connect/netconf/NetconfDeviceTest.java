@@ -71,10 +71,10 @@ import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
+import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
-import org.opendaylight.yangtools.yang.parser.rfc7950.repo.ASTSchemaSource;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.xml.sax.SAXException;
 
@@ -214,7 +214,7 @@ public class NetconfDeviceTest {
         final MissingSchemaSourceException schemaResolutionException =
                 new MissingSchemaSourceException("fail first", TEST_SID);
         doReturn(Futures.immediateFailedFuture(schemaResolutionException))
-                .when(schemaRepository).getSchemaSource(eq(TEST_SID), eq(ASTSchemaSource.class));
+                .when(schemaRepository).getSchemaSource(eq(TEST_SID), eq(YangTextSchemaSource.class));
         doAnswer(invocation -> {
             if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
                 return Futures.immediateFailedFuture(schemaResolutionException);
@@ -266,7 +266,7 @@ public class NetconfDeviceTest {
         final SchemaRepository mock = mock(SchemaRepository.class);
         final SchemaSourceRepresentation mockRep = mock(SchemaSourceRepresentation.class);
         doReturn(Futures.immediateFuture(mockRep))
-                .when(mock).getSchemaSource(any(SourceIdentifier.class), eq(ASTSchemaSource.class));
+                .when(mock).getSchemaSource(any(SourceIdentifier.class), eq(YangTextSchemaSource.class));
         return mock;
     }
 

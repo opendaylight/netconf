@@ -95,7 +95,9 @@ import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
+import org.opendaylight.yangtools.yang.model.repo.util.InMemorySchemaSourceCache;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
+import org.opendaylight.yangtools.yang.parser.rfc7950.repo.ASTSchemaSource;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToASTTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,6 +150,9 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             new FilesystemSchemaSourceCache<>(DEFAULT_SCHEMA_REPOSITORY, YangTextSchemaSource.class,
                     new File(QUALIFIED_DEFAULT_CACHE_DIRECTORY));
 
+    public static final InMemorySchemaSourceCache<ASTSchemaSource> DEFAULT_AST_CACHE =
+            InMemorySchemaSourceCache.createSoftCache(DEFAULT_SCHEMA_REPOSITORY, ASTSchemaSource.class);
+
     /**
      * The default factory for creating <code>SchemaContext</code> instances.
      */
@@ -172,6 +177,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                         DEFAULT_SCHEMA_CONTEXT_FACTORY,
                         new NetconfStateSchemasResolverImpl()));
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_CACHE);
+        DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_AST_CACHE);
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(
                 TextToASTTransformer.create(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY));
     }
@@ -410,6 +416,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final FilesystemSchemaSourceCache<YangTextSchemaSource> deviceCache =
                 createDeviceFilesystemCache(moduleSchemaCacheDirectory);
         repository.registerSchemaSourceListener(deviceCache);
+        repository.registerSchemaSourceListener(
+            InMemorySchemaSourceCache.createSoftCache(repository, ASTSchemaSource.class));
         return new NetconfDevice.SchemaResourcesDTO(repository, repository, contextFactory,
                 new NetconfStateSchemasResolverImpl());
     }
