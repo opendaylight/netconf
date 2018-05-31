@@ -46,8 +46,6 @@ public class RestconfApplication extends Application {
     public Set<Object> getSingletons() {
         final Set<Object> singletons = new HashSet<>();
         final SchemaRetrievalServiceImpl schemaRetrieval = new SchemaRetrievalServiceImpl(controllerContext);
-        singletons.add(controllerContext);
-        singletons.add(brokerFacade);
         singletons.add(schemaRetrieval);
         singletons.add(new RestconfCompositeWrapper(statsServiceWrapper, schemaRetrieval));
         singletons.add(new RestconfDocumentedExceptionMapper(controllerContext));
