@@ -85,7 +85,6 @@
 
   <bean id="restconfApplication" class="org.opendaylight.netconf.sal.rest.impl.RestconfApplication">
     <argument ref="controllerContext"/>
-    <argument ref="brokerFacade"/>
     <argument ref="statsServiceWrapper"/>
   </bean>
 

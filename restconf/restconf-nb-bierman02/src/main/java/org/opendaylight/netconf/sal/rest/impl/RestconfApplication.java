@@ -14,19 +14,16 @@ import javax.ws.rs.core.Application;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYangBodyWriter;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYinBodyWriter;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaRetrievalServiceImpl;
-import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.StatisticsRestconfServiceWrapper;
 
 public class RestconfApplication extends Application {
     private final ControllerContext controllerContext;
-    private final BrokerFacade brokerFacade;
     private final StatisticsRestconfServiceWrapper statsServiceWrapper;
 
-    public RestconfApplication(ControllerContext controllerContext, BrokerFacade brokerFacade,
+    public RestconfApplication(ControllerContext controllerContext,
             StatisticsRestconfServiceWrapper statsServiceWrapper) {
         this.controllerContext = controllerContext;
-        this.brokerFacade = brokerFacade;
         this.statsServiceWrapper = statsServiceWrapper;
     }
 
@@ -46,8 +43,6 @@ public class RestconfApplication extends Application {
     public Set<Object> getSingletons() {
         final Set<Object> singletons = new HashSet<>();
         final SchemaRetrievalServiceImpl schemaRetrieval = new SchemaRetrievalServiceImpl(controllerContext);
-        singletons.add(controllerContext);
-        singletons.add(brokerFacade);
         singletons.add(schemaRetrieval);
         singletons.add(new RestconfCompositeWrapper(statsServiceWrapper, schemaRetrieval));
         singletons.add(new RestconfDocumentedExceptionMapper(controllerContext));
