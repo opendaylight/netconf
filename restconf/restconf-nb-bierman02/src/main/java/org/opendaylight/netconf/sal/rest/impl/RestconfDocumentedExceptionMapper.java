@@ -18,6 +18,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.ws.rs.core.Context;
@@ -99,9 +100,14 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
         LOG.debug("In toResponse: {}", exception.getMessage());
 
-        final MediaType mediaType = headers.getAcceptableMediaTypes().stream()
-                .filter(type -> !type.equals(MediaType.WILDCARD_TYPE)).findFirst()
-                        .orElse(MediaType.APPLICATION_JSON_TYPE);
+        final List<MediaType> mediaTypeList = new ArrayList<>();
+        if (headers.getMediaType() != null) {
+            mediaTypeList.add(headers.getMediaType());
+        }
+
+        mediaTypeList.addAll(headers.getAcceptableMediaTypes());
+        final MediaType mediaType = mediaTypeList.stream().filter(type -> !type.equals(MediaType.WILDCARD_TYPE))
+                .findFirst().orElse(MediaType.APPLICATION_JSON_TYPE);
 
         LOG.debug("Using MediaType: {}", mediaType);
 
