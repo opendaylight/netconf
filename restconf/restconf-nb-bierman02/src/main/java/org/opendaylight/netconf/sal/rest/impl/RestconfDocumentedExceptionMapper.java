@@ -100,7 +100,8 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         LOG.debug("In toResponse: {}", exception.getMessage());
 
         final MediaType mediaType = headers.getAcceptableMediaTypes().stream()
-                .filter(type -> type != MediaType.WILDCARD_TYPE).findFirst().orElse(MediaType.APPLICATION_JSON_TYPE);
+                .filter(type -> !type.equals(MediaType.WILDCARD_TYPE)).findFirst()
+                        .orElse(MediaType.APPLICATION_JSON_TYPE);
 
         LOG.debug("Using MediaType: {}", mediaType);
 
