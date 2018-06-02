@@ -25,16 +25,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>odl-config-api</artifactId>
-            <version>0.9.0-SNAPSHOT</version>
+            <groupId>org.opendaylight.odlparent</groupId>
+            <artifactId>odl-netty-4</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>odl-config-netty-config-api</artifactId>
-            <version>0.9.0-SNAPSHOT</version>
+            <groupId>org.opendaylight.odlparent</groupId>
+            <artifactId>odl-guava-23</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
