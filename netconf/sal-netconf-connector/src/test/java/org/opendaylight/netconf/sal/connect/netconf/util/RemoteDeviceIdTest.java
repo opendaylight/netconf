@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotEquals;
 
 import java.net.InetSocketAddress;
 import org.junit.Test;
-import org.opendaylight.controller.config.api.ModuleIdentifier;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 
 public class RemoteDeviceIdTest {
@@ -21,10 +20,9 @@ public class RemoteDeviceIdTest {
     @Test
     public void testEquals() {
         final InetSocketAddress address = new InetSocketAddress("127.0.0.1", 8000);
-        final ModuleIdentifier identifier = new ModuleIdentifier("test", "test");
 
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test", address);
-        final RemoteDeviceId remoteDeviceIdEqualName = new RemoteDeviceId(identifier, address);
+        final RemoteDeviceId remoteDeviceIdEqualName = new RemoteDeviceId("test", address);
         final RemoteDeviceId remoteDeviceIdDiffName = new RemoteDeviceId("test-diff", address);
 
         assertEquals(true, remoteDeviceId.equals(remoteDeviceId));

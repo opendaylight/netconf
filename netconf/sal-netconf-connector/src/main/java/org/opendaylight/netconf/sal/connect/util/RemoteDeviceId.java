@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.connect.util;
 
 import com.google.common.base.Preconditions;
 import java.net.InetSocketAddress;
-import org.opendaylight.controller.config.api.ModuleIdentifier;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.HostBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.inventory.rev130819.NodeId;
@@ -37,12 +36,6 @@ public final class RemoteDeviceId {
             .network.topology.rev131021.network.topology.topology.Node> topologyBindingPath;
     private InetSocketAddress address;
     private Host host;
-
-    public RemoteDeviceId(final ModuleIdentifier identifier, InetSocketAddress address) {
-        this(Preconditions.checkNotNull(identifier).getInstanceName());
-        this.address = address;
-        this.host = buildHost();
-    }
 
     private RemoteDeviceId(final String name) {
         this.name = Preconditions.checkNotNull(name);
