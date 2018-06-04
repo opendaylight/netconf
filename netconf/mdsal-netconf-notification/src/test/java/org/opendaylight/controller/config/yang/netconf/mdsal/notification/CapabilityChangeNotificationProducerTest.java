@@ -74,8 +74,8 @@ public class CapabilityChangeNotificationProducerTest {
 
     @Test
     public void testOnDataChangedCreate() {
-        final InstanceIdentifier capabilitiesIdentifier =
-                InstanceIdentifier.create(NetconfState.class).child(Capabilities.class).builder().build();
+        final InstanceIdentifier<Capabilities> capabilitiesIdentifier =
+                InstanceIdentifier.create(NetconfState.class).child(Capabilities.class);
         final List<Uri> newCapabilitiesList =
                 Lists.newArrayList(new Uri("newCapability"), new Uri("createdCapability"));
         Capabilities newCapabilities = new CapabilitiesBuilder().setCapability(newCapabilitiesList).build();
@@ -111,8 +111,8 @@ public class CapabilityChangeNotificationProducerTest {
 
     @SuppressWarnings("unchecked")
     private void verifyDataTreeChange(final DataObjectModification.ModificationType modificationType,
-                                      Capabilities originalCapabilities, Capabilities updatedCapabilities,
-                                      NetconfCapabilityChange expectedChange) {
+                                      final Capabilities originalCapabilities, final Capabilities updatedCapabilities,
+                                      final NetconfCapabilityChange expectedChange) {
         final DataTreeModification<Capabilities> treeChange2 = mock(DataTreeModification.class);
         final DataObjectModification<Capabilities> objectChange2 = mock(DataObjectModification.class);
         doReturn(modificationType).when(objectChange2).getModificationType();
@@ -123,7 +123,7 @@ public class CapabilityChangeNotificationProducerTest {
         verify(baseNotificationPublisherRegistration).onCapabilityChanged(expectedChange);
     }
 
-    private NetconfCapabilityChange changedCapabilitesFrom(List<Uri> added, List<Uri> deleted) {
+    private NetconfCapabilityChange changedCapabilitesFrom(final List<Uri> added, final List<Uri> deleted) {
         NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
         netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(
                 new ServerBuilder().setServer(true).build()).build());

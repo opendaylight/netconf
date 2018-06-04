@@ -28,7 +28,7 @@ public class GetTest {
         final StreamBuilder streamBuilder = new StreamBuilder();
         final StreamNameType base = new StreamNameType("base");
         streamBuilder.setName(base);
-        streamBuilder.setKey(new StreamKey(base));
+        streamBuilder.withKey(new StreamKey(base));
         streamBuilder.setDescription("description");
         streamBuilder.setReplaySupport(false);
         streamsBuilder.setStream(Lists.newArrayList(streamBuilder.build()));

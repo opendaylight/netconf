@@ -62,32 +62,32 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
     }
 
     @Override
-    public void onSessionStarted(Session session) {
+    public void onSessionStarted(final Session session) {
         final InstanceIdentifier<Session> sessionPath =
-                SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.getKey());
+                SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.key());
         runTransaction((tx) -> tx.put(LogicalDatastoreType.OPERATIONAL, sessionPath, session));
     }
 
     @Override
-    public void onSessionEnded(Session session) {
+    public void onSessionEnded(final Session session) {
         final InstanceIdentifier<Session> sessionPath =
-                SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.getKey());
+                SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.key());
         runTransaction((tx) -> tx.delete(LogicalDatastoreType.OPERATIONAL, sessionPath));
     }
 
     @Override
-    public void onSessionsUpdated(Collection<Session> sessions) {
+    public void onSessionsUpdated(final Collection<Session> sessions) {
         runTransaction((tx) -> updateSessions(tx, sessions));
     }
 
     @Override
-    public void onCapabilitiesChanged(Capabilities capabilities) {
+    public void onCapabilitiesChanged(final Capabilities capabilities) {
         runTransaction((tx) -> tx.put(LogicalDatastoreType.OPERATIONAL, CAPABILITIES_INSTANCE_IDENTIFIER,
                 capabilities));
     }
 
     @Override
-    public void onSchemasChanged(Schemas schemas) {
+    public void onSchemasChanged(final Schemas schemas) {
         runTransaction((tx) -> tx.put(LogicalDatastoreType.OPERATIONAL, SCHEMAS_INSTANCE_IDENTIFIER, schemas));
     }
 
@@ -99,27 +99,27 @@ public final class MonitoringToMdsalWriter implements AutoCloseable, NetconfMoni
         serverMonitoringDependency.registerSessionsListener(this);
     }
 
-    private void runTransaction(Consumer<WriteTransaction> txUser) {
+    private void runTransaction(final Consumer<WriteTransaction> txUser) {
         Preconditions.checkState(dataBroker != null);
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
         txUser.accept(tx);
         Futures.addCallback(tx.submit(), new FutureCallback<Void>() {
             @Override
-            public void onSuccess(@Nullable Void result) {
+            public void onSuccess(@Nullable final Void result) {
                 LOG.debug("Netconf state updated successfully");
             }
 
             @Override
-            public void onFailure(Throwable throwable) {
+            public void onFailure(final Throwable throwable) {
                 LOG.warn("Unable to update netconf state", throwable);
             }
         }, MoreExecutors.directExecutor());
     }
 
-    private static void updateSessions(WriteTransaction tx, Collection<Session> sessions) {
+    private static void updateSessions(final WriteTransaction tx, final Collection<Session> sessions) {
         for (Session session : sessions) {
             final InstanceIdentifier<Session> sessionPath =
-                    SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.getKey());
+                    SESSIONS_INSTANCE_IDENTIFIER.child(Session.class, session.key());
             tx.put(LogicalDatastoreType.OPERATIONAL, sessionPath, session);
         }
     }
