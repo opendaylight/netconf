@@ -19,7 +19,7 @@
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>netconf-netty-util</artifactId>
   <packaging>bundle</packaging>
-  <version>1.4.2-SNAPSHOT</version>
+  <version>1.4.2</version>
   <name>${project.artifactId}</name>
 
   <dependencyManagement>
@@ -101,7 +101,7 @@
     <dependency>
       <groupId>org.opendaylight.aaa</groupId>
       <artifactId>aaa-encrypt-service</artifactId>
-      <version>0.7.2-SNAPSHOT</version>
+      <version>0.7.2</version>
     </dependency>
 
     <!-- test dependencies -->

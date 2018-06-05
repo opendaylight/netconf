@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-config-netconf-connector</artifactId>
-    <version>1.4.2-SNAPSHOT</version>
+    <version>1.4.2</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Netconf :: Connector</name>
@@ -28,7 +28,7 @@
             <dependency>
                 <groupId>org.opendaylight.controller</groupId>
                 <artifactId>config-artifacts</artifactId>
-                <version>0.8.2-SNAPSHOT</version>
+                <version>0.8.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

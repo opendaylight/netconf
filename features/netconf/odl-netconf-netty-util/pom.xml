@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-netty-util</artifactId>
-    <version>1.4.2-SNAPSHOT</version>
+    <version>1.4.2</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Netconf :: Netty Util</name>
@@ -35,7 +35,7 @@
             <dependency>
                 <groupId>org.opendaylight.aaa</groupId>
                 <artifactId>aaa-artifacts</artifactId>
-                <version>0.7.2-SNAPSHOT</version>
+                <version>0.7.2</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -61,7 +61,7 @@
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>odl-aaa-encryption-service</artifactId>
             <!-- FIXME: version declaration should be coming from aaa-artifacts -->
-            <version>0.7.2-SNAPSHOT</version>
+            <version>0.7.2</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

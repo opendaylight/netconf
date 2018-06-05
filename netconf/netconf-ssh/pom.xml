@@ -17,7 +17,7 @@
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>netconf-ssh</artifactId>
-  <version>1.4.2-SNAPSHOT</version>
+  <version>1.4.2</version>
   <name>${project.artifactId}</name>
   <packaging>bundle</packaging>
 
@@ -40,14 +40,14 @@
       <dependency>
         <groupId>org.opendaylight.controller</groupId>
         <artifactId>config-artifacts</artifactId>
-        <version>0.8.2-SNAPSHOT</version>
+        <version>0.8.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.opendaylight.mdsal.model</groupId>
         <artifactId>mdsal-model-artifacts</artifactId>
-        <version>0.12.2-SNAPSHOT</version>
+        <version>0.12.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

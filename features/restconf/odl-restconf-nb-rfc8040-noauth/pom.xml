@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-restconf-nb-rfc8040-noauth</artifactId>
-    <version>1.7.2-SNAPSHOT</version>
+    <version>1.7.2</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: RESTCONF :: RFC8040</name>
@@ -28,7 +28,7 @@
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>restconf-artifacts</artifactId>
-                <version>1.7.2-SNAPSHOT</version>
+                <version>1.7.2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
