@@ -23,7 +23,6 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.notifications.NotificationRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
@@ -48,11 +47,9 @@ public class NotificationToMdsalWriterTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         final NetconfNotificationCollector notificationCollector = mock(NetconfNotificationCollector.class);
-        final BindingAwareBroker.ProviderContext session = mock(BindingAwareBroker.ProviderContext.class);
 
         doReturn(notificationRegistration).when(notificationCollector).registerStreamListener(any(
                 NetconfNotificationCollector.NetconfNotificationStreamListener.class));
-        doReturn(dataBroker).when(session).getSALService(DataBroker.class);
 
         WriteTransaction tx = mock(WriteTransaction.class);
         doNothing().when(tx).merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class),

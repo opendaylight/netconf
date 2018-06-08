@@ -23,7 +23,6 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesState;
@@ -49,8 +48,6 @@ public class SchemaServiceToMdsalWriterTest {
     @Mock
     private SchemaService schemaService;
     @Mock
-    private BindingAwareBroker.ProviderContext context;
-    @Mock
     private DataBroker dataBroker;
     @Mock
     private WriteTransaction writeTransaction;
@@ -61,7 +58,6 @@ public class SchemaServiceToMdsalWriterTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        when(context.getSALService(DataBroker.class)).thenReturn(dataBroker);
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
         doNothing().when(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
         when(writeTransaction.submit()).thenReturn(Futures.immediateCheckedFuture(null));

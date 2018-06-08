@@ -29,15 +29,12 @@ import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 
 public class NetconfDeviceSalProviderTest {
 
     @Mock
     private DOMMountPointService mountpointService;
-    @Mock
-    private BindingAwareBroker.ProviderContext context;
     @Mock
     private WriteTransaction tx;
     @Mock
@@ -60,7 +57,6 @@ public class NetconfDeviceSalProviderTest {
         doReturn(Futures.immediateCheckedFuture(null)).when(writeTx).submit();
         provider = new NetconfDeviceSalProvider(new RemoteDeviceId("device1",
                 InetSocketAddress.createUnresolved("localhost", 17830)), mountPointService, dataBroker);
-        when(context.getSALService(DataBroker.class)).thenReturn(dataBroker);
         when(chain.newWriteOnlyTransaction()).thenReturn(tx);
         when(tx.submit()).thenReturn(Futures.immediateCheckedFuture(null));
         when(tx.getIdentifier()).thenReturn(tx);
