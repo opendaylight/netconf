@@ -9,11 +9,13 @@
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
 import com.google.common.base.Strings;
+import com.google.common.util.concurrent.Uninterruptibles;
 import java.io.File;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverImpl;
@@ -73,12 +75,6 @@ public final class NetconfTopologyUtils {
     public static final SharedSchemaRepository DEFAULT_SCHEMA_REPOSITORY =
             new SharedSchemaRepository(DEFAULT_SCHEMA_REPOSITORY_NAME);
 
-
-     // The default <code>FilesystemSchemaSourceCache</code>, which stores cached files in <code>cache/schema</code>.
-    public static final FilesystemSchemaSourceCache<YangTextSchemaSource> DEFAULT_CACHE =
-            new FilesystemSchemaSourceCache<>(DEFAULT_SCHEMA_REPOSITORY, YangTextSchemaSource.class,
-                    new File(QUALIFIED_DEFAULT_CACHE_DIRECTORY));
-
     public static final InMemorySchemaSourceCache<ASTSchemaSource> DEFAULT_AST_CACHE =
             InMemorySchemaSourceCache.createSoftCache(DEFAULT_SCHEMA_REPOSITORY, ASTSchemaSource.class);
 
@@ -102,10 +98,33 @@ public final class NetconfTopologyUtils {
         SCHEMA_RESOURCES_DTO_MAP.put(DEFAULT_CACHE_DIRECTORY,
                 new NetconfDevice.SchemaResourcesDTO(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY,
                         DEFAULT_SCHEMA_CONTEXT_FACTORY, new NetconfStateSchemasResolverImpl()));
-        DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_CACHE);
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(DEFAULT_AST_CACHE);
         DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(
                 TextToASTTransformer.create(DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY));
+
+        /*
+         * Create the default <code>FilesystemSchemaSourceCache</code>, which stores cached files
+         * in <code>cache/schema</code>. Try up to 3 times - we've seen intermittent failures on jenkins where
+         * FilesystemSchemaSourceCache throws an IAE due to mkdirs failure. The theory is that there's a race
+         * creating the dir and it already exists when mkdirs is called (mkdirs returns false in this case). In this
+         * scenario, a retry should succeed.
+         */
+        int tries = 1;
+        while (true) {
+            try {
+                FilesystemSchemaSourceCache<YangTextSchemaSource> defaultCache =
+                        new FilesystemSchemaSourceCache<>(DEFAULT_SCHEMA_REPOSITORY, YangTextSchemaSource.class,
+                                new File(QUALIFIED_DEFAULT_CACHE_DIRECTORY));
+                DEFAULT_SCHEMA_REPOSITORY.registerSchemaSourceListener(defaultCache);
+                break;
+            } catch (IllegalArgumentException e) {
+                if (tries++ >= 3) {
+                    LOG.error("Error creating default schema cache", e);
+                    break;
+                }
+                Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS);
+            }
+        }
     }
 
     private NetconfTopologyUtils() {
