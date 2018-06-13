@@ -126,7 +126,8 @@ public class RuntimeRpcTest {
                 @Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
             final Collection<DataContainerChild<? extends PathArgument, ?>> children =
                     (Collection<DataContainerChild<? extends PathArgument, ?>>) input.getValue();
-            final Module module = schemaContext.findModule(type.getLastComponent().getNamespace()).orElse(null);
+            final Module module = schemaContext.findModules(type.getLastComponent().getNamespace()).stream()
+                .findFirst().orElse(null);
             final RpcDefinition rpcDefinition = getRpcDefinitionFromModule(
                 module, module.getNamespace(), type.getLastComponent().getLocalName());
             final ContainerSchemaNode outputSchemaNode = rpcDefinition.getOutput();

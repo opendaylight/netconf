@@ -3,6 +3,8 @@ module rpc-test {
     namespace "urn:opendaylight:mdsal:mapping:rpc:test";
     prefix "rpc";
 
+    revision "2015-04-08";
+
     rpc void-input-output-rpc {
 
     }
