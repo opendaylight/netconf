@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-connector</artifactId>
-    <version>1.4.2-SNAPSHOT</version>
+    <version>1.4.3-SNAPSHOT</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Netconf Connector :: Netconf Connector</name>
@@ -28,7 +28,7 @@
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>netconf-artifacts</artifactId>
-                <version>1.4.2-SNAPSHOT</version>
+                <version>1.4.3-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -39,7 +39,7 @@
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-mdsal-broker</artifactId>
-            <version>1.7.2-SNAPSHOT</version>
+            <version>1.7.3-SNAPSHOT</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -60,14 +60,14 @@
         <dependency>
             <groupId>org.opendaylight.mdsal.model</groupId>
             <artifactId>odl-mdsal-models</artifactId>
-            <version>0.12.2-SNAPSHOT</version>
+            <version>0.12.3-SNAPSHOT</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-mdsal-model-inventory</artifactId>
-            <version>1.7.2-SNAPSHOT</version>
+            <version>1.7.3-SNAPSHOT</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
@@ -90,7 +90,7 @@
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>odl-aaa-encryption-service</artifactId>
-            <version>0.7.2-SNAPSHOT</version>
+            <version>0.7.3-SNAPSHOT</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>

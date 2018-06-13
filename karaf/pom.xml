@@ -16,11 +16,11 @@
   </parent>
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>netconf-karaf</artifactId>
-  <version>1.7.2-SNAPSHOT</version>
+  <version>1.7.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <properties>
-    <netconf.version>1.4.2-SNAPSHOT</netconf.version>
-    <restconf.version>1.7.2-SNAPSHOT</restconf.version>
+    <netconf.version>1.4.3-SNAPSHOT</netconf.version>
+    <restconf.version>1.7.3-SNAPSHOT</restconf.version>
   </properties>
 
   <dependencies>

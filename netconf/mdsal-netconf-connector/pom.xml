@@ -18,7 +18,7 @@
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>mdsal-netconf-connector</artifactId>
-  <version>1.4.2-SNAPSHOT</version>
+  <version>1.4.3-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <packaging>bundle</packaging>
 
@@ -41,7 +41,7 @@
       <dependency>
         <groupId>org.opendaylight.controller</groupId>
         <artifactId>mdsal-artifacts</artifactId>
-        <version>1.7.2-SNAPSHOT</version>
+        <version>1.7.3-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
