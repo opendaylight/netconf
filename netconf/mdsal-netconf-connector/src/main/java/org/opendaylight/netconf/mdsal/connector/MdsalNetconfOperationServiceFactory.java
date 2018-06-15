@@ -14,10 +14,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import org.opendaylight.controller.config.util.capability.BasicCapability;
 import org.opendaylight.controller.config.util.capability.Capability;
 import org.opendaylight.controller.config.util.capability.YangModuleCapability;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
@@ -38,6 +40,8 @@ import org.slf4j.LoggerFactory;
 public class MdsalNetconfOperationServiceFactory implements NetconfOperationServiceFactory, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MdsalNetconfOperationServiceFactory.class);
+    private static final BasicCapability VALIDATE_CAPABILITY =
+        new BasicCapability("urn:ietf:params:netconf:capability:validate:1.0");
 
     private final DOMDataBroker dataBroker;
     private final DOMRpcService rpcService;
@@ -148,6 +152,11 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
 
     @Override
     public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
+        // Advertise validate capability only if DOMDataBroker provides DOMDataTransactionValidator
+        if (dataBroker.getSupportedExtensions().get(DOMDataTransactionValidator.class) != null) {
+            listener.onCapabilitiesChanged(Collections.singleton(VALIDATE_CAPABILITY), Collections.emptySet());
+        }
+        // Advertise namespaces of supported YANG models as NETCONF capabilities
         return currentSchemaContext.registerCapabilityListener(listener);
     }
 }
