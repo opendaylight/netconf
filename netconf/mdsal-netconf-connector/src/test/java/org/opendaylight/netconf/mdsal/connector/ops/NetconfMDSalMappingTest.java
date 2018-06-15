@@ -72,7 +72,7 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
     @Override
     protected SchemaContext getSchemaContext() {
         return YangParserTestUtils.parseYangResources(NetconfMDSalMappingTest.class,
-            "/META-INF/yang/config@2013-04-05.yang", "/yang/mdsal-netconf-mapping-test.yang");
+            "/yang/mdsal-netconf-mapping-test.yang");
     }
 
     @Test

@@ -52,7 +52,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-abstract class AbstractNetconfOperationTest {
+public abstract class AbstractNetconfOperationTest {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfOperationTest.class);
     protected static final String SESSION_ID_FOR_REPORTING = "netconf-test-session1";
     private static final String RPC_REPLY_ELEMENT = "rpc-reply";
