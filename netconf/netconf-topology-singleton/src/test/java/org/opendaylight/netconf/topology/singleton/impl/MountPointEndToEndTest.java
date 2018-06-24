@@ -63,7 +63,6 @@ import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
-import org.opendaylight.controller.md.sal.binding.impl.BindingToNormalizedNodeCodec;
 import org.opendaylight.controller.md.sal.binding.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -86,6 +85,7 @@ import org.opendaylight.controller.md.sal.dom.broker.impl.mount.DOMMountPointSer
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.controller.sal.core.api.mount.MountProvisionListener;
+import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.eos.dom.simple.SimpleDOMEntityOwnershipService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
@@ -194,7 +194,7 @@ public class MountPointEndToEndTest {
     private YangModuleInfo topModuleInfo;
     private SchemaPath putTopRpcSchemaPath;
     private SchemaPath getTopRpcSchemaPath;
-    private BindingToNormalizedNodeCodec bindingToNormalized;
+    private BindingNormalizedNodeSerializer bindingToNormalized;
     private YangInstanceIdentifier yangNodeInstanceId;
     private final TopDOMRpcImplementation topRpcImplementation = new TopDOMRpcImplementation();
 
