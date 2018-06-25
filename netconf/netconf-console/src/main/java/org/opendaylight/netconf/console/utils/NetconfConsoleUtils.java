@@ -99,18 +99,6 @@ public final class NetconfConsoleUtils {
     }
 
     /**
-     * Wait for datastore to populate NETCONF data.
-     * @param deviceIp :IP address of NETCONF device
-     */
-    public static void waitForUpdate(final String deviceIp) {
-        try {
-            Thread.sleep(NetconfConsoleConstants.DEFAULT_TIMEOUT_MILLIS);
-        } catch (final InterruptedException e) {
-            LOG.warn("Interrupted while waiting after Netconf node {}", deviceIp, e);
-        }
-    }
-
-    /**
      * Blocking read transaction.
      * @param store :DatastoreType
      * @param path :InstanceIdentifier

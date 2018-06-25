@@ -17,11 +17,9 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.MoreExecutors;
 import java.net.InetSocketAddress;
-import java.util.EnumMap;
 import java.util.concurrent.TimeUnit;
-import javassist.ClassPool;
+import org.awaitility.Awaitility;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -29,25 +27,13 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
-import org.opendaylight.controller.md.sal.binding.impl.BindingDOMDataBrokerAdapter;
-import org.opendaylight.controller.md.sal.binding.impl.BindingToNormalizedNodeCodec;
+import org.opendaylight.controller.md.sal.binding.test.ConcurrentDataBrokerTestCustomizer;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.broker.impl.SerializedDOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
-import org.opendaylight.controller.sal.core.spi.data.DOMStore;
-import org.opendaylight.mdsal.binding.dom.codec.gen.impl.DataObjectSerializerGenerator;
-import org.opendaylight.mdsal.binding.dom.codec.gen.impl.StreamWriterGenerator;
-import org.opendaylight.mdsal.binding.dom.codec.impl.BindingNormalizedNodeCodecRegistry;
-import org.opendaylight.mdsal.binding.generator.impl.GeneratedClassLoadingStrategy;
-import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
-import org.opendaylight.mdsal.binding.generator.util.BindingRuntimeContext;
-import org.opendaylight.mdsal.binding.generator.util.JavassistUtils;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -55,23 +41,18 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class NetconfDeviceTopologyAdapterTest {
 
     private final RemoteDeviceId id = new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
 
-    @Mock
-    private DataBroker broker;
     @Mock
     private WriteTransaction writeTx;
     @Mock
@@ -93,7 +74,6 @@ public class NetconfDeviceTopologyAdapterTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        doReturn(txChain).when(broker).createTransactionChain(any(TransactionChainListener.class));
         doReturn(writeTx).when(txChain).newWriteOnlyTransaction();
         doNothing().when(writeTx)
                 .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetconfNode.class));
@@ -107,29 +87,11 @@ public class NetconfDeviceTopologyAdapterTest {
             "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang",
             "/schemas/network-topology-augment-test@2016-08-08.yang");
         schemaContext.getModules();
-        final SchemaService schemaService = createSchemaService();
 
-        final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
-        final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
-
-        final EnumMap<LogicalDatastoreType, DOMStore> datastores = new EnumMap<>(LogicalDatastoreType.class);
-        datastores.put(LogicalDatastoreType.CONFIGURATION, configStore);
-        datastores.put(LogicalDatastoreType.OPERATIONAL, operStore);
-
-        domDataBroker = new SerializedDOMDataBroker(datastores, MoreExecutors.newDirectExecutorService());
-
-        final ClassPool pool = ClassPool.getDefault();
-        final DataObjectSerializerGenerator generator = StreamWriterGenerator.create(JavassistUtils.forClassPool(pool));
-        final BindingNormalizedNodeCodecRegistry codecRegistry = new BindingNormalizedNodeCodecRegistry(generator);
-        final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        codecRegistry.onBindingRuntimeContextUpdated(
-                BindingRuntimeContext.create(moduleInfoBackedContext, schemaContext));
-
-        final GeneratedClassLoadingStrategy loading = GeneratedClassLoadingStrategy.getTCCLClassLoadingStrategy();
-        final BindingToNormalizedNodeCodec bindingToNormalized =
-                new BindingToNormalizedNodeCodec(loading, codecRegistry);
-        bindingToNormalized.onGlobalContextUpdated(schemaContext);
-        dataBroker = new BindingDOMDataBrokerAdapter(domDataBroker, bindingToNormalized);
+        ConcurrentDataBrokerTestCustomizer customizer = new ConcurrentDataBrokerTestCustomizer(true);
+        domDataBroker = customizer.getDOMDataBroker();
+        dataBroker = customizer.createDataBroker();
+        customizer.updateSchema(schemaContext);
 
         transactionChain = dataBroker.createTransactionChain(new TransactionChainListener() {
             @Override
@@ -161,14 +123,13 @@ public class NetconfDeviceTopologyAdapterTest {
         adapter = new NetconfDeviceTopologyAdapter(id, transactionChain); //not a mock
         adapter.setDeviceAsFailed(null);
 
-        Optional<NetconfNode> netconfNode = dataBroker.newReadWriteTransaction().read(LogicalDatastoreType.OPERATIONAL,
-                id.getTopologyBindingPath().augmentation(NetconfNode.class)).checkedGet(5, TimeUnit.SECONDS);
-
-        assertEquals("Netconf node should be presented.", true, netconfNode.isPresent());
-        assertEquals("Connection status should be failed.",
-                NetconfNodeConnectionStatus.ConnectionStatus.UnableToConnect.getName(),
-                netconfNode.get().getConnectionStatus().getName());
-
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
+            Optional<NetconfNode> netconfNode = dataBroker.newReadWriteTransaction()
+                    .read(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath().augmentation(NetconfNode.class))
+                    .checkedGet(5, TimeUnit.SECONDS);
+            return netconfNode.isPresent() && netconfNode.get().getConnectionStatus()
+                    == NetconfNodeConnectionStatus.ConnectionStatus.UnableToConnect;
+        });
     }
 
     @Test
@@ -223,47 +184,6 @@ public class NetconfDeviceTopologyAdapterTest {
         assertEquals("Augmented node data should be still present after device failed.", true, testNode.isPresent());
         assertEquals("Augmented data should be the same as before failed device.",
                 dataTestId, testNode.get().getValue());
-    }
-
-    private SchemaService createSchemaService() {
-        return new SchemaService() {
-
-            @Override
-            public void addModule(final Module module) {
-            }
-
-            @Override
-            public void removeModule(final Module module) {
-
-            }
-
-            @Override
-            public SchemaContext getSessionContext() {
-                return schemaContext;
-            }
-
-            @Override
-            public SchemaContext getGlobalContext() {
-                return schemaContext;
-            }
-
-            @Override
-            public ListenerRegistration<SchemaContextListener> registerSchemaContextListener(
-                    final SchemaContextListener listener) {
-                listener.onGlobalContextUpdated(getGlobalContext());
-                return new ListenerRegistration<SchemaContextListener>() {
-                    @Override
-                    public void close() {
-
-                    }
-
-                    @Override
-                    public SchemaContextListener getInstance() {
-                        return listener;
-                    }
-                };
-            }
-        };
     }
 
     @Test
