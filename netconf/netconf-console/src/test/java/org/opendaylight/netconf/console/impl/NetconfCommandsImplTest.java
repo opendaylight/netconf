@@ -15,36 +15,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import javassist.ClassPool;
+import org.awaitility.Awaitility;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
-import org.opendaylight.controller.md.sal.binding.impl.BindingDOMDataBrokerAdapter;
-import org.opendaylight.controller.md.sal.binding.impl.BindingToNormalizedNodeCodec;
+import org.opendaylight.controller.md.sal.binding.test.ConcurrentDataBrokerTestCustomizer;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.broker.impl.SerializedDOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
-import org.opendaylight.controller.sal.core.spi.data.DOMStore;
-import org.opendaylight.mdsal.binding.dom.codec.gen.impl.DataObjectSerializerGenerator;
-import org.opendaylight.mdsal.binding.dom.codec.gen.impl.StreamWriterGenerator;
-import org.opendaylight.mdsal.binding.dom.codec.impl.BindingNormalizedNodeCodecRegistry;
-import org.opendaylight.mdsal.binding.generator.impl.GeneratedClassLoadingStrategy;
-import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
-import org.opendaylight.mdsal.binding.generator.util.BindingRuntimeContext;
-import org.opendaylight.mdsal.binding.generator.util.JavassistUtils;
 import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 import org.opendaylight.netconf.console.utils.NetconfConsoleUtils;
 import org.opendaylight.netconf.console.utils.NetconfIidFactory;
@@ -67,10 +52,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
-import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class NetconfCommandsImplTest {
@@ -92,30 +74,10 @@ public class NetconfCommandsImplTest {
             "/schemas/network-topology@2013-10-21.yang", "/schemas/ietf-inet-types@2013-07-15.yang",
             "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang");
         schemaContext.getModules();
-        final SchemaService schemaService = createSchemaService();
 
-        final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
-        final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
-
-        final EnumMap<LogicalDatastoreType, DOMStore> datastores = new EnumMap<>(LogicalDatastoreType.class);
-        datastores.put(LogicalDatastoreType.CONFIGURATION, configStore);
-        datastores.put(LogicalDatastoreType.OPERATIONAL, operStore);
-
-        final DOMDataBroker domDataBroker =
-                new SerializedDOMDataBroker(datastores, MoreExecutors.newDirectExecutorService());
-
-        final ClassPool pool = ClassPool.getDefault();
-        final DataObjectSerializerGenerator generator = StreamWriterGenerator.create(JavassistUtils.forClassPool(pool));
-        final BindingNormalizedNodeCodecRegistry codecRegistry = new BindingNormalizedNodeCodecRegistry(generator);
-        final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        codecRegistry
-                .onBindingRuntimeContextUpdated(BindingRuntimeContext.create(moduleInfoBackedContext, schemaContext));
-
-        final GeneratedClassLoadingStrategy loading = GeneratedClassLoadingStrategy.getTCCLClassLoadingStrategy();
-        final BindingToNormalizedNodeCodec bindingToNormalized =
-                new BindingToNormalizedNodeCodec(loading, codecRegistry);
-        bindingToNormalized.onGlobalContextUpdated(schemaContext);
-        dataBroker = new BindingDOMDataBrokerAdapter(domDataBroker, bindingToNormalized);
+        ConcurrentDataBrokerTestCustomizer customizer = new ConcurrentDataBrokerTestCustomizer(true);
+        dataBroker = customizer.createDataBroker();
+        customizer.updateSchema(schemaContext);
 
         netconfCommands = new NetconfCommandsImpl(dataBroker);
     }
@@ -161,33 +123,42 @@ public class NetconfCommandsImplTest {
 
         createTopology(LogicalDatastoreType.CONFIGURATION);
         netconfCommands.connectDevice(netconfNode, "netconf-ID");
-        NetconfConsoleUtils.waitForUpdate("10.10.1.1");
 
-        final Topology topology = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
-                NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
-        final List<Node> nodes = topology.getNode();
-        assertEquals(2, nodes.size());
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
+            final Topology topology = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
+                    NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
+            final List<Node> nodes = topology.getNode();
+            if (nodes.size() != 2) {
+                return false;
+            }
 
-        final Optional<Node> storedNode = nodes.stream().filter(node ->
-                node.key().getNodeId().getValue().equals("netconf-ID")).findFirst();
+            final Optional<Node> storedNode = nodes.stream().filter(node ->
+                    node.key().getNodeId().getValue().equals("netconf-ID")).findFirst();
 
-        assertTrue(storedNode.isPresent());
+            assertTrue(storedNode.isPresent());
 
-        NetconfNode storedNetconfNode = storedNode.get().augmentation(NetconfNode.class);
-        assertEquals(7777, storedNetconfNode.getPort().getValue().longValue());
-        assertEquals("10.10.1.1", storedNetconfNode.getHost().getIpAddress().getIpv4Address().getValue());
+            NetconfNode storedNetconfNode = storedNode.get().augmentation(NetconfNode.class);
+            assertEquals(7777, storedNetconfNode.getPort().getValue().longValue());
+            assertEquals("10.10.1.1", storedNetconfNode.getHost().getIpAddress().getIpv4Address().getValue());
+            return true;
+        });
 
         netconfCommands.disconnectDevice("netconf-ID");
 
-        final Topology topologyDeleted = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
-                NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
-        final List<Node> nodesDeleted = topologyDeleted.getNode();
-        assertEquals(1, nodesDeleted.size());
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
+            final Topology topologyDeleted = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
+                    NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
+            final List<Node> nodesDeleted = topologyDeleted.getNode();
+            if (nodesDeleted.size() != 1) {
+                return false;
+            }
 
-        final Optional<Node> storedNodeDeleted = nodesDeleted.stream().filter(node ->
-                node.key().getNodeId().getValue().equals("netconf-ID")).findFirst();
+            final Optional<Node> storedNodeDeleted = nodesDeleted.stream().filter(node ->
+                    node.key().getNodeId().getValue().equals("netconf-ID")).findFirst();
 
-        assertFalse(storedNodeDeleted.isPresent());
+            assertFalse(storedNodeDeleted.isPresent());
+            return true;
+        });
     }
 
     @Test
@@ -202,19 +173,23 @@ public class NetconfCommandsImplTest {
         update.put(NetconfConsoleConstants.SCHEMALESS, "true");
 
         netconfCommands.updateDevice(NODE_ID, "admin", "admin", update);
-        NetconfConsoleUtils.waitForUpdate("7.7.7.7");
 
-        final Topology topology = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
-                NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
-        final List<Node> nodes = topology.getNode();
-        assertEquals(1, nodes.size());
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
+            final Topology topology = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
+                    NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
+            final List<Node> nodes = topology.getNode();
+            if (nodes.size() != 1) {
+                return false;
+            }
 
-        final Optional<Node> storedNode = nodes.stream().filter(node ->
-                node.key().getNodeId().getValue().equals(NODE_ID)).findFirst();
-        assertTrue(storedNode.isPresent());
+            final Optional<Node> storedNode = nodes.stream().filter(node ->
+                    node.key().getNodeId().getValue().equals(NODE_ID)).findFirst();
+            assertTrue(storedNode.isPresent());
 
-        NetconfNode storedNetconfNode = storedNode.get().augmentation(NetconfNode.class);
-        assertEquals("7.7.7.7", storedNetconfNode.getHost().getIpAddress().getIpv4Address().getValue());
+            NetconfNode storedNetconfNode = storedNode.get().augmentation(NetconfNode.class);
+            assertEquals("7.7.7.7", storedNetconfNode.getHost().getIpAddress().getIpv4Address().getValue());
+            return true;
+        });
     }
 
     @Test
@@ -288,46 +263,5 @@ public class NetconfCommandsImplTest {
         assertEquals(ImmutableList.of(IP), mapNode.get(NetconfConsoleConstants.NETCONF_IP));
         assertEquals(ImmutableList.of(String.valueOf(PORT)), mapNode.get(NetconfConsoleConstants.NETCONF_PORT));
         assertEquals(ImmutableList.of(CONN_STATUS.name()), mapNode.get(NetconfConsoleConstants.STATUS));
-    }
-
-    private SchemaService createSchemaService() {
-        return new SchemaService() {
-
-            @Override
-            public void addModule(final Module module) {
-            }
-
-            @Override
-            public void removeModule(final Module module) {
-
-            }
-
-            @Override
-            public SchemaContext getSessionContext() {
-                return schemaContext;
-            }
-
-            @Override
-            public SchemaContext getGlobalContext() {
-                return schemaContext;
-            }
-
-            @Override
-            public ListenerRegistration<SchemaContextListener> registerSchemaContextListener(
-                    final SchemaContextListener listener) {
-                listener.onGlobalContextUpdated(getGlobalContext());
-                return new ListenerRegistration<SchemaContextListener>() {
-                    @Override
-                    public void close() {
-
-                    }
-
-                    @Override
-                    public SchemaContextListener getInstance() {
-                        return listener;
-                    }
-                };
-            }
-        };
     }
 }
