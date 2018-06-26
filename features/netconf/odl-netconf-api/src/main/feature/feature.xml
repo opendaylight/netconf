@@ -6,8 +6,8 @@
   ~ terms of the Eclipse Public License v1.0 which accompanies this distribution,
   ~ and is available at http://www.eclipse.org/legal/epl-v10.html
   -->
-<features name="odl-netconf-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0">
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-${project.version}">
     <feature name="odl-netconf-api" version="${project.version}">
-        <feature version="[2.0.5,3)">odl-yangtools-parser-api</feature>
+        <feature version="[2.0.7,3)">odl-yangtools-parser-api</feature>
     </feature>
 </features>
