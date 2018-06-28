@@ -121,8 +121,8 @@
       <artifactId>yang-model-export</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>ietf-yang-library</artifactId>
+      <groupId>org.opendaylight.mdsal.model</groupId>
+      <artifactId>rfc7895</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
