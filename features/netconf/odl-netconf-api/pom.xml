@@ -94,7 +94,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>ietf-netconf-yang-library</artifactId>
+            <artifactId>ietf-yang-library</artifactId>
         </dependency>
     </dependencies>
 </project>
