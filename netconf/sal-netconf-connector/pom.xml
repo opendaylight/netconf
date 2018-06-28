@@ -40,8 +40,8 @@
       <artifactId>ietf-netconf-notifications</artifactId>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>ietf-netconf-yang-library</artifactId>
+      <groupId>org.opendaylight.mdsal.model</groupId>
+      <artifactId>rfc7895</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

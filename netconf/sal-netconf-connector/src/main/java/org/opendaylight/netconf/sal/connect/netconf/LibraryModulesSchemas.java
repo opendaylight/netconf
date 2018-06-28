@@ -47,8 +47,8 @@ import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.module.list.Module;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -88,7 +88,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     static {
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
         moduleInfoBackedContext.registerModuleInfo(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang
-                .library.rev160409.$YangModuleInfoImpl.getInstance());
+                .library.rev160621.$YangModuleInfoImpl.getInstance());
         LIBRARY_CONTEXT = moduleInfoBackedContext.tryToCreateSchemaContext().get();
     }
 
