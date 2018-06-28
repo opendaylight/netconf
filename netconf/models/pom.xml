@@ -27,6 +27,6 @@
     <module>ietf-netconf-monitoring</module>
     <module>ietf-netconf-notifications</module>
     <module>ietf-netconf-monitoring-extension</module>
-    <module>ietf-netconf-yang-library</module>
+    <module>ietf-yang-library</module>
   </modules>
 </project>

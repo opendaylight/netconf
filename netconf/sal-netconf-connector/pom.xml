@@ -41,7 +41,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ietf-netconf-yang-library</artifactId>
+      <artifactId>ietf-yang-library</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
