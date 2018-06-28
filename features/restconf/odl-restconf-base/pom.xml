@@ -46,6 +46,13 @@
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-nb-bierman02</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <!-- Provided by odl-restconf-common, via odl-karaf-feat-jetty -->
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>

@@ -45,6 +45,13 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>restconf-nb-rfc8040</artifactId>
+            <exclusions>
+                <exclusion>
+                    <!-- Provided by odl-restconf-common, via odl-karaf-feat-jetty -->
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>
