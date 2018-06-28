@@ -45,8 +45,8 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>ietf-netconf-yang-library</artifactId>
-            <version>1.5.0-SNAPSHOT</version>
+            <artifactId>ietf-yang-library</artifactId>
+            <version>1.8.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

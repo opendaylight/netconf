@@ -13,7 +13,7 @@ import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160409.ModulesState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
 import org.opendaylight.yangtools.yang.common.QName;
 
 /**

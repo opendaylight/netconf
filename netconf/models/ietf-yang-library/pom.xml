@@ -12,9 +12,9 @@
 
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
-        <artifactId>restconf-parent</artifactId>
-        <version>1.8.0-SNAPSHOT</version>
-        <relativePath>../../restconf-parent</relativePath>
+        <artifactId>netconf-parent</artifactId>
+        <version>1.5.0-SNAPSHOT</version>
+        <relativePath>../../netconf-parent</relativePath>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
