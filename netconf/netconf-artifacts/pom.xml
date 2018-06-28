@@ -161,12 +161,6 @@
             </dependency>
 
             <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>ietf-netconf-yang-library</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>yanglib</artifactId>
                 <version>${project.version}</version>
