@@ -12,6 +12,8 @@ module netconf-node-topology {
 
     augment "/nt:network-topology/nt:topology/nt:topology-types" {
         container topology-netconf {
+            presence "The presence of the container node indicates a network
+                      of NETCONF devices";
         }
     }
 
