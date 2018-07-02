@@ -67,10 +67,6 @@
             <artifactId>mdsal-singleton-common-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.mdsal.model</groupId>
-            <artifactId>ietf-topology</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-eos-dom-simple</artifactId>
             <scope>test</scope>

@@ -41,8 +41,8 @@ import org.opendaylight.controller.messagebus.spi.EventSourceRegistry;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.Node;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -130,8 +130,8 @@ public class NetconfEventSourceManagerTest {
     }
 
     @SuppressWarnings("unchecked")
-    private void onDataChangedTestHelper(boolean create, boolean update, boolean isNetconf, String
-            notificationCapabilityPrefix) throws Exception {
+    private void onDataChangedTestHelper(final boolean create, final boolean update, final boolean isNetconf,
+            final String notificationCapabilityPrefix) throws Exception {
         dataTreeModificationMock = mock(DataTreeModification.class);
         DataObjectModification<Node> mockModification = mock(DataObjectModification.class);
         doReturn(create ? DataObjectModification.ModificationType.WRITE :
