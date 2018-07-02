@@ -101,13 +101,19 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.Networks;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.NodeId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.Network;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.Node;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.NodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.NodeKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.Keystore;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPwUnencryptedBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.network.topology.topology.topology.types.TopologyNetconf;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.NetconfNodeConnectionStatus;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.netconf.node.credentials.credentials.LoginPwUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.netconf.node.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.networks.network.network.types.NetconfNetwork;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.ConfigBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.GetTopOutputBuilder;
@@ -115,12 +121,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controll
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.Top;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.two.level.list.TopLevelList;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.two.level.list.TopLevelListBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.binding.util.BindingReflections;
@@ -155,7 +155,7 @@ public class MountPointEndToEndTest {
 
     private static final String TOP_MODULE_NAME = "opendaylight-mdsal-list-test";
     private static final String ACTOR_SYSTEM_NAME = "test";
-    private static final String TOPOLOGY_ID = TopologyNetconf.QNAME.getLocalName();
+    private static final String TOPOLOGY_ID = NetconfNetwork.QNAME.getLocalName();
     private static final NodeId NODE_ID = new NodeId("node-id");
     private static final InstanceIdentifier<Node> NODE_INSTANCE_ID = NetconfTopologyUtils.createTopologyNodeListPath(
             new NodeKey(NODE_ID), TOPOLOGY_ID);
@@ -269,8 +269,8 @@ public class MountPointEndToEndTest {
                 mockMasterActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
                 masterMountPointService, mockEncryptionService) {
             @Override
-            protected NetconfTopologyContext newNetconfTopologyContext(NetconfTopologySetup setup,
-                    ServiceGroupIdentifier serviceGroupIdent, Timeout actorResponseWaitTime) {
+            protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
+                    final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime) {
                 NetconfTopologyContext context =
                         super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime);
                 NetconfTopologyContext spiedContext = spy(context);
@@ -304,10 +304,10 @@ public class MountPointEndToEndTest {
         slaveNetconfTopologyManager = new NetconfTopologyManager(slaveDataBroker, mockRpcProviderRegistry,
                 mockSlaveClusterSingletonServiceProvider, mockKeepaliveExecutor, mockThreadPool,
                 mockSlaveActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
-                slaveMountPointService, mockEncryptionService)  {
+                slaveMountPointService, mockEncryptionService) {
             @Override
-            protected NetconfTopologyContext newNetconfTopologyContext(NetconfTopologySetup setup,
-                    ServiceGroupIdentifier serviceGroupIdent, Timeout actorResponseWaitTime) {
+            protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
+                    final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime) {
                 NetconfTopologyContext spiedContext =
                         spy(super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime));
                 slaveNetconfTopologyContextFuture.set(spiedContext);
@@ -321,12 +321,12 @@ public class MountPointEndToEndTest {
 
         slaveTxChain = slaveDataBroker.createTransactionChain(new TransactionChainListener() {
             @Override
-            public void onTransactionChainSuccessful(TransactionChain<?, ?> chain) {
+            public void onTransactionChainSuccessful(final TransactionChain<?, ?> chain) {
             }
 
             @Override
-            public void onTransactionChainFailed(TransactionChain<?, ?> chain, AsyncTransaction<?, ?> transaction,
-                    Throwable cause) {
+            public void onTransactionChainFailed(final TransactionChain<?, ?> chain,
+                    final AsyncTransaction<?, ?> transaction, final Throwable cause) {
                 LOG.error("Slave transaction chain failed", cause);
             }
         });
@@ -466,7 +466,7 @@ public class MountPointEndToEndTest {
         verify(mockSlaveClusterSingletonServiceReg).close();
     }
 
-    private void testDOMRpcService(DOMRpcService domRpcService)
+    private void testDOMRpcService(final DOMRpcService domRpcService)
             throws InterruptedException, ExecutionException, TimeoutException {
         testPutTopRpc(domRpcService, new DefaultDOMRpcResult((NormalizedNode<?, ?>)null));
         testPutTopRpc(domRpcService, null);
@@ -481,7 +481,7 @@ public class MountPointEndToEndTest {
         testFailedRpc(domRpcService, getTopRpcSchemaPath, null);
     }
 
-    private void testPutTopRpc(DOMRpcService domRpcService, DOMRpcResult result)
+    private void testPutTopRpc(final DOMRpcService domRpcService, final DOMRpcResult result)
             throws InterruptedException, ExecutionException, TimeoutException {
         ContainerNode putTopInput = bindingToNormalized.toNormalizedNodeRpcData(
                 new PutTopInputBuilder().setTopLevelList(Arrays.asList(new TopLevelListBuilder().setName("one")
@@ -489,13 +489,14 @@ public class MountPointEndToEndTest {
         testRpc(domRpcService, putTopRpcSchemaPath, putTopInput, result);
     }
 
-    private void testGetTopRpc(DOMRpcService domRpcService, DOMRpcResult result)
+    private void testGetTopRpc(final DOMRpcService domRpcService, final DOMRpcResult result)
             throws InterruptedException, ExecutionException, TimeoutException {
         testRpc(domRpcService, getTopRpcSchemaPath, null, result);
     }
 
-    private void testRpc(DOMRpcService domRpcService, SchemaPath schemaPath, NormalizedNode<?, ?> input,
-            DOMRpcResult result) throws InterruptedException, ExecutionException, TimeoutException {
+    private void testRpc(final DOMRpcService domRpcService, final SchemaPath schemaPath,
+            final NormalizedNode<?, ?> input, final DOMRpcResult result)
+            throws InterruptedException, ExecutionException, TimeoutException {
         final DOMRpcResult actual = invokeRpc(domRpcService, schemaPath, input, Futures.immediateCheckedFuture(result));
         if (result == null) {
             assertNull(actual);
@@ -520,8 +521,8 @@ public class MountPointEndToEndTest {
         }
     }
 
-    private void testFailedRpc(DOMRpcService domRpcService, SchemaPath schemaPath, NormalizedNode<?, ?> input)
-            throws InterruptedException, TimeoutException  {
+    private void testFailedRpc(final DOMRpcService domRpcService, final SchemaPath schemaPath,
+            final NormalizedNode<?, ?> input) throws InterruptedException, TimeoutException {
         try {
             invokeRpc(domRpcService, schemaPath, input, Futures.immediateFailedCheckedFuture(
                     new ClusteringRpcException("mock")));
@@ -532,9 +533,9 @@ public class MountPointEndToEndTest {
         }
     }
 
-    private DOMRpcResult invokeRpc(DOMRpcService domRpcService, SchemaPath schemaPath, NormalizedNode<?, ?> input,
-            CheckedFuture<DOMRpcResult, DOMRpcException> returnFuture)
-                    throws InterruptedException, ExecutionException, TimeoutException {
+    private DOMRpcResult invokeRpc(final DOMRpcService domRpcService, final SchemaPath schemaPath,
+            final NormalizedNode<?, ?> input, final CheckedFuture<DOMRpcResult, DOMRpcException> returnFuture)
+            throws InterruptedException, ExecutionException, TimeoutException {
         topRpcImplementation.init(returnFuture);
         final ListenableFuture<DOMRpcResult> resultFuture = domRpcService.invokeRpc(schemaPath, input);
 
@@ -543,7 +544,7 @@ public class MountPointEndToEndTest {
         return resultFuture.get(5, TimeUnit.SECONDS);
     }
 
-    private static void testDOMDataBrokerOperations(DOMDataBroker dataBroker)
+    private static void testDOMDataBrokerOperations(final DOMDataBroker dataBroker)
             throws InterruptedException, ExecutionException, TimeoutException {
 
         DOMDataWriteTransaction writeTx = dataBroker.newWriteOnlyTransaction();
@@ -573,7 +574,7 @@ public class MountPointEndToEndTest {
         assertTrue(readTx.cancel());
     }
 
-    private static void writeNetconfNode(String cacheDir, DataBroker databroker)
+    private static void writeNetconfNode(final String cacheDir, final DataBroker databroker)
             throws InterruptedException, ExecutionException, TimeoutException {
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
@@ -596,8 +597,8 @@ public class MountPointEndToEndTest {
         writeTx.commit().get(5, TimeUnit.SECONDS);
     }
 
-    private static void verifyDataInStore(DOMDataReadTransaction readTx, YangInstanceIdentifier path,
-            NormalizedNode<?, ?> expNode) throws InterruptedException, ExecutionException, TimeoutException {
+    private static void verifyDataInStore(final DOMDataReadTransaction readTx, final YangInstanceIdentifier path,
+            final NormalizedNode<?, ?> expNode) throws InterruptedException, ExecutionException, TimeoutException {
         final Optional<NormalizedNode<?, ?>> read = readTx.read(LogicalDatastoreType.CONFIGURATION, path)
                 .get(5, TimeUnit.SECONDS);
         assertTrue(read.isPresent());
@@ -607,12 +608,12 @@ public class MountPointEndToEndTest {
         assertTrue(exists);
     }
 
-    private static void verifyTopologyNodesCreated(DataBroker dataBroker) {
+    private static void verifyTopologyNodesCreated(final DataBroker dataBroker) {
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
             try (ReadOnlyTransaction readTx = dataBroker.newReadOnlyTransaction()) {
-                Optional<Topology> configTopology = readTx.read(LogicalDatastoreType.CONFIGURATION,
+                Optional<Network> configTopology = readTx.read(LogicalDatastoreType.CONFIGURATION,
                         NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
-                Optional<Topology> operTopology = readTx.read(LogicalDatastoreType.OPERATIONAL,
+                Optional<Network> operTopology = readTx.read(LogicalDatastoreType.OPERATIONAL,
                         NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
                 return configTopology.isPresent() && operTopology.isPresent();
             }
@@ -624,8 +625,8 @@ public class MountPointEndToEndTest {
             @Override
             protected Iterable<YangModuleInfo> getModuleInfos() throws Exception {
                 return ImmutableSet.of(BindingReflections.getModuleInfo(NetconfNode.class),
-                        BindingReflections.getModuleInfo(NetworkTopology.class),
-                        BindingReflections.getModuleInfo(Topology.class),
+                        BindingReflections.getModuleInfo(Networks.class),
+                        BindingReflections.getModuleInfo(Network.class),
                         BindingReflections.getModuleInfo(Keystore.class),
                         topModuleInfo);
             }
@@ -635,26 +636,27 @@ public class MountPointEndToEndTest {
         return dataBrokerTest;
     }
 
-    private void awaitMountPointNotPresent(DOMMountPointService mountPointService) {
+    private void awaitMountPointNotPresent(final DOMMountPointService mountPointService) {
         await().atMost(5, TimeUnit.SECONDS).until(
             () -> !mountPointService.getMountPoint(yangNodeInstanceId).isPresent());
     }
 
-    private static DOMDataBroker getDOMDataBroker(DOMMountPoint mountPoint) {
+    private static DOMDataBroker getDOMDataBroker(final DOMMountPoint mountPoint) {
         return getMountPointService(mountPoint, DOMDataBroker.class);
     }
 
-    private static DOMRpcService getDOMRpcService(DOMMountPoint mountPoint) {
+    private static DOMRpcService getDOMRpcService(final DOMMountPoint mountPoint) {
         return getMountPointService(mountPoint, DOMRpcService.class);
     }
 
-    private static <T extends DOMService> T getMountPointService(DOMMountPoint mountPoint, Class<T> serviceClass) {
+    private static <T extends DOMService> T getMountPointService(final DOMMountPoint mountPoint,
+            final Class<T> serviceClass) {
         final Optional<T> maybeService = mountPoint.getService(serviceClass);
         assertTrue(maybeService.isPresent());
         return maybeService.get();
     }
 
-    private DOMMountPoint awaitMountPoint(DOMMountPointService mountPointService) {
+    private DOMMountPoint awaitMountPoint(final DOMMountPointService mountPointService) {
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
             return mountPointService.getMountPoint(yangNodeInstanceId).isPresent();
         });
@@ -662,7 +664,7 @@ public class MountPointEndToEndTest {
         return mountPointService.getMountPoint(yangNodeInstanceId).get();
     }
 
-    private RpcDefinition findRpcDefinition(String rpc) {
+    private RpcDefinition findRpcDefinition(final String rpc) {
         Module topModule = deviceSchemaContext.findModule(TOP_MODULE_NAME, topModuleInfo.getName().getRevision()).get();
         RpcDefinition rpcDefinition = null;
         for (RpcDefinition def: topModule.getRpcs()) {
@@ -681,18 +683,18 @@ public class MountPointEndToEndTest {
         private volatile CheckedFuture<DOMRpcResult, DOMRpcException> returnFuture;
 
         @Override
-        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(DOMRpcIdentifier rpc,
-                NormalizedNode<?, ?> input) {
+        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(final DOMRpcIdentifier rpc,
+                final NormalizedNode<?, ?> input) {
             rpcInvokedFuture.set(new SimpleEntry<>(rpc, input));
             return returnFuture;
         }
 
-        void init(CheckedFuture<DOMRpcResult, DOMRpcException> retFuture) {
+        void init(final CheckedFuture<DOMRpcResult, DOMRpcException> retFuture) {
             this.returnFuture = retFuture;
             rpcInvokedFuture = SettableFuture.create();
         }
 
-        void verify(DOMRpcIdentifier expRpc, NormalizedNode<?, ?> expInput)
+        void verify(final DOMRpcIdentifier expRpc, final NormalizedNode<?, ?> expInput)
                 throws InterruptedException, ExecutionException, TimeoutException {
             final Entry<DOMRpcIdentifier, NormalizedNode<?, ?>> actual = rpcInvokedFuture.get(5, TimeUnit.SECONDS);
             assertEquals(expRpc, actual.getKey());
