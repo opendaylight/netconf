@@ -32,13 +32,12 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.NetworkId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.Networks;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.NetworksBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.Network;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.NetworkBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.Node;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
@@ -136,13 +135,12 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     }
 
     private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType) {
-        final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
-        final InstanceIdentifier<NetworkTopology> networkTopologyId =
-                InstanceIdentifier.builder(NetworkTopology.class).build();
+        final Networks networkTopology = new NetworksBuilder().build();
+        final InstanceIdentifier<Networks> networkTopologyId = InstanceIdentifier.create(Networks.class);
         wtx.merge(datastoreType, networkTopologyId, networkTopology);
-        final Topology topology = new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build();
+        final Network topology = new NetworkBuilder().setNetworkId(new NetworkId(topologyId)).build();
         wtx.merge(datastoreType,
-                networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(topologyId))), topology);
+                networkTopologyId.child(Network.class, topology.key()), topology);
     }
 
 }

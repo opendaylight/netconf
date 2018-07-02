@@ -42,16 +42,16 @@ import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonS
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.NetworkId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.Networks;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.NetworksBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.NodeId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.Network;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.NetworkBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.NetworkKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.Node;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
@@ -197,8 +197,8 @@ public class NetconfTopologyManager
     }
 
     @VisibleForTesting
-    protected NetconfTopologyContext newNetconfTopologyContext(NetconfTopologySetup setup,
-            ServiceGroupIdentifier serviceGroupIdent, Timeout actorResponseWaitTime) {
+    protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
+            final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime) {
         return new NetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime, mountPointService);
     }
 
@@ -219,7 +219,7 @@ public class NetconfTopologyManager
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    private void close(AutoCloseable closeable) {
+    private void close(final AutoCloseable closeable) {
         try {
             closeable.close();
         } catch (Exception e) {
@@ -264,13 +264,11 @@ public class NetconfTopologyManager
     }
 
     private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType) {
-        final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
-        final InstanceIdentifier<NetworkTopology> networkTopologyId =
-                InstanceIdentifier.builder(NetworkTopology.class).build();
-        wtx.merge(datastoreType, networkTopologyId, networkTopology);
-        final Topology topology = new TopologyBuilder().setTopologyId(new TopologyId(topologyId)).build();
-        wtx.merge(datastoreType, networkTopologyId.child(Topology.class,
-                new TopologyKey(new TopologyId(topologyId))), topology);
+        final InstanceIdentifier<Networks> networkTopologyId = InstanceIdentifier.create(Networks.class);
+        wtx.merge(datastoreType, networkTopologyId,  new NetworksBuilder().build());
+        final Network topology = new NetworkBuilder().setNetworkId(new NetworkId(topologyId)).build();
+        wtx.merge(datastoreType, networkTopologyId.child(Network.class,
+                new NetworkKey(new NetworkId(topologyId))), topology);
     }
 
     private NetconfTopologySetup createSetup(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
