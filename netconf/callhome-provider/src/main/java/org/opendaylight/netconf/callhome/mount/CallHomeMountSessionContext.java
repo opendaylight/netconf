@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.mount;
 
 import com.google.common.base.Preconditions;
@@ -19,12 +18,12 @@ import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.NodeId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.Node;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.NodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.netconf.node.credentials.credentials.LoginPasswordBuilder;
 
 class CallHomeMountSessionContext {
 
@@ -39,8 +38,8 @@ class CallHomeMountSessionContext {
     // FIXME: Remove this
     private final ContextKey key;
 
-    CallHomeMountSessionContext(String nodeId, CallHomeProtocolSessionContext protocol,
-                                CallHomeChannelActivator activator, CloseCallback callback) {
+    CallHomeMountSessionContext(final String nodeId, final CallHomeProtocolSessionContext protocol,
+                                final CallHomeChannelActivator activator, final CloseCallback callback) {
 
         this.nodeId = new NodeId(Preconditions.checkNotNull(nodeId, "nodeId"));
         this.key = ContextKey.from(protocol.getRemoteAddress());
@@ -58,8 +57,7 @@ class CallHomeMountSessionContext {
     }
 
     Node getConfigNode() {
-        NodeBuilder builder = new NodeBuilder();
-        return builder.setNodeId(getId()).addAugmentation(NetconfNode.class, configNetconfNode()).build();
+        return new NodeBuilder().setNodeId(getId()).addAugmentation(NetconfNode.class, configNetconfNode()).build();
     }
 
     private NetconfNode configNetconfNode() {
@@ -73,7 +71,7 @@ class CallHomeMountSessionContext {
     }
 
     @SuppressWarnings("unchecked")
-    <V> Promise<V> activateNetconfChannel(NetconfClientSessionListener sessionListener) {
+    <V> Promise<V> activateNetconfChannel(final NetconfClientSessionListener sessionListener) {
         return (Promise<V>) activator.activate(wrap(sessionListener));
     }
 
@@ -81,12 +79,12 @@ class CallHomeMountSessionContext {
     private NetconfClientSessionListener wrap(final NetconfClientSessionListener delegate) {
         return new NetconfClientSessionListener() {
             @Override
-            public void onSessionUp(NetconfClientSession session) {
+            public void onSessionUp(final NetconfClientSession session) {
                 delegate.onSessionUp(session);
             }
 
             @Override
-            public void onSessionTerminated(NetconfClientSession session, NetconfTerminationReason reason) {
+            public void onSessionTerminated(final NetconfClientSession session, final NetconfTerminationReason reason) {
                 try {
                     delegate.onSessionTerminated(session, reason);
                 } finally {
@@ -95,7 +93,7 @@ class CallHomeMountSessionContext {
             }
 
             @Override
-            public void onSessionDown(NetconfClientSession session, Exception exc) {
+            public void onSessionDown(final NetconfClientSession session, final Exception exc) {
                 try {
                     removeSelf();
                 } finally {
@@ -104,7 +102,7 @@ class CallHomeMountSessionContext {
             }
 
             @Override
-            public void onMessage(NetconfClientSession session, NetconfMessage message) {
+            public void onMessage(final NetconfClientSession session, final NetconfMessage message) {
                 delegate.onMessage(session, message);
             }
         };
