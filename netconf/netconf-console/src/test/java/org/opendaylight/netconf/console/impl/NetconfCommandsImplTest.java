@@ -51,6 +51,14 @@ import org.opendaylight.netconf.console.utils.NetconfIidFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.HostBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.NetworkId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.NodeId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.Network;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.NetworkBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.NetworkKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.Node;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.NodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.NodeKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
@@ -58,15 +66,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.network.topology.topology.topology.types.TopologyNetconf;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.networks.network.network.types.TopologyNetconf;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -89,7 +89,7 @@ public class NetconfCommandsImplTest {
     @Before
     public void setUp() throws Exception {
         schemaContext = YangParserTestUtils.parseYangResources(NetconfCommandsImplTest.class,
-            "/schemas/network-topology@2013-10-21.yang", "/schemas/ietf-inet-types@2013-07-15.yang",
+            "/schemas/ietf-network@2018-02-26.yang", "/schemas/ietf-inet-types@2013-07-15.yang",
             "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang");
         schemaContext.getModules();
         final SchemaService schemaService = createSchemaService();
@@ -163,7 +163,7 @@ public class NetconfCommandsImplTest {
         netconfCommands.connectDevice(netconfNode, "netconf-ID");
         NetconfConsoleUtils.waitForUpdate("10.10.1.1");
 
-        final Topology topology = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
+        final Network topology = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
                 NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
         final List<Node> nodes = topology.getNode();
         assertEquals(2, nodes.size());
@@ -179,7 +179,7 @@ public class NetconfCommandsImplTest {
 
         netconfCommands.disconnectDevice("netconf-ID");
 
-        final Topology topologyDeleted = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
+        final Network topologyDeleted = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
                 NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
         final List<Node> nodesDeleted = topologyDeleted.getNode();
         assertEquals(1, nodesDeleted.size());
@@ -204,7 +204,7 @@ public class NetconfCommandsImplTest {
         netconfCommands.updateDevice(NODE_ID, "admin", "admin", update);
         NetconfConsoleUtils.waitForUpdate("7.7.7.7");
 
-        final Topology topology = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
+        final Network topology = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
                 NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
         final List<Node> nodes = topology.getNode();
         assertEquals(1, nodes.size());
@@ -233,9 +233,9 @@ public class NetconfCommandsImplTest {
         final Node node = getNetconfNode(NODE_ID, IP, PORT, CONN_STATUS, CAP_PREFIX);
         nodes.add(node);
 
-        final Topology topology = new TopologyBuilder()
-                .withKey(new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())))
-                .setTopologyId(new TopologyId(TopologyNetconf.QNAME.getLocalName())).setNode(nodes).build();
+        final Network topology = new NetworkBuilder()
+                .withKey(new NetworkKey(new NetworkId(TopologyNetconf.QNAME.getLocalName())))
+                .setNetworkId(new NetworkId(TopologyNetconf.QNAME.getLocalName())).setNode(nodes).build();
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeTransaction.put(dataStoreType, NetconfIidFactory.NETCONF_TOPOLOGY_IID, topology);

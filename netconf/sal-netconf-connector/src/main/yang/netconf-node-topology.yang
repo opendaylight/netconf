@@ -2,15 +2,15 @@ module netconf-node-topology {
     namespace "urn:opendaylight:netconf-node-topology";
     prefix "nettop";
 
-    import network-topology { prefix nt; revision-date 2013-10-21; }
+    import ietf-inet-types { prefix inet; }
+    import ietf-network { prefix nw; }
     import yang-ext { prefix ext; revision-date "2013-07-09";}
-    import ietf-inet-types { prefix inet; revision-date "2013-07-15"; }
 
     revision "2015-01-14" {
         description "Initial revision of Topology model";
     }
 
-    augment "/nt:network-topology/nt:topology/nt:topology-types" {
+    augment "/nw:networks/nw:network/nw:network-types" {
         container topology-netconf {
             presence "The presence of the container node indicates a network
                       of NETCONF devices";
@@ -357,8 +357,8 @@ module netconf-node-topology {
         }
     }
 
-    augment "/nt:network-topology/nt:topology/nt:node" {
-        when "../../nt:topology-types/topology-netconf";
+    augment "/nw:networks/nw:network/nw:node" {
+        when "../../nw:topology-types/topology-netconf";
         ext:augment-identifier "netconf-node";
 
         uses netconf-node-fields;
