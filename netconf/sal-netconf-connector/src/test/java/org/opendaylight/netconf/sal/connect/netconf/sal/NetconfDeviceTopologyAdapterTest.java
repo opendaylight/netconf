@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.junit.Assert.assertEquals;
@@ -50,11 +49,11 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.Networks;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.Network;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.Node;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.NetconfNodeConnectionStatus;
 import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
@@ -106,7 +105,7 @@ public class NetconfDeviceTopologyAdapterTest {
         doReturn(txIdent).when(writeTx).getIdentifier();
 
         this.schemaContext = YangParserTestUtils.parseYangResources(NetconfDeviceTopologyAdapterTest.class,
-            "/schemas/network-topology@2013-10-21.yang", "/schemas/ietf-inet-types@2013-07-15.yang",
+            "/schemas/ietf-network@2018-02-26.yang", "/schemas/ietf-inet-types@2013-07-15.yang",
             "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang",
             "/schemas/network-topology-augment-test@2016-08-08.yang");
         schemaContext.getModules();
@@ -198,9 +197,9 @@ public class NetconfDeviceTopologyAdapterTest {
         QName netconfTestLeafQname = QName.create(
                 "urn:TBD:params:xml:ns:yang:network-topology-augment-test", "2016-08-08", "test-id").intern();
 
-        YangInstanceIdentifier pathToAugmentedLeaf = YangInstanceIdentifier.builder().node(NetworkTopology.QNAME)
-                .node(Topology.QNAME)
-                .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"), "topology-netconf")
+        YangInstanceIdentifier pathToAugmentedLeaf = YangInstanceIdentifier.builder().node(Networks.QNAME)
+                .node(Network.QNAME)
+                .nodeWithKey(Network.QNAME, QName.create(Network.QNAME, "network-id"), "topology-netconf")
                 .node(Node.QNAME)
                 .nodeWithKey(Node.QNAME, QName.create(Node.QNAME, "node-id"), "test")
                 .node(netconfTestLeafQname).build();
