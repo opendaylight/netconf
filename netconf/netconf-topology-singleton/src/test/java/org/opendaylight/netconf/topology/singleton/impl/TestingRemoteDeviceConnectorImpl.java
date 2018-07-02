@@ -18,8 +18,8 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfConnectorDTO;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.NodeId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 
 class TestingRemoteDeviceConnectorImpl extends RemoteDeviceConnectorImpl {
 
@@ -34,7 +34,7 @@ class TestingRemoteDeviceConnectorImpl extends RemoteDeviceConnectorImpl {
 
     @Override
     public NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
-            RemoteDeviceHandler<NetconfSessionPreferences> salFacade) {
+            final RemoteDeviceHandler<NetconfSessionPreferences> salFacade) {
         final NetconfConnectorDTO connectorDTO = new NetconfConnectorDTO(communicator, salFacade);
         doReturn(Futures.immediateCheckedFuture(null)).when(communicator).initializeRemoteConnection(any(), any());
         return connectorDTO;
