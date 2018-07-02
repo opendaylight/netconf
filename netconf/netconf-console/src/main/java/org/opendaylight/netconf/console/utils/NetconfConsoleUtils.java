@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.console.utils;
 
 import com.google.common.base.Optional;
@@ -17,9 +16,9 @@ import java.util.concurrent.ExecutionException;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.Network;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.Node;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.NetconfNode;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,7 @@ public final class NetconfConsoleUtils {
      * @return :list on NETCONF nodes
      */
     public static List<Node> getNetconfNodeFromIp(final String deviceIp, final DataBroker db) {
-        final Topology topology = read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.NETCONF_TOPOLOGY_IID, db);
+        final Network topology = read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.NETCONF_TOPOLOGY_IID, db);
         List<Node> nodes = new ArrayList<>();
         if (isNetconfNodesPresent(topology)) {
             for (Node node : topology.getNode()) {
@@ -76,7 +75,7 @@ public final class NetconfConsoleUtils {
      */
     public static Node getNetconfNodeFromIpAndPort(final String deviceIp, final String devicePort,
                                                    final DataBroker db) {
-        final Topology topology = read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.NETCONF_TOPOLOGY_IID, db);
+        final Network topology = read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.NETCONF_TOPOLOGY_IID, db);
         if (isNetconfNodesPresent(topology)) {
             for (Node node : topology.getNode()) {
                 final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
@@ -95,7 +94,7 @@ public final class NetconfConsoleUtils {
      * @param topology :NETCONF topology instance
      * @return :<code>true</code> if not empty, else, <code>false</code>
      */
-    private static boolean isNetconfNodesPresent(final Topology topology) {
+    private static boolean isNetconfNodesPresent(final Network topology) {
         return topology != null && topology.getNode() != null && !topology.getNode().isEmpty();
     }
 
