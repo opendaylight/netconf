@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import static org.awaitility.Awaitility.await;
@@ -63,16 +62,16 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.Networks;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.NodeId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.Network;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.Node;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.NodeBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.NodeKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.ConfigBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -102,8 +101,7 @@ public class NetconfTopologyManagerTest {
         ConstantSchemaAbstractDataBrokerTest dataBrokerTest = new ConstantSchemaAbstractDataBrokerTest(false) {
             @Override
             protected Iterable<YangModuleInfo> getModuleInfos() throws Exception {
-                return ImmutableSet.of(BindingReflections.getModuleInfo(NetworkTopology.class),
-                        BindingReflections.getModuleInfo(Topology.class));
+                return ImmutableSet.of(BindingReflections.getModuleInfo(Networks.class));
             }
         };
 
@@ -125,8 +123,8 @@ public class NetconfTopologyManagerTest {
                 actorSystemProvider, eventExecutor, clientDispatcher, TOPOLOGY_ID, config,
                 mountPointService, encryptionService) {
             @Override
-            protected NetconfTopologyContext newNetconfTopologyContext(NetconfTopologySetup setup,
-                    ServiceGroupIdentifier serviceGroupIdent, Timeout actorResponseWaitTime) {
+            protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
+                    final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime) {
                 assertEquals(ACTOR_RESPONSE_WAIT_TIME, actorResponseWaitTime.duration().toSeconds());
                 return Objects.requireNonNull(mockContextMap.get(setup.getInstanceIdentifier()),
                         "No mock context for " + setup.getInstanceIdentifier()).apply(setup);
@@ -144,9 +142,9 @@ public class NetconfTopologyManagerTest {
 
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
             ReadOnlyTransaction readTx = dataBroker.newReadOnlyTransaction();
-            Optional<Topology> config = readTx.read(LogicalDatastoreType.CONFIGURATION,
+            Optional<Network> config = readTx.read(LogicalDatastoreType.CONFIGURATION,
                     NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
-            Optional<Topology> oper = readTx.read(LogicalDatastoreType.OPERATIONAL,
+            Optional<Network> oper = readTx.read(LogicalDatastoreType.OPERATIONAL,
                     NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
             return config.isPresent() && oper.isPresent();
         });

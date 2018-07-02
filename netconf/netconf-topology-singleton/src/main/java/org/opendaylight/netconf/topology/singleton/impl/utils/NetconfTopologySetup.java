@@ -18,7 +18,7 @@ import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.Node;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import scala.concurrent.duration.Duration;
 
@@ -269,7 +269,7 @@ public class NetconfTopologySetup {
             return idleTimeout;
         }
 
-        public NetconfTopologySetupBuilder setPrivateKeyPath(String privateKeyPath) {
+        public NetconfTopologySetupBuilder setPrivateKeyPath(final String privateKeyPath) {
             this.privateKeyPath = privateKeyPath;
             return this;
         }
@@ -278,7 +278,7 @@ public class NetconfTopologySetup {
             return this.privateKeyPath;
         }
 
-        public NetconfTopologySetupBuilder setPrivateKeyPassphrase(String privateKeyPassphrase) {
+        public NetconfTopologySetupBuilder setPrivateKeyPassphrase(final String privateKeyPassphrase) {
             this.privateKeyPassphrase = privateKeyPassphrase;
             return this;
         }
