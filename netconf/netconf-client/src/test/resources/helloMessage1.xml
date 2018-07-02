@@ -21,7 +21,7 @@
         <capability>urn:opendaylight:params:xml:ns:yang:controller:md:sal:dom?module=opendaylight-md-sal-dom&amp;revision=2013-10-28</capability>
         <capability>urn:opendaylight:yang:extension:yang-ext?module=yang-ext&amp;revision=2013-07-09</capability>
         <capability>urn:ietf:params:xml:ns:yang:rpc-context?module=rpc-context&amp;revision=2013-06-17</capability>
-        <capability>urn:ietf:params:xml:ns:yang:ietf-network-topology?module=ietf-network-topology&amp;revision=2015-06-08</capability>
+        <capability>urn:ietf:params:xml:ns:yang:ietf-network-topology?module=ietf-network-topology&amp;revision=2018-02-26</capability>
         <capability>urn:ietf:params:xml:ns:yang:ietf-netconf-notifications?module=ietf-netconf-notifications&amp;revision=2012-02-06</capability>
         <capability>urn:TBD:params:xml:ns:yang:ospf-topology?module=ospf-topology&amp;revision=2013-10-21</capability>
         <capability>urn:opendaylight:params:xml:ns:yang:controller:config:netconf:auth?module=netconf-auth&amp;revision=2015-07-15</capability>
@@ -83,7 +83,7 @@
         <capability>urn:opendaylight:params:xml:ns:yang:controller:config:actor-system-provider:impl?module=actor-system-provider-impl&amp;revision=2015-10-05</capability>
         <capability>urn:opendaylight:params:xml:ns:yang:controller:netty?module=netty&amp;revision=2013-11-19</capability>
         <capability>urn:opendaylight:params:xml:ns:yang:controller:threadpool?module=threadpool&amp;revision=2013-04-09</capability>
-        <capability>urn:ietf:params:xml:ns:yang:ietf-network?module=ietf-network&amp;revision=2015-06-08</capability>
+        <capability>urn:ietf:params:xml:ns:yang:ietf-network?module=ietf-network&amp;revision=2018-02-26</capability>
         <capability>urn:opendaylight:l2:types?module=opendaylight-l2-types&amp;revision=2013-08-27</capability>
         <capability>urn:opendaylight:params:xml:ns:yang:controller:protocol:framework?module=protocol-framework&amp;revision=2014-03-13</capability>
         <capability>urn:ietf:params:xml:ns:yang:ietf-inet-types?module=ietf-inet-types&amp;revision=2013-07-15</capability>
