@@ -48,16 +48,17 @@ import org.slf4j.LoggerFactory;
 public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyRPCProvider.class);
 
+    private final InstanceIdentifier<Topology> topologyPath;
     private final AAAEncryptionService encryptionService;
     private final DataBroker dataBroker;
-    private final String topologyId;
 
     public NetconfTopologyRPCProvider(final DataBroker dataBroker,
                                       final AAAEncryptionService encryptionService,
                                       final String topologyId) {
         this.dataBroker = dataBroker;
         this.encryptionService = Preconditions.checkNotNull(encryptionService);
-        this.topologyId = Preconditions.checkNotNull(topologyId);
+        this.topologyPath = InstanceIdentifier.builder(NetworkTopology.class)
+                .child(Topology.class, new TopologyKey(new TopologyId(Preconditions.checkNotNull(topologyId)))).build();
     }
 
     @Override
@@ -99,10 +100,7 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
             final SettableFuture<RpcResult<CreateDeviceOutput>> futureResult) {
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        final InstanceIdentifier<NetworkTopology> networkTopologyId =
-                InstanceIdentifier.builder(NetworkTopology.class).build();
-        final InstanceIdentifier<NetconfNode> niid = networkTopologyId.child(Topology.class,
-                new TopologyKey(new TopologyId(topologyId))).child(Node.class,
+        final InstanceIdentifier<NetconfNode> niid = topologyPath.child(Node.class,
                 new NodeKey(nodeId)).augmentation(NetconfNode.class);
         writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, niid, node, true);
         final ListenableFuture<Void> future = writeTransaction.submit();
@@ -127,11 +125,7 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
     public ListenableFuture<RpcResult<DeleteDeviceOutput>> deleteDevice(final DeleteDeviceInput input) {
         final NodeId nodeId = new NodeId(input.getNodeId());
 
-        final InstanceIdentifier<NetworkTopology> networkTopologyId =
-                InstanceIdentifier.builder(NetworkTopology.class).build();
-        final InstanceIdentifier<Node> niid = networkTopologyId.child(Topology.class,
-                new TopologyKey(new TopologyId(topologyId))).child(Node.class,
-                new NodeKey(nodeId));
+        final InstanceIdentifier<Node> niid = topologyPath.child(Node.class, new NodeKey(nodeId));
 
         final WriteTransaction wtx = dataBroker.newWriteOnlyTransaction();
         wtx.delete(LogicalDatastoreType.CONFIGURATION, niid);
