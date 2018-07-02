@@ -26,8 +26,8 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.NodeId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,12 +47,9 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
 
     protected CallHomeTopology topology;
 
-    private final CloseCallback onCloseHandler = new CloseCallback() {
-        @Override
-        public void onClosed(final CallHomeMountSessionContext deviceContext) {
-            LOG.info("Removing {} from Netconf Topology.", deviceContext.getId());
-            topology.disconnectNode(deviceContext.getId());
-        }
+    private final CloseCallback onCloseHandler = deviceContext -> {
+        LOG.info("Removing {} from Netconf Topology.", deviceContext.getId());
+        topology.disconnectNode(deviceContext.getId());
     };
 
     public CallHomeMountDispatcher(final String topologyId, final EventExecutor eventExecutor,
