@@ -38,8 +38,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.network.Node;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -89,7 +89,7 @@ class NetconfEventSourceMount {
         this.dataBroker = getService(mountPoint, DOMDataBroker.class);
     }
 
-    private static <T extends DOMService> T getService(DOMMountPoint mountPoint, Class<T> service) {
+    private static <T extends DOMService> T getService(final DOMMountPoint mountPoint, final Class<T> service) {
         final Optional<T> optional = mountPoint.getService(service);
         Preconditions.checkState(optional.isPresent(), "Service not present on mount point: %s", service.getName());
         return optional.get();
@@ -166,8 +166,8 @@ class NetconfEventSourceMount {
      * @return ListenerRegistration
      * @see DOMNotificationService#registerNotificationListener(DOMNotificationListener, SchemaPath...)
      */
-    ListenerRegistration<DOMNotificationListener> registerNotificationListener(DOMNotificationListener listener,
-                                                                               SchemaPath notificationPath) {
+    ListenerRegistration<DOMNotificationListener> registerNotificationListener(final DOMNotificationListener listener,
+                                                                               final SchemaPath notificationPath) {
         return notificationService.registerNotificationListener(listener, notificationPath);
     }
 
