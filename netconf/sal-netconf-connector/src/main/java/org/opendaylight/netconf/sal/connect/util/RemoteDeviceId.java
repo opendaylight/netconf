@@ -11,17 +11,16 @@ import com.google.common.base.Preconditions;
 import java.net.InetSocketAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.HostBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.NetworkId;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.Networks;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.Network;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.network.rev180226.networks.NetworkKey;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.inventory.rev130819.NodeId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.inventory.rev130819.Nodes;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.inventory.rev130819.nodes.Node;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.inventory.rev130819.nodes.NodeKey;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.network.topology.topology.topology.types.TopologyNetconf;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
-import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev180703.networks.network.network.types.NetconfNetwork;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -32,8 +31,8 @@ public final class RemoteDeviceId {
     private final InstanceIdentifier<Node> bindingPath;
     private final NodeKey key;
     private final org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier topologyPath;
-    private final InstanceIdentifier<org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang
-            .network.topology.rev131021.network.topology.topology.Node> topologyBindingPath;
+    private final InstanceIdentifier<org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+            .ietf.network.rev180226.networks.network.Node> topologyBindingPath;
     private InetSocketAddress address;
     private Host host;
 
@@ -46,7 +45,7 @@ public final class RemoteDeviceId {
         this.topologyBindingPath = createBindingPathForTopology(key);
     }
 
-    public RemoteDeviceId(final String name, InetSocketAddress address) {
+    public RemoteDeviceId(final String name, final InetSocketAddress address) {
         this(name);
         this.address = address;
         this.host = buildHost();
@@ -65,36 +64,33 @@ public final class RemoteDeviceId {
         return builder.build();
     }
 
-    private static InstanceIdentifier<org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network
-            .topology.rev131021.network.topology.topology.Node> createBindingPathForTopology(final NodeKey key) {
-        final InstanceIdentifier<NetworkTopology> networkTopology =
-                InstanceIdentifier.builder(NetworkTopology.class).build();
-        final KeyedInstanceIdentifier<Topology, TopologyKey> topology = networkTopology
-                .child(Topology.class, new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())));
-        return topology
-                .child(org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang
-                        .network.topology.rev131021.network.topology.topology.Node.class,
-                        new org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network
-                                .topology.topology.NodeKey(new org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang
-                                .network.topology.rev131021.NodeId(key.getId().getValue())));
+    private static InstanceIdentifier<org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+            .ietf.network.rev180226.networks.network.Node> createBindingPathForTopology(final NodeKey key) {
+        return InstanceIdentifier.builder(Networks.class)
+                .child(Network.class, new NetworkKey(new NetworkId(NetconfNetwork.QNAME.getLocalName())))
+                .child(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                    .ietf.network.rev180226.networks.network.Node.class,
+                    new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                    .ietf.network.rev180226.networks.network.NodeKey(
+                        new org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                        .ietf.network.rev180226.NodeId(key.getId().getValue())))
+                .build();
     }
 
     private static org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier createBIPathForTopology(
             final String name) {
-        final org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.InstanceIdentifierBuilder builder =
-                org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.builder();
-        builder
-                .node(NetworkTopology.QNAME)
-                .node(Topology.QNAME)
-                .nodeWithKey(Topology.QNAME, QName.create(Topology.QNAME, "topology-id"),
-                        TopologyNetconf.QNAME.getLocalName())
-                .node(org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang
-                        .network.topology.rev131021.network.topology.topology.Node.QNAME)
-                .nodeWithKey(org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang
-                        .network.topology.rev131021.network.topology.topology.Node.QNAME,
-                        QName.create(org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang
-                                .network.topology.rev131021.network.topology.topology.Node.QNAME, "node-id"), name);
-        return builder.build();
+        return YangInstanceIdentifier.builder()
+                .node(Networks.QNAME)
+                .node(Network.QNAME)
+                .nodeWithKey(Network.QNAME, QName.create(Network.QNAME, "network-id"),
+                    NetconfNetwork.QNAME.getLocalName())
+                .node(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                    .ietf.network.rev180226.networks.network.Node.QNAME)
+                .nodeWithKey(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                    .ietf.network.rev180226.networks.network.Node.QNAME,
+                        QName.create(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+                            .ietf.network.rev180226.networks.network.Node.QNAME, "node-id"), name)
+                .build();
     }
 
     private Host buildHost() {
@@ -117,8 +113,8 @@ public final class RemoteDeviceId {
         return key;
     }
 
-    public InstanceIdentifier<org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang
-            .network.topology.rev131021.network.topology.topology.Node> getTopologyBindingPath() {
+    public InstanceIdentifier<org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang
+            .ietf.network.rev180226.networks.network.Node> getTopologyBindingPath() {
         return topologyBindingPath;
     }
 

@@ -64,8 +64,8 @@
       <artifactId>model-inventory</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.mdsal.model</groupId>
-      <artifactId>ietf-topology</artifactId>
+      <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+      <artifactId>rfc8345-ietf-network</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.controller</groupId>
