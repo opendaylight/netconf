@@ -10,13 +10,13 @@ package org.opendaylight.netconf.console.commands;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.apache.karaf.shell.console.AbstractAction;
+import org.apache.karaf.shell.api.action.Action;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
 import org.opendaylight.netconf.console.api.NetconfCommands;
 
 @Command(name = "netconf:disconnect-device", scope = "netconf", description = "Disconnect netconf device.")
-public class NetconfDisconnectDeviceCommand extends AbstractAction {
+public class NetconfDisconnectDeviceCommand implements Action {
 
     protected final NetconfCommands service;
 
@@ -55,7 +55,7 @@ public class NetconfDisconnectDeviceCommand extends AbstractAction {
     private String deviceId;
 
     @Override
-    protected Object doExecute() throws Exception {
+    public Object execute() {
         boolean status = false;
         if (!Strings.isNullOrEmpty(deviceId)) {
             status = service.disconnectDevice(deviceId);

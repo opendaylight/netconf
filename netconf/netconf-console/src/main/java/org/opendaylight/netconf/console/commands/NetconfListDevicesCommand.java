@@ -10,14 +10,14 @@ package org.opendaylight.netconf.console.commands;
 
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.console.AbstractAction;
-import org.apache.karaf.shell.table.ShellTable;
+import org.apache.karaf.shell.api.action.Action;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.support.table.ShellTable;
 import org.opendaylight.netconf.console.api.NetconfCommands;
 import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 
 @Command(name = "netconf:list-devices", scope = "netconf", description = "List all netconf devices in the topology.")
-public class NetconfListDevicesCommand extends AbstractAction {
+public class NetconfListDevicesCommand implements Action {
 
     protected final NetconfCommands service;
 
@@ -26,14 +26,14 @@ public class NetconfListDevicesCommand extends AbstractAction {
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    public Object execute() {
         final Map<String, Map<String, String>> allDevices = service.listDevices();
         printDevicesList(allDevices);
         return null;
     }
 
     @SuppressWarnings("checkstyle:RegexpSinglelineJava")
-    private void printDevicesList(@Nonnull final Map<String, Map<String, String>> allDevices) {
+    private static void printDevicesList(@Nonnull final Map<String, Map<String, String>> allDevices) {
         final ShellTable table = new ShellTable();
         table.column(NetconfConsoleConstants.NETCONF_ID).alignLeft();
         table.column(NetconfConsoleConstants.NETCONF_IP).alignLeft();
