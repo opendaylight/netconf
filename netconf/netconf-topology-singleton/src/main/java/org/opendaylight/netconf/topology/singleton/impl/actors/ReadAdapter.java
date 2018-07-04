@@ -5,19 +5,16 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import akka.actor.ActorRef;
 import akka.actor.Status.Failure;
 import com.google.common.base.Optional;
-import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
@@ -53,8 +50,7 @@ class ReadAdapter {
 
     private void read(final YangInstanceIdentifier path, final LogicalDatastoreType store, final ActorRef sender,
                       final ActorRef self) {
-        final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> read = tx.read(store, path);
-        Futures.addCallback(read, new FutureCallback<Optional<NormalizedNode<?, ?>>>() {
+        Futures.addCallback(tx.read(store, path), new FutureCallback<Optional<NormalizedNode<?, ?>>>() {
 
             @Override
             public void onSuccess(@Nonnull final Optional<NormalizedNode<?, ?>> result) {
@@ -74,8 +70,7 @@ class ReadAdapter {
 
     private void exists(final YangInstanceIdentifier path, final LogicalDatastoreType store, final ActorRef sender,
                         final ActorRef self) {
-        final CheckedFuture<Boolean, ReadFailedException> readFuture = tx.exists(store, path);
-        Futures.addCallback(readFuture, new FutureCallback<Boolean>() {
+        Futures.addCallback(tx.exists(store, path), new FutureCallback<Boolean>() {
             @Override
             public void onSuccess(final Boolean result) {
                 if (result == null) {
