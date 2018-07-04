@@ -14,15 +14,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.annotation.Nonnull;
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.apache.karaf.shell.console.AbstractAction;
-import org.apache.karaf.shell.table.ShellTable;
+import org.apache.karaf.shell.api.action.Action;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.support.table.ShellTable;
 import org.opendaylight.netconf.console.api.NetconfCommands;
 import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 
 @Command(name = "netconf:show-device", scope = "netconf", description = "Shows netconf device attributes.")
-public class NetconfShowDeviceCommand extends AbstractAction {
+public class NetconfShowDeviceCommand implements Action {
 
     protected final NetconfCommands service;
 
@@ -61,7 +61,7 @@ public class NetconfShowDeviceCommand extends AbstractAction {
     private String devicePort;
 
     @Override
-    protected Object doExecute() throws Exception {
+    public Object execute() {
 
         if ((Strings.isNullOrEmpty(deviceIp) || Strings.isNullOrEmpty(devicePort)) && Strings.isNullOrEmpty(deviceId)) {
             return "You must provide either the device Ip and the device Port or the device Id";
@@ -86,7 +86,7 @@ public class NetconfShowDeviceCommand extends AbstractAction {
     }
 
     @SuppressWarnings("checkstyle:RegexpSinglelineJava")
-    private void printDeviceData(@Nonnull final Map<String, Map<String, List<String>>> devices) {
+    private static void printDeviceData(@Nonnull final Map<String, Map<String, List<String>>> devices) {
         final ShellTable table = new ShellTable();
         table.column(NetconfConsoleConstants.NETCONF_ID).alignLeft();
         table.column(NetconfConsoleConstants.NETCONF_IP).alignLeft();
@@ -108,8 +108,8 @@ public class NetconfShowDeviceCommand extends AbstractAction {
         table.print(System.out);
     }
 
-    private void formatCapabilities(final Map<String, List<String>> device, final ShellTable table,
-                                    final String capabilityName) {
+    private static void formatCapabilities(final Map<String, List<String>> device, final ShellTable table,
+            final String capabilityName) {
         for (final String availableCapability : device.get(capabilityName)) {
             // First row is already added to table with the first available capability
             // Process rows other than the first to only have remaining available capabilities
@@ -120,8 +120,8 @@ public class NetconfShowDeviceCommand extends AbstractAction {
         }
     }
 
-    private boolean isFirstAvailableCapability(final Map<String, List<String>> device, final String capabilityName,
-            final String availableCapability) {
+    private static boolean isFirstAvailableCapability(final Map<String, List<String>> device,
+            final String capabilityName, final String availableCapability) {
         return device.get(capabilityName).indexOf(availableCapability) == NetconfConsoleConstants.DEFAULT_INDEX;
     }
 }

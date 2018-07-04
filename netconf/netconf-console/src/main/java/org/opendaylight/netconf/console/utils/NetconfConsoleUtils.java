@@ -9,13 +9,14 @@
 package org.opendaylight.netconf.console.utils;
 
 import com.google.common.base.Optional;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
@@ -119,20 +120,24 @@ public final class NetconfConsoleUtils {
      */
     public static <D extends org.opendaylight.yangtools.yang.binding.DataObject> D read(
             final LogicalDatastoreType store, final InstanceIdentifier<D> path, final DataBroker db) {
-        D result = null;
-        final ReadOnlyTransaction transaction = db.newReadOnlyTransaction();
-        Optional<D> optionalData;
-        try {
-            optionalData = transaction.read(store, path).checkedGet();
-            if (optionalData.isPresent()) {
-                result = optionalData.get();
-            } else {
-                LOG.debug("{}: Failed to read {}", Thread.currentThread().getStackTrace()[1], path);
-            }
-        } catch (ReadFailedException e) {
-            LOG.warn("Failed to read {} ", path, e);
+        final ListenableFuture<Optional<D>> future;
+        try (ReadOnlyTransaction transaction = db.newReadOnlyTransaction()) {
+            future = transaction.read(store, path);
         }
-        transaction.close();
-        return result;
+
+        final Optional<D> optionalData;
+        try {
+            optionalData = future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.warn("Failed to read {} ", path, e);
+            return null;
+        }
+
+        if (optionalData.isPresent()) {
+            return optionalData.get();
+        }
+
+        LOG.debug("{}: Failed to read {}", Thread.currentThread().getStackTrace()[1], path);
+        return null;
     }
 }

@@ -11,14 +11,14 @@ package org.opendaylight.netconf.console.commands;
 import com.google.common.annotations.VisibleForTesting;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.apache.karaf.shell.console.AbstractAction;
+import org.apache.karaf.shell.api.action.Action;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
 import org.opendaylight.netconf.console.api.NetconfCommands;
 import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 
 @Command(name = "netconf:update-device", scope = "netconf", description = "Update netconf device attributes.")
-public class NetconfUpdateDeviceCommand extends AbstractAction {
+public class NetconfUpdateDeviceCommand implements Action {
 
     protected final NetconfCommands service;
 
@@ -96,7 +96,7 @@ public class NetconfUpdateDeviceCommand extends AbstractAction {
     private String newSchemaless = "false";
 
     @Override
-    protected Object doExecute() throws Exception {
+    public  Object execute() {
 
         Map<String, String> updated = new HashMap<>();
         updated.put(NetconfConsoleConstants.NETCONF_IP, newIp);
@@ -109,10 +109,8 @@ public class NetconfUpdateDeviceCommand extends AbstractAction {
 
         if (updated.isEmpty()) {
             return "Nothing to update.";
-        } else {
-            String statusMessage = service.updateDevice(deviceId, username, password, updated);
-            return statusMessage;
         }
-    }
 
+        return service.updateDevice(deviceId, username, password, updated);
+    }
 }
