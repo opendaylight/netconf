@@ -13,9 +13,7 @@
     <reference id="domDataBroker" interface="org.opendaylight.controller.md.sal.dom.api.DOMDataBroker"/>
     <reference id="domRpcService" interface="org.opendaylight.controller.md.sal.dom.api.DOMRpcService"/>
     <reference id="schemaService"
-               interface="org.opendaylight.controller.sal.core.api.model.SchemaService"/>
-    <reference id="rootSchemaSourceProviderDependency"
-               interface="org.opendaylight.controller.sal.core.api.model.YangTextSourceProvider"/>
+               interface="org.opendaylight.mdsal.dom.api.DOMSchemaService"/>
     <reference id="netconfOperationServiceFactoryListener"
                interface="org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener"
                odl:type="mapper-aggregator-registry"/>
@@ -24,7 +22,6 @@
           class="org.opendaylight.netconf.mdsal.connector.MdsalNetconfOperationServiceFactory"
           destroy-method="close">
         <argument ref="schemaService"/>
-        <argument ref="rootSchemaSourceProviderDependency"/>
         <argument ref="netconfOperationServiceFactoryListener"/>
         <argument ref="domDataBroker"/>
         <argument ref="domRpcService"/>

@@ -22,8 +22,8 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesStateBuilder;
@@ -48,7 +48,7 @@ public class SchemaServiceToMdsalWriterTest {
             InstanceIdentifier.create(ModulesState.class);
 
     @Mock
-    private SchemaService schemaService;
+    private DOMSchemaService schemaService;
     @Mock
     private DataBroker dataBroker;
     @Mock

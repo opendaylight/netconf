@@ -39,7 +39,6 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.broker.impl.SerializedDOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.core.spi.data.DOMStore;
 import org.opendaylight.mdsal.binding.dom.codec.gen.impl.DataObjectSerializerGenerator;
 import org.opendaylight.mdsal.binding.dom.codec.gen.impl.StreamWriterGenerator;
@@ -48,6 +47,7 @@ import org.opendaylight.mdsal.binding.generator.impl.GeneratedClassLoadingStrate
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.binding.generator.util.BindingRuntimeContext;
 import org.opendaylight.mdsal.binding.generator.util.JavassistUtils;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -55,13 +55,13 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -107,7 +107,7 @@ public class NetconfDeviceTopologyAdapterTest {
             "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang",
             "/schemas/network-topology-augment-test@2016-08-08.yang");
         schemaContext.getModules();
-        final SchemaService schemaService = createSchemaService();
+        final DOMSchemaService schemaService = createSchemaService();
 
         final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
         final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
@@ -225,17 +225,8 @@ public class NetconfDeviceTopologyAdapterTest {
                 dataTestId, testNode.get().getValue());
     }
 
-    private SchemaService createSchemaService() {
-        return new SchemaService() {
-
-            @Override
-            public void addModule(final Module module) {
-            }
-
-            @Override
-            public void removeModule(final Module module) {
-
-            }
+    private DOMSchemaService createSchemaService() {
+        return new DOMSchemaService() {
 
             @Override
             public SchemaContext getSessionContext() {
@@ -251,15 +242,10 @@ public class NetconfDeviceTopologyAdapterTest {
             public ListenerRegistration<SchemaContextListener> registerSchemaContextListener(
                     final SchemaContextListener listener) {
                 listener.onGlobalContextUpdated(getGlobalContext());
-                return new ListenerRegistration<SchemaContextListener>() {
+                return new AbstractListenerRegistration<SchemaContextListener>(listener) {
                     @Override
-                    public void close() {
-
-                    }
-
-                    @Override
-                    public SchemaContextListener getInstance() {
-                        return listener;
+                    protected void removeRegistration() {
+                        // No-op
                     }
                 };
             }

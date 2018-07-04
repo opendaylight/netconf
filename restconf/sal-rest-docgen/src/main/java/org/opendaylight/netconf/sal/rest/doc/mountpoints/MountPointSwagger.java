@@ -21,8 +21,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.core.api.mount.MountProvisionListener;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Api;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
@@ -40,7 +40,7 @@ public class MountPointSwagger implements MountProvisionListener, AutoCloseable 
     private static final String DATASTORES_REVISION = "-";
     private static final String DATASTORES_LABEL = "Datastores";
 
-    private final SchemaService globalSchema;
+    private final DOMSchemaService globalSchema;
     private final DOMMountPointService mountService;
     private final BaseYangSwaggerGenerator swaggerGenerator;
     private final Map<YangInstanceIdentifier, Long> instanceIdToLongId =
@@ -53,7 +53,7 @@ public class MountPointSwagger implements MountProvisionListener, AutoCloseable 
 
     private ListenerRegistration<MountProvisionListener> registration;
 
-    public MountPointSwagger(SchemaService globalSchema, DOMMountPointService mountService,
+    public MountPointSwagger(DOMSchemaService globalSchema, DOMMountPointService mountService,
             BaseYangSwaggerGenerator swaggerGenerator) {
         this.globalSchema = Objects.requireNonNull(globalSchema);
         this.mountService = Objects.requireNonNull(mountService);

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector;
 
 import com.google.common.base.Preconditions;
@@ -21,7 +20,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.api.capability.BasicCapability;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.capability.YangModuleCapability;
@@ -51,8 +51,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
 
     public MdsalNetconfOperationServiceFactory(
-            final SchemaService schemaService,
-            final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProviderDependency,
+            final DOMSchemaService schemaService,
             final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener,
             final DOMDataBroker dataBroker,
             final DOMRpcService rpcService) {
@@ -60,7 +59,8 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
         this.dataBroker = dataBroker;
         this.rpcService = rpcService;
 
-        this.rootSchemaSourceProviderDependency = rootSchemaSourceProviderDependency;
+        this.rootSchemaSourceProviderDependency = (DOMYangTextSourceProvider) schemaService.getSupportedExtensions()
+                .get(DOMYangTextSourceProvider.class);
         this.currentSchemaContext = new CurrentSchemaContext(Preconditions.checkNotNull(schemaService),
                 rootSchemaSourceProviderDependency);
         this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
