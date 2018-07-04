@@ -560,7 +560,7 @@ public class NetconfNodeActorTest {
         doReturn(mockMountPointReg).when(mockMountPointBuilder).register();
     }
 
-    private PotentialSchemaSource<?> withSourceId(final SourceIdentifier identifier) {
+    private static PotentialSchemaSource<?> withSourceId(final SourceIdentifier identifier) {
         return argThat(new ArgumentMatcher<PotentialSchemaSource<?>>() {
             @Override
             public boolean matches(final Object argument) {
@@ -570,7 +570,7 @@ public class NetconfNodeActorTest {
         });
     }
 
-    private String convertStreamToString(final InputStream is) {
+    private static String convertStreamToString(final InputStream is) {
         try (Scanner scanner = new Scanner(is)) {
             return scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
         }

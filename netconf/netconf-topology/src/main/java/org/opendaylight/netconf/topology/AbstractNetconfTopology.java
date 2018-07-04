@@ -542,18 +542,18 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     protected abstract RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(RemoteDeviceId id);
 
-    private InetSocketAddress getSocketAddress(final Host host, final int port) {
+    private static InetSocketAddress getSocketAddress(final Host host, final int port) {
         if (host.getDomainName() != null) {
             return new InetSocketAddress(host.getDomainName().getValue(), port);
-        } else {
-            final IpAddress ipAddress = host.getIpAddress();
-            final String ip = ipAddress.getIpv4Address() != null
-                    ? ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue();
-            return new InetSocketAddress(ip, port);
         }
+
+        final IpAddress ipAddress = host.getIpAddress();
+        final String ip = ipAddress.getIpv4Address() != null ? ipAddress.getIpv4Address().getValue()
+                : ipAddress.getIpv6Address().getValue();
+        return new InetSocketAddress(ip, port);
     }
 
-    private Optional<UserPreferences> getUserCapabilities(final NetconfNode node) {
+    private static Optional<UserPreferences> getUserCapabilities(final NetconfNode node) {
         // if none of yang-module-capabilities or non-module-capabilities is specified
         // just return absent
         if (node.getYangModuleCapabilities() == null && node.getNonModuleCapabilities() == null) {

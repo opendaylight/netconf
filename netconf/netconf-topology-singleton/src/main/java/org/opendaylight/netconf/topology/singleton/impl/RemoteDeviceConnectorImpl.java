@@ -225,7 +225,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                         : new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit), salFacade);
     }
 
-    private Optional<NetconfSessionPreferences> getUserCapabilities(final NetconfNode node) {
+    private static Optional<NetconfSessionPreferences> getUserCapabilities(final NetconfNode node) {
         if (node.getYangModuleCapabilities() == null && node.getNonModuleCapabilities() == null) {
             return Optional.empty();
         }
@@ -249,7 +249,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     }
 
     //TODO: duplicate code
-    private InetSocketAddress getSocketAddress(final Host host, final int port) {
+    private static InetSocketAddress getSocketAddress(final Host host, final int port) {
         if (host.getDomainName() != null) {
             return new InetSocketAddress(host.getDomainName().getValue(), port);
         } else {
@@ -302,12 +302,9 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         return builder.build();
     }
 
-    private List<Uri> getOdlHelloCapabilities(final NetconfNode node) {
+    private static List<Uri> getOdlHelloCapabilities(final NetconfNode node) {
         final OdlHelloMessageCapabilities helloCapabilities = node.getOdlHelloMessageCapabilities();
-        if (helloCapabilities != null) {
-            return helloCapabilities.getCapability();
-        }
-        return null;
+        return helloCapabilities != null ? helloCapabilities.getCapability() : null;
     }
 
     private AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {

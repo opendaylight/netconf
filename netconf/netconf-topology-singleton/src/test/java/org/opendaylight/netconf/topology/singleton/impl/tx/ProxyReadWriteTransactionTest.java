@@ -398,7 +398,7 @@ public class ProxyReadWriteTransactionTest {
         }
     }
 
-    private void verifyDocumentedException(Throwable cause) {
+    private static void verifyDocumentedException(Throwable cause) {
         assertTrue("Unexpected cause " + cause, cause instanceof DocumentedException);
         final DocumentedException de = (DocumentedException) cause;
         assertEquals(DocumentedException.ErrorSeverity.WARNING, de.getErrorSeverity());

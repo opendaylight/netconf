@@ -231,7 +231,7 @@ public class MountPointEndToEndTest {
         LOG.info("****** Setup complete");
     }
 
-    private void deleteCacheDir() {
+    private static void deleteCacheDir() {
         FileUtils.deleteQuietly(new File(NetconfTopologyUtils.CACHE_DIRECTORY));
     }
 
