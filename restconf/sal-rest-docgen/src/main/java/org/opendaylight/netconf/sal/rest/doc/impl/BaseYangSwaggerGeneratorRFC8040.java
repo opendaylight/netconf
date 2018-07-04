@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import java.util.Optional;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 
 /**
  * Base class for an RFC 8040 implementation.
@@ -19,7 +19,7 @@ public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGen
 
     private static final String BASE_PATH = "rests";
 
-    protected BaseYangSwaggerGeneratorRFC8040(Optional<SchemaService> schemaService) {
+    protected BaseYangSwaggerGeneratorRFC8040(Optional<DOMSchemaService> schemaService) {
         super(schemaService);
     }
 

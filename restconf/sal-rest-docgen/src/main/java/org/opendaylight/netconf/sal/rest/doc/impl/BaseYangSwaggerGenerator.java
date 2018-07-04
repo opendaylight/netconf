@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Delete;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Get;
@@ -66,14 +66,14 @@ public abstract class BaseYangSwaggerGenerator {
 
     // private Map<String, ApiDeclaration> MODULE_DOC_CACHE = new HashMap<>()
     private final ObjectMapper mapper = new ObjectMapper();
-    private final SchemaService schemaService;
+    private final DOMSchemaService schemaService;
 
-    protected BaseYangSwaggerGenerator(Optional<SchemaService> schemaService) {
+    protected BaseYangSwaggerGenerator(Optional<DOMSchemaService> schemaService) {
         this.schemaService = schemaService.orElse(null);
         this.mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
     }
 
-    public SchemaService getSchemaService() {
+    public DOMSchemaService getSchemaService() {
         return schemaService;
     }
 
