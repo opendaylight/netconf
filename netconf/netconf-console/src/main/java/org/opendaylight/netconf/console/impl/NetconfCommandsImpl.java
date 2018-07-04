@@ -11,7 +11,6 @@ package org.opendaylight.netconf.console.impl;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,11 +19,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.netconf.console.api.NetconfCommands;
 import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 import org.opendaylight.netconf.console.utils.NetconfConsoleUtils;
@@ -162,36 +162,33 @@ public class NetconfCommandsImpl implements NetconfCommands {
         final WriteTransaction transaction = dataBroker.newWriteOnlyTransaction();
         transaction.put(LogicalDatastoreType.CONFIGURATION, NetconfIidFactory.netconfNodeIid(nodeId.getValue()), node);
 
-        Futures.addCallback(transaction.submit(), new FutureCallback<Void>() {
-
+        transaction.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
-            public void onSuccess(final Void result) {
+            public void onSuccess(final CommitInfo result) {
                 LOG.debug("NetconfNode={} created successfully", netconfNode);
             }
 
             @Override
             public void onFailure(final Throwable throwable) {
-                LOG.error("Failed to created NetconfNode={}", netconfNode);
-                throw new RuntimeException(throwable);
+                LOG.error("Failed to created NetconfNode={}", netconfNode, throwable);
             }
         }, MoreExecutors.directExecutor());
     }
 
     @Override
     public boolean disconnectDevice(final String netconfNodeId) {
-        boolean result = false;
         final WriteTransaction transaction = dataBroker.newWriteOnlyTransaction();
-        InstanceIdentifier<Node> iid = NetconfIidFactory.netconfNodeIid(netconfNodeId);
+        final InstanceIdentifier<Node> iid = NetconfIidFactory.netconfNodeIid(netconfNodeId);
         transaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
 
         try {
             LOG.debug("Deleting netconf node: {}", netconfNodeId);
-            transaction.submit().checkedGet();
-            result = true;
-        } catch (final TransactionCommitFailedException e) {
+            transaction.commit().get();
+            return true;
+        } catch (final InterruptedException | ExecutionException e) {
             LOG.error("Unable to remove node with Iid {}", iid, e);
+            return false;
         }
-        return result;
     }
 
     @Override
@@ -244,17 +241,15 @@ public class NetconfCommandsImpl implements NetconfCommands {
             transaction.put(LogicalDatastoreType.CONFIGURATION,
                     NetconfIidFactory.netconfNodeIid(updatedNode.getNodeId().getValue()), updatedNode);
 
-            Futures.addCallback(transaction.submit(), new FutureCallback<Void>() {
-
+            transaction.commit().addCallback(new FutureCallback<CommitInfo>() {
                 @Override
-                public void onSuccess(final Void result) {
+                public void onSuccess(final CommitInfo result) {
                     LOG.debug("NetconfNode={} updated successfully", netconfNode);
                 }
 
                 @Override
                 public void onFailure(final Throwable throwable) {
-                    LOG.error("Failed to updated NetconfNode={}", netconfNode);
-                    throw new RuntimeException(throwable);
+                    LOG.error("Failed to updated NetconfNode={}", netconfNode, throwable);
                 }
             }, MoreExecutors.directExecutor());
 

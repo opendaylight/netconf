@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import javassist.ClassPool;
@@ -32,7 +33,6 @@ import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.binding.impl.BindingDOMDataBrokerAdapter;
 import org.opendaylight.controller.md.sal.binding.impl.BindingToNormalizedNodeCodec;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.broker.impl.SerializedDOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
@@ -121,7 +121,7 @@ public class NetconfCommandsImplTest {
     }
 
     @Test
-    public void testListDevice() throws TimeoutException, TransactionCommitFailedException {
+    public void testListDevice() throws TimeoutException, InterruptedException, ExecutionException {
         createTopology(LogicalDatastoreType.OPERATIONAL);
 
         final Map<?, ?> map = netconfCommands.listDevices();
@@ -133,7 +133,7 @@ public class NetconfCommandsImplTest {
     }
 
     @Test
-    public void testShowDevice() throws TimeoutException, TransactionCommitFailedException {
+    public void testShowDevice() throws TimeoutException, InterruptedException, ExecutionException {
         createTopology(LogicalDatastoreType.OPERATIONAL);
 
         final Map<?, ?> mapCorrect = netconfCommands.showDevice(IP, String.valueOf(PORT));
@@ -150,12 +150,11 @@ public class NetconfCommandsImplTest {
 
         final Map<?, ?> mapId = netconfCommands.showDevice(NODE_ID);
         assertTrue(mapId.containsKey(NODE_ID));
-        assertBaseNodeAttributesImmutableList((Map) mapId.get(NODE_ID));
+        assertBaseNodeAttributesImmutableList((Map<?, ?>) mapId.get(NODE_ID));
     }
 
     @Test
-    public void testConnectDisconnectDevice()
-            throws InterruptedException, TimeoutException, TransactionCommitFailedException {
+    public void testConnectDisconnectDevice() throws InterruptedException, TimeoutException, ExecutionException {
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setPort(new PortNumber(7777)).setHost(HostBuilder.getDefaultInstance("10.10.1.1")).build();
 
@@ -191,7 +190,7 @@ public class NetconfCommandsImplTest {
     }
 
     @Test
-    public void testUpdateDevice() throws TimeoutException, TransactionCommitFailedException {
+    public void testUpdateDevice() throws TimeoutException, InterruptedException, ExecutionException {
         //We need both, read data from OPERATIONAL DS and update data in CONFIGURATIONAL DS
         createTopology(LogicalDatastoreType.OPERATIONAL);
         createTopology(LogicalDatastoreType.CONFIGURATION);
@@ -218,7 +217,7 @@ public class NetconfCommandsImplTest {
     }
 
     @Test
-    public void testNetconfNodeFromIp() throws TimeoutException, TransactionCommitFailedException {
+    public void testNetconfNodeFromIp() throws TimeoutException, InterruptedException, ExecutionException {
         final List<Node> nodesNotExist = NetconfConsoleUtils.getNetconfNodeFromIp(IP, dataBroker);
         assertNull(nodesNotExist);
         createTopology(LogicalDatastoreType.OPERATIONAL);
@@ -228,7 +227,7 @@ public class NetconfCommandsImplTest {
     }
 
     private void createTopology(final LogicalDatastoreType dataStoreType)
-            throws TransactionCommitFailedException, TimeoutException {
+            throws TimeoutException, InterruptedException, ExecutionException {
         final List<Node> nodes = new ArrayList<>();
         final Node node = getNetconfNode(NODE_ID, IP, PORT, CONN_STATUS, CAP_PREFIX);
         nodes.add(node);
@@ -239,7 +238,7 @@ public class NetconfCommandsImplTest {
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeTransaction.put(dataStoreType, NetconfIidFactory.NETCONF_TOPOLOGY_IID, topology);
-        writeTransaction.submit().checkedGet(2, TimeUnit.SECONDS);
+        writeTransaction.commit().get(2, TimeUnit.SECONDS);
     }
 
     private static Node getNetconfNode(final String nodeIdent, final String ip, final int portNumber,

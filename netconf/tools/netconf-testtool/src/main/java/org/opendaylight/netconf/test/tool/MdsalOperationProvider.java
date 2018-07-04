@@ -15,9 +15,9 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.broker.impl.SerializedDOMDataBroker;
@@ -136,9 +136,9 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             tx.put(LogicalDatastoreType.OPERATIONAL, yangInstanceIdentifier, netconf);
 
             try {
-                tx.submit().checkedGet();
+                tx.commit().get();
                 LOG.debug("Netconf state updated successfully");
-            } catch (TransactionCommitFailedException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 LOG.warn("Unable to update netconf state", e);
             }
 
