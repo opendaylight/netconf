@@ -23,7 +23,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
 import com.google.common.net.InetAddresses;
-import com.google.common.util.concurrent.Futures;
 import io.netty.util.concurrent.EventExecutor;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
@@ -39,6 +38,7 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -63,6 +63,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import scala.concurrent.duration.Duration;
 
 public class RemoteDeviceConnectorImplTest {
@@ -70,6 +71,9 @@ public class RemoteDeviceConnectorImplTest {
     private static final NodeId NODE_ID = new NodeId("testing-node");
     private static final String TOPOLOGY_ID = "testing-topology";
     private static final Timeout TIMEOUT = new Timeout(Duration.create(5, "seconds"));
+
+    @Mock
+    private CommitInfo info;
 
     @Mock
     private DataBroker dataBroker;
@@ -118,7 +122,7 @@ public class RemoteDeviceConnectorImplTest {
         doReturn(writeTx).when(txChain).newWriteOnlyTransaction();
         doNothing().when(writeTx).merge(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
         doReturn("Some object").when(writeTx).getIdentifier();
-        doReturn(Futures.immediateCheckedFuture(null)).when(writeTx).submit();
+        doReturn(FluentFutures.immediateFluentFuture(info)).when(writeTx).commit();
         builder = new NetconfTopologySetup.NetconfTopologySetupBuilder();
         builder.setDataBroker(dataBroker);
         builder.setRpcProviderRegistry(rpcProviderRegistry);
