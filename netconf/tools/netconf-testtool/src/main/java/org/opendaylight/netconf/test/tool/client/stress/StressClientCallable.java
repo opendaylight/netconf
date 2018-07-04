@@ -32,7 +32,7 @@ public class StressClientCallable implements Callable<Boolean> {
 
     private static final Logger LOG = LoggerFactory.getLogger(StressClientCallable.class);
 
-    private Parameters params;
+    private final Parameters params;
     private final NetconfDeviceCommunicator sessionListener;
     private final NetconfClientDispatcherImpl netconfClientDispatcher;
     private final NetconfClientConfiguration cfg;
@@ -62,7 +62,7 @@ public class StressClientCallable implements Callable<Boolean> {
     public Boolean call() throws Exception {
         executionStrategy.invoke();
         netconfClientSession.close();
-        return true;
+        return Boolean.TRUE;
     }
 
     private static ExecutionStrategy getExecutionStrategy(final Parameters params,

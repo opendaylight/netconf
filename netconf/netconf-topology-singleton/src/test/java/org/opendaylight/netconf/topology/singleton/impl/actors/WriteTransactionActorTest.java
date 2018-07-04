@@ -34,6 +34,6 @@ public class WriteTransactionActorTest extends WriteTransactionActorTestAdapter 
 
     @AfterClass
     public static void staticTearDown() {
-        TestKit.shutdownActorSystem(system, Boolean.TRUE);
+        TestKit.shutdownActorSystem(system, true);
     }
 }
