@@ -186,8 +186,8 @@ public class NetconfNodeManagerTest {
 
     @After
     public void teardown() {
-        TestKit.shutdownActorSystem(slaveSystem, Boolean.TRUE);
-        TestKit.shutdownActorSystem(masterSystem, Boolean.TRUE);
+        TestKit.shutdownActorSystem(slaveSystem, true);
+        TestKit.shutdownActorSystem(masterSystem, true);
     }
 
     @SuppressWarnings("unchecked")

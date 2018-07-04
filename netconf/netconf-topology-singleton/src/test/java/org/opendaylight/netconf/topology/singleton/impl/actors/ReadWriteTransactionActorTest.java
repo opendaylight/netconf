@@ -40,7 +40,7 @@ public class ReadWriteTransactionActorTest {
 
     @AfterClass
     public static void staticTearDown() {
-        TestKit.shutdownActorSystem(system, Boolean.TRUE);
+        TestKit.shutdownActorSystem(system, true);
     }
 
     @Test

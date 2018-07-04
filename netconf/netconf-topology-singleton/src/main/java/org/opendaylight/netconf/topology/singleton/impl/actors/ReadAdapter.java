@@ -74,7 +74,7 @@ class ReadAdapter {
             @Override
             public void onSuccess(final Boolean result) {
                 if (result == null) {
-                    sender.tell(false, self);
+                    sender.tell(Boolean.FALSE, self);
                 } else {
                     sender.tell(result, self);
                 }

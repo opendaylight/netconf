@@ -94,7 +94,7 @@ public class Parameters {
 
         parser.addArgument("--async-requests")
                 .type(Boolean.class)
-                .setDefault(true)
+                .setDefault(Boolean.TRUE)
                 .dest("async");
 
         parser.addArgument("--thread-amount")
@@ -104,7 +104,7 @@ public class Parameters {
 
         parser.addArgument("--same-device")
                 .type(Boolean.class)
-                .setDefault(true)
+                .setDefault(Boolean.TRUE)
                 .help("If true, every thread edits the device at the first port. "
                     + "If false, n-th thread edits device at n-th port.")
                 .dest("same-device");

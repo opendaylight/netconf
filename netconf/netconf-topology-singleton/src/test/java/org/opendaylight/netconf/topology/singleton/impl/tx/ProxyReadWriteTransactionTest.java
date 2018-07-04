@@ -74,7 +74,7 @@ public class ProxyReadWriteTransactionTest {
 
     @AfterClass
     public static void staticTearDown() {
-        TestKit.shutdownActorSystem(system, Boolean.TRUE);
+        TestKit.shutdownActorSystem(system, true);
     }
 
     private ProxyReadWriteTransaction newSuccessfulProxyTx() {

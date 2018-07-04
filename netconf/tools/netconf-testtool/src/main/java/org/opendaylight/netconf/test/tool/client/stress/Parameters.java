@@ -111,29 +111,29 @@ public class Parameters {
         parser.addArgument("--candidate-datastore")
                 .type(Boolean.class)
                 .required(false)
-                .setDefault(true)
+                .setDefault(Boolean.TRUE)
                 .help("Edit candidate or running datastore. Defaults to candidate.")
                 .dest("candidate-datastore");
 
         parser.addArgument("--debug")
                 .type(Boolean.class)
-                .setDefault(false)
+                .setDefault(Boolean.FALSE)
                 .help("Whether to use debug log level instead of INFO")
                 .dest("debug");
 
         parser.addArgument("--legacy-framing")
                 .type(Boolean.class)
-                .setDefault(false)
+                .setDefault(Boolean.FALSE)
                 .dest("legacy-framing");
 
         parser.addArgument("--exi")
                 .type(Boolean.class)
-                .setDefault(false)
+                .setDefault(Boolean.FALSE)
                 .dest("exi");
 
         parser.addArgument("--async-requests")
                 .type(Boolean.class)
-                .setDefault(true)
+                .setDefault(Boolean.TRUE)
                 .dest("async");
 
         parser.addArgument("--msg-timeout")
@@ -143,7 +143,7 @@ public class Parameters {
 
         parser.addArgument("--ssh")
                 .type(Boolean.class)
-                .setDefault(false)
+                .setDefault(Boolean.FALSE)
                 .dest("ssh");
 
         parser.addArgument("--username")
