@@ -196,7 +196,7 @@ public final class ScaleUtil {
         }
     }
 
-    private static class ScaleVerifyCallable implements Callable {
+    private static class ScaleVerifyCallable implements Callable<Void> {
         private static final Logger LOG = LoggerFactory.getLogger(ScaleVerifyCallable.class);
 
         private static final String RESTCONF_URL
@@ -224,7 +224,7 @@ public final class ScaleUtil {
         }
 
         @Override
-        public Object call() throws Exception {
+        public Void call() throws Exception {
             try {
                 final Response response = asyncHttpClient.executeRequest(request).get();
 
@@ -257,9 +257,9 @@ public final class ScaleUtil {
         }
     }
 
-    private static class TimeoutGuard implements Callable {
+    private static class TimeoutGuard implements Callable<Void> {
         @Override
-        public Object call() throws Exception {
+        public Void call() throws Exception {
             resultsLog.warn("Timeout for scale test reached after: {} ..aborting", STOPWATCH);
             root.warn("Timeout for scale test reached after: {} ..aborting", STOPWATCH);
             System.exit(0);
@@ -275,25 +275,20 @@ public final class ScaleUtil {
 
         @Override
         public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
-            return super.schedule(wrapCallable(callable), delay, unit);
+            return super.schedule(new LogOnExceptionCallable<>(callable), delay, unit);
         }
 
-        private Callable wrapCallable(Callable callable) {
-            return new LogOnExceptionCallable(callable);
-        }
+        private static class LogOnExceptionCallable<T> implements Callable<T> {
+            private final Callable<T> theCallable;
 
-        private static class LogOnExceptionCallable implements Callable {
-            private final Callable theCallable;
-
-            LogOnExceptionCallable(Callable theCallable) {
+            LogOnExceptionCallable(Callable<T> theCallable) {
                 this.theCallable = theCallable;
             }
 
             @Override
-            public Object call() throws Exception {
+            public T call() throws Exception {
                 try {
-                    theCallable.call();
-                    return null;
+                    return theCallable.call();
                 } catch (Exception e) {
                     // log
                     root.warn("error in executing: " + theCallable + ". It will no longer be run!", e);
