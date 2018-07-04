@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.rest.impl.test.providers.TestJsonBodyWriter;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -74,7 +73,7 @@ public final class TestRestconfUtils {
         doReturn(Optional.fromNullable(mountInstance)).when(mockMountService)
             .getMountPoint(any(YangInstanceIdentifier.class));
 
-        SchemaService mockSchemaService = mock(SchemaService.class);
+        DOMSchemaService mockSchemaService = mock(DOMSchemaService.class);
         doReturn(schemaContext).when(mockSchemaService).getGlobalContext();
 
         DOMSchemaService mockDomSchemaService = mock(DOMSchemaService.class);

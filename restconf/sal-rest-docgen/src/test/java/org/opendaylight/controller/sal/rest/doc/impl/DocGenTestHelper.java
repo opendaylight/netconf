@@ -25,7 +25,7 @@ import java.util.Set;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.mockito.ArgumentCaptor;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -67,12 +67,12 @@ public class DocGenTestHelper {
         return this.schemaContext;
     }
 
-    public SchemaService createMockSchemaService(SchemaContext mockContext) {
+    public DOMSchemaService createMockSchemaService(SchemaContext mockContext) {
         if (mockContext == null) {
             mockContext = createMockSchemaContext();
         }
 
-        final SchemaService mockSchemaService = mock(SchemaService.class);
+        final DOMSchemaService mockSchemaService = mock(DOMSchemaService.class);
         when(mockSchemaService.getGlobalContext()).thenReturn(mockContext);
         return mockSchemaService;
     }
