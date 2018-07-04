@@ -9,14 +9,14 @@
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import akka.actor.Props;
-import akka.actor.UntypedActor;
+import akka.actor.UntypedAbstractActor;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadActorMessage;
 
 /**
  * ReadTransactionActor is an interface to device's {@link DOMDataReadOnlyTransaction} for cluster nodes.
  */
-public final class ReadTransactionActor extends UntypedActor {
+public final class ReadTransactionActor extends UntypedAbstractActor {
 
     private final ReadAdapter readAdapter;
 

@@ -10,7 +10,7 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import akka.actor.Props;
 import akka.actor.ReceiveTimeout;
-import akka.actor.UntypedActor;
+import akka.actor.UntypedAbstractActor;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.WriteActorMessage;
@@ -21,7 +21,7 @@ import scala.concurrent.duration.Duration;
 /**
  * WriteTransactionActor is an interface to device's {@link DOMDataReadOnlyTransaction} for cluster nodes.
  */
-public final class WriteTransactionActor extends UntypedActor {
+public final class WriteTransactionActor extends UntypedAbstractActor {
 
     private static final Logger LOG = LoggerFactory.getLogger(WriteTransactionActor.class);
 
