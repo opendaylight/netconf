@@ -22,8 +22,8 @@ import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.controller.md.sal.dom.broker.impl.SerializedDOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.core.spi.data.DOMStore;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.impl.SessionIdProvider;
@@ -43,6 +43,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
+import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -54,7 +55,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -103,7 +103,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
         private final long currentSessionId;
         private final SchemaContext schemaContext;
         private final Set<Capability> caps;
-        private final SchemaService schemaService;
+        private final DOMSchemaService schemaService;
         private final DOMDataBroker dataBroker;
         private final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
@@ -208,7 +208,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                     new YangInstanceIdentifier.NodeIdentifier(NetconfState.QNAME)).withChild(schemasContainer).build();
         }
 
-        private static DOMDataBroker createDataStore(final SchemaService schemaService, final long sessionId) {
+        private static DOMDataBroker createDataStore(final DOMSchemaService schemaService, final long sessionId) {
             LOG.debug("Session {}: Creating data stores for simulated device", sessionId);
             final DOMStore operStore = InMemoryDOMDataStoreFactory
                     .create("DOM-OPER", schemaService);
@@ -225,17 +225,8 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             return new SerializedDOMDataBroker(datastores, MoreExecutors.listeningDecorator(listenableFutureExecutor));
         }
 
-        private SchemaService createSchemaService() {
-            return new SchemaService() {
-
-                @Override
-                public void addModule(final Module module) {
-                }
-
-                @Override
-                public void removeModule(final Module module) {
-
-                }
+        private DOMSchemaService createSchemaService() {
+            return new DOMSchemaService() {
 
                 @Override
                 public SchemaContext getSessionContext() {
@@ -251,15 +242,11 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                 public ListenerRegistration<SchemaContextListener> registerSchemaContextListener(
                         final SchemaContextListener listener) {
                     listener.onGlobalContextUpdated(getGlobalContext());
-                    return new ListenerRegistration<SchemaContextListener>() {
-                        @Override
-                        public void close() {
-
-                        }
+                    return new AbstractListenerRegistration<SchemaContextListener>(listener) {
 
                         @Override
-                        public SchemaContextListener getInstance() {
-                            return listener;
+                        protected void removeRegistration() {
+                            // No-op
                         }
                     };
                 }
