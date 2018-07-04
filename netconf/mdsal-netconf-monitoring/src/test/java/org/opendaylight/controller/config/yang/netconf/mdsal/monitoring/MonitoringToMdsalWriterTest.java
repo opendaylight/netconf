@@ -15,7 +15,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.Futures;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -26,6 +25,7 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
@@ -35,12 +35,16 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class MonitoringToMdsalWriterTest {
 
     private static final InstanceIdentifier<NetconfState> INSTANCE_IDENTIFIER =
             InstanceIdentifier.create(NetconfState.class);
+
+    @Mock
+    private CommitInfo info;
 
     @Mock
     private NetconfMonitoringService monitoring;
@@ -62,7 +66,7 @@ public class MonitoringToMdsalWriterTest {
 
         doNothing().when(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
         doNothing().when(writeTransaction).delete(eq(LogicalDatastoreType.OPERATIONAL), any());
-        doReturn(Futures.immediateCheckedFuture(null)).when(writeTransaction).submit();
+        doReturn(FluentFutures.immediateFluentFuture(info)).when(writeTransaction).commit();
 
         writer = new MonitoringToMdsalWriter(monitoring, dataBroker);
     }
@@ -73,7 +77,7 @@ public class MonitoringToMdsalWriterTest {
         writer.close();
         InOrder inOrder = inOrder(writeTransaction);
         inOrder.verify(writeTransaction).delete(LogicalDatastoreType.OPERATIONAL, INSTANCE_IDENTIFIER);
-        inOrder.verify(writeTransaction).submit();
+        inOrder.verify(writeTransaction).commit();
     }
 
     @Test
@@ -85,7 +89,7 @@ public class MonitoringToMdsalWriterTest {
         writer.onCapabilitiesChanged(capabilities);
         InOrder inOrder = inOrder(writeTransaction);
         inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL, capabilitiesId, capabilities);
-        inOrder.verify(writeTransaction).submit();
+        inOrder.verify(writeTransaction).commit();
     }
 
     @Test
@@ -97,7 +101,7 @@ public class MonitoringToMdsalWriterTest {
         writer.onSchemasChanged(schemas);
         InOrder inOrder = inOrder(writeTransaction);
         inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL, schemasId, schemas);
-        inOrder.verify(writeTransaction).submit();
+        inOrder.verify(writeTransaction).commit();
     }
 
     @Test
@@ -113,7 +117,7 @@ public class MonitoringToMdsalWriterTest {
         writer.onSessionStarted(session);
         InOrder inOrder = inOrder(writeTransaction);
         inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL, id, session);
-        inOrder.verify(writeTransaction).submit();
+        inOrder.verify(writeTransaction).commit();
     }
 
     @Test
@@ -129,7 +133,7 @@ public class MonitoringToMdsalWriterTest {
         writer.onSessionEnded(session);
         InOrder inOrder = inOrder(writeTransaction);
         inOrder.verify(writeTransaction).delete(LogicalDatastoreType.OPERATIONAL, id);
-        inOrder.verify(writeTransaction).submit();
+        inOrder.verify(writeTransaction).commit();
     }
 
     @Test
@@ -156,7 +160,7 @@ public class MonitoringToMdsalWriterTest {
         InOrder inOrder = inOrder(writeTransaction);
         inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL, id1, session1);
         inOrder.verify(writeTransaction).put(LogicalDatastoreType.OPERATIONAL, id2, session2);
-        inOrder.verify(writeTransaction).submit();
+        inOrder.verify(writeTransaction).commit();
     }
 
     @Test
