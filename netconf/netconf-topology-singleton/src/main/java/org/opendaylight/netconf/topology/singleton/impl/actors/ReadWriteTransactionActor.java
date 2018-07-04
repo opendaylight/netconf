@@ -10,7 +10,7 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import akka.actor.Props;
 import akka.actor.ReceiveTimeout;
-import akka.actor.UntypedActor;
+import akka.actor.UntypedAbstractActor;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadActorMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.WriteActorMessage;
@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.duration.Duration;
 
-public final class ReadWriteTransactionActor extends UntypedActor {
+public final class ReadWriteTransactionActor extends UntypedAbstractActor {
 
     private static final Logger LOG = LoggerFactory.getLogger(ReadWriteTransactionActor.class);
 
