@@ -8,6 +8,8 @@
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,16 +23,17 @@ import akka.actor.ActorSystem;
 import akka.actor.Status.Failure;
 import akka.actor.Status.Success;
 import akka.testkit.TestProbe;
-import com.google.common.util.concurrent.Futures;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.MergeRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.PutRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.SubmitRequest;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 
@@ -73,7 +76,7 @@ public abstract class WriteTransactionActorTestAdapter {
     }
 
     @Test
-    public void testCancel() throws Exception {
+    public void testCancel() {
         when(mockWriteTx.cancel()).thenReturn(true);
         actorRef.tell(new CancelRequest(), probe.ref());
 
@@ -82,29 +85,29 @@ public abstract class WriteTransactionActorTestAdapter {
     }
 
     @Test
-    public void testSubmit() throws Exception {
-        when(mockWriteTx.submit()).thenReturn(Futures.immediateCheckedFuture(null));
+    public void testSubmit() {
+        doReturn(FluentFutures.immediateFluentFuture(mock(CommitInfo.class))).when(mockWriteTx).commit();
         actorRef.tell(new SubmitRequest(), probe.ref());
 
-        verify(mockWriteTx).submit();
+        verify(mockWriteTx).commit();
         probe.expectMsgClass(Success.class);
     }
 
     @Test
-    public void testSubmitFail() throws Exception {
+    public void testSubmitFail() {
         final RpcError rpcError =
                 RpcResultBuilder.newError(RpcError.ErrorType.APPLICATION, "fail", "fail");
         final TransactionCommitFailedException cause = new TransactionCommitFailedException("fail", rpcError);
-        when(mockWriteTx.submit()).thenReturn(Futures.immediateFailedCheckedFuture(cause));
+        when(mockWriteTx.commit()).thenReturn(FluentFutures.immediateFailedFluentFuture(cause));
         actorRef.tell(new SubmitRequest(), probe.ref());
 
-        verify(mockWriteTx).submit();
+        verify(mockWriteTx).commit();
         final Failure response = probe.expectMsgClass(Failure.class);
         assertEquals(cause, response.cause());
     }
 
     @Test
-    public void testIdleTimeout() throws Exception {
+    public void testIdleTimeout() {
         final TestProbe testProbe = new TestProbe(system);
         testProbe.watch(actorRef);
         verify(mockWriteTx, timeout(3000)).cancel();

@@ -9,17 +9,16 @@
 package org.opendaylight.netconf.mdsal.yang.library;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesStateBuilder;
@@ -80,9 +79,9 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
                 MODULES_STATE_INSTANCE_IDENTIFIER, newModuleState);
 
         LOG.debug("Trying to write new module-state: {}", newModuleState);
-        Futures.addCallback(tx.submit(), new FutureCallback<Void>() {
+        tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
-            public void onSuccess(@Nullable final Void result) {
+            public void onSuccess(final CommitInfo result) {
                 LOG.debug("Modules state updated successfully");
             }
 
