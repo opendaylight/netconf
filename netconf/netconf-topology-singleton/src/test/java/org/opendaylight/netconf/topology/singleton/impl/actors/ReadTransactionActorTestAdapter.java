@@ -86,11 +86,11 @@ public abstract class ReadTransactionActorTestAdapter {
 
     @Test
     public void testExists() {
-        when(mockReadTx.exists(STORE, PATH)).thenReturn(Futures.immediateCheckedFuture(true));
+        when(mockReadTx.exists(STORE, PATH)).thenReturn(Futures.immediateCheckedFuture(Boolean.TRUE));
         actorRef.tell(new ExistsRequest(STORE, PATH), probe.ref());
 
         verify(mockReadTx).exists(STORE, PATH);
-        probe.expectMsg(true);
+        probe.expectMsg(Boolean.TRUE);
     }
 
     @Test

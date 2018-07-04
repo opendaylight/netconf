@@ -112,7 +112,7 @@ public class TesttoolParameters {
 
         parser.addArgument("--async-requests")
                 .type(Boolean.class)
-                .setDefault(false)
+                .setDefault(Boolean.FALSE)
                 .dest("async");
 
         parser.addArgument("--thread-amount")
@@ -199,25 +199,25 @@ public class TesttoolParameters {
 
         parser.addArgument("--ssh")
                 .type(Boolean.class)
-                .setDefault(true)
+                .setDefault(Boolean.TRUE)
                 .help("Whether to use ssh for transport or just pure tcp")
                 .dest("ssh");
 
         parser.addArgument("--exi")
                 .type(Boolean.class)
-                .setDefault(true)
+                .setDefault(Boolean.TRUE)
                 .help("Whether to use exi to transport xml content")
                 .dest("exi");
 
         parser.addArgument("--debug")
                 .type(Boolean.class)
-                .setDefault(false)
+                .setDefault(Boolean.FALSE)
                 .help("Whether to use debug log level instead of INFO")
                 .dest("debug");
 
         parser.addArgument("--md-sal")
                 .type(Boolean.class)
-                .setDefault(false)
+                .setDefault(Boolean.FALSE)
                 .help("Whether to use md-sal datastore instead of default simulated datastore.")
                 .dest("md-sal");
 

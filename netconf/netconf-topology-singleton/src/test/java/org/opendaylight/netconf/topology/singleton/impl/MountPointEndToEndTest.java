@@ -238,8 +238,8 @@ public class MountPointEndToEndTest {
     @After
     public void tearDown() throws Exception {
         deleteCacheDir();
-        TestKit.shutdownActorSystem(slaveSystem, Boolean.TRUE);
-        TestKit.shutdownActorSystem(masterSystem, Boolean.TRUE);
+        TestKit.shutdownActorSystem(slaveSystem, true);
+        TestKit.shutdownActorSystem(masterSystem, true);
     }
 
     private void setupMaster() throws Exception {

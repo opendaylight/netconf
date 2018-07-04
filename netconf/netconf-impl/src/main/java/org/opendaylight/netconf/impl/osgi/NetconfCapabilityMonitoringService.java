@@ -234,8 +234,8 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     private static NetconfCapabilityChange computeDiff(final Set<Capability> added, final Set<Capability> removed) {
         final NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
         netconfCapabilityChangeBuilder
-                .setChangedBy(new ChangedByBuilder().setServerOrUser(new ServerBuilder().setServer(true).build())
-                        .build());
+                .setChangedBy(new ChangedByBuilder().setServerOrUser(
+                    new ServerBuilder().setServer(Boolean.TRUE).build()).build());
         netconfCapabilityChangeBuilder.setDeletedCapability(Lists.newArrayList(Collections2
                 .transform(removed, CAPABILITY_TO_URI)));
         netconfCapabilityChangeBuilder.setAddedCapability(Lists.newArrayList(Collections2
