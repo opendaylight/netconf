@@ -9,7 +9,7 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import java.util.Objects;
 import java.util.Optional;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 
 /**
  * This class gathers all YANG-defined {@link org.opendaylight.yangtools.yang.model.api.Module}s and
@@ -19,7 +19,7 @@ import org.opendaylight.controller.sal.core.api.model.SchemaService;
  */
 public class ApiDocGeneratorRFC8040 extends BaseYangSwaggerGeneratorRFC8040 {
 
-    public ApiDocGeneratorRFC8040(SchemaService schemaService) {
+    public ApiDocGeneratorRFC8040(DOMSchemaService schemaService) {
         super(Optional.of(Objects.requireNonNull(schemaService)));
     }
 }

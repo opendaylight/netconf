@@ -37,7 +37,6 @@ import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizat
 import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizer;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
@@ -102,7 +101,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
     private volatile SchemaContext globalSchema;
     private volatile DataNormalizer dataNormalizer;
 
-    private ControllerContext(SchemaService schemaService, DOMMountPointService mountService,
+    private ControllerContext(DOMSchemaService schemaService, DOMMountPointService mountService,
             DOMYangTextSourceProvider yangTextSourceProvider) {
         this.mountService = mountService;
         this.yangTextSourceProvider = yangTextSourceProvider;
@@ -111,7 +110,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         listenerRegistration = schemaService.registerSchemaContextListener(this);
     }
 
-    public static ControllerContext newInstance(SchemaService schemaService, DOMMountPointService mountService,
+    public static ControllerContext newInstance(DOMSchemaService schemaService, DOMMountPointService mountService,
             DOMSchemaService domSchemaService) {
         final DOMYangTextSourceProvider yangTextSourceProvider =
             (DOMYangTextSourceProvider) domSchemaService.getSupportedExtensions().get(DOMYangTextSourceProvider.class);

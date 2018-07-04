@@ -5,29 +5,19 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 
-final class SchemaServiceStub implements SchemaService {
+final class SchemaServiceStub implements DOMSchemaService {
     private final SchemaContext schemaContext;
 
     SchemaServiceStub(SchemaContext schemaContext) {
         this.schemaContext = schemaContext;
-    }
-
-    @Override
-    public void addModule(final Module module) {
-    }
-
-    @Override
-    public void removeModule(final Module module) {
-
     }
 
     @Override
@@ -44,14 +34,10 @@ final class SchemaServiceStub implements SchemaService {
     public ListenerRegistration<SchemaContextListener> registerSchemaContextListener(
         final SchemaContextListener listener) {
         listener.onGlobalContextUpdated(getGlobalContext());
-        return new ListenerRegistration<SchemaContextListener>() {
+        return new AbstractListenerRegistration<SchemaContextListener>(listener) {
             @Override
-            public void close() {
-            }
-
-            @Override
-            public SchemaContextListener getInstance() {
-                return listener;
+            protected void removeRegistration() {
+                // No-op
             }
         };
     }
