@@ -10,12 +10,10 @@ package org.opendaylight.netconf.console.commands;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
-
 import java.util.Arrays;
-
-import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.apache.karaf.shell.console.AbstractAction;
+import org.apache.karaf.shell.api.action.Action;
+import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.Option;
 import org.opendaylight.netconf.console.api.NetconfCommands;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -31,7 +29,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
 
 @Command(name = "netconf:connect-device", scope = "netconf", description = "Connect to a netconf device.")
-public class NetconfConnectDeviceCommand extends AbstractAction {
+public class NetconfConnectDeviceCommand implements Action {
 
     protected final NetconfCommands service;
 
@@ -110,7 +108,7 @@ public class NetconfConnectDeviceCommand extends AbstractAction {
     private String deviceId;
 
     @Override
-    protected Object doExecute() throws Exception {
+    public Object execute() {
         if (!NetconfCommandUtils.isIpValid(deviceIp) || !NetconfCommandUtils.isPortValid(devicePort)) {
             return "Invalid IP:" + deviceIp + " or Port:" + devicePort + "Please enter a valid entry to proceed.";
         }

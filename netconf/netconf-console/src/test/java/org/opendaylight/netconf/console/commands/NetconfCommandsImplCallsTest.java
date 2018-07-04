@@ -51,14 +51,14 @@ public class NetconfCommandsImplCallsTest {
     public void testConnectDeviceCommand() throws Exception {
         NetconfConnectDeviceCommand netconfConnectDeviceCommand =
                 new NetconfConnectDeviceCommand(netconfCommands);
-        netconfConnectDeviceCommand.doExecute();
+        netconfConnectDeviceCommand.execute();
         verify(netconfCommands, times(0)).connectDevice(any(), any());
 
         netconfConnectDeviceCommand = new NetconfConnectDeviceCommand(netconfCommands, "192.168.1.1", "7777");
 
         PowerMockito.mockStatic(Strings.class);
         given(Strings.isNullOrEmpty(any())).willReturn(false);
-        netconfConnectDeviceCommand.doExecute();
+        netconfConnectDeviceCommand.execute();
         doNothing().when(netconfCommands).connectDevice(any(), any());
         verify(netconfCommands, times(1)).connectDevice(any(), any());
     }
@@ -67,14 +67,14 @@ public class NetconfCommandsImplCallsTest {
     public void testDisconnectDeviceCommand() throws Exception {
         NetconfDisconnectDeviceCommand netconfDisconnectDeviceCommand =
                 new NetconfDisconnectDeviceCommand(netconfCommands);
-        netconfDisconnectDeviceCommand.doExecute();
+        netconfDisconnectDeviceCommand.execute();
 
         verify(netconfCommands, times(0)).disconnectDevice(any(), any());
 
         netconfDisconnectDeviceCommand = new NetconfDisconnectDeviceCommand(netconfCommands, "deviceId", null, null);
 
         doReturn(true).when(netconfCommands).disconnectDevice(any());
-        netconfDisconnectDeviceCommand.doExecute();
+        netconfDisconnectDeviceCommand.execute();
 
         verify(netconfCommands, times(1)).disconnectDevice(any());
 
@@ -82,7 +82,7 @@ public class NetconfCommandsImplCallsTest {
                 new NetconfDisconnectDeviceCommand(netconfCommands, null, "192.168.1.1", "7777");
 
         doReturn(true).when(netconfCommands).disconnectDevice(any(), any());
-        netconfDisconnectDeviceCommand.doExecute();
+        netconfDisconnectDeviceCommand.execute();
 
         verify(netconfCommands, times(1)).disconnectDevice(any(), any());
     }
@@ -92,7 +92,7 @@ public class NetconfCommandsImplCallsTest {
         final NetconfListDevicesCommand netconfListDeviceCommand = new NetconfListDevicesCommand(netconfCommands);
         doReturn(getDeviceHashMap()).when(netconfCommands).listDevices();
 
-        netconfListDeviceCommand.doExecute();
+        netconfListDeviceCommand.execute();
 
         verify(netconfCommands, times(1)).listDevices();
     }
@@ -100,21 +100,21 @@ public class NetconfCommandsImplCallsTest {
     @Test
     public void testShowDeviceCommand() throws Exception {
         NetconfShowDeviceCommand netconfShowDeviceCommand = new NetconfShowDeviceCommand(netconfCommands);
-        netconfShowDeviceCommand.doExecute();
+        netconfShowDeviceCommand.execute();
 
         verify(netconfCommands, times(0)).showDevice(any());
 
         netconfShowDeviceCommand = new NetconfShowDeviceCommand(netconfCommands, "deviceId", null, null);
 
         doReturn(getDeviceHashMap()).when(netconfCommands).showDevice(any());
-        netconfShowDeviceCommand.doExecute();
+        netconfShowDeviceCommand.execute();
 
         verify(netconfCommands, times(1)).showDevice(any());
 
         netconfShowDeviceCommand = new NetconfShowDeviceCommand(netconfCommands, null, "192.168.1.1", "7777");
 
         doReturn(getDeviceHashMap()).when(netconfCommands).showDevice(any(), any());
-        netconfShowDeviceCommand.doExecute();
+        netconfShowDeviceCommand.execute();
 
         verify(netconfCommands, times(1)).showDevice(any(), any());
     }
@@ -129,7 +129,7 @@ public class NetconfCommandsImplCallsTest {
 
         doReturn("").when(netconfCommands).updateDevice(anyString(), anyString(), anyString(), any());
 
-        netconfUpdateDeviceCommand.doExecute();
+        netconfUpdateDeviceCommand.execute();
 
         verify(netconfCommands, times(1)).updateDevice(anyString(), anyString(), anyString(),
                 hashMapArgumentCaptor.capture());
@@ -138,7 +138,7 @@ public class NetconfCommandsImplCallsTest {
         assertEquals("192.168.1.1", hashMapArgumentCaptor.getValue().get(NetconfConsoleConstants.NETCONF_IP));
     }
 
-    private HashMap getDeviceHashMap() {
+    private static HashMap<String, Map<String, List<String>>> getDeviceHashMap() {
         final HashMap<String, Map<String, List<String>>> devices = new HashMap<>();
         final HashMap<String, List<String>> deviceMap = new HashMap<>();
         deviceMap.put(NetconfConsoleConstants.NETCONF_IP, Lists.newArrayList("192.168.1.1"));
