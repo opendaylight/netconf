@@ -219,7 +219,7 @@ public class NetconfTopologyManager
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    private void close(AutoCloseable closeable) {
+    private static void close(AutoCloseable closeable) {
         try {
             closeable.close();
         } catch (Exception e) {
