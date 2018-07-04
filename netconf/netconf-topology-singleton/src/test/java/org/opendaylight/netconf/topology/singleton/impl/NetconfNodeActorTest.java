@@ -189,7 +189,7 @@ public class NetconfNodeActorTest {
 
     @After
     public void teardown() {
-        TestKit.shutdownActorSystem(system, Boolean.TRUE);
+        TestKit.shutdownActorSystem(system, true);
         system = null;
     }
 
