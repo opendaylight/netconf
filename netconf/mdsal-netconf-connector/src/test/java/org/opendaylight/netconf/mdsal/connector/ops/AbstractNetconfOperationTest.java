@@ -32,8 +32,8 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.broker.impl.SerializedDOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
 import org.opendaylight.controller.sal.core.spi.data.DOMStore;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
@@ -70,14 +70,14 @@ public abstract class AbstractNetconfOperationTest {
         XMLUnit.setIgnoreAttributeOrder(true);
 
         final SchemaContext schemaContext = getSchemaContext();
-        final SchemaService schemaService = new SchemaServiceStub(schemaContext);
+        final DOMSchemaService schemaService = new SchemaServiceStub(schemaContext);
         final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
         final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
 
         currentSchemaContext = new CurrentSchemaContext(schemaService, sourceIdentifier -> {
             final YangTextSchemaSource yangTextSchemaSource =
                 YangTextSchemaSource.delegateForByteSource(sourceIdentifier, ByteSource.wrap("module test".getBytes()));
-            return Futures.immediateCheckedFuture(yangTextSchemaSource);
+            return Futures.immediateFuture(yangTextSchemaSource);
         });
 
         final EnumMap<LogicalDatastoreType, DOMStore> datastores = new EnumMap<>(LogicalDatastoreType.class);

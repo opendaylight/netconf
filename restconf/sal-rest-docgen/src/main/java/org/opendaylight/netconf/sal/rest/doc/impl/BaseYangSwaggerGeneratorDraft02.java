@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import java.util.Optional;
-import org.opendaylight.controller.sal.core.api.model.SchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 
 /**
  * Base class for a bierman draft02 implementation.
@@ -18,7 +18,7 @@ import org.opendaylight.controller.sal.core.api.model.SchemaService;
 public abstract class BaseYangSwaggerGeneratorDraft02 extends BaseYangSwaggerGenerator {
     protected static final String RESTCONF_CONTEXT_ROOT = "restconf";
 
-    protected BaseYangSwaggerGeneratorDraft02(Optional<SchemaService> schemaService) {
+    protected BaseYangSwaggerGeneratorDraft02(Optional<DOMSchemaService> schemaService) {
         super(schemaService);
     }
 

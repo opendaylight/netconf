@@ -13,7 +13,7 @@
     <reference id="domDataBroker" interface="org.opendaylight.controller.md.sal.dom.api.DOMDataBroker"/>
     <reference id="domRpcService" interface="org.opendaylight.controller.md.sal.dom.api.DOMRpcService"/>
     <reference id="schemaService"
-               interface="org.opendaylight.controller.sal.core.api.model.SchemaService"/>
+               interface="org.opendaylight.mdsal.dom.api.DOMSchemaService"/>
     <reference id="rootSchemaSourceProviderDependency"
                interface="org.opendaylight.controller.sal.core.api.model.YangTextSourceProvider"/>
     <reference id="netconfOperationServiceFactoryListener"
