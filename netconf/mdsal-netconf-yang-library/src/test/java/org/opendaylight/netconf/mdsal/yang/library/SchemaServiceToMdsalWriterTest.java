@@ -13,6 +13,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
@@ -22,7 +23,6 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
@@ -36,7 +36,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.module.SubmoduleBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
@@ -53,8 +52,6 @@ public class SchemaServiceToMdsalWriterTest {
     private DataBroker dataBroker;
     @Mock
     private WriteTransaction writeTransaction;
-    @Mock
-    private CommitInfo info;
 
     private SchemaServiceToMdsalWriter schemaServiceToMdsalWriter;
 
@@ -64,7 +61,7 @@ public class SchemaServiceToMdsalWriterTest {
 
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
         doNothing().when(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
-        doReturn(FluentFutures.immediateFluentFuture(info)).when(writeTransaction).commit();
+        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
         when(schemaService.registerSchemaContextListener(any())).thenReturn(
                 new ListenerRegistration<SchemaContextListener>() {
                     @Override

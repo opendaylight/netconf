@@ -112,7 +112,7 @@ public class TxChainTest {
     public void testChainFail() throws Exception {
         final AbstractWriteTx writeTx = chain.newWriteOnlyTransaction();
         verify(writeOnlyTx1).addListener(captor.capture());
-        writeTx.submit();
+        writeTx.commit();
         final TransactionCommitFailedException cause = new TransactionCommitFailedException("fail");
         captor.getValue().onTransactionFailed(writeOnlyTx1, cause);
         verify(registration1).close();
@@ -124,7 +124,7 @@ public class TxChainTest {
         final AbstractWriteTx writeTx = chain.newWriteOnlyTransaction();
         chain.close();
         verify(writeOnlyTx1).addListener(captor.capture());
-        writeTx.submit();
+        writeTx.commit();
         captor.getValue().onTransactionSuccessful(writeOnlyTx1);
         verify(registration1).close();
         verify(listener).onTransactionChainSuccessful(chain);
@@ -146,7 +146,7 @@ public class TxChainTest {
         final ArgumentCaptor<TxListener> captor1 = ArgumentCaptor.forClass(TxListener.class);
         verify(writeOnlyTx1).addListener(captor1.capture());
         //submit 1st tx
-        writeTx1.submit();
+        writeTx1.commit();
         captor1.getValue().onTransactionSubmitted(writeOnlyTx1);
 
         //create 2nd tx
@@ -154,7 +154,7 @@ public class TxChainTest {
         final ArgumentCaptor<TxListener> captor2 = ArgumentCaptor.forClass(TxListener.class);
         verify(writeTx2).addListener(captor2.capture());
         //submit 2nd tx
-        writeTx2.submit();
+        writeTx2.commit();
         captor2.getValue().onTransactionSubmitted(writeOnlyTx2);
 
         //create 3rd tx
@@ -185,7 +185,7 @@ public class TxChainTest {
         final ArgumentCaptor<TxListener> captor1 = ArgumentCaptor.forClass(TxListener.class);
         verify(writeOnlyTx1).addListener(captor1.capture());
         //submit 1st tx
-        writeTx1.submit();
+        writeTx1.commit();
         captor1.getValue().onTransactionSubmitted(writeOnlyTx1);
 
         //create 2nd tx
@@ -193,7 +193,7 @@ public class TxChainTest {
         final ArgumentCaptor<TxListener> captor2 = ArgumentCaptor.forClass(TxListener.class);
         verify(writeTx2).addListener(captor2.capture());
         //submit 2nd tx
-        writeTx2.submit();
+        writeTx2.commit();
         captor2.getValue().onTransactionSubmitted(writeOnlyTx2);
 
         //create 3rd tx

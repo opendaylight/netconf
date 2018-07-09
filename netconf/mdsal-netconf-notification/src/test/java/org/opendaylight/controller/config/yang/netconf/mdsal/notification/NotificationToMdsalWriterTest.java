@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.config.yang.netconf.mdsal.notification;
 
 import static org.mockito.Matchers.any;
@@ -14,8 +13,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
-import com.google.common.util.concurrent.Futures;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -55,7 +54,7 @@ public class NotificationToMdsalWriterTest {
         doNothing().when(tx).merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class),
                 any(DataObject.class), anyBoolean());
         doNothing().when(tx).delete(any(LogicalDatastoreType.class), any(InstanceIdentifier.class));
-        doReturn(Futures.immediateCheckedFuture(null)).when(tx).submit();
+        doReturn(emptyFluentFuture()).when(tx).commit();
         doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
 
         writer = new NotificationToMdsalWriter(notificationCollector, dataBroker);

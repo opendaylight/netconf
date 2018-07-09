@@ -10,7 +10,6 @@ package org.opendaylight.netconf.sal.connect.util;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
@@ -18,6 +17,7 @@ import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.CreateDeviceInput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.CreateDeviceOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.CreateDeviceOutputBuilder;
@@ -103,11 +103,10 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
         final InstanceIdentifier<NetconfNode> niid = topologyPath.child(Node.class,
                 new NodeKey(nodeId)).augmentation(NetconfNode.class);
         writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, niid, node, true);
-        final ListenableFuture<Void> future = writeTransaction.submit();
-        Futures.addCallback(future, new FutureCallback<Void>() {
+        writeTransaction.commit().addCallback(new FutureCallback<CommitInfo>() {
 
             @Override
-            public void onSuccess(final Void result) {
+            public void onSuccess(final CommitInfo result) {
                 LOG.info("add-netconf-node RPC: Added netconf node successfully.");
                 futureResult.set(RpcResultBuilder.success(new CreateDeviceOutputBuilder().build()).build());
             }
@@ -130,13 +129,12 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
         final WriteTransaction wtx = dataBroker.newWriteOnlyTransaction();
         wtx.delete(LogicalDatastoreType.CONFIGURATION, niid);
 
-        final ListenableFuture<Void> future = wtx.submit();
         final SettableFuture<RpcResult<DeleteDeviceOutput>> rpcFuture = SettableFuture.create();
 
-        Futures.addCallback(future, new FutureCallback<Void>() {
+        wtx.commit().addCallback(new FutureCallback<CommitInfo>() {
 
             @Override
-            public void onSuccess(final Void result) {
+            public void onSuccess(final CommitInfo result) {
                 LOG.info("delete-device RPC: Removed netconf node successfully.");
                 rpcFuture.set(RpcResultBuilder.success(new DeleteDeviceOutputBuilder().build()).build());
             }

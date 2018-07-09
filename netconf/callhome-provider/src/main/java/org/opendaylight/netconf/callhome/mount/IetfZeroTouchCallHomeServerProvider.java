@@ -185,7 +185,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         }
 
         if (numRemoved > 0) {
-            opTx.submit();
+            opTx.commit();
         }
     }
 
@@ -213,6 +213,6 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
                 .setSshHostKey(cfgDevice.getSshHostKey()).setUniqueId(cfgDevice.getUniqueId()).build();
 
         tx.merge(LogicalDatastoreType.OPERATIONAL, deviceIID, cfgDevice);
-        tx.submit();
+        tx.commit();
     }
 }

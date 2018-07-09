@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.mockito.Matchers.any;
@@ -15,8 +14,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
-import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +44,7 @@ public class NetconfDeviceSalProviderTest {
     private DOMMountPointService mountPointService;
     @Mock
     private WriteTransaction writeTx;
+
     private NetconfDeviceSalProvider provider;
 
     @Before
@@ -54,11 +54,11 @@ public class NetconfDeviceSalProviderTest {
         doReturn(writeTx).when(chain).newWriteOnlyTransaction();
         doNothing().when(writeTx).merge(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
         doReturn("Some object").when(writeTx).getIdentifier();
-        doReturn(Futures.immediateCheckedFuture(null)).when(writeTx).submit();
+        doReturn(emptyFluentFuture()).when(writeTx).commit();
         provider = new NetconfDeviceSalProvider(new RemoteDeviceId("device1",
                 InetSocketAddress.createUnresolved("localhost", 17830)), mountPointService, dataBroker);
         when(chain.newWriteOnlyTransaction()).thenReturn(tx);
-        when(tx.submit()).thenReturn(Futures.immediateCheckedFuture(null));
+        doReturn(emptyFluentFuture()).when(tx).commit();
         when(tx.getIdentifier()).thenReturn(tx);
     }
 

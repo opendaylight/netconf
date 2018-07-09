@@ -224,7 +224,7 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
     private void writeDevice(final NodeId nodeId, final Device modifiedDevice) {
         ReadWriteTransaction opTx = dataBroker.newReadWriteTransaction();
         opTx.merge(LogicalDatastoreType.OPERATIONAL, buildDeviceInstanceIdentifier(nodeId), modifiedDevice);
-        opTx.submit();
+        opTx.commit();
     }
 
     private static InstanceIdentifier<Device> buildDeviceInstanceIdentifier(final NodeId nodeId) {
@@ -265,7 +265,7 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
                         .child(Device.class, device.key());
 
         tx.merge(LogicalDatastoreType.OPERATIONAL, deviceIId, device);
-        tx.submit();
+        tx.commit();
     }
 
     private AllowedDevices getDevices() {
