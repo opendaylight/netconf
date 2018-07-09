@@ -58,7 +58,7 @@ public class WriteRunningTxTest {
         //check, if no edit-config is called before submit
         verify(rpc, never())
                 .invokeRpc(eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), any());
-        tx.submit().get();
+        tx.commit().get();
         //check, if both edits are called
         verify(rpc, times(2))
                 .invokeRpc(eq(SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)), any());

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.junit.Assert.assertEquals;
@@ -14,9 +13,9 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
 import com.google.common.base.Optional;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.InetSocketAddress;
 import java.util.EnumMap;
@@ -149,7 +148,7 @@ public class NetconfDeviceTopologyAdapterTest {
     @Test
     public void testFailedDevice() throws Exception {
 
-        doReturn(Futures.immediateCheckedFuture(null)).when(writeTx).submit();
+        doReturn(emptyFluentFuture()).when(writeTx).commit();
         NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
         adapter.setDeviceAsFailed(null);
 
@@ -173,7 +172,7 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @Test
     public void testDeviceUpdate() throws Exception {
-        doReturn(Futures.immediateCheckedFuture(null)).when(writeTx).submit();
+        doReturn(emptyFluentFuture()).when(writeTx).commit();
 
         NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
         adapter.updateDeviceData(true, new NetconfDeviceCapabilities());
@@ -207,18 +206,18 @@ public class NetconfDeviceTopologyAdapterTest {
 
         DOMDataWriteTransaction wtx =  domDataBroker.newWriteOnlyTransaction();
         wtx.put(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf, augmentNode);
-        wtx.submit().get(5, TimeUnit.SECONDS);
+        wtx.commit().get(5, TimeUnit.SECONDS);
 
         adapter.updateDeviceData(true, new NetconfDeviceCapabilities());
         Optional<NormalizedNode<?, ?>> testNode = domDataBroker.newReadOnlyTransaction()
-                .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).checkedGet(2, TimeUnit.SECONDS);
+                .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).get(2, TimeUnit.SECONDS);
 
         assertEquals("Augmented node data should be still present after device update.", true, testNode.isPresent());
         assertEquals("Augmented data should be the same as before update node.", dataTestId, testNode.get().getValue());
 
         adapter.setDeviceAsFailed(null);
         testNode = domDataBroker.newReadOnlyTransaction()
-                .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).checkedGet(2, TimeUnit.SECONDS);
+                .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).get(2, TimeUnit.SECONDS);
 
         assertEquals("Augmented node data should be still present after device failed.", true, testNode.isPresent());
         assertEquals("Augmented data should be the same as before failed device.",
@@ -254,14 +253,14 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @Test
     public void testRemoveDeviceConfiguration() throws Exception {
-        doReturn(Futures.immediateCheckedFuture(null)).when(writeTx).submit();
+        doReturn(emptyFluentFuture()).when(writeTx).commit();
 
         NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
         adapter.close();
 
         verify(txChain, times(2)).newWriteOnlyTransaction();
         verify(writeTx).delete(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath());
-        verify(writeTx, times(2)).submit();
+        verify(writeTx, times(2)).commit();
     }
 
 }

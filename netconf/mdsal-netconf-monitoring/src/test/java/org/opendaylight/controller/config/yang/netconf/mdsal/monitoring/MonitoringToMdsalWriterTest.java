@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.config.yang.netconf.mdsal.monitoring;
 
 import static org.mockito.Matchers.any;
@@ -14,6 +13,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
+import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,6 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
@@ -35,16 +34,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
-import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 public class MonitoringToMdsalWriterTest {
 
     private static final InstanceIdentifier<NetconfState> INSTANCE_IDENTIFIER =
             InstanceIdentifier.create(NetconfState.class);
-
-    @Mock
-    private CommitInfo info;
 
     @Mock
     private NetconfMonitoringService monitoring;
@@ -66,7 +61,7 @@ public class MonitoringToMdsalWriterTest {
 
         doNothing().when(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
         doNothing().when(writeTransaction).delete(eq(LogicalDatastoreType.OPERATIONAL), any());
-        doReturn(FluentFutures.immediateFluentFuture(info)).when(writeTransaction).commit();
+        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
 
         writer = new MonitoringToMdsalWriter(monitoring, dataBroker);
     }

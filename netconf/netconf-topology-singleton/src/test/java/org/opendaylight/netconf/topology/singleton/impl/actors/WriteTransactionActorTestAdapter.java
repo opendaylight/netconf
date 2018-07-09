@@ -9,10 +9,10 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 import static org.opendaylight.netconf.topology.singleton.impl.actors.ReadTransactionActorTestAdapter.NODE;
 import static org.opendaylight.netconf.topology.singleton.impl.actors.ReadTransactionActorTestAdapter.PATH;
 import static org.opendaylight.netconf.topology.singleton.impl.actors.ReadTransactionActorTestAdapter.STORE;
@@ -26,7 +26,6 @@ import akka.testkit.TestProbe;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteRequest;
@@ -86,7 +85,7 @@ public abstract class WriteTransactionActorTestAdapter {
 
     @Test
     public void testSubmit() {
-        doReturn(FluentFutures.immediateFluentFuture(mock(CommitInfo.class))).when(mockWriteTx).commit();
+        doReturn(emptyFluentFuture()).when(mockWriteTx).commit();
         actorRef.tell(new SubmitRequest(), probe.ref());
 
         verify(mockWriteTx).commit();

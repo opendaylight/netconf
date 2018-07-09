@@ -11,12 +11,13 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
-import com.google.common.util.concurrent.Futures;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -112,7 +113,7 @@ public class YangLibProviderTest {
                             org.opendaylight.yangtools.yang.common.Revision.of("2016-04-28")),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
-        when(writeTransaction.submit()).thenReturn(Futures.immediateCheckedFuture(null));
+        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
         yangLibProvider.schemaSourceRegistered(list);
 
         List<Module> newModulesList = new ArrayList<>();
@@ -137,7 +138,7 @@ public class YangLibProviderTest {
         verify(writeTransaction).merge(eq(LogicalDatastoreType.OPERATIONAL),
                 eq(InstanceIdentifier.create(ModulesState.class)),
                 eq(new ModulesStateBuilder().setModule(newModulesList).build()));
-        verify(writeTransaction).submit();
+        verify(writeTransaction).commit();
     }
 
     @Test
@@ -173,7 +174,7 @@ public class YangLibProviderTest {
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
-        when(writeTransaction.submit()).thenReturn(Futures.immediateCheckedFuture(null));
+        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
         yangLibProvider.schemaSourceRegistered(potentialSources);
         verify(dataBroker).newWriteOnlyTransaction();
 
@@ -181,7 +182,7 @@ public class YangLibProviderTest {
         verify(writeTransaction).merge(eq(LogicalDatastoreType.OPERATIONAL),
                 eq(InstanceIdentifier.create(ModulesState.class)), modulesStateCaptor.capture());
         assertEquals(modulesStateCaptor.getValue().getModule().size(), 1);
-        verify(writeTransaction).submit();
+        verify(writeTransaction).commit();
     }
 
     @Test
@@ -207,7 +208,7 @@ public class YangLibProviderTest {
         doNothing().when(writeTransaction)
                 .delete(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class));
 
-        when(writeTransaction.submit()).thenReturn(Futures.immediateCheckedFuture(null));
+        doReturn(emptyFluentFuture()).when(writeTransaction).commit();
 
         PotentialSchemaSource<YangTextSchemaSource> yangUnregistererSource =
                 PotentialSchemaSource.create(
@@ -223,7 +224,7 @@ public class YangLibProviderTest {
                                 new ModuleKey(new YangIdentifier("unregistered-yang-schema-without-revision"),
                                         RevisionUtils.emptyRevision()))));
 
-        verify(writeTransaction).submit();
+        verify(writeTransaction).commit();
 
         yangUnregistererSource =
                 PotentialSchemaSource.create(
@@ -240,6 +241,6 @@ public class YangLibProviderTest {
                                 new ModuleKey(new YangIdentifier("unregistered-yang-with-revision"),
                                         new Revision(new RevisionIdentifier("2016-04-28"))))));
 
-        verify(writeTransaction, times(2)).submit();
+        verify(writeTransaction, times(2)).commit();
     }
 }

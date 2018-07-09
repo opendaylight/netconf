@@ -9,12 +9,12 @@
 package org.opendaylight.controller.config.yang.netconf.mdsal.notification;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.util.concurrent.ExecutionException;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.notifications.NotificationRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
@@ -52,9 +52,9 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
         tx.delete(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(Netconf.class));
 
-        Futures.addCallback(tx.submit(), new FutureCallback<Void>() {
+        tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
-            public void onSuccess(final Void avoid) {
+            public void onSuccess(final CommitInfo info) {
                 LOG.debug("Streams cleared successfully");
             }
 
@@ -82,9 +82,9 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
         tx.merge(LogicalDatastoreType.OPERATIONAL, streamIdentifier, stream, true);
 
         try {
-            tx.submit().checkedGet();
+            tx.commit().get();
             LOG.debug("Stream %s registered successfully.", stream.getName());
-        } catch (TransactionCommitFailedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             LOG.warn("Unable to register stream.", e);
         }
     }
@@ -98,9 +98,9 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
         tx.delete(LogicalDatastoreType.OPERATIONAL, streamIdentifier);
 
         try {
-            tx.submit().checkedGet();
+            tx.commit().get();
             LOG.debug("Stream %s unregistered successfully.", stream);
-        } catch (TransactionCommitFailedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             LOG.warn("Unable to unregister stream", e);
         }
     }
