@@ -177,16 +177,12 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
 
         ReadWriteTransaction opTx = dataBroker.newReadWriteTransaction();
 
-        int numRemoved = deletedDevices.size();
-
         for (InstanceIdentifier<?> removedIID : deletedDevices) {
             LOG.info("Deleting the entry for callhome device {}", removedIID);
             opTx.delete(LogicalDatastoreType.OPERATIONAL, removedIID);
         }
 
-        if (numRemoved > 0) {
-            opTx.commit();
-        }
+        opTx.commit();
     }
 
     private static List<Device> getReadDevices(final ListenableFuture<Optional<AllowedDevices>> devicesFuture)
