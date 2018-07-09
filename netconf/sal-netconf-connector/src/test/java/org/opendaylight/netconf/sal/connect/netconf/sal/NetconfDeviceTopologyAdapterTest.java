@@ -16,7 +16,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.base.Optional;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.InetSocketAddress;
 import java.util.EnumMap;
@@ -47,6 +46,7 @@ import org.opendaylight.mdsal.binding.generator.impl.GeneratedClassLoadingStrate
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.binding.generator.util.BindingRuntimeContext;
 import org.opendaylight.mdsal.binding.generator.util.JavassistUtils;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -57,6 +57,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -78,6 +79,8 @@ public class NetconfDeviceTopologyAdapterTest {
     private BindingTransactionChain txChain;
     @Mock
     private NetconfNode data;
+    @Mock
+    private CommitInfo info;
 
     private final String txIdent = "test transaction";
 
@@ -149,7 +152,7 @@ public class NetconfDeviceTopologyAdapterTest {
     @Test
     public void testFailedDevice() throws Exception {
 
-        doReturn(Futures.immediateCheckedFuture(null)).when(writeTx).submit();
+        doReturn(FluentFutures.immediateFluentFuture(info)).when(writeTx).commit();
         NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
         adapter.setDeviceAsFailed(null);
 
@@ -173,7 +176,7 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @Test
     public void testDeviceUpdate() throws Exception {
-        doReturn(Futures.immediateCheckedFuture(null)).when(writeTx).submit();
+        doReturn(FluentFutures.immediateFluentFuture(info)).when(writeTx).commit();
 
         NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
         adapter.updateDeviceData(true, new NetconfDeviceCapabilities());
@@ -207,18 +210,18 @@ public class NetconfDeviceTopologyAdapterTest {
 
         DOMDataWriteTransaction wtx =  domDataBroker.newWriteOnlyTransaction();
         wtx.put(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf, augmentNode);
-        wtx.submit().get(5, TimeUnit.SECONDS);
+        wtx.commit().get(5, TimeUnit.SECONDS);
 
         adapter.updateDeviceData(true, new NetconfDeviceCapabilities());
         Optional<NormalizedNode<?, ?>> testNode = domDataBroker.newReadOnlyTransaction()
-                .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).checkedGet(2, TimeUnit.SECONDS);
+                .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).get(2, TimeUnit.SECONDS);
 
         assertEquals("Augmented node data should be still present after device update.", true, testNode.isPresent());
         assertEquals("Augmented data should be the same as before update node.", dataTestId, testNode.get().getValue());
 
         adapter.setDeviceAsFailed(null);
         testNode = domDataBroker.newReadOnlyTransaction()
-                .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).checkedGet(2, TimeUnit.SECONDS);
+                .read(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf).get(2, TimeUnit.SECONDS);
 
         assertEquals("Augmented node data should be still present after device failed.", true, testNode.isPresent());
         assertEquals("Augmented data should be the same as before failed device.",
@@ -254,14 +257,14 @@ public class NetconfDeviceTopologyAdapterTest {
 
     @Test
     public void testRemoveDeviceConfiguration() throws Exception {
-        doReturn(Futures.immediateCheckedFuture(null)).when(writeTx).submit();
+        doReturn(FluentFutures.immediateFluentFuture(info)).when(writeTx).commit();
 
         NetconfDeviceTopologyAdapter adapter = new NetconfDeviceTopologyAdapter(id, txChain);
         adapter.close();
 
         verify(txChain, times(2)).newWriteOnlyTransaction();
         verify(writeTx).delete(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath());
-        verify(writeTx, times(2)).submit();
+        verify(writeTx, times(2)).commit();
     }
 
 }

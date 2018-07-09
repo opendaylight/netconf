@@ -15,7 +15,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.Futures;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -23,6 +22,7 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.notifications.NotificationRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
@@ -30,6 +30,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.r
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.StreamBuilder;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -43,6 +44,9 @@ public class NotificationToMdsalWriterTest {
     @Mock
     private NotificationRegistration notificationRegistration;
 
+    @Mock
+    private CommitInfo info;
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -55,7 +59,7 @@ public class NotificationToMdsalWriterTest {
         doNothing().when(tx).merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class),
                 any(DataObject.class), anyBoolean());
         doNothing().when(tx).delete(any(LogicalDatastoreType.class), any(InstanceIdentifier.class));
-        doReturn(Futures.immediateCheckedFuture(null)).when(tx).submit();
+        doReturn(FluentFutures.immediateFluentFuture(info)).when(tx).commit();
         doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
 
         writer = new NotificationToMdsalWriter(notificationCollector, dataBroker);

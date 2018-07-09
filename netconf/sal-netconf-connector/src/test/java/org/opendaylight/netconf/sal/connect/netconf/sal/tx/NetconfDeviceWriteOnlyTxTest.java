@@ -25,6 +25,7 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
+import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +34,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
@@ -63,7 +63,7 @@ public class NetconfDeviceWriteOnlyTxTest {
         MockitoAnnotations.initMocks(this);
 
         final CheckedFuture<DefaultDOMRpcResult, Exception> successFuture =
-                Futures.immediateCheckedFuture(new DefaultDOMRpcResult(((NormalizedNode<?, ?>) null)));
+                Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null));
 
         doReturn(successFuture)
                 .doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("Failed tx")))
@@ -87,13 +87,12 @@ public class NetconfDeviceWriteOnlyTxTest {
     }
 
     @Test
-    public void testDiscardChanges() {
+    public void testDiscardChanges() throws InterruptedException {
         final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(SchemaContext.class)),
                 false);
-        final CheckedFuture<Void, TransactionCommitFailedException> submitFuture = tx.submit();
         try {
-            submitFuture.checkedGet();
-        } catch (final TransactionCommitFailedException e) {
+            tx.commit().get();
+        } catch (final ExecutionException e) {
             // verify discard changes was sent
             final InOrder inOrder = inOrder(rpc);
             inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME),
@@ -115,20 +114,18 @@ public class NetconfDeviceWriteOnlyTxTest {
         final CheckedFuture<DefaultDOMRpcResult, Exception> rpcErrorFuture = Futures.immediateCheckedFuture(
                 new DefaultDOMRpcResult(RpcResultBuilder.newError(RpcError.ErrorType.APPLICATION, "a", "m")));
 
-        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(((NormalizedNode<?, ?>) null))))
+        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
         .doReturn(rpcErrorFuture).when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(SchemaContext.class)),
                 false);
 
-        final CheckedFuture<Void, TransactionCommitFailedException> submitFuture = tx.submit();
         try {
-            submitFuture.checkedGet();
-        } catch (final TransactionCommitFailedException e) {
-            return;
+            tx.commit().get();
+            fail("Submit should fail");
+        } catch (final ExecutionException e) {
+            // Intended
         }
-
-        fail("Submit should fail");
     }
 
     @Test
@@ -141,7 +138,7 @@ public class NetconfDeviceWriteOnlyTxTest {
                 id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext()), false);
 
         tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);
-        tx.submit();
+        tx.commit();
         // verify discard changes was sent
         final InOrder inOrder = inOrder(rpc);
         inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME),
@@ -161,7 +158,7 @@ public class NetconfDeviceWriteOnlyTxTest {
         final TxListener listener = mock(TxListener.class);
         tx.addListener(listener);
         tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);
-        tx.submit();
+        tx.commit();
         verify(listener).onTransactionSubmitted(tx);
         verify(listener).onTransactionSuccessful(tx);
         verify(listener, never()).onTransactionFailed(eq(tx), any());
@@ -194,7 +191,7 @@ public class NetconfDeviceWriteOnlyTxTest {
         final TxListener listener = mock(TxListener.class);
         tx.addListener(listener);
         tx.delete(LogicalDatastoreType.CONFIGURATION, yangIId);
-        tx.submit();
+        tx.commit();
         final ArgumentCaptor<Exception> excCaptor = ArgumentCaptor.forClass(Exception.class);
         verify(listener).onTransactionSubmitted(tx);
         verify(listener).onTransactionFailed(eq(tx), excCaptor.capture());

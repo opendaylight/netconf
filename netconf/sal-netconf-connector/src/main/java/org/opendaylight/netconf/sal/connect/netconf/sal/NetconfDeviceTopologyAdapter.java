@@ -10,7 +10,6 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +19,7 @@ import java.util.stream.Collectors;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
@@ -203,7 +203,7 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
                 id, writeTx.getIdentifier());
 
         try {
-            writeTx.submit().get();
+            writeTx.commit().get();
         } catch (InterruptedException | ExecutionException e) {
             LOG.error("{}: Transaction(close) {} FAILED!", id, writeTx.getIdentifier(), e);
             throw new IllegalStateException(id + "  Transaction(close) not committed correctly", e);
@@ -228,9 +228,9 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
         LOG.trace("{}: Committing Transaction {}:{}", id, txType,
                 transaction.getIdentifier());
 
-        Futures.addCallback(transaction.submit(), new FutureCallback<Void>() {
+        transaction.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
-            public void onSuccess(final Void result) {
+            public void onSuccess(final CommitInfo result) {
                 LOG.trace("{}: Transaction({}) {} SUCCESSFUL", id, txType,
                         transaction.getIdentifier());
             }
@@ -252,7 +252,7 @@ public final class NetconfDeviceTopologyAdapter implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         removeDeviceConfiguration();
     }
 

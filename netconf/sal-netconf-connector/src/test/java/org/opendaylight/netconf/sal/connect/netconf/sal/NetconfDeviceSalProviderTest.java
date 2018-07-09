@@ -16,7 +16,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +28,9 @@ import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 
 public class NetconfDeviceSalProviderTest {
 
@@ -45,6 +46,8 @@ public class NetconfDeviceSalProviderTest {
     private DOMMountPointService mountPointService;
     @Mock
     private WriteTransaction writeTx;
+    @Mock
+    private CommitInfo info;
     private NetconfDeviceSalProvider provider;
 
     @Before
@@ -54,11 +57,11 @@ public class NetconfDeviceSalProviderTest {
         doReturn(writeTx).when(chain).newWriteOnlyTransaction();
         doNothing().when(writeTx).merge(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
         doReturn("Some object").when(writeTx).getIdentifier();
-        doReturn(Futures.immediateCheckedFuture(null)).when(writeTx).submit();
+        doReturn(FluentFutures.immediateFluentFuture(info)).when(writeTx).commit();
         provider = new NetconfDeviceSalProvider(new RemoteDeviceId("device1",
                 InetSocketAddress.createUnresolved("localhost", 17830)), mountPointService, dataBroker);
         when(chain.newWriteOnlyTransaction()).thenReturn(tx);
-        when(tx.submit()).thenReturn(Futures.immediateCheckedFuture(null));
+        doReturn(FluentFutures.immediateFluentFuture(info)).when(tx).commit();
         when(tx.getIdentifier()).thenReturn(tx);
     }
 

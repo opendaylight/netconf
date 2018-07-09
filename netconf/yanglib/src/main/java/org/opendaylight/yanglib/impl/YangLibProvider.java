@@ -12,7 +12,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.File;
 import java.util.ArrayList;
@@ -21,6 +20,7 @@ import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesStateBuilder;
@@ -124,9 +124,9 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
         tx.merge(LogicalDatastoreType.OPERATIONAL, InstanceIdentifier.create(ModulesState.class),
                 new ModulesStateBuilder().setModule(newModules).build());
 
-        Futures.addCallback(tx.submit(), new FutureCallback<Void>() {
+        tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
-            public void onSuccess(@Nullable final Void result) {
+            public void onSuccess(@Nullable final CommitInfo result) {
                 LOG.debug("Modules state successfully populated with new modules");
             }
 
@@ -153,9 +153,9 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
                                         new YangIdentifier(source.getSourceIdentifier().getName()),
                                         RevisionUtils.fromYangCommon(source.getSourceIdentifier().getRevision()))));
 
-        Futures.addCallback(tx.submit(), new FutureCallback<Void>() {
+        tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
-            public void onSuccess(@Nullable final Void result) {
+            public void onSuccess(@Nullable final CommitInfo result) {
                 LOG.debug("Modules state successfully updated.");
             }
 

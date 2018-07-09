@@ -13,7 +13,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.Futures;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -24,7 +23,7 @@ import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.util.NetconfSalKeystoreService;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.AddPrivateKeyInput;
@@ -37,6 +36,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificate;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.trusted.certificates.TrustedCertificateKey;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.w3c.dom.Document;
@@ -58,6 +58,8 @@ public class NetconfSalKeystoreServiceTest {
     private DataBroker dataBroker;
     @Mock
     private AAAEncryptionService encryptionService;
+    @Mock
+    private CommitInfo info;
 
     @Before
     public void setUp() {
@@ -69,7 +71,7 @@ public class NetconfSalKeystoreServiceTest {
 
     @Test
     public void testAddPrivateKey() throws Exception {
-        doReturn(Futures.<Void, TransactionCommitFailedException>immediateCheckedFuture(null)).when(writeTx).submit();
+        doReturn(FluentFutures.immediateFluentFuture(info)).when(writeTx).commit();
         NetconfSalKeystoreService keystoreService = new NetconfSalKeystoreService(dataBroker, encryptionService);
 
         final AddPrivateKeyInput input = getPrivateKeyInput();
@@ -81,7 +83,7 @@ public class NetconfSalKeystoreServiceTest {
 
     @Test
     public void testAddTrustedCertificate() throws Exception {
-        doReturn(Futures.<Void, TransactionCommitFailedException>immediateCheckedFuture(null)).when(writeTx).submit();
+        doReturn(FluentFutures.immediateFluentFuture(info)).when(writeTx).commit();
         NetconfSalKeystoreService keystoreService = new NetconfSalKeystoreService(dataBroker, encryptionService);
 
         final AddTrustedCertificateInput input = getTrustedCertificateInput();

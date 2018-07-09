@@ -11,12 +11,12 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import com.google.common.util.concurrent.Futures;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,6 +33,7 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesStateBuilder;
@@ -45,6 +46,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfigBuilder;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -61,6 +63,9 @@ public class YangLibProviderTest {
 
     @Mock
     private WriteTransaction writeTransaction;
+
+    @Mock
+    private CommitInfo info;
 
     private YangLibProvider yangLibProvider;
 
@@ -112,7 +117,7 @@ public class YangLibProviderTest {
                             org.opendaylight.yangtools.yang.common.Revision.of("2016-04-28")),
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
-        when(writeTransaction.submit()).thenReturn(Futures.immediateCheckedFuture(null));
+        doReturn(FluentFutures.immediateFluentFuture(info)).when(writeTransaction).commit();
         yangLibProvider.schemaSourceRegistered(list);
 
         List<Module> newModulesList = new ArrayList<>();
@@ -137,7 +142,7 @@ public class YangLibProviderTest {
         verify(writeTransaction).merge(eq(LogicalDatastoreType.OPERATIONAL),
                 eq(InstanceIdentifier.create(ModulesState.class)),
                 eq(new ModulesStateBuilder().setModule(newModulesList).build()));
-        verify(writeTransaction).submit();
+        verify(writeTransaction).commit();
     }
 
     @Test
@@ -173,7 +178,7 @@ public class YangLibProviderTest {
                         YangTextSchemaSource.class, PotentialSchemaSource.Costs.IMMEDIATE.getValue()));
 
         when(dataBroker.newWriteOnlyTransaction()).thenReturn(writeTransaction);
-        when(writeTransaction.submit()).thenReturn(Futures.immediateCheckedFuture(null));
+        doReturn(FluentFutures.immediateFluentFuture(info)).when(writeTransaction).commit();
         yangLibProvider.schemaSourceRegistered(potentialSources);
         verify(dataBroker).newWriteOnlyTransaction();
 
@@ -181,7 +186,7 @@ public class YangLibProviderTest {
         verify(writeTransaction).merge(eq(LogicalDatastoreType.OPERATIONAL),
                 eq(InstanceIdentifier.create(ModulesState.class)), modulesStateCaptor.capture());
         assertEquals(modulesStateCaptor.getValue().getModule().size(), 1);
-        verify(writeTransaction).submit();
+        verify(writeTransaction).commit();
     }
 
     @Test
@@ -207,7 +212,7 @@ public class YangLibProviderTest {
         doNothing().when(writeTransaction)
                 .delete(eq(LogicalDatastoreType.OPERATIONAL), any(InstanceIdentifier.class));
 
-        when(writeTransaction.submit()).thenReturn(Futures.immediateCheckedFuture(null));
+        doReturn(FluentFutures.immediateFluentFuture(info)).when(writeTransaction).commit();
 
         PotentialSchemaSource<YangTextSchemaSource> yangUnregistererSource =
                 PotentialSchemaSource.create(
@@ -223,7 +228,7 @@ public class YangLibProviderTest {
                                 new ModuleKey(new YangIdentifier("unregistered-yang-schema-without-revision"),
                                         RevisionUtils.emptyRevision()))));
 
-        verify(writeTransaction).submit();
+        verify(writeTransaction).commit();
 
         yangUnregistererSource =
                 PotentialSchemaSource.create(
@@ -240,6 +245,6 @@ public class YangLibProviderTest {
                                 new ModuleKey(new YangIdentifier("unregistered-yang-with-revision"),
                                         new Revision(new RevisionIdentifier("2016-04-28"))))));
 
-        verify(writeTransaction, times(2)).submit();
+        verify(writeTransaction, times(2)).commit();
     }
 }
