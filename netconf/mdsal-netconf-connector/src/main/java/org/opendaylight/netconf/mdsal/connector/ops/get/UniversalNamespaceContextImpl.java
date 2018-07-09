@@ -112,7 +112,7 @@ public class UniversalNamespaceContextImpl implements NamespaceContext {
     }
 
     @Override
-    public Iterator getPrefixes(final String namespaceURI) {
+    public Iterator<String> getPrefixes(final String namespaceURI) {
         // Not implemented
         return null;
     }

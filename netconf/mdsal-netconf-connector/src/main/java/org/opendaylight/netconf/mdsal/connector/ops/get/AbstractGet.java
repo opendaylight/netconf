@@ -5,12 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops.get;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import javax.xml.stream.XMLOutputFactory;
@@ -75,7 +73,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         return result.getNode();
     }
 
-    private XMLStreamWriter getXmlStreamWriter(final DOMResult result) {
+    private static XMLStreamWriter getXmlStreamWriter(final DOMResult result) {
         try {
             return XML_OUTPUT_FACTORY.createXMLStreamWriter(result);
         } catch (final XMLStreamException e) {
@@ -83,12 +81,12 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         }
     }
 
-    private SchemaPath getSchemaPath(final YangInstanceIdentifier dataRoot) {
+    private static SchemaPath getSchemaPath(final YangInstanceIdentifier dataRoot) {
         return SchemaPath.create(
                 Iterables.transform(dataRoot.getPathArguments(), PathArgument::getNodeType), dataRoot.equals(ROOT));
     }
 
-    private void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,
+    private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,
                                   final ContainerNode data) {
         try {
             if (data.getNodeType().equals(SchemaContext.NAME)) {
@@ -101,12 +99,12 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
             nnWriter.flush();
             xmlWriter.flush();
         } catch (XMLStreamException | IOException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
     protected Element serializeNodeWithParentStructure(final Document document, final YangInstanceIdentifier dataRoot,
-                                                       final NormalizedNode node) {
+                                                       final NormalizedNode<?, ?> node) {
         if (!dataRoot.equals(ROOT)) {
             return (Element) transformNormalizedNode(document,
                     ImmutableNodes.fromInstanceId(schemaContext.getCurrentContext(), dataRoot, node),
