@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "764182ae_b5aa37de",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NotificationToMdsalWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-07-09T13:05:06Z",
+      "side": 1,
+      "message": "avoid is not that suitable parameter name anymore..",
+      "revId": "28da26515f86a758cbfddee8844d1f2a3a1f22db",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
