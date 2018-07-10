@@ -30,14 +30,16 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySet
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
 
-class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
+class NetconfTopologyContext extends AbstractRegistration implements ClusterSingletonService {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyContext.class);
 
+    private final AtomicBoolean stopped = new AtomicBoolean(false);
     private final ServiceGroupIdentifier serviceGroupIdent;
     private final Timeout actorResponseWaitTime;
     private final DOMMountPointService mountService;
@@ -47,8 +49,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
     private RemoteDeviceConnector remoteDeviceConnector;
     private NetconfNodeManager netconfNodeManager;
     private ActorRef masterActorRef;
-    private final AtomicBoolean closed = new AtomicBoolean(false);
-    private final AtomicBoolean stopped = new AtomicBoolean(false);
+
     private volatile boolean isMaster;
 
     NetconfTopologyContext(final NetconfTopologySetup netconfTopologyDeviceSetup,
@@ -79,7 +80,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             netconfNodeManager = null;
         }
 
-        if (!closed.get()) {
+        if (!isClosed()) {
             final String masterAddress =
                     Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
             masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
@@ -95,8 +96,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
     // called when master is down/changed to slave
     @Override
     public ListenableFuture<Void> closeServiceInstance() {
-
-        if (!closed.get()) {
+        if (!isClosed()) {
             // in case that master changes role to slave, new NodeDeviceManager must be created and listener registered
             netconfNodeManager = createNodeDeviceManager();
         }
@@ -119,17 +119,13 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         return ndm;
     }
 
-    @Override
-    public void close() throws Exception {
-        if (!closed.compareAndSet(false, true)) {
-            return;
-        }
 
+    @Override
+    protected void removeRegistration() {
         if (netconfNodeManager != null) {
             netconfNodeManager.close();
         }
         stopDeviceConnectorAndActor();
-
     }
 
     /**
