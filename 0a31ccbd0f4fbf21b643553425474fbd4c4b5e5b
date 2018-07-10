@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ab948c96_b5a6f816",
+        "filename": "netconf/mdsal-netconf-notification/src/main/java/org/opendaylight/controller/config/yang/netconf/mdsal/notification/NotificationToMdsalWriter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-07-10T09:43:49Z",
+      "side": 1,
+      "message": "We should rename CommitInfo parameter name avoid into something more suitable..",
+      "revId": "0a31ccbd0f4fbf21b643553425474fbd4c4b5e5b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
