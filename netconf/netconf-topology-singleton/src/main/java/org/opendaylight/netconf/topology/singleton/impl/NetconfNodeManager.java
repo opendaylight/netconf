@@ -37,6 +37,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.concepts.AbstractRegistration;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
@@ -49,8 +50,8 @@ import scala.concurrent.Future;
  * Managing and reacting on data tree changes in specific netconf node when master writes status to the operational
  * data store (e.g. handling lifecycle of slave mount point).
  */
-class NetconfNodeManager
-        implements ClusteredDataTreeChangeListener<Node>, NetconfTopologySingletonService, AutoCloseable {
+class NetconfNodeManager extends AbstractRegistration
+        implements ClusteredDataTreeChangeListener<Node>, NetconfTopologySingletonService {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfNodeManager.class);
 
@@ -65,9 +66,6 @@ class NetconfNodeManager
 
     @GuardedBy("this")
     private ActorRef slaveActorRef;
-
-    @GuardedBy("this")
-    private boolean closed;
 
     @GuardedBy("this")
     private int lastUpdateCount;
@@ -115,12 +113,7 @@ class NetconfNodeManager
     }
 
     @Override
-    public synchronized void close() {
-        if (closed) {
-            return;
-        }
-
-        closed = true;
+    protected synchronized void removeRegistration() {
         closeActor();
         if (dataChangeListenerRegistration != null) {
             dataChangeListenerRegistration.close();
@@ -153,7 +146,7 @@ class NetconfNodeManager
     }
 
     private synchronized void handleSlaveMountPoint(final DataObjectModification<Node> rootNode) {
-        if (closed) {
+        if (isClosed()) {
             return;
         }
 
@@ -189,7 +182,7 @@ class NetconfNodeManager
             public void onComplete(final Throwable failure, final Object response) {
                 synchronized (this) {
                     // Ignore the response if we were since closed or another notification update occurred.
-                    if (closed || updateCount != lastUpdateCount) {
+                    if (isClosed() || updateCount != lastUpdateCount) {
                         return;
                     }
 

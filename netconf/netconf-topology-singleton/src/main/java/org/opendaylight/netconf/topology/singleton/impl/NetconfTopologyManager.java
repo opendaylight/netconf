@@ -181,7 +181,7 @@ public class NetconfTopologyManager
                 if (--tries <= 0) {
                     LOG.error("Unable to register cluster singleton service {} - done trying, closing topology context",
                             newNetconfTopologyContext, e);
-                    close(newNetconfTopologyContext);
+                    newNetconfTopologyContext.close();
                     break;
                 }
             }
@@ -191,8 +191,8 @@ public class NetconfTopologyManager
     private void stopNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier) {
         final NetconfTopologyContext netconfTopologyContext = contexts.remove(instanceIdentifier);
         if (netconfTopologyContext != null) {
-            close(clusterRegistrations.remove(instanceIdentifier));
-            close(netconfTopologyContext);
+            clusterRegistrations.remove(instanceIdentifier).close();
+            netconfTopologyContext.close();
         }
     }
 
@@ -209,22 +209,11 @@ public class NetconfTopologyManager
             dataChangeListenerRegistration = null;
         }
 
-        contexts.values().forEach(netconfTopologyContext -> close(netconfTopologyContext));
-
-        clusterRegistrations.values().forEach(
-            clusterSingletonServiceRegistration -> close(clusterSingletonServiceRegistration));
-
+        contexts.values().forEach(NetconfTopologyContext::close);
         contexts.clear();
-        clusterRegistrations.clear();
-    }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
-    private static void close(AutoCloseable closeable) {
-        try {
-            closeable.close();
-        } catch (Exception e) {
-            LOG.warn("Error closing {}", closeable, e);
-        }
+        clusterRegistrations.values().forEach(ClusterSingletonServiceRegistration::close);
+        clusterRegistrations.clear();
     }
 
     /**
