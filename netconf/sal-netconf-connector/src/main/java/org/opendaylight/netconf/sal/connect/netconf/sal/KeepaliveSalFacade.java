@@ -106,7 +106,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         if (currentKeepalive != null) {
             currentKeepalive.cancel(false);
         }
-        scheduleKeepalive();
+        scheduleKeepalives();
     }
 
     /**
@@ -135,15 +135,15 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         salFacade.onDeviceConnected(remoteSchemaContext, netconfSessionPreferences, deviceRpc1);
 
         LOG.debug("{}: Netconf session initiated, starting keepalives", id);
-        scheduleKeepalive();
+        scheduleKeepalives();
     }
 
-    private void scheduleKeepalive() {
+    private void scheduleKeepalives() {
         lastKeepAliveSucceeded.set(true);
         Preconditions.checkState(currentDeviceRpc != null);
-        LOG.trace("{}: Scheduling keepalives every  {} {} ", id, keepaliveDelaySeconds, TimeUnit.SECONDS);
+        LOG.trace("{}: Scheduling keepalives every  {} {}", id, keepaliveDelaySeconds, TimeUnit.SECONDS);
         currentKeepalive = executor.scheduleWithFixedDelay(new Keepalive(),
-          keepaliveDelaySeconds, keepaliveDelaySeconds,TimeUnit.SECONDS);
+          keepaliveDelaySeconds, keepaliveDelaySeconds, TimeUnit.SECONDS);
     }
 
     @Override
@@ -211,7 +211,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
             // No matter what response we got, rpc-reply or rpc-error,
             // we got it from device so the netconf session is OK
             if (result != null && result.getResult() != null) {
-            	lastKeepAliveSucceeded.set(true);
+                lastKeepAliveSucceeded.set(true);
             }  else if (result != null && result.getErrors() != null) {
                 LOG.warn("{}: Keepalive RPC failed with error: {}", id, result.getErrors());
                 lastKeepAliveSucceeded.set(true);
