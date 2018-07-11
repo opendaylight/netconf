@@ -169,7 +169,7 @@ public class DocumentedException extends Exception {
 
     public DocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag,
             final ErrorSeverity errorSeverity) {
-        this(message, errorType, errorTag, errorSeverity, Collections.<String, String>emptyMap());
+        this(message, errorType, errorTag, errorSeverity, Collections.emptyMap());
     }
 
     public DocumentedException(final String message, final ErrorType errorType, final ErrorTag errorTag,
@@ -183,7 +183,7 @@ public class DocumentedException extends Exception {
 
     public DocumentedException(final String message, final Exception cause, final ErrorType errorType,
             final ErrorTag errorTag, final ErrorSeverity errorSeverity) {
-        this(message, cause, errorType, errorTag, errorSeverity, Collections.<String, String>emptyMap());
+        this(message, cause, errorType, errorTag, errorSeverity, Collections.emptyMap());
     }
 
     public DocumentedException(final String message, final Exception cause, final ErrorType errorType,

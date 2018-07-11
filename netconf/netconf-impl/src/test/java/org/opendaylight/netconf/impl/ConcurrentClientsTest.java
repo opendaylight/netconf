@@ -73,7 +73,6 @@ import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.protocol.framework.NeverReconnectStrategy;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.CapabilitiesBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,7 +127,7 @@ public class ConcurrentClientsTest {
 
         }).when(monitoring).registerCapabilitiesListener(any(NetconfMonitoringService.CapabilitiesListener.class));
         doReturn(sessionListener).when(monitoring).getSessionListener();
-        doReturn(new CapabilitiesBuilder().setCapability(Collections.<Uri>emptyList()).build()).when(monitoring)
+        doReturn(new CapabilitiesBuilder().setCapability(Collections.emptyList()).build()).when(monitoring)
                 .getCapabilities();
         return monitoring;
     }

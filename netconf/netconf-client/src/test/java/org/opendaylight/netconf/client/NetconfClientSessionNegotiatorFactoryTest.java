@@ -18,7 +18,6 @@ import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import org.junit.Test;
-import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.protocol.framework.SessionListenerFactory;
 import org.opendaylight.protocol.framework.SessionNegotiator;
 
@@ -33,7 +32,7 @@ public class NetconfClientSessionNegotiatorFactoryTest {
         Channel channel = mock(Channel.class);
         Promise<NetconfClientSession> promise = mock(Promise.class);
         NetconfClientSessionNegotiatorFactory negotiatorFactory = new NetconfClientSessionNegotiatorFactory(timer,
-                Optional.<NetconfHelloMessageAdditionalHeader>absent(), 200L);
+                Optional.absent(), 200L);
 
         SessionNegotiator<?> sessionNegotiator = negotiatorFactory.getSessionNegotiator(listenerFactory, channel,
                 promise);

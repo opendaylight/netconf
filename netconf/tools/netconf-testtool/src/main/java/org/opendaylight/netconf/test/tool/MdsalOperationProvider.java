@@ -88,7 +88,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
     @Override
     public AutoCloseable registerCapabilityListener(
             final CapabilityListener listener) {
-        listener.onCapabilitiesChanged(caps, Collections.<Capability>emptySet());
+        listener.onCapabilitiesChanged(caps, Collections.emptySet());
         return () -> {
         };
     }
@@ -153,7 +153,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             final DiscardChanges discardChanges = new DiscardChanges(
                 String.valueOf(currentSessionId), transactionProvider);
 
-            return Sets.<NetconfOperation>newHashSet(get, getConfig,
+            return Sets.newHashSet(get, getConfig,
                     editConfig, commit, lock, unLock, discardChanges);
         }
 

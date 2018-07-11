@@ -28,8 +28,6 @@ import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.SchemasBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.SessionsBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.w3c.dom.Document;
 
 public class GetTest {
@@ -54,9 +52,9 @@ public class GetTest {
         correctSubsequentResult = XmlUtil.readXmlToDocument("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:"
                 + "1.0\"><data></data></rpc-reply>");
 
-        doReturn(new SessionsBuilder().setSession(Collections.<Session>emptyList()).build()).when(monitor)
+        doReturn(new SessionsBuilder().setSession(Collections.emptyList()).build()).when(monitor)
                 .getSessions();
-        doReturn(new SchemasBuilder().setSchema(Collections.<Schema>emptyList()).build()).when(monitor).getSchemas();
+        doReturn(new SchemasBuilder().setSchema(Collections.emptyList()).build()).when(monitor).getSchemas();
         doReturn(false).when(subsequentOperation).isExecutionTermination();
 
         get = new Get(monitor);

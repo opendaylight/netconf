@@ -44,7 +44,7 @@ public class OperationsProvider implements NetconfOperationServiceFactory {
     @Override
     public AutoCloseable registerCapabilityListener(
         final CapabilityListener listener) {
-        listener.onCapabilitiesChanged(caps, Collections.<Capability>emptySet());
+        listener.onCapabilitiesChanged(caps, Collections.emptySet());
         return () -> {
         };
     }

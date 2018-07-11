@@ -58,17 +58,14 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 public class NetconfMessageTransformerTest {
@@ -165,7 +162,7 @@ public class NetconfMessageTransformerTest {
         assertNotNull(compositeNodeRpcResult.getResult());
         final DOMSource schemaContent =
             ((AnyXmlNode) ((ContainerNode) compositeNodeRpcResult.getResult()).getValue().iterator().next()).getValue();
-        assertThat(((Element) schemaContent.getNode()).getTextContent(),
+        assertThat(schemaContent.getNode().getTextContent(),
                 CoreMatchers.containsString("Random YANG SCHEMA"));
     }
 
@@ -261,7 +258,7 @@ public class NetconfMessageTransformerTest {
                 .nodeWithKey(Schema.QNAME, keys).build();
         final DataContainerChild<?, ?> editConfigStructure =
                 createEditConfigStructure(BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext(), id,
-                        Optional.<ModifyAction>absent(), Optional.<NormalizedNode<?, ?>>fromNullable(schemaNode));
+                        Optional.absent(), Optional.fromNullable(schemaNode));
 
         final DataContainerChild<?, ?> target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_QNAME);
 

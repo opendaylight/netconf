@@ -165,7 +165,7 @@ public abstract class CallHomeAuthorization {
         @Override
         protected void applyTo(final ClientSession session) {
             Preconditions.checkArgument(session instanceof ClientSessionImpl);
-            ((ClientSessionImpl) session).setUsername(username);
+            session.setUsername(username);
 
             // First try authentication using server host keys, else try password.
             for (KeyPair keyPair : clientKeyPair) {

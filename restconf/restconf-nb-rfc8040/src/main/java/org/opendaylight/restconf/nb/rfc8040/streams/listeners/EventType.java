@@ -11,5 +11,5 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
  * Type of the event.
  */
 enum EventType {
-    REGISTER, DEREGISTER, NOTIFY;
+    REGISTER, DEREGISTER, NOTIFY
 }

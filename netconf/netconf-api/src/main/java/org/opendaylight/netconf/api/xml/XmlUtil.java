@@ -145,7 +145,7 @@ public final class XmlUtil {
             final String prefix, final String namespace, final String contentWithoutPrefix) {
 
         return createTextElementWithNamespacedContent(document, qname, prefix, namespace, contentWithoutPrefix,
-                Optional.<String>absent());
+                Optional.absent());
     }
 
     public static Element createTextElementWithNamespacedContent(final Document document, final String qname,

@@ -61,7 +61,6 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.ModuleImport;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
@@ -178,7 +177,7 @@ public class NetconfDeviceTest {
         // Make fallback attempt to fail due to empty resolved sources
         final SchemaResolutionException schemaResolutionException
                 = new SchemaResolutionException("fail first",
-                Collections.<SourceIdentifier>emptyList(), HashMultimap.<SourceIdentifier, ModuleImport>create());
+                Collections.emptyList(), HashMultimap.create());
         doReturn(Futures.immediateFailedFuture(schemaResolutionException))
                 .when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
 
