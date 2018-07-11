@@ -59,8 +59,8 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
         this.dataBroker = dataBroker;
         this.rpcService = rpcService;
 
-        this.rootSchemaSourceProviderDependency = (DOMYangTextSourceProvider) schemaService.getSupportedExtensions()
-                .get(DOMYangTextSourceProvider.class);
+        this.rootSchemaSourceProviderDependency = schemaService.getExtensions()
+                .getInstance(DOMYangTextSourceProvider.class);
         this.currentSchemaContext = new CurrentSchemaContext(Preconditions.checkNotNull(schemaService),
                 rootSchemaSourceProviderDependency);
         this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
