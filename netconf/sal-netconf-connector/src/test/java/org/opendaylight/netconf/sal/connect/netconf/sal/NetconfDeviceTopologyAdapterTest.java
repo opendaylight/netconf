@@ -16,6 +16,8 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.net.InetSocketAddress;
 import java.util.EnumMap;
@@ -47,6 +49,7 @@ import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.binding.generator.util.BindingRuntimeContext;
 import org.opendaylight.mdsal.binding.generator.util.JavassistUtils;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaServiceExtension;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -247,6 +250,11 @@ public class NetconfDeviceTopologyAdapterTest {
                         // No-op
                     }
                 };
+            }
+
+            @Override
+            public ClassToInstanceMap<DOMSchemaServiceExtension> getExtensions() {
+                return ImmutableClassToInstanceMap.of();
             }
         };
     }

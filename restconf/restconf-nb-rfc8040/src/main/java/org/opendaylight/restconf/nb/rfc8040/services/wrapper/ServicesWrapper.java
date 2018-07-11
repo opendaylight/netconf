@@ -75,9 +75,8 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
             final DOMSchemaService domSchemaService) {
         RestconfOperationsService restconfOpsService =
                 new RestconfOperationsServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
-        final DOMYangTextSourceProvider yangTextSourceProvider =
-                (DOMYangTextSourceProvider) domSchemaService.getSupportedExtensions()
-                        .get(DOMYangTextSourceProvider.class);
+        final DOMYangTextSourceProvider yangTextSourceProvider = domSchemaService.getExtensions()
+                .getInstance(DOMYangTextSourceProvider.class);
         RestconfSchemaService restconfSchemaService =
                 new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler,
                 yangTextSourceProvider);

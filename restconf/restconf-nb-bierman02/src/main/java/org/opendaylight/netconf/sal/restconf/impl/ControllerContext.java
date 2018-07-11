@@ -112,8 +112,8 @@ public final class ControllerContext implements SchemaContextListener, Closeable
 
     public static ControllerContext newInstance(DOMSchemaService schemaService, DOMMountPointService mountService,
             DOMSchemaService domSchemaService) {
-        final DOMYangTextSourceProvider yangTextSourceProvider =
-            (DOMYangTextSourceProvider) domSchemaService.getSupportedExtensions().get(DOMYangTextSourceProvider.class);
+        final DOMYangTextSourceProvider yangTextSourceProvider = domSchemaService.getExtensions()
+                .getInstance(DOMYangTextSourceProvider.class);
 
         return new ControllerContext(schemaService, mountService, yangTextSourceProvider);
     }
