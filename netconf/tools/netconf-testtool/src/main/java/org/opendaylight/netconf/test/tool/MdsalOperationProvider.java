@@ -8,6 +8,8 @@
 
 package org.opendaylight.netconf.test.tool;
 
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -24,6 +26,7 @@ import org.opendaylight.controller.md.sal.dom.broker.impl.SerializedDOMDataBroke
 import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
 import org.opendaylight.controller.sal.core.spi.data.DOMStore;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaServiceExtension;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.impl.SessionIdProvider;
@@ -249,6 +252,11 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                             // No-op
                         }
                     };
+                }
+
+                @Override
+                public ClassToInstanceMap<DOMSchemaServiceExtension> getExtensions() {
+                    return ImmutableClassToInstanceMap.of();
                 }
             };
         }

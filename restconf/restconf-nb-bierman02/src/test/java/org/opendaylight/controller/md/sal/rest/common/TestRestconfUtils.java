@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -75,8 +76,10 @@ public final class TestRestconfUtils {
 
         DOMSchemaService mockSchemaService = mock(DOMSchemaService.class);
         doReturn(schemaContext).when(mockSchemaService).getGlobalContext();
+        doReturn(ImmutableClassToInstanceMap.of()).when(mockSchemaService).getExtensions();
 
         DOMSchemaService mockDomSchemaService = mock(DOMSchemaService.class);
+        doReturn(ImmutableClassToInstanceMap.of()).when(mockDomSchemaService).getExtensions();
 
         return ControllerContext.newInstance(mockSchemaService, mockMountService, mockDomSchemaService);
     }
