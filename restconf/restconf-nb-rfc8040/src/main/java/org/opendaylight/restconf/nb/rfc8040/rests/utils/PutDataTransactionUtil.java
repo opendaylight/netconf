@@ -36,7 +36,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.OrderedLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
@@ -383,7 +382,7 @@ public final class PutDataTransactionUtil {
         final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
         writeTx.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
         TransactionUtil.ensureParentsByMerge(path, schemaContext, writeTx);
-        for (final MapEntryNode child : ((MapNode) payload).getValue()) {
+        for (final MapEntryNode child : payload.getValue()) {
             final YangInstanceIdentifier childPath = path.node(child.getIdentifier());
             writeTx.put(datastore, childPath, child);
         }

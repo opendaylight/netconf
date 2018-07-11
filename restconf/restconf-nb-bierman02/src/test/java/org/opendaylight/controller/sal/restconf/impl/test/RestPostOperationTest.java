@@ -32,7 +32,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
@@ -153,7 +152,7 @@ public class RestPostOperationTest extends JerseyTest {
     public void createConfigurationDataNullTest() throws UnsupportedEncodingException {
         when(brokerFacade.commitConfigurationDataPost(any(SchemaContext.class), any(YangInstanceIdentifier.class),
                 any(NormalizedNode.class), Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(Futures.<Void, TransactionCommitFailedException>immediateCheckedFuture(null));
+                .thenReturn(Futures.immediateCheckedFuture(null));
 
         //FIXME : find who is set schemaContext
 //        final String URI_1 = "/config";

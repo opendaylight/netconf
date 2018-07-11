@@ -18,7 +18,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.util.concurrent.Promise;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

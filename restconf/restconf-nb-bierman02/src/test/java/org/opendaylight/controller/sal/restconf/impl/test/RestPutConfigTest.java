@@ -135,7 +135,7 @@ public class RestPutConfigTest {
         final PutResult result = Mockito.mock(PutResult.class);
         final CheckedFuture<Void, TransactionCommitFailedException> checkedFuture =
                 Futures.immediateCheckedFuture(null);
-        Mockito.when(this.brokerFacade.commitConfigurationDataPut(this.schemaContext, yii, data, null, null))
+        Mockito.when(this.brokerFacade.commitConfigurationDataPut(schemaContext, yii, data, null, null))
                 .thenReturn(result);
         Mockito.when(result.getFutureOfPutData()).thenReturn(checkedFuture);
         Mockito.when(result.getStatus()).thenReturn(Status.OK);

@@ -55,7 +55,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfStateSchemas.class);
 
-    public static final NetconfStateSchemas EMPTY = new NetconfStateSchemas(Collections.<RemoteYangSchema>emptySet());
+    public static final NetconfStateSchemas EMPTY = new NetconfStateSchemas(Collections.emptySet());
 
     private static final YangInstanceIdentifier STATE_SCHEMAS_IDENTIFIER =
             YangInstanceIdentifier.builder().node(NetconfState.QNAME).node(Schemas.QNAME).build();

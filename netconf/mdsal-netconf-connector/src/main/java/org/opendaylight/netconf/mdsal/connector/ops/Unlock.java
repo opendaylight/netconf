@@ -39,7 +39,7 @@ public class Unlock extends AbstractSingletonNetconfOperation {
         final Datastore targetDatastore = Lock.extractTargetParameter(operationElement);
         if (targetDatastore == Datastore.candidate) {
             LOG.debug("Unlocking candidate datastore on session: {}", getNetconfSessionIdForReporting());
-            return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.<String>absent());
+            return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
         }
 
         throw new DocumentedException("Unable to unlock " + targetDatastore + " datastore",
