@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.io.Resources;
 import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
@@ -149,6 +150,8 @@ public class JSONRestconfServiceRfc8040ImplTest {
     @Before
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
+
+        doReturn(ImmutableClassToInstanceMap.of()).when(domSchemaService).getExtensions();
 
         doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(mockReadOnlyTx).read(
                 eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
