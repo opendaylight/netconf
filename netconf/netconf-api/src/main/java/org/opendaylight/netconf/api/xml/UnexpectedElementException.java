@@ -16,7 +16,7 @@ public class UnexpectedElementException extends DocumentedException {
 
     public UnexpectedElementException(final String message, final DocumentedException.ErrorType errorType,
             final DocumentedException.ErrorTag errorTag, final DocumentedException.ErrorSeverity errorSeverity) {
-        this(message, errorType, errorTag, errorSeverity, Collections.<String, String>emptyMap());
+        this(message, errorType, errorTag, errorSeverity, Collections.emptyMap());
     }
 
     public UnexpectedElementException(final String message, final DocumentedException.ErrorType errorType,

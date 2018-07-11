@@ -31,7 +31,7 @@ public class NetconfMessageToXMLEncoder extends MessageToByteEncoder<NetconfMess
     private final Optional<String> clientId;
 
     public NetconfMessageToXMLEncoder() {
-        this(Optional.<String>absent());
+        this(Optional.absent());
     }
 
     public NetconfMessageToXMLEncoder(final Optional<String> clientId) {

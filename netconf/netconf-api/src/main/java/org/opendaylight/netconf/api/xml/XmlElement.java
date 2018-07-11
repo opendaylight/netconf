@@ -470,7 +470,7 @@ public final class XmlElement {
     }
 
     public void checkUnrecognisedElements(final XmlElement... additionalRecognisedElements) throws DocumentedException {
-        checkUnrecognisedElements(Collections.<XmlElement>emptyList(), additionalRecognisedElements);
+        checkUnrecognisedElements(Collections.emptyList(), additionalRecognisedElements);
     }
 
     @Override

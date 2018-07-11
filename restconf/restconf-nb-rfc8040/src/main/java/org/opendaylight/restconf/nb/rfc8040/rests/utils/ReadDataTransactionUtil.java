@@ -355,7 +355,7 @@ public final class ReadDataTransactionUtil {
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
-                final Object nodeVal = ((LeafNode<?>) child).getValue();
+                final Object nodeVal = child.getValue();
                 final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (keys.contains(child.getNodeType())) {
@@ -410,7 +410,7 @@ public final class ReadDataTransactionUtil {
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
-                final Object nodeVal = ((LeafNode<?>) child).getValue();
+                final Object nodeVal = child.getValue();
                 final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (trim) {

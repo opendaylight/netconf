@@ -86,7 +86,7 @@ public class MessageParserTest {
         }
         assertTrue(messages.isEmpty());
 
-        NetconfMessage receivedMessage = (NetconfMessage) testChunkChannel.readInbound();
+        NetconfMessage receivedMessage = testChunkChannel.readInbound();
         assertNotNull(receivedMessage);
         assertXMLEqual(this.msg.getDocument(), receivedMessage.getDocument());
     }
@@ -98,7 +98,7 @@ public class MessageParserTest {
                 new NetconfMessageToXMLEncoder(), new NetconfEOMAggregator(), new NetconfXMLToMessageDecoder());
 
         testChunkChannel.writeOutbound(this.msg);
-        ByteBuf recievedOutbound = (ByteBuf) testChunkChannel.readOutbound();
+        ByteBuf recievedOutbound = testChunkChannel.readOutbound();
 
         byte[] endOfMsgBytes = NetconfMessageConstants.END_OF_MESSAGE.getBytes(StandardCharsets.UTF_8);
         byte[] eom = new byte[endOfMsgBytes.length];
@@ -106,7 +106,7 @@ public class MessageParserTest {
         assertArrayEquals(endOfMsgBytes, eom);
 
         testChunkChannel.writeInbound(recievedOutbound);
-        NetconfMessage receivedMessage = (NetconfMessage) testChunkChannel.readInbound();
+        NetconfMessage receivedMessage = testChunkChannel.readInbound();
         assertNotNull(receivedMessage);
         assertXMLEqual(this.msg.getDocument(), receivedMessage.getDocument());
     }

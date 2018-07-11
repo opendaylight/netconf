@@ -26,7 +26,7 @@ public class NetconfMonitoringOperationService implements NetconfOperationServic
 
     @Override
     public Set<NetconfOperation> getNetconfOperations() {
-        return Sets.<NetconfOperation>newHashSet(new Get(monitor), new GetSchema(monitor));
+        return Sets.newHashSet(new Get(monitor), new GetSchema(monitor));
     }
 
     @Override

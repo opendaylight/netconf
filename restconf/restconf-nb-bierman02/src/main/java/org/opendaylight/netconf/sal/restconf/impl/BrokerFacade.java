@@ -594,21 +594,21 @@ public class BrokerFacade implements Closeable {
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
-                final Object nodeVal = ((LeafNode<?>) child).getValue();
+                final Object nodeVal = child.getValue();
                 final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (keys.contains(child.getNodeType())) {
-                    leafBuilder.withValue(((LeafNode<?>) child).getValue());
+                    leafBuilder.withValue(child.getValue());
                     builder.withChild(leafBuilder.build());
                 } else {
                     if (trim) {
                         if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                            leafBuilder.withValue(((LeafNode<?>) child).getValue());
+                            leafBuilder.withValue(child.getValue());
                             builder.withChild(leafBuilder.build());
                         }
                     } else {
                         if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                            leafBuilder.withValue(((LeafNode<?>) child).getValue());
+                            leafBuilder.withValue(child.getValue());
                             builder.withChild(leafBuilder.build());
                         }
                     }
@@ -649,17 +649,17 @@ public class BrokerFacade implements Closeable {
                 builder.withChild(childBuilder.build());
             } else if (child instanceof LeafNode) {
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
-                final Object nodeVal = ((LeafNode<?>) child).getValue();
+                final Object nodeVal = child.getValue();
                 final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (trim) {
                     if (defaultVal == null || !defaultVal.equals(nodeVal)) {
-                        leafBuilder.withValue(((LeafNode<?>) child).getValue());
+                        leafBuilder.withValue(child.getValue());
                         builder.withChild(leafBuilder.build());
                     }
                 } else {
                     if (defaultVal != null && defaultVal.equals(nodeVal)) {
-                        leafBuilder.withValue(((LeafNode<?>) child).getValue());
+                        leafBuilder.withValue(child.getValue());
                         builder.withChild(leafBuilder.build());
                     }
                 }
