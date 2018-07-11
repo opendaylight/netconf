@@ -7,7 +7,10 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops;
 
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMSchemaServiceExtension;
 import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -40,5 +43,10 @@ final class SchemaServiceStub implements DOMSchemaService {
                 // No-op
             }
         };
+    }
+
+    @Override
+    public ClassToInstanceMap<DOMSchemaServiceExtension> getExtensions() {
+        return ImmutableClassToInstanceMap.of();
     }
 }
