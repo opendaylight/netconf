@@ -138,10 +138,11 @@ public class NetconfServerSessionTest {
         final NetconfServerSession tcpSession = new NetconfServerSession(listener, ch, 1L, header);
         tcpSession.sessionUp();
         final Session managementSession = tcpSession.toManagementSession();
-        Assert.assertEquals(new String(managementSession.getSourceHost().getValue()), HOST);
+        Assert.assertEquals(HOST, managementSession.getSourceHost().getIpAddress().getIpv4Address().getValue());
         Assert.assertEquals(managementSession.getUsername(), USER);
         Assert.assertEquals(managementSession.getSessionId().toString(), SESSION_ID);
         Assert.assertEquals(managementSession.getTransport(), NetconfTcp.class);
+        tcpSession.close();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -152,6 +153,7 @@ public class NetconfServerSessionTest {
         final NetconfServerSession tcpSession = new NetconfServerSession(listener, ch, 1L, header);
         tcpSession.sessionUp();
         tcpSession.toManagementSession();
+        tcpSession.close();
     }
 
     @Test
@@ -162,10 +164,11 @@ public class NetconfServerSessionTest {
         final NetconfServerSession tcpSession = new NetconfServerSession(listener, ch, 1L, header);
         tcpSession.sessionUp();
         final Session managementSession = tcpSession.toManagementSession();
-        Assert.assertEquals(new String(managementSession.getSourceHost().getValue()), "::1");
+        Assert.assertEquals("::1", managementSession.getSourceHost().getIpAddress().getIpv6Address().getValue());
         Assert.assertEquals(managementSession.getUsername(), USER);
         Assert.assertEquals(managementSession.getSessionId().toString(), SESSION_ID);
         Assert.assertEquals(managementSession.getTransport(), NetconfSsh.class);
+        tcpSession.close();
     }
 
     @Test

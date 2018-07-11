@@ -23,12 +23,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
+import org.opendaylight.controller.md.sal.binding.api.DataObjectModification.ModificationType;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeChangeListener;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.HostBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
@@ -74,8 +75,7 @@ public class SessionNotificationProducerTest {
     @Test
     public void testOnDataChangedSessionCreated() throws Exception {
         final Session session = createSession(1);
-        final DataTreeModification<Session> treeChange = getTreeModification(session, DataObjectModification
-                .ModificationType.WRITE);
+        final DataTreeModification<Session> treeChange = getTreeModification(session, ModificationType.WRITE);
         publisher.onDataTreeChanged(Collections.singleton(treeChange));
         ArgumentCaptor<NetconfSessionStart> captor = ArgumentCaptor.forClass(NetconfSessionStart.class);
         verify(registration).onSessionStarted(captor.capture());
@@ -93,7 +93,7 @@ public class SessionNotificationProducerTest {
         final Session sessionAfter = createSessionWithInRpcCount(1, 1);
         doReturn(sessionBefore).when(changeObject).getDataBefore();
         doReturn(sessionAfter).when(changeObject).getDataAfter();
-        doReturn(DataObjectModification.ModificationType.WRITE).when(changeObject).getModificationType();
+        doReturn(ModificationType.WRITE).when(changeObject).getModificationType();
         doReturn(changeObject).when(treeChange).getRootNode();
         publisher.onDataTreeChanged(Collections.singleton(treeChange));
         //session didn't start, only stats changed. No notification should be produced
@@ -104,8 +104,7 @@ public class SessionNotificationProducerTest {
     @Test
     public void testOnDataChangedSessionDeleted() throws Exception {
         final Session session = createSession(1);
-        final DataTreeModification<Session> data = getTreeModification(session, DataObjectModification
-                .ModificationType.DELETE);
+        final DataTreeModification<Session> data = getTreeModification(session, ModificationType.DELETE);
         publisher.onDataTreeChanged(Collections.singleton(data));
         ArgumentCaptor<NetconfSessionEnd> captor = ArgumentCaptor.forClass(NetconfSessionEnd.class);
         verify(registration).onSessionEnded(captor.capture());
@@ -115,22 +114,21 @@ public class SessionNotificationProducerTest {
         Assert.assertEquals(session.getUsername(), value.getUsername());
     }
 
-    private Session createSession(long id) {
+    private static Session createSession(long id) {
         return createSessionWithInRpcCount(id, 0);
     }
 
-    private Session createSessionWithInRpcCount(long id, long inRpc) {
+    private static Session createSessionWithInRpcCount(long id, long inRpc) {
         return new SessionBuilder()
                 .setSessionId(id)
-                .setSourceHost(new Host("0.0.0.0".toCharArray()))
+                .setSourceHost(HostBuilder.getDefaultInstance("0.0.0.0"))
                 .setUsername("user")
                 .setInRpcs(new ZeroBasedCounter32(inRpc))
                 .build();
     }
 
     @SuppressWarnings("unchecked")
-    private DataTreeModification<Session> getTreeModification(Session session, DataObjectModification
-            .ModificationType type) {
+    private static DataTreeModification<Session> getTreeModification(Session session, ModificationType type) {
         final DataTreeModification<Session> treeChange = mock(DataTreeModification.class);
         final DataObjectModification<Session> changeObject = mock(DataObjectModification.class);
         switch (type) {

@@ -32,7 +32,7 @@ import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.monitoring.SessionEvent;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.HostBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
 
@@ -40,12 +40,12 @@ public class NetconfSessionMonitoringServiceTest {
 
     private static final Session SESSION_1 = new SessionBuilder()
             .setSessionId(1L)
-            .setSourceHost(new Host("0.0.0.0".toCharArray()))
+            .setSourceHost(HostBuilder.getDefaultInstance("0.0.0.0"))
             .setUsername("admin")
             .build();
     private static final Session SESSION_2 = new SessionBuilder()
             .setSessionId(2L)
-            .setSourceHost(new Host("0.0.0.0".toCharArray()))
+            .setSourceHost(HostBuilder.getDefaultInstance("0.0.0.0"))
             .setUsername("admin")
             .build();
 
