@@ -20,7 +20,6 @@ import org.opendaylight.netconf.sal.restconf.impl.jmx.Put;
 import org.opendaylight.netconf.sal.restconf.impl.jmx.RestConnectorRuntimeMXBean;
 import org.opendaylight.netconf.sal.restconf.impl.jmx.Rpcs;
 import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 
@@ -41,7 +40,7 @@ public class RestconfProviderImpl extends AbstractMXBean
 
     public void start() {
         this.webSocketServerThread = new Thread(WebSocketServer.createInstance(
-            IetfInetUtil.INSTANCE.stringForIpAddress(websocketAddress), websocketPort.getValue()));
+                websocketAddress.stringValue(), websocketPort.getValue()));
         this.webSocketServerThread.setName("Web socket server on port " + websocketPort);
         this.webSocketServerThread.start();
 
