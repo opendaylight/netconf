@@ -8,6 +8,8 @@
 
 package org.opendaylight.netconf.console.commands;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import java.util.Arrays;
@@ -42,6 +44,16 @@ public class NetconfConnectDeviceCommand implements Action {
         this.service = service;
         this.deviceIp = deviceIp;
         this.devicePort = devicePort;
+    }
+
+    @VisibleForTesting
+    NetconfConnectDeviceCommand(final NetconfCommands service, final String deviceIp, final String devicePort,
+            final String username, final String password) {
+        this.service = requireNonNull(service);
+        this.deviceIp = requireNonNull(deviceIp);
+        this.devicePort = requireNonNull(devicePort);
+        this.username = requireNonNull(username);
+        this.password = requireNonNull(password);
     }
 
     @Option(name = "-i",

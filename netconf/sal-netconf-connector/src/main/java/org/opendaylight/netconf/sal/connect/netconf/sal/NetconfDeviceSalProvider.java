@@ -90,6 +90,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
 
     }
 
+    @Override
     public void close() throws Exception {
         mountInstance.close();
         if (topologyDatastoreAdapter != null) {
@@ -101,7 +102,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
         }
     }
 
-    public static final class MountInstance implements AutoCloseable {
+    public static class MountInstance implements AutoCloseable {
 
         private final DOMMountPointService mountService;
         private final RemoteDeviceId id;
@@ -109,7 +110,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
 
         private ObjectRegistration<DOMMountPoint> topologyRegistration;
 
-        public MountInstance(final DOMMountPointService mountService, final RemoteDeviceId id) {
+        MountInstance(final DOMMountPointService mountService, final RemoteDeviceId id) {
             this.mountService = Preconditions.checkNotNull(mountService);
             this.id = Preconditions.checkNotNull(id);
         }

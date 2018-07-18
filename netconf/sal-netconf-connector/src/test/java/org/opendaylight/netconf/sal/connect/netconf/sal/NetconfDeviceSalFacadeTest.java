@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
@@ -32,18 +31,14 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({NetconfDeviceTopologyAdapter.class, NetconfDeviceSalProvider.MountInstance.class,
-        NetconfSessionPreferences.class})
 public class NetconfDeviceSalFacadeTest {
 
     private NetconfDeviceSalFacade deviceFacade;
 
+    @Mock
     private NetconfDeviceTopologyAdapter netconfDeviceTopologyAdapter;
+    @Mock
     private NetconfDeviceSalProvider.MountInstance mountInstance;
 
     @Mock
@@ -56,9 +51,6 @@ public class NetconfDeviceSalFacadeTest {
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test", address);
 
         deviceFacade = new NetconfDeviceSalFacade(remoteDeviceId, salProvider);
-
-        netconfDeviceTopologyAdapter = PowerMockito.mock(NetconfDeviceTopologyAdapter.class);
-        mountInstance = PowerMockito.mock(NetconfDeviceSalProvider.MountInstance.class);
 
         doReturn(netconfDeviceTopologyAdapter).when(salProvider).getTopologyDatastoreAdapter();
         doNothing().when(netconfDeviceTopologyAdapter)
