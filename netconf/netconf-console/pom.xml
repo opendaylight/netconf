@@ -40,20 +40,6 @@ and is available at http://www.eclipse.org/legal/epl-v10.html INTERNAL
           <scope>test</scope>
       </dependency>
       <dependency>
-          <groupId>org.powermock</groupId>
-          <artifactId>powermock-module-junit4</artifactId>
-          <scope>test</scope>
-      </dependency>
-      <dependency>
-          <groupId>org.powermock</groupId>
-          <artifactId>powermock-api-mockito</artifactId>
-          <scope>test</scope>
-      </dependency>
-      <dependency>
-          <groupId>org.powermock</groupId>
-          <artifactId>powermock-core</artifactId>
-      </dependency>
-      <dependency>
           <groupId>org.opendaylight.yangtools</groupId>
           <artifactId>yang-test-util</artifactId>
       </dependency>
