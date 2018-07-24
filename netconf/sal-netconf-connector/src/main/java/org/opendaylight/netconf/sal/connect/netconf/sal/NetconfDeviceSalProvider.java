@@ -91,7 +91,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         mountInstance.close();
         if (topologyDatastoreAdapter != null) {
             topologyDatastoreAdapter.close();
@@ -154,7 +154,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
         }
 
         @Override
-        public synchronized void close() throws Exception {
+        public synchronized void close() {
             onTopologyDeviceDisconnected();
         }
 

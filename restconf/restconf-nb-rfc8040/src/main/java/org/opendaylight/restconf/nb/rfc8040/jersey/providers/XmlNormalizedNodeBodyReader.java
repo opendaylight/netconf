@@ -73,7 +73,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     protected NormalizedNodeContext readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
-            throws IOException, WebApplicationException {
+            throws WebApplicationException {
         try {
             final Document doc = UntrustedXML.newDocumentBuilder().parse(entityStream);
             return parse(path,doc);

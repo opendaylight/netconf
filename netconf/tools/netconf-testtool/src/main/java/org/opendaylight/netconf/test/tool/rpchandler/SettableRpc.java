@@ -32,7 +32,7 @@ class SettableRpc implements NetconfOperation {
     }
 
     @Override
-    public HandlingPriority canHandle(final Document message) throws DocumentedException {
+    public HandlingPriority canHandle(final Document message) {
         return HandlingPriority.HANDLE_WITH_DEFAULT_PRIORITY.increasePriority(1000);
     }
 

@@ -43,7 +43,7 @@ class TcpClientChannelInitializer extends AbstractChannelInitializer<NetconfClie
             @Override
             public void connect(final ChannelHandlerContext ctx, final SocketAddress remoteAddress,
                                 final SocketAddress localAddress,
-                                final ChannelPromise channelPromise) throws Exception {
+                                final ChannelPromise channelPromise) {
                 connectPromise = channelPromise;
                 ChannelPromise tcpConnectFuture = new DefaultChannelPromise(ch);
 

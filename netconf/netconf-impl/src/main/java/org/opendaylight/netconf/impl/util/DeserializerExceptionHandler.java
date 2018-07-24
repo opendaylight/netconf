@@ -22,17 +22,17 @@ public final class DeserializerExceptionHandler implements ChannelHandler {
     private static final Logger LOG = LoggerFactory.getLogger(DeserializerExceptionHandler.class);
 
     @Override
-    public void handlerAdded(final ChannelHandlerContext ctx) throws Exception {
+    public void handlerAdded(final ChannelHandlerContext ctx) {
         // NOOP
     }
 
     @Override
-    public void handlerRemoved(final ChannelHandlerContext ctx) throws Exception {
+    public void handlerRemoved(final ChannelHandlerContext ctx) {
         // NOOP
     }
 
     @Override
-    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
         LOG.warn("An exception occurred during message handling", cause);
         handleDeserializerException(ctx, cause);
     }

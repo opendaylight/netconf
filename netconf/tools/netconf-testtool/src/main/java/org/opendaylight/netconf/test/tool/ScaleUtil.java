@@ -259,7 +259,7 @@ public final class ScaleUtil {
 
     private static class TimeoutGuard implements Callable<Void> {
         @Override
-        public Void call() throws Exception {
+        public Void call() {
             resultsLog.warn("Timeout for scale test reached after: {} ..aborting", STOPWATCH);
             root.warn("Timeout for scale test reached after: {} ..aborting", STOPWATCH);
             System.exit(0);
@@ -286,7 +286,7 @@ public final class ScaleUtil {
             }
 
             @Override
-            public T call() throws Exception {
+            public T call() {
                 try {
                     return theCallable.call();
                 } catch (Exception e) {

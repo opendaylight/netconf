@@ -58,7 +58,7 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         // TODO Delete modules-state from operational data store
     }
 

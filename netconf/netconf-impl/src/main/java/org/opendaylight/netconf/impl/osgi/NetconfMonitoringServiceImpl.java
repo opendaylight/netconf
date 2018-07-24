@@ -80,7 +80,7 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         capabilityMonitoring.close();
         sessionMonitoring.close();
     }

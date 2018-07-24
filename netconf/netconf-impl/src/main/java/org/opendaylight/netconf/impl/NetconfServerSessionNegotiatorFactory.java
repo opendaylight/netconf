@@ -130,7 +130,7 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
     }
 
     private NetconfHelloMessage createHelloMessage(
-            final long sessionId, final NetconfMonitoringService capabilityProvider) throws NetconfDocumentedException {
+            final long sessionId, final NetconfMonitoringService capabilityProvider) {
         return NetconfHelloMessage.createServerHello(Sets.union(transformCapabilities(capabilityProvider
                 .getCapabilities()), baseCapabilities), sessionId);
     }

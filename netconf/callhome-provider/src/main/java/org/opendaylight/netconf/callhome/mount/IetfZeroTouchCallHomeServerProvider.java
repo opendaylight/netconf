@@ -121,7 +121,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         authProvider.close();
         statusReporter.close();
 

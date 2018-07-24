@@ -100,7 +100,7 @@ public final class SendErrorExceptionUtil {
         }
 
         @Override
-        public void operationComplete(final ChannelFuture channelFuture) throws Exception {
+        public void operationComplete(final ChannelFuture channelFuture) {
             Preconditions.checkState(channelFuture.isSuccess(), "Unable to send exception %s", sendErrorException,
                     channelFuture.cause());
         }

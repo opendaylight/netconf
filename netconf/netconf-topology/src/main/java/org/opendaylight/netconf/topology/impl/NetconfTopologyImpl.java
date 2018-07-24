@@ -62,7 +62,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         // close all existing connectors, delete whole topology in datastore?
         for (final NetconfConnectorDTO connectorDTO : activeConnectors.values()) {
             connectorDTO.close();

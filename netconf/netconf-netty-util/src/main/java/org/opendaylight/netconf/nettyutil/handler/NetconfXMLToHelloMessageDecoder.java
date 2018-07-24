@@ -21,7 +21,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
@@ -60,7 +59,7 @@ public final class NetconfXMLToHelloMessageDecoder extends ByteToMessageDecoder 
     @Override
     @VisibleForTesting
     public void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out)
-            throws IOException, SAXException, NetconfDocumentedException {
+            throws IOException, SAXException {
         if (in.readableBytes() == 0) {
             LOG.debug("No more content in incoming buffer.");
             return;
@@ -108,8 +107,7 @@ public final class NetconfXMLToHelloMessageDecoder extends ByteToMessageDecoder 
         }
     }
 
-    private static NetconfMessage getNetconfMessage(final String additionalHeader, final Document doc)
-            throws NetconfDocumentedException {
+    private static NetconfMessage getNetconfMessage(final String additionalHeader, final Document doc) {
         NetconfMessage msg = new NetconfMessage(doc);
         if (NetconfHelloMessage.isHelloMessage(msg)) {
             if (additionalHeader != null) {

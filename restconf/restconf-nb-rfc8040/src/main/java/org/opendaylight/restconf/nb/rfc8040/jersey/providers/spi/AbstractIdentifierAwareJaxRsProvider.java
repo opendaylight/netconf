@@ -81,7 +81,7 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
     protected abstract T emptyBody(InstanceIdentifierContext<?> path);
 
     protected abstract T readBody(InstanceIdentifierContext<?> path, InputStream entityStream)
-            throws IOException, WebApplicationException;
+            throws WebApplicationException;
 
 
     private String getIdentifier() {

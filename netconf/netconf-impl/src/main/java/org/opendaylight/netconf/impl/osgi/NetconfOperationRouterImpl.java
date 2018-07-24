@@ -90,12 +90,11 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         netconfOperationServiceSnapshot.close();
     }
 
-    private static DocumentedException handleUnexpectedEx(final String message, final Exception exception) throws
-            DocumentedException {
+    private static DocumentedException handleUnexpectedEx(final String message, final Exception exception) {
         LOG.error("{}", message, exception);
         return new DocumentedException("Unexpected error",
                 DocumentedException.ErrorType.APPLICATION,

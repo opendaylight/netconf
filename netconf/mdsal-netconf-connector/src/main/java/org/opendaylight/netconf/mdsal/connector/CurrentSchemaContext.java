@@ -51,7 +51,7 @@ public class CurrentSchemaContext implements SchemaContextListener, AutoCloseabl
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         listeners1.clear();
         schemaContextListenerListenerRegistration.close();
         currentContext.set(null);

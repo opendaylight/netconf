@@ -34,7 +34,6 @@ import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.util.CharsetUtil;
-import java.io.IOException;
 import java.util.List;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
@@ -54,7 +53,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     private WebSocketServerHandshaker handshaker;
 
     @Override
-    protected void channelRead0(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+    protected void channelRead0(final ChannelHandlerContext ctx, final Object msg) {
         if (msg instanceof FullHttpRequest) {
             handleHttpRequest(ctx, (FullHttpRequest) msg);
         } else if (msg instanceof WebSocketFrame) {
@@ -70,7 +69,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
      * @param req
      *            FullHttpRequest
      */
-    private void handleHttpRequest(final ChannelHandlerContext ctx, final FullHttpRequest req) throws Exception {
+    private void handleHttpRequest(final ChannelHandlerContext ctx, final FullHttpRequest req) {
         // Handle a bad request.
         if (!req.getDecoderResult().isSuccess()) {
             sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, BAD_REQUEST));
@@ -154,7 +153,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
      * @param frame
      *            {@link WebSocketFrame}
      */
-    private void handleWebSocketFrame(final ChannelHandlerContext ctx, final WebSocketFrame frame) throws IOException {
+    private void handleWebSocketFrame(final ChannelHandlerContext ctx, final WebSocketFrame frame) {
         if (frame instanceof CloseWebSocketFrame) {
             this.handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
             final String streamName = Notificator.createStreamNameFromUri(((CloseWebSocketFrame) frame).reasonText());
@@ -182,7 +181,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     }
 
     @Override
-    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
         ctx.close();
     }
 

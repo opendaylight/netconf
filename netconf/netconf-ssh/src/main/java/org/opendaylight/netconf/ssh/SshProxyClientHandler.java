@@ -79,7 +79,7 @@ final class SshProxyClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(final ChannelHandlerContext ctx, final Object msg) throws Exception {
+    public void channelRead(final ChannelHandlerContext ctx, final Object msg) {
         asyncSshHandlerWriter.write(ctx, msg, ctx.newPromise());
     }
 

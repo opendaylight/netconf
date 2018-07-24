@@ -54,7 +54,7 @@ public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider
 
         scalaFuture.onComplete(new OnComplete<Object>() {
             @Override
-            public void onComplete(final Throwable failure, final Object success) throws Throwable {
+            public void onComplete(final Throwable failure, final Object success) {
                 if (failure != null) {
                     promise.failure(failure);
                     return;

@@ -120,7 +120,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         if (!closed.compareAndSet(false, true)) {
             return;
         }
@@ -155,7 +155,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
             future.onComplete(new OnComplete<Object>() {
                 @Override
-                public void onComplete(final Throwable failure, final Object success) throws Throwable {
+                public void onComplete(final Throwable failure, final Object success) {
                     if (failure != null) {
                         LOG.error("Failed to refresh master actor data: {}", failure);
                         return;

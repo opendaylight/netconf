@@ -66,8 +66,7 @@ public final class NetconfMessageUtil {
         }
     }
 
-    public static Collection<String> extractCapabilitiesFromHello(final Document doc)
-            throws NetconfDocumentedException {
+    public static Collection<String> extractCapabilitiesFromHello(final Document doc) {
         XmlElement responseElement = XmlElement.fromDomDocument(doc);
         // Extract child element <capabilities> from <hello> with or without(fallback) the same namespace
         Optional<XmlElement> capabilitiesElement = responseElement

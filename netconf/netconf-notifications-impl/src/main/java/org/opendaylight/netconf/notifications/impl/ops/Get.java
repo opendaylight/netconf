@@ -54,8 +54,7 @@ public class Get extends AbstractNetconfOperation implements AutoCloseable {
 
     @Override
     protected Element handle(final Document document, final XmlElement message,
-                             final NetconfOperationChainedExecution subsequentOperation)
-            throws DocumentedException {
+                             final NetconfOperationChainedExecution subsequentOperation) {
         throw new UnsupportedOperationException("Never gets called");
     }
 
@@ -103,7 +102,7 @@ public class Get extends AbstractNetconfOperation implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
 
     }
 }

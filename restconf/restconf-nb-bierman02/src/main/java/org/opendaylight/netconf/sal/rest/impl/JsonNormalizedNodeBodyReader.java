@@ -75,8 +75,8 @@ public class JsonNormalizedNodeBodyReader
     @Override
     public NormalizedNodeContext readFrom(final Class<NormalizedNodeContext> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType,
-            final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws IOException,
-            WebApplicationException {
+            final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream) throws
+        WebApplicationException {
         try {
             return readFrom(getInstanceIdentifierContext(), entityStream, isPost());
         } catch (final Exception e) {

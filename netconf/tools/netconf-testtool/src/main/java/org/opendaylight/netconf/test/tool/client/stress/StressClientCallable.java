@@ -59,7 +59,7 @@ public class StressClientCallable implements Callable<Boolean> {
     }
 
     @Override
-    public Boolean call() throws Exception {
+    public Boolean call() {
         executionStrategy.invoke();
         netconfClientSession.close();
         return Boolean.TRUE;
