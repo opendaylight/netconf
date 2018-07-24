@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.impl.mapping.operations;
 
-import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -32,7 +31,7 @@ public class DefaultStopExi extends AbstractSingletonNetconfOperation implements
 
     @Override
     protected Element handleWithNoSubsequentOperations(Document document,
-                                                       XmlElement operationElement) throws DocumentedException {
+                                                       XmlElement operationElement) {
         LOG.debug("Received stop-exi message {} ", XmlUtil.toString(operationElement));
 
         netconfSession.stopExiCommunication();

@@ -314,7 +314,7 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         reg.close();
     }
 }

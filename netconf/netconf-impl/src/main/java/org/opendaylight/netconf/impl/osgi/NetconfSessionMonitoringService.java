@@ -101,14 +101,14 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
         }
         return new AutoCloseable() {
             @Override
-            public void close() throws Exception {
+            public void close() {
                 listeners.remove(listener);
             }
         };
     }
 
     @Override
-    public synchronized void close() throws Exception {
+    public synchronized void close() {
         stopUpdateSessionStats();
         listeners.clear();
         sessions.clear();

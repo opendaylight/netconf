@@ -48,7 +48,7 @@ public class NetconfNorthboundTcpServer implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         if (tcpServer.isDone()) {
             tcpServer.channel().close();
         } else {

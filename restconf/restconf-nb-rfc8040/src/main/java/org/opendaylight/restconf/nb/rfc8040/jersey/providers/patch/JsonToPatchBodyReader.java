@@ -66,7 +66,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     protected PatchContext readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
-            throws IOException, WebApplicationException {
+            throws WebApplicationException {
         try {
             return readFrom(path, entityStream);
         } catch (final Exception e) {

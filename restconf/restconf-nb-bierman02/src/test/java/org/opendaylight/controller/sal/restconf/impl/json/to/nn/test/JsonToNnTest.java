@@ -15,7 +15,6 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import javax.ws.rs.WebApplicationException;
@@ -280,7 +279,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         try {
             normalizedNodeContext = this.jsonBodyReader.readFrom(null, null, null,
                     this.mediaType, null, inputStream);
-        } catch (WebApplicationException | IOException e) {
+        } catch (WebApplicationException e) {
             // TODO Auto-generated catch block
         }
 

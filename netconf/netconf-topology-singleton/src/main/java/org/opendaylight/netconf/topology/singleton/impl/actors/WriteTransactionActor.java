@@ -50,7 +50,7 @@ public final class WriteTransactionActor extends UntypedAbstractActor {
     }
 
     @Override
-    public void onReceive(final Object message) throws Throwable {
+    public void onReceive(final Object message) {
         if (message instanceof WriteActorMessage) {
             writeAdapter.handle(message, sender(), context(), self());
         } else if (message instanceof ReceiveTimeout) {

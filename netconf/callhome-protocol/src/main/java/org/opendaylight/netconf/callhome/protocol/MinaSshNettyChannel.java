@@ -55,8 +55,7 @@ class MinaSshNettyChannel extends AbstractServerChannel {
     private ChannelOutboundHandlerAdapter createChannelAdapter() {
         return new ChannelOutboundHandlerAdapter() {
             @Override
-            public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise)
-                throws Exception {
+            public void write(final ChannelHandlerContext ctx, final Object msg, final ChannelPromise promise) {
                 sshWriteAsyncHandler.write(ctx, msg, promise);
             }
         };
@@ -107,7 +106,7 @@ class MinaSshNettyChannel extends AbstractServerChannel {
     }
 
     @Override
-    protected void doBind(final SocketAddress localAddress) throws Exception {
+    protected void doBind(final SocketAddress localAddress) {
         throw new UnsupportedOperationException("Bind not supported.");
     }
 
@@ -128,14 +127,14 @@ class MinaSshNettyChannel extends AbstractServerChannel {
     }
 
     @Override
-    protected void doDisconnect() throws Exception {
+    protected void doDisconnect() {
         LOG.info("Disconnect invoked");
         doNettyDisconnect();
         doMinaDisconnect(false);
     }
 
     @Override
-    protected void doClose() throws Exception {
+    protected void doClose() {
         context.removeSelf();
         if (notClosing(session)) {
             session.close(true);
@@ -144,12 +143,12 @@ class MinaSshNettyChannel extends AbstractServerChannel {
     }
 
     @Override
-    protected void doBeginRead() throws Exception {
+    protected void doBeginRead() {
         // Intentional NOOP - read is started by AsyncSshHandlerReader
     }
 
     @Override
-    protected void doWrite(final ChannelOutboundBuffer in) throws Exception {
+    protected void doWrite(final ChannelOutboundBuffer in) {
         throw new IllegalStateException("Outbound writes to SSH should be done by SSH Write handler");
     }
 
@@ -166,7 +165,7 @@ class MinaSshNettyChannel extends AbstractServerChannel {
          * Invoked when SSH session dropped during read using {@link AsyncSshHandlerReader}.
          */
         @Override
-        public void close() throws Exception {
+        public void close() {
             doNettyDisconnect();
         }
     }

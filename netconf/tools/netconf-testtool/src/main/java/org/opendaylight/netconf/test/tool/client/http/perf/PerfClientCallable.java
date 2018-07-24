@@ -63,7 +63,7 @@ public class PerfClientCallable implements Callable<Void> {
     }
 
     @Override
-    public Void call() throws Exception {
+    public Void call() {
         executionStrategy.invoke();
         asyncHttpClient.closeAsynchronously();
         return null;

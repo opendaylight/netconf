@@ -160,7 +160,7 @@ class StreamNotificationTopicRegistration extends NotificationTopicRegistration 
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         closeStream();
     }
 

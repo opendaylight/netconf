@@ -225,12 +225,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
         }
 
         final InputStream entityStream = new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8));
-        try {
-            return JsonNormalizedNodeBodyReader.readFrom(instanceIdentifierContext, entityStream, isPost);
-        } catch (final IOException e) {
-            propagateExceptionAs(uriPath, e, "GET");
-            return null;
-        }
+        return JsonNormalizedNodeBodyReader.readFrom(instanceIdentifierContext, entityStream, isPost);
     }
 
     private  String toJson(final PatchStatusContext patchStatusContext) throws IOException {

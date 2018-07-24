@@ -398,7 +398,7 @@ public class NetconfNodeManagerTest {
 
         @SuppressWarnings({ "rawtypes", "unchecked" })
         @Override
-        public void handleReceive(Object message) throws Exception {
+        public void handleReceive(Object message) {
             CompletableFuture dropFuture = messagesToDrop.remove(message.getClass());
             if (dropFuture != null) {
                 dropFuture.complete(message);

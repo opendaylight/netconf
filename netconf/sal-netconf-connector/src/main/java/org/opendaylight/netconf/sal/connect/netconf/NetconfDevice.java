@@ -353,7 +353,7 @@ public class NetconfDevice
         }
 
         @Override
-        public DeviceSources call() throws Exception {
+        public DeviceSources call() {
             final NetconfDeviceSchemas availableSchemas =
                     stateSchemasResolver.resolve(deviceRpc, remoteSessionCapabilities, id);
             LOG.debug("{}: Schemas exposed by ietf-netconf-monitoring: {}", id,

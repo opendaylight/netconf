@@ -36,7 +36,7 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
         final ProxyClientHandler clientHandler = new ProxyClientHandler(remoteCtx);
         clientBootstrap.handler(new ChannelInitializer<LocalChannel>() {
             @Override
-            public void initChannel(LocalChannel ch) throws Exception {
+            public void initChannel(LocalChannel ch) {
                 ch.pipeline().addLast(clientHandler);
             }
         });

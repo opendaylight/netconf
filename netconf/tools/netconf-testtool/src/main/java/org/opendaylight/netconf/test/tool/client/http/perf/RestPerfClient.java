@@ -69,7 +69,7 @@ public final class RestPerfClient {
 
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         Parameters parameters = parseArgs(args, Parameters.getParser());
         parameters.validate();

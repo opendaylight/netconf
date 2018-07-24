@@ -83,7 +83,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
     public PatchContext readFrom(final Class<PatchContext> type, final Type genericType,
                                  final Annotation[] annotations, final MediaType mediaType,
                                  final MultivaluedMap<String, String> httpHeaders, final InputStream entityStream)
-            throws IOException, WebApplicationException {
+            throws WebApplicationException {
         try {
             return readFrom(getInstanceIdentifierContext(), entityStream);
         } catch (final Exception e) {

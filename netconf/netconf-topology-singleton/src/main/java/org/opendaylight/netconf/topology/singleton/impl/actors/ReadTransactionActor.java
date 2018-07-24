@@ -35,7 +35,7 @@ public final class ReadTransactionActor extends UntypedAbstractActor {
     }
 
     @Override
-    public void onReceive(final Object message) throws Throwable {
+    public void onReceive(final Object message) {
         if (message instanceof ReadActorMessage) {
             readAdapter.handle(message, sender(), self());
         } else {

@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import com.google.common.collect.Iterables;
 import com.google.gson.stream.JsonReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -62,7 +61,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     protected NormalizedNodeContext readBody(final InstanceIdentifierContext<?> path, final InputStream entityStream)
-            throws IOException, WebApplicationException {
+            throws WebApplicationException {
         try {
             return readFrom(path, entityStream, isPost());
         } catch (final Exception e) {
@@ -72,8 +71,7 @@ public class JsonNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyRead
     }
 
     public static NormalizedNodeContext readFrom(
-            final InstanceIdentifierContext<?> path, final InputStream entityStream, final boolean isPost)
-            throws IOException {
+            final InstanceIdentifierContext<?> path, final InputStream entityStream, final boolean isPost) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
