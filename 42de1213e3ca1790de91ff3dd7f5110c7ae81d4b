@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "88b9a7e9_46b02205",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2018-07-24T15:43:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "915cd9ce_a1700ce0",
+      "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "891a0512_42ad1949",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2018-03-28T14:40:30Z",
       "side": 1,
       "message": "No need for blank line",
+      "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2cbaa25f_377c0ba7",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2018-07-24T15:43:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "891a0512_42ad1949",
       "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "bad9c08f_4f9f6c38",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2018-07-24T15:43:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e13d6c3b_de1e3fb6",
+      "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "00d3590c_dde5b5f0",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2018-03-28T14:40:30Z",
       "side": 1,
       "message": "Also here",
+      "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ae03173a_36bb2c8f",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2018-07-24T15:43:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "00d3590c_dde5b5f0",
       "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "2ca36d29_01dd84c4",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2018-07-24T15:43:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "73897f4f_c47e3608",
+      "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b1f15dd9_c81980ca",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
         "patchSetId": 3
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "1376b73c_3caa5926",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2018-07-24T15:43:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b1f15dd9_c81980ca",
+      "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "72ef24f9_bde1d5e6",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
         "patchSetId": 3
@@ -115,6 +223,24 @@
       "writtenOn": "2018-03-28T14:40:30Z",
       "side": 1,
       "message": "missing space between comma and TimeUnit.SECONDS\n\nShould look like this:\nkeepaliveDelaySeconds, keepaliveDelaySeconds, TimeUnit.SECONDS)",
+      "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "384a844d_0b4457d2",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacade.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2018-07-24T15:43:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72ef24f9_bde1d5e6",
       "revId": "42de1213e3ca1790de91ff3dd7f5110c7ae81d4b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
