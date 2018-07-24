@@ -48,7 +48,7 @@ public class TransactionProvider implements AutoCloseable {
     }
 
     @Override
-    public synchronized void close() throws Exception {
+    public synchronized void close() {
         for (final DOMDataReadWriteTransaction rwt : allOpenReadWriteTransactions) {
             rwt.cancel();
         }

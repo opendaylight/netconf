@@ -205,7 +205,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     }
 
     @Override
-    public synchronized void close() throws Exception {
+    public synchronized void close() {
         listeners.clear();
         capabilities.clear();
     }

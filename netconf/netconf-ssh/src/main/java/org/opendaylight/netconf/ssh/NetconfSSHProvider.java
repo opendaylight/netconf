@@ -20,7 +20,6 @@ import org.apache.sshd.common.util.threads.ThreadUtils;
 import org.apache.sshd.server.keyprovider.AbstractGeneratorHostKeyProvider;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.util.NetconfConfiguration;
-import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +49,7 @@ public class NetconfSSHProvider {
 
     // Called via blueprint
     @SuppressWarnings("unused")
-    public void init() throws IOException, InvalidSyntaxException {
+    public void init() throws IOException {
         minaTimerExecutor = Executors.newScheduledThreadPool(POOL_SIZE,
             runnable -> new Thread(runnable, "netconf-ssh-server-mina-timers"));
         clientGroup = new NioEventLoopGroup();
@@ -79,7 +78,7 @@ public class NetconfSSHProvider {
     }
 
     private SshProxyServer startSSHServer()
-            throws IOException, InvalidSyntaxException {
+            throws IOException {
 
         final InetSocketAddress sshSocketAddress = netconfConfiguration.getSshServerAddress();
         LOG.info("Starting netconf SSH server at {}", sshSocketAddress);

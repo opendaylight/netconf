@@ -137,7 +137,7 @@ public class Execution implements Callable<Void> {
                 }
 
                 @Override
-                public Response onCompleted(Response response) throws Exception {
+                public Response onCompleted(Response response) {
                     semaphore.release();
                     return response;
                 }
@@ -155,7 +155,7 @@ public class Execution implements Callable<Void> {
     }
 
     @Override
-    public Void call() throws Exception {
+    public Void call() {
         if (invokeAsync) {
             this.invokeAsync();
         } else {

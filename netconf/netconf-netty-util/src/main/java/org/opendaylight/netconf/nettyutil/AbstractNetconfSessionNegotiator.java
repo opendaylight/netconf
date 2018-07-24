@@ -141,7 +141,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
 
                             channel.close().addListener(new GenericFutureListener<ChannelFuture>() {
                                 @Override
-                                public void operationComplete(final ChannelFuture future) throws Exception {
+                                public void operationComplete(final ChannelFuture future) {
                                     if (future.isSuccess()) {
                                         LOG.debug("Channel {} closed: success", future.channel());
                                     } else {

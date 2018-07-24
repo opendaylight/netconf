@@ -63,7 +63,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private GenericFutureListener negotiationFutureListener;
 
     public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient,
-            final Future<?> negotiationFuture) throws IOException {
+            final Future<?> negotiationFuture) {
         this(authenticationHandler, sshClient);
         this.negotiationFuture = negotiationFuture;
     }
@@ -76,13 +76,12 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      * @throws IOException          if the I/O operation fails
      */
     public AsyncSshHandler(final AuthenticationHandler authenticationHandler,
-                           final SshClient sshClient) throws IOException {
+                           final SshClient sshClient) {
         this.authenticationHandler = Preconditions.checkNotNull(authenticationHandler);
         this.sshClient = Preconditions.checkNotNull(sshClient);
     }
 
-    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler)
-            throws IOException {
+    public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler) {
         return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT);
     }
 
@@ -93,10 +92,9 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      * @param authenticationHandler authentication handler
      * @param negotiationFuture     negotiation future
      * @return                      {@code AsyncSshHandler}
-     * @throws IOException          if the I/O operation fails
      */
     public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler,
-            final Future<?> negotiationFuture) throws IOException {
+            final Future<?> negotiationFuture) {
         return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT, negotiationFuture);
     }
 
@@ -212,7 +210,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     }
 
     @Override
-    public void close(final ChannelHandlerContext ctx, final ChannelPromise promise) throws Exception {
+    public void close(final ChannelHandlerContext ctx, final ChannelPromise promise) {
         disconnect(ctx, promise);
     }
 

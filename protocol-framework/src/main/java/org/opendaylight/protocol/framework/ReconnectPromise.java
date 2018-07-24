@@ -91,7 +91,7 @@ final class ReconnectPromise<S extends ProtocolSession<?>, L extends SessionList
         }
 
         @Override
-        public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
+        public void channelInactive(final ChannelHandlerContext ctx) {
             // This is the ultimate channel inactive handler, not forwarding
             if (promise.isCancelled()) {
                 return;

@@ -280,7 +280,7 @@ public class JsonToNnTest extends AbstractBodyReaderTest {
         try {
             normalizedNodeContext = this.jsonBodyReader.readFrom(null, null, null,
                     this.mediaType, null, inputStream);
-        } catch (WebApplicationException | IOException e) {
+        } catch (WebApplicationException e) {
             // TODO Auto-generated catch block
         }
 

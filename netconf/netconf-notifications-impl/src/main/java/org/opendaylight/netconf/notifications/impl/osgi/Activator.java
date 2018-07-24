@@ -41,7 +41,7 @@ public class Activator implements BundleActivator {
     private NetconfNotificationManager netconfNotificationManager;
 
     @Override
-    public void start(final BundleContext context) throws Exception {
+    public void start(final BundleContext context) {
         netconfNotificationManager = new NetconfNotificationManager();
         // Add properties to autowire with netconf-impl instance for cfg subsystem
         final Dictionary<String, String> props = new Hashtable<>();
@@ -94,7 +94,7 @@ public class Activator implements BundleActivator {
     }
 
     @Override
-    public void stop(final BundleContext context) throws Exception {
+    public void stop(final BundleContext context) {
         if (netconfNotificationCollectorServiceRegistration != null) {
             netconfNotificationCollectorServiceRegistration.unregister();
             netconfNotificationCollectorServiceRegistration = null;

@@ -11,7 +11,6 @@ import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -102,7 +101,7 @@ public final class SchemaSourceCache<T extends SchemaSourceRepresentation>
             }
 
             @Override
-            public InputStream openStream() throws IOException {
+            public InputStream openStream() {
                 return TestToolUtils.getDataAsStream(cachedSource);
             }
         };

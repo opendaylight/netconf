@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.schema;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -42,8 +41,8 @@ public class SchemaExportContentYinBodyWriter implements MessageBodyWriter<Schem
     @Override
     public void writeTo(final SchemaExportContext context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType,
-            final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws IOException,
-            WebApplicationException {
+            final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream) throws
+        WebApplicationException {
         try {
             YinExportUtils.writeModuleAsYinText(context.getModule(), entityStream);
         } catch (final XMLStreamException e) {

@@ -112,7 +112,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         configReg.close();
         deviceReg.close();
         deviceOpReg.close();

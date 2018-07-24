@@ -19,7 +19,6 @@ import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.util.Set;
 import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
@@ -111,14 +110,7 @@ public class NetconfClientSessionNegotiatorFactory implements SessionNegotiatorF
             final Channel channel, final Promise<NetconfClientSession> promise) {
 
         NetconfMessage startExiMessage = NetconfStartExiMessage.create(options, START_EXI_MESSAGE_ID);
-        NetconfHelloMessage helloMessage = null;
-        try {
-            helloMessage = NetconfHelloMessage.createClientHello(clientCapabilities, additionalHeader);
-        } catch (NetconfDocumentedException e) {
-            LOG.error("Unable to create client hello message with capabilities {} and additional handler {}",
-                    clientCapabilities, additionalHeader);
-            throw new IllegalStateException(e);
-        }
+        NetconfHelloMessage helloMessage = NetconfHelloMessage.createClientHello(clientCapabilities, additionalHeader);
 
         NetconfClientSessionPreferences proposal = new NetconfClientSessionPreferences(helloMessage, startExiMessage);
         return new NetconfClientSessionNegotiator(proposal, promise, channel, timer,

@@ -37,7 +37,7 @@ public interface NetconfOperationChainedExecution {
         }
 
         @Override
-        public Document execute(Document requestMessage) throws DocumentedException {
+        public Document execute(Document requestMessage) {
             throw new IllegalStateException("This execution represents the termination point in operation execution "
                     + "and cannot be executed itself");
         }

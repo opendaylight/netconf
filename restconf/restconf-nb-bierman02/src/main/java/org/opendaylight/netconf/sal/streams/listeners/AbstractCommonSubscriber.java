@@ -50,7 +50,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     }
 
     @Override
-    public final void close() throws Exception {
+    public final void close() {
         this.registration.close();
         this.registration = null;
         unregister();

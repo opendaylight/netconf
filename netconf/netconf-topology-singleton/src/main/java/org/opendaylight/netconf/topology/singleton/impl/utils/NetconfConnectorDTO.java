@@ -37,7 +37,7 @@ public class NetconfConnectorDTO implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         if (communicator != null) {
             communicator.close();
         }

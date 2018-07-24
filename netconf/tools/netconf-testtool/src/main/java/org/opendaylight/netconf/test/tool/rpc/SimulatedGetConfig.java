@@ -12,7 +12,6 @@ import com.google.common.base.Optional;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -60,8 +59,7 @@ public class SimulatedGetConfig extends AbstractLastNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
-            throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) {
         final Element element = XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.absent());
 
         for (final XmlElement e : storage.getConfigList()) {
