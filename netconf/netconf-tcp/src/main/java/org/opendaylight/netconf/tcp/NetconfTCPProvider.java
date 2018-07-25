@@ -11,7 +11,6 @@ package org.opendaylight.netconf.tcp;
 import java.net.InetSocketAddress;
 import org.opendaylight.netconf.tcp.netty.ProxyServer;
 import org.opendaylight.netconf.util.NetconfConfiguration;
-import org.osgi.framework.InvalidSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ public class NetconfTCPProvider {
 
     // Called via blueprint
     @SuppressWarnings("unused")
-    public void init() throws InvalidSyntaxException {
+    public void init() {
         final InetSocketAddress address = netconfConfiguration.getTcpServerAddress();
 
         if (address.getAddress().isAnyLocalAddress()) {

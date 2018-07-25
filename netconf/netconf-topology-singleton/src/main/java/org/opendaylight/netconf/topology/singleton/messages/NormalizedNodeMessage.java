@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.topology.singleton.messages;
 
 import java.io.Externalizable;
-import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import org.opendaylight.controller.cluster.datastore.node.utils.stream.SerializationUtils;
@@ -43,12 +42,12 @@ public class NormalizedNodeMessage implements Externalizable {
     }
 
     @Override
-    public void writeExternal(final ObjectOutput out) throws IOException {
+    public void writeExternal(final ObjectOutput out) {
         SerializationUtils.serializePathAndNode(getIdentifier(), node, out);
     }
 
     @Override
-    public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(final ObjectInput in) {
         SerializationUtils.deserializePathAndNode(in, this, APPLIER);
     }
 

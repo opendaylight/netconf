@@ -52,7 +52,7 @@ final class TlsClientChannelInitializer extends AbstractChannelInitializer<Netco
         }
 
         @Override
-        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        public void channelActive(ChannelHandlerContext ctx) {
             ctx.pipeline().replace(this, "sslHandler", sslHandlerFactory.createSslHandler())
                           .fireChannelActive();
         }

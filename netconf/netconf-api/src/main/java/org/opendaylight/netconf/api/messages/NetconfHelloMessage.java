@@ -11,7 +11,6 @@ package org.opendaylight.netconf.api.messages;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 import java.util.Set;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -31,14 +30,13 @@ public final class NetconfHelloMessage extends NetconfMessage {
 
     private final NetconfHelloMessageAdditionalHeader additionalHeader;
 
-    public NetconfHelloMessage(final Document doc, final NetconfHelloMessageAdditionalHeader additionalHeader)
-            throws NetconfDocumentedException {
+    public NetconfHelloMessage(final Document doc, final NetconfHelloMessageAdditionalHeader additionalHeader) {
         super(doc);
         checkHelloMessage(doc);
         this.additionalHeader = additionalHeader;
     }
 
-    public NetconfHelloMessage(final Document doc) throws NetconfDocumentedException {
+    public NetconfHelloMessage(final Document doc) {
         this(doc, null);
     }
 
@@ -55,8 +53,7 @@ public final class NetconfHelloMessage extends NetconfMessage {
     }
 
     public static NetconfHelloMessage createClientHello(final Iterable<String> capabilities,
-            final Optional<NetconfHelloMessageAdditionalHeader> additionalHeaderOptional)
-                    throws NetconfDocumentedException {
+            final Optional<NetconfHelloMessageAdditionalHeader> additionalHeaderOptional) {
         return new NetconfHelloMessage(createHelloMessageDoc(capabilities), additionalHeaderOptional.orNull());
     }
 
@@ -80,8 +77,7 @@ public final class NetconfHelloMessage extends NetconfMessage {
         return doc;
     }
 
-    public static NetconfHelloMessage createServerHello(final Set<String> capabilities, final long sessionId)
-            throws NetconfDocumentedException {
+    public static NetconfHelloMessage createServerHello(final Set<String> capabilities, final long sessionId) {
         Document doc = createHelloMessageDoc(capabilities);
         Element sessionIdElement = doc.createElementNS(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0,
                 XmlNetconfConstants.SESSION_ID);

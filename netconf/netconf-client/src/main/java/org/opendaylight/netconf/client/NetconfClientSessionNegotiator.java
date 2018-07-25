@@ -154,7 +154,7 @@ public class NetconfClientSessionNegotiator extends
 
     @Override
     protected NetconfClientSession getSession(final NetconfClientSessionListener sessionListener, final Channel channel,
-                                              final NetconfHelloMessage message) throws NetconfDocumentedException {
+                                              final NetconfHelloMessage message) {
         final long sessionId = extractSessionId(message.getDocument());
 
         // Copy here is important: it disconnects the strings from the document

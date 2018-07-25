@@ -58,7 +58,7 @@ public class AsyncExecutionStrategy implements ExecutionStrategy {
                 }
 
                 @Override
-                public Response onCompleted(Response response) throws Exception {
+                public Response onCompleted(Response response) {
                     semaphore.release();
                     return response;
                 }

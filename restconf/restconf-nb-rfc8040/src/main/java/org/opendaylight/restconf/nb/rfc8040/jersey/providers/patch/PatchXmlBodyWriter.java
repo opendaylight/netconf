@@ -8,7 +8,6 @@
 
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -57,7 +56,7 @@ public class PatchXmlBodyWriter implements MessageBodyWriter<PatchStatusContext>
     public void writeTo(final PatchStatusContext patchStatusContext, final Class<?> type, final Type genericType,
                         final Annotation[] annotations, final MediaType mediaType,
                         final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
-            throws IOException, WebApplicationException {
+            throws WebApplicationException {
 
         try {
             final XMLStreamWriter xmlWriter =
@@ -71,7 +70,7 @@ public class PatchXmlBodyWriter implements MessageBodyWriter<PatchStatusContext>
     }
 
     private static void writeDocument(final XMLStreamWriter writer, final PatchStatusContext context)
-            throws XMLStreamException, IOException {
+            throws XMLStreamException {
         writer.writeStartElement("", "yang-patch-status", "urn:ietf:params:xml:ns:yang:ietf-yang-patch");
         writer.writeStartElement("patch-id");
         writer.writeCharacters(context.getPatchId());
@@ -107,7 +106,7 @@ public class PatchXmlBodyWriter implements MessageBodyWriter<PatchStatusContext>
     }
 
     private static void reportErrors(final List<RestconfError> errors, final XMLStreamWriter writer)
-            throws IOException, XMLStreamException {
+            throws XMLStreamException {
         writer.writeStartElement("errors");
 
         for (final RestconfError restconfError : errors) {

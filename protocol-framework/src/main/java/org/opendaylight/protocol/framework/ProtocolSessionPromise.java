@@ -89,7 +89,7 @@ final class ProtocolSessionPromise<S extends ProtocolSession<?>> extends Default
         }
 
         @Override
-        public void operationComplete(final ChannelFuture cf) throws Exception {
+        public void operationComplete(final ChannelFuture cf) {
             synchronized (lock) {
 
                 LOG.debug("Promise {} connection resolved", lock);

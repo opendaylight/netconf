@@ -17,7 +17,6 @@ import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 import java.util.Set;
-import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfServerSessionPreferences;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
@@ -98,13 +97,8 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
             final Channel channel, final Promise<NetconfServerSession> promise) {
         final long sessionId = idProvider.getNextSessionId();
 
-        NetconfServerSessionPreferences proposal;
-        try {
-            proposal = new NetconfServerSessionPreferences(createHelloMessage(sessionId, monitoringService), sessionId);
-        } catch (final NetconfDocumentedException e) {
-            LOG.error("Unable to create hello message for session {} with {}", sessionId, monitoringService);
-            throw new IllegalStateException(e);
-        }
+        NetconfServerSessionPreferences proposal =
+            new NetconfServerSessionPreferences(createHelloMessage(sessionId, monitoringService), sessionId);
 
         return new NetconfServerSessionNegotiator(proposal, promise, channel, timer,
                 getListener(Long.toString(sessionId), channel.parent().localAddress()), connectionTimeoutMillis);
@@ -130,7 +124,7 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
     }
 
     private NetconfHelloMessage createHelloMessage(
-            final long sessionId, final NetconfMonitoringService capabilityProvider) throws NetconfDocumentedException {
+            final long sessionId, final NetconfMonitoringService capabilityProvider) {
         return NetconfHelloMessage.createServerHello(Sets.union(transformCapabilities(capabilityProvider
                 .getCapabilities()), baseCapabilities), sessionId);
     }

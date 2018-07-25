@@ -32,7 +32,7 @@ class ReadAdapter {
     }
 
     @SuppressWarnings("checkstyle:IllegalThrows")
-    public void handle(final Object message, final ActorRef sender, final ActorRef self) throws Throwable {
+    public void handle(final Object message, final ActorRef sender, final ActorRef self) {
         if (message instanceof ReadRequest) {
 
             final ReadRequest readRequest = (ReadRequest) message;

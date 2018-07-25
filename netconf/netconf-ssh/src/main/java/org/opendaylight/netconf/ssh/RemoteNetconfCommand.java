@@ -17,7 +17,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalChannel;
 import io.netty.util.concurrent.GenericFutureListener;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -105,7 +104,7 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
     }
 
     @Override
-    public void start(final Environment env) throws IOException {
+    public void start(final Environment env) {
         LOG.trace("Establishing internal connection to netconf server for client: {}", getClientAddress());
 
         final Bootstrap clientBootstrap = new Bootstrap();
@@ -113,7 +112,7 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
 
         clientBootstrap.handler(new ChannelInitializer<LocalChannel>() {
             @Override
-            public void initChannel(final LocalChannel ch) throws Exception {
+            public void initChannel(final LocalChannel ch) {
                 ch.pipeline()
                         .addLast(new SshProxyClientHandler(in, out, netconfHelloMessageAdditionalHeader, callback));
             }
@@ -122,7 +121,7 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
         clientChannelFuture.addListener(new GenericFutureListener<ChannelFuture>() {
 
             @Override
-            public void operationComplete(final ChannelFuture future) throws Exception {
+            public void operationComplete(final ChannelFuture future) {
                 if (future.isSuccess()) {
                     clientChannel = clientChannelFuture.channel();
                 } else {
@@ -146,7 +145,7 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
             clientChannel.close().addListener(new GenericFutureListener<ChannelFuture>() {
 
                 @Override
-                public void operationComplete(final ChannelFuture future) throws Exception {
+                public void operationComplete(final ChannelFuture future) {
                     if (!future.isSuccess()) {
                         LOG.warn("Unable to release internal connection to netconf server on channel: {}",
                                 clientChannel);

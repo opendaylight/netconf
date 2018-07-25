@@ -268,7 +268,7 @@ public class NetconfDeviceSimulator implements Closeable {
     }
 
     private SshProxyServerConfiguration getSshConfiguration(final InetSocketAddress bindingAddress,
-            final LocalAddress tcpLocalAddress, final KeyPairProvider keyPairProvider) throws IOException {
+            final LocalAddress tcpLocalAddress, final KeyPairProvider keyPairProvider) {
         return new SshProxyServerConfigurationBuilder()
                 .setBindingAddress(bindingAddress)
                 .setLocalAddress(tcpLocalAddress)
@@ -370,7 +370,7 @@ public class NetconfDeviceSimulator implements Closeable {
             }
 
             @Override
-            public InputStream openStream() throws IOException {
+            public InputStream openStream() {
                 return getClass().getResourceAsStream(resource);
             }
         }), PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class,

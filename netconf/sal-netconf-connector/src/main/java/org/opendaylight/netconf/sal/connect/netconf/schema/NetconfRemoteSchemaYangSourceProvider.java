@@ -19,7 +19,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import javax.annotation.Nonnull;
@@ -188,7 +187,7 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         }
 
         @Override
-        public InputStream openStream() throws IOException {
+        public InputStream openStream() {
             return new ByteArrayInputStream(schemaString.get().getBytes(StandardCharsets.UTF_8));
         }
     }

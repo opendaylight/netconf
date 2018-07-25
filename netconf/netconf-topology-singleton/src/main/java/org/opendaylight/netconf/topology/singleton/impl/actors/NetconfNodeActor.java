@@ -111,7 +111,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public void handleReceive(final Object message) throws Exception {
+    public void handleReceive(final Object message) {
         LOG.debug("{}:  received message {}", id, message);
 
         if (message instanceof CreateInitialMasterActorData) { // master

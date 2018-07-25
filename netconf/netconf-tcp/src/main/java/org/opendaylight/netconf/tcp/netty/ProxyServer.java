@@ -38,7 +38,7 @@ public class ProxyServer implements AutoCloseable {
                 .handler(new LoggingHandler(LogLevel.DEBUG))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    public void initChannel(SocketChannel ch) throws Exception {
+                    public void initChannel(SocketChannel ch) {
                         ch.pipeline().addLast(new ProxyServerHandler(clientBootstrap, localAddress));
                     }
                 });

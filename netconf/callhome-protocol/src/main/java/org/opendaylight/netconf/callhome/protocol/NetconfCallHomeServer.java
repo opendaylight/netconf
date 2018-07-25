@@ -184,7 +184,7 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         acceptor.close(true);
     }
 }

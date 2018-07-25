@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.test.tool.rpc;
 
 import com.google.common.base.Optional;
-import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -27,8 +26,7 @@ public class SimulatedGet extends AbstractLastNetconfOperation {
     }
 
     @Override
-    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
-            throws DocumentedException {
+    protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) {
         final Element element = XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.absent());
 
         for (final XmlElement e : storage.getConfigList()) {
