@@ -26,12 +26,7 @@ public final class NetconfEXICodec {
      * OpenEXI does not allow us to directly prevent resolution of external entities. In order
      * to prevent XXE attacks, we reuse a single no-op entity resolver.
      */
-    private static final EntityResolver ENTITY_RESOLVER = new EntityResolver() {
-        @Override
-        public InputSource resolveEntity(final String publicId, final String systemId) {
-            return new InputSource();
-        }
-    };
+    private static final EntityResolver ENTITY_RESOLVER = (publicId, systemId) -> new InputSource();
 
     /**
      * Since we have a limited number of options we can have, instantiating a weak cache

@@ -99,12 +99,7 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
         if (!running) {
             startUpdateSessionStats();
         }
-        return new AutoCloseable() {
-            @Override
-            public void close() {
-                listeners.remove(listener);
-            }
-        };
+        return () -> listeners.remove(listener);
     }
 
     @Override

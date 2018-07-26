@@ -53,12 +53,9 @@ public class Configuration {
         return true;
     };
 
-    public static final PublickeyAuthenticator DEFAULT_PUBLIC_KEY_AUTHENTICATOR = new PublickeyAuthenticator() {
-        @Override
-        public boolean authenticate(final String username, final PublicKey key, final ServerSession session) {
-            LOG.info("Auth with public key: {}", key);
-            return true;
-        }
+    public static final PublickeyAuthenticator DEFAULT_PUBLIC_KEY_AUTHENTICATOR = (username, key, session) -> {
+        LOG.info("Auth with public key: {}", key);
+        return true;
     };
 
     private int generateConfigsTimeout = (int) TimeUnit.MINUTES.toMillis(30);

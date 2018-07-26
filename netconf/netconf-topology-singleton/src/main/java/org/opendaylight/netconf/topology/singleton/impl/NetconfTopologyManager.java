@@ -209,10 +209,8 @@ public class NetconfTopologyManager
             dataChangeListenerRegistration = null;
         }
 
-        contexts.values().forEach(netconfTopologyContext -> close(netconfTopologyContext));
-
-        clusterRegistrations.values().forEach(
-            clusterSingletonServiceRegistration -> close(clusterSingletonServiceRegistration));
+        contexts.values().forEach(NetconfTopologyManager::close);
+        clusterRegistrations.values().forEach(NetconfTopologyManager::close);
 
         contexts.clear();
         clusterRegistrations.clear();

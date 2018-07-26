@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import javax.annotation.concurrent.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.controller.md.sal.common.api.data.AsyncWriteTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
@@ -79,7 +80,7 @@ public class ProxyReadWriteTransaction implements DOMDataReadWriteTransaction {
             return false;
         }
 
-        processTransactionOperation(facade -> facade.cancel());
+        processTransactionOperation(AsyncWriteTransaction::cancel);
         return true;
     }
 

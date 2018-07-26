@@ -85,13 +85,10 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
             final Optional<SslHandler> sslHandler = getSslHandler(channel);
             if (sslHandler.isPresent()) {
                 Future<Channel> future = sslHandler.get().handshakeFuture();
-                future.addListener(new GenericFutureListener<Future<? super Channel>>() {
-                    @Override
-                    public void operationComplete(final Future<? super Channel> future) {
-                        Preconditions.checkState(future.isSuccess(), "Ssl handshake was not successful");
-                        LOG.debug("Ssl handshake complete");
-                        start();
-                    }
+                future.addListener(future1 -> {
+                    Preconditions.checkState(future1.isSuccess(), "Ssl handshake was not successful");
+                    LOG.debug("Ssl handshake complete");
+                    start();
                 });
             } else {
                 start();
