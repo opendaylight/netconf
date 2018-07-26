@@ -118,19 +118,15 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
             }
         });
         clientChannelFuture = clientBootstrap.connect(localAddress);
-        clientChannelFuture.addListener(new GenericFutureListener<ChannelFuture>() {
-
-            @Override
-            public void operationComplete(final ChannelFuture future) {
-                if (future.isSuccess()) {
-                    clientChannel = clientChannelFuture.channel();
-                } else {
-                    LOG.warn("Unable to establish internal connection to netconf server for client: {}",
-                            getClientAddress());
-                    Preconditions.checkNotNull(callback, "Exit callback must be set");
-                    callback.onExit(1, "Unable to establish internal connection to netconf server for client: "
-                            + getClientAddress());
-                }
+        clientChannelFuture.addListener((GenericFutureListener<ChannelFuture>) future -> {
+            if (future.isSuccess()) {
+                clientChannel = clientChannelFuture.channel();
+            } else {
+                LOG.warn("Unable to establish internal connection to netconf server for client: {}",
+                        getClientAddress());
+                Preconditions.checkNotNull(callback, "Exit callback must be set");
+                callback.onExit(1, "Unable to establish internal connection to netconf server for client: "
+                        + getClientAddress());
             }
         });
     }
