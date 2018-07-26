@@ -177,12 +177,6 @@ public class MultivaluedHashMap<K, V> implements MultivaluedMap<K, V> {
     }
 
     private List<V> getValues(K key) {
-        List<V> list = store.get(key);
-        if (list == null) {
-            list = new LinkedList<>();
-            store.put(key, list);
-        }
-
-        return list;
+        return store.computeIfAbsent(key, k -> new LinkedList<>());
     }
 }

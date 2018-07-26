@@ -164,7 +164,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
         ClientChannel localChannel = channel;
         sshReadAsyncListener = new AsyncSshHandlerReader(() -> AsyncSshHandler.this.disconnect(ctx, ctx.newPromise()),
-            msg -> ctx.fireChannelRead(msg), localChannel.toString(), localChannel.getAsyncOut());
+            ctx::fireChannelRead, localChannel.toString(), localChannel.getAsyncOut());
 
         // if readAsyncListener receives immediate close,
         // it will close this handler and closing this handler sets channel variable to null

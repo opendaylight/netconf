@@ -55,16 +55,10 @@ public final class RestDocgenUtil {
         final URI namespace = node.getQName().getNamespace();
         final Optional<Revision> revision = node.getQName().getRevision();
 
-        Map<Optional<Revision>, Module> revisionToModule = NAMESPACE_AND_REVISION_TO_MODULE.get(namespace);
-        if (revisionToModule == null) {
-            revisionToModule = new HashMap<>();
-            NAMESPACE_AND_REVISION_TO_MODULE.put(namespace, revisionToModule);
-        }
-        Module module = revisionToModule.get(revision);
-        if (module == null) {
-            module = schemaContext.findModule(namespace, revision).orElse(null);
-            revisionToModule.put(revision, module);
-        }
+        Map<Optional<Revision>, Module> revisionToModule =
+            NAMESPACE_AND_REVISION_TO_MODULE.computeIfAbsent(namespace, k -> new HashMap<>());
+        Module module =
+            revisionToModule.computeIfAbsent(revision, k -> schemaContext.findModule(namespace, k).orElse(null));
         if (module != null) {
             return module.getName() + ":" + node.getQName().getLocalName();
         }

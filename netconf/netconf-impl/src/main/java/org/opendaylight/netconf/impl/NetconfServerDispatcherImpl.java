@@ -12,9 +12,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalAddress;
-import io.netty.channel.local.LocalChannel;
 import io.netty.channel.local.LocalServerChannel;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
 import org.opendaylight.netconf.api.NetconfServerDispatcher;
@@ -35,23 +33,12 @@ public class NetconfServerDispatcherImpl extends AbstractDispatcher<NetconfServe
 
     @Override
     public ChannelFuture createServer(InetSocketAddress address) {
-        return super.createServer(address, new PipelineInitializer<NetconfServerSession>() {
-            @Override
-            public void initializeChannel(final SocketChannel ch, final Promise<NetconfServerSession> promise) {
-                initializer.initialize(ch, promise);
-            }
-        });
+        return super.createServer(address, initializer::initialize);
     }
 
     @Override
     public ChannelFuture createLocalServer(LocalAddress address) {
-        return super.createServer(address, LocalServerChannel.class, new ChannelPipelineInitializer<LocalChannel,
-                NetconfServerSession>() {
-            @Override
-            public void initializeChannel(final LocalChannel ch, final Promise<NetconfServerSession> promise) {
-                initializer.initialize(ch, promise);
-            }
-        });
+        return super.createServer(address, LocalServerChannel.class, initializer::initialize);
     }
 
     public static class ServerChannelInitializer extends AbstractChannelInitializer<NetconfServerSession> {

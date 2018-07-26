@@ -106,11 +106,8 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
             }
 
             final String currentModuleName = cap.getModuleName().get();
-            Map<String, String> revisionMap = mappedModulesToRevisionToSchema.get(currentModuleName);
-            if (revisionMap == null) {
-                revisionMap = Maps.newHashMap();
-                mappedModulesToRevisionToSchema.put(currentModuleName, revisionMap);
-            }
+            Map<String, String> revisionMap =
+                mappedModulesToRevisionToSchema.computeIfAbsent(currentModuleName, k -> Maps.newHashMap());
 
             final String currentRevision = cap.getRevision().get();
             revisionMap.put(currentRevision, cap.getCapabilitySchema().get());
