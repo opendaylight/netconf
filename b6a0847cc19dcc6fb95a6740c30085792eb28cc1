@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "098ba062_533c75a0",
+        "filename": "netconf/netconf-impl/src/main/java/org/opendaylight/netconf/impl/NetconfServerDispatcherImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-07-27T10:02:03Z",
+      "side": 1,
+      "message": "Is there any benefit of the cast here?",
+      "revId": "b6a0847cc19dcc6fb95a6740c30085792eb28cc1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "32f3b111_95678eb2",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-07-27T10:02:03Z",
+      "side": 1,
+      "message": "Better name for the lambda expression parameter. Or we can get rid of previous future variable declaration and do something like\nsslHandler.get().handshakeFuture().addListener(future -\u003e {\n...\n});",
+      "revId": "b6a0847cc19dcc6fb95a6740c30085792eb28cc1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ddb5eb84_b23eaa51",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/AbstractNetconfSessionNegotiator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-07-27T10:02:03Z",
+      "side": 1,
+      "message": "Why don\u0027t we use lambda expression also here?",
+      "revId": "b6a0847cc19dcc6fb95a6740c30085792eb28cc1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "299ef27d_bbc7fbbe",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/RemoteNetconfCommand.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-07-27T10:02:03Z",
+      "side": 1,
+      "message": "Do we need the cast here?",
+      "revId": "b6a0847cc19dcc6fb95a6740c30085792eb28cc1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0617b132_812147fb",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/RemoteNetconfCommand.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-07-27T10:02:03Z",
+      "side": 1,
+      "message": "Can be replaced with lambda too",
+      "revId": "b6a0847cc19dcc6fb95a6740c30085792eb28cc1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
