@@ -1,0 +1,8 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Richard Kosegi <richard.kosegi@gmail.com>
+Code-Review+2: Jakub Morvay <jakub.morvay@gmail.com>
+Submitted-by: Jakub Morvay <jakub.morvay@gmail.com>
+Submitted-at: Fri, 27 Jul 2018 19:53:05 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/74591
+Project: netconf
+Branch: refs/heads/stable/oxygen
