@@ -16,7 +16,6 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalChannel;
-import io.netty.util.concurrent.GenericFutureListener;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -118,19 +117,15 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
             }
         });
         clientChannelFuture = clientBootstrap.connect(localAddress);
-        clientChannelFuture.addListener(new GenericFutureListener<ChannelFuture>() {
-
-            @Override
-            public void operationComplete(final ChannelFuture future) {
-                if (future.isSuccess()) {
-                    clientChannel = clientChannelFuture.channel();
-                } else {
-                    LOG.warn("Unable to establish internal connection to netconf server for client: {}",
-                            getClientAddress());
-                    Preconditions.checkNotNull(callback, "Exit callback must be set");
-                    callback.onExit(1, "Unable to establish internal connection to netconf server for client: "
-                            + getClientAddress());
-                }
+        clientChannelFuture.addListener(future -> {
+            if (future.isSuccess()) {
+                clientChannel = clientChannelFuture.channel();
+            } else {
+                LOG.warn("Unable to establish internal connection to netconf server for client: {}",
+                        getClientAddress());
+                Preconditions.checkNotNull(callback, "Exit callback must be set");
+                callback.onExit(1, "Unable to establish internal connection to netconf server for client: "
+                        + getClientAddress());
             }
         });
     }
@@ -142,14 +137,10 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
 
         clientChannelFuture.cancel(true);
         if (clientChannel != null) {
-            clientChannel.close().addListener(new GenericFutureListener<ChannelFuture>() {
-
-                @Override
-                public void operationComplete(final ChannelFuture future) {
-                    if (!future.isSuccess()) {
-                        LOG.warn("Unable to release internal connection to netconf server on channel: {}",
-                                clientChannel);
-                    }
+            clientChannel.close().addListener(future -> {
+                if (!future.isSuccess()) {
+                    LOG.warn("Unable to release internal connection to netconf server on channel: {}",
+                            clientChannel);
                 }
             });
         }

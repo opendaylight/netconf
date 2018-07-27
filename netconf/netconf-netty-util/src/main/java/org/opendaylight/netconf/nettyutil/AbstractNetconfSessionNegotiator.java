@@ -19,7 +19,6 @@ import io.netty.handler.ssl.SslHandler;
 import io.netty.util.Timeout;
 import io.netty.util.Timer;
 import io.netty.util.TimerTask;
-import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import java.util.concurrent.TimeUnit;
@@ -84,14 +83,10 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         } else {
             final Optional<SslHandler> sslHandler = getSslHandler(channel);
             if (sslHandler.isPresent()) {
-                Future<Channel> future = sslHandler.get().handshakeFuture();
-                future.addListener(new GenericFutureListener<Future<? super Channel>>() {
-                    @Override
-                    public void operationComplete(final Future<? super Channel> future) {
-                        Preconditions.checkState(future.isSuccess(), "Ssl handshake was not successful");
-                        LOG.debug("Ssl handshake complete");
-                        start();
-                    }
+                sslHandler.get().handshakeFuture().addListener(future -> {
+                    Preconditions.checkState(future.isSuccess(), "Ssl handshake was not successful");
+                    LOG.debug("Ssl handshake complete");
+                    start();
                 });
             } else {
                 start();
@@ -139,14 +134,11 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
                             LOG.warn("Netconf session was not established after {}", connectionTimeoutMillis);
                             changeState(State.FAILED);
 
-                            channel.close().addListener(new GenericFutureListener<ChannelFuture>() {
-                                @Override
-                                public void operationComplete(final ChannelFuture future) {
-                                    if (future.isSuccess()) {
-                                        LOG.debug("Channel {} closed: success", future.channel());
-                                    } else {
-                                        LOG.warn("Channel {} closed: fail", future.channel());
-                                    }
+                            channel.close().addListener((GenericFutureListener<ChannelFuture>) future -> {
+                                if (future.isSuccess()) {
+                                    LOG.debug("Channel {} closed: success", future.channel());
+                                } else {
+                                    LOG.warn("Channel {} closed: fail", future.channel());
                                 }
                             });
                         }

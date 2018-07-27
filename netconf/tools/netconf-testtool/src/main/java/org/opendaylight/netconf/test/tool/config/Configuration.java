@@ -9,11 +9,9 @@ package org.opendaylight.netconf.test.tool.config;
 
 import com.google.common.collect.ImmutableSet;
 import java.io.File;
-import java.security.PublicKey;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
-import org.apache.sshd.server.session.ServerSession;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.test.tool.operations.OperationsCreator;
@@ -53,12 +51,9 @@ public class Configuration {
         return true;
     };
 
-    public static final PublickeyAuthenticator DEFAULT_PUBLIC_KEY_AUTHENTICATOR = new PublickeyAuthenticator() {
-        @Override
-        public boolean authenticate(final String username, final PublicKey key, final ServerSession session) {
-            LOG.info("Auth with public key: {}", key);
-            return true;
-        }
+    public static final PublickeyAuthenticator DEFAULT_PUBLIC_KEY_AUTHENTICATOR = (username, key, session) -> {
+        LOG.info("Auth with public key: {}", key);
+        return true;
     };
 
     private int generateConfigsTimeout = (int) TimeUnit.MINUTES.toMillis(30);
