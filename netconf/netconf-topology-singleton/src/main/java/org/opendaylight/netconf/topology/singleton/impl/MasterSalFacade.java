@@ -18,6 +18,7 @@ import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
@@ -69,7 +70,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     @Override
     public void onDeviceConnected(final SchemaContext remoteSchemaContext,
                                   final NetconfSessionPreferences sessionPreferences,
-                                  final DOMRpcService domRpcService) {
+                                  final DOMRpcService domRpcService, DOMActionService domActionService) {
         this.currentSchemaContext = remoteSchemaContext;
         this.netconfSessionPreferences = sessionPreferences;
         this.deviceRpc = domRpcService;
@@ -132,7 +133,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
         final ProxyDOMDataBroker proxyDataBroker =
                 new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(), actorResponseWaitTime);
         salProvider.getMountInstance()
-                .onTopologyDeviceConnected(currentSchemaContext, proxyDataBroker, deviceRpc, notificationService);
+                .onTopologyDeviceConnected(currentSchemaContext, proxyDataBroker, deviceRpc, notificationService, null);
     }
 
     protected DOMDataBroker newDeviceDataBroker() {

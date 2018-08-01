@@ -353,7 +353,7 @@ public class MountPointEndToEndTest {
         final MasterSalFacade masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
 
         masterSalFacade.onDeviceConnected(deviceSchemaContext,
-                NetconfSessionPreferences.fromStrings(Collections.emptyList()), deviceRpcService);
+                NetconfSessionPreferences.fromStrings(Collections.emptyList()), deviceRpcService, null);
 
         DOMMountPoint masterMountPoint = awaitMountPoint(masterMountPointService);
 
@@ -428,7 +428,7 @@ public class MountPointEndToEndTest {
         MasterSalFacade masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
 
         masterSalFacade.onDeviceConnected(deviceSchemaContext,
-                NetconfSessionPreferences.fromStrings(Collections.emptyList()), deviceRpcService);
+                NetconfSessionPreferences.fromStrings(Collections.emptyList()), deviceRpcService, null);
 
         verify(masterMountPointListener, timeout(5000)).onMountPointCreated(yangNodeInstanceId);
 

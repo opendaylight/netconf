@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -56,7 +57,8 @@ public class SchemalessNetconfDeviceTest {
 
         device.onRemoteSessionUp(sessionCaps, listener);
         verify(facade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
+                any(DOMActionService.class));
 
         device.onNotification(netconfMessage);
         verify(facade).onNotification(any(DOMNotification.class));
@@ -73,7 +75,8 @@ public class SchemalessNetconfDeviceTest {
         final RemoteDeviceHandler<NetconfSessionPreferences> remoteDeviceHandler =
                 mockCloseableClass(RemoteDeviceHandler.class);
         doNothing().when(remoteDeviceHandler).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class),
+                any(DOMActionService.class));
         doNothing().when(remoteDeviceHandler).onDeviceDisconnected();
         doNothing().when(remoteDeviceHandler).onNotification(any(DOMNotification.class));
         return remoteDeviceHandler;

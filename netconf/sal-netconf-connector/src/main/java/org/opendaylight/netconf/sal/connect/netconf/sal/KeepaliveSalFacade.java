@@ -13,7 +13,9 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -23,11 +25,15 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMActionResult;
+import org.opendaylight.mdsal.dom.api.DOMActionServiceExtension;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -62,6 +68,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     private final long keepaliveDelaySeconds;
     private final ResetKeepalive resetKeepaliveTask;
     private final long defaultRequestTimeoutMillis;
+    private final ActionResetKeepalive actionResetKeepalive;
 
     private volatile NetconfDeviceCommunicator listener;
     private volatile ScheduledFuture<?> currentKeepalive;
@@ -76,6 +83,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         this.keepaliveDelaySeconds = keepaliveDelaySeconds;
         this.defaultRequestTimeoutMillis = defaultRequestTimeoutMillis;
         this.resetKeepaliveTask = new ResetKeepalive();
+        actionResetKeepalive = new ActionResetKeepalive();
     }
 
     public KeepaliveSalFacade(final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
@@ -126,11 +134,14 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
 
     @Override
     public void onDeviceConnected(final SchemaContext remoteSchemaContext,
-                          final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
+                          final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc,
+                          DOMActionService deviceAction) {
         this.currentDeviceRpc = deviceRpc;
         final DOMRpcService deviceRpc1 =
                 new KeepaliveDOMRpcService(deviceRpc, resetKeepaliveTask, defaultRequestTimeoutMillis, executor);
-        salFacade.onDeviceConnected(remoteSchemaContext, netconfSessionPreferences, deviceRpc1);
+        DOMActionService domActionService = new KeepaliveDOMActionService(deviceAction, actionResetKeepalive,
+                defaultRequestTimeoutMillis, executor);
+        salFacade.onDeviceConnected(remoteSchemaContext, netconfSessionPreferences, deviceRpc1, domActionService);
 
         LOG.debug("{}: Netconf session initiated, starting keepalives", id);
         scheduleKeepalive();
@@ -251,6 +262,24 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         }
     }
 
+    private class ActionResetKeepalive implements FutureCallback<DOMActionResult> {
+        @Override
+        public void onSuccess(@Nullable final DOMActionResult result) {
+            // No matter what response we got,
+            // rpc-reply or rpc-error, we got it from device so the netconf session is OK.
+            resetKeepalive();
+        }
+
+        @Override
+        public void onFailure(@Nonnull final Throwable throwable) {
+            // User/Application Action failed (The Action did not reach the remote device or ..
+            // TODO what other reasons could cause this ?)
+            // There is no point in keeping this session. Reconnect.
+            LOG.warn("{}: Action failure detected. Reconnecting netconf session", id, throwable);
+            reconnect();
+        }
+    }
+
     /*
      * Request timeout task is called once the defaultRequestTimeoutMillis is
      * reached. At this moment, if the request is not yet finished, we cancel
@@ -268,6 +297,22 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         public void run() {
             if (!rpcResultFuture.isDone()) {
                 rpcResultFuture.cancel(true);
+            }
+        }
+    }
+
+    private static final class ActionRequestTimeoutTask implements Runnable {
+
+        private final FluentFuture<? extends DOMActionResult> actionResultFuture;
+
+        ActionRequestTimeoutTask(final FluentFuture<? extends DOMActionResult> actionResultFuture) {
+            this.actionResultFuture = actionResultFuture;
+        }
+
+        @Override
+        public void run() {
+            if (!actionResultFuture.isDone()) {
+                actionResultFuture.cancel(true);
             }
         }
     }
@@ -315,6 +360,41 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
                 @Nonnull final T listener) {
             // There is no real communication with the device (yet), no reset here
             return deviceRpc.registerRpcListener(listener);
+        }
+    }
+
+    public static final class KeepaliveDOMActionService implements DOMActionService {
+
+        private final DOMActionService deviceAction;
+        private final ActionResetKeepalive resetKeepaliveTask;
+        private final long defaultRequestTimeoutMillis;
+        private final ScheduledExecutorService executor;
+
+        KeepaliveDOMActionService(final DOMActionService deviceAction, final ActionResetKeepalive resetKeepaliveTask,
+                final long defaultRequestTimeoutMillis, final ScheduledExecutorService executor) {
+            this.deviceAction = deviceAction;
+            this.resetKeepaliveTask = resetKeepaliveTask;
+            this.defaultRequestTimeoutMillis = defaultRequestTimeoutMillis;
+            this.executor = executor;
+        }
+
+        public DOMActionService getDeviceRpc() {
+            return deviceAction;
+        }
+
+        @Override
+        public FluentFuture<? extends DOMActionResult> invokeAction(SchemaPath type, DOMDataTreeIdentifier path,
+                ContainerNode input) {
+            FluentFuture<? extends DOMActionResult> invokeAction = deviceAction.invokeAction(type, path, input);
+            invokeAction.addCallback(resetKeepaliveTask, executor);
+            final ActionRequestTimeoutTask timeoutTask = new ActionRequestTimeoutTask(invokeAction);
+            executor.schedule(timeoutTask, defaultRequestTimeoutMillis, TimeUnit.MILLISECONDS);
+            return invokeAction;
+        }
+
+        @Override
+        public ClassToInstanceMap<DOMActionServiceExtension> getExtensions() {
+            return deviceAction.getExtensions();
         }
     }
 }

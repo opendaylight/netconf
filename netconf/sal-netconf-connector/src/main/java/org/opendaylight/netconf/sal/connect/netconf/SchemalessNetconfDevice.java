@@ -33,8 +33,8 @@ public class SchemalessNetconfDevice implements
         this.id = id;
         this.salFacade = salFacade;
         final MessageCounter counter = new MessageCounter();
-        rpcTransformer = new BaseRpcSchemalessTransformer(counter);
-        messageTransformer = new SchemalessMessageTransformer(counter);
+        this.rpcTransformer = new BaseRpcSchemalessTransformer(counter);
+        this.messageTransformer = new SchemalessMessageTransformer(counter);
     }
 
     @VisibleForTesting
@@ -43,18 +43,18 @@ public class SchemalessNetconfDevice implements
         this.id = id;
         this.salFacade = salFacade;
         final MessageCounter counter = new MessageCounter();
-        rpcTransformer = new BaseRpcSchemalessTransformer(counter);
+        this.rpcTransformer = new BaseRpcSchemalessTransformer(counter);
         this.messageTransformer = messageTransformer;
     }
 
-    @Override public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
+    @Override
+    public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
                                             final NetconfDeviceCommunicator netconfDeviceCommunicator) {
         final SchemalessNetconfDeviceRpc schemalessNetconfDeviceRpc = new SchemalessNetconfDeviceRpc(id,
                 netconfDeviceCommunicator, rpcTransformer, messageTransformer);
 
-        salFacade.onDeviceConnected(BaseSchema.BASE_NETCONF_CTX.getSchemaContext(),
-                remoteSessionCapabilities, schemalessNetconfDeviceRpc);
-
+        salFacade.onDeviceConnected(BaseSchema.BASE_NETCONF_CTX.getSchemaContext(), remoteSessionCapabilities,
+                schemalessNetconfDeviceRpc, null);
     }
 
     @Override public void onRemoteSessionDown() {
