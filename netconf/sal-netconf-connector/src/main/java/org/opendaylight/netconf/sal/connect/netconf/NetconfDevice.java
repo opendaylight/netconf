@@ -31,11 +31,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.GuardedBy;
+import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.sal.connect.AbstractDeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
@@ -81,17 +83,20 @@ public class NetconfDevice
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDevice.class);
 
     protected final RemoteDeviceId id;
-    private final boolean reconnectOnSchemasChange;
-
     protected final SchemaContextFactory schemaContextFactory;
-    private final RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
-    private final ListeningExecutorService processingExecutor;
     protected final SchemaSourceRegistry schemaRegistry;
     protected final SchemaRepository schemaRepository;
-    private final NetconfDeviceSchemasResolver stateSchemasResolver;
-    private final NotificationHandler notificationHandler;
+
     protected final List<SchemaSourceRegistration<? extends SchemaSourceRepresentation>> sourceRegistrations =
             new ArrayList<>();
+
+    private final RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
+    private final ListeningExecutorService processingExecutor;
+    private final AbstractDeviceActionFactory deviceActionFactory;
+    private final NetconfDeviceSchemasResolver stateSchemasResolver;
+    private final NotificationHandler notificationHandler;
+    private final boolean reconnectOnSchemasChange;
+
     @GuardedBy("this")
     private boolean connected = false;
 
@@ -115,8 +120,16 @@ public class NetconfDevice
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id,
                          final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
                          final ExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
+        this(schemaResourcesDTO, id, salFacade, globalProcessingExecutor, reconnectOnSchemasChange, null);
+    }
+
+    public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id,
+            final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
+            final ExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange,
+            final AbstractDeviceActionFactory deviceActionFactory) {
         this.id = id;
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
+        this.deviceActionFactory = deviceActionFactory;
         this.schemaRegistry = schemaResourcesDTO.getSchemaRegistry();
         this.schemaRepository = schemaResourcesDTO.getSchemaRepository();
         this.schemaContextFactory = schemaResourcesDTO.getSchemaContextFactory();
@@ -155,7 +168,8 @@ public class NetconfDevice
             }
 
             private void setUpSchema(final DeviceSources result) {
-                processingExecutor.submit(new SchemaSetup(result, remoteSessionCapabilities, listener));
+                processingExecutor.submit(new SchemaSetup(result, remoteSessionCapabilities, listener,
+                        deviceActionFactory));
             }
 
             @Override
@@ -215,7 +229,7 @@ public class NetconfDevice
 
     private synchronized void handleSalInitializationSuccess(final SchemaContext result,
                                         final NetconfSessionPreferences remoteSessionCapabilities,
-                                        final DOMRpcService deviceRpc) {
+                                        final DOMRpcService deviceRpc, DOMActionService deviceAction) {
         //NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
         //since salFacade.onDeviceDisconnected was already called.
         if (connected) {
@@ -226,7 +240,7 @@ public class NetconfDevice
 
             updateTransformer(messageTransformer);
             // salFacade.onDeviceConnected has to be called before the notification handler is initialized
-            salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc);
+            salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc, deviceAction);
             notificationHandler.onRemoteSchemaUp(messageTransformer);
 
             LOG.info("{}: Netconf connector initialized successfully", id);
@@ -443,12 +457,15 @@ public class NetconfDevice
         private final NetconfSessionPreferences remoteSessionCapabilities;
         private final RemoteDeviceCommunicator<NetconfMessage> listener;
         private final NetconfDeviceCapabilities capabilities;
+        private final AbstractDeviceActionFactory deviceActionFactory;
 
         SchemaSetup(final DeviceSources deviceSources, final NetconfSessionPreferences remoteSessionCapabilities,
-                           final RemoteDeviceCommunicator<NetconfMessage> listener) {
+                           final RemoteDeviceCommunicator<NetconfMessage> listener,
+                           AbstractDeviceActionFactory deviceActionFactory) {
             this.deviceSources = deviceSources;
             this.remoteSessionCapabilities = remoteSessionCapabilities;
             this.listener = listener;
+            this.deviceActionFactory = deviceActionFactory;
             this.capabilities = remoteSessionCapabilities.getNetconfDeviceCapabilities();
         }
 
@@ -478,6 +495,8 @@ public class NetconfDevice
 
         /**
          * Build schema context, in case of success or final failure notify device.
+         *
+         * @param requiredSources required sources
          */
         @SuppressWarnings("checkstyle:IllegalCatch")
         private void setUpSchema(Collection<SourceIdentifier> requiredSources) {
@@ -501,7 +520,8 @@ public class NetconfDevice
                                             remoteSessionCapabilities.getNonModuleBasedCapsOrigin().get(entry)).build())
                             .collect(Collectors.toList()));
 
-                    handleSalInitializationSuccess(result, remoteSessionCapabilities, getDeviceSpecificRpc(result));
+                    handleSalInitializationSuccess(result, remoteSessionCapabilities, getDeviceSpecificRpc(result),
+                            deviceActionFactory == null ? null : deviceActionFactory.createDeviceAction());
                     return;
                 } catch (final ExecutionException e) {
                     // schemaBuilderFuture.checkedGet() throws only SchemaResolutionException

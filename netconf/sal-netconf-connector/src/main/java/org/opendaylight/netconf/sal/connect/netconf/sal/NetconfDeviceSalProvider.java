@@ -13,6 +13,7 @@ import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
+import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
@@ -53,20 +54,20 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
         }
     };
 
+    public NetconfDeviceSalProvider(final RemoteDeviceId deviceId, final DOMMountPointService mountService) {
+        this(deviceId, mountService, null);
+    }
+
     public NetconfDeviceSalProvider(final RemoteDeviceId deviceId, final DOMMountPointService mountService,
-                                    final DataBroker dataBroker) {
+            final DataBroker dataBroker) {
         this.id = deviceId;
         mountInstance = new MountInstance(mountService, id);
         this.dataBroker = dataBroker;
-        txChain = Preconditions.checkNotNull(dataBroker).createTransactionChain(transactionChainListener);
+        if (dataBroker != null) {
+            txChain = Preconditions.checkNotNull(dataBroker).createTransactionChain(transactionChainListener);
+        }
 
         topologyDatastoreAdapter = new NetconfDeviceTopologyAdapter(id, txChain);
-    }
-
-    public NetconfDeviceSalProvider(final RemoteDeviceId deviceId, final DOMMountPointService mountService) {
-        this.id = deviceId;
-        mountInstance = new MountInstance(mountService, id);
-        this.dataBroker = null;
     }
 
     public MountInstance getMountInstance() {
@@ -106,8 +107,8 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
 
         private final DOMMountPointService mountService;
         private final RemoteDeviceId id;
-        private NetconfDeviceNotificationService notificationService;
 
+        private NetconfDeviceNotificationService notificationService;
         private ObjectRegistration<DOMMountPoint> topologyRegistration;
 
         MountInstance(final DOMMountPointService mountService, final RemoteDeviceId id) {
@@ -117,7 +118,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
 
         public synchronized void onTopologyDeviceConnected(final SchemaContext initialCtx,
                 final DOMDataBroker broker, final DOMRpcService rpc,
-                final NetconfDeviceNotificationService newNotificationService) {
+                final NetconfDeviceNotificationService newNotificationService, DOMActionService deviceAction) {
             Preconditions.checkNotNull(mountService, "Closed");
             Preconditions.checkState(topologyRegistration == null, "Already initialized");
 
@@ -128,6 +129,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
             mountBuilder.addService(DOMDataBroker.class, broker);
             mountBuilder.addService(DOMRpcService.class, rpc);
             mountBuilder.addService(DOMNotificationService.class, newNotificationService);
+            mountBuilder.addService(DOMActionService.class, deviceAction);
             this.notificationService = newNotificationService;
 
             topologyRegistration = mountBuilder.register();

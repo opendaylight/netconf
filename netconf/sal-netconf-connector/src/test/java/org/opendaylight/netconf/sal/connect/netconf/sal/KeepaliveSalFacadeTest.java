@@ -28,6 +28,7 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
@@ -74,7 +75,8 @@ public class KeepaliveSalFacadeTest {
         doNothing().when(listener).disconnect();
         doReturn("mockedRpc").when(deviceRpc).toString();
         doNothing().when(underlyingSalFacade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
+                any(DOMActionService.class));
 
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorServiceSpy = Mockito.spy(executorService);
@@ -105,10 +107,11 @@ public class KeepaliveSalFacadeTest {
         doReturn(Futures.immediateCheckedFuture(result))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
-        keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
+        keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc, null);
 
         verify(underlyingSalFacade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
+                any(DOMActionService.class));
 
         verify(deviceRpc, timeout(15000).times(5)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
     }
@@ -119,10 +122,11 @@ public class KeepaliveSalFacadeTest {
         doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("illegal-state")))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
-        keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
+        keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc, null);
 
         verify(underlyingSalFacade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
+                any(DOMActionService.class));
 
         // Should disconnect the session
         verify(listener, timeout(15000).times(1)).disconnect();
@@ -137,10 +141,11 @@ public class KeepaliveSalFacadeTest {
         doReturn(Futures.immediateCheckedFuture(rpcSuccessWithError))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
-        keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
+        keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc, null);
 
         verify(underlyingSalFacade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
+                any(DOMActionService.class));
 
         // Shouldn't disconnect the session
         verify(listener, times(0)).disconnect();
@@ -154,7 +159,8 @@ public class KeepaliveSalFacadeTest {
                 proxyRpc = (DOMRpcService) invocationOnMock.getArguments()[2];
                 return null;
             }).when(underlyingSalFacade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
+                any(DOMActionService.class));
 
         doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("illegal-state")))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
@@ -163,7 +169,7 @@ public class KeepaliveSalFacadeTest {
                 new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorServiceSpy, 100L, 1L);
         keepaliveSalFacade.setListener(listener);
 
-        keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
+        keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc, null);
 
         proxyRpc.invokeRpc(mock(SchemaPath.class), mock(NormalizedNode.class));
 

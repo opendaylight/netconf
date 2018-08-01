@@ -9,11 +9,13 @@ package org.opendaylight.netconf.sal.connect.netconf;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.sal.connect.AbstractDeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.SchemalessNetconfDeviceRpc;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.ActionMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseRpcSchemalessTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMessageTransformer;
@@ -27,14 +29,23 @@ public class SchemalessNetconfDevice implements
     private RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
     private final SchemalessMessageTransformer messageTransformer;
     private final BaseRpcSchemalessTransformer rpcTransformer;
+    private final AbstractDeviceActionFactory actionFactory;
+    private final ActionMessageTransformer actionMessageTransformer;
 
     public SchemalessNetconfDevice(final RemoteDeviceId id,
                                    final RemoteDeviceHandler<NetconfSessionPreferences> salFacade) {
+        this(id, salFacade, (AbstractDeviceActionFactory)null);
+    }
+
+    public SchemalessNetconfDevice(final RemoteDeviceId id,
+            final RemoteDeviceHandler<NetconfSessionPreferences> salFacade, AbstractDeviceActionFactory actionFactory) {
         this.id = id;
         this.salFacade = salFacade;
+        this.actionFactory = actionFactory;
         final MessageCounter counter = new MessageCounter();
-        rpcTransformer = new BaseRpcSchemalessTransformer(counter);
-        messageTransformer = new SchemalessMessageTransformer(counter);
+        this.rpcTransformer = new BaseRpcSchemalessTransformer(counter);
+        this.messageTransformer = new SchemalessMessageTransformer(counter);
+        this.actionMessageTransformer = new ActionMessageTransformer();
     }
 
     @VisibleForTesting
@@ -43,18 +54,22 @@ public class SchemalessNetconfDevice implements
         this.id = id;
         this.salFacade = salFacade;
         final MessageCounter counter = new MessageCounter();
-        rpcTransformer = new BaseRpcSchemalessTransformer(counter);
+        this.rpcTransformer = new BaseRpcSchemalessTransformer(counter);
         this.messageTransformer = messageTransformer;
+        this.actionFactory = null;
+        this.actionMessageTransformer = new ActionMessageTransformer();
     }
 
-    @Override public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
+    @Override
+    public void onRemoteSessionUp(final NetconfSessionPreferences remoteSessionCapabilities,
                                             final NetconfDeviceCommunicator netconfDeviceCommunicator) {
         final SchemalessNetconfDeviceRpc schemalessNetconfDeviceRpc = new SchemalessNetconfDeviceRpc(id,
                 netconfDeviceCommunicator, rpcTransformer, messageTransformer);
 
-        salFacade.onDeviceConnected(BaseSchema.BASE_NETCONF_CTX.getSchemaContext(),
-                remoteSessionCapabilities, schemalessNetconfDeviceRpc);
-
+        salFacade.onDeviceConnected(BaseSchema.BASE_NETCONF_CTX.getSchemaContext(), remoteSessionCapabilities,
+                schemalessNetconfDeviceRpc,
+                actionFactory == null ? null : this.actionFactory.createSchemaLessDeviceAction(id,
+                        netconfDeviceCommunicator, actionMessageTransformer));
     }
 
     @Override public void onRemoteSessionDown() {
