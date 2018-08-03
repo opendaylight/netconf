@@ -94,10 +94,10 @@ public class TransactionProvider implements AutoCloseable {
                 netconfSessionIdForReporting, e);
             final String cause = e.getCause() != null ? (" Cause: " + e.getCause().getMessage()) : "";
             throw new DocumentedException(
-                "Candidate transaction validate failed on " + e.getMessage() + " " + netconfSessionIdForReporting
-                    +  cause, e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
+                "Candidate transaction validate failed [sessionId=" + netconfSessionIdForReporting + "]: "
+                    + e.getMessage() + cause,
+                e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
-        return;
     }
 
     public synchronized boolean commitTransaction() throws DocumentedException {
