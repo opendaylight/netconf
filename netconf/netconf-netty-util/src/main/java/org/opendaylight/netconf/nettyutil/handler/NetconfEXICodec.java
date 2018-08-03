@@ -8,14 +8,15 @@
 
 package org.opendaylight.netconf.nettyutil.handler;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.siemens.ct.exi.EXIFactory;
-import com.siemens.ct.exi.api.sax.SAXEncoder;
-import com.siemens.ct.exi.api.sax.SAXFactory;
-import com.siemens.ct.exi.exceptions.EXIException;
+import com.siemens.ct.exi.core.EXIFactory;
+import com.siemens.ct.exi.core.exceptions.EXIException;
+import com.siemens.ct.exi.main.api.sax.SAXEncoder;
+import com.siemens.ct.exi.main.api.sax.SAXFactory;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -43,7 +44,7 @@ public final class NetconfEXICodec {
     private final SAXFactory exiFactory;
 
     private NetconfEXICodec(final EXIFactory exiFactory) {
-        this.exiFactory = new SAXFactory(Preconditions.checkNotNull(exiFactory));
+        this.exiFactory = new SAXFactory(requireNonNull(exiFactory));
     }
 
     public static NetconfEXICodec forParameters(final EXIParameters parameters) {
