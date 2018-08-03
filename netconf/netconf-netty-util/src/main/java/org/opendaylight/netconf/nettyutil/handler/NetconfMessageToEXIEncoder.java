@@ -7,9 +7,10 @@
  */
 package org.opendaylight.netconf.nettyutil.handler;
 
-import com.google.common.base.Preconditions;
-import com.siemens.ct.exi.api.sax.SAXEncoder;
-import com.siemens.ct.exi.exceptions.EXIException;
+import static java.util.Objects.requireNonNull;
+
+import com.siemens.ct.exi.core.exceptions.EXIException;
+import com.siemens.ct.exi.main.api.sax.SAXEncoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.channel.ChannelHandlerContext;
@@ -29,7 +30,7 @@ public final class NetconfMessageToEXIEncoder extends MessageToByteEncoder<Netco
     private final NetconfEXICodec codec;
 
     private NetconfMessageToEXIEncoder(final NetconfEXICodec codec) {
-        this.codec = Preconditions.checkNotNull(codec);
+        this.codec = requireNonNull(codec);
     }
 
     public static NetconfMessageToEXIEncoder create(final NetconfEXICodec codec) {
