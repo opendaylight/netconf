@@ -12,8 +12,8 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.Lists;
-import com.siemens.ct.exi.api.sax.SAXEncoder;
-import com.siemens.ct.exi.exceptions.EXIException;
+import com.siemens.ct.exi.core.exceptions.EXIException;
+import com.siemens.ct.exi.main.api.sax.SAXEncoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.io.ByteArrayOutputStream;

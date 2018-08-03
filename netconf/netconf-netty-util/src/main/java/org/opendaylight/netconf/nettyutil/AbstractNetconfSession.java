@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
-import com.siemens.ct.exi.exceptions.EXIException;
-import com.siemens.ct.exi.exceptions.UnsupportedOption;
+import com.siemens.ct.exi.core.exceptions.EXIException;
+import com.siemens.ct.exi.core.exceptions.UnsupportedOption;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;

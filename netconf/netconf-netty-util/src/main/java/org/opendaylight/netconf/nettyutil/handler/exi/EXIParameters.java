@@ -7,14 +7,15 @@
  */
 package org.opendaylight.netconf.nettyutil.handler.exi;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
-import com.siemens.ct.exi.CodingMode;
-import com.siemens.ct.exi.EXIFactory;
-import com.siemens.ct.exi.EncodingOptions;
-import com.siemens.ct.exi.FidelityOptions;
-import com.siemens.ct.exi.exceptions.UnsupportedOption;
-import com.siemens.ct.exi.helpers.DefaultEXIFactory;
+import com.siemens.ct.exi.core.CodingMode;
+import com.siemens.ct.exi.core.EXIFactory;
+import com.siemens.ct.exi.core.EncodingOptions;
+import com.siemens.ct.exi.core.FidelityOptions;
+import com.siemens.ct.exi.core.exceptions.UnsupportedOption;
+import com.siemens.ct.exi.core.helpers.DefaultEXIFactory;
 import java.util.Objects;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.slf4j.Logger;
@@ -63,8 +64,8 @@ public final class EXIParameters {
     private final CodingMode codingMode;
 
     public EXIParameters(final CodingMode codingMode, final FidelityOptions fidelityOptions) {
-        this.fidelityOptions = Preconditions.checkNotNull(fidelityOptions);
-        this.codingMode = Preconditions.checkNotNull(codingMode);
+        this.fidelityOptions = requireNonNull(fidelityOptions);
+        this.codingMode = requireNonNull(codingMode);
     }
 
     @VisibleForTesting

@@ -7,8 +7,9 @@
  */
 package org.opendaylight.netconf.nettyutil.handler;
 
-import com.google.common.base.Preconditions;
-import com.siemens.ct.exi.exceptions.EXIException;
+import static java.util.Objects.requireNonNull;
+
+import com.siemens.ct.exi.core.exceptions.EXIException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufUtil;
@@ -57,7 +58,7 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
     private final DocumentBuilder documentBuilder;
 
     private NetconfEXIToMessageDecoder(final XMLReader reader) {
-        this.reader = Preconditions.checkNotNull(reader);
+        this.reader = requireNonNull(reader);
         this.documentBuilder = UntrustedXML.newDocumentBuilder();
     }
 
