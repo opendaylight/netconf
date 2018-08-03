@@ -10,9 +10,9 @@ package org.opendaylight.netconf.nettyutil.handler.exi;
 
 import static org.junit.Assert.assertEquals;
 
-import com.siemens.ct.exi.CodingMode;
-import com.siemens.ct.exi.EXIFactory;
-import com.siemens.ct.exi.FidelityOptions;
+import com.siemens.ct.exi.core.CodingMode;
+import com.siemens.ct.exi.core.EXIFactory;
+import com.siemens.ct.exi.core.FidelityOptions;
 import java.util.Arrays;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -11,13 +11,13 @@ package org.opendaylight.netconf.nettyutil.handler;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import com.google.common.collect.Lists;
-import com.siemens.ct.exi.api.sax.SAXEncoder;
-import com.siemens.ct.exi.exceptions.EXIException;
+import com.siemens.ct.exi.core.exceptions.EXIException;
+import com.siemens.ct.exi.main.api.sax.SAXEncoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.xml.transform.TransformerException;
@@ -71,7 +71,7 @@ public class NetconfEXIHandlersTest {
             assertEquals((byte)0, buffer.array()[i]);
         }
 
-        final List<Object> out = Lists.newArrayList();
+        final List<Object> out = new ArrayList<>();
         netconfEXIToMessageDecoder.decode(null, buffer, out);
 
         XMLUnit.compareXML(msg.getDocument(), ((NetconfMessage) out.get(0)).getDocument());

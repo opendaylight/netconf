@@ -41,7 +41,7 @@
       <dependency>
         <groupId>com.siemens.ct.exi</groupId>
         <artifactId>exificient</artifactId>
-        <version>0.9.7</version>
+        <version>1.0.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -5,15 +5,15 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.client;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.siemens.ct.exi.CodingMode;
-import com.siemens.ct.exi.FidelityOptions;
-import com.siemens.ct.exi.exceptions.UnsupportedOption;
+import com.siemens.ct.exi.core.CodingMode;
+import com.siemens.ct.exi.core.FidelityOptions;
+import com.siemens.ct.exi.core.exceptions.UnsupportedOption;
 import io.netty.channel.Channel;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
@@ -55,11 +55,6 @@ public class NetconfClientSessionNegotiatorFactory implements SessionNegotiatorF
     private static final String START_EXI_MESSAGE_ID = "default-start-exi";
     private static final EXIParameters DEFAULT_OPTIONS;
 
-    private final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader;
-    private final long connectionTimeoutMillis;
-    private final Timer timer;
-    private final EXIParameters options;
-
     static {
         final FidelityOptions fidelity = FidelityOptions.createDefault();
         try {
@@ -73,7 +68,11 @@ public class NetconfClientSessionNegotiatorFactory implements SessionNegotiatorF
         DEFAULT_OPTIONS = new EXIParameters(CodingMode.BYTE_PACKED, fidelity);
     }
 
+    private final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader;
     private final Set<String> clientCapabilities;
+    private final long connectionTimeoutMillis;
+    private final Timer timer;
+    private final EXIParameters options;
 
     public NetconfClientSessionNegotiatorFactory(final Timer timer,
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
@@ -98,7 +97,7 @@ public class NetconfClientSessionNegotiatorFactory implements SessionNegotiatorF
                                                  final Optional<NetconfHelloMessageAdditionalHeader> additionalHeader,
                                                  final long connectionTimeoutMillis, final EXIParameters exiOptions,
                                                  final Set<String> capabilities) {
-        this.timer = Preconditions.checkNotNull(timer);
+        this.timer = requireNonNull(timer);
         this.additionalHeader = additionalHeader;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
         this.options = exiOptions;
