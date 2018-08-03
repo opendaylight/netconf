@@ -10,8 +10,8 @@ package org.opendaylight.netconf.nettyutil.handler.exi;
 
 import static org.junit.Assert.assertTrue;
 
-import com.siemens.ct.exi.CodingMode;
-import com.siemens.ct.exi.FidelityOptions;
+import com.siemens.ct.exi.core.CodingMode;
+import com.siemens.ct.exi.core.FidelityOptions;
 import java.util.Arrays;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
