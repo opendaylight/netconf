@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
 import com.google.common.base.Optional;
@@ -13,10 +12,10 @@ import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import org.opendaylight.controller.md.sal.common.api.MappingCheckedFuture;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.mdsal.common.api.MappingCheckedFuture;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -24,7 +23,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public final class ReadOnlyTx implements DOMDataReadOnlyTransaction {
 
