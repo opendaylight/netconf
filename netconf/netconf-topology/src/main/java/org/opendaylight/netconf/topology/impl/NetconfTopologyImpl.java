@@ -26,7 +26,9 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
+import org.opendaylight.netconf.sal.connect.netconf.DeviceActionFactoryRemove;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -52,13 +54,24 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     private ListenerRegistration<NetconfTopologyImpl> datastoreListenerRegistration = null;
 
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
-                               final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
-                               final ThreadPool processingExecutor,
-                               final SchemaRepositoryProvider schemaRepositoryProvider,
-                               final DataBroker dataBroker, final DOMMountPointService mountPointService,
-                               final AAAEncryptionService encryptionService) {
+            final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
+            final ThreadPool processingExecutor,
+            final SchemaRepositoryProvider schemaRepositoryProvider,
+            final DataBroker dataBroker, final DOMMountPointService mountPointService,
+            final AAAEncryptionService encryptionService) {
+        this(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
+                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, null);
+    }
+
+    public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
+            final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
+            final ThreadPool processingExecutor,
+            final SchemaRepositoryProvider schemaRepositoryProvider,
+            final DataBroker dataBroker, final DOMMountPointService mountPointService,
+            final AAAEncryptionService encryptionService,
+            final DeviceActionFactory deviceActionFactory) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService);
+                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, deviceActionFactory);
     }
 
     @Override

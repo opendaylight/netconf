@@ -15,6 +15,7 @@ import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.topology.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 
@@ -26,9 +27,10 @@ abstract class BaseCallHomeTopology extends AbstractNetconfTopology {
                          final SchemaRepositoryProvider schemaRepositoryProvider,
                          final DataBroker dataBroker,
                          final DOMMountPointService mountPointService,
-                         final AAAEncryptionService encryptionService) {
+                         final AAAEncryptionService encryptionService,
+                         final DeviceActionFactory deviceActionFactory) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
               processingExecutor, schemaRepositoryProvider, dataBroker, mountPointService,
-              encryptionService);
+              encryptionService, deviceActionFactory);
     }
 }
