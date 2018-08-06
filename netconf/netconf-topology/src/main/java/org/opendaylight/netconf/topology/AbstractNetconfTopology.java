@@ -51,6 +51,7 @@ import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurati
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
+import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemas;
@@ -200,15 +201,16 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         }
     }
 
-    protected final String topologyId;
     private final NetconfClientDispatcher clientDispatcher;
     private final EventExecutor eventExecutor;
+    private final DeviceActionFactory deviceActionFactory;
+    private final NetconfKeystoreAdapter keystoreAdapter;
     protected final ScheduledThreadPool keepaliveExecutor;
     protected final ThreadPool processingExecutor;
     protected final SharedSchemaRepository sharedSchemaRepository;
     protected final DataBroker dataBroker;
     protected final DOMMountPointService mountPointService;
-    private final NetconfKeystoreAdapter keystoreAdapter;
+    protected final String topologyId;
     protected SchemaSourceRegistry schemaRegistry = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaRepository schemaRepository = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaContextFactory schemaContextFactory = DEFAULT_SCHEMA_CONTEXT_FACTORY;
@@ -222,12 +224,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                                       final ThreadPool processingExecutor,
                                       final SchemaRepositoryProvider schemaRepositoryProvider,
                                       final DataBroker dataBroker, final DOMMountPointService mountPointService,
-                                      final AAAEncryptionService encryptionService) {
+                                      final AAAEncryptionService encryptionService,
+                                      final DeviceActionFactory deviceActionFactory) {
         this.topologyId = topologyId;
         this.clientDispatcher = clientDispatcher;
         this.eventExecutor = eventExecutor;
         this.keepaliveExecutor = keepaliveExecutor;
         this.processingExecutor = processingExecutor;
+        this.deviceActionFactory = deviceActionFactory;
         this.sharedSchemaRepository = schemaRepositoryProvider.getSharedSchemaRepository();
         this.dataBroker = dataBroker;
         this.mountPointService = mountPointService;
@@ -320,7 +324,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         if (keepaliveDelay > 0) {
             LOG.warn("Adding keepalive facade, for device {}", nodeId);
-            salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, keepaliveExecutor.getExecutor(),
+            salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade, this.keepaliveExecutor.getExecutor(),
                     keepaliveDelay, defaultRequestTimeoutMillis);
         }
 
@@ -356,13 +360,16 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         if (node.isSchemaless()) {
             device = new SchemalessNetconfDevice(remoteDeviceId, salFacade);
         } else {
-            device = new NetconfDeviceBuilder()
+            NetconfDeviceBuilder netconfDeviceBuilder = new NetconfDeviceBuilder()
                     .setReconnectOnSchemasChange(reconnectOnChangedSchema)
                     .setSchemaResourcesDTO(schemaResourcesDTO)
-                    .setGlobalProcessingExecutor(processingExecutor.getExecutor())
+                    .setGlobalProcessingExecutor(this.processingExecutor.getExecutor())
                     .setId(remoteDeviceId)
-                    .setSalFacade(salFacade)
-                    .build();
+                    .setSalFacade(salFacade);
+            if (this.deviceActionFactory != null) {
+                netconfDeviceBuilder.setDeviceActionFactory(this.deviceActionFactory);
+            }
+            device = netconfDeviceBuilder.build();
         }
 
         final Optional<UserPreferences> userCapabilities = getUserCapabilities(node);
