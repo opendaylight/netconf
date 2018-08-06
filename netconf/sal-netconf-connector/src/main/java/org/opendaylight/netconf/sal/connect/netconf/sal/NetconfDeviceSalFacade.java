@@ -11,6 +11,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import java.util.List;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
@@ -32,7 +33,7 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
     private final List<AutoCloseable> salRegistrations = Lists.newArrayList();
 
     public NetconfDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
-                                  final DataBroker dataBroker) {
+            final DataBroker dataBroker) {
         this.id = id;
         this.salProvider = new NetconfDeviceSalProvider(id, mountPointService, dataBroker);
     }
@@ -51,7 +52,7 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
     @Override
     public synchronized void onDeviceConnected(final SchemaContext schemaContext,
                                                final NetconfSessionPreferences netconfSessionPreferences,
-                                               final DOMRpcService deviceRpc) {
+                                               final DOMRpcService deviceRpc, DOMActionService deviceAction) {
 
         final DOMDataBroker domBroker =
                 new NetconfDeviceDataBroker(id, schemaContext, deviceRpc, netconfSessionPreferences);
@@ -59,7 +60,7 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
         salProvider.getMountInstance()
-                .onTopologyDeviceConnected(schemaContext, domBroker, deviceRpc, notificationService);
+                .onTopologyDeviceConnected(schemaContext, domBroker, deviceRpc, notificationService, deviceAction);
         salProvider.getTopologyDatastoreAdapter()
                 .updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
     }
