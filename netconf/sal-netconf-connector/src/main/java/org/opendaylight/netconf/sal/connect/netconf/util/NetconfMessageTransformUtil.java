@@ -18,6 +18,7 @@ import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.FailedNetconfMessage;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -47,6 +49,8 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -128,6 +132,9 @@ public final class NetconfMessageTransformUtil {
     public static final QName NETCONF_FILTER_QNAME = QName.create(NETCONF_QNAME, "filter").intern();
     public static final QName NETCONF_GET_QNAME = QName.create(NETCONF_QNAME, "get").intern();
     public static final QName NETCONF_RPC_QNAME = QName.create(NETCONF_QNAME, "rpc").intern();
+    public static final QName YANG_QNAME = null;
+    public static final URI NETCONF_ACTION_NAMESPACE = URI.create("urn:ietf:params:xml:ns:yang:1");
+    public static final String NETCONF_ACTION = "action";
 
     public static final URI NETCONF_ROLLBACK_ON_ERROR_URI = URI
             .create("urn:ietf:params:netconf:capability:rollback-on-error:1.0");
@@ -380,6 +387,51 @@ public final class NetconfMessageTransformUtil {
         rpcNS.appendChild(elementNS);
         document.appendChild(rpcNS);
         return new DOMResult(elementNS);
+    }
+
+    public static DOMResult prepareDomResultForActionRequest(DOMDataTreeIdentifier domDataTreeIdentifier,
+            final SchemaPath actionSchemaPath, final MessageCounter counter, String action) {
+        final Document document = XmlUtil.newDocument();
+        final Element rpcNS =
+                document.createElementNS(NETCONF_RPC_QNAME.getNamespace().toString(), NETCONF_RPC_QNAME.getLocalName());
+        // set msg id
+        rpcNS.setAttribute(MESSAGE_ID_ATTR, counter.getNewMessageId(MESSAGE_ID_PREFIX));
+
+        final Element actionNS = document.createElementNS(NETCONF_ACTION_NAMESPACE.toString(), NETCONF_ACTION);
+
+        final Element actionData = prepareActionData(actionNS,
+                domDataTreeIdentifier.getRootIdentifier().getPathArguments().iterator(), document);
+
+        Element specificActionElement = document.createElement(action);
+        actionData.appendChild(specificActionElement);
+        rpcNS.appendChild(actionNS);
+        document.appendChild(rpcNS);
+        return new DOMResult(specificActionElement);
+    }
+
+    private static Element prepareActionData(Element actionNS, Iterator<PathArgument> iterator, Document document) {
+        if (iterator.hasNext()) {
+            PathArgument next = iterator.next();
+            final QName actualNS = next.getNodeType();
+
+            final Element actualElement = document.createElementNS(actualNS.getNamespace().toString(),
+                    actualNS.getLocalName());
+            if (next instanceof NodeWithValue) {
+                actualElement.setNodeValue(((NodeWithValue) next).getValue().toString());
+            } else if (next instanceof NodeIdentifierWithPredicates) {
+                for (Entry<QName, Object> entry : ((NodeIdentifierWithPredicates) next).getKeyValues().entrySet()) {
+                    final Element entryElement = document.createElementNS(entry.getKey().getNamespace().toString(),
+                            entry.getKey().getLocalName());
+                    entryElement.setTextContent(entry.getValue().toString());
+                    entryElement.setNodeValue(entry.getValue().toString());
+                    actualElement.appendChild(entryElement);
+                }
+            }
+            actionNS.appendChild(actualElement);
+            return prepareActionData(actualElement, iterator, document);
+        } else {
+            return actionNS;
+        }
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")

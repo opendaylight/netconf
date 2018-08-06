@@ -23,6 +23,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -92,10 +93,11 @@ public class NetconfDeviceSalFacadeTest {
                 NetconfSessionPreferences.fromStrings(getCapabilities());
 
         final DOMRpcService deviceRpc = mock(DOMRpcService.class);
-        deviceFacade.onDeviceConnected(schemaContext, netconfSessionPreferences, deviceRpc);
+        deviceFacade.onDeviceConnected(schemaContext, netconfSessionPreferences, deviceRpc, null);
 
         verify(mountInstance, times(1)).onTopologyDeviceConnected(eq(schemaContext),
-                any(DOMDataBroker.class), eq(deviceRpc), any(NetconfDeviceNotificationService.class));
+                any(DOMDataBroker.class), eq(deviceRpc), any(NetconfDeviceNotificationService.class),
+                any(DOMActionService.class));
         verify(netconfDeviceTopologyAdapter,
                 times(1)).updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
     }
