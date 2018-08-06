@@ -12,6 +12,8 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -21,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
@@ -30,6 +33,9 @@ import org.opendaylight.controller.md.sal.dom.api.DOMEvent;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMActionResult;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -38,6 +44,7 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransform
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -46,8 +53,13 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
+import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
+import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -67,8 +79,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     private final MessageCounter counter;
     private final Map<QName, RpcDefinition> mappedRpcs;
     private final Multimap<QName, NotificationDefinition> mappedNotifications;
-
     private final boolean strictParsing;
+    private final Set<ActionDefinition> actions;
 
     public NetconfMessageTransformer(final SchemaContext schemaContext, final boolean strictParsing) {
         this(schemaContext, strictParsing, BaseSchema.BASE_NETCONF_CTX);
@@ -78,11 +90,36 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                                      final BaseSchema baseSchema) {
         this.counter = new MessageCounter();
         this.schemaContext = schemaContext;
-        mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
-        mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
+        this.mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
+        this.actions = getActions();
+        this.mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
             node -> node.getQName().withoutRevision());
         this.baseSchema = baseSchema;
         this.strictParsing = strictParsing;
+    }
+
+    private Set<ActionDefinition> getActions() {
+        Builder<ActionDefinition> builder = ImmutableSet.builder();
+        for (DataSchemaNode dataSchemaNode : schemaContext.getChildNodes()) {
+            if (dataSchemaNode instanceof ActionNodeContainer) {
+                findAction(dataSchemaNode, builder);
+            }
+        }
+        return builder.build();
+    }
+
+    private void findAction(DataSchemaNode dataSchemaNode, Builder<ActionDefinition> builder) {
+        if (dataSchemaNode instanceof ActionNodeContainer) {
+            final ActionNodeContainer containerSchemaNode = (ActionNodeContainer) dataSchemaNode;
+            for (ActionDefinition actionDefinition : containerSchemaNode.getActions()) {
+                builder.add(actionDefinition);
+            }
+        }
+        if (dataSchemaNode instanceof DataNodeContainer) {
+            for (DataSchemaNode innerDataSchemaNode : ((DataNodeContainer) dataSchemaNode).getChildNodes()) {
+                findAction(innerDataSchemaNode, builder);
+            }
+        }
     }
 
     @Override
@@ -150,9 +187,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         }
 
         Preconditions.checkNotNull(payload, "Transforming an rpc with input: %s, payload cannot be null", rpcQName);
+
         Preconditions.checkArgument(payload instanceof ContainerNode,
                 "Transforming an rpc with input: %s, payload has to be a container, but was: %s", rpcQName, payload);
-
         // Set the path to the input of rpc for the node stream writer
         rpc = rpc.createChild(QName.create(rpcQName, "input").intern());
         final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpcQName, counter);
@@ -165,6 +202,47 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result, rpc, ctx);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize " + rpc, e);
+        }
+
+        final Document node = result.getNode().getOwnerDocument();
+
+        return new NetconfMessage(node);
+    }
+
+    @Override
+    public NetconfMessage toActionRequest(SchemaPath action, DOMDataTreeIdentifier domDataTreeIdentifier,
+            final NormalizedNode<?, ?> payload) {
+        ActionDefinition actionDefinition = null;
+        SchemaPath schemaPath = action;
+        for (ActionDefinition actionDef : actions) {
+            if (actionDef.getPath().getLastComponent().equals(action.getLastComponent())) {
+                actionDefinition = actionDef;
+                schemaPath = actionDef.getPath();
+            }
+        }
+        Preconditions.checkNotNull(actionDefinition, "Action does not exist: %s", action.getLastComponent());
+
+        if (actionDefinition.getInput().getChildNodes().isEmpty()) {
+            return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForActionRequest(
+                    domDataTreeIdentifier, action, counter, actionDefinition.getQName().getLocalName())
+                    .getNode().getOwnerDocument());
+        }
+
+        Preconditions.checkNotNull(payload, "Transforming an action with input: %s, payload cannot be null",
+                action.getLastComponent());
+        Preconditions.checkArgument(payload instanceof ContainerNode,
+                "Transforming an rpc with input: %s, payload has to be a container, but was: %s",
+                action.getLastComponent(), payload);
+        // Set the path to the input of rpc for the node stream writer
+        action = action.createChild(QName.create(action.getLastComponent(), "input").intern());
+        final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForActionRequest(
+                domDataTreeIdentifier, action, counter, actionDefinition.getQName().getLocalName());
+
+        try {
+            NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result,
+                    schemaPath.createChild(QName.create(action.getLastComponent(), "input").intern()), schemaContext);
+        } catch (final XMLStreamException | IOException | IllegalStateException e) {
+            throw new IllegalStateException("Unable to serialize " + action, e);
         }
 
         final Document node = result.getNode().getOwnerDocument();
@@ -221,27 +299,47 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                     "Unable to parse response of %s, the rpc is unknown", rpcQName);
 
             // In case no input for rpc is defined, we can simply construct the payload here
-            if (rpcDefinition.getOutput().getChildNodes().isEmpty()) {
-                Preconditions.checkArgument(XmlElement.fromDomDocument(
-                    message.getDocument()).getOnlyChildElementWithSameNamespaceOptionally("ok").isPresent(),
-                    "Unexpected content in response of rpc: %s, %s", rpcDefinition.getQName(), message);
-                normalizedNode = null;
-            } else {
-                final Element element = message.getDocument().getDocumentElement();
-                try {
-                    final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
-                    final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                    final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext,
-                            rpcDefinition.getOutput(), strictParsing);
-                    xmlParser.traverse(new DOMSource(element));
-                    normalizedNode = resultHolder.getResult();
-                } catch (XMLStreamException | URISyntaxException | IOException | ParserConfigurationException
-                        | SAXException e) {
-                    throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
-                }
-            }
+            normalizedNode = parseResult(message, rpcDefinition);
         }
         return new DefaultDOMRpcResult(normalizedNode);
+    }
+
+    @Override
+    public DOMActionResult toActionResult(SchemaPath action, DOMDataTreeIdentifier domDataTreeIdentifier,
+            NetconfMessage message) {
+        ActionDefinition actionDefinition = null;
+        for (ActionDefinition actionDef : actions) {
+            if (actionDef.getPath().getLastComponent().equals(action.getLastComponent())) {
+                actionDefinition = actionDef;
+            }
+        }
+        Preconditions.checkNotNull(actionDefinition, "Action does not exist: %s", action);
+        ContainerNode normalizedNode = (ContainerNode) parseResult(message, actionDefinition);
+
+        return new SimpleDOMActionResult(normalizedNode, Collections.<RpcError>emptyList());
+    }
+
+    private NormalizedNode<?, ?> parseResult(final NetconfMessage message,
+            final OperationDefinition operationDefinition) {
+        if (operationDefinition.getOutput().getChildNodes().isEmpty()) {
+            Preconditions.checkArgument(XmlElement.fromDomDocument(
+                message.getDocument()).getOnlyChildElementWithSameNamespaceOptionally("ok").isPresent(),
+                "Unexpected content in response of rpc: %s, %s", operationDefinition.getQName(), message);
+            return null;
+        } else {
+            final Element element = message.getDocument().getDocumentElement();
+            try {
+                final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+                final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+                final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext,
+                        operationDefinition.getOutput(), strictParsing);
+                xmlParser.traverse(new DOMSource(element));
+                return resultHolder.getResult();
+            } catch (XMLStreamException | URISyntaxException | IOException | ParserConfigurationException
+                    | SAXException e) {
+                throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
+            }
+        }
     }
 
     static class NetconfDeviceNotification implements DOMNotification, DOMEvent {
