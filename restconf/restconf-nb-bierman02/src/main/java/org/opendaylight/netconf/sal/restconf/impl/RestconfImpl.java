@@ -51,12 +51,14 @@ import javax.ws.rs.core.UriInfo;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.OptimisticLockFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
@@ -439,6 +441,26 @@ public final class RestconfImpl implements RestconfService {
             }
             schemaContext = mountPoint.getSchemaContext();
             response = mountRpcServices.get().invokeRpc(type, payload.getData());
+            Optional<DOMActionService> actions = mountPoint.getService(DOMActionService.class);
+            if (actions.isPresent()) {
+                DOMActionService domActionService = actions.get();
+                QName qName = QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "server");
+                QName nameQname = QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "name");
+                YangInstanceIdentifier yangInstanceIdentifier =YangInstanceIdentifier.builder().append(
+                        new NodeIdentifierWithPredicates(qName, nameQname, "test")).build();
+                DOMDataTreeIdentifier domDataTreeIdentifier =
+                        new DOMDataTreeIdentifier(org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION,
+                                yangInstanceIdentifier);
+                ImmutableLeafNodeBuilder<String> immutableLeafNodeBuilder = new ImmutableLeafNodeBuilder<>();
+                DataContainerChild<NodeIdentifier, String> build = immutableLeafNodeBuilder.withNodeIdentifier(
+                        NodeIdentifier.create(QName.create(qName, "reset-at"))).withValue("now").build();
+                ContainerNode data = ImmutableContainerNodeBuilder.create().withNodeIdentifier(NodeIdentifier.create(
+                        QName.create(qName, "input"))).withChild(build).build();
+                domActionService.invokeAction(
+                        SchemaPath.create(true,
+                                QName.create("http://netconfcentral.org/ns/toaster", "2009-11-20", "reset")),
+                        domDataTreeIdentifier, data);
+            }
         } else {
             if (namespace.toString().equals(SAL_REMOTE_NAMESPACE)) {
                 if (identifier.contains(CREATE_DATA_SUBSCR)) {
