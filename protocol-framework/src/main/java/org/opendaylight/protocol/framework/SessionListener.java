@@ -41,6 +41,12 @@ public interface SessionListener<M, S extends ProtocolSession<?>, T extends Term
     void onSessionTerminated(S session, T reason);
 
     /**
+     *
+     * @param session
+     */
+    void onSessionIdle(S session);
+
+    /**
      * Fired when a normal protocol message is received.
      *
      * @param message Protocol message

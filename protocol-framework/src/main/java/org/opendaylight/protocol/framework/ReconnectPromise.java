@@ -11,12 +11,15 @@ import com.google.common.base.Preconditions;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
-import java.net.InetSocketAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetSocketAddress;
 
 @Deprecated
 final class ReconnectPromise<S extends ProtocolSession<?>, L extends SessionListener<?, ?, ?>> extends DefaultPromise<Void> {
@@ -50,6 +53,7 @@ final class ReconnectPromise<S extends ProtocolSession<?>, L extends SessionList
             // Handlers in front of it can react to channelInactive event, but have to forward the event or the reconnect will not work
             // This handler is last so all handlers in front of it can handle channel inactive (to e.g. resource cleanup) before a new connection is started
             channel.pipeline().addLast(new ClosedChannelHandler(ReconnectPromise.this));
+            channel.pipeline().addLast(new IdleHandler(60, 30, 0));
         });
 
         pending.addListener(future -> {
@@ -79,6 +83,19 @@ final class ReconnectPromise<S extends ProtocolSession<?>, L extends SessionList
         return false;
     }
 
+    // This handler is mostly used to detect an idle state (eg for 1 min)
+    // and provide an indication to kick the keepalive mechanism into action.
+    private static final class IdleHandler extends IdleStateHandler{
+
+        public IdleHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds) {
+            super(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds);
+        }
+
+        @Override
+        protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
+            System.out.println("Channel is idle");
+        }
+    }
     /**
      * Channel handler that responds to channelInactive event and reconnects the session.
      * Only if the promise was not canceled.
