@@ -412,6 +412,11 @@ public class NetconfDeviceCommunicator
         return XmlNetconfConstants.NOTIFICATION_ELEMENT_NAME.equals(xmle.getName()) ;
     }
 
+    @Override
+    public void onSessionIdle() {
+        remoteDevice.onRemoteSessionIdle();
+    }
+
     private static final class Request {
         final UncancellableFuture<RpcResult<NetconfMessage>> future;
         final NetconfMessage request;

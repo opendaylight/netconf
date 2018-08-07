@@ -8,6 +8,9 @@
 package org.opendaylight.netconf.client;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.Promise;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
@@ -32,6 +35,7 @@ final class SshClientChannelInitializer extends AbstractChannelInitializer<Netco
         // ssh handler has to be the first handler in pipeline
         ch.pipeline().addFirst(AsyncSshHandler.createForNetconfSubsystem(authenticationHandler, promise));
         super.initialize(ch, promise);
+        initializeIdleStateHandler(ch);
     }
 
     @Override
@@ -40,4 +44,26 @@ final class SshClientChannelInitializer extends AbstractChannelInitializer<Netco
         ch.pipeline().addAfter(NETCONF_MESSAGE_DECODER, AbstractChannelInitializer.NETCONF_SESSION_NEGOTIATOR,
                 negotiatorFactory.getSessionNegotiator(() -> sessionListener, ch, promise));
     }
+
+    protected void initializeIdleStateHandler(Channel ch) {
+        ch.pipeline().addLast(new IdleHandler(sessionListener, 2,2,2));
+    }
+
+    // This handler is mostly used to detect an idle state (eg for 1 min)
+    // and provide an indication to kick the keepalive mechanism into action.
+    private static final class IdleHandler<S> extends IdleStateHandler {
+        NetconfClientSessionListener sessionListener;
+
+        IdleHandler(NetconfClientSessionListener sessionListener, int readerIdleTimeSeconds,
+                           int writerIdleTimeSeconds, int allIdleTimeSeconds) {
+            super(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds);
+            this.sessionListener = sessionListener;
+        }
+
+        @Override
+        protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
+            sessionListener.onSessionIdle();
+        }
+    }
+
 }

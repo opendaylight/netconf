@@ -11,4 +11,5 @@ import org.opendaylight.netconf.api.NetconfSessionListener;
 
 public interface NetconfClientSessionListener extends NetconfSessionListener<NetconfClientSession> {
 
+    void onSessionIdle();
 }

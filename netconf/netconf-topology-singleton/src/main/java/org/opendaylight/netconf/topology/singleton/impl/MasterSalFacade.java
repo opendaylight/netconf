@@ -116,6 +116,11 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
         closeGracefully(salProvider);
     }
 
+    @Override
+    public void onDeviceIdle() {
+        salProvider.notifyAll();
+    }
+
     private void registerMasterMountPoint() {
         Preconditions.checkNotNull(id);
         Preconditions.checkNotNull(currentSchemaContext,
