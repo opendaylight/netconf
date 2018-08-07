@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff20ed4c_f8a64945",
+        "filename": "netconf/netconf-netty-util/src/main/resources/rfc6241.xsd",
+        "patchSetId": 23
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-08-07T08:17:47Z",
+      "side": 1,
+      "message": "I don\u0027t think we need blank lines here",
+      "revId": "c3aedf6971e058bbfb39c88f3911ffdeaa57c449",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
