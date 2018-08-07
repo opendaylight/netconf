@@ -19,4 +19,6 @@ public interface RemoteDevice<PREF, M, LISTENER extends RemoteDeviceCommunicator
     void onRemoteSessionFailed(Throwable throwable);
 
     void onNotification(M notification);
+
+    void onRemoteSessionIdle();
 }

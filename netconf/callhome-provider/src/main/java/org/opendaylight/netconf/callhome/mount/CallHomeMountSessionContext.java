@@ -81,6 +81,11 @@ class CallHomeMountSessionContext {
     private NetconfClientSessionListener wrap(final NetconfClientSessionListener delegate) {
         return new NetconfClientSessionListener() {
             @Override
+            public void onSessionIdle() {
+                delegate.onSessionIdle();
+            }
+
+            @Override
             public void onSessionUp(NetconfClientSession session) {
                 delegate.onSessionUp(session);
             }

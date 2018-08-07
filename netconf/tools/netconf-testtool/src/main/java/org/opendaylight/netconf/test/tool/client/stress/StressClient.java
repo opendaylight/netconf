@@ -282,6 +282,11 @@ public final class StressClient {
         public void onNotification(final NetconfMessage notification) {
             LOG.info("Notification received: {}", notification.toString());
         }
+
+        @Override
+        public void onRemoteSessionIdle() {
+            LOG.info("remote session idle");
+        }
     }
 
 }
