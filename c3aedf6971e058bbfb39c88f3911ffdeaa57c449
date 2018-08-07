@@ -16,6 +16,24 @@
       "revId": "c3aedf6971e058bbfb39c88f3911ffdeaa57c449",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a3c5a92_ed754af8",
+        "filename": "netconf/netconf-netty-util/src/main/resources/rfc6241.xsd",
+        "patchSetId": 23
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2018-08-07T08:59:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff20ed4c_f8a64945",
+      "revId": "c3aedf6971e058bbfb39c88f3911ffdeaa57c449",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
