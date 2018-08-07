@@ -68,4 +68,9 @@ public class SchemalessNetconfDevice implements
     @Override public void onNotification(final NetconfMessage notification) {
         salFacade.onNotification(messageTransformer.toNotification(notification));
     }
+
+    @Override
+    public void onRemoteSessionIdle() {
+        salFacade.onDeviceIdle();
+    }
 }

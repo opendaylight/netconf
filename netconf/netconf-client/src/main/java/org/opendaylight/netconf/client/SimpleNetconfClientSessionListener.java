@@ -21,6 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SimpleNetconfClientSessionListener implements NetconfClientSessionListener {
+    @Override
+    public void onSessionIdle() {
+        LOG.info("session idle");
+    }
+
     private static final class RequestEntry {
         private final Promise<NetconfMessage> promise;
         private final NetconfMessage request;

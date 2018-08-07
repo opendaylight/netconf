@@ -23,4 +23,6 @@ public interface RemoteDeviceHandler<PREF> extends AutoCloseable {
     void onNotification(DOMNotification domNotification);
 
     void close();
+
+    void onDeviceIdle();
 }

@@ -165,6 +165,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         salFacade.close();
     }
 
+    @Override
+    public void onDeviceIdle() {
+        scheduleKeepalive();
+    }
+
     // Keepalive RPC static resources
     private static final SchemaPath PATH = toPath(NETCONF_GET_CONFIG_QNAME);
     private static final ContainerNode KEEPALIVE_PAYLOAD = NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME,

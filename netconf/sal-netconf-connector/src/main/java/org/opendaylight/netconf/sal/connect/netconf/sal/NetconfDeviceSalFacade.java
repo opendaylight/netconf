@@ -84,6 +84,11 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
         closeGracefully(salProvider);
     }
 
+    @Override
+    public void onDeviceIdle() {
+        salProvider.notifyAll();
+    }
+
     @SuppressWarnings("checkstyle:IllegalCatch")
     private void closeGracefully(final AutoCloseable resource) {
         if (resource != null) {

@@ -291,6 +291,11 @@ public class NetconfDevice
         notificationHandler.handleNotification(notification);
     }
 
+    @Override
+    public void onRemoteSessionIdle() {
+        salFacade.onDeviceIdle();
+    }
+
     /**
      * Just a transfer object containing schema related dependencies. Injected in constructor.
      */
