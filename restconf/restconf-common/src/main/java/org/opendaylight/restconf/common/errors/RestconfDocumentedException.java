@@ -139,7 +139,7 @@ public class RestconfDocumentedException extends WebApplicationException {
      * Constructs an instance with the given RpcErrors.
      */
     public RestconfDocumentedException(final String message, final Throwable cause,
-                                       final Collection<RpcError> rpcErrors) {
+                                       final Collection<? extends RpcError> rpcErrors) {
         this(message, cause, convertToRestconfErrors(rpcErrors));
     }
 
@@ -162,7 +162,7 @@ public class RestconfDocumentedException extends WebApplicationException {
         status = null;
     }
 
-    private static List<RestconfError> convertToRestconfErrors(final Collection<RpcError> rpcErrors) {
+    private static List<RestconfError> convertToRestconfErrors(final Collection<? extends RpcError> rpcErrors) {
         final List<RestconfError> errorList = Lists.newArrayList();
         if (rpcErrors != null) {
             for (RpcError rpcError : rpcErrors) {

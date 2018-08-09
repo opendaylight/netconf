@@ -14,7 +14,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -508,8 +508,8 @@ public class MountPointEndToEndTest {
         assertEquals(result.getResult(), actual.getResult());
 
         assertEquals(result.getErrors().size(), actual.getErrors().size());
-        Iterator<RpcError> iter1 = result.getErrors().iterator();
-        Iterator<RpcError> iter2 = actual.getErrors().iterator();
+        Iterator<? extends RpcError> iter1 = result.getErrors().iterator();
+        Iterator<? extends RpcError> iter2 = actual.getErrors().iterator();
         while (iter1.hasNext() && iter2.hasNext()) {
             RpcError err1 = iter1.next();
             RpcError err2 = iter2.next();

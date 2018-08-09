@@ -65,7 +65,7 @@ public class RestconfInvokeOperationsUtilTest {
         final DOMRpcResult rpcResult =
                 RestconfInvokeOperationsUtil.invokeRpc(DATA.input, DATA.errorRpc, serviceHandler);
         assertNull(rpcResult.getResult());
-        final Collection<RpcError> errorList = rpcResult.getErrors();
+        final Collection<? extends RpcError> errorList = rpcResult.getErrors();
         assertEquals(1, errorList.size());
         final RpcError actual = errorList.iterator().next();
         assertEquals("No implementation of RPC " + DATA.errorRpc.toString() + " available.", actual.getMessage());

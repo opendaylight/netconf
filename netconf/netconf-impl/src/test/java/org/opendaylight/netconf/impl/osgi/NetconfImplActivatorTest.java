@@ -8,8 +8,8 @@
 
 package org.opendaylight.netconf.impl.osgi;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -36,17 +36,22 @@ public class NetconfImplActivatorTest {
     private ServiceReference<?> reference;
     @Mock
     private ServiceRegistration<?> registration;
+    @Mock
+    private ServiceRegistration<?> monRegistration;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         doReturn(filter).when(bundle).createFilter(anyString());
-        doNothing().when(bundle).addServiceListener(any(ServiceListener.class), anyString());
+        doNothing().when(bundle).addServiceListener(any(ServiceListener.class), any());
 
         ServiceReference<?>[] refs = {};
-        doReturn(refs).when(bundle).getServiceReferences(anyString(), anyString());
-        doReturn(Arrays.asList(refs)).when(bundle).getServiceReferences(any(Class.class), anyString());
+        doReturn(refs).when(bundle).getServiceReferences(anyString(), any());
+        doReturn(Arrays.asList(refs)).when(bundle).getServiceReferences(any(Class.class), any());
         doReturn("").when(bundle).getProperty(anyString());
+        doReturn(monRegistration).when(bundle).registerService(any(Class.class),
+            any(NetconfMonitoringServiceImpl.class), any(Dictionary.class));
+        doNothing().when(monRegistration).unregister();
         doReturn(registration).when(bundle).registerService(any(Class.class),
                 any(AggregatedNetconfOperationServiceFactory.class), any(Dictionary.class));
         doNothing().when(registration).unregister();
@@ -57,7 +62,7 @@ public class NetconfImplActivatorTest {
     public void testStart() throws Exception {
         NetconfImplActivator activator = new NetconfImplActivator();
         activator.start(bundle);
-        verify(bundle).registerService(any(Class.class), any(AggregatedNetconfOperationServiceFactory.class),
+        verify(bundle).registerService(any(Class.class), any(NetconfMonitoringServiceImpl.class),
                 any(Dictionary.class));
         activator.stop(bundle);
     }
