@@ -8,11 +8,9 @@
 
 package org.opendaylight.controller.md.sal.rest.common;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.io.File;
@@ -34,7 +32,6 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
@@ -71,12 +68,9 @@ public final class TestRestconfUtils {
         }
 
         final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        doReturn(Optional.fromNullable(mountInstance)).when(mockMountService)
-            .getMountPoint(any(YangInstanceIdentifier.class));
 
         DOMSchemaService mockSchemaService = mock(DOMSchemaService.class);
         doReturn(schemaContext).when(mockSchemaService).getGlobalContext();
-        doReturn(ImmutableClassToInstanceMap.of()).when(mockSchemaService).getExtensions();
 
         DOMSchemaService mockDomSchemaService = mock(DOMSchemaService.class);
         doReturn(ImmutableClassToInstanceMap.of()).when(mockDomSchemaService).getExtensions();
