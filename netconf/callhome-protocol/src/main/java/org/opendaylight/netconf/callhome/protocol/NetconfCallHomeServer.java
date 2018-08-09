@@ -5,10 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.protocol;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.annotations.VisibleForTesting;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -22,11 +23,10 @@ import org.apache.sshd.client.session.SessionFactory;
 import org.apache.sshd.common.future.SshFutureListener;
 import org.apache.sshd.common.io.IoAcceptor;
 import org.apache.sshd.common.io.IoServiceFactory;
-import org.apache.sshd.common.io.mina.MinaServiceFactory;
-import org.apache.sshd.common.io.nio2.Nio2ServiceFactory;
 import org.apache.sshd.common.kex.KeyExchange;
 import org.apache.sshd.common.session.Session;
 import org.apache.sshd.common.session.SessionListener;
+import org.apache.sshd.netty.NettyIoServiceFactory;
 import org.opendaylight.netconf.callhome.protocol.CallHomeSessionContext.Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,38 +35,40 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfCallHomeServer.class);
 
-    private final IoAcceptor acceptor;
-    private final SshClient client;
     private final CallHomeAuthorizationProvider authProvider;
-    private final CallHomeSessionContext.Factory sessionFactory;
+    private final IoServiceFactory serviceFactory;
     private final InetSocketAddress bindAddress;
     private final StatusRecorder recorder;
+    private final Factory sessionFactory;
+    private final IoAcceptor acceptor;
+    private final SshClient client;
 
     NetconfCallHomeServer(final SshClient sshClient, final CallHomeAuthorizationProvider authProvider,
             final Factory factory, final InetSocketAddress socketAddress, final StatusRecorder recorder) {
-        this.client = Preconditions.checkNotNull(sshClient);
-        this.authProvider = Preconditions.checkNotNull(authProvider);
-        this.sessionFactory = Preconditions.checkNotNull(factory);
+        this(sshClient, authProvider, factory, socketAddress, recorder,
+            new NettyIoServiceFactory(factory.getNettyGroup()));
+    }
+
+    @VisibleForTesting
+    NetconfCallHomeServer(final SshClient sshClient, final CallHomeAuthorizationProvider authProvider,
+            final Factory factory, final InetSocketAddress socketAddress, final StatusRecorder recorder,
+            final IoServiceFactory serviceFactory) {
+        this.client = requireNonNull(sshClient);
+        this.authProvider = requireNonNull(authProvider);
+        this.sessionFactory = requireNonNull(factory);
         this.bindAddress = socketAddress;
         this.recorder = recorder;
+        this.serviceFactory = requireNonNull(serviceFactory);
 
         sshClient.setServerKeyVerifier(this);
         sshClient.addSessionListener(createSessionListener());
 
-        this.acceptor = createServiceFactory(sshClient).createAcceptor(new SessionFactory(sshClient));
+        acceptor = serviceFactory.createAcceptor(new SessionFactory(sshClient));
     }
 
-    private IoServiceFactory createServiceFactory(final SshClient sshClient) {
-        try {
-            return createMinaServiceFactory(sshClient);
-        } catch (NoClassDefFoundError e) {
-            LOG.warn("Mina is not available, defaulting to NIO.");
-            return new Nio2ServiceFactory(sshClient, sshClient.getScheduledExecutorService(), false);
-        }
-    }
-
-    protected IoServiceFactory createMinaServiceFactory(final SshClient sshClient) {
-        return new MinaServiceFactory(sshClient, sshClient.getScheduledExecutorService(), false);
+    @VisibleForTesting
+    SshClient getClient() {
+        return client;
     }
 
     SessionListener createSessionListener() {
@@ -186,5 +188,6 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
     @Override
     public void close() {
         acceptor.close(true);
+        serviceFactory.close(true);
     }
 }

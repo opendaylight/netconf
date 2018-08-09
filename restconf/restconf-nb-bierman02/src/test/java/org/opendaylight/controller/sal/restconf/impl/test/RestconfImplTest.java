@@ -9,8 +9,9 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -53,7 +54,6 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -129,7 +129,7 @@ public class RestconfImplTest {
     public void testExample() throws FileNotFoundException, ParseException {
         @SuppressWarnings("rawtypes")
         final NormalizedNode normalizedNodeData = TestUtils.prepareNormalizedNodeWithIetfInterfacesInterfacesData();
-        when(brokerFacade.readOperationalData(any(YangInstanceIdentifier.class))).thenReturn(normalizedNodeData);
+        when(brokerFacade.readOperationalData(isNull())).thenReturn(normalizedNodeData);
         assertEquals(normalizedNodeData,
                 brokerFacade.readOperationalData(null));
     }
@@ -155,7 +155,7 @@ public class RestconfImplTest {
                 .invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
         this.restconfImpl.invokeRpc("randomId", ctx, uriInfo);
         this.restconfImpl.invokeRpc("ietf-netconf", ctx, uriInfo);
-        verify(rpcService, times(2)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        verify(rpcService, times(2)).invokeRpc(any(SchemaPath.class), isNull());
     }
 
     /**
