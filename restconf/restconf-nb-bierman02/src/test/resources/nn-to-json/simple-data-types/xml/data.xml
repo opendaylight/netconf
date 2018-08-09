@@ -19,7 +19,7 @@
     <lfdecimal2>-0.43</lfdecimal2>
     <lfdecimal3>43</lfdecimal3>
     <lfdecimal4>43E3</lfdecimal4>
-    <lfdecimal6>33.12345</lfdecimal6>
+    <lfdecimal6>34.0.0-SNAPSHOT45</lfdecimal6>
     <lfenum>enum3</lfenum>
     <lfbits>bit3 bit2</lfbits>
     <lfbinary>ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz</lfbinary>
