@@ -12,7 +12,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYangResources;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
@@ -22,6 +24,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.w3c.dom.Document;
 
 public class CopyConfigTest extends AbstractNetconfOperationTest {
+    @Rule
+    public TemporaryFolder tmpDir = new TemporaryFolder();
 
     @Override
     protected SchemaContext getSchemaContext() {
@@ -58,7 +62,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     public void testConfigMissing() throws Exception {
         try {
             copyConfig("messages/mapping/copyConfigs/copyConfig_no_config.xml");
-            fail("Should have failed - <config> element is missing");
+            fail("Should have failed - neither <config> nor <url> element is present");
         } catch (final DocumentedException e) {
             assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
             assertTrue(e.getErrorTag() == ErrorTag.MISSING_ELEMENT);

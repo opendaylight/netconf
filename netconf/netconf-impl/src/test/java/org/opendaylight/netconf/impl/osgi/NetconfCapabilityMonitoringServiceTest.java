@@ -12,6 +12,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0;
+import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0;
 
 import com.google.common.base.Optional;
 import java.net.URI;
@@ -160,14 +162,15 @@ public class NetconfCapabilityMonitoringServiceTest {
 
     @Test
     public void testGetCapabilities() throws Exception {
-        Capabilities actual = monitoringService.getCapabilities();
         List<Uri> exp = new ArrayList<>();
         for (Capability capability : capabilities) {
             exp.add(new Uri(capability.getCapabilityUri()));
         }
-        //candidate is added by monitoring service automatically
-        exp.add(0, new Uri("urn:ietf:params:netconf:capability:candidate:1.0"));
+        //candidate and url capabilities are added by monitoring service automatically
+        exp.add(new Uri(URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0));
+        exp.add(new Uri(URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0));
         Capabilities expected = new CapabilitiesBuilder().setCapability(exp).build();
+        Capabilities actual = monitoringService.getCapabilities();
         Assert.assertEquals(new HashSet<>(expected.getCapability()), new HashSet<>(actual.getCapability()));
     }
 
