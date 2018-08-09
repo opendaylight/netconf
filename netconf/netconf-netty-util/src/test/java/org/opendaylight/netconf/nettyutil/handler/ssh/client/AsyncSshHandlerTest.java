@@ -5,13 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -57,7 +56,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
@@ -218,8 +216,7 @@ public class AsyncSshHandlerTest {
             @Override
             public void onSuccess(final SshFutureListener<IoReadFuture> result) {
                 doReturn(new IllegalStateException()).when(mockedReadFuture).getException();
-                doReturn(mockedReadFuture).when(mockedReadFuture)
-                        .removeListener(Matchers.any());
+                doReturn(mockedReadFuture).when(mockedReadFuture).removeListener(any());
                 doReturn(true).when(asyncOut).isClosing();
                 doReturn(true).when(asyncOut).isClosed();
                 result.operationComplete(mockedReadFuture);
@@ -249,8 +246,7 @@ public class AsyncSshHandlerTest {
             @Override
             public void onSuccess(final SshFutureListener<IoReadFuture> result) {
                 doReturn(new IllegalStateException()).when(mockedReadFuture).getException();
-                doReturn(mockedReadFuture).when(mockedReadFuture)
-                        .removeListener(Matchers.any());
+                doReturn(mockedReadFuture).when(mockedReadFuture).removeListener(any());
                 result.operationComplete(mockedReadFuture);
             }
         }, MoreExecutors.directExecutor());
@@ -294,7 +290,7 @@ public class AsyncSshHandlerTest {
         final IoInputStream asyncOut = getMockedIoInputStream();
         final IoOutputStream asyncIn = getMockedIoOutputStream();
 
-        final IoWriteFuture ioWriteFuture = asyncIn.write(null);
+        final IoWriteFuture ioWriteFuture = asyncIn.write(new ByteArrayBuffer());
 
         Futures.addCallback(stubAddListener(ioWriteFuture), new SuccessFutureListener<IoWriteFuture>() {
             @Override
@@ -327,7 +323,7 @@ public class AsyncSshHandlerTest {
 
         final IoInputStream asyncOut = getMockedIoInputStream();
         final IoOutputStream asyncIn = getMockedIoOutputStream();
-        final IoWriteFuture ioWriteFuture = asyncIn.write(null);
+        final IoWriteFuture ioWriteFuture = asyncIn.write(new ByteArrayBuffer());
 
         final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
@@ -493,7 +489,7 @@ public class AsyncSshHandlerTest {
     private static IoOutputStream getMockedIoOutputStream() {
         final IoOutputStream mock = mock(IoOutputStream.class);
         final IoWriteFuture ioWriteFuture = mock(IoWriteFuture.class);
-        doReturn(ioWriteFuture).when(ioWriteFuture).addListener(Matchers.any());
+        doReturn(ioWriteFuture).when(ioWriteFuture).addListener(any());
         doReturn(true).when(ioWriteFuture).isWritten();
 
         Futures.addCallback(stubAddListener(ioWriteFuture), new SuccessFutureListener<IoWriteFuture>() {
@@ -513,10 +509,11 @@ public class AsyncSshHandlerTest {
         final IoInputStream mock = mock(IoInputStream.class);
         final IoReadFuture ioReadFuture = mock(IoReadFuture.class);
         doReturn(null).when(ioReadFuture).getException();
-        doReturn(ioReadFuture).when(ioReadFuture).removeListener(Matchers.any());
+        doReturn(ioReadFuture).when(ioReadFuture).removeListener(any());
+        doReturn(ioReadFuture).when(mock).read(any());
         doReturn(5).when(ioReadFuture).getRead();
         doReturn(new ByteArrayBuffer(new byte[]{0, 1, 2, 3, 4})).when(ioReadFuture).getBuffer();
-        doReturn(ioReadFuture).when(ioReadFuture).addListener(Matchers.any());
+        doReturn(ioReadFuture).when(ioReadFuture).addListener(any());
 
         // Always success for read
         Futures.addCallback(stubAddListener(ioReadFuture), new SuccessFutureListener<IoReadFuture>() {
