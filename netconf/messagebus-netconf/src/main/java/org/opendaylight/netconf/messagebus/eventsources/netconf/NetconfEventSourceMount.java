@@ -63,9 +63,7 @@ class NetconfEventSourceMount {
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
         moduleInfoBackedContext.addModuleInfos(Collections.singletonList(org.opendaylight.yang.gen.v1.urn.ietf.params
                 .xml.ns.netmod.notification.rev080714.$YangModuleInfoImpl.getInstance()));
-        final Optional<SchemaContext> schemaContextOptional = moduleInfoBackedContext.tryToCreateSchemaContext();
-        Preconditions.checkState(schemaContextOptional.isPresent());
-        SchemaContext notificationsSchemaCtx = schemaContextOptional.get();
+        SchemaContext notificationsSchemaCtx = moduleInfoBackedContext.tryToCreateSchemaContext().get();
 
         final JavassistUtils javassist = JavassistUtils.forClassPool(ClassPool.getDefault());
         CODEC_REGISTRY = new BindingNormalizedNodeCodecRegistry(StreamWriterGenerator.create(javassist));
@@ -89,7 +87,7 @@ class NetconfEventSourceMount {
         this.dataBroker = getService(mountPoint, DOMDataBroker.class);
     }
 
-    private static <T extends DOMService> T getService(DOMMountPoint mountPoint, Class<T> service) {
+    private static <T extends DOMService> T getService(final DOMMountPoint mountPoint, final Class<T> service) {
         final Optional<T> optional = mountPoint.getService(service);
         Preconditions.checkState(optional.isPresent(), "Service not present on mount point: %s", service.getName());
         return optional.get();
@@ -166,8 +164,8 @@ class NetconfEventSourceMount {
      * @return ListenerRegistration
      * @see DOMNotificationService#registerNotificationListener(DOMNotificationListener, SchemaPath...)
      */
-    ListenerRegistration<DOMNotificationListener> registerNotificationListener(DOMNotificationListener listener,
-                                                                               SchemaPath notificationPath) {
+    ListenerRegistration<DOMNotificationListener> registerNotificationListener(final DOMNotificationListener listener,
+                                                                               final SchemaPath notificationPath) {
         return notificationService.registerNotificationListener(listener, notificationPath);
     }
 
