@@ -8,7 +8,7 @@
 
 package org.opendaylight.controller.md.sal.rest.common;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -66,17 +66,16 @@ public final class TestRestconfUtils {
     }
 
     public static ControllerContext newControllerContext(SchemaContext schemaContext, DOMMountPoint mountInstance) {
+        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
+
         if (mountInstance != null) {
             doReturn(schemaContext).when(mountInstance).getSchemaContext();
+            doReturn(Optional.fromNullable(mountInstance)).when(mockMountService)
+                    .getMountPoint(any(YangInstanceIdentifier.class));
         }
-
-        final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
-        doReturn(Optional.fromNullable(mountInstance)).when(mockMountService)
-            .getMountPoint(any(YangInstanceIdentifier.class));
 
         DOMSchemaService mockSchemaService = mock(DOMSchemaService.class);
         doReturn(schemaContext).when(mockSchemaService).getGlobalContext();
-        doReturn(ImmutableClassToInstanceMap.of()).when(mockSchemaService).getExtensions();
 
         DOMSchemaService mockDomSchemaService = mock(DOMSchemaService.class);
         doReturn(ImmutableClassToInstanceMap.of()).when(mockDomSchemaService).getExtensions();

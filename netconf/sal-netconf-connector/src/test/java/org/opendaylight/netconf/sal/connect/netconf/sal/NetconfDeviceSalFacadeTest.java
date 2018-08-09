@@ -8,8 +8,9 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -23,7 +24,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -97,7 +97,7 @@ public class NetconfDeviceSalFacadeTest {
 
         verify(mountInstance, times(1)).onTopologyDeviceConnected(eq(schemaContext),
                 any(DOMDataBroker.class), eq(deviceRpc), any(NetconfDeviceNotificationService.class),
-                any(DOMActionService.class));
+                isNull());
         verify(netconfDeviceTopologyAdapter,
                 times(1)).updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
     }
