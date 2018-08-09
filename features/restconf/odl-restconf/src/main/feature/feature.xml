@@ -8,6 +8,6 @@
   -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-${project.version}">
     <feature name="odl-restconf" version="${project.version}">
-        <feature version="[3.1.0,4)">odl-jackson-2.8</feature>
+        <feature version="[4,5)">odl-jackson-2.8</feature>
     </feature>
 </features>
