@@ -8,8 +8,8 @@
 
 package org.opendaylight.netconf.monitoring.osgi;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -39,7 +39,7 @@ public class NetconfMonitoringActivatorTest {
         doNothing().when(context).addServiceListener(any(ServiceListener.class), anyString());
         ServiceReference<?>[] refs = new ServiceReference[2];
         doReturn(Arrays.asList(refs)).when(context).getServiceReferences(any(Class.class), anyString());
-        doReturn(refs).when(context).getServiceReferences(anyString(), anyString());
+        doReturn(refs).when(context).getServiceReferences(anyString(), any());
         doNothing().when(context).removeServiceListener(any(ServiceListener.class));
     }
 

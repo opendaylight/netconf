@@ -30,8 +30,6 @@ import org.opendaylight.protocol.framework.SessionNegotiator;
 import org.opendaylight.protocol.framework.SessionNegotiatorFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorFactory<NetconfHelloMessage,
         NetconfServerSession, NetconfServerSessionListener> {
@@ -48,8 +46,14 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
     private final NetconfOperationServiceFactory aggregatedOpService;
     private final long connectionTimeoutMillis;
     private final NetconfMonitoringService monitoringService;
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSessionNegotiatorFactory.class);
     private final Set<String> baseCapabilities;
+
+    public NetconfServerSessionNegotiatorFactory(final Timer timer,
+            final NetconfOperationServiceFactory netconfOperationProvider,
+            final SessionIdProvider idProvider, final long connectionTimeoutMillis,
+            final NetconfMonitoringService monitoringService) {
+        this(timer, netconfOperationProvider, idProvider, connectionTimeoutMillis, monitoringService, null);
+    }
 
     public NetconfServerSessionNegotiatorFactory(final Timer timer,
                                                  final NetconfOperationServiceFactory netconfOperationProvider,
@@ -64,7 +68,6 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
         this.baseCapabilities = validateBaseCapabilities(baseCapabilities == null ? DEFAULT_BASE_CAPABILITIES :
                 baseCapabilities);
     }
-
 
     private static ImmutableSet<String> validateBaseCapabilities(final Set<String> baseCapabilities) {
         // Check base capabilities to be supported by the server
@@ -111,7 +114,6 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
         final NetconfOperationRouter operationRouter =
                 new NetconfOperationRouterImpl(service, monitoringService, netconfSessionIdForReporting);
         return new NetconfServerSessionListener(operationRouter, monitoringService, service);
-
     }
 
     protected NetconfOperationService getOperationServiceForAddress(final String netconfSessionIdForReporting,
@@ -132,5 +134,4 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
     public static Set<String> transformCapabilities(final Capabilities capabilities) {
         return Sets.newHashSet(Collections2.transform(capabilities.getCapability(), Uri::getValue));
     }
-
 }
