@@ -40,7 +40,7 @@
       <artifactId>ietf-netconf-notifications</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.mdsal.model</groupId>
+      <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
       <artifactId>rfc7895</artifactId>
     </dependency>
     <dependency>
@@ -92,8 +92,8 @@
       <artifactId>yang-data-codec-xml</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.mdsal.model</groupId>
-      <artifactId>ietf-inet-types-2013-07-15</artifactId>
+      <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+      <artifactId>rfc6991-ietf-inet-types</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.mdsal.model</groupId>
@@ -104,8 +104,8 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>xmlunit</groupId>
-      <artifactId>xmlunit</artifactId>
+      <groupId>org.xmlunit</groupId>
+      <artifactId>xmlunit-legacy</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
