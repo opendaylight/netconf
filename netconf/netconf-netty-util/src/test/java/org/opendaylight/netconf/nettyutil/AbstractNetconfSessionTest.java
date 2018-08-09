@@ -9,8 +9,8 @@
 package org.opendaylight.netconf.nettyutil;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -80,7 +80,7 @@ public class AbstractNetconfSessionTest {
 
         doReturn(eventLoop).when(channel).eventLoop();
         doAnswer(invocation -> {
-            invocation.getArgumentAt(0, Runnable.class).run();
+            invocation.<Runnable>getArgument(0).run();
             return null;
         }).when(eventLoop).execute(any(Runnable.class));
 
