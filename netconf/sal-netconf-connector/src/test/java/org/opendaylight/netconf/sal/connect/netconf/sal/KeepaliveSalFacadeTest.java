@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -103,12 +104,15 @@ public class KeepaliveSalFacadeTest {
                 new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME)).build());
 
         doReturn(Futures.immediateCheckedFuture(result))
+                .when(deviceRpc).invokeRpc(any(SchemaPath.class), isNull());
+
+        doReturn(Futures.immediateCheckedFuture(result))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
         verify(underlyingSalFacade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class), any());
+                isNull(), isNull(), any(DOMRpcService.class), isNull());
 
         verify(deviceRpc, timeout(15000).times(5)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
     }
@@ -121,8 +125,7 @@ public class KeepaliveSalFacadeTest {
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
-        verify(underlyingSalFacade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class), any());
+        verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(DOMRpcService.class), isNull());
 
         // Should disconnect the session
         verify(listener, timeout(15000).times(1)).disconnect();
@@ -139,8 +142,8 @@ public class KeepaliveSalFacadeTest {
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
-        verify(underlyingSalFacade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class), any());
+        verify(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(DOMRpcService.class), isNull());
+
 
         // Shouldn't disconnect the session
         verify(listener, times(0)).disconnect();
@@ -153,8 +156,7 @@ public class KeepaliveSalFacadeTest {
             invocationOnMock -> {
                 proxyRpc = (DOMRpcService) invocationOnMock.getArguments()[2];
                 return null;
-            }).when(underlyingSalFacade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class), any());
+            }).when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(DOMRpcService.class), isNull());
 
         doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("illegal-state")))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
