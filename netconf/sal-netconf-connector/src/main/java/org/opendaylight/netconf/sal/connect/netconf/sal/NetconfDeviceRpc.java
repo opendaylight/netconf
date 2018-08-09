@@ -27,6 +27,7 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.NoOpListenerRegistration;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -77,25 +78,7 @@ public final class NetconfDeviceRpc implements DOMRpcService {
         listener.onRpcAvailable(Collections2.transform(schemaContext.getOperations(),
             input -> DOMRpcIdentifier.create(input.getPath())));
 
-        return new NoOpListenerRegistration<>(listener);
-    }
-
-    private static final class NoOpListenerRegistration<T extends DOMRpcAvailabilityListener>
-            implements ListenerRegistration<T> {
-        private final T listener;
-
-        NoOpListenerRegistration(final T listener) {
-            this.listener = requireNonNull(listener);
-        }
-
-        @Override
-        public T getInstance() {
-            return listener;
-        }
-
-        @Override
-        public void close() {
-            // NOOP, no rpcs appear and disappear in this implementation
-        }
+        // NOOP, no rpcs appear and disappear in this implementation
+        return NoOpListenerRegistration.of(listener);
     }
 }
