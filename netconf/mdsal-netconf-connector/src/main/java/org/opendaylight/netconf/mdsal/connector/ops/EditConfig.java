@@ -10,8 +10,10 @@ package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -49,7 +51,6 @@ public final class EditConfig extends AbstractEdit {
     private static final Logger LOG = LoggerFactory.getLogger(EditConfig.class);
 
     private static final String OPERATION_NAME = "edit-config";
-    private static final String CONFIG_KEY = "config";
     private static final String DEFAULT_OPERATION_KEY = "default-operation";
     private final TransactionProvider transactionProvider;
 
@@ -62,7 +63,8 @@ public final class EditConfig extends AbstractEdit {
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement)
             throws DocumentedException {
-        final Datastore targetDatastore = extractTargetParameter(operationElement, OPERATION_NAME);
+        final XmlElement targetElement = extractTargetElement(operationElement, OPERATION_NAME);
+        final Datastore targetDatastore = Datastore.valueOf(targetElement.getName());
         if (targetDatastore == Datastore.running) {
             throw new DocumentedException("edit-config on running datastore is not supported",
                     ErrorType.PROTOCOL,
@@ -72,7 +74,7 @@ public final class EditConfig extends AbstractEdit {
 
         final ModifyAction defaultAction = getDefaultOperation(operationElement);
 
-        final XmlElement configElement = getElement(operationElement, CONFIG_KEY);
+        final XmlElement configElement = getConfigElement(operationElement);
 
         for (final XmlElement element : configElement.getChildElements()) {
             final String ns = element.getNamespace();
@@ -85,7 +87,6 @@ public final class EditConfig extends AbstractEdit {
 
         return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
     }
-
     private void executeOperations(final DataTreeChangeTracker changeTracker) throws DocumentedException {
         final DOMDataReadWriteTransaction rwTx = transactionProvider.getOrCreateTransaction();
         final List<DataTreeChange> aa = changeTracker.getDataTreeChanges();
