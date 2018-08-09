@@ -5,10 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.notifications.impl.ops;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
@@ -16,6 +14,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Optional;
 import javassist.ClassPool;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
@@ -33,22 +32,14 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 public final class NotificationsTransformUtil {
-
-    private static final Logger LOG = LoggerFactory.getLogger(NotificationsTransformUtil.class);
-
-    private NotificationsTransformUtil() {}
-
     static final SchemaContext NOTIFICATIONS_SCHEMA_CTX;
     static final BindingNormalizedNodeCodecRegistry CODEC_REGISTRY;
     static final RpcDefinition CREATE_SUBSCRIPTION_RPC;
 
     static {
-
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
         moduleInfoBackedContext.addModuleInfos(Collections.singletonList($YangModuleInfoImpl.getInstance()));
         moduleInfoBackedContext.addModuleInfos(Collections.singletonList(org.opendaylight.yang.gen.v1.urn.ietf.params
@@ -67,6 +58,10 @@ public final class NotificationsTransformUtil {
                 NOTIFICATIONS_SCHEMA_CTX));
     }
 
+    private NotificationsTransformUtil() {
+
+    }
+
     @SuppressFBWarnings(value = "NP_NONNULL_PARAM_VIOLATION", justification = "Unrecognised NullableDecl")
     private static RpcDefinition findCreateSubscriptionRpc() {
         return Iterables.getFirst(Collections2.filter(NOTIFICATIONS_SCHEMA_CTX.getOperations(),
@@ -76,17 +71,17 @@ public final class NotificationsTransformUtil {
     /**
      * Transform base notification for capabilities into NetconfNotification.
      */
-    public static NetconfNotification transform(final Notification notification, SchemaPath path) {
-        return transform(notification, Optional.absent(), path);
+    public static NetconfNotification transform(final Notification notification, final SchemaPath path) {
+        return transform(notification, Optional.empty(), path);
     }
 
-    public static NetconfNotification transform(final Notification notification,
-                                                final Date eventTime, SchemaPath path) {
-        return transform(notification, Optional.fromNullable(eventTime), path);
+    public static NetconfNotification transform(final Notification notification, final Date eventTime,
+            final SchemaPath path) {
+        return transform(notification, Optional.ofNullable(eventTime), path);
     }
 
-    private static NetconfNotification transform(final Notification notification,
-                                                 final Optional<Date> eventTime, SchemaPath path) {
+    private static NetconfNotification transform(final Notification notification, final Optional<Date> eventTime,
+            final SchemaPath path) {
         final ContainerNode containerNode = CODEC_REGISTRY.toNormalizedNodeNotification(notification);
         final DOMResult result = new DOMResult(XmlUtil.newDocument());
         try {

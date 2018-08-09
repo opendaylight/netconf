@@ -7,7 +7,5 @@
   -->
 
 <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" a="64" id="a" message-id="101" xmlnx="a:b:c:d">
-    <data>
-        <top xmlns="urn:opendaylight:mdsal:mapping:test"/>
-    </data>
+    <data/>
 </rpc-reply>
