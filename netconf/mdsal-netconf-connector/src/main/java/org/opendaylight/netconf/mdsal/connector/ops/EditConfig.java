@@ -49,7 +49,6 @@ public final class EditConfig extends AbstractEdit {
     private static final Logger LOG = LoggerFactory.getLogger(EditConfig.class);
 
     private static final String OPERATION_NAME = "edit-config";
-    private static final String CONFIG_KEY = "config";
     private static final String DEFAULT_OPERATION_KEY = "default-operation";
     private final TransactionProvider transactionProvider;
 
@@ -72,7 +71,7 @@ public final class EditConfig extends AbstractEdit {
 
         final ModifyAction defaultAction = getDefaultOperation(operationElement);
 
-        final XmlElement configElement = getElement(operationElement, CONFIG_KEY);
+        final XmlElement configElement = getConfigElement(operationElement);
 
         for (final XmlElement element : configElement.getChildElements()) {
             final String ns = element.getNamespace();

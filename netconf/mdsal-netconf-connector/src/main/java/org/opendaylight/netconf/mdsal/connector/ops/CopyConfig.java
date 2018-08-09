@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.base.Optional;
+import java.util.List;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -33,7 +34,6 @@ import org.w3c.dom.Element;
 
 public final class CopyConfig extends AbstractEdit {
     private static final String OPERATION_NAME = "copy-config";
-    private static final String CONFIG_KEY = "config";
     private static final String SOURCE_KEY = "source";
 
     // Top-level "data" node without child nodes
@@ -58,7 +58,8 @@ public final class CopyConfig extends AbstractEdit {
                     ErrorTag.OPERATION_NOT_SUPPORTED,
                     ErrorSeverity.ERROR);
         }
-        final XmlElement configElement = extractConfigParameter(operationElement);
+        final XmlElement source = getSourceElement(operationElement);
+        final List<XmlElement> configElements = getConfigElement(source).getChildElements();
 
         // <copy-config>, unlike <edit-config>, always replaces entire configuration,
         // so remove old configuration first:
@@ -66,7 +67,7 @@ public final class CopyConfig extends AbstractEdit {
         rwTx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.EMPTY, EMPTY_ROOT_NODE);
 
         // Then create nodes present in the <config> element:
-        for (final XmlElement element : configElement.getChildElements()) {
+        for (final XmlElement element : configElements) {
             final String ns = element.getNamespace();
             final DataSchemaNode schemaNode = getSchemaNodeFromNamespace(ns, element);
             final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
@@ -79,13 +80,20 @@ public final class CopyConfig extends AbstractEdit {
         return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
     }
 
-    private static XmlElement extractConfigParameter(final XmlElement operationElement) throws DocumentedException {
-        final XmlElement source = getElement(operationElement, SOURCE_KEY);
-        return getElement(source, CONFIG_KEY);
-    }
-
     @Override
     protected String getOperationName() {
         return OPERATION_NAME;
+    }
+
+    private static XmlElement getSourceElement(final XmlElement parent) throws DocumentedException {
+        final Optional<XmlElement> sourceElement = parent.getOnlyChildElementOptionally(SOURCE_KEY);
+        if (!sourceElement.isPresent()) {
+            throw new DocumentedException("<source> element is missing",
+                DocumentedException.ErrorType.PROTOCOL,
+                DocumentedException.ErrorTag.MISSING_ELEMENT,
+                DocumentedException.ErrorSeverity.ERROR);
+        }
+
+        return sourceElement.get();
     }
 }
