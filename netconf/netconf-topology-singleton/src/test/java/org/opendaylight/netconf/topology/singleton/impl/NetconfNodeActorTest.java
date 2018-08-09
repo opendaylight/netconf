@@ -12,9 +12,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
@@ -56,7 +56,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
@@ -543,7 +542,7 @@ public class NetconfNodeActorTest {
         return slaveRef;
     }
 
-    private void initializeMaster(List<SourceIdentifier> sourceIdentifiers) {
+    private void initializeMaster(final List<SourceIdentifier> sourceIdentifiers) {
         masterRef.tell(new CreateInitialMasterActorData(mockDOMDataBroker, sourceIdentifiers,
                 mockDOMRpcService), testKit.getRef());
 
@@ -561,13 +560,7 @@ public class NetconfNodeActorTest {
     }
 
     private static PotentialSchemaSource<?> withSourceId(final SourceIdentifier identifier) {
-        return argThat(new ArgumentMatcher<PotentialSchemaSource<?>>() {
-            @Override
-            public boolean matches(final Object argument) {
-                final PotentialSchemaSource<?> potentialSchemaSource = (PotentialSchemaSource<?>) argument;
-                return identifier.equals(potentialSchemaSource.getSourceIdentifier());
-            }
-        });
+        return argThat(argument -> identifier.equals(argument.getSourceIdentifier()));
     }
 
     private static String convertStreamToString(final InputStream is) {
