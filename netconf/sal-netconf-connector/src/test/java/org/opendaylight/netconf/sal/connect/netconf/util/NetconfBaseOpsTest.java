@@ -8,9 +8,9 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,11 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -268,7 +267,7 @@ public class NetconfBaseOpsTest {
         }
     }
 
-    private static class NetconfMessageMatcher extends BaseMatcher<NetconfMessage> {
+    private static class NetconfMessageMatcher implements ArgumentMatcher<NetconfMessage> {
 
         private final Document expected;
 
@@ -277,21 +276,12 @@ public class NetconfBaseOpsTest {
         }
 
         @Override
-        public boolean matches(final Object item) {
-            if (!(item instanceof NetconfMessage)) {
-                return false;
-            }
-            final NetconfMessage message = (NetconfMessage) item;
+        public boolean matches(final NetconfMessage message) {
             final Document actualDoc = removeAttrs(message.getDocument());
             actualDoc.normalizeDocument();
             expected.normalizeDocument();
             final Diff diff = XMLUnit.compareXML(expected, actualDoc);
             return diff.similar();
-        }
-
-        @Override
-        public void describeTo(final Description description) {
-            description.appendText(XmlUtil.toString(expected));
         }
 
         private static Document removeAttrs(final Document input) {
