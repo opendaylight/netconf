@@ -9,7 +9,7 @@ package org.opendaylight.netconf.topology.singleton.impl;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -125,8 +125,8 @@ public class NetconfTopologyManagerTest {
                 actorSystemProvider, eventExecutor, clientDispatcher, TOPOLOGY_ID, config,
                 mountPointService, encryptionService) {
             @Override
-            protected NetconfTopologyContext newNetconfTopologyContext(NetconfTopologySetup setup,
-                    ServiceGroupIdentifier serviceGroupIdent, Timeout actorResponseWaitTime) {
+            protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
+                    final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime) {
                 assertEquals(ACTOR_RESPONSE_WAIT_TIME, actorResponseWaitTime.duration().toSeconds());
                 return Objects.requireNonNull(mockContextMap.get(setup.getInstanceIdentifier()),
                         "No mock context for " + setup.getInstanceIdentifier()).apply(setup);
@@ -189,7 +189,7 @@ public class NetconfTopologyManagerTest {
         final DataObjectModification<Node> dataObjectModification1 = mock(DataObjectModification.class);
         doReturn(WRITE).when(dataObjectModification1).getModificationType();
         doReturn(node1).when(dataObjectModification1).getDataAfter();
-        doReturn(new InstanceIdentifier.IdentifiableItem<>(Node.class, new NodeKey(nodeId1)))
+        doReturn(InstanceIdentifier.IdentifiableItem.of(Node.class, new NodeKey(nodeId1)))
                 .when(dataObjectModification1).getIdentifier();
 
         final NetconfNode netconfNode2 = new NetconfNodeBuilder()
@@ -203,7 +203,7 @@ public class NetconfTopologyManagerTest {
         final DataObjectModification<Node> dataObjectModification2 = mock(DataObjectModification.class);
         doReturn(WRITE).when(dataObjectModification2).getModificationType();
         doReturn(node2).when(dataObjectModification2).getDataAfter();
-        doReturn(new InstanceIdentifier.IdentifiableItem<>(Node.class, new NodeKey(nodeId2)))
+        doReturn(InstanceIdentifier.IdentifiableItem.of(Node.class, new NodeKey(nodeId2)))
                 .when(dataObjectModification2).getIdentifier();
 
         final NetconfTopologyContext mockContext1 = mock(NetconfTopologyContext.class);
@@ -346,7 +346,7 @@ public class NetconfTopologyManagerTest {
         final DataObjectModification<Node> dataObjectModification = mock(DataObjectModification.class);
         doReturn(WRITE).when(dataObjectModification).getModificationType();
         doReturn(node).when(dataObjectModification).getDataAfter();
-        doReturn(new InstanceIdentifier.IdentifiableItem<>(Node.class, new NodeKey(nodeId)))
+        doReturn(InstanceIdentifier.IdentifiableItem.of(Node.class, new NodeKey(nodeId)))
                 .when(dataObjectModification).getIdentifier();
 
         final NetconfTopologyContext mockContext = mock(NetconfTopologyContext.class);

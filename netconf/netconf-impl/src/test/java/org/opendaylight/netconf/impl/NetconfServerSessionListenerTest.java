@@ -8,8 +8,8 @@
 
 package org.opendaylight.netconf.impl;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -18,11 +18,11 @@ import static org.mockito.Mockito.verify;
 import io.netty.channel.embedded.EmbeddedChannel;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.hamcrest.CustomMatcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -154,17 +154,7 @@ public class NetconfServerSessionListenerTest {
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.NOTIFICATION)));
     }
 
-    private CustomMatcher<SessionEvent> sessionEventIs(final SessionEvent.Type type) {
-        return new CustomMatcher<SessionEvent>(type.name()) {
-            @Override
-            public boolean matches(final Object item) {
-                if (!(item instanceof SessionEvent)) {
-                    return false;
-                }
-                final SessionEvent e = (SessionEvent) item;
-                return e.getType().equals(type) && e.getSession().equals(session);
-            }
-        };
+    private ArgumentMatcher<SessionEvent> sessionEventIs(final SessionEvent.Type type) {
+        return event -> event.getType().equals(type) && event.getSession().equals(session);
     }
-
 }
