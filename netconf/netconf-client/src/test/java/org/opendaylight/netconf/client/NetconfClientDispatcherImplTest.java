@@ -9,7 +9,7 @@
 package org.opendaylight.netconf.client;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 import io.netty.channel.Channel;
@@ -47,6 +47,8 @@ public class NetconfClientDispatcherImplTest {
         ChannelPromise promise = Mockito.mock(ChannelPromise.class);
         doReturn(promise).when(chf).addListener(any(GenericFutureListener.class));
         doReturn(thr).when(chf).cause();
+        doReturn(true).when(chf).isDone();
+        doReturn(false).when(chf).isSuccess();
 
         Long timeout = 200L;
         NetconfHelloMessageAdditionalHeader header =
