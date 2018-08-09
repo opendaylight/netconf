@@ -32,7 +32,7 @@
       <artifactId>restconf-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.mdsal.model</groupId>
+      <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
       <artifactId>rfc7895</artifactId>
     </dependency>
     <dependency>
@@ -74,8 +74,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.opendaylight.mdsal.model</groupId>
-      <artifactId>ietf-yang-types-20130715</artifactId>
+      <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+      <artifactId>rfc6991-ietf-yang-types</artifactId>
     </dependency>
 
     <dependency>
