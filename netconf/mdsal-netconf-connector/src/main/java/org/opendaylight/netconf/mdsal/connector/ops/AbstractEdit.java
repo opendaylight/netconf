@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.mdsal.connector.ops;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -113,18 +112,5 @@ abstract class AbstractEdit extends AbstractConfigOperation {
                 XmlElement.fromDomElement((Element) elementsByTagName.item(0)).getOnlyChildElement();
             return Datastore.valueOf(targetChildNode.getName());
         }
-    }
-
-    protected static XmlElement getElement(final XmlElement parent, final String elementName)
-        throws DocumentedException {
-        final Optional<XmlElement> childNode = parent.getOnlyChildElementOptionally(elementName);
-        if (!childNode.isPresent()) {
-            throw new DocumentedException(elementName + " element is missing",
-                ErrorType.PROTOCOL,
-                ErrorTag.MISSING_ELEMENT,
-                ErrorSeverity.ERROR);
-        }
-
-        return childNode.get();
     }
 }
