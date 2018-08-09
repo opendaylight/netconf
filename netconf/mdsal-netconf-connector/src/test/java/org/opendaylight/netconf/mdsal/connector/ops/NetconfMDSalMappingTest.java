@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.StringWriter;
+import java.net.URI;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -633,5 +634,18 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
 
         verifyResponse(commit(), RPC_REPLY_OK);
         assertEmptyDatastore(getConfigRunning());
+    }
+
+    @Test
+    public void testEditUsingConfigFromFile() throws Exception {
+        // Ask class loader for URI of config file and use it as <url> in <edit-config> RPC:
+        final String template = XmlFileLoader.fileToString("messages/mapping/editConfigs/editConfig_from_file.xml");
+        final URI uri = getClass().getClassLoader().getResource("messages/mapping/editConfigs/config_file.xml").toURI();
+        final String copyConfig = template.replaceFirst("URL", uri.toString());
+        final Document request = XmlUtil.readXmlToDocument(copyConfig);
+
+        verifyResponse(edit(request), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
+            "messages/mapping/editConfigs/editConfig_from_file_control.xml"));
     }
 }

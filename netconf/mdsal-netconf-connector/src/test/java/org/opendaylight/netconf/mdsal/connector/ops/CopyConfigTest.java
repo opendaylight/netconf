@@ -12,11 +12,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYangResources;
 
+import java.net.URI;
 import org.junit.Test;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.DocumentedException.ErrorType;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.w3c.dom.Document;
@@ -201,9 +203,28 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
             "messages/mapping/copyConfigs/copyConfig_choices_control.xml"));
     }
 
+    @Test
+    public void testConfigFromFile() throws Exception {
+        // Ask class loader for URI of config file and use it as <url> in <copy-config> RPC:
+        final String template = XmlFileLoader.fileToString("messages/mapping/copyConfigs/copyConfig_from_file.xml");
+        final URI uri = getClass().getClassLoader().getResource("messages/mapping/copyConfigs/config_file.xml").toURI();
+        final String copyConfig = template.replaceFirst("URL", uri.toString());
+        final Document request = XmlUtil.readXmlToDocument(copyConfig);
+
+        verifyResponse(copyConfig(request), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
+            "messages/mapping/copyConfigs/copyConfig_from_file_control.xml"));
+    }
+
     private Document copyConfig(final String resource) throws Exception {
         final CopyConfig copyConfig = new CopyConfig(SESSION_ID_FOR_REPORTING, getCurrentSchemaContext(),
             getTransactionProvider());
         return executeOperation(copyConfig, resource);
+    }
+
+    private Document copyConfig(final Document request) throws Exception {
+        final CopyConfig copyConfig = new CopyConfig(SESSION_ID_FOR_REPORTING, getCurrentSchemaContext(),
+            getTransactionProvider());
+        return executeOperation(copyConfig, request);
     }
 }

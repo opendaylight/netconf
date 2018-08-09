@@ -1,0 +1,17 @@
+1. Support for reading config from file (IN PROGRESS)
+a) copy-config (DONE)
+b) edit-config (DONE)
+c) validate (IN PROGRESS)
+
+2. Support for reading config from URL
+a) copy-config
+b) edit-config
+c) validate
+
+3. Support for writing config to file
+a) copy-config
+
+4. Support for writing config to URL (?)
+a) copy-config
+
+5. Announce URL capability
