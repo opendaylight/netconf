@@ -187,8 +187,11 @@ public abstract class AbstractNetconfOperationTest {
 
     protected static Document executeOperation(final NetconfOperation op, final String filename) throws Exception {
         final Document request = XmlFileLoader.xmlFileToDocument(filename);
-        final Document response = op.handle(request, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
+        return executeOperation(op, request);
+    }
 
+    protected static Document executeOperation(final NetconfOperation op, final Document request) throws Exception {
+        final Document response = op.handle(request, NetconfOperationChainedExecution.EXECUTION_TERMINATION_POINT);
         LOG.debug("Got response {}", response);
         return response;
     }
