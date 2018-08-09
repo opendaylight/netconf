@@ -1,0 +1,19 @@
+1. Support for reading config from file
+a) copy-config IN PROGRESS
+todo: make unit test read config from resources DIR
+
+b) edit-config
+c) validate
+
+2. Support for reading config from URL
+a) copy-config
+b) edit-config
+c) validate
+
+3. Support for writing config to file
+a) copy-config
+
+4. Support for writing config to URL (?)
+a) copy-config
+
+5. Announce URL capability

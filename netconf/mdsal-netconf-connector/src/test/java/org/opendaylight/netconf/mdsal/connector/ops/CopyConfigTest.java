@@ -201,6 +201,14 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
             "messages/mapping/copyConfigs/copyConfig_choices_control.xml"));
     }
 
+    @Test
+    public void testURL() throws Exception {
+        // TODO use a template here to get URI of config file from the test dir
+        verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_from_file.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
+            "messages/mapping/copyConfigs/copyConfig_top_modules_control.xml"));
+    }
+
     private Document copyConfig(final String resource) throws Exception {
         final CopyConfig copyConfig = new CopyConfig(SESSION_ID_FOR_REPORTING, getCurrentSchemaContext(),
             getTransactionProvider());
