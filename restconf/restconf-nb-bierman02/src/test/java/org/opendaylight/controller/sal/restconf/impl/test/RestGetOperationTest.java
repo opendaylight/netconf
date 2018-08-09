@@ -14,8 +14,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +41,6 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
@@ -169,8 +169,7 @@ public class RestGetOperationTest extends JerseyTest {
     @Test
     public void getDataWithUrlMountPoint() throws Exception {
         when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
-                Mockito.anyString())).thenReturn(
-                prepareCnDataForMountPointTest(false));
+                isNull())).thenReturn(prepareCnDataForMountPointTest(false));
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
 
         String uri = "/config/ietf-interfaces:interfaces/interface/0/yang-ext:mount/test-module:cont/cont1";
@@ -192,7 +191,7 @@ public class RestGetOperationTest extends JerseyTest {
     public void getDataWithSlashesBehindMountPoint() throws Exception {
         final YangInstanceIdentifier awaitedInstanceIdentifier = prepareInstanceIdentifierForList();
         when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), eq(awaitedInstanceIdentifier),
-                Mockito.anyString())).thenReturn(prepareCnDataForSlashesBehindMountPointTest());
+                isNull())).thenReturn(prepareCnDataForSlashesBehindMountPointTest());
 
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
 
@@ -222,8 +221,7 @@ public class RestGetOperationTest extends JerseyTest {
     @Test
     public void getDataMountPointIntoHighestElement() throws Exception {
         when(brokerFacade.readConfigurationData(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
-                Mockito.anyString())).thenReturn(
-                prepareCnDataForMountPointTest(true));
+                isNull())).thenReturn(prepareCnDataForMountPointTest(true));
 
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
 
@@ -610,7 +608,7 @@ public class RestGetOperationTest extends JerseyTest {
 
     @SuppressWarnings("unchecked")
     private void mockReadConfigurationDataMethod() {
-        when(brokerFacade.readConfigurationData(any(YangInstanceIdentifier.class), Mockito.anyString()))
+        when(brokerFacade.readConfigurationData(any(YangInstanceIdentifier.class), isNull()))
                 .thenReturn(answerFromGet);
     }
 

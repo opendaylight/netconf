@@ -67,7 +67,6 @@
         <argument ref="sessionIdProvider"/>
         <argument value="${connection-timeout-millis}"/>
         <argument ref="netconfMonitoringService"/>
-        <argument><null/></argument><!--Base capabilities-->
     </bean>
 
     <bean id="serverChannelInitializer"

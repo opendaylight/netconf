@@ -61,7 +61,7 @@ public class SimpleNetconfClientSessionListenerTest {
         final EventLoop eventLoop = mock(EventLoop.class);
         doReturn(eventLoop).when(channel).eventLoop();
         doAnswer(invocation -> {
-            invocation.getArgumentAt(0, Runnable.class).run();
+            invocation.<Runnable>getArgument(0).run();
             return null;
         }).when(eventLoop).execute(any(Runnable.class));
     }

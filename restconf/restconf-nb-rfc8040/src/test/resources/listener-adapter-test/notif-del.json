@@ -3,12 +3,7 @@
         "data-changed-notification": {
             "data-change-event": [
                 {
-                    "data": {
-                        "patch-cont": {
-                            "xmlns": "instance:identifier:patch:module"
-                        }
-                    },
-                    "operation": "updated",
+                    "operation": "deleted",
                     "path": "/instance-identifier-patch-module:patch-cont"
                 },
                 {
