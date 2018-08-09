@@ -13,6 +13,7 @@ import akka.actor.ActorSystem;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
@@ -48,7 +49,7 @@ public class ProxyDOMRpcService implements DOMRpcService {
     private final ExceptionMapper<DOMRpcException> domRpcExceptionMapper =
         new ExceptionMapper<DOMRpcException>("invokeRpc", DOMRpcException.class) {
             @Override
-            protected DOMRpcException newWithCause(String message, Throwable cause) {
+            protected DOMRpcException newWithCause(final String message, final Throwable cause) {
                 return new ClusteringRpcException(id + ": Exception during remote rpc invocation.", cause);
             }
         };
@@ -92,12 +93,12 @@ public class ProxyDOMRpcService implements DOMRpcService {
                     return;
                 }
 
-                final Collection<RpcError> errors = ((InvokeRpcMessageReply) response).getRpcErrors();
+                final Collection<? extends RpcError> errors = ((InvokeRpcMessageReply) response).getRpcErrors();
                 final NormalizedNodeMessage normalizedNodeMessageResult =
                         ((InvokeRpcMessageReply) response).getNormalizedNodeMessage();
                 final DOMRpcResult result;
                 if (normalizedNodeMessageResult == null) {
-                    result = new DefaultDOMRpcResult(errors);
+                    result = new DefaultDOMRpcResult(ImmutableList.copyOf(errors));
                 } else {
                     result = new DefaultDOMRpcResult(normalizedNodeMessageResult.getNode(), errors);
                 }

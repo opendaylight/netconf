@@ -13,8 +13,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -164,7 +165,7 @@ public class InvokeRpcMethodTest {
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
         final SchemaPath type = SchemaPath.create(true, qname);
 
-        when(brokerFacade.invokeRpc(eq(type), any(NormalizedNode.class))).thenReturn(future);
+        when(brokerFacade.invokeRpc(eq(type), isNull())).thenReturn(future);
 
         try {
             this.restconfImpl.invokeRpc("toaster:cancel-toast", "", uriInfo);
@@ -211,7 +212,7 @@ public class InvokeRpcMethodTest {
         final SchemaPath path = SchemaPath.create(true,
                 QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast"));
 
-        when(brokerFacade.invokeRpc(eq(path), any(NormalizedNode.class))).thenReturn(future);
+        when(brokerFacade.invokeRpc(eq(path), isNull())).thenReturn(future);
 
         try {
             this.restconfImpl.invokeRpc("toaster:cancel-toast", "", uriInfo);
@@ -233,7 +234,7 @@ public class InvokeRpcMethodTest {
         final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
         final SchemaPath path = SchemaPath.create(true, qname);
 
-        when(brokerFacade.invokeRpc(eq(path), any(NormalizedNode.class))).thenReturn(future);
+        when(brokerFacade.invokeRpc(eq(path), isNull())).thenReturn(future);
 
         final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:cancel-toast", "", uriInfo);
         assertNotNull(output);
@@ -352,7 +353,7 @@ public class InvokeRpcMethodTest {
         final DOMRpcResult result = new DefaultDOMRpcResult(container);
         final CheckedFuture<DOMRpcResult, DOMRpcException> future = Futures.immediateCheckedFuture(result);
 
-        when(brokerFacade.invokeRpc(eq(rpcDef.getPath()), any(NormalizedNode.class))).thenReturn(future);
+        when(brokerFacade.invokeRpc(eq(rpcDef.getPath()), isNull())).thenReturn(future);
 
         final NormalizedNodeContext output = this.restconfImpl.invokeRpc("toaster:testOutput", "", uriInfo);
         assertNotNull(output);

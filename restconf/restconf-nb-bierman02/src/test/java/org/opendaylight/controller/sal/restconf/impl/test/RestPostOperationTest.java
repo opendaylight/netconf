@@ -8,7 +8,8 @@
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -31,7 +32,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
@@ -151,7 +151,7 @@ public class RestPostOperationTest extends JerseyTest {
     @Test
     public void createConfigurationDataNullTest() throws UnsupportedEncodingException {
         when(brokerFacade.commitConfigurationDataPost(any(SchemaContext.class), any(YangInstanceIdentifier.class),
-                any(NormalizedNode.class), Mockito.anyString(), Mockito.anyString()))
+                any(NormalizedNode.class), isNull(), isNull()))
                 .thenReturn(Futures.immediateCheckedFuture(null));
 
         //FIXME : find who is set schemaContext
