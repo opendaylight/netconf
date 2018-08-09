@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -116,7 +116,7 @@ public class NetconfDeviceTopologyAdapterTest {
 
         verify(txChain, times(2)).newWriteOnlyTransaction();
         verify(writeTx, times(1))
-                .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetconfNode.class));
+                .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
         adapter.close();
 
         adapter = new NetconfDeviceTopologyAdapter(id, transactionChain); //not a mock
@@ -140,7 +140,7 @@ public class NetconfDeviceTopologyAdapterTest {
 
         verify(txChain, times(2)).newWriteOnlyTransaction();
         verify(writeTx, times(1))
-                .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(NetconfNode.class));
+                .put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
         verify(writeTx, times(1)).put(any(LogicalDatastoreType.class), any(InstanceIdentifier.class), any(Node.class));
 
     }

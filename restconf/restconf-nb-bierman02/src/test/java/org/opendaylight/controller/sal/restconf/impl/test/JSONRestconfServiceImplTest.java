@@ -12,11 +12,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Matchers.notNull;
-import static org.mockito.Matchers.same;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.notNull;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -137,8 +137,8 @@ public class JSONRestconfServiceImplTest {
     public void testPut() throws Exception {
         final PutResult result = mock(PutResult.class);
         when(brokerFacade.commitConfigurationDataPut(notNull(SchemaContext.class),
-                notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), Mockito.anyString(),
-                Mockito.anyString())).thenReturn(result);
+                notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), isNull(), isNull()))
+                .thenReturn(result);
         when(result.getFutureOfPutData())
                 .thenReturn(Futures.immediateCheckedFuture(null));
         when(result.getStatus()).thenReturn(Status.OK);
@@ -150,7 +150,7 @@ public class JSONRestconfServiceImplTest {
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
         verify(brokerFacade).commitConfigurationDataPut(notNull(SchemaContext.class), capturedPath.capture(),
-                capturedNode.capture(), Mockito.anyString(), Mockito.anyString());
+                capturedNode.capture(), isNull(), isNull());
 
         verifyPath(capturedPath.getValue(), INTERFACES_QNAME, INTERFACE_QNAME,
                 new Object[]{INTERFACE_QNAME, NAME_QNAME, "eth0"});
@@ -170,8 +170,8 @@ public class JSONRestconfServiceImplTest {
     public void testPutBehindMountPoint() throws Exception {
         final PutResult result = mock(PutResult.class);
         when(brokerFacade.commitMountPointDataPut(notNull(DOMMountPoint.class),
-                notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), Mockito.anyString(),
-                Mockito.anyString())).thenReturn(result);
+                notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), isNull(), isNull()))
+                .thenReturn(result);
         when(result.getFutureOfPutData()).thenReturn(Futures.immediateCheckedFuture(null));
         when(result.getStatus()).thenReturn(Status.OK);
         final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont/cont1";
@@ -183,7 +183,7 @@ public class JSONRestconfServiceImplTest {
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
         verify(brokerFacade).commitMountPointDataPut(same(mockMountPoint), capturedPath.capture(),
-                capturedNode.capture(), Mockito.anyString(), Mockito.anyString());
+                capturedNode.capture(), isNull(), isNull());
 
         verifyPath(capturedPath.getValue(), TEST_CONT_QNAME, TEST_CONT1_QNAME);
 
@@ -217,7 +217,7 @@ public class JSONRestconfServiceImplTest {
     public void testPost() throws Exception {
         doReturn(Futures.immediateCheckedFuture(null)).when(brokerFacade).commitConfigurationDataPost(
                 any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class),
-                Mockito.anyString(), Mockito.anyString());
+                isNull(), isNull());
 
         final String uriPath = null;
         final String payload = loadData("/parts/ietf-interfaces_interfaces_absolute_path.json");
@@ -228,7 +228,7 @@ public class JSONRestconfServiceImplTest {
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
         verify(brokerFacade).commitConfigurationDataPost(notNull(SchemaContext.class), capturedPath.capture(),
-                capturedNode.capture(), Mockito.anyString(), Mockito.anyString());
+                capturedNode.capture(), isNull(), isNull());
 
         verifyPath(capturedPath.getValue(), INTERFACES_QNAME);
 
@@ -258,7 +258,7 @@ public class JSONRestconfServiceImplTest {
     public void testPostBehindMountPoint() throws Exception {
         doReturn(Futures.immediateCheckedFuture(null)).when(brokerFacade).commitConfigurationDataPost(
                 notNull(DOMMountPoint.class), notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class),
-                Mockito.anyString(), Mockito.anyString());
+                isNull(), isNull());
 
         final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont";
         final String payload = loadData("/full-versions/testCont1Data.json");
@@ -269,7 +269,7 @@ public class JSONRestconfServiceImplTest {
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         final ArgumentCaptor<NormalizedNode> capturedNode = ArgumentCaptor.forClass(NormalizedNode.class);
         verify(brokerFacade).commitConfigurationDataPost(same(mockMountPoint), capturedPath.capture(),
-                capturedNode.capture(), Mockito.anyString(), Mockito.anyString());
+                capturedNode.capture(), isNull(), isNull());
 
         verifyPath(capturedPath.getValue(), TEST_CONT_QNAME, TEST_CONT1_QNAME);
 
@@ -285,7 +285,7 @@ public class JSONRestconfServiceImplTest {
     public void testPostFailure() throws Throwable {
         doReturn(Futures.immediateFailedCheckedFuture(new TransactionCommitFailedException("mock"))).when(brokerFacade)
                 .commitConfigurationDataPost(any(SchemaContext.class), any(YangInstanceIdentifier.class),
-                        any(NormalizedNode.class), Mockito.anyString(), Mockito.anyString());
+                        any(NormalizedNode.class), isNull(), isNull());
 
         final String uriPath = null;
         final String payload = loadData("/parts/ietf-interfaces_interfaces_absolute_path.json");
@@ -445,7 +445,7 @@ public class JSONRestconfServiceImplTest {
 
         final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
         doReturn(Futures.immediateCheckedFuture(expResult)).when(brokerFacade).invokeRpc(any(SchemaPath.class),
-                any(NormalizedNode.class));
+                isNull());
 
         final String uriPath = "toaster:cancel-toast";
 
@@ -453,7 +453,7 @@ public class JSONRestconfServiceImplTest {
 
         assertEquals("Output present", false, output.isPresent());
 
-        verify(brokerFacade).invokeRpc(eq(path), isNull(NormalizedNode.class));
+        verify(brokerFacade).invokeRpc(eq(path), isNull());
     }
 
     @Test
@@ -465,7 +465,7 @@ public class JSONRestconfServiceImplTest {
                 .withChild(ImmutableNodes.leafNode(TEXT_OUT_QNAME, "foo")).build();
         final DOMRpcResult expResult = new DefaultDOMRpcResult(outputNode);
         doReturn(Futures.immediateCheckedFuture(expResult)).when(brokerFacade).invokeRpc(any(SchemaPath.class),
-                any(NormalizedNode.class));
+                isNull());
 
         final String uriPath = "toaster:testOutput";
 
@@ -475,7 +475,7 @@ public class JSONRestconfServiceImplTest {
         assertNotNull("Returned null response", output.get());
         assertThat("Missing \"textOut\"", output.get(), containsString("\"textOut\":\"foo\""));
 
-        verify(brokerFacade).invokeRpc(eq(path), isNull(NormalizedNode.class));
+        verify(brokerFacade).invokeRpc(eq(path), isNull());
     }
 
     @Test(expected = OperationFailedException.class)
@@ -499,7 +499,7 @@ public class JSONRestconfServiceImplTest {
 
         if (datastoreType == LogicalDatastoreType.CONFIGURATION) {
             doReturn(entryNode).when(brokerFacade).readConfigurationData(notNull(YangInstanceIdentifier.class),
-                    Mockito.anyString());
+                    isNull());
         } else {
             doReturn(entryNode).when(brokerFacade).readOperationalData(notNull(YangInstanceIdentifier.class));
         }
@@ -519,7 +519,7 @@ public class JSONRestconfServiceImplTest {
         final ArgumentCaptor<YangInstanceIdentifier> capturedPath =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
         if (datastoreType == LogicalDatastoreType.CONFIGURATION) {
-            verify(brokerFacade).readConfigurationData(capturedPath.capture(), Mockito.anyString());
+            verify(brokerFacade).readConfigurationData(capturedPath.capture(), isNull());
         } else {
             verify(brokerFacade).readOperationalData(capturedPath.capture());
         }

@@ -8,9 +8,10 @@
 package org.opendaylight.netconf.sal.connect.netconf;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyCollectionOf;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollectionOf;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
@@ -161,8 +162,7 @@ public class NetconfDeviceTest {
         device.onRemoteSessionUp(sessionCaps, listener);
 
         Mockito.verify(facade, Mockito.timeout(5000)).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class),
-                any(DOMActionService.class));
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class), isNull());
         Mockito.verify(schemaFactory, times(2)).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
     }
 
@@ -249,8 +249,7 @@ public class NetconfDeviceTest {
         device.onRemoteSessionUp(sessionCaps, listener);
 
         Mockito.verify(facade, Mockito.timeout(5000)).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class),
-                any(DOMActionService.class));
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class), isNull());
         Mockito.verify(schemaFactory, times(1)).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
     }
 
@@ -329,7 +328,7 @@ public class NetconfDeviceTest {
         verify(schemaContextProviderFactory, timeout(5000)).createSchemaContext(any(Collection.class));
         verify(facade, timeout(5000)).onDeviceConnected(
                 any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
-                any(DOMActionService.class));
+                isNull());
 
         device.onRemoteSessionDown();
         verify(facade, timeout(5000)).onDeviceDisconnected();
@@ -339,7 +338,7 @@ public class NetconfDeviceTest {
         verify(schemaContextProviderFactory, timeout(5000).times(2)).createSchemaContext(any(Collection.class));
         verify(facade, timeout(5000).times(2)).onDeviceConnected(
                 any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
-                any(DOMActionService.class));
+                isNull());
     }
 
     @Test
@@ -402,8 +401,7 @@ public class NetconfDeviceTest {
         final ArgumentCaptor<NetconfSessionPreferences> argument =
                 ArgumentCaptor.forClass(NetconfSessionPreferences.class);
         verify(facade, timeout(5000))
-                .onDeviceConnected(any(SchemaContext.class), argument.capture(), any(DOMRpcService.class),
-                        any(DOMActionService.class));
+                .onDeviceConnected(any(SchemaContext.class), argument.capture(), any(DOMRpcService.class), isNull());
         final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().getNetconfDeviceCapabilities();
 
         netconfDeviceCaps.getResolvedCapabilities()
