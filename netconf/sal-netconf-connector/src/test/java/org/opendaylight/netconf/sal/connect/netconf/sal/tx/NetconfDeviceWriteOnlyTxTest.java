@@ -9,8 +9,9 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
@@ -88,6 +89,9 @@ public class NetconfDeviceWriteOnlyTxTest {
 
     @Test
     public void testDiscardChanges() throws InterruptedException {
+        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
+                .when(rpc).invokeRpc(any(SchemaPath.class), isNull());
+
         final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(SchemaContext.class)),
                 false);
         try {
@@ -100,7 +104,7 @@ public class NetconfDeviceWriteOnlyTxTest {
             inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME),
                     NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
             inOrder.verify(rpc).invokeRpc(eq(toPath(NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME)),
-                    any(NormalizedNode.class));
+                    isNull());
             inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME),
                     NetconfBaseOps.getUnLockContent(NETCONF_CANDIDATE_QNAME));
             return;
@@ -168,7 +172,7 @@ public class NetconfDeviceWriteOnlyTxTest {
     @Test
     public void testListenerCancellation() throws Exception {
         doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
-                .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+                .when(rpc).invokeRpc(any(SchemaPath.class), isNull());
         final WriteCandidateTx tx = new WriteCandidateTx(
                 id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()), false);
         final TxListener listener = mock(TxListener.class);
