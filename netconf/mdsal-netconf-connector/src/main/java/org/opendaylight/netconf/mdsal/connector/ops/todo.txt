@@ -1,0 +1,47 @@
+1. Support for reading config from file (DONE)
+a) copy-config
+b) edit-config
+
+2. Support for reading config from URL (DONE)
+a) copy-config
+b) edit-config
+
+Testing HTTP:
+python -m SimpleHTTPServer
+
+alternative:
+https://github.com/tianhuil/SimpleHTTPAuthServer
+
+sudo pip install git+git://github.com/tianhuil/SimpleHTTPAuthServer.git@master
+
+python -m SimpleHTTPAuthServer 8000 admin:admin
+
+
+
+Testing HTTPS:
+
+openssl req -new -x509 -keyout server.pem -out server.pem -days 365 -nodes
+openssl x509 -in server.pem -inform pem -out server.der -outform der
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+sudo keytool -importcert -alias startssl -keystore $JAVA_HOME/jre/lib/security/cacerts -storepass changeit -file server.der
+python simple-https-server.py
+
+# https://gist.github.com/dergachev/7028596
+# https://connect2id.com/blog/importing-ca-root-cert-into-jvm-trust-store
+
+Testing FTP:
+sudo sudo pip install pyftpdlib
+python -m pyftpdlib -w
+wget 'ftp://localhost:2121/config.conf'
+
+python -m pyftpdlib -w -u admin -p admin
+
+3. Support for writing config to file (DONE)
+a) copy-config
+
+4. Announce URL capability (TODO)
+
+5. Cleanup tests:
+- temporary files
+- test reachable/unrechable URL using powermock
+e.g. https://stackoverflow.com/questions/565535/mocking-a-url-in-java

@@ -12,14 +12,21 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYangResources;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import org.junit.Test;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.DocumentedException.ErrorType;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 public class CopyConfigTest extends AbstractNetconfOperationTest {
 
@@ -58,7 +65,7 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
     public void testConfigMissing() throws Exception {
         try {
             copyConfig("messages/mapping/copyConfigs/copyConfig_no_config.xml");
-            fail("Should have failed - <config> element is missing");
+            fail("Should have failed - neither <config> nor <url> element is present");
         } catch (final DocumentedException e) {
             assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
             assertTrue(e.getErrorTag() == ErrorTag.MISSING_ELEMENT);
@@ -201,9 +208,192 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
             "messages/mapping/copyConfigs/copyConfig_choices_control.xml"));
     }
 
+    @Test
+    public void testConfigFromFile() throws Exception {
+        // Ask class loader for URI of config file and use it as <url> in <copy-config> RPC:
+        final String template = XmlFileLoader.fileToString("messages/mapping/copyConfigs/copyConfig_from_file.xml");
+        final URI uri = getClass().getClassLoader()
+            .getResource("messages/mapping/copyConfigs/config_file_valid.xml").toURI();
+        final String copyConfig = template.replaceFirst("URL", uri.toString());
+        final Document request = XmlUtil.readXmlToDocument(copyConfig);
+
+        verifyResponse(copyConfig(request), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
+            "messages/mapping/copyConfigs/copyConfig_from_file_control.xml"));
+    }
+
+    @Test
+    public void testConfigFromInvalidUrl() throws Exception {
+        try {
+            copyConfig("messages/mapping/copyConfigs/copyConfig_invalid_url.xml");
+            fail("Should have failed - provided <url> is not valid");
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.INVALID_VALUE);
+            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
+            assertTrue(e.getCause() instanceof MalformedURLException);
+        }
+    }
+
+    @Test
+    public void testExternalConfigInvalid() throws Exception {
+        try {
+            // Ask class loader for URI of config file and use it as <url> in <copy-config> RPC:
+            final String template = XmlFileLoader.fileToString("messages/mapping/copyConfigs/copyConfig_from_file.xml");
+            final URI uri = getClass().getClassLoader()
+                .getResource("messages/mapping/copyConfigs/config_file_invalid.xml").toURI();
+            final String copyConfig = template.replaceFirst("URL", uri.toString());
+            final Document request = XmlUtil.readXmlToDocument(copyConfig);
+            copyConfig(request);
+            fail("Should have failed - provided config is not valid XML");
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_FAILED);
+            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
+            assertTrue(e.getCause() instanceof SAXException);
+        }
+    }
+
+    @Test
+    public void testCopyFromURLConnectionFails() throws Exception {
+        try {
+            // FIXME do not rely on the fact that the URL is unreachable, use powermock or mock web server
+            copyConfig("messages/mapping/copyConfigs/copyConfig_unreachable_url.xml");
+            fail("Should have failed - url is not reachable");
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_FAILED);
+            assertTrue(e.getErrorType() == ErrorType.APPLICATION);
+            assertTrue(e.getCause() instanceof IOException);
+        }
+    }
+
+    @Test
+    public void testCopyFromHttp() throws Exception {
+        // FIXME mock web server!
+        verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_url_http.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
+            "messages/mapping/copyConfigs/copyConfig_from_file_control.xml"));
+    }
+
+    @Test
+    public void testCopyFromHttpWithCredentials() throws Exception {
+        // FIXME mock web server!
+        verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_url_http_with_credentials.xml"),
+            RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
+            "messages/mapping/copyConfigs/copyConfig_from_file_control.xml"));
+    }
+
+    @Test
+    public void testCopyFromHttps() throws Exception {
+        // https://stackoverflow.com/questions/2113117/web-server-for-testing-on-linux
+
+        // FIXME mock web server!
+        verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_url_https.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
+            "messages/mapping/copyConfigs/copyConfig_from_file_control.xml"));
+    }
+
+    @Test
+    public void testCopyFromFtp() throws Exception {
+        // FIXME mock ftp server!
+        verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_url_ftp.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
+            "messages/mapping/copyConfigs/copyConfig_from_file_control.xml"));
+    }
+
+    @Test
+    public void testCopyFromFtpWithCredentials() throws Exception {
+        // FIXME mock ftp server!
+        verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_url_ftp_with_credentials.xml"),
+            RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
+            "messages/mapping/copyConfigs/copyConfig_from_file_control.xml"));
+    }
+
+    @Test
+    public void testCopyToFile() throws Exception {
+        // Initialize config:
+        verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_top_modules.xml"), RPC_REPLY_OK);
+        verifyResponse(getConfigCandidate(), XmlFileLoader.xmlFileToDocument(
+            "messages/mapping/copyConfigs/copyConfig_top_modules_control.xml"));
+
+        // Load copy-config template and replace URL with the URI of target file:
+        final String template = XmlFileLoader.fileToString("messages/mapping/copyConfigs/copyConfig_to_file.xml");
+        final File outFile = new File("target/test-copy-to-file.xml");
+        try {
+            final URI uri = outFile.toURI();
+            final String copyConfig = template.replaceFirst("URL", uri.toString());
+            final Document request = XmlUtil.readXmlToDocument(copyConfig);
+
+            // Invoke copy-config RPC:
+            verifyResponse(copyConfig(request), RPC_REPLY_OK);
+
+            // Check if outFile was created with expected content:
+            verifyResponse(XmlUtil.readXmlToDocument(new FileInputStream(outFile)),
+                XmlFileLoader.xmlFileToDocument("messages/mapping/copyConfigs/copyConfig_to_file_control.xml"));
+        } finally {
+            outFile.delete();
+        }
+    }
+
+    @Test
+    public void testUnsupportedTargetUrlProtocol() throws Exception {
+        try {
+            copyConfig("messages/mapping/copyConfigs/copyConfig_to_unsupported_url_protocol.xml");
+            fail("Should have failed - exporting config to http server is not supported");
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_NOT_SUPPORTED);
+            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
+        }
+    }
+
+    @Test
+    public void testCopyToFileFromRunning() throws Exception {
+        // Load copy-config template and replace URL with the URI of target file:
+        final String template =
+            XmlFileLoader.fileToString("messages/mapping/copyConfigs/copyConfig_to_file_from_running.xml");
+        final File outFile = new File("target/test-copy-to-file-from-running.xml");
+        try {
+            final URI uri = outFile.toURI();
+            final String copyConfig = template.replaceFirst("URL", uri.toString());
+            final Document request = XmlUtil.readXmlToDocument(copyConfig);
+
+            // Invoke copy-config RPC:
+            verifyResponse(copyConfig(request), RPC_REPLY_OK);
+
+            // Check if outFile was created with expected content:
+            verifyResponse(XmlUtil.readXmlToDocument(new FileInputStream(outFile)),
+                XmlFileLoader.xmlFileToDocument(
+                    "messages/mapping/copyConfigs/copyConfig_to_file_from_running_control.xml"));
+        } finally {
+            outFile.delete();
+        }
+    }
+
+    @Test
+    public void testRemoteToRemoteOperationIsNotSupported() throws Exception {
+        try {
+            copyConfig("messages/mapping/copyConfigs/copyConfig_url_remote_to_remote.xml");
+            fail("Should have failed - remote to remote operations are not supported");
+        } catch (final DocumentedException e) {
+            assertTrue(e.getErrorSeverity() == ErrorSeverity.ERROR);
+            assertTrue(e.getErrorTag() == ErrorTag.OPERATION_NOT_SUPPORTED);
+            assertTrue(e.getErrorType() == ErrorType.PROTOCOL);
+        }
+    }
+
     private Document copyConfig(final String resource) throws Exception {
         final CopyConfig copyConfig = new CopyConfig(SESSION_ID_FOR_REPORTING, getCurrentSchemaContext(),
             getTransactionProvider());
         return executeOperation(copyConfig, resource);
+    }
+
+    private Document copyConfig(final Document request) throws Exception {
+        final CopyConfig copyConfig = new CopyConfig(SESSION_ID_FOR_REPORTING, getCurrentSchemaContext(),
+            getTransactionProvider());
+        return executeOperation(copyConfig, request);
     }
 }
