@@ -8,12 +8,11 @@
 
 package org.opendaylight.netconf.client;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -30,6 +29,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.ChannelProgressivePromise;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
+import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
@@ -46,6 +46,7 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.nettyutil.handler.ChunkedFramingMechanismEncoder;
+import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
@@ -82,8 +83,8 @@ public class NetconfClientSessionNegotiatorTest {
         doReturn("").when(ret).toString();
         doReturn(future).when(ret).newPromise();
         doReturn(future).when(ret).close();
-        doReturn(future).when(ret).writeAndFlush(anyObject());
-        doReturn(future).when(ret).writeAndFlush(anyObject(), anyObject());
+        doReturn(future).when(ret).writeAndFlush(any());
+        doReturn(future).when(ret).writeAndFlush(any(), any());
         doReturn(true).when(ret).isOpen();
         doReturn(pipeline).when(ret).pipeline();
         doReturn("").when(pipeline).toString();
@@ -107,10 +108,14 @@ public class NetconfClientSessionNegotiatorTest {
         doReturn(handler).when(pipeline).replace(anyString(), anyString(), any(ChunkedFramingMechanismEncoder.class));
 
         NetconfXMLToHelloMessageDecoder messageDecoder = new NetconfXMLToHelloMessageDecoder();
-        doReturn(messageDecoder).when(pipeline).replace(anyString(), anyString(), any(NetconfXMLToMessageDecoder
-                .class));
-        doReturn(pipeline).when(pipeline).replace(any(ChannelHandler.class), anyString(), any(NetconfClientSession
-                .class));
+        doReturn(messageDecoder).when(pipeline).replace(anyString(), anyString(),
+            any(NetconfXMLToMessageDecoder.class));
+        doReturn(pipeline).when(pipeline).replace(any(ChannelHandler.class), anyString(),
+            any(NetconfClientSession.class));
+        doReturn(null).when(pipeline).replace(anyString(), anyString(),
+            any(MessageToByteEncoder.class));
+        doReturn(null).when(pipeline).replace(anyString(), anyString(),
+            any(NetconfEXIToMessageDecoder.class));
         return pipeline;
     }
 
@@ -118,7 +123,7 @@ public class NetconfClientSessionNegotiatorTest {
         final EventLoop eventLoop = mock(EventLoop.class);
         doReturn(eventLoop).when(channel).eventLoop();
         doAnswer(invocation -> {
-            invocation.getArgumentAt(0, Runnable.class).run();
+            invocation.<Runnable>getArgument(0).run();
             return null;
         }).when(eventLoop).execute(any(Runnable.class));
     }
@@ -152,21 +157,21 @@ public class NetconfClientSessionNegotiatorTest {
     @Test
     public void testNetconfClientSessionNegotiator() throws NetconfDocumentedException {
         Promise<NetconfClientSession> promise = mock(Promise.class);
-        doReturn(promise).when(promise).setSuccess(anyObject());
+        doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
 
         negotiator.channelActive(null);
         Set<String> caps = Sets.newSet("a", "b");
         NetconfHelloMessage helloServerMessage = NetconfHelloMessage.createServerHello(caps, 10);
         negotiator.handleMessage(helloServerMessage);
-        verify(promise).setSuccess(anyObject());
+        verify(promise).setSuccess(any());
     }
 
     @Test
     public void testNegotiatorWhenChannelActiveHappenAfterHandleMessage() throws Exception {
         Promise promise = mock(Promise.class);
         doReturn(false).when(promise).isDone();
-        doReturn(promise).when(promise).setSuccess(anyObject());
+        doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
         Set<String> caps = Sets.newSet("a", "b");
         NetconfHelloMessage helloServerMessage = NetconfHelloMessage.createServerHello(caps, 10);
@@ -174,7 +179,7 @@ public class NetconfClientSessionNegotiatorTest {
         negotiator.handleMessage(helloServerMessage);
         negotiator.channelActive(null);
 
-        verify(promise).setSuccess(anyObject());
+        verify(promise).setSuccess(any());
     }
 
 
@@ -182,7 +187,7 @@ public class NetconfClientSessionNegotiatorTest {
     public void testNetconfClientSessionNegotiatorWithEXI() throws Exception {
         Promise<NetconfClientSession> promise = mock(Promise.class);
         NetconfStartExiMessage exiMessage = NetconfStartExiMessage.create(EXIParameters.empty(), "msg-id");
-        doReturn(promise).when(promise).setSuccess(anyObject());
+        doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, exiMessage);
 
         negotiator.channelActive(null);
@@ -190,7 +195,7 @@ public class NetconfClientSessionNegotiatorTest {
         NetconfHelloMessage message = NetconfHelloMessage.createServerHello(caps, 10);
 
         doAnswer(invocationOnMock -> {
-            channelInboundHandlerAdapter = (ChannelInboundHandlerAdapter) invocationOnMock.getArguments()[2];
+            channelInboundHandlerAdapter = invocationOnMock.getArgument(2);
             return null;
         }).when(pipeline).addAfter(anyString(), anyString(), any(ChannelHandler.class));
 
@@ -200,7 +205,7 @@ public class NetconfClientSessionNegotiatorTest {
         Document expectedResult = XmlFileLoader.xmlFileToDocument("netconfMessages/rpc-reply_ok.xml");
         channelInboundHandlerAdapter.channelRead(handlerContext, new NetconfMessage(expectedResult));
 
-        verify(promise).setSuccess(anyObject());
+        verify(promise).setSuccess(any());
 
         // two calls for exiMessage, 2 for hello message
         verify(pipeline, times(4)).replace(anyString(), anyString(), any(ChannelHandler.class));
@@ -209,7 +214,7 @@ public class NetconfClientSessionNegotiatorTest {
     @Test
     public void testNetconfClientSessionNegotiatorGetCached() throws Exception {
         Promise promise = mock(Promise.class);
-        doReturn(promise).when(promise).setSuccess(anyObject());
+        doReturn(promise).when(promise).setSuccess(any());
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
         NetconfClientSessionNegotiator negotiator = createNetconfClientSessionNegotiator(promise, null);
 

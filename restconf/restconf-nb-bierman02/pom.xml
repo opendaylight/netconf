@@ -32,7 +32,6 @@
     <dependency>
       <groupId>org.glassfish.jersey.bundles.repackaged</groupId>
       <artifactId>jersey-guava</artifactId>
-      <version>2.6</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -88,12 +87,8 @@
       <artifactId>ietf-restconf</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.mdsal.model</groupId>
-      <artifactId>ietf-yang-types-20130715</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.mdsal.model</groupId>
-      <artifactId>ietf-inet-types-2013-07-15</artifactId>
+      <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
+      <artifactId>rfc6991</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -121,7 +116,7 @@
       <artifactId>yang-model-export</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.mdsal.model</groupId>
+      <groupId>org.opendaylight.mdsal.binding.model.ietf</groupId>
       <artifactId>rfc7895</artifactId>
     </dependency>
     <dependency>

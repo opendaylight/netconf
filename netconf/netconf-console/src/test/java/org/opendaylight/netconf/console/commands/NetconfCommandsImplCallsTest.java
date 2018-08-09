@@ -10,8 +10,9 @@ package org.opendaylight.netconf.console.commands;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
@@ -122,7 +123,7 @@ public class NetconfCommandsImplCallsTest {
 
         netconfUpdateDeviceCommand.execute();
 
-        verify(netconfCommands, times(1)).updateDevice(anyString(), anyString(), anyString(),
+        verify(netconfCommands, times(1)).updateDevice(isNull(), isNull(), isNull(),
                 hashMapArgumentCaptor.capture());
 
         assertTrue(hashMapArgumentCaptor.getValue().containsKey(NetconfConsoleConstants.NETCONF_IP));
