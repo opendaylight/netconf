@@ -9,6 +9,12 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.base.Optional;
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.util.List;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -35,6 +41,7 @@ public final class CopyConfig extends AbstractEdit {
     private static final String OPERATION_NAME = "copy-config";
     private static final String CONFIG_KEY = "config";
     private static final String SOURCE_KEY = "source";
+    private static final String URL_KEY = "url";
 
     // Top-level "data" node without child nodes
     private static final ContainerNode EMPTY_ROOT_NODE = Builders.containerBuilder()
@@ -58,7 +65,8 @@ public final class CopyConfig extends AbstractEdit {
                     ErrorTag.OPERATION_NOT_SUPPORTED,
                     ErrorSeverity.ERROR);
         }
-        final XmlElement configElement = extractConfigParameter(operationElement);
+
+        final List<XmlElement> configElements = getConfigElements(operationElement);
 
         // <copy-config>, unlike <edit-config>, always replaces entire configuration,
         // so remove old configuration first:
@@ -66,7 +74,7 @@ public final class CopyConfig extends AbstractEdit {
         rwTx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.EMPTY, EMPTY_ROOT_NODE);
 
         // Then create nodes present in the <config> element:
-        for (final XmlElement element : configElement.getChildElements()) {
+        for (final XmlElement element : configElements) {
             final String ns = element.getNamespace();
             final DataSchemaNode schemaNode = getSchemaNodeFromNamespace(ns, element);
             final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
@@ -79,9 +87,46 @@ public final class CopyConfig extends AbstractEdit {
         return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
     }
 
-    private static XmlElement extractConfigParameter(final XmlElement operationElement) throws DocumentedException {
+
+    // TODO move to some utility
+    private List<XmlElement> getConfigElements(final XmlElement operationElement) throws DocumentedException {
         final XmlElement source = getElement(operationElement, SOURCE_KEY);
-        return getElement(source, CONFIG_KEY);
+        final Optional<XmlElement> configElement = source.getOnlyChildElementOptionally(CONFIG_KEY);
+        List<XmlElement> configElements = null;
+        if (configElement.isPresent()) {
+            configElements = configElement.get().getChildElements();
+        } else {
+            final XmlElement urlElement = getElement(source, URL_KEY);
+            final String urlString = urlElement.getTextContent();
+            if (urlString.startsWith("file:")) {
+                try {
+                    URI uri = new URI(urlString);
+                    File file = new File(uri);
+                    String content = new String (Files.readAllBytes(file.toPath()), Charset.forName("UTF-8"));
+                    content.toString();
+                    // TODO parse content to XML
+                } catch (URISyntaxException e) {
+                    throw new DocumentedException(urlString + " is not valid URI",
+                        ErrorType.APPLICATION,
+                        ErrorTag.INVALID_VALUE,
+                        ErrorSeverity.ERROR);
+                } catch (Exception e) {
+                    throw new DocumentedException("Could not open URI:" + urlString,
+                        ErrorType.APPLICATION,
+                        ErrorTag.INVALID_VALUE,
+                        ErrorSeverity.ERROR);
+                }
+            } else {
+                throw new IllegalArgumentException("URL unsupported");
+            }
+
+        }
+        return configElements;
+    }
+
+    private static XmlElement extractURLParameter(final XmlElement operationElement) throws DocumentedException {
+        final XmlElement source = getElement(operationElement, SOURCE_KEY);
+        return getElement(source, URL_KEY);
     }
 
     @Override

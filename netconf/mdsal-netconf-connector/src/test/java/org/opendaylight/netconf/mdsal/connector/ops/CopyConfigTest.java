@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYangResources;
 
+import java.net.URI;
 import org.junit.Test;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
@@ -199,6 +200,12 @@ public class CopyConfigTest extends AbstractNetconfOperationTest {
         verifyResponse(commit(), RPC_REPLY_OK);
         verifyResponse(getConfigRunning(), XmlFileLoader.xmlFileToDocument(
             "messages/mapping/copyConfigs/copyConfig_choices_control.xml"));
+    }
+
+    @Test
+    public void testURL() throws Exception {
+        // TODO use a template here to get URI of config file from the test dir
+        verifyResponse(copyConfig("messages/mapping/copyConfigs/copyConfig_from_file.xml"), RPC_REPLY_OK);
     }
 
     private Document copyConfig(final String resource) throws Exception {
