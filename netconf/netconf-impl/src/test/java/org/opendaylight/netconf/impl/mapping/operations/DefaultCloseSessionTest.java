@@ -8,8 +8,8 @@
 
 package org.opendaylight.netconf.impl.mapping.operations;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -40,7 +40,7 @@ public class DefaultCloseSessionTest {
         final EventLoop eventLoop = mock(EventLoop.class);
         doReturn(eventLoop).when(channel).eventLoop();
         doAnswer(invocation -> {
-            invocation.getArgumentAt(0, Runnable.class).run();
+            invocation.<Runnable>getArgument(0).run();
             return null;
         }).when(eventLoop).execute(any(Runnable.class));
         doReturn(true).when(eventLoop).inEventLoop();
@@ -62,7 +62,7 @@ public class DefaultCloseSessionTest {
 
         final ChannelPromise sendFuture = mock(ChannelPromise.class);
         doAnswer(invocation -> {
-            invocation.getArgumentAt(0, GenericFutureListener.class).operationComplete(sendFuture);
+            invocation.<GenericFutureListener>getArgument(0).operationComplete(sendFuture);
             return null;
         }).when(sendFuture).addListener(any(GenericFutureListener.class));
         doReturn(sendFuture).when(channel).newPromise();
