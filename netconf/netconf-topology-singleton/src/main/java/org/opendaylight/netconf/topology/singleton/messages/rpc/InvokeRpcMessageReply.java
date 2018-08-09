@@ -26,11 +26,11 @@ public class InvokeRpcMessageReply implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @SuppressFBWarnings("SE_BAD_FIELD")
-    private final Collection<RpcError> rpcErrors;
+    private final Collection<? extends RpcError> rpcErrors;
     private final NormalizedNodeMessage normalizedNodeMessage;
 
     public InvokeRpcMessageReply(@Nullable final NormalizedNodeMessage normalizedNodeMessage,
-                                 @Nonnull final Collection<RpcError> rpcErrors) {
+                                 @Nonnull final Collection<? extends RpcError> rpcErrors) {
         this.normalizedNodeMessage = normalizedNodeMessage;
         this.rpcErrors = Objects.requireNonNull(rpcErrors);
     }
@@ -41,7 +41,7 @@ public class InvokeRpcMessageReply implements Serializable {
     }
 
     @Nonnull
-    public Collection<RpcError> getRpcErrors() {
+    public Collection<? extends RpcError> getRpcErrors() {
         return rpcErrors;
     }
 
@@ -64,7 +64,7 @@ public class InvokeRpcMessageReply implements Serializable {
         }
 
         @Override
-        public void writeExternal(ObjectOutput out) throws IOException {
+        public void writeExternal(final ObjectOutput out) throws IOException {
             out.writeInt(invokeRpcMessageReply.getRpcErrors().size());
             for (final RpcError rpcError : invokeRpcMessageReply.getRpcErrors()) {
                 out.writeObject(rpcError);
@@ -73,7 +73,7 @@ public class InvokeRpcMessageReply implements Serializable {
         }
 
         @Override
-        public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
             final int size = in.readInt();
             final Collection<RpcError> rpcErrors = new LinkedList<>();
             for (int i = 0; i < size; i++) {
