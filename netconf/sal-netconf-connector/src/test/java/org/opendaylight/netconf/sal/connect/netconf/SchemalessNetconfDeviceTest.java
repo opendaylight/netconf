@@ -8,7 +8,8 @@
 
 package org.opendaylight.netconf.sal.connect.netconf;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -59,7 +60,7 @@ public class SchemalessNetconfDeviceTest {
                 any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
 
         device.onNotification(netconfMessage);
-        verify(facade).onNotification(any(DOMNotification.class));
+        verify(facade).onNotification(isNull());
 
         device.onRemoteSessionDown();
         verify(facade).onDeviceDisconnected();
