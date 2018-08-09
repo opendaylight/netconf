@@ -12,10 +12,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Matchers.notNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -494,8 +494,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         final SchemaPath path = SchemaPath.create(true, CANCEL_TOAST_QNAME);
 
         final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
-        doReturn(Futures.immediateCheckedFuture(expResult)).when(mockRpcService).invokeRpc(eq(path),
-                any(NormalizedNode.class));
+        doReturn(Futures.immediateCheckedFuture(expResult)).when(mockRpcService).invokeRpc(eq(path), isNull());
 
         final String uriPath = "toaster:cancel-toast";
 
@@ -503,7 +502,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         assertEquals("Output present", false, output.isPresent());
 
-        verify(mockRpcService).invokeRpc(eq(path), isNull(NormalizedNode.class));
+        verify(mockRpcService).invokeRpc(eq(path), isNull());
     }
 
     @Test
@@ -514,8 +513,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(TEST_OUTPUT_QNAME))
                 .withChild(ImmutableNodes.leafNode(TEXT_OUT_QNAME, "foo")).build();
         final DOMRpcResult expResult = new DefaultDOMRpcResult(outputNode);
-        doReturn(Futures.immediateCheckedFuture(expResult)).when(mockRpcService).invokeRpc(eq(path),
-                any(NormalizedNode.class));
+        doReturn(Futures.immediateCheckedFuture(expResult)).when(mockRpcService).invokeRpc(eq(path), isNull());
 
         final String uriPath = "toaster:testOutput";
 
@@ -525,7 +523,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         assertNotNull("Returned null response", output.get());
         assertThat("Missing \"textOut\"", output.get(), containsString("\"textOut\":\"foo\""));
 
-        verify(mockRpcService).invokeRpc(eq(path), isNull(NormalizedNode.class));
+        verify(mockRpcService).invokeRpc(eq(path), isNull());
     }
 
     @Test(expected = OperationFailedException.class)
