@@ -70,6 +70,13 @@
       <artifactId>netty-transport</artifactId>
     </dependency>
 
+    <!-- For ed25519 support -->
+    <dependency>
+      <groupId>net.i2p.crypto</groupId>
+      <artifactId>eddsa</artifactId>
+      <version>0.3.0</version>
+    </dependency>
+
     <dependency>
       <groupId>com.siemens.ct.exi</groupId>
       <artifactId>exificient</artifactId>
