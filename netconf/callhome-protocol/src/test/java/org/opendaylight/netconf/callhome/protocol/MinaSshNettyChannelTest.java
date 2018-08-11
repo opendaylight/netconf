@@ -21,6 +21,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
+import java.io.IOException;
 import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.common.io.IoInputStream;
@@ -39,7 +40,7 @@ public class MinaSshNettyChannelTest {
     private MinaSshNettyChannel instance;
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         IoReadFuture mockFuture = mock(IoReadFuture.class);
         IoInputStream mockIn = mock(IoInputStream.class);
         Mockito.doReturn(mockFuture).when(mockIn).read(any(Buffer.class));
@@ -54,7 +55,7 @@ public class MinaSshNettyChannelTest {
         IoWriteFuture mockWrFuture = mock(IoWriteFuture.class);
         Mockito.doReturn(false).when(mockOut).isClosed();
         Mockito.doReturn(false).when(mockOut).isClosing();
-        Mockito.doReturn(mockWrFuture).when(mockOut).write(any(Buffer.class));
+        Mockito.doReturn(mockWrFuture).when(mockOut).writePacket(any(Buffer.class));
         Mockito.doReturn(null).when(mockWrFuture).addListener(any());
 
         Mockito.doReturn(mockFuture).when(mockFuture).addListener(Mockito.any());

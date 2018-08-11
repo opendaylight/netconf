@@ -5,13 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
 import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -29,8 +29,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class AsyncSshHandlerWriter implements AutoCloseable {
 
-    private static final Logger LOG = LoggerFactory
-            .getLogger(AsyncSshHandlerWriter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandlerWriter.class);
 
     // public static final int MAX_PENDING_WRITES = 1000;
     // TODO implement Limiting mechanism for pending writes
@@ -77,23 +76,21 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
     }
 
     //sending message with pending
-    //if resending message not succesfull, then attribute wasPending is true
+    //if resending message not successful, then attribute wasPending is true
     private void writeWithPendingDetection(final ChannelHandlerContext ctx, final ChannelPromise promise,
-                                           final ByteBuf byteBufMsg, final boolean wasPending) {
+            final ByteBuf byteBufMsg, final boolean wasPending) {
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Writing request on channel: {}, message: {}", ctx.channel(), byteBufToString(byteBufMsg));
+        }
         try {
-
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Writing request on channel: {}, message: {}", ctx.channel(), byteBufToString(byteBufMsg));
-            }
-            asyncIn.write(toBuffer(byteBufMsg)).addListener(future -> {
+            asyncIn.writePacket(toBuffer(byteBufMsg)).addListener(future -> {
                 // synchronized block due to deadlock that happens on ssh window resize
-                // writes and pending writes would lock the underlyinch channel session
+                // writes and pending writes would lock the underlying channel session
                 // window resize write would try to write the message on an already locked channelSession,
                 // while the pending write was in progress from the write callback
                 synchronized (asyncInLock) {
                     if (LOG.isTraceEnabled()) {
-                        LOG.trace(
-                            "Ssh write request finished on channel: {} with result: {}: and ex:{}, message: {}",
+                        LOG.trace("Ssh write request finished on channel: {} with result: {}: and ex:{}, message: {}",
                             ctx.channel(), future.isWritten(), future.getException(), byteBufToString(byteBufMsg));
                     }
 
@@ -121,9 +118,11 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
                 // so the next request should succeed
                 writePendingIfAny();
             });
-
+        } catch (IOException e) {
+            LOG.warn("Ssh write request failed on channel: {} for message: {}", ctx.channel(),
+                byteBufToString(byteBufMsg), e);
+            promise.setFailure(e);
         } catch (final WritePendingException e) {
-
             if (!wasPending) {
                 queueRequest(ctx, byteBufMsg, promise);
             }
