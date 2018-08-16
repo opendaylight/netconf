@@ -10,13 +10,59 @@ package org.opendaylight.netconf.nettyutil.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
+import java.util.List;
 
-public class NetconfEOMAggregator extends DelimiterBasedFrameDecoder {
+public class NetconfEOMAggregator extends ByteToMessageDecoder {
 
-    public static final ByteBuf DELIMITER = Unpooled.wrappedBuffer(MessageParts.END_OF_MESSAGE);
+    private static final ByteBuf DELIMITER = Unpooled.wrappedBuffer(MessageParts.END_OF_MESSAGE);
+    private static final int DELIMITER_LENGTH = DELIMITER.capacity();
 
-    public NetconfEOMAggregator() {
-        super(Integer.MAX_VALUE, DELIMITER);
+    private int nextByteToCheck;
+    private boolean frameConsumed = true;
+
+    @Override
+    protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) {
+        if (frameConsumed) {
+            nextByteToCheck = in.readerIndex();
+            frameConsumed = false;
+        }
+
+        int frameLength = indexOfDelimiter(in);
+
+        if (frameLength != -1) {
+            ByteBuf frame = in.readSlice(frameLength);
+            in.skipBytes(DELIMITER_LENGTH);
+
+            out.add(frame.retain());
+            frameConsumed = true;
+        }
+    }
+
+    private int indexOfDelimiter(ByteBuf in) {
+        for (int i = nextByteToCheck; i < in.writerIndex(); i++) {
+            int inputBufIndex = i;
+            int delimiterIndex;
+            for (delimiterIndex = 0; delimiterIndex < DELIMITER_LENGTH; delimiterIndex++) {
+                if (in.getByte(inputBufIndex) != DELIMITER.getByte(delimiterIndex)) {
+                    break;
+                } else {
+                    inputBufIndex++;
+                    if (inputBufIndex == in.writerIndex() && delimiterIndex != DELIMITER_LENGTH - 1) {
+                        return -1;
+                    }
+                }
+            }
+
+            if (delimiterIndex == DELIMITER_LENGTH) {
+                // Found the delimiter in the input buffer!
+                return i - in.readerIndex();
+            }
+
+            nextByteToCheck = i;
+        }
+
+        return -1;
     }
 }
