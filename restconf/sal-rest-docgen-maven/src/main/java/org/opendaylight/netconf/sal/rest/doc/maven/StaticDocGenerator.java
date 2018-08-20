@@ -76,7 +76,7 @@ public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
         // Create JS file
         File resourcesJsFile = new File(outputDir, "resources.js");
         if (!resourcesJsFile.createNewFile()) {
-            LOG.info("File " + resourcesJsFile + " already exists.");
+            LOG.info("File {} already exists.", resourcesJsFile);
         }
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(resourcesJsFile))) {

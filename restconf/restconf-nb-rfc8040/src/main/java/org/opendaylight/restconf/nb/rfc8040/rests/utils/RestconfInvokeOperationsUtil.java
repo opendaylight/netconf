@@ -97,11 +97,11 @@ public final class RestconfInvokeOperationsUtil {
             if (response.getErrors().isEmpty()) {
                 return response;
             }
-            LOG.debug("RpcError message", response.getErrors());
+            LOG.debug("RpcError message {}", response.getErrors());
             throw new RestconfDocumentedException("RPCerror message ", null, response.getErrors());
         } catch (final CancellationException e) {
             final String errMsg = "The operation was cancelled while executing.";
-            LOG.debug("Cancel RpcExecution: " + errMsg, e);
+            LOG.debug("Cancel RpcExecution: {}", errMsg, e);
             throw new RestconfDocumentedException(errMsg, ErrorType.RPC, ErrorTag.PARTIAL_OPERATION, e);
         }
     }

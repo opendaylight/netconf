@@ -21,6 +21,8 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfChunkAggregator.class);
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM = "Got byte {} while waiting for {}";
     private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM = "Got byte {} while waiting for {}-{}";
+    private static final String GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM_PARAM =
+        "Got byte {} while waiting for {}-{}-{}";
     public static final int DEFAULT_MAXIMUM_CHUNK_SIZE = 16 * 1024 * 1024;
 
     private enum State {
@@ -160,7 +162,7 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
         } else if (byteToCheck == '#') {
             state = State.FOOTER_FOUR;
         } else {
-            LOG.debug(GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM, byteToCheck, (byte) '#', (byte) '1', (byte) '9');
+            LOG.debug(GOT_PARAM_WHILE_WAITING_FOR_PARAM_PARAM_PARAM, byteToCheck, (byte) '#', (byte) '1', (byte) '9');
             throw new IllegalStateException("Malformed chunk footer encountered (byte 2)");
         }
     }

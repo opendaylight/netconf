@@ -213,14 +213,14 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
     private void createNetworkTopologyIfNotPresent(final WriteTransaction writeTx) {
 
         final NetworkTopology networkTopology = new NetworkTopologyBuilder().build();
-        LOG.trace("{}: Merging {} container to ensure its presence", id,
-                NetworkTopology.QNAME, writeTx.getIdentifier());
+        LOG.trace("{}: Transaction {} merging {} container to ensure its presence", id, writeTx.getIdentifier(),
+            NetworkTopology.QNAME);
         writeTx.merge(LogicalDatastoreType.OPERATIONAL, networkTopologyPath, networkTopology);
 
         final Topology topology =
                 new TopologyBuilder().setTopologyId(new TopologyId(TopologyNetconf.QNAME.getLocalName())).build();
-        LOG.trace("{}: Merging {} container to ensure its presence", id,
-                Topology.QNAME, writeTx.getIdentifier());
+        LOG.trace("{}: Transaction {} merging {} container to ensure its presence", id, writeTx.getIdentifier(),
+                Topology.QNAME);
         writeTx.merge(LogicalDatastoreType.OPERATIONAL, topologyListPath, topology);
     }
 

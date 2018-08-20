@@ -69,7 +69,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
      */
     public void addSubscriber(final Channel subscriber) {
         if (!subscriber.isActive()) {
-            LOG.debug("Channel is not active between websocket server and subscriber {}" + subscriber.remoteAddress());
+            LOG.debug("Channel is not active between websocket server and subscriber {}", subscriber.remoteAddress());
         }
         final Event event = new Event(EventType.REGISTER);
         event.setSubscriber(subscriber);

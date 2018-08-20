@@ -46,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class NetconfTopologyUtils {
-    private static Logger LOG = LoggerFactory.getLogger(NetconfTopologyUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyUtils.class);
 
     private static final String DEFAULT_SCHEMA_REPOSITORY_NAME = "sal-netconf-connector";
 

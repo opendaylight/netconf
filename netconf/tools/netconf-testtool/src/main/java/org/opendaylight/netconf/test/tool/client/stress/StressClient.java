@@ -117,12 +117,11 @@ public final class StressClient {
         root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
 
         final int threadAmount = params.threadAmount;
-        LOG.info("thread amount: " + threadAmount);
+        LOG.info("thread amount: {}", threadAmount);
         final int requestsPerThread = params.editCount / params.threadAmount;
-        LOG.info("requestsPerThread: " + requestsPerThread);
+        LOG.info("requestsPerThread: {}", requestsPerThread);
         final int leftoverRequests = params.editCount % params.threadAmount;
-        LOG.info("leftoverRequests: " + leftoverRequests);
-
+        LOG.info("leftoverRequests: {}", leftoverRequests);
 
         LOG.info("Preparing messages");
         // Prepare all msgs up front
@@ -150,7 +149,7 @@ public final class StressClient {
                 padding = leftoverRequests;
             }
             for (int j = 0; j < requestsPerThread + padding; j++) {
-                LOG.debug("id: " + (i * requestsPerThread + j));
+                LOG.debug("id: {}", i * requestsPerThread + j);
                 preparedMessages.add(prepareMessage(i * requestsPerThread + j, editContentString));
             }
         }

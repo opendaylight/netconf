@@ -172,7 +172,7 @@ public class NetconfDevice
 
             @Override
             public void onFailure(final Throwable throwable) {
-                LOG.warn("{}: Unexpected error resolving device sources: {}", id, throwable);
+                LOG.warn("{}: Unexpected error resolving device sources", id, throwable);
                 handleSalInitializationFailure(throwable, listener);
             }
         };

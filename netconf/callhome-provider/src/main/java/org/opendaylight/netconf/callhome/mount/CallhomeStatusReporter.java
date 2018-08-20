@@ -304,7 +304,7 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
                     return;
                 }
             } catch (GeneralSecurityException e) {
-                LOG.error("Failed decoding a device key with host key: {} {}", keyString, e);
+                LOG.error("Failed decoding a device key with host key: {}", keyString, e);
                 return;
             }
         }

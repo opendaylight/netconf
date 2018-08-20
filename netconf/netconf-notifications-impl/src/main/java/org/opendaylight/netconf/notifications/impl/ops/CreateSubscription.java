@@ -142,7 +142,7 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
                         currentSession.sendMessage(new NetconfNotification(filtered.get(), eventTime));
                     }
                 } catch (DocumentedException e) {
-                    LOG.warn(e.toString());
+                    LOG.warn("Failed to process notification {}", notification, e);
                     currentSession.sendMessage(notification);
                 }
             } else {

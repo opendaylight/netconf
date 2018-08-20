@@ -35,7 +35,7 @@ class FailedProxyTransactionFacade implements ProxyTransactionFacade {
     private final RemoteDeviceId id;
     private final Throwable failure;
 
-    FailedProxyTransactionFacade(RemoteDeviceId id, Throwable failure) {
+    FailedProxyTransactionFacade(final RemoteDeviceId id, final Throwable failure) {
         this.id = Objects.requireNonNull(id);
         this.failure = Objects.requireNonNull(failure);
     }
@@ -51,38 +51,41 @@ class FailedProxyTransactionFacade implements ProxyTransactionFacade {
     }
 
     @Override
-    public CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> read(LogicalDatastoreType store,
-            YangInstanceIdentifier path) {
-        LOG.debug("{}: Read {} {} - failure {}", id, store, path, failure);
+    public CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> read(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path) {
+        LOG.debug("{}: Read {} {} - failure", id, store, path, failure);
         return Futures.immediateFailedCheckedFuture(ReadFailedException.MAPPER.apply(
                 failure instanceof Exception ? (Exception)failure : new ReadFailedException("read", failure)));
     }
 
     @Override
-    public CheckedFuture<Boolean, ReadFailedException> exists(LogicalDatastoreType store, YangInstanceIdentifier path) {
-        LOG.debug("{}: Exists {} {} - failure {}", id, store, path, failure);
+    public CheckedFuture<Boolean, ReadFailedException> exists(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path) {
+        LOG.debug("{}: Exists {} {} - failure", id, store, path, failure);
         return Futures.immediateFailedCheckedFuture(ReadFailedException.MAPPER.apply(
                 failure instanceof Exception ? (Exception)failure : new ReadFailedException("read", failure)));
     }
 
     @Override
-    public void delete(LogicalDatastoreType store, YangInstanceIdentifier path) {
-        LOG.debug("{}: Delete {} {} - failure {}", id, store, path, failure);
+    public void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+        LOG.debug("{}: Delete {} {} - failure", id, store, path, failure);
     }
 
     @Override
-    public void put(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data) {
-        LOG.debug("{}: Put {} {} - failure {}", id, store, path, failure);
+    public void put(final LogicalDatastoreType store, final YangInstanceIdentifier path,
+            final NormalizedNode<?, ?> data) {
+        LOG.debug("{}: Put {} {} - failure", id, store, path, failure);
     }
 
     @Override
-    public void merge(LogicalDatastoreType store, YangInstanceIdentifier path, NormalizedNode<?, ?> data) {
-        LOG.debug("{}: Merge {} {} - failure {}", id, store, path, failure);
+    public void merge(final LogicalDatastoreType store, final YangInstanceIdentifier path,
+            final NormalizedNode<?, ?> data) {
+        LOG.debug("{}: Merge {} {} - failure", id, store, path, failure);
     }
 
     @Override
     public @NonNull FluentFuture<? extends @NonNull CommitInfo> commit() {
-        LOG.debug("{}: Commit {} {} - failure {}", id, failure);
+        LOG.debug("{}: Commit - failure", id, failure);
         return FluentFuture.from(Futures.immediateFailedFuture(failure instanceof Exception
                 ? AsyncWriteTransaction.SUBMIT_EXCEPTION_MAPPER.apply((Exception)failure)
                         : new TransactionCommitFailedException("commit", failure)));

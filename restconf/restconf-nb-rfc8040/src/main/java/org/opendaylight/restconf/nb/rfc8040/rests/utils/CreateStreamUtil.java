@@ -179,9 +179,9 @@ public final class CreateStreamUtil {
             pathValue = path.get().getValue();
         }
         if (!(pathValue instanceof YangInstanceIdentifier)) {
-            final String errMsg = "Instance identifier was not normalized correctly ";
-            LOG.debug(errMsg + qualifiedName);
-            throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
+            LOG.debug("Instance identifier {} was not normalized correctly", qualifiedName);
+            throw new RestconfDocumentedException("Instance identifier was not normalized correctly",
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
         }
         return (YangInstanceIdentifier) pathValue;
     }

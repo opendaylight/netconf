@@ -228,7 +228,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
         return JsonNormalizedNodeBodyReader.readFrom(instanceIdentifierContext, entityStream, isPost);
     }
 
-    private  String toJson(final PatchStatusContext patchStatusContext) throws IOException {
+    private static String toJson(final PatchStatusContext patchStatusContext) throws IOException {
         final PatchJsonBodyWriter writer = new PatchJsonBodyWriter();
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writer.writeTo(patchStatusContext, PatchStatusContext.class, null, EMPTY_ANNOTATIONS,

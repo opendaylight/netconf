@@ -103,7 +103,7 @@ public final class RestCodec {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug(
                             "Value is not instance of IdentityrefTypeDefinition but is {}. "
-                                    + "Therefore NULL is used as translation of  - {}",
+                                    + "Therefore NULL is used as translation of - {}",
                             input == null ? "null" : input.getClass(), String.valueOf(input));
                     }
                     return null;
@@ -124,15 +124,12 @@ public final class RestCodec {
                         }
                         return typeAwarecodec.deserialize(String.valueOf(input));
                     } else {
-                        LOG.debug("Codec for type \"" + this.type.getQName().getLocalName()
-                                + "\" is not implemented yet.");
+                        LOG.debug("Codec for type \"{}\" is not implemented yet.", type.getQName().getLocalName());
                         return null;
                     }
                 }
             } catch (final ClassCastException e) { // TODO remove this catch when everyone use codecs
-                LOG.error(
-                        "ClassCastException was thrown when codec is invoked with parameter " + String.valueOf(input),
-                        e);
+                LOG.error("ClassCastException was thrown when codec is invoked with parameter {}", input, e);
                 return null;
             }
         }
@@ -154,20 +151,16 @@ public final class RestCodec {
                         return typeAwarecodec.serialize(input);
                     } else {
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("Codec for type \"" + this.type.getQName().getLocalName()
-                                + "\" is not implemented yet.");
+                            LOG.debug("Codec for type \"{}\" is not implemented yet.", type.getQName().getLocalName());
                         }
                         return null;
                     }
                 }
             } catch (final ClassCastException e) { // TODO remove this catch when everyone use codecs
-                LOG.error(
-                        "ClassCastException was thrown when codec is invoked with parameter " + String.valueOf(input),
-                        e);
+                LOG.error("ClassCastException was thrown when codec is invoked with parameter {}", input, e);
                 return input;
             }
         }
-
     }
 
     public static class IdentityrefCodecImpl implements IdentityrefCodec<IdentityValuesDTO> {
@@ -355,7 +348,7 @@ public final class RestCodec {
             module = schemaContext.findModules(validNamespace).iterator().next();
         }
         if (module == null) {
-            LOG.info("Module for namespace " + validNamespace + " wasn't found.");
+            LOG.info("Module for namespace {} was not found.", validNamespace);
             return null;
         }
         return module;

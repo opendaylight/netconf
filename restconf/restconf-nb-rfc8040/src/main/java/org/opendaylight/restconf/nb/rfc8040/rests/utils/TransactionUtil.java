@@ -104,8 +104,7 @@ public final class TransactionUtil {
             transactionChainHandler.reset();
 
             // throw error
-            final String errMsg = "Operation via Restconf was not executed because data does not exist";
-            LOG.trace("{}:{}", errMsg, path);
+            LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
             throw new RestconfDocumentedException(
                     "Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, path);
         }
@@ -135,8 +134,7 @@ public final class TransactionUtil {
             transactionChainHandler.reset();
 
             // throw error
-            final String errMsg = "Operation via Restconf was not executed because data already exists";
-            LOG.trace("{}:{}", errMsg, path);
+            LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
             throw new RestconfDocumentedException(
                     "Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);
         }

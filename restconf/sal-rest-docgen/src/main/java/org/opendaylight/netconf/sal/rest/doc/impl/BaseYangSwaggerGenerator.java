@@ -68,7 +68,7 @@ public abstract class BaseYangSwaggerGenerator {
     private final ObjectMapper mapper = new ObjectMapper();
     private final DOMSchemaService schemaService;
 
-    protected BaseYangSwaggerGenerator(Optional<DOMSchemaService> schemaService) {
+    protected BaseYangSwaggerGenerator(final Optional<DOMSchemaService> schemaService) {
         this.schemaService = schemaService.orElse(null);
         this.mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
     }
@@ -238,7 +238,7 @@ public abstract class BaseYangSwaggerGenerator {
                 models = this.jsonConverter.convertToJsonSchema(module, schemaContext);
                 doc.setModels(models);
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug(this.mapper.writeValueAsString(doc));
+                    LOG.debug("Document: {}", this.mapper.writeValueAsString(doc));
                 }
             } catch (IOException e) {
                 LOG.error("Exception occured in ModelGenerator", e);

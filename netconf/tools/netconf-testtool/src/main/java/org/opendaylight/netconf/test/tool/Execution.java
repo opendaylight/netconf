@@ -5,8 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
-
 package org.opendaylight.netconf.test.tool;
 
 import com.ning.http.client.AsyncCompletionHandler;
@@ -38,7 +36,7 @@ public class Execution implements Callable<Void> {
         private final String destination;
         private final String payload;
 
-        DestToPayload(String destination, String payload) {
+        DestToPayload(final String destination, final String payload) {
             this.destination = destination;
             this.payload = payload;
         }
@@ -52,7 +50,7 @@ public class Execution implements Callable<Void> {
         }
     }
 
-    public Execution(TesttoolParameters params, ArrayList<DestToPayload> payloads) {
+    public Execution(final TesttoolParameters params, final ArrayList<DestToPayload> payloads) {
         this.invokeAsync = params.async;
         this.throttle = params.throttle / params.threadAmount;
 
@@ -100,11 +98,11 @@ public class Execution implements Callable<Void> {
                     } else {
                         LOG.warn("Status code: {}", response.getStatusCode());
                         LOG.warn("url: {}", request.getUrl());
-                        LOG.warn(response.getResponseBody());
+                        LOG.warn("body: {}", response.getResponseBody());
                     }
                 }
             } catch (InterruptedException | ExecutionException | IOException e) {
-                LOG.warn(e.toString());
+                LOG.warn("Failed to execute request", e);
             }
         }
         LOG.info("End sending sync requests");
@@ -121,7 +119,7 @@ public class Execution implements Callable<Void> {
             }
             asyncHttpClient.executeRequest(request, new AsyncCompletionHandler<Response>() {
                 @Override
-                public STATE onStatusReceived(HttpResponseStatus status) throws Exception {
+                public STATE onStatusReceived(final HttpResponseStatus status) throws Exception {
                     super.onStatusReceived(status);
                     if (status.getStatusCode() != 200 && status.getStatusCode() != 204) {
                         if (status.getStatusCode() == 409) {
@@ -137,7 +135,7 @@ public class Execution implements Callable<Void> {
                 }
 
                 @Override
-                public Response onCompleted(Response response) {
+                public Response onCompleted(final Response response) {
                     semaphore.release();
                     return response;
                 }

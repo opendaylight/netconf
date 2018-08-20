@@ -79,13 +79,13 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
                     tag, DocumentedException.ErrorSeverity.ERROR,
                     Collections.singletonMap(tag.toString(), e.getMessage()));
         } catch (final RuntimeException e) {
-            throw handleUnexpectedEx("Unexpected exception during netconf operation sort", e);
+            throw handleUnexpectedEx("sort", e);
         }
 
         try {
             return executeOperationWithHighestPriority(message, netconfOperationExecution);
         } catch (final RuntimeException e) {
-            throw handleUnexpectedEx("Unexpected exception during netconf operation execution", e);
+            throw handleUnexpectedEx("execution", e);
         }
     }
 
@@ -94,8 +94,8 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
         netconfOperationServiceSnapshot.close();
     }
 
-    private static DocumentedException handleUnexpectedEx(final String message, final Exception exception) {
-        LOG.error("{}", message, exception);
+    private static DocumentedException handleUnexpectedEx(final String op, final Exception exception) {
+        LOG.error("Unexpected exception during netconf operation {}", op, exception);
         return new DocumentedException("Unexpected error",
                 DocumentedException.ErrorType.APPLICATION,
                 DocumentedException.ErrorTag.OPERATION_FAILED,

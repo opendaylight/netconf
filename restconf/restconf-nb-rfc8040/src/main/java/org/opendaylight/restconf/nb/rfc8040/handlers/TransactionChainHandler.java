@@ -38,7 +38,7 @@ public class TransactionChainHandler implements Handler<DOMTransactionChain>, Au
 
         @Override
         public void onTransactionChainSuccessful(final TransactionChain<?, ?> chain) {
-            LOG.trace("TransactionChain({}) {} SUCCESSFUL", chain);
+            LOG.trace("TransactionChain({}) SUCCESSFUL", chain);
         }
     };
 

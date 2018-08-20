@@ -175,12 +175,12 @@ public final class RestconfImpl implements RestconfService {
 
     private final ControllerContext controllerContext;
 
-    private RestconfImpl(BrokerFacade broker, ControllerContext controllerContext) {
+    private RestconfImpl(final BrokerFacade broker, final ControllerContext controllerContext) {
         this.broker = broker;
         this.controllerContext = controllerContext;
     }
 
-    public static RestconfImpl newInstance(BrokerFacade broker, ControllerContext controllerContext) {
+    public static RestconfImpl newInstance(final BrokerFacade broker, final ControllerContext controllerContext) {
         return new RestconfImpl(broker, controllerContext);
     }
 
@@ -213,7 +213,7 @@ public final class RestconfImpl implements RestconfService {
         if (!identifier.contains(ControllerContext.MOUNT)) {
             final String errMsg = "URI has bad format. If modules behind mount point should be showed,"
                     + " URI has to end with " + ControllerContext.MOUNT;
-            LOG.debug(errMsg + " for " + identifier);
+            LOG.debug("{} for {}", errMsg, identifier);
             throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
@@ -258,10 +258,9 @@ public final class RestconfImpl implements RestconfService {
         }
 
         if (module == null) {
-            final String errMsg = "Module with name '" + nameRev.getKey() + "' and revision '"
-                    + nameRev.getValue() + "' was not found.";
-            LOG.debug(errMsg);
-            throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
+            LOG.debug("Module with name '{}' and revision '{}' was not found.", nameRev.getKey(), nameRev.getValue());
+            throw new RestconfDocumentedException("Module with name '" + nameRev.getKey() + "' and revision '"
+                    + nameRev.getValue() + "' was not found.", ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
         }
 
         final Module restconfModule = getRestconfModule();
@@ -323,11 +322,10 @@ public final class RestconfImpl implements RestconfService {
             modules = this.controllerContext.getAllModules(mountPoint);
 
         } else {
-            final String errMsg =
-                    "URI has bad format. If operations behind mount point should be showed, URI has to " + "end with ";
-            LOG.debug(errMsg + ControllerContext.MOUNT + " for " + identifier);
-            throw new RestconfDocumentedException(errMsg + ControllerContext.MOUNT, ErrorType.PROTOCOL,
-                    ErrorTag.INVALID_VALUE);
+            final String errMsg = "URI has bad format. If operations behind mount point should be showed, URI has to "
+                    + " end with " +  ControllerContext.MOUNT;
+            LOG.debug("{} for {}", errMsg, identifier);
+            throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
         return operationsFromModulesToNormalizedContext(modules, mountPoint);
@@ -402,7 +400,7 @@ public final class RestconfImpl implements RestconfService {
         final Splitter splitter = Splitter.on('/').omitEmptyStrings();
         final List<String> pathArgs = splitter.splitToList(moduleNameAndRevision);
         if (pathArgs.size() < 2) {
-            LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' " + identifier);
+            LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' {}", identifier);
             throw new RestconfDocumentedException(
                     "URI has bad format. End of URI should be in format \'moduleName/yyyy-MM-dd\'", ErrorType.PROTOCOL,
                     ErrorTag.INVALID_VALUE);
@@ -411,7 +409,7 @@ public final class RestconfImpl implements RestconfService {
         try {
             return new SimpleImmutableEntry<>(pathArgs.get(0), Revision.of(pathArgs.get(1)));
         } catch (final DateTimeParseException e) {
-            LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' " + identifier);
+            LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' {}", identifier);
             throw new RestconfDocumentedException("URI has bad format. It should be \'moduleName/yyyy-MM-dd\'",
                     ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
         }
@@ -474,7 +472,7 @@ public final class RestconfImpl implements RestconfService {
 
     @Override
     public NormalizedNodeContext invokeRpc(final String identifier, final String noPayload, final UriInfo uriInfo) {
-        if (noPayload != null && !CharMatcher.WHITESPACE.matchesAllOf(noPayload)) {
+        if (noPayload != null && !CharMatcher.whitespace().matchesAllOf(noPayload)) {
             throw new RestconfDocumentedException("Content must be empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
@@ -491,13 +489,11 @@ public final class RestconfImpl implements RestconfService {
             final String remoteRpcName = identifier.substring(startOfRemoteRpcName);
             identifierEncoded = remoteRpcName;
 
-        } else if (identifier.indexOf("/") != CHAR_NOT_FOUND) {
-            final String slashErrorMsg = String.format(
-                    "Identifier %n%s%ncan\'t contain slash "
-                            + "character (/).%nIf slash is part of identifier name then use %%2F placeholder.",
-                    identifier);
-            LOG.debug(slashErrorMsg);
-            throw new RestconfDocumentedException(slashErrorMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        } else if (identifier.indexOf('/') != CHAR_NOT_FOUND) {
+            LOG.debug("Identifier {} cannot contain slash character (/).", identifier);
+            throw new RestconfDocumentedException(String.format("Identifier %n%s%ncan\'t contain slash character (/).%n"
+                    + "If slash is part of identifier name then use %%2F placeholder.", identifier), ErrorType.PROTOCOL,
+                ErrorTag.INVALID_VALUE);
         } else {
             identifierEncoded = identifier;
             schemaContext = this.controllerContext.getGlobalSchema();
@@ -513,12 +509,12 @@ public final class RestconfImpl implements RestconfService {
         }
 
         if (rpc == null) {
-            LOG.debug("RPC " + identifierDecoded + " does not exist.");
+            LOG.debug("RPC {} does not exist.", identifierDecoded);
             throw new RestconfDocumentedException("RPC does not exist.", ErrorType.RPC, ErrorTag.UNKNOWN_ELEMENT);
         }
 
         if (!rpc.getInput().getChildNodes().isEmpty()) {
-            LOG.debug("RPC " + rpc + " does not need input value.");
+            LOG.debug("RPC {} does not need input value.", rpc);
             throw new RestconfDocumentedException("RPC " + rpc + " does not take any input value.",
                     ErrorType.RPC, ErrorTag.INVALID_VALUE);
         }
@@ -550,11 +546,11 @@ public final class RestconfImpl implements RestconfService {
             if (retValue.getErrors().isEmpty()) {
                 return retValue;
             }
-            LOG.debug("RpcError message", retValue.getErrors());
+            LOG.debug("RpcError message {}", retValue.getErrors());
             throw new RestconfDocumentedException("RpcError message", null, retValue.getErrors());
         } catch (final InterruptedException e) {
             final String errMsg = "The operation was interrupted while executing and did not complete.";
-            LOG.debug("Rpc Interrupt - " + errMsg, e);
+            LOG.debug("Rpc Interrupt - {}", errMsg, e);
             throw new RestconfDocumentedException(errMsg, ErrorType.RPC, ErrorTag.PARTIAL_OPERATION, e);
         } catch (final ExecutionException e) {
             LOG.debug("Execution RpcError: ", e);
@@ -579,7 +575,7 @@ public final class RestconfImpl implements RestconfService {
             }
         } catch (final CancellationException e) {
             final String errMsg = "The operation was cancelled while executing.";
-            LOG.debug("Cancel RpcExecution: " + errMsg, e);
+            LOG.debug("Cancel RpcExecution: {}", errMsg, e);
             throw new RestconfDocumentedException(errMsg, ErrorType.RPC, ErrorTag.PARTIAL_OPERATION);
         }
     }
@@ -604,9 +600,9 @@ public final class RestconfImpl implements RestconfService {
         final Object pathValue = path.isPresent() ? path.get().getValue() : null;
 
         if (!(pathValue instanceof YangInstanceIdentifier)) {
-            final String errMsg = "Instance identifier was not normalized correctly ";
-            LOG.debug(errMsg + rpcQName);
-            throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
+            LOG.debug("Instance identifier {} was not normalized correctly", rpcQName);
+            throw new RestconfDocumentedException("Instance identifier was not normalized correctly",
+                ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED);
         }
 
         final YangInstanceIdentifier pathIdentifier = (YangInstanceIdentifier) pathValue;
@@ -631,9 +627,10 @@ public final class RestconfImpl implements RestconfService {
         }
 
         if (Strings.isNullOrEmpty(streamName)) {
-            final String errMsg = "Path is empty or contains value node which is not Container or List build-in type.";
-            LOG.debug(errMsg + pathIdentifier);
-            throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            LOG.debug("Path is empty or contains value node which is not Container or List built-in type at {}",
+                pathIdentifier);
+            throw new RestconfDocumentedException("Path is empty or contains value node which is not Container or List "
+                    + "built-in type.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
         final QName outputQname = QName.create(rpcQName, "output");
@@ -655,9 +652,9 @@ public final class RestconfImpl implements RestconfService {
     private static RpcDefinition findRpc(final SchemaContext schemaContext, final String identifierDecoded) {
         final String[] splittedIdentifier = identifierDecoded.split(":");
         if (splittedIdentifier.length != 2) {
-            final String errMsg = identifierDecoded + " couldn't be splitted to 2 parts (module:rpc name)";
-            LOG.debug(errMsg);
-            throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
+            LOG.debug("{} could not be split to 2 parts (module:rpc name)", identifierDecoded);
+            throw new RestconfDocumentedException(identifierDecoded + " could not be split to 2 parts "
+                    + "(module:rpc name)", ErrorType.APPLICATION, ErrorTag.INVALID_VALUE);
         }
         for (final Module module : schemaContext.getModules()) {
             if (module.getName().equals(splittedIdentifier[0])) {
@@ -712,10 +709,7 @@ public final class RestconfImpl implements RestconfService {
             data = this.broker.readConfigurationData(normalizedII, withDefa);
         }
         if (data == null) {
-            final String errMsg =
-                    "Request could not be completed because the relevant data model content does not exist ";
-            LOG.debug(errMsg + identifier);
-            throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
+            throw dataMissing(identifier);
         }
         return new NormalizedNodeContext(iiWithData, data,
                 QueryParametersParser.parseWriterParameters(uriInfo, tagged));
@@ -733,12 +727,16 @@ public final class RestconfImpl implements RestconfService {
             data = this.broker.readOperationalData(normalizedII);
         }
         if (data == null) {
-            final String errMsg =
-                    "Request could not be completed because the relevant data model content does not exist ";
-            LOG.debug(errMsg + identifier);
-            throw new RestconfDocumentedException(errMsg, ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
+            throw dataMissing(identifier);
         }
         return new NormalizedNodeContext(iiWithData, data, QueryParametersParser.parseWriterParameters(uriInfo));
+    }
+
+    private static RestconfDocumentedException dataMissing(final String identifier) {
+        LOG.debug("Request could not be completed because the relevant data model content does not exist {}",
+            identifier);
+        return new RestconfDocumentedException("Request could not be completed because the relevant data model content "
+            + "does not exist", ErrorType.APPLICATION, ErrorTag.DATA_MISSING);
     }
 
     @Override
@@ -825,13 +823,13 @@ public final class RestconfImpl implements RestconfService {
             } catch (final TransactionCommitFailedException e) {
                 if (e instanceof OptimisticLockFailedException) {
                     if (--tries <= 0) {
-                        LOG.debug("Got OptimisticLockFailedException on last try - failing " + identifier);
+                        LOG.debug("Got OptimisticLockFailedException on last try - failing {}", identifier);
                         throw new RestconfDocumentedException(e.getMessage(), e, e.getErrorList());
                     }
 
-                    LOG.debug("Got OptimisticLockFailedException - trying again " + identifier);
+                    LOG.debug("Got OptimisticLockFailedException - trying again {}", identifier);
                 } else {
-                    LOG.debug("Update failed for " + identifier, e);
+                    LOG.debug("Update failed for {}", identifier, e);
                     throw new RestconfDocumentedException(e.getMessage(), e, e.getErrorList());
                 }
             }
@@ -974,7 +972,7 @@ public final class RestconfImpl implements RestconfService {
         } catch (final RestconfDocumentedException e) {
             throw e;
         } catch (final TransactionCommitFailedException e) {
-            LOG.info("Error creating data " + (uriInfo != null ? uriInfo.getPath() : ""), e);
+            LOG.info("Error creating data {}", uriInfo != null ? uriInfo.getPath() : "", e);
             throw new RestconfDocumentedException(e.getMessage(), e, e.getErrorList());
         }
 
@@ -1002,7 +1000,7 @@ public final class RestconfImpl implements RestconfService {
         try {
             uriBuilder.path(this.controllerContext.toFullRestconfIdentifier(normalizedII, mountPoint));
         } catch (final Exception e) {
-            LOG.info("Location for instance identifier" + normalizedII + "wasn't created", e);
+            LOG.info("Location for instance identifier {} was not created", normalizedII, e);
             return null;
         }
         return uriBuilder.build();
@@ -1207,7 +1205,7 @@ public final class RestconfImpl implements RestconfService {
         return uriToWebsocketServerBuilder.replacePath(streamName).build();
     }
 
-    private String getWsScheme(UriInfo uriInfo) {
+    private String getWsScheme(final UriInfo uriInfo) {
         URI uri = uriInfo.getAbsolutePath();
         if (uri == null) {
             return "ws";

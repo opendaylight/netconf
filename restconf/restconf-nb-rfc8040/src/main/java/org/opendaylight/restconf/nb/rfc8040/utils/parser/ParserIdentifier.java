@@ -156,7 +156,7 @@ public final class ParserIdentifier {
         // check if more than one slash is not used as path separator
         if (identifier.contains(
                 String.valueOf(RestconfConstants.SLASH).concat(String.valueOf(RestconfConstants.SLASH)))) {
-            LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' " + identifier);
+            LOG.debug("URI has bad format. It should be \'moduleName/yyyy-MM-dd\' {}", identifier);
             throw new RestconfDocumentedException(
                     "URI has bad format. End of URI should be in format \'moduleName/yyyy-MM-dd\'", ErrorType.PROTOCOL,
                     ErrorTag.INVALID_VALUE);
