@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
@@ -100,7 +101,7 @@ public class NetconfTopologyManagerTest {
 
         ConstantSchemaAbstractDataBrokerTest dataBrokerTest = new ConstantSchemaAbstractDataBrokerTest(false) {
             @Override
-            protected Iterable<YangModuleInfo> getModuleInfos() throws Exception {
+            protected Set<YangModuleInfo> getModuleInfos() throws Exception {
                 return ImmutableSet.of(BindingReflections.getModuleInfo(NetworkTopology.class),
                         BindingReflections.getModuleInfo(Topology.class));
             }

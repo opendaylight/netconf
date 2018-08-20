@@ -44,6 +44,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -623,7 +624,7 @@ public class MountPointEndToEndTest {
     private AbstractConcurrentDataBrokerTest newDataBrokerTest() throws Exception {
         AbstractConcurrentDataBrokerTest dataBrokerTest = new AbstractConcurrentDataBrokerTest(true) {
             @Override
-            protected Iterable<YangModuleInfo> getModuleInfos() throws Exception {
+            protected Set<YangModuleInfo> getModuleInfos() throws Exception {
                 return ImmutableSet.of(BindingReflections.getModuleInfo(NetconfNode.class),
                         BindingReflections.getModuleInfo(NetworkTopology.class),
                         BindingReflections.getModuleInfo(Topology.class),
