@@ -10,6 +10,7 @@ package org.opendaylight.netconf.mdsal.connector.ops;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import java.io.IOException;
@@ -65,9 +66,17 @@ abstract class AbstractConfigOperation extends AbstractSingletonNetconfOperation
                     DocumentedException.ErrorSeverity.ERROR);
             }
 
-            final Document document = getDocumentFromUrl(urlElement.get().getTextContent());
-            return XmlElement.fromDomElementWithExpected(document.getDocumentElement(), CONFIG_KEY,
-                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
+            final String url = urlElement.get().getTextContent();
+            try {
+                final Document document = getDocumentFromUrl(new URL(url));
+                return XmlElement.fromDomElementWithExpected(document.getDocumentElement(), CONFIG_KEY,
+                    XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
+            } catch (MalformedURLException e) {
+                throw new DocumentedException(url + " URL is invalid or unsupported", e,
+                    DocumentedException.ErrorType.APPLICATION,
+                    DocumentedException.ErrorTag.INVALID_VALUE,
+                    DocumentedException.ErrorSeverity.ERROR);
+            }
         }
     }
 
@@ -80,14 +89,10 @@ abstract class AbstractConfigOperation extends AbstractSingletonNetconfOperation
      * @param url URL as defined in RFC 2396
      * @see URL#URL(String, String, int, String)
      */
-    private static Document getDocumentFromUrl(final String url) throws DocumentedException {
-        try (InputStream input = openConnection(new URL(url))) {
+    @VisibleForTesting
+    static Document getDocumentFromUrl(final URL url) throws DocumentedException {
+        try (InputStream input = openConnection(url)) {
             return XmlUtil.readXmlToDocument(input);
-        } catch (MalformedURLException e) {
-            throw new DocumentedException(url + " URL is invalid or unsupported", e,
-                DocumentedException.ErrorType.APPLICATION,
-                DocumentedException.ErrorTag.INVALID_VALUE,
-                DocumentedException.ErrorSeverity.ERROR);
         } catch (IOException e) {
             throw new DocumentedException("Could not open URL:" + url, e,
                 DocumentedException.ErrorType.APPLICATION,
