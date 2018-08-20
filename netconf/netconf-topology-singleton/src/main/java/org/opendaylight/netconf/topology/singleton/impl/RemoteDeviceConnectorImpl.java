@@ -127,7 +127,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
             @Override
             public void onFailure(@Nullable final Throwable throwable) {
-                LOG.error("{}: Connector failed, {}", remoteDeviceId, throwable);
+                LOG.error("{}: Connector failed", remoteDeviceId, throwable);
             }
         }, MoreExecutors.directExecutor());
     }

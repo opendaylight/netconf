@@ -100,16 +100,16 @@ public class BrokerFacade implements Closeable {
     private final DOMNotificationService domNotification;
     private final ControllerContext controllerContext;
 
-    private BrokerFacade(DOMRpcService rpcService, DOMDataBroker domDataBroker, DOMNotificationService domNotification,
-            ControllerContext controllerContext) {
+    private BrokerFacade(final DOMRpcService rpcService, final DOMDataBroker domDataBroker,
+            final DOMNotificationService domNotification, final ControllerContext controllerContext) {
         this.rpcService = Objects.requireNonNull(rpcService);
         this.domDataBroker = Objects.requireNonNull(domDataBroker);
         this.domNotification = Objects.requireNonNull(domNotification);
         this.controllerContext = Objects.requireNonNull(controllerContext);
     }
 
-    public static BrokerFacade newInstance(DOMRpcService rpcService, DOMDataBroker domDataBroker,
-            DOMNotificationService domNotification, ControllerContext controllerContext) {
+    public static BrokerFacade newInstance(final DOMRpcService rpcService, final DOMDataBroker domDataBroker,
+            final DOMNotificationService domNotification, final ControllerContext controllerContext) {
         return new BrokerFacade(rpcService, domDataBroker, domNotification, controllerContext);
     }
 
@@ -176,9 +176,7 @@ public class BrokerFacade implements Closeable {
                 return readDataViaTransaction(tx, CONFIGURATION, path, withDefa);
             }
         }
-        final String errMsg = "DOM data broker service isn't available for mount point " + path;
-        LOG.warn(errMsg);
-        throw new RestconfDocumentedException(errMsg);
+        throw dataBrokerUnavailable(path);
     }
 
     /**
@@ -210,9 +208,7 @@ public class BrokerFacade implements Closeable {
                 return readDataViaTransaction(tx, OPERATIONAL, path);
             }
         }
-        final String errMsg = "DOM data broker service isn't available for mount point " + path;
-        LOG.warn(errMsg);
-        throw new RestconfDocumentedException(errMsg);
+        throw dataBrokerUnavailable(path);
     }
 
     /**
@@ -287,9 +283,7 @@ public class BrokerFacade implements Closeable {
                     point);
             return new PutResult(status, future);
         }
-        final String errMsg = "DOM data broker service isn't available for mount point " + path;
-        LOG.warn(errMsg);
-        throw new RestconfDocumentedException(errMsg);
+        throw dataBrokerUnavailable(path);
     }
 
     public PatchStatusContext patchConfigurationDataWithinTransaction(final PatchContext patchContext)
@@ -464,9 +458,7 @@ public class BrokerFacade implements Closeable {
             return postDataViaTransaction(domDataBrokerService.get().newReadWriteTransaction(), CONFIGURATION, path,
                     payload, mountPoint.getSchemaContext(), insert, point);
         }
-        final String errMsg = "DOM data broker service isn't available for mount point " + path;
-        LOG.warn(errMsg);
-        throw new RestconfDocumentedException(errMsg);
+        throw dataBrokerUnavailable(path);
     }
 
     // DELETE configuration
@@ -481,9 +473,7 @@ public class BrokerFacade implements Closeable {
         if (domDataBrokerService.isPresent()) {
             return deleteDataViaTransaction(domDataBrokerService.get().newReadWriteTransaction(), CONFIGURATION, path);
         }
-        final String errMsg = "DOM data broker service isn't available for mount point " + path;
-        LOG.warn(errMsg);
-        throw new RestconfDocumentedException(errMsg);
+        throw dataBrokerUnavailable(path);
     }
 
     // RPC
@@ -948,8 +938,7 @@ public class BrokerFacade implements Closeable {
     private static void checkItemExists(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         if (!doesItemExist(rwTransaction, store, path)) {
-            final String errMsg = "Operation via Restconf was not executed because data does not exist";
-            LOG.trace("{}:{}", errMsg, path);
+            LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
             rwTransaction.cancel();
             throw new RestconfDocumentedException("Data does not exist for path: " + path, ErrorType.PROTOCOL,
                     ErrorTag.DATA_MISSING);
@@ -965,8 +954,7 @@ public class BrokerFacade implements Closeable {
     private static void checkItemDoesNotExists(final DOMDataReadWriteTransaction rwTransaction,
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         if (doesItemExist(rwTransaction, store, path)) {
-            final String errMsg = "Operation via Restconf was not executed because data already exists";
-            LOG.trace("{}:{}", errMsg, path);
+            LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
             rwTransaction.cancel();
             throw new RestconfDocumentedException("Data already exists for path: " + path, ErrorType.PROTOCOL,
                     ErrorTag.DATA_EXISTS);
@@ -1234,6 +1222,11 @@ public class BrokerFacade implements Closeable {
         final NormalizedNode<?, ?> parentStructure = ImmutableNodes.fromInstanceId(schemaContext,
                 YangInstanceIdentifier.create(normalizedPathWithoutChildArgs));
         tx.merge(store, rootNormalizedPath, parentStructure);
+    }
+
+    private static RestconfDocumentedException dataBrokerUnavailable(final YangInstanceIdentifier path) {
+        LOG.warn("DOM data broker service is not available for mount point {}", path);
+        return new RestconfDocumentedException("DOM data broker service is not available for mount point " + path);
     }
 
     private static final class PatchStatusContextHelper {

@@ -281,10 +281,9 @@ public final class PatchDataTransactionUtil {
         FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
 
         if (!response.result) {
-            final String errMsg = "Operation via Restconf was not executed because data does not exist";
-            LOG.trace("{}:{}", errMsg, path);
-            throw new RestconfDocumentedException(
-                    "Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, path);
+            LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
+            throw new RestconfDocumentedException("Data does not exist", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                path);
         }
     }
 
@@ -303,10 +302,9 @@ public final class PatchDataTransactionUtil {
         FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
 
         if (response.result) {
-            final String errMsg = "Operation via Restconf was not executed because data already exists";
-            LOG.trace("{}:{}", errMsg, path);
-            throw new RestconfDocumentedException(
-                    "Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, path);
+            LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
+            throw new RestconfDocumentedException("Data already exists", ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS,
+                path);
         }
     }
 }

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.client.http.perf;
 
 import com.ning.http.client.AsyncHttpClient;
@@ -43,10 +42,10 @@ public class SyncExecutionStrategy implements ExecutionStrategy {
                 if (response.getStatusCode() != 200 && response.getStatusCode() != 204) {
                     LOG.warn("Status code: {}", response.getStatusCode());
                     LOG.warn("url: {}", request.getUrl());
-                    LOG.warn(response.getResponseBody());
+                    LOG.warn("body: {}", response.getResponseBody());
                 }
             } catch (InterruptedException | ExecutionException | IOException e) {
-                LOG.warn(e.toString());
+                LOG.warn("Failed to execute request", e);
             }
         }
         LOG.info("End sending sync requests");

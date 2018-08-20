@@ -43,7 +43,7 @@ import scala.concurrent.Future;
 
 public class ProxyDOMRpcService implements DOMRpcService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfTopologyManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProxyDOMRpcService.class);
 
     private final ExceptionMapper<DOMRpcException> domRpcExceptionMapper =
         new ExceptionMapper<DOMRpcException>("invokeRpc", DOMRpcException.class) {

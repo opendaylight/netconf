@@ -36,7 +36,7 @@ import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressFBWarnings({"DM_EXIT", "DM_DEFAULT_ENCODING"})
+@SuppressFBWarnings({"DM_EXIT", "DM_DEFAULT_ENCODING", "SLF4J_LOGGER_SHOULD_BE_FINAL"})
 public final class ScaleUtil {
     private static final ScheduledExecutorService EXECUTOR = new LoggingWrapperExecutor(4);
     private static final Semaphore SEMAPHORE = new Semaphore(0);
@@ -178,7 +178,7 @@ public final class ScaleUtil {
         deleteFolder(new File(params.distroFolder.getAbsoluteFile() + "/data"));
     }
 
-    private static void deleteFolder(File folder) {
+    private static void deleteFolder(final File folder) {
         File[] files = folder.listFiles();
         if (files != null) { //some JVMs return null for empty dirs
             for (File f : files) {
@@ -269,19 +269,19 @@ public final class ScaleUtil {
 
     @SuppressWarnings("checkstyle:illegalCatch")
     public static class LoggingWrapperExecutor extends ScheduledThreadPoolExecutor {
-        public LoggingWrapperExecutor(int corePoolSize) {
+        public LoggingWrapperExecutor(final int corePoolSize) {
             super(corePoolSize);
         }
 
         @Override
-        public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
+        public <V> ScheduledFuture<V> schedule(final Callable<V> callable, final long delay, final TimeUnit unit) {
             return super.schedule(new LogOnExceptionCallable<>(callable), delay, unit);
         }
 
         private static class LogOnExceptionCallable<T> implements Callable<T> {
             private final Callable<T> theCallable;
 
-            LogOnExceptionCallable(Callable<T> theCallable) {
+            LogOnExceptionCallable(final Callable<T> theCallable) {
                 this.theCallable = theCallable;
             }
 

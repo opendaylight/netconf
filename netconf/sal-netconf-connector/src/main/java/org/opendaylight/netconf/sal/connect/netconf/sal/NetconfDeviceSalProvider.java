@@ -50,7 +50,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
 
         @Override
         public void onTransactionChainSuccessful(final TransactionChain<?, ?> chain) {
-            LOG.trace("{}: TransactionChain({}) {} SUCCESSFUL", id, chain);
+            LOG.trace("{}: TransactionChain({}) SUCCESSFUL", id, chain);
         }
     };
 
@@ -123,7 +123,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
 
         public synchronized void onTopologyDeviceConnected(final SchemaContext initialCtx,
                 final DOMDataBroker broker, final DOMRpcService rpc,
-                final NetconfDeviceNotificationService newNotificationService, DOMActionService deviceAction) {
+                final NetconfDeviceNotificationService newNotificationService, final DOMActionService deviceAction) {
             Preconditions.checkNotNull(mountService, "Closed");
             Preconditions.checkState(topologyRegistration == null, "Already initialized");
 

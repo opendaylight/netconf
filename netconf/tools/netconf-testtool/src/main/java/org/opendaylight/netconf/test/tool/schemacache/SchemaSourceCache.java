@@ -76,13 +76,14 @@ public final class SchemaSourceCache<T extends SchemaSourceRepresentation>
 
     @Override
     public synchronized ListenableFuture<? extends T> getSource(final SourceIdentifier sourceIdentifier) {
-        ModelData modelData = cachedSchemas.get(sourceIdentifier.toYangFilename());
+        final String fileName = sourceIdentifier.toYangFilename();
+        ModelData modelData = cachedSchemas.get(fileName);
         if (modelData != null) {
             final SchemaSourceRepresentation restored = restoreAsType(modelData.getId(), modelData.getPath());
             return Futures.immediateFuture(representation.cast(restored));
         }
 
-        LOG.debug("Source {} not found in cache as {}", sourceIdentifier);
+        LOG.debug("Source {} not found in cache as {}", sourceIdentifier, fileName);
         return Futures.immediateFailedFuture(new MissingSchemaSourceException("Source not found", sourceIdentifier));
     }
 

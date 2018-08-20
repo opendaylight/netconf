@@ -116,15 +116,12 @@ public final class RestCodec {
                         }
                         return typeAwarecodec.deserialize(String.valueOf(input));
                     } else {
-                        LOG.debug("Codec for type \"" + this.type.getQName().getLocalName()
-                                + "\" is not implemented yet.");
+                        LOG.debug("Codec for type \"{}\" is not implemented yet.", type.getQName().getLocalName());
                         return null;
                     }
                 }
             } catch (final ClassCastException e) { // TODO remove this catch when everyone use codecs
-                LOG.error(
-                        "ClassCastException was thrown when codec is invoked with parameter " + String.valueOf(input),
-                        e);
+                LOG.error("ClassCastException was thrown when codec is invoked with parameter {}", input, e);
                 return null;
             }
         }
@@ -145,17 +142,12 @@ public final class RestCodec {
                     if (typeAwarecodec != null) {
                         return typeAwarecodec.serialize(input);
                     } else {
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug("Codec for type \"" + this.type.getQName().getLocalName()
-                                + "\" is not implemented yet.");
-                        }
+                        LOG.debug("Codec for type \"{}\" is not implemented yet.", type.getQName().getLocalName());
                         return null;
                     }
                 }
             } catch (final ClassCastException e) { // TODO remove this catch when everyone use codecs
-                LOG.error(
-                        "ClassCastException was thrown when codec is invoked with parameter " + String.valueOf(input),
-                        e);
+                LOG.error("ClassCastException was thrown when codec is invoked with parameter {}", input, e);
                 return input;
             }
         }
@@ -169,7 +161,7 @@ public final class RestCodec {
         private final DOMMountPoint mountPoint;
         private final ControllerContext controllerContext;
 
-        public IdentityrefCodecImpl(final DOMMountPoint mountPoint, ControllerContext controllerContext) {
+        public IdentityrefCodecImpl(final DOMMountPoint mountPoint, final ControllerContext controllerContext) {
             this.mountPoint = mountPoint;
             this.controllerContext = controllerContext;
         }
@@ -350,7 +342,7 @@ public final class RestCodec {
             module = controllerContext.findModuleByNamespace(validNamespace);
         }
         if (module == null) {
-            LOG.info("Module for namespace " + validNamespace + " wasn't found.");
+            LOG.info("Module for namespace {} was not found.", validNamespace);
             return null;
         }
         return module;

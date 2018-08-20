@@ -119,7 +119,7 @@ public final class EditConfig extends AbstractEdit {
                     mergeParentMixin(rwtx, path, changeData);
                     rwtx.put(LogicalDatastoreType.CONFIGURATION, path, changeData);
                 } catch (final InterruptedException | ExecutionException e) {
-                    LOG.warn("Read from datastore failed when trying to read data for create operation", change, e);
+                    LOG.warn("Read from datastore failed when trying to read data for create operation {}", change, e);
                 }
                 break;
             case REPLACE:
@@ -136,7 +136,7 @@ public final class EditConfig extends AbstractEdit {
                     }
                     rwtx.delete(LogicalDatastoreType.CONFIGURATION, path);
                 } catch (final InterruptedException | ExecutionException e) {
-                    LOG.warn("Read from datastore failed when trying to read data for delete operation", change, e);
+                    LOG.warn("Read from datastore failed when trying to read data for delete operation {}", change, e);
                 }
                 break;
             case REMOVE:

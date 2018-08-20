@@ -94,9 +94,9 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
             mountPoint = mountPointIdentifier.getMountPoint();
             modules = ref.getModules(mountPoint);
         } else {
-            final String errMsg =
-                    "URI has bad format. If operations behind mount point should be showed, URI has to end with ";
-            LOG.debug(errMsg + RestconfConstants.MOUNT + " for " + identifier);
+            final String errMsg = "URI has bad format. If operations behind mount point should be showed, URI has to "
+                    + " end with " + RestconfConstants.MOUNT;
+            LOG.debug("{} for {}", errMsg, identifier);
             throw new RestconfDocumentedException(errMsg + RestconfConstants.MOUNT, ErrorType.PROTOCOL,
                     ErrorTag.INVALID_VALUE);
         }
