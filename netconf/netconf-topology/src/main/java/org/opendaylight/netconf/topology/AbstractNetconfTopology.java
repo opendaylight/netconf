@@ -290,12 +290,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         Futures.addCallback(future, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
             public void onSuccess(final NetconfDeviceCapabilities result) {
-                LOG.debug("Connector for : " + nodeId.getValue() + " started succesfully");
+                LOG.debug("Connector for {} started succesfully", nodeId.getValue());
             }
 
             @Override
             public void onFailure(final Throwable throwable) {
-                LOG.error("Connector for : " + nodeId.getValue() + " failed");
+                LOG.error("Connector for {} failed", nodeId.getValue(), throwable);
                 // remove this node from active connectors?
             }
         }, MoreExecutors.directExecutor());
@@ -303,8 +303,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return future;
     }
 
-    protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId,
-                                                           final NetconfNode node) {
+    protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node) {
         //setup default values since default value is not supported in mdsal
         final long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
                 ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
