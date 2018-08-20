@@ -90,7 +90,7 @@ public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
 
             @Override
             public void onFailure(final Throwable throwable) {
-                LOG.error("Node {} creation failed: {}", instanceName, throwable);
+                LOG.error("Node {} creation failed", instanceName, throwable);
             }
         }, MoreExecutors.directExecutor());
         return node;

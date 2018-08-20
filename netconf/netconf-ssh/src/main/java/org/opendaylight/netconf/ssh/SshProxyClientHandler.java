@@ -85,12 +85,10 @@ final class SshProxyClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
-        LOG.debug("Internal connection to netconf server was dropped for client: {} on channel: ",
+        LOG.debug("Internal connection to netconf server was dropped for client: {} on channel: {}",
                 netconfHelloMessageAdditionalHeader.getAddress(), ctx.channel());
         callback.onExit(1, "Internal connection to netconf server was dropped for client: "
                 + netconfHelloMessageAdditionalHeader.getAddress() + " on channel: " + ctx.channel());
         super.channelInactive(ctx);
     }
-
-
 }
