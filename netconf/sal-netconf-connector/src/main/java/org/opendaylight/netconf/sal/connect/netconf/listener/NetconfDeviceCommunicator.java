@@ -345,8 +345,8 @@ public class NetconfDeviceCommunicator
         sessionLock.lock();
         try {
             if (semaphore != null && !semaphore.tryAcquire()) {
-                LOG.warn("Limit of concurrent rpc messages was reached (limit :" + concurentRpcMsgs
-                    + "). Rpc reply message is needed. Discarding request of Netconf device with id" + id.getName());
+                LOG.warn("Limit of concurrent rpc messages was reached (limit: {}). Rpc reply message is needed. "
+                    + "Discarding request of Netconf device with id {}", concurentRpcMsgs, id.getName());
                 return Futures.immediateFailedFuture(new NetconfDocumentedException(
                         "Limit of rpc messages was reached (Limit :" + concurentRpcMsgs
                         + ") waiting for emptying the queue of Netconf device with id" + id.getName()));
