@@ -66,30 +66,26 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
                           final ByteBuf in, final List<Object> out) throws IllegalStateException {
         while (in.isReadable()) {
             switch (state) {
-                case HEADER_ONE:
-                {
+                case HEADER_ONE: {
                     final byte b = in.readByte();
                     checkNewLine(b, "Malformed chunk header encountered (byte 0)");
                     state = State.HEADER_TWO;
                     initChunk();
                     break;
                 }
-                case HEADER_TWO:
-                {
+                case HEADER_TWO: {
                     final byte b = in.readByte();
                     checkHash(b, "Malformed chunk header encountered (byte 1)");
                     state = State.HEADER_LENGTH_FIRST;
                     break;
                 }
-                case HEADER_LENGTH_FIRST:
-                {
+                case HEADER_LENGTH_FIRST: {
                     final byte b = in.readByte();
                     chunkSize = processHeaderLengthFirst(b);
                     state = State.HEADER_LENGTH_OTHER;
                     break;
                 }
-                case HEADER_LENGTH_OTHER:
-                {
+                case HEADER_LENGTH_OTHER: {
                     final byte b = in.readByte();
                     if (b == '\n') {
                         state = State.DATA;
@@ -119,31 +115,27 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
                     aggregateChunks(in.readBytes((int) chunkSize));
                     state = State.FOOTER_ONE;
                     break;
-                case FOOTER_ONE:
-                {
+                case FOOTER_ONE: {
                     final byte b = in.readByte();
                     checkNewLine(b,"Malformed chunk footer encountered (byte 0)");
                     state = State.FOOTER_TWO;
                     chunkSize = 0;
                     break;
                 }
-                case FOOTER_TWO:
-                {
+                case FOOTER_TWO: {
                     final byte b = in.readByte();
                     checkHash(b,"Malformed chunk footer encountered (byte 1)");
                     state = State.FOOTER_THREE;
                     break;
                 }
-                case FOOTER_THREE:
-                {
+                case FOOTER_THREE: {
                     final byte b = in.readByte();
                     // In this state, either header-of-new-chunk or message-end is expected
                     // Depends on the next character
                     extractNewChunkOrMessageEnd(b);
                     break;
                 }
-                case FOOTER_FOUR:
-                {
+                case FOOTER_FOUR: {
                     final byte b = in.readByte();
                     checkNewLine(b,"Malformed chunk footer encountered (byte 3)");
                     state = State.HEADER_ONE;
@@ -151,10 +143,8 @@ public class NetconfChunkAggregator extends ByteToMessageDecoder {
                     chunk = null;
                     break;
                 }
-                default :
-                {
+                default:
                     LOG.info("Unknown state.");
-                }
             }
         }
 
