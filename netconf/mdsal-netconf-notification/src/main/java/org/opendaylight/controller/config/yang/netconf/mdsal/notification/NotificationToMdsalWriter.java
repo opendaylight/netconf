@@ -83,9 +83,9 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
 
         try {
             tx.commit().get();
-            LOG.debug("Stream %s registered successfully.", stream.getName());
+            LOG.debug("Stream {} registered successfully.", stream.getName());
         } catch (InterruptedException | ExecutionException e) {
-            LOG.warn("Unable to register stream.", e);
+            LOG.warn("Unable to register stream {}.", stream, e);
         }
     }
 
@@ -99,9 +99,9 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
 
         try {
             tx.commit().get();
-            LOG.debug("Stream %s unregistered successfully.", stream);
+            LOG.debug("Stream {} unregistered successfully.", stream);
         } catch (InterruptedException | ExecutionException e) {
-            LOG.warn("Unable to unregister stream", e);
+            LOG.warn("Unable to unregister stream {}", stream, e);
         }
     }
 }
