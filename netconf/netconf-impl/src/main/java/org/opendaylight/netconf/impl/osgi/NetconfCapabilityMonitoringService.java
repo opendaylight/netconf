@@ -7,6 +7,9 @@
  */
 package org.opendaylight.netconf.impl.osgi;
 
+import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0;
+import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0;
+
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -48,7 +51,9 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     private static final Schema.Location NETCONF_LOCATION = new Schema.Location(Schema.Location.Enumeration.NETCONF);
     private static final List<Schema.Location> NETCONF_LOCATIONS = ImmutableList.of(NETCONF_LOCATION);
     private static final BasicCapability CANDIDATE_CAPABILITY =
-            new BasicCapability("urn:ietf:params:netconf:capability:candidate:1.0");
+            new BasicCapability(URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0);
+    private static final BasicCapability URL_CAPABILITY =
+            new BasicCapability(URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0);
     private static final Function<Capability, Uri> CAPABILITY_TO_URI = input -> new Uri(input.getCapabilityUri());
 
     private final NetconfOperationServiceFactory netconfOperationProvider;
@@ -195,6 +200,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     private static Set<Capability> setupCapabilities(final Set<Capability> caps) {
         Set<Capability> capabilities = new HashSet<>(caps);
         capabilities.add(CANDIDATE_CAPABILITY);
+        capabilities.add(URL_CAPABILITY);
         // TODO rollback on error not supported EditConfigXmlParser:100
         // [RFC6241] 8.5.  Rollback-on-Error Capability
         // capabilities.add(new BasicCapability("urn:ietf:params:netconf:capability:rollback-on-error:1.0"));

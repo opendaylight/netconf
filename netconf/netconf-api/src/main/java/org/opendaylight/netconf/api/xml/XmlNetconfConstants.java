@@ -42,6 +42,10 @@ public final class XmlNetconfConstants {
 
     public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_EXI_1_0 =
             "urn:ietf:params:netconf:capability:exi:1.0";
+    public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0 =
+            "urn:ietf:params:netconf:capability:candidate:1.0";
+    public static final String URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0 =
+            "urn:ietf:params:netconf:capability:url:1.0?scheme=file";
     public static final String URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING =
             "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring";
 }
