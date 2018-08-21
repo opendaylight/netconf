@@ -83,11 +83,13 @@ abstract class AbstractEdit extends AbstractConfigOperation {
         }
 
         final Module module = it.next();
+        final String elementName = element.getName();
         final java.util.Optional<DataSchemaNode> schemaNode =
             module.findDataChildByName(QName.create(module.getQNameModule(), element.getName()));
         if (!schemaNode.isPresent()) {
             throw new DocumentedException(
-                "Unable to find node with namespace: " + namespace + "in module: " + module.toString(),
+                "Unable to find node " + elementName + " with namespace: " + namespace + "in module: "
+                    + module.toString(),
                 ErrorType.APPLICATION,
                 ErrorTag.UNKNOWN_NAMESPACE,
                 ErrorSeverity.ERROR);
