@@ -8,7 +8,8 @@
 package org.opendaylight.netconf.sal.connect.netconf;
 
 import static javax.xml.bind.DatatypeConverter.printBase64Binary;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
@@ -103,7 +104,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         final DataContainerChild<?, ?> filter =
                 NetconfMessageTransformUtil.toFilterStructure(MODULES_STATE_MODULE_LIST, LIBRARY_CONTEXT);
         GET_MODULES_STATE_MODULE_LIST_RPC =
-                Builders.containerBuilder().withNodeIdentifier(toId(NETCONF_GET_QNAME)).withChild(filter).build();
+                Builders.containerBuilder().withNodeIdentifier(NETCONF_GET_NODEID).withChild(filter).build();
     }
 
     private LibraryModulesSchemas(final Map<QName, URL> availableModels) {
@@ -235,7 +236,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             return Optional.empty();
         }
         final Optional<DataContainerChild<?, ?>> dataNode =
-                ((DataContainerNode<?>) result).getChild(toId(NETCONF_DATA_QNAME));
+                ((DataContainerNode<?>) result).getChild(NETCONF_DATA_NODEID);
         if (dataNode.isPresent() == false) {
             return Optional.empty();
         }
