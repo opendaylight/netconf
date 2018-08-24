@@ -16,7 +16,6 @@ import java.net.URI;
 import java.time.format.DateTimeParseException;
 import java.util.AbstractMap;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -111,26 +110,40 @@ public final class NetconfMessageTransformUtil {
     public static final URI NETCONF_URI = NETCONF_QNAME.getNamespace();
 
     public static final QName NETCONF_DATA_QNAME = QName.create(NETCONF_QNAME, "data").intern();
+    public static final NodeIdentifier NETCONF_DATA_NODEID = NodeIdentifier.create(NETCONF_DATA_QNAME);
+
     public static final QName NETCONF_RPC_REPLY_QNAME = QName.create(NETCONF_QNAME, "rpc-reply").intern();
     public static final QName NETCONF_OK_QNAME = QName.create(NETCONF_QNAME, "ok").intern();
     public static final QName NETCONF_ERROR_OPTION_QNAME = QName.create(NETCONF_QNAME, "error-option").intern();
+    public static final NodeIdentifier NETCONF_ERROR_OPTION_NODEID = NodeIdentifier.create(NETCONF_ERROR_OPTION_QNAME);
     public static final QName NETCONF_RUNNING_QNAME = QName.create(NETCONF_QNAME, "running").intern();
     public static final QName NETCONF_SOURCE_QNAME = QName.create(NETCONF_QNAME, "source").intern();
+    public static final NodeIdentifier NETCONF_SOURCE_NODEID = NodeIdentifier.create(NETCONF_SOURCE_QNAME);
     public static final QName NETCONF_CANDIDATE_QNAME = QName.create(NETCONF_QNAME, "candidate").intern();
     public static final QName NETCONF_TARGET_QNAME = QName.create(NETCONF_QNAME, "target").intern();
+    public static final NodeIdentifier NETCONF_TARGET_NODEID = NodeIdentifier.create(NETCONF_TARGET_QNAME);
     public static final QName NETCONF_CONFIG_QNAME = QName.create(NETCONF_QNAME, "config").intern();
+    public static final NodeIdentifier NETCONF_CONFIG_NODEID = NodeIdentifier.create(NETCONF_CONFIG_QNAME);
+
     public static final QName NETCONF_COMMIT_QNAME = QName.create(NETCONF_QNAME, "commit").intern();
     public static final QName NETCONF_VALIDATE_QNAME = QName.create(NETCONF_QNAME, "validate").intern();
+    public static final NodeIdentifier NETCONF_VALIDATE_NODEID = NodeIdentifier.create(NETCONF_VALIDATE_QNAME);
     public static final QName NETCONF_COPY_CONFIG_QNAME = QName.create(NETCONF_QNAME, "copy-config").intern();
+    public static final NodeIdentifier NETCONF_COPY_CONFIG_NODEID = NodeIdentifier.create(NETCONF_COPY_CONFIG_QNAME);
+
     public static final QName NETCONF_OPERATION_QNAME = QName.create(NETCONF_QNAME, "operation").intern();
     public static final QName NETCONF_DEFAULT_OPERATION_QNAME =
             QName.create(NETCONF_OPERATION_QNAME, "default-operation").intern();
+    public static final NodeIdentifier NETCONF_DEFAULT_OPERATION_NODEID =
+            NodeIdentifier.create(NETCONF_DEFAULT_OPERATION_QNAME);
     public static final QName NETCONF_EDIT_CONFIG_QNAME = QName.create(NETCONF_QNAME, "edit-config").intern();
+    public static final NodeIdentifier NETCONF_EDIT_CONFIG_NODEID = NodeIdentifier.create(NETCONF_EDIT_CONFIG_QNAME);
     public static final QName NETCONF_GET_CONFIG_QNAME = QName.create(NETCONF_QNAME, "get-config");
     public static final QName NETCONF_DISCARD_CHANGES_QNAME = QName.create(NETCONF_QNAME, "discard-changes");
     public static final QName NETCONF_TYPE_QNAME = QName.create(NETCONF_QNAME, "type").intern();
     public static final QName NETCONF_FILTER_QNAME = QName.create(NETCONF_QNAME, "filter").intern();
     public static final QName NETCONF_GET_QNAME = QName.create(NETCONF_QNAME, "get").intern();
+    public static final NodeIdentifier NETCONF_GET_NODEID = NodeIdentifier.create(NETCONF_GET_QNAME);
     public static final QName NETCONF_RPC_QNAME = QName.create(NETCONF_QNAME, "rpc").intern();
     public static final QName YANG_QNAME = null;
     public static final URI NETCONF_ACTION_NAMESPACE = URI.create("urn:ietf:params:xml:ns:yang:1");
@@ -150,30 +163,37 @@ public final class NetconfMessageTransformUtil {
             .create("urn:ietf:params:netconf:capability:writable-running:1.0");
 
     public static final QName NETCONF_LOCK_QNAME = QName.create(NETCONF_QNAME, "lock").intern();
+    public static final NodeIdentifier NETCONF_LOCK_NODEID = NodeIdentifier.create(NETCONF_LOCK_QNAME);
     public static final QName NETCONF_UNLOCK_QNAME = QName.create(NETCONF_QNAME, "unlock").intern();
+    public static final NodeIdentifier NETCONF_UNLOCK_NODEID = NodeIdentifier.create(NETCONF_UNLOCK_QNAME);
+
+    public static final NodeIdentifier EDIT_CONTENT_NODEID = NodeIdentifier.create(EditContent.QNAME);
 
     // Discard changes message
-    public static final ContainerNode DISCARD_CHANGES_RPC_CONTENT =
-            Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(NETCONF_DISCARD_CHANGES_QNAME)).build();
+    public static final ContainerNode DISCARD_CHANGES_RPC_CONTENT = Builders.containerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(NETCONF_DISCARD_CHANGES_QNAME)).build();
 
     // Commit changes message
-    public static final ContainerNode COMMIT_RPC_CONTENT =
-            Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(NETCONF_COMMIT_QNAME)).build();
+    public static final ContainerNode COMMIT_RPC_CONTENT = Builders.containerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(NETCONF_COMMIT_QNAME)).build();
 
     // Get message
-    public static final ContainerNode GET_RPC_CONTENT =
-            Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(NETCONF_GET_QNAME)).build();
+    public static final ContainerNode GET_RPC_CONTENT = Builders.containerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(NETCONF_GET_QNAME)).build();
 
     // Create-subscription changes message
-    public static final ContainerNode CREATE_SUBSCRIPTION_RPC_CONTENT =
-            Builders.containerBuilder().withNodeIdentifier(new NodeIdentifier(CREATE_SUBSCRIPTION_RPC_QNAME)).build();
+    public static final ContainerNode CREATE_SUBSCRIPTION_RPC_CONTENT = Builders.containerBuilder()
+            .withNodeIdentifier(NodeIdentifier.create(CREATE_SUBSCRIPTION_RPC_QNAME)).build();
+
+    private static final NodeIdentifier NETCONF_FILTER_NODEID = NodeIdentifier.create(NETCONF_FILTER_QNAME);
+    private static final Map<QName, String> SUBTREE_FILTER_ATTRIBUTES = ImmutableMap.of(NETCONF_TYPE_QNAME, SUBTREE);
 
     public static final DataContainerChild<?, ?> EMPTY_FILTER;
 
     static {
         final NormalizedNodeAttrBuilder<NodeIdentifier, DOMSource, AnyXmlNode> anyXmlBuilder =
-                Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_FILTER_QNAME));
-        anyXmlBuilder.withAttributes(Collections.singletonMap(NETCONF_TYPE_QNAME, SUBTREE));
+                Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID)
+                .withAttributes(SUBTREE_FILTER_ATTRIBUTES);
 
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
                 Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
@@ -187,11 +207,8 @@ public final class NetconfMessageTransformUtil {
 
     public static DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier identifier,
                                                              final SchemaContext ctx) {
-        final NormalizedNodeAttrBuilder<NodeIdentifier, DOMSource, AnyXmlNode> anyXmlBuilder =
-                Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_FILTER_QNAME));
-        anyXmlBuilder.withAttributes(Collections.singletonMap(NETCONF_TYPE_QNAME, SUBTREE));
-
-        final NormalizedNode<?, ?> filterContent = ImmutableNodes.fromInstanceId(ctx, identifier);
+        final NormalizedNodeAttrBuilder<NodeIdentifier, DOMSource, AnyXmlNode> anyXmlBuilder = Builders.anyXmlBuilder()
+                .withNodeIdentifier(NETCONF_FILTER_NODEID).withAttributes(SUBTREE_FILTER_ATTRIBUTES);
 
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
                 Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
@@ -199,7 +216,8 @@ public final class NetconfMessageTransformUtil {
                 "subtree");
 
         try {
-            NetconfUtil.writeNormalizedNode(filterContent, new DOMResult(element), SchemaPath.ROOT, ctx);
+            NetconfUtil.writeNormalizedNode(ImmutableNodes.fromInstanceId(ctx, identifier), new DOMResult(element),
+                SchemaPath.ROOT, ctx);
         } catch (IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize filter element for path " + identifier, e);
         }
@@ -275,7 +293,7 @@ public final class NetconfMessageTransformUtil {
     }
 
     public static NodeIdentifier toId(final PathArgument qname) {
-        return toId(qname.getNodeType());
+        return qname instanceof NodeIdentifier ? (NodeIdentifier) qname : toId(qname.getNodeType());
     }
 
     public static NodeIdentifier toId(final QName nodeType) {
@@ -330,15 +348,15 @@ public final class NetconfMessageTransformUtil {
         } catch (IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize edit config content element for path " + dataPath, e);
         }
-        final DOMSource value = new DOMSource(element);
 
-        return Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_CONFIG_QNAME)).withValue(value).build();
+        return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_CONFIG_NODEID).withValue(new DOMSource(element))
+                .build();
     }
 
     public static DataContainerChild<?, ?> createEditConfigStructure(
             final SchemaContext ctx, final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation,
             final Optional<NormalizedNode<?, ?>> lastChildOverride) {
-        return Builders.choiceBuilder().withNodeIdentifier(toId(EditContent.QNAME))
+        return Builders.choiceBuilder().withNodeIdentifier(EDIT_CONTENT_NODEID)
                 .withChild(createEditConfigAnyxml(ctx, dataPath, operation, lastChildOverride)).build();
     }
 

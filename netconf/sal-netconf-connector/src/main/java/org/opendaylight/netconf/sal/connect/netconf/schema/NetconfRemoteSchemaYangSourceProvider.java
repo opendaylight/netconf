@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.connect.netconf.schema;
 
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.GET_SCHEMA_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 
 import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;
@@ -60,20 +59,20 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
     }
 
     private static final NodeIdentifier FORMAT_PATHARG =
-            new NodeIdentifier(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "format").intern());
+            NodeIdentifier.create(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "format").intern());
     private static final NodeIdentifier GET_SCHEMA_PATHARG =
-            new NodeIdentifier(NetconfMessageTransformUtil.GET_SCHEMA_QNAME);
+            NodeIdentifier.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME);
     private static final NodeIdentifier IDENTIFIER_PATHARG =
-            new NodeIdentifier(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "identifier").intern());
+            NodeIdentifier.create(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "identifier").intern());
     private static final NodeIdentifier VERSION_PATHARG =
-            new NodeIdentifier(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "version").intern());
+            NodeIdentifier.create(QName.create(NetconfMessageTransformUtil.GET_SCHEMA_QNAME, "version").intern());
 
     private static final LeafNode<?> FORMAT_LEAF =
             Builders.leafBuilder().withNodeIdentifier(FORMAT_PATHARG).withValue(Yang.QNAME).build();
 
     private static final QName NETCONF_DATA =
             QName.create(GET_SCHEMA_QNAME, NETCONF_DATA_QNAME.getLocalName()).intern();
-    private static final NodeIdentifier NETCONF_DATA_PATHARG = toId(NETCONF_DATA);
+    private static final NodeIdentifier NETCONF_DATA_PATHARG = NodeIdentifier.create(NETCONF_DATA);
 
     public static ContainerNode createGetSchemaRequest(final String moduleName, final Optional<String> revision) {
         final LeafNode<?> identifier =

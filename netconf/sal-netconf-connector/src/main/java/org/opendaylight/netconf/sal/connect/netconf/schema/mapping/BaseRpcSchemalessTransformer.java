@@ -94,8 +94,7 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfM
             final Document data = XmlUtil.newDocument();
             data.appendChild(data.importNode(xmlData, true));
             AnyXmlNode xmlDataNode = Builders.anyXmlBuilder()
-                    .withNodeIdentifier(new YangInstanceIdentifier
-                            .NodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_QNAME))
+                    .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
                     .withValue(new DOMSource(data))
                     .build();
 

@@ -7,7 +7,10 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CONFIG_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CONFIG_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_QNAME;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -51,15 +54,14 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         Preconditions.checkArgument(data instanceof AnyXmlNode);
         final List<XmlElement> xmlElements = selectMatchingNodes(getSourceElement(((AnyXmlNode)data).getValue()), path);
         final Document result = XmlUtil.newDocument();
-        final QName dataQName = NetconfMessageTransformUtil.NETCONF_DATA_QNAME;
         final Element dataElement =
-                result.createElementNS(dataQName.getNamespace().toString(), dataQName.getLocalName());
+                result.createElementNS(NETCONF_DATA_QNAME.getNamespace().toString(), NETCONF_DATA_QNAME.getLocalName());
         result.appendChild(dataElement);
         for (XmlElement xmlElement : xmlElements) {
             dataElement.appendChild(result.importNode(xmlElement.getDomElement(), true));
         }
         final AnyXmlNode resultAnyxml = Builders.anyXmlBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(dataQName))
+                .withNodeIdentifier(NETCONF_DATA_NODEID)
                 .withValue(new DOMSource(result))
                 .build();
         return Optional.of(resultAnyxml);
@@ -105,8 +107,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         }
         //append data
         parentXmlStructure.appendChild(document.importNode(dataNode, true));
-        return Builders.anyXmlBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(NETCONF_CONFIG_QNAME))
+        return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_CONFIG_NODEID)
                 .withValue(new DOMSource(document.getDocumentElement()))
                 .build();
     }
