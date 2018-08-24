@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf;
 
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
@@ -66,7 +66,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         final DataContainerChild<?, ?> filter = NetconfMessageTransformUtil.toFilterStructure(STATE_SCHEMAS_IDENTIFIER,
                 BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext());
         GET_SCHEMAS_RPC
-                = Builders.containerBuilder().withNodeIdentifier(toId(NETCONF_GET_QNAME)).withChild(filter).build();
+                = Builders.containerBuilder().withNodeIdentifier(NETCONF_GET_NODEID).withChild(filter).build();
     }
 
     private final Set<RemoteYangSchema> availableYangSchemas;
@@ -156,8 +156,8 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         if (result == null) {
             return Optional.empty();
         }
-        final Optional<DataContainerChild<?, ?>> dataNode =
-                ((DataContainerNode<?>) result).getChild(toId(NETCONF_DATA_QNAME));
+        final Optional<DataContainerChild<?, ?>> dataNode = ((DataContainerNode<?>) result).
+                getChild(NETCONF_DATA_NODEID);
         if (!dataNode.isPresent()) {
             return Optional.empty();
         }
