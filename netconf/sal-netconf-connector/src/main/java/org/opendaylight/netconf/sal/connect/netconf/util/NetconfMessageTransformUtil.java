@@ -184,15 +184,13 @@ public final class NetconfMessageTransformUtil {
                 Builders.anyXmlBuilder().withNodeIdentifier(toId(NETCONF_FILTER_QNAME));
         anyXmlBuilder.withAttributes(Collections.singletonMap(NETCONF_TYPE_QNAME, SUBTREE));
 
-        final NormalizedNode<?, ?> filterContent = ImmutableNodes.fromInstanceId(ctx, identifier);
-
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
                 Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
         element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
                 "subtree");
 
         try {
-            NetconfUtil.writeNormalizedNode(filterContent, new DOMResult(element), SchemaPath.ROOT, ctx);
+            NetconfUtil.writeFilter(identifier, new DOMResult(element), SchemaPath.ROOT, ctx);
         } catch (IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize filter element for path " + identifier, e);
         }
