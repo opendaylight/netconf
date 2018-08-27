@@ -9,6 +9,7 @@ package org.opendaylight.netconf.util;
 
 import com.google.common.base.Preconditions;
 import java.io.IOException;
+import java.util.Iterator;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -18,6 +19,8 @@ import org.opendaylight.controller.config.util.xml.XmlElement;
 import org.opendaylight.controller.config.util.xml.XmlMappingConstants;
 import org.opendaylight.controller.config.util.xml.XmlUtil;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
@@ -73,6 +76,27 @@ public final class NetconfUtil {
             } catch (final Exception e) {
                 LOG.warn("Unable to close resource properly", e);
             }
+        }
+    }
+
+    public static void writeFilter(final YangInstanceIdentifier query, final DOMResult result,
+            final SchemaPath schemaPath, final SchemaContext context) throws IOException, XMLStreamException {
+        if (query.isEmpty()) {
+            // No query at all
+            return;
+        }
+
+        final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
+        try {
+            try (NormalizedNodeStreamWriter writer =
+                    XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath)) {
+                final Iterator<PathArgument> it = query.getPathArguments().iterator();
+                final PathArgument first = it.next();
+                StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType()).streamToWriter(writer, first,
+                    it);
+            }
+        } finally {
+            xmlWriter.close();
         }
     }
 }

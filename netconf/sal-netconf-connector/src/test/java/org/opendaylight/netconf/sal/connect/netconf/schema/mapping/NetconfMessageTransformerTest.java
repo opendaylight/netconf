@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
 import static org.junit.Assert.assertEquals;
@@ -31,6 +30,7 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -214,6 +214,36 @@ public class NetconfMessageTransformerTest {
         assertEquals(1, Iterables.size(schemaParent.getValue()));
 
         assertEquals(schemaNode, schemaParent.getValue().iterator().next());
+    }
+
+    @Test
+    public void testGetConfigLeafRequest() throws Exception {
+        final DataContainerChild<?, ?> filter = toFilterStructure(
+                YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Schemas.QNAME), toId(Schema.QNAME),
+                    new YangInstanceIdentifier.NodeIdentifierWithPredicates(Schema.QNAME, ImmutableMap.of()),
+                    toId(QName.create(Schemas.QNAME, "version"))), schema);
+
+        final DataContainerChild<?, ?> source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
+
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_CONFIG_QNAME),
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
+
+        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "<get-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+                + "<schemas>\n"
+                + "<schema>\n"
+                + "<version/>\n"
+                + "</schema>\n"
+                + "</schemas>\n"
+                + "</netconf-state>\n"
+                + "</filter>\n"
+                + "<source>\n"
+                + "<running/>\n"
+                + "</source>\n"
+                + "</get-config>\n"
+                + "</rpc>");
     }
 
     @Test
