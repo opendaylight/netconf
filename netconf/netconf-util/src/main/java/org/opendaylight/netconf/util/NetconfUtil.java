@@ -7,8 +7,12 @@
  */
 package org.opendaylight.netconf.util;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.base.Preconditions;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Optional;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -17,10 +21,13 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -72,6 +79,31 @@ public final class NetconfUtil {
             } catch (final Exception e) {
                 LOG.warn("Unable to close resource properly", e);
             }
+        }
+    }
+
+    public static void writeFilter(final YangInstanceIdentifier query, final DOMResult result,
+            final SchemaPath schemaPath, final SchemaContext context) throws IOException, XMLStreamException {
+        if (query.isEmpty()) {
+            // No query at all
+            return;
+        }
+
+        final Iterator<PathArgument> it = query.getPathArguments().iterator();
+        final PathArgument first = it.next();
+        final Optional<DataSchemaNode> dataChildByName = context.findDataChildByName(first.getNodeType());
+        checkState(dataChildByName.isPresent(),
+            "Cannot find %s node in schema context. Instance identifier has to start from root", first);
+
+        final XMLStreamWriter xmlWriter = XML_FACTORY.createXMLStreamWriter(result);
+        try {
+            try (NormalizedNodeStreamWriter writer =
+                    XMLStreamNormalizedNodeStreamWriter.create(xmlWriter, context, schemaPath)) {
+                StreamingContext.fromSchemaAndQNameChecked(context, first.getNodeType()).streamToWriter(writer, first,
+                    it);
+            }
+        } finally {
+            xmlWriter.close();
         }
     }
 }
