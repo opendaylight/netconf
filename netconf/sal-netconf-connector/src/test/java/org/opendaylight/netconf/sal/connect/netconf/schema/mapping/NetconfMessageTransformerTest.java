@@ -31,6 +31,7 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -232,6 +233,36 @@ public class NetconfMessageTransformerTest {
         assertEquals(1, Iterables.size(schemaParent.getValue()));
 
         assertEquals(schemaNode, schemaParent.getValue().iterator().next());
+    }
+
+    @Test
+    public void testGetConfigLeafRequest() throws Exception {
+        final DataContainerChild<?, ?> filter = toFilterStructure(
+                YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Schemas.QNAME), toId(Schema.QNAME),
+                    new NodeIdentifierWithPredicates(Schema.QNAME, ImmutableMap.of()),
+                    toId(QName.create(Schemas.QNAME, "version"))), schema);
+
+        final DataContainerChild<?, ?> source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
+
+        final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_CONFIG_QNAME),
+                NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME, source, filter));
+
+        assertSimilarXml(netconfMessage, "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "<get-config xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
+                + "<filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+                + "<netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+                + "<schemas>\n"
+                + "<schema>\n"
+                + "<version/>\n"
+                + "</schema>\n"
+                + "</schemas>\n"
+                + "</netconf-state>\n"
+                + "</filter>\n"
+                + "<source>\n"
+                + "<running/>\n"
+                + "</source>\n"
+                + "</get-config>\n"
+                + "</rpc>");
     }
 
     @Test
@@ -477,8 +508,8 @@ public class NetconfMessageTransformerTest {
         assertEquals("now", leaf.getValue());
     }
 
-    private void checkAction(QName actionQname, Node action , String inputLocalName, String inputNodeName,
-            String inputValue) {
+    private void checkAction(final QName actionQname, final Node action , final String inputLocalName, final String inputNodeName,
+            final String inputValue) {
         checkNode(action, null, actionQname.getLocalName(), null);
 
         Node childResetAt = action.getFirstChild();
@@ -488,7 +519,7 @@ public class NetconfMessageTransformerTest {
         assertEquals(firstChild.getData(), inputValue);
     }
 
-    private Node checkBasePartOfActionRequest(NetconfMessage actionRequest) {
+    private Node checkBasePartOfActionRequest(final NetconfMessage actionRequest) {
         Node baseRpc = actionRequest.getDocument().getFirstChild();
         checkNode(baseRpc, "rpc", "rpc", NetconfMessageTransformUtil.NETCONF_QNAME.getNamespace().toString());
         assertTrue(baseRpc.getLocalName().equals("rpc"));
@@ -503,7 +534,7 @@ public class NetconfMessageTransformerTest {
         return childAction;
     }
 
-    private DOMDataTreeIdentifier prepareDataTreeId(Set<PathArgument> nodeIdentifiers) {
+    private DOMDataTreeIdentifier prepareDataTreeId(final Set<PathArgument> nodeIdentifiers) {
         YangInstanceIdentifier yangInstanceIdentifier =
                 YangInstanceIdentifier.builder().append(nodeIdentifiers).build();
         DOMDataTreeIdentifier domDataTreeIdentifier =
@@ -512,7 +543,7 @@ public class NetconfMessageTransformerTest {
         return domDataTreeIdentifier;
     }
 
-    private ContainerNode initInputAction(QName qname, String value) {
+    private ContainerNode initInputAction(final QName qname, final String value) {
         ImmutableLeafNodeBuilder<String> immutableLeafNodeBuilder = new ImmutableLeafNodeBuilder<>();
         DataContainerChild<NodeIdentifier, String> build = immutableLeafNodeBuilder.withNodeIdentifier(
                 NodeIdentifier.create(qname)).withValue(value).build();
@@ -521,8 +552,8 @@ public class NetconfMessageTransformerTest {
         return data;
     }
 
-    private void checkNode(Node childServer, String expectedLocalName, String expectedNodeName,
-            String expectedNamespace) {
+    private void checkNode(final Node childServer, final String expectedLocalName, final String expectedNodeName,
+            final String expectedNamespace) {
         assertNotNull(childServer);
         assertEquals(childServer.getLocalName(), expectedLocalName);
         assertEquals(childServer.getNodeName(), expectedNodeName);
