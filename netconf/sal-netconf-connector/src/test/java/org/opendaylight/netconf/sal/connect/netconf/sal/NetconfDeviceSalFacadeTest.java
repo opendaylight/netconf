@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
@@ -32,6 +33,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabi
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
@@ -91,9 +93,9 @@ public class NetconfDeviceSalFacadeTest {
     @Test
     public void testOnDeviceConnected() {
         final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
-
+        final long sessionId = 5L;
         final NetconfSessionPreferences netconfSessionPreferences =
-                NetconfSessionPreferences.fromStrings(getCapabilities());
+                NetconfSessionPreferences.fromStrings(getCapabilities(), sessionId);
 
         final DOMRpcService deviceRpc = mock(DOMRpcService.class);
         deviceFacade.onDeviceConnected(new EmptyMountPointContext(schemaContext), netconfSessionPreferences, deviceRpc,
@@ -103,7 +105,9 @@ public class NetconfDeviceSalFacadeTest {
                 any(DOMDataBroker.class), eq(deviceRpc), any(NetconfDeviceNotificationService.class),
                 isNull());
         verify(netconfDeviceTopologyAdapter,
-                times(1)).updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
+            times(1)).updateDeviceData(ConnectionStatus.Connected,
+            netconfSessionPreferences.getNetconfDeviceCapabilities(), LogicalDatastoreType.CONFIGURATION, null,
+            sessionId);
     }
 
     @Test

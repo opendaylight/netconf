@@ -84,14 +84,16 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
                 .onTopologyDeviceConnected(schemaContext, netconfDeviceDataBroker, deviceRpc, notificationService,
                         deviceAction);
         salProvider.getTopologyDatastoreAdapter()
-                .updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
+                .updateDeviceData(ConnectionStatus.Connected, netconfSessionPreferences.getNetconfDeviceCapabilities(),
+                    LogicalDatastoreType.CONFIGURATION, null, netconfSessionPreferences.getSessionId());
     }
 
     @Override
     public synchronized void onDeviceReconnected(final NetconfSessionPreferences netconfSessionPreferences,
             final NetconfNode node) {
         this.salProvider.getTopologyDatastoreAdapter().updateDeviceData(ConnectionStatus.Connecting,
-                netconfSessionPreferences.getNetconfDeviceCapabilities(), LogicalDatastoreType.CONFIGURATION, node);
+                netconfSessionPreferences.getNetconfDeviceCapabilities(), LogicalDatastoreType.CONFIGURATION, node,
+            netconfSessionPreferences.getSessionId());
     }
 
     @Override
