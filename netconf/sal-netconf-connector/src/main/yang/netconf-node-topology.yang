@@ -68,6 +68,10 @@ module netconf-node-topology {
 
     grouping netconf-node-connection-parameters {
 
+        leaf sessionId {
+            type uint32;
+        }
+
         leaf host {
             type inet:host;
         }
