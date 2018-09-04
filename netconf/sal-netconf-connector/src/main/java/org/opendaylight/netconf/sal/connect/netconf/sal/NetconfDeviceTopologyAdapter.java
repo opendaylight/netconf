@@ -97,8 +97,8 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "init");
     }
 
-    public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities) {
-        final NetconfNode data = buildDataForNetconfNode(up, capabilities);
+    public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities, long sessionId) {
+        final NetconfNode data = buildDataForNetconfNode(up, capabilities, sessionId);
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
@@ -111,8 +111,12 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "update");
     }
 
+    public void updateDeviceData(boolean up, NetconfDeviceCapabilities netconfDeviceCapabilities) {
+        updateDeviceData(up, netconfDeviceCapabilities, -1);
+    }
+
     public void updateClusteredDeviceData(final boolean up, final String masterAddress,
-                                          final NetconfDeviceCapabilities capabilities) {
+                                          final NetconfDeviceCapabilities capabilities, long sessinoId) {
         final NetconfNode data = buildDataForNetconfClusteredNode(up, masterAddress, capabilities);
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
@@ -147,7 +151,8 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "update-failed-device");
     }
 
-    private NetconfNode buildDataForNetconfNode(final boolean up, final NetconfDeviceCapabilities capabilities) {
+    private NetconfNode buildDataForNetconfNode(final boolean up, final NetconfDeviceCapabilities capabilities,
+            long sessionId) {
         List<AvailableCapability> capabilityList = new ArrayList<>();
         capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
         capabilityList.addAll(capabilities.getResolvedCapabilities());
@@ -161,6 +166,9 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
                 .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
                 .setAvailableCapabilities(avCapabalitiesBuilder.build())
                 .setUnavailableCapabilities(unavailableCapabilities(capabilities.getUnresolvedCapabilites()));
+        if (sessionId != -1) {
+            netconfNodeBuilder.setSessionId(sessionId);
+        }
 
         return netconfNodeBuilder.build();
     }

@@ -65,7 +65,7 @@ public class NetconfDeviceSalFacadeTest {
     public void testOnDeviceDisconnected() {
         deviceFacade.onDeviceDisconnected();
 
-        verify(netconfDeviceTopologyAdapter).updateDeviceData(eq(false), any(NetconfDeviceCapabilities.class));
+        verify(netconfDeviceTopologyAdapter).updateDeviceData(eq(false), any(NetconfDeviceCapabilities.class), eq(-1L));
         verify(mountInstance, times(1)).onTopologyDeviceDisconnected();
 
     }
@@ -99,7 +99,7 @@ public class NetconfDeviceSalFacadeTest {
                 any(DOMDataBroker.class), eq(deviceRpc), any(NetconfDeviceNotificationService.class),
                 any(DOMActionService.class));
         verify(netconfDeviceTopologyAdapter,
-                times(1)).updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
+                times(1)).updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities(), -1);
     }
 
     @Test
