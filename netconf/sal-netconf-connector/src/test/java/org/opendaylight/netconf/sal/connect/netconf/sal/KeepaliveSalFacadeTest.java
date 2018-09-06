@@ -108,7 +108,7 @@ public class KeepaliveSalFacadeTest {
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
         verify(underlyingSalFacade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class), any());
 
         verify(deviceRpc, timeout(15000).times(5)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
     }
@@ -122,7 +122,7 @@ public class KeepaliveSalFacadeTest {
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
         verify(underlyingSalFacade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class), any());
 
         // Should disconnect the session
         verify(listener, timeout(15000).times(1)).disconnect();
@@ -140,7 +140,7 @@ public class KeepaliveSalFacadeTest {
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
         verify(underlyingSalFacade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class), any());
 
         // Shouldn't disconnect the session
         verify(listener, times(0)).disconnect();
@@ -154,7 +154,7 @@ public class KeepaliveSalFacadeTest {
                 proxyRpc = (DOMRpcService) invocationOnMock.getArguments()[2];
                 return null;
             }).when(underlyingSalFacade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class), any());
 
         doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("illegal-state")))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
