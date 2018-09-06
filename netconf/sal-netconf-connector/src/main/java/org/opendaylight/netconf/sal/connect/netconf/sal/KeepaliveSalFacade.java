@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
@@ -129,10 +130,18 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     @Override
     public void onDeviceConnected(final SchemaContext remoteSchemaContext,
                           final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
+        onDeviceConnected(remoteSchemaContext, netconfSessionPreferences, deviceRpc, null);
+    }
+
+    @Override
+    public void onDeviceConnected(SchemaContext remoteSchemaContext,
+            NetconfSessionPreferences netconfSessionPreferences, DOMRpcService deviceRpc,
+            DOMActionService deviceAction) {
         this.currentDeviceRpc = deviceRpc;
         final DOMRpcService deviceRpc1 =
                 new KeepaliveDOMRpcService(deviceRpc, resetKeepaliveTask, defaultRequestTimeoutMillis, executor);
-        salFacade.onDeviceConnected(remoteSchemaContext, netconfSessionPreferences, deviceRpc1);
+
+        salFacade.onDeviceConnected(remoteSchemaContext, netconfSessionPreferences, deviceRpc1, deviceAction);
 
         LOG.debug("{}: Netconf session initiated, starting keepalives", id);
         scheduleKeepalives();
