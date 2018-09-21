@@ -7,8 +7,11 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.ByteStreams;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -17,6 +20,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Map;
+import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider.NetconfYangTextSchemaSource;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -35,27 +39,21 @@ public final class YangLibrarySchemaYangSourceProvider implements SchemaSourcePr
     private final Map<SourceIdentifier, URL> availableSources;
     private final RemoteDeviceId id;
 
-    public YangLibrarySchemaYangSourceProvider(
-            final RemoteDeviceId id, final Map<SourceIdentifier, URL> availableSources) {
+    public YangLibrarySchemaYangSourceProvider(final RemoteDeviceId id,
+            final Map<SourceIdentifier, URL> availableSources) {
         this.id = id;
-        this.availableSources = Preconditions.checkNotNull(availableSources);
+        this.availableSources = ImmutableMap.copyOf(availableSources);
     }
 
     @Override
-    public ListenableFuture<? extends YangTextSchemaSource> getSource(
-            final SourceIdentifier sourceIdentifier) {
-        Preconditions.checkNotNull(sourceIdentifier);
-        Preconditions.checkArgument(availableSources.containsKey(sourceIdentifier));
-        return download(sourceIdentifier);
-    }
-
-    private ListenableFuture<? extends YangTextSchemaSource> download(final SourceIdentifier sourceIdentifier) {
-        final URL url = availableSources.get(sourceIdentifier);
+    public ListenableFuture<? extends YangTextSchemaSource> getSource(final SourceIdentifier sourceIdentifier) {
+        final URL url = availableSources.get(requireNonNull(sourceIdentifier));
+        checkArgument(url != null);
         try (InputStream in = url.openStream()) {
+            // FIXME: defaultCharset() seems to be wrong here
             final String schemaContent = new String(ByteStreams.toByteArray(in), Charset.defaultCharset());
-            final NetconfRemoteSchemaYangSourceProvider.NetconfYangTextSchemaSource yangSource =
-                    new NetconfRemoteSchemaYangSourceProvider
-                            .NetconfYangTextSchemaSource(id, sourceIdentifier, Optional.of(schemaContent));
+            final NetconfYangTextSchemaSource yangSource = new NetconfYangTextSchemaSource(id, sourceIdentifier,
+                Optional.of(schemaContent));
             LOG.debug("Source {} downloaded from a yang library's url {}", sourceIdentifier, url);
             return Futures.immediateFuture(yangSource);
         } catch (IOException e) {
