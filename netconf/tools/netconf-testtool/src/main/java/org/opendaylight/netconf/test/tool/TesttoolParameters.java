@@ -348,7 +348,7 @@ public class TesttoolParameters {
         final String editContentString;
         try {
             if (stream == null) {
-                editContentString = Files.toString(editContent, StandardCharsets.UTF_8);
+                editContentString = Files.asCharSource(editContent, StandardCharsets.UTF_8).read();
             } else {
                 editContentString = CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8));
             }

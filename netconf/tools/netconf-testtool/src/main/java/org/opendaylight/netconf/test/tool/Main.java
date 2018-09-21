@@ -199,7 +199,7 @@ public final class Main {
                             final File to = new File(
                                 configDir, String.format(SIM_DEVICE_CFG_PREFIX + "%d-%d.xml", batchStart, openDevice));
                             generatedConfigs.add(to);
-                            Files.write(builder.toString(), to, StandardCharsets.UTF_8);
+                            Files.asCharSink(to, StandardCharsets.UTF_8).write(builder.toString());
                             connectorCount = 0;
                             builder = new StringBuilder();
                             builder.append(before);
@@ -214,7 +214,7 @@ public final class Main {
                     final File to = new File(configDir, String.format(
                             SIM_DEVICE_CFG_PREFIX + "%d-%d.xml", batchStart, openDevices.get(openDevices.size() - 1)));
                     generatedConfigs.add(to);
-                    Files.write(builder.toString(), to, StandardCharsets.UTF_8);
+                    Files.asCharSink(to, StandardCharsets.UTF_8).write(builder.toString());
                 }
 
                 LOG.info("Config files generated in {}", configDir);

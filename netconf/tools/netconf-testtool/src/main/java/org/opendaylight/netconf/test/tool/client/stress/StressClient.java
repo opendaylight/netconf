@@ -137,7 +137,7 @@ public final class StressClient {
 
         final String editContentString;
         try {
-            editContentString = Files.toString(params.editContent, StandardCharsets.UTF_8);
+            editContentString = Files.asCharSource(params.editContent, StandardCharsets.UTF_8).read();
         } catch (final IOException e) {
             throw new IllegalArgumentException("Cannot read content of " + params.editContent, e);
         }
