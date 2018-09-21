@@ -11,7 +11,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
@@ -71,7 +70,7 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         verify(service).invokeRpc(
                 SchemaPath.create(true, NetconfMessageTransformUtil.GET_SCHEMA_QNAME),
                 NetconfRemoteSchemaYangSourceProvider.createGetSchemaRequest(identifier.getName(),
-                    Optional.fromJavaUtil(identifier.getRevision().map(Revision::toString)))
+                    identifier.getRevision().map(Revision::toString))
         );
     }
 
