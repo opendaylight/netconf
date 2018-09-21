@@ -126,10 +126,13 @@ public final class NetconfMessageTransformUtil {
     public static final NodeIdentifier NETCONF_CONFIG_NODEID = NodeIdentifier.create(NETCONF_CONFIG_QNAME);
 
     public static final QName NETCONF_COMMIT_QNAME = QName.create(NETCONF_QNAME, "commit").intern();
+    public static final SchemaPath NETCONF_COMMIT_PATH = toPath(NETCONF_COMMIT_QNAME);
     public static final QName NETCONF_VALIDATE_QNAME = QName.create(NETCONF_QNAME, "validate").intern();
     public static final NodeIdentifier NETCONF_VALIDATE_NODEID = NodeIdentifier.create(NETCONF_VALIDATE_QNAME);
+    public static final SchemaPath NETCONF_VALIDATE_PATH = toPath(NETCONF_VALIDATE_QNAME);
     public static final QName NETCONF_COPY_CONFIG_QNAME = QName.create(NETCONF_QNAME, "copy-config").intern();
     public static final NodeIdentifier NETCONF_COPY_CONFIG_NODEID = NodeIdentifier.create(NETCONF_COPY_CONFIG_QNAME);
+    public static final SchemaPath NETCONF_COPY_CONFIG_PATH = toPath(NETCONF_COPY_CONFIG_QNAME);
 
     public static final QName NETCONF_OPERATION_QNAME = QName.create(NETCONF_QNAME, "operation").intern();
     public static final QName NETCONF_DEFAULT_OPERATION_QNAME =
@@ -138,12 +141,17 @@ public final class NetconfMessageTransformUtil {
             NodeIdentifier.create(NETCONF_DEFAULT_OPERATION_QNAME);
     public static final QName NETCONF_EDIT_CONFIG_QNAME = QName.create(NETCONF_QNAME, "edit-config").intern();
     public static final NodeIdentifier NETCONF_EDIT_CONFIG_NODEID = NodeIdentifier.create(NETCONF_EDIT_CONFIG_QNAME);
+    public static final SchemaPath NETCONF_EDIT_CONFIG_PATH = toPath(NETCONF_EDIT_CONFIG_QNAME);
     public static final QName NETCONF_GET_CONFIG_QNAME = QName.create(NETCONF_QNAME, "get-config");
+    public static final NodeIdentifier NETCONF_GET_CONFIG_NODEID = NodeIdentifier.create(NETCONF_GET_CONFIG_QNAME);
+    public static final SchemaPath NETCONF_GET_CONFIG_PATH = toPath(NETCONF_GET_CONFIG_QNAME);
     public static final QName NETCONF_DISCARD_CHANGES_QNAME = QName.create(NETCONF_QNAME, "discard-changes");
+    public static final SchemaPath NETCONF_DISCARD_CHANGES_PATH = toPath(NETCONF_DISCARD_CHANGES_QNAME);
     public static final QName NETCONF_TYPE_QNAME = QName.create(NETCONF_QNAME, "type").intern();
     public static final QName NETCONF_FILTER_QNAME = QName.create(NETCONF_QNAME, "filter").intern();
     public static final QName NETCONF_GET_QNAME = QName.create(NETCONF_QNAME, "get").intern();
     public static final NodeIdentifier NETCONF_GET_NODEID = NodeIdentifier.create(NETCONF_GET_QNAME);
+    public static final SchemaPath NETCONF_GET_PATH = toPath(NETCONF_GET_QNAME);
     public static final QName NETCONF_RPC_QNAME = QName.create(NETCONF_QNAME, "rpc").intern();
     public static final QName YANG_QNAME = null;
     public static final URI NETCONF_ACTION_NAMESPACE = URI.create("urn:ietf:params:xml:ns:yang:1");
@@ -164,8 +172,10 @@ public final class NetconfMessageTransformUtil {
 
     public static final QName NETCONF_LOCK_QNAME = QName.create(NETCONF_QNAME, "lock").intern();
     public static final NodeIdentifier NETCONF_LOCK_NODEID = NodeIdentifier.create(NETCONF_LOCK_QNAME);
+    public static final SchemaPath NETCONF_LOCK_PATH = toPath(NETCONF_LOCK_QNAME);
     public static final QName NETCONF_UNLOCK_QNAME = QName.create(NETCONF_QNAME, "unlock").intern();
     public static final NodeIdentifier NETCONF_UNLOCK_NODEID = NodeIdentifier.create(NETCONF_UNLOCK_QNAME);
+    public static final SchemaPath NETCONF_UNLOCK_PATH = toPath(NETCONF_UNLOCK_QNAME);
 
     public static final NodeIdentifier EDIT_CONTENT_NODEID = NodeIdentifier.create(EditContent.QNAME);
 
@@ -179,7 +189,7 @@ public final class NetconfMessageTransformUtil {
 
     // Get message
     public static final ContainerNode GET_RPC_CONTENT = Builders.containerBuilder()
-            .withNodeIdentifier(NodeIdentifier.create(NETCONF_GET_QNAME)).build();
+            .withNodeIdentifier(NETCONF_GET_NODEID).build();
 
     // Create-subscription changes message
     public static final ContainerNode CREATE_SUBSCRIPTION_RPC_CONTENT = Builders.containerBuilder()
@@ -316,8 +326,13 @@ public final class NetconfMessageTransformUtil {
         return new NodeContainerProxy(next.getQName(), next.getChildNodes(), next.getAvailableAugmentations());
     }
 
+    @Deprecated
     public static ContainerNode wrap(final QName name, final DataContainerChild<?, ?>... node) {
-        return Builders.containerBuilder().withNodeIdentifier(toId(name)).withValue(ImmutableList.copyOf(node)).build();
+        return wrap(toId(name), node);
+    }
+
+    public static ContainerNode wrap(final NodeIdentifier name, final DataContainerChild<?, ?>... node) {
+        return Builders.containerBuilder().withNodeIdentifier(name).withValue(ImmutableList.copyOf(node)).build();
     }
 
     public static AnyXmlNode createEditConfigAnyxml(
@@ -359,7 +374,7 @@ public final class NetconfMessageTransformUtil {
     }
 
     public static SchemaPath toPath(final QName rpc) {
-        return SchemaPath.create(true, rpc);
+        return SchemaPath.ROOT.createChild(rpc);
     }
 
     public static Map.Entry<Date, XmlElement> stripNotification(final NetconfMessage message) {
@@ -407,8 +422,8 @@ public final class NetconfMessageTransformUtil {
         return new DOMResult(elementNS);
     }
 
-    public static DOMResult prepareDomResultForActionRequest(DOMDataTreeIdentifier domDataTreeIdentifier,
-            final SchemaPath actionSchemaPath, final MessageCounter counter, String action) {
+    public static DOMResult prepareDomResultForActionRequest(final DOMDataTreeIdentifier domDataTreeIdentifier,
+            final SchemaPath actionSchemaPath, final MessageCounter counter, final String action) {
         final Document document = XmlUtil.newDocument();
         final Element rpcNS =
                 document.createElementNS(NETCONF_RPC_QNAME.getNamespace().toString(), NETCONF_RPC_QNAME.getLocalName());
@@ -427,7 +442,8 @@ public final class NetconfMessageTransformUtil {
         return new DOMResult(specificActionElement);
     }
 
-    private static Element prepareActionData(Element actionNS, Iterator<PathArgument> iterator, Document document) {
+    private static Element prepareActionData(final Element actionNS, final Iterator<PathArgument> iterator,
+            final Document document) {
         if (iterator.hasNext()) {
             PathArgument next = iterator.next();
             final QName actualNS = next.getNodeType();

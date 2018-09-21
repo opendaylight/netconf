@@ -11,9 +11,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_PATH;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
@@ -99,7 +98,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
 
         final DOMRpcResult schemasNodeResult;
         try {
-            schemasNodeResult = deviceRpc.invokeRpc(toPath(NETCONF_GET_QNAME), GET_SCHEMAS_RPC).get();
+            schemasNodeResult = deviceRpc.invokeRpc(NETCONF_GET_PATH, GET_SCHEMAS_RPC).get();
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(id

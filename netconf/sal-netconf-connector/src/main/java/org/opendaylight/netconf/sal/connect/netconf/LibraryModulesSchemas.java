@@ -10,14 +10,12 @@ package org.opendaylight.netconf.sal.connect.netconf;
 import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_PATH;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.gson.stream.JsonReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +30,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -98,30 +97,25 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     private static final YangInstanceIdentifier MODULES_STATE_MODULE_LIST =
             YangInstanceIdentifier.builder().node(ModulesState.QNAME).node(Module.QNAME).build();
 
-    private static final ContainerNode GET_MODULES_STATE_MODULE_LIST_RPC;
-
-    static {
-        final DataContainerChild<?, ?> filter =
-                NetconfMessageTransformUtil.toFilterStructure(MODULES_STATE_MODULE_LIST, LIBRARY_CONTEXT);
-        GET_MODULES_STATE_MODULE_LIST_RPC =
-                Builders.containerBuilder().withNodeIdentifier(NETCONF_GET_NODEID).withChild(filter).build();
-    }
+    private static final ContainerNode GET_MODULES_STATE_MODULE_LIST_RPC = Builders.containerBuilder()
+            .withNodeIdentifier(NETCONF_GET_NODEID)
+            .withChild(NetconfMessageTransformUtil.toFilterStructure(MODULES_STATE_MODULE_LIST, LIBRARY_CONTEXT))
+            .build();
 
     private LibraryModulesSchemas(final Map<QName, URL> availableModels) {
         this.availableModels = availableModels;
     }
 
     public Map<SourceIdentifier, URL> getAvailableModels() {
-        final Map<SourceIdentifier, URL> result = Maps.newHashMap();
+        final Map<SourceIdentifier, URL> result = new HashMap<>();
         for (final Map.Entry<QName, URL> entry : availableModels.entrySet()) {
-            final SourceIdentifier sId = RevisionSourceIdentifier
-                .create(entry.getKey().getLocalName(), entry.getKey().getRevision());
+            final SourceIdentifier sId = RevisionSourceIdentifier.create(entry.getKey().getLocalName(),
+                entry.getKey().getRevision());
             result.put(sId, entry.getValue());
         }
 
         return result;
     }
-
 
     /**
      * Resolves URLs with YANG schema resources from modules-state. Uses basic http authenticaiton
@@ -156,7 +150,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         final DOMRpcResult moduleListNodeResult;
         try {
             moduleListNodeResult =
-                    deviceRpc.invokeRpc(toPath(NETCONF_GET_QNAME), GET_MODULES_STATE_MODULE_LIST_RPC).get();
+                    deviceRpc.invokeRpc(NETCONF_GET_PATH, GET_MODULES_STATE_MODULE_LIST_RPC).get();
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(deviceId + ": Interrupted while waiting for response to "

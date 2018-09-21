@@ -8,9 +8,9 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps.getSourceNode;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_PATH;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.CheckedFuture;
@@ -134,9 +134,9 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     }
 
     @Override
-    public void onDeviceConnected(SchemaContext remoteSchemaContext,
-            NetconfSessionPreferences netconfSessionPreferences, DOMRpcService deviceRpc,
-            DOMActionService deviceAction) {
+    public void onDeviceConnected(final SchemaContext remoteSchemaContext,
+            final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc,
+            final DOMActionService deviceAction) {
         this.currentDeviceRpc = deviceRpc;
         final DOMRpcService deviceRpc1 =
                 new KeepaliveDOMRpcService(deviceRpc, resetKeepaliveTask, defaultRequestTimeoutMillis, executor);
@@ -180,8 +180,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     }
 
     // Keepalive RPC static resources
-    private static final SchemaPath PATH = toPath(NETCONF_GET_CONFIG_QNAME);
-    private static final ContainerNode KEEPALIVE_PAYLOAD = NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_QNAME,
+    private static final ContainerNode KEEPALIVE_PAYLOAD = NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID,
             getSourceNode(NETCONF_RUNNING_QNAME), NetconfMessageTransformUtil.EMPTY_FILTER);
 
     /**
@@ -201,7 +200,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
                 if (!lastJobSucceeded) {
                     onFailure(new IllegalStateException("Previous keepalive timed out"));
                 } else {
-                    Futures.addCallback(currentDeviceRpc.invokeRpc(PATH, KEEPALIVE_PAYLOAD), this,
+                    Futures.addCallback(currentDeviceRpc.invokeRpc(NETCONF_GET_CONFIG_PATH, KEEPALIVE_PAYLOAD), this,
                                         MoreExecutors.directExecutor());
                 }
             } catch (NullPointerException e) {
