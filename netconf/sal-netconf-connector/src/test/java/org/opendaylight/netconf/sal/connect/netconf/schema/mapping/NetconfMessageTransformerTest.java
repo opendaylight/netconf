@@ -29,7 +29,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -40,6 +39,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import javax.xml.transform.dom.DOMSource;
 import org.apache.xerces.dom.TextImpl;
@@ -309,7 +309,7 @@ public class NetconfMessageTransformerTest {
                 .nodeWithKey(Schema.QNAME, keys).build();
         final DataContainerChild<?, ?> editConfigStructure =
                 createEditConfigStructure(BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext(), id,
-                        Optional.absent(), Optional.fromNullable(schemaNode));
+                    com.google.common.base.Optional.absent(), com.google.common.base.Optional.fromNullable(schemaNode));
 
         final DataContainerChild<?, ?> target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_QNAME);
 

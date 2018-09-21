@@ -71,7 +71,7 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         verify(service).invokeRpc(
                 SchemaPath.create(true, NetconfMessageTransformUtil.GET_SCHEMA_QNAME),
                 NetconfRemoteSchemaYangSourceProvider.createGetSchemaRequest(identifier.getName(),
-                    Optional.fromJavaUtil(identifier.getRevision().map(Revision::toString)))
+                    identifier.getRevision().map(Revision::toString))
         );
     }
 
