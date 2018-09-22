@@ -64,7 +64,8 @@ public final class ScaleUtil {
 
         while (true) {
             root.warn("Starting scale test with {} devices", params.deviceCount);
-            final ScheduledFuture timeoutGuardFuture = EXECUTOR.schedule(new TimeoutGuard(), TIMEOUT, TimeUnit.MINUTES);
+            final ScheduledFuture<?> timeoutGuardFuture = EXECUTOR.schedule(new TimeoutGuard(), TIMEOUT,
+                TimeUnit.MINUTES);
             final Configuration configuration = new ConfigurationBuilder().from(params).build();
             final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(configuration);
             try {
@@ -199,8 +200,8 @@ public final class ScaleUtil {
     private static class ScaleVerifyCallable implements Callable<Void> {
         private static final Logger LOG = LoggerFactory.getLogger(ScaleVerifyCallable.class);
 
-        private static final String RESTCONF_URL
-                = "http://127.0.0.1:8181/restconf/operational/network-topology:network-topology/topology/topology-netconf/";
+        private static final String RESTCONF_URL = "http://127.0.0.1:8181/restconf/operational/"
+                + "network-topology:network-topology/topology/topology-netconf/";
         private static final Pattern PATTERN = Pattern.compile("connected");
 
         private final AsyncHttpClient asyncHttpClient = new AsyncHttpClient(new Builder()

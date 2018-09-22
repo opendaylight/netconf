@@ -51,7 +51,7 @@ public final class RestPerfClient {
         private final String destination;
         private final String payload;
 
-        DestToPayload(String destination, String payload) {
+        DestToPayload(final String destination, final String payload) {
             this.destination = destination;
             this.payload = payload;
         }
@@ -69,7 +69,7 @@ public final class RestPerfClient {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
 
         Parameters parameters = parseArgs(args, Parameters.getParser());
         parameters.validate();
@@ -81,7 +81,7 @@ public final class RestPerfClient {
 
         final String editContentString;
         try {
-            editContentString = Files.toString(parameters.editContent, StandardCharsets.UTF_8);
+            editContentString = Files.asCharSource(parameters.editContent, StandardCharsets.UTF_8).read();
         } catch (final IOException e) {
             throw new IllegalArgumentException("Cannot read content of " + parameters.editContent, e);
         }
