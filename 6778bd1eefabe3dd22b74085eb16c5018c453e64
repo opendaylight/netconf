@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "47b9dec8_a3f43019",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-09-23T15:23:23Z",
+      "side": 1,
+      "message": "Please remove empty lines",
+      "revId": "6778bd1eefabe3dd22b74085eb16c5018c453e64",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "42018335_36268830",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/tx/AbstractWriteTx.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-09-23T15:23:23Z",
+      "side": 1,
+      "message": "Before we just took first failed RPC and filled the NetconfDocumentedException with data from corresponding \u003crpc-error\u003e reply.\n\nHere, we want to just aggregate all error messages from all failed RPCs that are part of the transaction. Other NetconfDocumentedException values are parsed just from last failed RPC. Maybe this can be little confusing.. Also just appending error messages one to another can lead to final error message that can be really hard to understand.",
+      "revId": "6778bd1eefabe3dd22b74085eb16c5018c453e64",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
