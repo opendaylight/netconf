@@ -8,6 +8,9 @@
 
 package org.opendaylight.netconf.ssh;
 
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import io.netty.channel.EventLoopGroup;
 import java.io.IOException;
@@ -45,13 +48,28 @@ public class SshProxyServer implements AutoCloseable {
     private final EventLoopGroup clientGroup;
     private final IoServiceFactoryFactory nioServiceWithPoolFactoryFactory;
 
-    public SshProxyServer(final ScheduledExecutorService minaTimerExecutor,
-                          final EventLoopGroup clientGroup, final ExecutorService nioExecutor) {
+    private SshProxyServer(final ScheduledExecutorService minaTimerExecutor, final EventLoopGroup clientGroup,
+            final IoServiceFactoryFactory serviceFactory) {
         this.minaTimerExecutor = minaTimerExecutor;
         this.clientGroup = clientGroup;
-        this.nioServiceWithPoolFactoryFactory =
-                new NioServiceWithPoolFactory.NioServiceWithPoolFactoryFactory(nioExecutor);
+        this.nioServiceWithPoolFactoryFactory = serviceFactory;
         this.sshServer = SshServer.setUpDefaultServer();
+    }
+
+    public SshProxyServer(final ScheduledExecutorService minaTimerExecutor,
+                          final EventLoopGroup clientGroup, final ExecutorService nioExecutor) {
+        this(minaTimerExecutor, clientGroup, new NioServiceWithPoolFactoryFactory(nioExecutor));
+    }
+
+    /**
+     * Create a server with a shared {@link AsynchronousChannelGroup}. Unlike the other constructor, this does
+     * not create a dedicated thread group, which is useful when you need to start a large number of servers and do
+     * not want to have a thread group (and hence an anonyous thread) for each of them.
+     */
+    @VisibleForTesting
+    public SshProxyServer(final ScheduledExecutorService minaTimerExecutor, final EventLoopGroup clientGroup,
+            final AsynchronousChannelGroup group) {
+        this(minaTimerExecutor, clientGroup, new SharedNioServiceFactoryFactory(group));
     }
 
     public void bind(final SshProxyServerConfiguration sshProxyServerConfiguration) throws IOException {
@@ -102,59 +120,85 @@ public class SshProxyServer implements AutoCloseable {
         }
     }
 
-    /**
-     * Based on Nio2ServiceFactory with one addition: injectable executor.
-     */
-    private static final class NioServiceWithPoolFactory extends AbstractCloseable implements IoServiceFactory {
-
+    private abstract static class AbstractNioServiceFactory extends AbstractCloseable implements IoServiceFactory {
         private final FactoryManager manager;
         private final AsynchronousChannelGroup group;
 
-        NioServiceWithPoolFactory(final FactoryManager manager, final ExecutorService executor) {
-            this.manager = manager;
-            try {
-                group = AsynchronousChannelGroup.withThreadPool(executor);
-            } catch (final IOException e) {
-                throw new RuntimeSshException(e);
-            }
+        AbstractNioServiceFactory(final FactoryManager manager, final AsynchronousChannelGroup group) {
+            this.manager = requireNonNull(manager);
+            this.group = requireNonNull(group);
+        }
+
+        final AsynchronousChannelGroup group() {
+            return group;
         }
 
         @Override
-        public IoConnector createConnector(final IoHandler handler) {
+        public final IoConnector createConnector(final IoHandler handler) {
             return new Nio2Connector(manager, handler, group);
         }
 
         @Override
-        public IoAcceptor createAcceptor(final IoHandler handler) {
+        public final IoAcceptor createAcceptor(final IoHandler handler) {
             return new Nio2Acceptor(manager, handler, group);
+        }
+    }
+
+    /**
+     * Based on Nio2ServiceFactory with one addition: injectable executor.
+     */
+    private static final class NioServiceWithPoolFactory extends AbstractNioServiceFactory {
+        NioServiceWithPoolFactory(final FactoryManager manager, final AsynchronousChannelGroup group) {
+            super(manager, group);
         }
 
         @SuppressWarnings("checkstyle:IllegalCatch")
         @Override
         protected void doCloseImmediately() {
             try {
-                group.shutdownNow();
-                group.awaitTermination(5, TimeUnit.SECONDS);
+                group().shutdownNow();
+                group().awaitTermination(5, TimeUnit.SECONDS);
             } catch (final Exception e) {
                 log.debug("Exception caught while closing channel group", e);
             } finally {
                 super.doCloseImmediately();
             }
         }
+    }
 
-        private static final class NioServiceWithPoolFactoryFactory extends Nio2ServiceFactoryFactory {
+    private static final class NioServiceWithPoolFactoryFactory extends Nio2ServiceFactoryFactory {
+        private final ExecutorService nioExecutor;
 
-            private final ExecutorService nioExecutor;
+        NioServiceWithPoolFactoryFactory(final ExecutorService nioExecutor) {
+            this.nioExecutor = nioExecutor;
+        }
 
-            private NioServiceWithPoolFactoryFactory(final ExecutorService nioExecutor) {
-                this.nioExecutor = nioExecutor;
-            }
-
-            @Override
-            public IoServiceFactory create(final FactoryManager manager) {
-                return new NioServiceWithPoolFactory(manager, nioExecutor);
+        @Override
+        public IoServiceFactory create(final FactoryManager manager) {
+            try {
+                return new NioServiceWithPoolFactory(manager, AsynchronousChannelGroup.withThreadPool(nioExecutor));
+            } catch (final IOException e) {
+                throw new RuntimeSshException("Failed to create channel group", e);
             }
         }
     }
 
+    private static final class SharedNioServiceFactory extends AbstractNioServiceFactory {
+        SharedNioServiceFactory(final FactoryManager manager, final AsynchronousChannelGroup group) {
+            super(manager, group);
+        }
+    }
+
+    private static final class SharedNioServiceFactoryFactory extends Nio2ServiceFactoryFactory {
+        private final AsynchronousChannelGroup group;
+
+        SharedNioServiceFactoryFactory(final AsynchronousChannelGroup group) {
+            this.group = requireNonNull(group);
+        }
+
+        @Override
+        public IoServiceFactory create(final FactoryManager manager) {
+            return new SharedNioServiceFactory(manager, group);
+        }
+    }
 }

@@ -27,6 +27,7 @@ import java.net.BindException;
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -189,6 +190,13 @@ public class NetconfDeviceSimulator implements Closeable {
         // Generate key to temp folder
         final KeyPairProvider keyPairProvider = getPemGeneratorHostKeyProvider();
 
+        final AsynchronousChannelGroup group;
+        try {
+            group = AsynchronousChannelGroup.withThreadPool(nioExecutor);
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to create group", e);
+        }
+
         for (int i = 0; i < configuration.getDeviceCount(); i++) {
             if (currentPort > 65535) {
                 LOG.warn("Port cannot be greater than 65535, stopping further attempts.");
@@ -204,7 +212,7 @@ public class NetconfDeviceSimulator implements Closeable {
                 server = dispatcher.createLocalServer(tcpLocalAddress);
                 try {
                     final SshProxyServer sshServer = new SshProxyServer(
-                        minaTimerExecutor, nettyThreadgroup, nioExecutor);
+                        minaTimerExecutor, nettyThreadgroup, group);
                     sshServer.bind(getSshConfiguration(bindingAddress, tcpLocalAddress, keyPairProvider));
                     sshWrappers.add(sshServer);
                 } catch (final BindException e) {
