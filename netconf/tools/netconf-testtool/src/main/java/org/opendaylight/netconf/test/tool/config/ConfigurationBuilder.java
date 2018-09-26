@@ -145,6 +145,8 @@ public class ConfigurationBuilder {
         this.configuration.setInitialConfigXMLFile(testtoolParameters.initialConfigXMLFile);
         this.configuration.setNotificationFile(testtoolParameters.notificationFile);
         this.configuration.setSchemasDir(testtoolParameters.schemasDir);
+        this.configuration.setCapabilities(testtoolParameters.exi ? Configuration.DEFAULT_BASE_CAPABILITIES_EXI
+                : Configuration.DEFAULT_BASE_CAPABILITIES);
         return this;
     }
 
