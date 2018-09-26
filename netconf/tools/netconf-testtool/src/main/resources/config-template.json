@@ -5,7 +5,7 @@
     "port": "{PORT}",
     "username": "admin",
     "password": "admin",
-    "tcp-only": "{SSH}",
+    "tcp-only": "{TCP_ONLY}",
     "keepalive-delay": "0"
   }
 }
