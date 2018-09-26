@@ -78,7 +78,7 @@ public class TesttoolParameters {
     @Arg(dest = "ssh")
     public boolean ssh;
     @Arg(dest = "exi")
-    public boolean exi;
+    public boolean exi = true;
     @Arg(dest = "debug")
     public boolean debug;
     @Arg(dest = "notification-file")
@@ -361,8 +361,8 @@ public class TesttoolParameters {
 
             final int batchedRequests = openDevices.size() / generateConfigBatchSize;
             final int batchedRequestsPerThread = batchedRequests / threadAmount;
-            final int leftoverBatchedRequests = (batchedRequests) % threadAmount;
-            final int leftoverRequests = openDevices.size() - (batchedRequests * generateConfigBatchSize);
+            final int leftoverBatchedRequests = batchedRequests % threadAmount;
+            final int leftoverRequests = openDevices.size() - batchedRequests * generateConfigBatchSize;
 
             final StringBuilder destBuilder = new StringBuilder(DEST);
             destBuilder.replace(destBuilder.indexOf(ADDRESS_PORT),
@@ -370,16 +370,16 @@ public class TesttoolParameters {
                 controllerDestination);
 
             for (int l = 0; l < threadAmount; l++) {
-                from = l * (batchedRequests * batchedRequestsPerThread);
-                to = from + (batchedRequests * batchedRequestsPerThread);
+                from = l * batchedRequests * batchedRequestsPerThread;
+                to = from + batchedRequests * batchedRequestsPerThread;
                 iterator = openDevices.subList(from, to).iterator();
                 allThreadsPayloads.add(createBatchedPayloads(batchedRequestsPerThread, iterator, editContentString,
                     destBuilder.toString()));
             }
             ArrayList<Execution.DestToPayload> payloads = null;
             if (leftoverBatchedRequests > 0) {
-                from = threadAmount * (batchedRequests * batchedRequestsPerThread);
-                to = from + (batchedRequests * batchedRequestsPerThread);
+                from = threadAmount * batchedRequests * batchedRequestsPerThread;
+                to = from + batchedRequests * batchedRequestsPerThread;
                 iterator = openDevices.subList(from, to).iterator();
                 payloads = createBatchedPayloads(leftoverBatchedRequests, iterator, editContentString,
                     destBuilder.toString());
@@ -413,7 +413,7 @@ public class TesttoolParameters {
             }
 
             if (leftoverRequests > 0) {
-                from = (threadAmount) * requestPerThreads;
+                from = threadAmount * requestPerThreads;
                 to = from + leftoverRequests;
                 iterator = openDevices.subList(from, to).iterator();
                 allThreadsPayloads.add(createPayloads(iterator, editContentString));
