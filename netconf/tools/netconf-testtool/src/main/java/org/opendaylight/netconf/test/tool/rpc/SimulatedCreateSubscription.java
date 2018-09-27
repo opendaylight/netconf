@@ -14,6 +14,7 @@ import com.google.common.collect.Maps;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -46,7 +47,7 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
     public SimulatedCreateSubscription(final String id, final Optional<File> notificationsFile) {
         super(id);
 
-        Optional<Notifications> notifs;
+        final Optional<Notifications> notifs;
 
         if (notificationsFile.isPresent()) {
             notifs = Optional.of(loadNotifications(notificationsFile.get()));
@@ -56,9 +57,9 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
         }
 
         if (notifs.isPresent()) {
-            Map<Notification, NetconfMessage> preparedMessages = Maps.newHashMapWithExpectedSize(
-                notifs.get().getNotificationList().size());
-            for (final Notification notification : notifs.get().getNotificationList()) {
+            final Collection<Notification> toCopy = notifs.get().getNotificationList();
+            final Map<Notification, NetconfMessage> preparedMessages = Maps.newHashMapWithExpectedSize(toCopy.size());
+            for (final Notification notification : toCopy) {
                 final NetconfMessage parsedNotification = parseNetconfNotification(notification.getContent());
                 preparedMessages.put(notification, parsedNotification);
             }
@@ -66,7 +67,6 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
         } else {
             this.notifications = Collections.emptyMap();
         }
-
     }
 
     private static Notifications loadNotifications(final File file) {
