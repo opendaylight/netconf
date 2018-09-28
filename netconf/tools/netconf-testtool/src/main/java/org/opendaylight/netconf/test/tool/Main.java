@@ -36,13 +36,21 @@ public final class Main {
     @SuppressWarnings("checkstyle:IllegalCatch")
     @SuppressFBWarnings({"UW_UNCOND_WAIT", "WA_NOT_IN_LOOP"})
     public static void main(final String[] args) {
+        final TesttoolParameters params = preSetup(args);
+        runSimulator(params, new ConfigurationBuilder().from(params).build());
+    }
+
+    public static TesttoolParameters preSetup(final String[] args) {
         final TesttoolParameters params = TesttoolParameters.parseArgs(args, TesttoolParameters.getParser());
         params.validate();
         final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
             .getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(params.debug ? Level.DEBUG : Level.INFO);
+        return params;
+    }
 
-        final Configuration configuration = new ConfigurationBuilder().from(params).build();
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    public static void runSimulator(final TesttoolParameters params, final Configuration configuration) {
         final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(configuration);
         try {
             LOG.debug("Trying to start netconf test-tool with parameters {}", params);

@@ -320,6 +320,36 @@
                             <shadedClassifierName>scale-util</shadedClassifierName>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>notif-blaster</id>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <shadedArtifactId>notif-blaster</shadedArtifactId>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Class>org.opendaylight.netconf.test.tool.notif.NotifBlaster</Main-Class>
+                                        <Class-Path>. lib lib/bcprov-jdk15on.jar lib/bcpkix-jdk15on.jar</Class-Path>
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>notif-blaster</shadedClassifierName>
+                        </configuration>
+                    </execution>
                   </executions>
               </plugin>
               <plugin>
