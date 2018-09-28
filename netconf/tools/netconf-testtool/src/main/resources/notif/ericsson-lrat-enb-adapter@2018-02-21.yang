@@ -1,0 +1,1319 @@
+module ericsson-lrat-enb-adapter {
+  yang-version 1.1;
+  namespace "urn:rdns:com:ericsson:oammodel:ericsson-lrat-enb-adapter";
+  prefix lrtadpt;
+
+  import ericsson-adapter-yang-extensions {
+    prefix ayexte;
+  }
+
+  organization
+    "Ericsson AB";
+  contact
+    "Contact Ericsson first line support";
+  description
+    "This module represents a subset of the eNodeB Lrat ECIM fragment to facilitate  a predev engagement with customer.  The data was primarily selected based on the following MOs  \t- EUtranCellFDD  \t- ENodeBFunction  \t- LoadBalancingFunction  \t- EUtranCellRelation  \t- EUtranFreqRelation  \t- CarrierAggregationFunction  \t- QciProfilePredefined  \t- QciProfileOperatorDefined  and the following features  \t- Inter-frequency Load Balancing (IFLB)  \t- Carrier Aggregation-Aware IFLB  \t- Configurable SCell Priority
+       Copyright (c) 2018 Ericsson AB. All rights reserved.
+     ";
+
+  revision 2018-02-21 {
+    ayexte:version "1";
+    ayexte:release "0";
+    ayexte:correction "0";
+    description
+      "Initial version based on ECIM Lrat fragment (17Q3.5)
+         release=62 revision=R9F03 version=2";
+  }
+
+  typedef uint-63 {
+    type uint8 {
+      range "0..63";
+    }
+  }
+
+  typedef uint-100 {
+    type uint8 {
+      range "0..100";
+    }
+  }
+
+  typedef uint-999 {
+    type uint16 {
+      range "0..999";
+    }
+  }
+
+  typedef uint-1000 {
+    type uint16 {
+      range "0..1000";
+    }
+  }
+
+  typedef uint-5000 {
+    type uint16 {
+      range "0..5000";
+    }
+  }
+
+  typedef uint-16000 {
+    type uint16 {
+      range "0..16000";
+    }
+  }
+
+  typedef uint-50000 {
+    type uint16 {
+      range "0..50000";
+    }
+  }
+
+  typedef uint-1000000 {
+    type uint32 {
+      range "0..1000000";
+    }
+  }
+
+  typedef channel-bandwidth-type {
+    type uint16 {
+      range "1400|3000|5000|10000|15000|20000";
+    }
+    units "kHz";
+    default "10000";
+  }
+
+  typedef priority-type {
+    type uint8 {
+      range "1..14";
+    }
+  }
+
+  typedef rsrp-power {
+    type int16 {
+      range "-140..-44";
+    }
+    units "dBm";
+    default "-44";
+  }
+
+  typedef load-balancing-type {
+    type enumeration {
+      enum "not-allowed" {
+        value 0;
+      }
+      enum "allowed" {
+        value 1;
+      }
+      enum "offload" {
+        value 2;
+      }
+      enum "ifo-and-iflb" {
+        value 3;
+        description
+          "Cell is allowed for both offload and load balancing       \t\tactions.";
+      }
+    }
+  }
+
+  typedef lb-qci-profile-handling-type {
+    type enumeration {
+      enum "allowed" {
+        value 0;
+        description
+          "If a QCI profile is configured as ALLOWED then a UE may use       \t\tit (but does not have to) in order to qualify for load       \t\tbalancing to the target frequency.";
+      }
+      enum "forbidden" {
+        value 1;
+        description
+          "If a QCI profile is configured as FORBIDDEN then UEs using       \t\tit are not qualified for load balancing to the target       \t\tfrequency.";
+      }
+      enum "required" {
+        value 2;
+        description
+          "If one or more QCI profiles are configured as REQUIRED then       \t\tonly UEs using one or more of them are qualified for load       \t\tbalancing to the target frequency.";
+      }
+    }
+  }
+
+  typedef resource-type-type {
+    type enumeration {
+      enum "non-gbr" {
+        value 0;
+        description
+          "Indicates the resource type of a QCI is Non-GBR type.";
+      }
+      enum "gbr" {
+        value 1;
+        description
+          "Indicates the resource type of a QCI is GBR type.";
+      }
+    }
+  }
+
+  typedef s-cell-selection-mode-type {
+    type enumeration {
+      enum "ack-sequential-scell-selection" {
+        value 0;
+        description
+          "A1 measurement configured at selection of secondary cell.       \t    Configures one secondary cell at a time.";
+      }
+      enum "un-ack-simultaneous-scell-selection" {
+        value 1;
+        description
+          "No A1 measurement configured at selection of secondary cell.       \t\tConfigures one or more secondary cells at a time at initial       \t\tconfiguration.";
+      }
+      enum "ack-simultaneous-scell-selection" {
+        value 2;
+        description
+          "A1 measurement configured at selection of secondary cell.       \t    Configures one or more secondary cells at a time at initial       \t    configuration.";
+      }
+    }
+  }
+
+  typedef dynamic-s-cell-selection-method-type {
+    type enumeration {
+      enum "round-robin" {
+        value 0;
+        description
+          "Secondary cell selection order determined using a round robin       \t\tselection of secondary cell candidates.              \t\tDependencies: Only applicable if Configurable SCell Priority, FAJ 121 4701       \t\tis active ";
+      }
+      enum "prioritized" {
+        value 1;
+        description
+          "Secondary cell selection order determined using a prioritized       \t\tselection of secondary cell candidates based on frequency prioritization.              \t\tDependencies: Only applicable if Configurable SCell Priority, FAJ 121 4701       \t\tis active";
+      }
+      enum "prioritized-automatic" {
+        value 2;
+        description
+          "Secondary cell selection prioritizes carriers with best combination       \t\tof bandwidth and potential number of layers.              \t\tDependencies: Only applicable if Automatic SCell Priority, FAJ 121 4734       \t\tis active.";
+      }
+    }
+  }
+
+  typedef ca-preference-type {
+    type enumeration {
+      enum "none" {
+        value 0;
+        description
+          "No preference between downlink and uplink carrier       \t\taggregation.";
+      }
+      enum "dl" {
+        value 1;
+        description
+          "Downlink carrier aggregation is preferred over uplink       \t\tcarrier aggregation.";
+      }
+      enum "ul" {
+        value 2;
+        description
+          "Uplink carrier aggregation is preferred over downlink       \t\tcarrier aggregation.";
+      }
+    }
+  }
+
+  typedef s-cell-candidate-type {
+    type enumeration {
+      enum "not-allowed" {
+        value 0;
+        description
+          "The cell indicated by the value of parameter cellrelation       \t\tmust not be used as secondary component carrier (SCell) for UE using this       \t\tcell as their primary component carrier (PCell).";
+      }
+      enum "allowed" {
+        value 1;
+        description
+          "The cell indicated by the value of parameter cellrelation can be       \t\tused as a secondary cell CC for UEs that use this cell as their primary       \t\tcell CC for both UL and DL.";
+      }
+      enum "auto" {
+        value 2;
+        description
+          "Same as not-allowed.";
+      }
+      enum "only-allowed-for-dl" {
+        value 3;
+        description
+          "The current cell is allowed to use the cell indicated by the       \t\tcell relation as a secondary cell candidate for DL CA only. This secondary       \t\tcell cannot be used for UL CA. UL CA performance degradation in secondary       \t\tcell occurs if the antenna of the secondary cell is placed more than       \t\t300 meters from the antenna from the primary cell. It is recommended that       \t\tthis parameter is set for cases where this can occur.";
+      }
+    }
+  }
+
+  typedef supported-coverage-type {
+    type enumeration {
+      enum "none" {
+        value 0;
+        description
+          "There is no coverage relation (e.g. the cells only partially overlap).";
+      }
+      enum "covers" {
+        value 1;
+        description
+          "The related cell covers the eutran cell.";
+      }
+      enum "overlap" {
+        value 2;
+        description
+          "The related cell and the eutran cell has approximately the same coverage area.";
+      }
+      enum "contained-in" {
+        value 3;
+        description
+          "The related cell is contained in the eutran cell.";
+      }
+    }
+  }
+
+  grouping plmn-identity {
+    description
+      "The ENodeB Public Land Mobile Network (PLMN) ID that forms \tpart of the ENodeB Global ID used to identify the node over \tthe S1 interface. Note: The value (MCC=001, MNC=01) \tindicates that the PLMN is not initiated. The value can not \tbe used as a valid PLMN Identity.";
+    leaf mcc {
+      type uint-999;
+      mandatory true;
+      description
+        "The MCC part of a PLMN identity used in the radio network.";
+    }
+
+    leaf mnc {
+      type uint-999;
+      mandatory true;
+      description
+        "The MNC part of a PLMN identity used in the radio network.";
+    }
+
+    leaf mnc-length {
+      type uint8 {
+        range "2..3";
+      }
+      mandatory true;
+      description
+        "The length of the MNC part of a PLMN identity used in the
+         \t\tradio network.";
+    }
+  }
+
+  container enodeb-function {
+    ayexte:is-system-created;
+    leaf enb-id {
+      ayexte:takes-effect "Next restart";
+      type int32 {
+        range "-1..1048575";
+      }
+      default "-1";
+      description
+        "The ENodeB ID that forms part of the Cell Global Identity,
+         \t\tand is also used to identify the node over the S1 interface.
+
+         \t\tTakes effect: Next restart";
+    }
+
+    container enodeb-plmn-id {
+      ayexte:takes-effect "Next restart";
+      description
+        "Takes effect: Next restart";
+      uses plmn-identity;
+    }
+
+    container qci-table {
+      ayexte:is-system-created;
+      description
+        "Contains mapping from QCIs to parameters that has impact on
+         \t\tQoS for DRBs.";
+      list qci-profile-predefined {
+        ayexte:is-system-created;
+        key "id";
+        unique "qci";
+        description
+          "Contains bearer-level QoS configuration. Each       \t\tlist entry corresponds to a standardized       \t\tQCI as described in TS 23.203, except for a default QCI       \t\tprofile activated whenever a profile related to a specific       \t\tQCI is not defined.";
+        leaf id {
+          type string {
+            pattern "default|qci[1-9]";
+          }
+          description
+            "The ids created by system are qci1, qci2, .. qci9, default.";
+        }
+
+        leaf qci {
+          type uint8 {
+            range "0..9";
+          }
+          config false;
+          description
+            "Quality of Service Class Indicator (QCI) as defined in 3GPP
+             TS 23.203 (Release 8).
+
+             Special value: 0 refers to a default QCI profile activated whenever a profile
+             related to a specific QCI has not been defined.";
+        }
+
+        leaf qci-subscription-quanta {
+          ayexte:disturbances "Changing this attribute can cause loss of traffic";
+          type uint-50000;
+          default "1";
+          description
+            "Normalized subscription quantity associated with the      \t\t\tspecific the QCI. Specifies the subscription cost of a      \t\t\tbearer with this predefined profile. The subscription cost      \t\t\tis used for traffic load balancing purposes.            \t\t\tTraffic disturbance: Changing this attribute can cause loss of traffic";
+        }
+
+        leaf dscp {
+          ayexte:takes-effect "New connection";
+          type uint-63;
+          mandatory true;
+          description
+            "The Differentiated Services Code Point for a Quality of Service Class
+             Indicator (QCI). This corresponds to mappings from RAN QoS to Transport
+             Network QoS.
+
+             Takes effect: New connection";
+        }
+
+        leaf logical-channel-group-ref {
+          ayexte:takes-effect "New connection";
+          type leafref {
+            path "../../logical-channel-group/id";
+          }
+          mandatory true;
+          description
+            "Refers to an instance of LogicalChannelGroup. Assigns a Logical
+             Channel Group to a Quality of Service Class Indicator (QCI).
+
+             Takes effect: New connection";
+        }
+
+        leaf priority {
+          ayexte:disturbances "Changing this attribute can cause loss of traffic.";
+          ayexte:takes-effect "New connection";
+          type priority-type;
+          mandatory true;
+          description
+            "Quality of Service Class Indicator (QCI)-related priority as defined
+             in 3GPP TS 23.203 (Release 8).
+
+             Traffic disturbance: Changing this attribute can cause loss of traffic.
+             Takes effect: New connection";
+        }
+
+        leaf resource-type {
+          ayexte:restricted;
+          ayexte:takes-effect "Object unlocked";
+          type resource-type-type;
+          mandatory true;
+          description
+            "Indicates if the resource type of the Quality of Service Class Indicator (QCI)
+             is Guaranteed Bit Rate (GBR) or non-GBR as defined in 3GPP TS 23.203.
+
+             Takes effect: Object unlocked";
+        }
+      }
+
+      list qci-profile-operator-defined {
+        ayexte:dependencies "Only applicable when feature Operator Defined QCI, FAJ 121 1892
+is active";
+        key "id";
+        unique "qci";
+        description
+          "Contains bearer-level QoS configuration. Each list entry       \t\tcorresponds to a unique operator defined QCI number within the range 10-255.              \t\tDependencies: Only applicable when feature Operator Defined QCI, FAJ 121 1892       \t\tis active";
+        leaf id {
+          type string;
+          description
+            "A user friendly identifier for the qci profile";
+        }
+
+        leaf qci {
+          ayexte:restricted;
+          ayexte:takes-effect "Object unlocked";
+          type uint8 {
+            range "10..255";
+          }
+          mandatory true;
+          description
+            "Quality of Service Class Indicator (QCI) as defined in 3GPP      \t\t\tTS 23.203 (Release 8).            \t\t\tTakes effect: Object unlocked";
+        }
+
+        leaf qci-subscription-quanta {
+          ayexte:disturbances "Changing this attribute can cause loss of traffic";
+          type uint-50000;
+          default "1";
+          description
+            "Normalized subscription quantity associated with the      \t\t\tspecific QCI. Specifies the subscription cost of a      \t\t\tbearer with this predefined profile. The subscription cost      \t\t\tis used for traffic load balancing purposes.            \t\t\tTraffic disturbance: Changing this attribute can cause loss of traffic";
+        }
+
+        leaf dscp {
+          ayexte:takes-effect "New connection";
+          type uint-63;
+          mandatory true;
+          description
+            "The Differentiated Services Code Point for a Quality of Service Class   \t        Indicator (QCI). This corresponds to mappings from RAN QoS to Transport   \t        Network QoS.      \t        Takes effect: New connection";
+        }
+
+        leaf logical-channel-group-ref {
+          ayexte:takes-effect "New connection";
+          type leafref {
+            path "../../logical-channel-group/id";
+          }
+          mandatory true;
+          description
+            "Refers to an instance of LogicalChannelGroup. Assigns a Logical
+             Channel Group to a Quality of Service Class Indicator (QCI).
+
+             Takes effect: New connection";
+        }
+
+        leaf priority {
+          ayexte:disturbances "Changing this attribute can cause loss of traffic.";
+          ayexte:takes-effect "New connection";
+          type priority-type;
+          mandatory true;
+          description
+            "Quality of Service Class Indicator (QCI)-related priority as defined   \t        in 3GPP TS 23.203 (Release 8).      \t        Traffic disturbance: Changing this attribute can cause loss of traffic.   \t        Takes effect: New connection";
+        }
+
+        leaf resource-type {
+          ayexte:restricted;
+          ayexte:takes-effect "Object unlocked";
+          type resource-type-type;
+          mandatory true;
+          description
+            "Indicates if the resource type of the Quality of Service Class Indicator (QCI)   \t        is Guaranteed Bit Rate (GBR) or non-GBR as defined in 3GPP TS 23.203.      \t        Takes effect: Object unlocked";
+        }
+      }
+
+      list logical-channel-group {
+        ayexte:is-system-created;
+        key "id";
+        description
+          "Represents QoS configuration related to a Logical Channel group.";
+        leaf id {
+          type uint8 {
+            range "0..3";
+          }
+          description
+            "The values correspond to logical channel group IDs in 3GPP TS 36.321.";
+        }
+      }
+    }
+
+    container eutra-network {
+      ayexte:is-system-created;
+      description
+        "This is a container for data related to EUTRA networks.";
+      list external-enodeb-function {
+        key "id";
+        max-elements 512;
+        description
+          "Each entry represents an external enodeb.";
+        leaf id {
+          type string;
+          description
+            "A user friendly identifier for the external enodeb";
+        }
+
+        leaf enb-id {
+          type uint32 {
+            range "0..1048575";
+          }
+          mandatory true;
+          description
+            "The ID of an enodeb within a Public Land Mobile Network (PLMN).";
+        }
+
+        leaf es-cell-capacity-scaling {
+          type uint-100;
+          units "percent";
+          default "100";
+          description
+            "Scaling factor for secondary cell subscription capacity. Used to      \t\t\tdecrease carrier aggregation attraction of cells belonging to indicated      \t\t\tenodeb if cell is used as external secondary cell for carrier aggregation.";
+        }
+
+        container enodeb-plmn-id {
+          uses plmn-identity;
+        }
+
+        list external-eutran-cell-fdd {
+          ayexte:is-system-created;
+          key "id";
+          unique "local-cell-id";
+          max-elements 24;
+          description
+            "Each list entry represents a neighbor EUTRAN cell (FDD)      \t\t\tin another enodeb in any MME pool.";
+          leaf id {
+            type string;
+            description
+              "A user friendly identifier for the external cell";
+          }
+
+          leaf local-cell-id {
+            type uint8;
+            mandatory true;
+            description
+              "RBS internal ID for the external cell.     \t\t\t\tTogether with the Node ID and Public Land Mobile Network (PLMN) ID     \t\t\t\tthis is a globally unique eUTRAN Cell ID (ECGI).";
+          }
+        }
+      }
+    }
+
+    list eutran-cell-fdd {
+      key "id";
+      unique "cell-id";
+      max-elements 24;
+      description
+        "Each list entry represents an eutran cell and contains parameters needed by
+         \t\tthe cell. It also contains parameters for the mandatory common channels.";
+      leaf id {
+        type string;
+        description
+          "A user friendly identifier for the cell.";
+      }
+
+      leaf ul-channel-bandwidth {
+        ayexte:disturbances "Changes may affect traffic.";
+        ayexte:takes-effect "Object disabled/enabled.";
+        type channel-bandwidth-type;
+        must ". = ../dl-channel-bandwidth" {
+          description
+            "This leaf is dependent on and shall be set to the same as      \t\t    dl-channel-bandwidth.            \t\t    Note: The expression above is given only as guidance for northbound user.      \t\t    Values supplied for this leaf are not validated by the adapter against      \t\t    this expression.";
+        }
+        description
+          "The uplink channel bandwidth in the cell              \t\tTraffic disturbance: Changes may affect traffic.       \t\tTakes effect: Object disabled/enabled.";
+      }
+
+      leaf cell-subscription-capacity {
+        ayexte:disturbances "Low values reduce cell capacity.";
+        type uint-1000000;
+        default "1000";
+        description
+          "Normalized subscription capacity of the cell. The value       \t\trepresents the total capacity of the cell used for traffic       \t\tload balancing purposes.              \t\tTraffic disturbance: Low values reduce cell capacity.";
+      }
+
+      leaf cell-downlink-ca-capacity {
+        type uint-1000000;
+        default "0";
+        description
+          "Normalized downlink cell capacity available for use by       \t\tcarrier aggregation. The value is used to calculate the       \t\taggregated capacity of a UE:s possible aggregation       \t\tpossibilities, for example by the CA Aware IFLB feature.";
+      }
+
+      leaf dl-channel-bandwidth {
+        ayexte:disturbances "Changes may affect traffic.";
+        ayexte:takes-effect "Object disabled/enabled.";
+        type channel-bandwidth-type;
+        must ". = ../ul-channel-bandwidth" {
+          description
+            "This attribute is dependent on and shall be set to the same as      \t\t    ul-channel-bandwidth.            \t\t    Note: The expression above is given only as guidance for northbound user.      \t\t    Values supplied for this leaf are not validated by the adapter against      \t\t    this expression.";
+        }
+        description
+          "The downlink channel bandwidth in the cell.              \t\tTraffic disturbance: Changes may affect traffic.       \t\tTakes effect: Object disabled/enabled.";
+      }
+
+      leaf cell-id {
+        ayexte:restricted;
+        ayexte:disturbances "Changing this attribute can cause loss of traffic.";
+        type uint8;
+        mandatory true;
+        description
+          "RBS internal ID for the eutran cell.       \t\tTogether with the Node ID and Public Land Mobile Network (PLMN)       \t\tthis is a universally unique cell ID.              \t\tTraffic disturbance: Changing this attribute can cause loss of traffic.";
+      }
+
+      leaf ca-prio-threshold {
+        ayexte:dependencies "Only applicable when
+/enodeb-function/carrier-aggregation-function/dynamic-s-cell-selection-method = prioritized.";
+        ayexte:takes-effect "Next restart";
+        type uint16;
+        default "300";
+        description
+          "The threshold number of secondary cells configured using prioritized       \t\tsecondary cell selection. When the number of secondary cells configured for UEs       \t\tconnected in this primary cell is higher than ca-prio-threshold, all frequency       \t\tcarriers configured for carrier aggregation are assumed to have equal priority       \t\tregardless of the configured values.              \t    Dependencies: Only applicable when       \t    /enodeb-function/carrier-aggregation-function/dynamic-s-cell-selection-method = prioritized.              \t\tTakes effect: Next restart";
+      }
+
+      leaf earfcndl {
+        ayexte:restricted;
+        ayexte:dependencies "This leaf is dependent on and set together with earfcnul.
+       The earfcnul and earfcndl values are dependent and relate according to default
+EUTRA TX channel to RX channel separation as specified in 3GPP TS 36.101 for the
+EUTRA operating band and channel bandwidth of the cell.";
+        type uint32 {
+          range "0..17999 | 46590..262143";
+        }
+        mandatory true;
+        description
+          "The channel number for the central downlink frequency. The mapping from       \t\tchannel number to physical frequency for specified EUTRA bands is described in       \t\t3GPP TS 36.104. The values that can be used depend on national, operator-specific       \t\tfrequency allocation as well as on the supported frequency bands in the RBS.
+                  \t\tDependencies: This leaf is dependent on and set together with earfcnul.       \t\tThe earfcnul and earfcndl values are dependent and relate according to default       \t\tEUTRA TX channel to RX channel separation as specified in 3GPP TS 36.101 for the       \t\tEUTRA operating band and channel bandwidth of the cell.";
+      }
+
+      leaf earfcnul {
+        ayexte:dependencies "This leaf is dependent on and set together with earfcndl.       	The earfcnul and earfcndl values are dependent and relate according to default       	EUTRA TX channel to RX channel separation as specified in 3GPP TS 36.101       	for the EUTRA operating band and channel bandwidth of the cell.";
+        ayexte:disturbances "Changes may affect traffic";
+        ayexte:takes-effect "Object disabled/enabled.";
+        type uint32 {
+          range "0 | 18000..35999 | 46590..262143";
+        }
+        mandatory true;
+        description
+          "Channel number for the central UL frequency.       \t\tThe mapping from channel number to physical frequency for specified EUTRA bands       \t\tis described in 3GPP TS 36.104. Values that can be used depend on national,       \t\toperator-specific frequency allocation, as well as on the supported frequency       \t\tbands of the RBS.       \t\tValue 0 means that the UL channel number is N/A for the DL-only bands.
+                  \t\tDependencies: This leaf is dependent on and set together with earfcndl.       \t\tThe earfcnul and earfcndl values are dependent and relate according to default       \t\tEUTRA TX channel to RX channel separation as specified in 3GPP TS 36.101 for       \t\tthe EUTRA operating band and channel bandwidth of the cell.              \t    Traffic disturbance: Changes may affect traffic.       \t\tTakes effect: Object disabled/enabled.";
+      }
+
+      leaf est-cell-cap-usable-fraction {
+        ayexte:disturbances "Changing this attribute can cause loss of traffic.";
+        type uint-100;
+        units "percent";
+        default "100";
+        description
+          "Scaling factor for the estimated cell subscription capacity.       \t\tCan be used to reduce the traffic load balancing attraction of the cell.       \t\tUsed if traffic handling capacity of the cell is constrained by circumstances       \t\tthe Automated Cell Capacity Estimation feature is unable to capture.       \t\tAn example of such a circumstance is at limited UL capacity in a TDD cell.
+                  \t\tWhen the leaf value is set to 0, the corresponding cell uses the value       \t\tcell-subscription-capacity as the Cell Subscription Capacity value for       \t    the cell. This bypasses the automatically estimated Cell Subscription       \t    Capacity value for the cell.              \t\tTraffic disturbance: Changing this attribute can cause loss of traffic.";
+      }
+
+      leaf lb-tp-non-qual-fraction {
+        type uint8 {
+          range "0 | 20..80";
+        }
+        units "0.01";
+        default "35";
+        description
+          "The fraction of non-qualified UEs at UE selection for throughput aware       \t\tload balancing. In case throughput aware UE selection is enabled, this parameter       \t\tsets a target size for the fraction of UE to be disqualified for load balancing       \t\tdue to insufficient relative gain when moving UE from source to target cell.              \t\tSpecial value 0 means that the throughput aware UE selection for this cell is       \t\tdisabled.";
+      }
+
+      leaf lb-tp-rank-thresh-min {
+        ayexte:disturbances "Changing this attribute can cause loss of traffic.";
+        type int8 {
+          range "-100 | -60..60";
+        }
+        units "0.01";
+        default "-20";
+        description
+          "The minimum threshold for the relative gain at throughput aware load balancing.       \t\tA negative value may allow for some throughput loss for the individual UE, if       \t\tthe load balancing criteria requires so. Higher values may increase the       \t\tfraction of non-qualified UEs at UE selection for throughput aware load       \t\tbalancing and may cause the load balancing to stall.              \t\tSpecial value -100 means the lower boundary for the threshold is disabled.              \t\tTraffic disturbance: Changing this attribute can cause loss of traffic.";
+      }
+
+      leaf ul-s-cell-priority {
+        ayexte:takes-effect "New connection";
+        type uint8 {
+          range "0..5";
+        }
+        default "5";
+        description
+          "Relative priority in initial secondary cell selection for cells       \t\tthat can be configured with UL Carrier Aggregation. Applicable where       \t\tseveral secondary cells are initially configured simultaneously.       \t\tLowest value has highest priority.              \t\tTakes effect: New connection";
+      }
+
+      leaf physical-layer-cell-id {
+        type uint16 {
+          range "0..503";
+        }
+        config false;
+        description
+          "Physical-layer cell ID, equal to the physical-layer-cell-id-group
+              multiplied by three plus the physical-layer-sub-cell-id. See 3GPP TS 36.211";
+      }
+
+      leaf physical-layer-cell-id-group {
+        ayexte:disturbances "Changes may affect traffic";
+        type uint8 {
+          range "0..167";
+        }
+        mandatory true;
+        description
+          "The physical layer cell ID group. Physical-layer cell IDs are grouped       \t\tinto 168 unique physical-layer cell-identity groups, each group containing       \t\t3 unique subidentities.
+                  \t\tThis leaf together with physical-layer-sub-cell-id is used to calculate       \t\tphysical layer cell ID (see 3GPP TS 36.211) that is sent as part of the       \t\tsystem information (see 3GPP TS 36.331).              \t\tTraffic disturbance: Changes may affect traffic";
+      }
+
+      leaf physical-layer-sub-cell-id {
+        ayexte:disturbances "Changes may affect traffic";
+        type uint8 {
+          range "0..2";
+        }
+        mandatory true;
+        description
+          "The subidentity within the physical layer cell ID group. Physical-layer       \t\tcell IDs are grouped into 168 unique physical-layer cell-identity groups, each       \t\tgroup containing 3 unique subidentities.
+                  \t\tThis leaf together with physical-layer-cell-id-group is used to calculate       \t\tphysical layer cell ID (see 3GPP TS 36.211) that is sent as part of the       \t\tsystem information (see 3GPP TS 36.331).              \t\tTraffic disturbance: Changes may affect traffic";
+      }
+
+      leaf tac {
+        ayexte:disturbances "Changes may affect traffic";
+        type uint16;
+        mandatory true;
+        description
+          "Tracking Area Code for the eutran cell.              \t\tTraffic disturbance: Changes may affect traffic";
+      }
+
+      container ue-meas-control {
+        ayexte:is-system-created;
+        description
+          "Models the manageable characteristics for UE measurements.";
+        leaf s-measure {
+          ayexte:disturbances "High values can stop outgoing HO.";
+          ayexte:takes-effect "New connection.";
+          type int16 {
+            range "-140..-44 | 0";
+          }
+          units "dBm";
+          default "0";
+          description
+            "Primary cell quality threshold controlling whether      \t\t\tor not the UE is required to perform measurements of intra-frequency,      \t\t\tinter-frequency and inter-RAT neighboring cells.
+                   \t\t\tValue 0 indicates to disable s-Measure.
+                   \t\t\tCorresponds to s-Measure in TS 36.331.            \t\t\tTraffic disturbance: High values can stop outgoing HO.      \t\t\tTakes effect: New connection.";
+        }
+
+        container report-config-eutra-interfreq-lb {
+          ayexte:is-system-created;
+          description
+            "Contains the Report Configuration settings for UE measurements      \t\t\tinitiated for EUTRA Inter-frequency Load Balancing";
+          leaf a5-threshold1-rsrp {
+            ayexte:disturbances "Changing this attribute can affect traffic";
+            type rsrp-power;
+            description
+              "The Reference Signal Received Power (RSRP) threshold1 value for eventA5.      \t\tTraffic disturbance: Changing this attribute can affect traffic";
+          }
+
+          leaf a5-threshold2-rsrp {
+            ayexte:disturbances "Changing this attribute can affect traffic";
+            type rsrp-power;
+            description
+              "The Reference Signal Received Power (RSRP) threshold2 value for eventA5.      \t\tTraffic disturbance: Changing this attribute can affect traffic";
+          }
+
+          leaf a5-threshold2-rsrq {
+            ayexte:disturbances "Changing this attribute can affect traffic";
+            type int16 {
+              range "-195..-30";
+            }
+            units "0.1 dB";
+            must ". mod 5 = 0" {
+              description
+                "The value must be set with resolution/step of 5        \t\t\t\t    Note: The expression above is given only as guidance for northbound user.    \t\t\t\t    Values supplied for this leaf are not validated by the adapter against    \t\t\t\t    this expression.";
+            }
+            default "-195";
+            description
+              "The Reference Signal Received Quality (RSRQ) threshold2 value for eventA5.      \t\tTraffic disturbance: Changing this attribute can affect traffic";
+          }
+
+          leaf hysteresis-a5 {
+            ayexte:disturbances "Changing this attribute can affect traffic";
+            type uint8 {
+              range "0..150";
+            }
+            units "0.1 dB";
+            must ". mod 5 = 0" {
+              description
+                "The value can must set with resolution/step of 5        \t\t\t\t    Note: The expression above is given only as guidance for northbound user.    \t\t\t\t    Values supplied for this leaf are not validated by the adapter against    \t\t\t\t    this expression.";
+            }
+            default "10";
+            description
+              "The hysteresis value for the eventA5 measurement.      \t\tTraffic disturbance: Changing this attribute can affect traffic";
+          }
+        }
+      }
+
+      list eutran-freq-relation {
+        ayexte:is-system-created;
+        key "id";
+        max-elements 9;
+        description
+          "This represents a mobility relation between an eutran cell and an eutran       \t\tfrequency. It contains parameters that are specific for the relation.";
+        leaf id {
+          type string;
+          description
+            "A user friendly identifier for the frequency relation";
+        }
+
+        leaf ca-freq-priority {
+          ayexte:dependencies "Only applicable when
+/enodeb-function/carrier-aggregation-function/dynamic-s-cell-selection-method = prioritized.
+Can also be applied to dynamic-s-cell-selection-method = prioritized-automatic
+as long as Configurable SCell Priority is licensed.";
+          ayexte:takes-effect "New connection";
+          type int8 {
+            range "-1..7";
+          }
+          default "4";
+          description
+            "Prioritizes eutran frequency carriers from which to pick      \t\t\tsecondary cells for carrier aggregation.      \t\t\t0 means lowest priority.      \t\t\t-1 means the frequency is excluded from secondary cell selection.            \t\t\tTakes effect: New connection            \t\t    Dependencies: Only applicable when      \t\t    /enodeb-function/carrier-aggregation-function/dynamic-s-cell-selection-method      \t\t    = prioritized.      \t\t    Can also be applied to dynamic-s-cell-selection-method = prioritized-automatic      \t\t    as long as Configurable SCell Priority is licensed.";
+        }
+
+        leaf ca-freq-proportion {
+          ayexte:dependencies "Only applicable when
+/enodeb-function/carrier-aggregation-function/dynamic-s-cell-selection-method = prioritized.";
+          ayexte:takes-effect "New connection";
+          type uint-100;
+          default "100";
+          description
+            "In conjunction with ca-prio-threshold the value sets a threshold for      \t\t\tthe number of secondary cells on this frequency carrier that can be configured      \t\t\tusing prioritized secondary cell selection. A normalized value is applied.      \t\t\tWhen frequency carriers have same priority, secondary cells are selected on the      \t\t\tcarrier with the lowest proportional secondary cell utilization.            \t\t    Dependencies: Only applicable when      \t\t    /enodeb-function/carrier-aggregation-function/dynamic-s-cell-selection-method      \t\t    = prioritized.            \t\t\tTakes effect: New connection";
+        }
+
+        leaf ca-triggered-redirection-active {
+          ayexte:disturbances "Changing this attribute can affect traffic.";
+          ayexte:takes-effect "New connection";
+          type boolean;
+          default "true";
+          description
+            "Parameter used to specify whether or not CA triggered      \t\t\tredirection is activated from the current cell towards a certain frequency.            \t\t\tTraffic disturbance: Changing this attribute can affect traffic.      \t\t\tTakes effect: New connection";
+        }
+
+        leaf lb-a5-thr1-rsrp-freq-offset {
+          ayexte:takes-effect "Ongoing connection";
+          type uint-100;
+          units "dB";
+          default "0";
+          description
+            "The frequency-relation specific offset for the absolute threshold      \t\t\ta5-threshold1-rsrp, RSRP threshold1 for event A5, used for Inter-frequency      \t\t\tload balancing.            \t\t\tTakes effect: Ongoing connection";
+        }
+
+        leaf lb-activation-threshold {
+          type uint-1000;
+          units "0.001";
+          default "0";
+          description
+            "The minimum target cell load (subscription ratio) the source cell takes into      \t\t\taccount when determining the amount of load balancing action to a cell      \t\t\tusing this carrier frequency.";
+        }
+
+        list eutran-freq-to-qci-profile-relation {
+          key "qci-profile-ref";
+          max-elements 19;
+          description
+            "Encapsulates parameters for service specific load      \t\t\tmanagement for a certain QCI profile.";
+          leaf lb-qci-profile-handling {
+            type lb-qci-profile-handling-type;
+            default "allowed";
+            description
+              "Specifies QCI profile handling with regard to load management.";
+          }
+
+          leaf qci-profile-ref {
+            type instance-identifier;
+            must "re-match(.,\"/.*enodeb-function/.*qci-table/(.*qci-profile-predefined\\[.*id=.+\\]|.*qci-profile-operator-defined\\[.*id=.+\\])\")" {
+              description
+                "The instance identifier must point at a qci-profile-predefined or    \t\t\t\t\tqci-profile-operator-defined list entry        \t\t\t\t\tExamples of valid values are    \t\t\t\t\t/enodeb-function/qci-table/qci-profile-predefined[id='qci9']    \t\t\t\t\t/enodeb-function/qci-table/qci-profile-operator-defined[id='myQci10']        \t\t\t\t\tor with prefixes    \t\t\t\t\t/lrtadpt:enodeb-function/lrtadpt:qci-table/lrtadpt:qci-profile-predefined[lrtadpt:id='qci9']    \t\t\t\t\t/lrtadpt:enodeb-function/lrtadpt:qci-table/lrtadpt:qci-profile-operator-defined[lrtadpt:id='myQci10']        \t\t\t\t    Note: The expression above is given only as guidance for northbound user.    \t\t\t\t    Values supplied for this leaf are not validated by the adapter against    \t\t\t\t    this expression.";
+            }
+            description
+              "Refers to a qci-profile-predefined or     \t\t\t\tqci-profile-operator-defined list entry.";
+          }
+        }
+
+        list eutran-cell-relation {
+          key "id";
+          max-elements 128;
+          description
+            "Each entry represents the handover relationship between two neighboring      \t\t\teutran cells.";
+          leaf coverage-indicator {
+            ayexte:disturbances "Changes may affect traffic.";
+            type supported-coverage-type;
+            default "none";
+            description
+              "Indicates whether the coverage area of the cell indicated by the relation     \t\t\t\thas approximately the same coverage area (overlap) as this cell, or whether     \t\t\t\tit fully covers this cell, or if it is fully contained in this cell.          \t\t\t\tTraffic disturbance: Changes may affect traffic.";
+          }
+
+          leaf id {
+            type string;
+            description
+              "A user friendly identifier for the cell relation";
+          }
+
+          leaf neighbor-cell-ref {
+            ayexte:restricted;
+            type instance-identifier;
+            must "re-match(.,\"/.*enodeb-function/.*eutran-cell-fdd\\[.*id=.+\\]|/.*enodeb-function/.*eutra-network/.*external-enodeb-function\\[.*id=.+\\]/.*external-eutran-cell-fdd\\[.*id=.+\\]\")" {
+              description
+                "The instance identifier must point at an entry in eutran-cell-fdd list or    \t\t\t\t\tthe external-eutran-cell-fdd list        \t\t\t\t\tExamples of valid values are    \t\t\t\t\t/enodeb-function/eutran-cell-fdd[id='myCell']    \t\t\t\t\t/enodeb-function/eutra-network/external-enodeb-function[id='extEnb1']/external-eutran-cell-fdd[id='extCell1']        \t\t\t\t\tor with prefixes    \t\t\t\t\t/lrtadpt:enodeb-function/lrtadpt:eutran-cell-fdd[lrtadpt:id='myCell']    \t\t\t\t\t/lrtadpt:enodeb-function/lrtadpt:eutra-network/lrtadpt:external-enodeb-function[lrtadpt:id='extEnb1']/lrtadpt:external-eutran-cell-fdd[lrtadpt:id='extCell1']        \t\t\t\t    Note: The expression above is given only as guidance for northbound user.
+                             Values supplied for this leaf are not validated by the adapter against
+                             this expression.";
+            }
+            mandatory true;
+            description
+              "Reference to an entry in eutran-cell-fdd list or     \t\t\t\tthe external-eutran-cell-fdd list";
+          }
+
+          leaf load-balancing {
+            type load-balancing-type;
+            default "not-allowed";
+            description
+              "This leaf indicates whether Inter-Frequency Load Balancing is ALLOWED or     \t\t\t\tNOT-ALLOWED or if Inter-Frequency Offload shall be applied from the current cell     \t\t\t\tto the cell indicated by the cell relation.";
+          }
+
+          leaf s-cell-candidate {
+            ayexte:takes-effect "Next secondary cell configuration during the ongoing connection.";
+            type s-cell-candidate-type;
+            default "auto";
+            description
+              "Secondary cell candidate status.     \t\t\t\tThe value indicates whether the cell indicated by parameter neighbor-cell-ref     \t\t\t\tcan be used as secondary cell for UEs using this cell as their primary cell.     \t\t\t\tThe secondary cell can be either local to the eNodeB, or on a remote eNodeB.          \t\t\t\tTakes effect: Next secondary cell configuration during the ongoing connection.";
+          }
+
+          leaf s-cell-priority {
+            ayexte:dependencies "Only applicable when
+ /enodeb-function/carrier-aggregation-function/dynamic-s-cell-selection-method = prioritized.";
+            ayexte:takes-effect "New connection";
+            type int8 {
+              range "-1..7";
+            }
+            default "7";
+            description
+              "Used for selecting a secondary cell within a frequency carrier.     \t\t\t\tThe secondary cell with highest priority is selected during initial blind     \t\t\t\tsecondary cell selection.     \t\t\t\t0 means lowest priority.     \t\t\t\t-1 means the cell is excluded from blind secondary cell selection.          \t\t\t    Dependencies: Only applicable when     \t\t\t    /enodeb-function/carrier-aggregation-function/dynamic-s-cell-selection-method     \t\t\t    = prioritized.          \t\t\t\tTakes effect: New connection";
+          }
+        }
+      }
+    }
+
+    container load-balancing-function {
+      ayexte:is-system-created;
+      must "lb-diff-ca-offset > lb-threshold" {
+        description
+          "lb-diff-ca-offset must be greater than lb-threshold              \t    Note: The expression above is given only as guidance for northbound user.       \t    Values supplied for this leaf are not validated by the adapter against       \t    this expression.";
+      }
+      description
+        "Contains parameters and constraints for Idle Mode Load Balancing functions";
+      leaf lb-threshold {
+        ayexte:disturbances "Changing this attribute can cause loss of traffic.";
+        type uint-1000;
+        units "0.001";
+        default "30";
+        description
+          "The minimum load (subscription ratio) difference to trigger       \t\tload balancing action.              \t\tTraffic disturbance: Changing this attribute can cause loss of traffic.";
+      }
+
+      leaf lb-ceiling {
+        ayexte:disturbances "Changing this attribute can cause loss of traffic.";
+        type uint16 {
+          range "10..2000";
+        }
+        units "0.001";
+        default "200";
+        description
+          "The maximum load (subscription ratio) difference taken into       \t\taccount in load balancing action.              \t\tTraffic disturbance: Changing this attribute can cause loss of traffic.";
+      }
+
+      leaf lb-rate-offset-coefficient {
+        ayexte:disturbances "Changing this attribute can cause loss of traffic.";
+        type uint-1000;
+        units "0.001";
+        must ". mod 20 = 0" {
+          description
+            "The value must be set with resolution/step of 20            \t\t    Note: The expression above is given only as guidance for northbound user.      \t\t    Values supplied for this leaf are not validated by the adapter against      \t\t    this expression.";
+        }
+        default "320";
+        description
+          "Coefficient of rate-dependent load balancing offset.       \t\tModerates how much the load balancing must be offset       \t\ttowards a cell with higher capacity.              \t\tTraffic disturbance: Changing this attribute can cause loss of traffic.";
+      }
+
+      leaf lb-rate-offset-load-threshold {
+        ayexte:disturbances "Changing this attribute can affect traffic.";
+        type uint-16000;
+        units "0.001";
+        default "500";
+        description
+          "Specifies the threshold for the source and target cell       \t\taverage load, above which the rate offset is set to zero.              \t\tTraffic disturbance: Changing this attribute can affect traffic.";
+      }
+
+      leaf lb-ca-threshold {
+        ayexte:disturbances "Changing this attribute can affect traffic.";
+        ayexte:takes-effect "New connection";
+        type uint-16000;
+        units "0.001";
+        default "800";
+        description
+          "The maximum load in the target cell in order to redirect a CA       \t\tcapable UE to that target cell. The maximum load in the current cell in order       \t\tto apply the capacity criterion when load balancing a CA capable UE.              \t\tTraffic disturbance: Changing this attribute can affect traffic.       \t\tTakes effect: New connection";
+      }
+
+      leaf lb-diff-ca-offset {
+        ayexte:disturbances "Changing this attribute can affect traffic.";
+        ayexte:takes-effect "New connection";
+        type uint-1000;
+        units "0.001";
+        default "100";
+        description
+          "The maximum load difference between the target cell and the source       \t\tcell in order to redirect a CA capable UE to that target cell. The maximum load       \t\tdifference between the source cell and the target cell in order to apply the       \t\tcapacity criterion when load balancing a CA capable UE.              \t\tTraffic disturbance: Changing this attribute can affect traffic.       \t\tTakes effect: New connection";
+      }
+
+      leaf lb-ca-cap-hysteresis {
+        ayexte:disturbances "Changing this attribute can affect traffic.";
+        ayexte:takes-effect "New connection";
+        type uint-100;
+        units "0.01";
+        default "20";
+        description
+          "Capacity related hysteresis value considered when checking the       \t\tcapacity criterion for both load balancing of CA capable UEs and CA triggered       \t\tredirection.              \t\tTraffic disturbance: Changing this attribute can affect traffic.       \t\tTakes effect: New connection";
+      }
+    }
+
+    container carrier-aggregation-function {
+      ayexte:is-system-created;
+      description
+        "Contains parameters and constraints for the Carrier Aggregation function";
+      leaf ca-usage-limit {
+        ayexte:takes-effect "Next restart";
+        type uint16;
+        units "1 UE SCell instances";
+        default "65535";
+        description
+          "The value configures the number of secondary cell connections which       \t\tcan be in use for carrier aggregation. A secondary cell costs in memory       \t\tthe same as a primary cell for each UE. It is preferred to avoid limiting       \t\tsecondary cell connections with ca-usage-limit, and use ca-preemption-threshold       \t\tinstead.              \t\tTakes effect: Next restart";
+      }
+
+      leaf ca-preemption-threshold {
+        ayexte:takes-effect "Next restart";
+        type uint-100;
+        units "percent";
+        default "50";
+        description
+          "Configures the resource consumption margin in percentage,       \t\tbeyond which secondary cells shall not be configured.              \t\tTakes effect: Next restart";
+      }
+
+      leaf s-cell-act-deact-data-thres {
+        ayexte:dependencies "s-cell-act-deact-data-thres-hyst <= s-cell-act-deact-data-thres
+when sCellActDeactDataThres is not equal to -1";
+        ayexte:takes-effect "Cell lock/unlock";
+        type int16 {
+          range "-1..5000";
+        }
+        units "0.1 Number of DL subframes";
+        default "100";
+        description
+          "One or more secondary cells can be activated if minimum time needed       \t\tto transmit all bits in all priority queues of UE is higher than       \t\ts-cell-act-deact-data-thres. When deciding the activation of one secondary       \t\tcell, minimum time needed to transmit all bits is calculated as the number       \t\tof bits in all priority queues, divided by the number of bits that can be       \t\ttransmitted in one TTI by all active serving cells prior to activation       \t\tdecision. This is computed as though the UE is given all resources in those       \t\tcells. If the condition for activating one secondary cell is satisfied,       \t\ta second secondary cell is also considered for activation but the minimum time       \t\tneeded to transmit all bits is now calculated by considering the added capacity       \t\tof the first new secondary cell that is already considered for activation.              \t\tFor FDD, the unit number of DL subframes is equivalent to ms, but for TDD UL/DL       \t\tsubframe configuration 1, there are 6 DL subframes in 10ms, and for UL/DL       \t\tsubframe configuration 2, there are 8 DL subframes in 10ms.              \t\t-1 means the data-triggered activation condition is always satisfied even with       \t\tno data in the buffer, and also that the data-triggered deactivation condition       \t\tis never satisfied.              \t    Dependencies: s-cell-act-deact-data-thres-hyst <= s-cell-act-deact-data-thres       \t    when s-cell-act-deact-data-thres is not equal to -1              \t\tTakes effect: Cell lock/unlock";
+      }
+
+      leaf s-cell-act-deact-data-thres-hyst {
+        ayexte:takes-effect "Cell lock/unlock";
+        type uint-5000;
+        units "0.1 Number of DL subframes";
+        default "90";
+        description
+          "If the minimum time needed to transmit all bits in all priority queues       \t\tof a UE is less than or equal to s-cell-act-deact-data-thres minus       \t\ts-cell-act-deact-data-thres-hyst, then deactivation of one component carrier       \t\tis considered.              \t\tMinimum time needed to transmit all bits is calculated as number of bits in all       \t\tpriority queues, divided by the  number of bits that can be transmitted in one       \t\tTTI by all active serving cells after deactivation decision. This is computed       \t\tas though the UE is given all resources in those cells.              \t\tFor FDD, the unit number of DL subframes is equivalent to ms, but for TDD UL/DL       \t\tsubframe configuration 1, there are 6 DL subframes in 10ms, and for UL/DL       \t\tsubframe configuration 2, there are 8 DL subframes in 10ms.              \t\tIf s-cell-act-deact-data-thres is set to -1, the data-triggered deactivation       \t\tcondition is never satisfied and the value of s-cell-act-deact-data-thres-hyst       \t\tis ignored.              \t    Dependencies: s-cell-act-deact-data-thres-hyst <= s-cell-act-deact-data-thres       \t    when s-cell-act-deact-data-thres is not equal to -1              \t\tTakes effect: Cell lock/unlock";
+      }
+
+      leaf s-cell-schedule-sinr-thres {
+        ayexte:takes-effect "Cell lock/unlock";
+        type int16 {
+          range "-200..300";
+        }
+        units "0.1 dB";
+        default "0";
+        description
+          "No data is scheduled on secondary cell if wideband SINR is lower       \t\tthan s-cell-schedule-sinr-thres. If SINR remains below threshold, secondary       \t\tcell is deactivated when s-cell-deact-out-of-coverage-timer expired.              \t\tTakes effect: Cell lock/unlock";
+      }
+
+      leaf wait-for-ca-opportunity {
+        ayexte:disturbances "Extreme settings can turn off CA for the eNB.";
+        ayexte:takes-effect "Ongoing connection";
+        type int32 {
+          range "-1..60000";
+        }
+        units "ms";
+        default "10000";
+        description
+          "Controls the length of time that elapses until a UE is considered once       \t\tagain for secondary cell configuration after the eNB was not able to configure       \t\tthis UE with a suitable secondary cell.              \t\t-1 means wait forever.              \t\tTraffic disturbance: Extreme settings can turn off CA for the eNB.              \t\tChanged value may take effect related to the next secondary cell configuration       \t\tduring the ongoing connection.";
+      }
+
+      leaf wait-for-better-s-cell-rep {
+        ayexte:takes-effect "Ongoing connection.";
+        type int16 {
+          range "-1..32000";
+        }
+        units "ms";
+        default "1000";
+        description
+          "Controls the length of time a UE searches for secondary cells       \t\ton a particular frequency, or set of frequencies based on measurements       \t\twhen it is in poor secondary cell coverage.              \t\t-1 means wait forever.              \t\tChanged value can take effect related to the next secondary cell configuration       \t\tduring the ongoing connection.";
+      }
+
+      leaf wait-for-additional-s-cell-opportunity {
+        ayexte:takes-effect "Ongoing connection.";
+        type int32 {
+          range "-1..60000";
+        }
+        units "ms";
+        default "10000";
+        description
+          "Controls the length of time that elapses until a UE is reconsidered for       \t\tadditional secondary cell configuration after the eNB was unable to configure       \t\tthis UE with more than one secondary cell.              \t\t-1 means wait forever.              \t\tChanged value can take effect related to the next secondary cell configuration       \t\tduring the ongoing connection.";
+      }
+
+      leaf ca-rate-adjust-coeff {
+        ayexte:takes-effect "Cell lock/unlock";
+        type uint8 {
+          range "0..10";
+        }
+        default "10";
+        description
+          "Used to adjust factor of CC rate for CA UEs, which is used in scheduler's       \t\tproportional fairness algorithm. A smaller value gives CA UE a greater       \t\tadvantage over non-CA UE.              \t\tValue 0 sets rate as 0 and this is for testing purpose only.       \t\tValues 1 - 4 set the rate as fraction of the cell rate in increased order.       \t\tValue 5 sets cell based rate.       \t\tValues 6 - 9 set the rate as cell rate plus rate influence from other       \t\tCCs in increased order.       \t\tValue 10 sets the rate as aggregated rate of all CCs.              \t\tTakes effect: Cell lock/unlock";
+      }
+
+      leaf s-cell-act-deact-ul-data-thresh {
+        ayexte:dependencies "s-cell-act-deact-ul-data-thresh-hyst =< s-cell-act-deact-ul-data-thresh";
+        ayexte:takes-effect "Cell lock/unlock";
+        type uint-5000;
+        units "0.1 Number of UL subframes";
+        default "100";
+        description
+          "If the minimum time needed to transmit all bits in all priority queues       \t\tin UL of a UE is higher than s-cell-act-deact-ul-data-thresh, activation       \t\tof one or more secondary cells is considered.              \t    Dependencies: s-cell-act-deact-ul-data-thresh-hyst =<       \t    s-cell-act-deact-ul-data-thresh              \t\tTakes effect: Cell lock/unlock";
+      }
+
+      leaf s-cell-act-deact-ul-data-thresh-hyst {
+        ayexte:dependencies "s-cell-act-deact-ul-data-thresh-hyst =< s-cell-act-deact-ul-data-thresh";
+        ayexte:takes-effect "Cell lock/unlock";
+        type uint-5000;
+        units "0.1 Number of UL subframes";
+        default "90";
+        description
+          "If minimum time needed to transmit all bits in all priority queues in UL of       \t\ta UE is less than s-cell-act-deact-ul-data-thresh minus       \t\ts-cell-act-deact-ul-data-thresh-hyst, deactivation of one CC is considered.              \t    Dependencies: s-cell-act-deact-ul-data-thresh-hyst =<       \t    s-cell-act-deact-ul-data-thresh              \t\tTakes effect: Cell lock/unlock";
+      }
+
+      leaf pdcch-enhanced-la-for-volte {
+        ayexte:dependencies "Only applicable when Carrier Aggregation, FAJ 121 3046 and
+Enhanced PDCCH Link Adaptation, FAJ 121 3051 are active, and a VoIP bearer
+exists for a UE.";
+        ayexte:takes-effect "At the next initial secondary cell selection during the ongoing connection";
+        type boolean;
+        default "false";
+        description
+          "Enables CA when VoIP and enhanced PDCCH Link Adaptation on       \t\tFDD primary cell are both active. Not used for TDD primary cells.              \t\tDependencies: Only applicable when Carrier Aggregation, FAJ 121 3046 and       \t\tEnhanced PDCCH Link Adaptation, FAJ 121 3051 are active, and a VoIP bearer       \t\texists for a UE.              \t\tTakes effect: At the next initial secondary cell selection during the       \t\tongoing connection";
+      }
+
+      leaf s-cell-selection-mode {
+        ayexte:dependencies "Only applicable when
+Dynamic SCell Selection for Carrier Aggregation, FAJ 121 3063 and
+3CC DL Carrier Aggregation Extension, FAJ 121 3084 are active.";
+        ayexte:takes-effect "New connection";
+        type s-cell-selection-mode-type;
+        default "ack-sequential-scell-selection";
+        description
+          "Selects the behavior of selecting secondary cell candidates       \t\tbeyond the first candidate.              \t\tWarning: There is a risk when using un-ack-simultaneous-scell-selection that       \t\tthe UE may not report a bad secondary cell.              \t\tDependencies: Only applicable when       \t\tDynamic SCell Selection for Carrier Aggregation, FAJ 121 3063 and       \t\t3CC DL Carrier Aggregation Extension, FAJ 121 3084 are active.              \t\tTakes effect: New connection";
+      }
+
+      leaf s-cell-act-prohibit-timer {
+        ayexte:takes-effect "Cell lock/unlock";
+        type uint-5000;
+        units "ms";
+        default "10";
+        description
+          "Activation prohibit timer. No new secondary cell activation is       \t\tallowed while this timer is running.              \t\tTakes effect: Cell lock/unlock";
+      }
+
+      leaf s-cell-deact-prohibit-timer {
+        ayexte:takes-effect "Cell lock/unlock";
+        type uint-5000;
+        units "ms";
+        default "200";
+        description
+          "Deactivation prohibit timer. No new secondary cell deactivation       \t\tis allowed while this timer is running.              \t\tTakes effect: Cell lock/unlock";
+      }
+
+      leaf s-cell-deact-out-of-coverage-timer {
+        type int16 {
+          range "-1..5000";
+        }
+        units "ms";
+        default "100";
+        description
+          "Secondary cell is deactivated if:       \t\t- wideband DL SINR remains below s-cell-schedule-sinr-thres, or       \t\t- no Channel State Information is received by the eNB for a duration of       \t\ts-cell-deact-out-of-coverage-timer.              \t\tDeactivation can be deferred, for example by s-cell-deact-prohibit-timer.              \t\t-1 means the secondary cell is not deactivated due to the SINR condition.";
+      }
+
+      leaf s-cell-deact-delay-timer {
+        ayexte:dependencies "s-cell-act-deact-data-thres-hyst <= s-cell-act-deact-data-thres";
+        type uint-5000;
+        units "ms";
+        default "50";
+        description
+          "One secondary cell is deactivated if minimum time needed to transmit       \t\tall bits in all priority queues of a UE is less than or equal to       \t\ts-cell-act-deact-data-thres minus s-cell-act-deact-data-thres-hyst for       \t\ta duration of s-cell-deact-delay-timer.              \t    Dependencies: s-cell-act-deact-data-thres-hyst <= s-cell-act-deact-data-thres";
+      }
+
+      leaf dynamic-s-cell-selection-method {
+        ayexte:dependencies "Only applicable when feature Dynamic SCell Selection
+for Carrier Aggregation, FAJ 121 3063 and feature
+Configurable SCell Priority, FAJ 121 4701 and/or
+feature Automatic SCell Priority, FAJ 121 4734 are active.";
+        ayexte:takes-effect "New connection";
+        type dynamic-s-cell-selection-method-type;
+        default "round-robin";
+        description
+          "Method used to select secondary cell candidates.              \t\tDependencies: Only applicable when feature Dynamic SCell Selection       \t\tfor Carrier Aggregation, FAJ 121 3063 and feature       \t\tConfigurable SCell Priority, FAJ 121 4701 and/or       \t\tfeature Automatic SCell Priority, FAJ 121 4734 are active.              \t\tTakes effect: New connection";
+      }
+
+      leaf ca-preference {
+        ayexte:dependencies "Only applicable when 3CC Carrier aggregation Extension
+Feature, FAJ 121 3084 is active and s-cell-selection-mode is equal to
+un-ack-simultaneous-scell-selection or ack-simultaneous-scell-selection.";
+        ayexte:takes-effect "New connection";
+        type ca-preference-type;
+        default "none";
+        description
+          "Preference between downlink and uplink carrier aggregation.              \t\tDependencies: Only applicable when 3CC Carrier aggregation Extension       \t\tFeature, FAJ 121 3084 is active and s-cell-selection-mode is equal to       \t    un-ack-simultaneous-scell-selection or ack-simultaneous-scell-selection.              \t\tTakes effect: New connection";
+      }
+
+      leaf s-cell-pdcch-outer-loop-margin {
+        type int16 {
+          range "-200..200";
+        }
+        units "0.1 dB";
+        default "100";
+        description
+          "The SINR margin for secondary cell PDCCH outer loop.";
+      }
+
+      leaf enhanced-selection-of-mimo-and-ca {
+        ayexte:dependencies "Only applicable when Configurable SCell Priority, FAJ 121 4701
+is active.";
+        ayexte:takes-effect "New connection";
+        type boolean;
+        default "false";
+        description
+          "Used to enable enhanced selection of four layer MIMO and carrier       \t\taggregation. Secondary cell is not added if effective bandwidth is reduced.       \t\tIf effective bandwidth is not changed, tie-breaking rule is governed by       \t\tfourLayerMimoPreferred. Effective bandwidth includes the number of PRBs and       \t\tMIMO layer capability of the UE in all serving cells.              \t\tDependencies: Only applicable when Configurable SCell Priority, FAJ 121 4701       \t\tis active.              \t\tTakes effect: New connection";
+      }
+
+      leaf four-layer-mimo-preferred {
+        ayexte:dependencies "Only applicable when Configurable SCell Priority, FAJ 121 4701
+is active.";
+        ayexte:takes-effect "New connection";
+        type boolean;
+        default "false";
+        description
+          "Whether or not secondary cell is added when there is no change in       \t\teffective bandwidth. Applies when enhanced selection of four layer MIMO and       \t\tcarrier aggregation is enabled. If set to true, secondary cell is not added,       \t\totherwise secondary cell is added.              \t\tDependencies: Only applicable when Configurable SCell Priority, FAJ 121 4701       \t\tis active.              \t\tTakes effect: New connection";
+      }
+
+      leaf selection-policy-ul-weighting {
+        ayexte:dependencies "Only applicable if Configurable SCell Priority, FAJ 121 4701 or
+Automatic SCell Priority, FAJ 121 4734 is active.";
+        ayexte:takes-effect "Next secondary cell reconfiguration";
+        type int8 {
+          range "-1..100";
+        }
+        units "percent";
+        default "-1";
+        description
+          "Amount of weight given to UL effective BW.       \t\tIf 0, UL is not included in utility function and fully determined by DL.       \t\tIf 100, only UL score is considered, and DL weight is 0.       \t\tIf set to -1, weight policy is disabled.              \t\tDependencies: Only applicable if Configurable SCell Priority, FAJ 121 4701 or       \t\tAutomatic SCell Priority, FAJ 121 4734 is active.              \t\tTakes effect: Next secondary cell reconfiguration";
+      }
+
+      leaf selection-policy-ul-target-ratio {
+        ayexte:dependencies "Only applicable if Configurable SCell Priority, FAJ 121 4701 or
+Automatic SCell Priority, FAJ 121 4734 is active.";
+        ayexte:takes-effect "Next secondary cell reconfiguration";
+        type uint-100;
+        units "percent";
+        default "0";
+        description
+          "A target minimum ratio of UL to DL effective BW, beyond       \t\twhich further secondary cells with no UL component will not be       \t\tconsidered.              \t\tDependencies: Only applicable if Configurable SCell Priority, FAJ 121 4701 or       \t\tAutomatic SCell Priority, FAJ 121 4734 is active.              \t\tTakes effect: Next secondary cell reconfiguration";
+      }
+
+      leaf effective-bw-impact-dl4-layer {
+        ayexte:dependencies "Only applicable when dynamic-s-cell-selection-method is equal
+to prioritized or prioritized-automatic.";
+        ayexte:takes-effect "Next secondary cell reconfiguration";
+        type uint8 {
+          range "0..200";
+        }
+        units "0.01 ratio of throughput increase";
+        default "150";
+        description
+          "Expected DL throughput gain of having 4 layers compared       \t\twith 2, averaged over a large sample of UE locations.              \t    Dependencies: Only applicable when dynamic-s-cell-selection-method is equal
+              to prioritized or prioritized-automatic.              \t\tTakes effect: Next secondary cell reconfiguration";
+      }
+
+      leaf wait-for-blind-sel-s-cell-rep-less-ttt {
+        ayexte:dependencies "Only valid for Dynamic SCell selection, with
+dynamic-s-cell-selection-method in any supported setting.";
+        ayexte:takes-effect "New connection. Also during ongoing connection, related to next       	secondary cell configuration during the connection.";
+        type uint16 {
+          range "0..10000";
+        }
+        units "ms";
+        default "600";
+        description
+          "Amount of time to wait for blind secondary cell       \t\tselection to return a measurement report, excluding the time to trigger.       \t\tAfter wait-for-blind-sel-s-cell-rep = wait-for-blind-sel-s-cell-rep-less-ttt +       \t\tmax(timeToTriggerA1, timeToTriggerA6), if no report is received,       \t\tthis secondary cell is deemed not to have coverage.              \t    Dependencies: Only valid for Dynamic SCell selection, with       \t    dynamic-s-cell-selection-method in any supported setting.              \t\tTakes effect: New connection. Also during ongoing connection, related to next       \t\tsecondary cell configuration during the connection.";
+      }
+
+      leaf use-absolute-prio-for-csp-eff-bw {
+        ayexte:dependencies "Only applicable when feature Configurable SCell Priority,
+FAJ 121 4701 is active.";
+        ayexte:takes-effect "New connection";
+        type boolean;
+        default "false";
+        description
+          "Enables absolute priority on CSP effective bandwidth       \t\tevaluation for prioritized dynamic secondary cell selection mode.              \t\tDependencies: Only applicable when feature Configurable SCell Priority,       \t\tFAJ 121 4701 is active.              \t\tTakes effect: New connection";
+      }
+    }
+  }
+}

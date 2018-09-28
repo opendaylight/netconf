@@ -1,0 +1,396 @@
+module ericsson-adapter-yang-extensions {
+  yang-version 1.1;
+  namespace "urn:rdns:com:ericsson:oammodel:ericsson-adapter-yang-extensions";
+  prefix ayexte;
+
+  organization
+    "Ericsson AB";
+  contact
+    "Ericsson first line support";
+  description
+    "The module defines Ericsson proprietary YANG extensions
+     used by the adapter.
+
+     Copyright (c) 2018 Ericsson AB. All rights reserved.";
+
+  revision 2018-03-12 {
+    ayexte:version "1";
+    ayexte:release "0";
+    ayexte:correction "0";
+    description
+      "Initial revision. Based on ericsson-yang-extensions
+       module, version 2, release 2, correction 0.";
+  }
+
+  extension status-information {
+    argument text;
+    description
+      "Contextual information related to the value of
+       status.
+
+       The statement MUST only be a substatement to the YANG
+       status statement.
+       Zero or one status-information statement per status is allowed.
+       NO substatements are allowed.
+
+       The value can be any text.";
+  }
+
+  extension original-prefix {
+    argument prefixString;
+    description
+      "If the prefix for a YANG module has been modified e.g. to
+       avoid prefix clashes the original prefix shall be placed in
+       this statement.
+
+       The statement MUST only be a substatement of the prefix
+       substatement of the module statement.
+       Zero or One original-prefix statement per prefix is allowed.
+       NO substatements are allowed.
+
+       The argument follows the same rules as the argument of
+       the prefix statement.";
+  }
+
+  extension dependencies {
+    argument dependencies-description;
+    description
+      "Specifies dependencies that exists to other data nodes. E.g. a > b.
+
+       The Description statement of the parent statement SHOULD contain
+       the label 'Dependencies: ' followed by the text from the argument.
+       The label and text are usually added automatically.
+
+       The statement MUST only be a substatement of the leaf, leaf-list,
+       container, list, anydata, anyxml, rpc, action statements.
+       Zero or One dependencies statement is allowed per parent
+       statement.
+       NO substatements are allowed.
+       The argument can be any text describing  depedndencies.";
+  }
+
+  extension disturbances {
+    argument disturbance-description;
+    description
+      "Specifies that a modification/execution MAY cause disturbances
+       for ongoing traffic handled by system.
+
+       The Description statement of the parent statement SHOULD contain
+       the label 'Traffic disturbance: ' followed by the text from the argument.
+       The label and text are usually added automatically.
+
+       The statement MUST only be a substatement of the leaf, leaf-list,
+       container, list, anydata, anyxml, rpc, action statements.
+       Zero or One disturbances statement is allowed per parent
+       statement.
+       NO substatements are allowed.
+       The argument can be any text describing
+       what effects the modification/execution may have on ongoing traffic.";
+  }
+
+  extension precondition {
+    argument precondition;
+    description
+      "Specification of the precondition(s) that must be met to
+       allow modification/execution.
+
+       The Description statement of the parent statement SHOULD contain
+       the label 'Precondition: ' followed by the text from the argument.
+       The label and text are usually added automatically.
+
+       The statement MUST only be a substatement of the leaf, leaf-list,
+       container, list, anydata, anyxml, rpc, action statements.
+       Zero or One precondition statement is allowed per parent
+       statement.
+       NO substatements are allowed.
+
+       The argument SHOULD take the form of a 'must' statement that when
+       evaluated to True allows modification/execution of the parent statement.
+       The condition refers to the configuration state of the running data store
+       BEFORE executing the current transaction/rpc/action.
+       A textual description of the precondition(s) is also allowed.";
+  }
+
+  extension restricted {
+    description
+      "Indicates that the value for the data node can only be set when its    \t\tparent data node is being created. To change the value after that, the    \t\tparent data node must be deleted and recreated with the data node    \t\thaving the new value.        \t    The restricted extension is only applicable to nodes that have
+               config=true.        \t\tThe statement MUST only be a substatement of the leaf, leaf-list,    \t    container, list statements.
+               Zero or one restricted statement is allowed per parent statement.
+               NO substatements are allowed.";
+  }
+
+  extension side-effects {
+    argument side-effects-description;
+    description
+      "Specifies that modification/execution MAY have side effects on the
+       configuration itself.
+
+       The Description statement of the parent statement SHOULD contain
+       the label 'Side effect: ' followed by the text from the argument.
+       The label and text are usually added automatically.
+
+       The statement MUST only be a substatement of the leaf, leaf-list,
+       container, list, anydata, anyxml, rpc, action statements.
+       Zero or One side-effects statement is allowed per parent
+       statement.
+       NO substatements are allowed.
+
+       The argument can be any text describing the side effects
+       on the configuration that the modification/execution has.";
+  }
+
+  extension takes-effect {
+    argument takes-effects-description;
+    description
+      "Specifies when a new value takes effect in the system.
+       Note! Not when it is stored in the datastore, but when
+       it effects the behavior of the system.
+
+       The Description statement of the parent statement SHOULD contain
+       the label 'Takes effect: ' followed by the text from the argument.
+       The label and text are usually added automatically.
+
+       The statement MUST only be a substatement of the leaf, leaf-list,
+       container, list, anydata, anyxml, rpc, action statements.
+       Zero or One takes-effect statement is allowed per parent
+       statement.
+       NO substatements are allowed.
+
+       The argument can be any text. Usual values are:
+          Next restart
+          Next reconfiguration";
+  }
+
+  extension version {
+    argument value;
+    description
+      "The version number of the module/submodule,
+       to be stepped when the module/submodule is
+       changed in a backward incompatible way.
+
+       The statement MUST only be a substatement to the revision statement.
+       Parent MUST have exactly one version statement.
+       NO substatements are allowed.
+
+       value is of type uint32.";
+  }
+
+  extension release {
+    argument value;
+    description
+      "The release number of the module/submodule,
+       to be stepped for each backward compatible change.
+       When the version is stepped, the release is reset to 0.
+
+       The statement MUST only be a substatement to the revision statement.
+       Parent MUST have exactly one release statement.
+       NO substatements are allowed.
+
+       value is of type uint32.";
+  }
+
+  extension correction {
+    argument value;
+    description
+      "The correction number of the module/submodule,
+       to be stepped for each backward compatible correction,
+       when a later release already exists.
+       When release is stepped or reset, correction is reset to 0.
+
+       The statement MUST only be a substatement to the revision statement.
+       Parent MUST have exactly one correction statement.
+       NO substatements are allowed.
+
+       value is of type uint32.";
+  }
+
+  extension resolution {
+    argument value;
+    description
+      "Used to further restrict the range of integer and decimal types.
+       The allowed values for the type is further restricted to  \tonly those values that match the expression:
+           'low' + n * 'resolution'
+         \twhere 'low' is the lowest allowed value in the range, n is a  \tarbitrary non-negative integer.
+
+       The Description statement of the parent statement SHOULD contain
+       the textual label 'Resolution: ' followed by the text from the argument.
+       The label and text are usually added automatically.
+
+       The statement MUST only be a substatement of the range statement.
+       Zero or one resolution statement per parent statement is
+       allowed.
+       NO substatements are allowed.
+
+       The value is a positive integer value for integer based data types
+       and for decimal64 based data types, the value is a decimal value
+       with the same or less number of decimals that is specified for the type.";
+  }
+
+  extension is-system-created {
+    description
+      "Indicates that the list or container cannot be
+       created/deleted through the North Bound Interface (NBI). System
+       created statements can have both read-only and read-write
+       data node children.
+
+       The Description statement of the parent statement SHOULD contain
+       the text 'Is created/deleted by the system only.'.
+
+       The statement MUST only be a substatement of the list, container
+       statements.
+       Zero or one is-system-created statement per parent statement is allowed.
+       NO substatements are allowed.";
+  }
+
+  extension static-data {
+    argument value;
+    description
+      "Indicates that a data node contains data that is
+       loaded by the system at system start and is only changed during
+       system start and cannot be created/deleted/changed through the
+       North Bound Interface (NBI) or CLI.
+
+       The data MAY be marked as config true to allow leafref,
+       when or must constraints to be based on it.
+
+       When changing static-data backward compatibility
+       MUST be considered. The following changes are considered
+       backwards incompatible:
+       - If a data node indicates support for a subfunction, changing
+       it to remove support
+       - Decreasing the valuespace of a whitelist (e.g. supported values)
+       - Increasing the value space of a blacklist (e.g. prohibited values)
+
+       The statement MUST only be a substatement of the leaf, leaf-list,
+       container, list, anydata, anyxml statements.
+       Zero or one static-data statement per parent statement is allowed.
+       NO substatements are allowed.
+
+       The argument is a boolean value indicating whether the data node
+       is considered static-data or not. If static-data is not specified,
+       the default is the same as the parent data node's value. For top
+       level data nodes the default value is false.
+       Note: Top level statements in augment or groupings do NOT inherit
+       the static-data value from containing nodes, they default to
+       static-data false.
+
+       When the argument value is true, the Description statement of
+       the parent statement SHOULD contain the text 'This data node (tree)
+       cannot be changed in a running system.'.
+
+       When the argument value is false the Description statement of
+       the parent statement SHOULD contain the text 'This data node (tree)
+       may be changed according to the model constraints.'.";
+  }
+
+  extension library-module {
+    description
+      "Indicates that this module (and all of its submodules) is
+       intended as library module.
+       The YAM SHOULD not contain any data nodes.
+       Very strict compatibility rules SHALL apply to all YANG
+       constructs importable from this YAM.
+       The only changes allowed for a released revision of a
+       library YAM are
+       - adding new constructs e.g. types, groupings, features,
+       identities, extensions
+       - Error corrections (not interpretation changes, only clean errors)   \t- Editorial updates that don't change behavior
+
+       The statement MUST only be a substatement of the module statement.
+       Zero or one library-module statement is allowed per
+       parent statement.
+       NO substatements are allowed.";
+  }
+
+  extension supported-feature {
+    argument supported-feature;
+    description
+      "The extension declares that a feature is supported by a managed
+       element.
+       The extension SHALL only be used in modules derived from
+       ericsson-supported-features.yang. It MUST be ignored in other YAMs.
+       If multiple derived files are present the system supports
+       the union of all features listed in these files.
+
+       If a YAM containing features is not included in any
+       supported-feature statements, all it's features are considered
+       to be supported. (default is to support all features)
+
+       If a YAM containing features is included in at least one
+       supported-feature statement, the listed features are supported.
+
+       If a YAM containing features is included in at least one
+       supported-feature statement with the argument '<modname>:' AND
+       it is NOT included in any supported-feature statements with an
+       argument that includes a featurename, then none of its features
+       are supported.
+
+       If a YAM containing features is included in multiple
+       supported-feature statements, some with an argument that includes
+       a featurename AND ALSO some with the argument '<modname>:' that
+       does not include a featurename, then the statements without
+       featurenames are ignored, and the listed features are supported.
+
+       The statement and its argument MUST be on a single line without
+       any quotation marks, concatenation using '+' or comments as some
+       programs will use simple, non-Yang-aware parsing to handle the file.
+       E.g.       yexte:supported-feature ericsson-fm:alert;
+
+       The statement MUST only be a substatement of the module statement.
+       Zero or More supported-features are allowed per parent statement.
+       NO substatements are allowed.
+
+       The argument has the format  <modulename>:[<featurename>]
+       Example:
+       'ietf-system:radius'     declares support for radius configuration
+       'ietf-system:'           declares that no features of the
+                                ietf-system YAM are supported.";
+  }
+
+  extension module-conformance-import {
+    argument yam-name;
+    description
+      "Indicates that the implementation imports reusable     \tdefinitions from the YAM but does not implement any     \tdata nodes.
+
+            The statement MUST only be a substatement of the module statement.
+            Zero or One module-conformance-import are allowed per parent
+            statement.
+            NO substatements are allowed.     
+            The argument is the name of the YAM.";
+  }
+
+  extension is-passphrase {
+    description
+      "The leaf or leaf-list holds a passphrase and its value
+       MUST NOT be revealed.
+
+       For a client interacting with the end user, the following
+       may apply:
+       - When the user enters a value for the attribute, '*' is
+       displayed instead of the actual characters.
+       - When the string value is received during a get operations,
+       the value returned by the Managed Element (Netconf server) is
+       displayed and that value may, or may not, have been replaced by
+       asterisks.
+
+       The statement MUST only be a substatement of the
+       leaf-list, leaf statements.
+       Zero or One is-passphrase statement is allowed per parent
+       statement.
+       NO substatements are allowed.";
+  }
+
+  extension preliminary {
+    description
+      "The schema node is part of an early design effort.
+       Preliminary nodes MUST be tested to ensure they do not cause
+       stoppage or significant traffic disturbance.   \tPreliminary nodes SHOULD be, but MAY NOT be fully functional.
+       Preliminary nodes MAY be changed or removed in the future   \tignoring backward compatibility rules.   \tFaults and problems with preliminary nodes MAY NOT always   \tbe handled during normal maintenance of the SW.
+
+       The statement MUST only be a substatement of a
+       status statement which has the argument  'current'.
+       Zero or One preliminary statement is allowed per parent
+       statement.
+       NO substatements are allowed.";
+  }
+}
