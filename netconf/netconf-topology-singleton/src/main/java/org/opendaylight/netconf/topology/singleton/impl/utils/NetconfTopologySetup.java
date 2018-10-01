@@ -5,14 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
 import akka.actor.ActorSystem;
+import com.google.common.util.concurrent.ListeningExecutorService;
 import io.netty.util.concurrent.EventExecutor;
+import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
@@ -29,8 +28,8 @@ public class NetconfTopologySetup {
     private final DataBroker dataBroker;
     private final InstanceIdentifier<Node> instanceIdentifier;
     private final Node node;
-    private final ScheduledThreadPool keepaliveExecutor;
-    private final ThreadPool processingExecutor;
+    private final ScheduledExecutorService keepaliveExecutor;
+    private final ListeningExecutorService processingExecutor;
     private final ActorSystem actorSystem;
     private final EventExecutor eventExecutor;
     private final NetconfClientDispatcher netconfClientDispatcher;
@@ -80,11 +79,11 @@ public class NetconfTopologySetup {
         return node;
     }
 
-    public ThreadPool getProcessingExecutor() {
+    public ListeningExecutorService getProcessingExecutor() {
         return processingExecutor;
     }
 
-    public ScheduledThreadPool getKeepaliveExecutor() {
+    public ScheduledExecutorService getKeepaliveExecutor() {
         return keepaliveExecutor;
     }
 
@@ -131,8 +130,8 @@ public class NetconfTopologySetup {
         private DataBroker dataBroker;
         private InstanceIdentifier<Node> instanceIdentifier;
         private Node node;
-        private ScheduledThreadPool keepaliveExecutor;
-        private ThreadPool processingExecutor;
+        private ScheduledExecutorService keepaliveExecutor;
+        private ListeningExecutorService processingExecutor;
         private ActorSystem actorSystem;
         private EventExecutor eventExecutor;
         private String topologyId;
@@ -196,20 +195,20 @@ public class NetconfTopologySetup {
             return new NetconfTopologySetup(this);
         }
 
-        private ScheduledThreadPool getKeepaliveExecutor() {
+        private ScheduledExecutorService getKeepaliveExecutor() {
             return keepaliveExecutor;
         }
 
-        public NetconfTopologySetupBuilder setKeepaliveExecutor(final ScheduledThreadPool keepaliveExecutor) {
+        public NetconfTopologySetupBuilder setKeepaliveExecutor(final ScheduledExecutorService keepaliveExecutor) {
             this.keepaliveExecutor = keepaliveExecutor;
             return this;
         }
 
-        private ThreadPool getProcessingExecutor() {
+        private ListeningExecutorService getProcessingExecutor() {
             return processingExecutor;
         }
 
-        public NetconfTopologySetupBuilder setProcessingExecutor(final ThreadPool processingExecutor) {
+        public NetconfTopologySetupBuilder setProcessingExecutor(final ListeningExecutorService processingExecutor) {
             this.processingExecutor = processingExecutor;
             return this;
         }
@@ -269,7 +268,7 @@ public class NetconfTopologySetup {
             return idleTimeout;
         }
 
-        public NetconfTopologySetupBuilder setPrivateKeyPath(String privateKeyPath) {
+        public NetconfTopologySetupBuilder setPrivateKeyPath(final String privateKeyPath) {
             this.privateKeyPath = privateKeyPath;
             return this;
         }
@@ -278,7 +277,7 @@ public class NetconfTopologySetup {
             return this.privateKeyPath;
         }
 
-        public NetconfTopologySetupBuilder setPrivateKeyPassphrase(String privateKeyPassphrase) {
+        public NetconfTopologySetupBuilder setPrivateKeyPassphrase(final String privateKeyPassphrase) {
             this.privateKeyPassphrase = privateKeyPassphrase;
             return this;
         }
