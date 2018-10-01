@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf;
 
 import static org.junit.Assert.assertEquals;
@@ -26,6 +25,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -34,7 +35,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -451,8 +451,8 @@ public class NetconfDeviceTest {
         return new RemoteDeviceId("test-D", InetSocketAddress.createUnresolved("localhost", 22));
     }
 
-    public ExecutorService getExecutor() {
-        return Executors.newSingleThreadExecutor();
+    public ListeningExecutorService getExecutor() {
+        return MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
     }
 
     public MessageTransformer<NetconfMessage> getMessageTransformer() throws Exception {

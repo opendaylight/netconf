@@ -9,7 +9,7 @@
 package org.opendaylight.netconf.sal.connect.netconf;
 
 import com.google.common.base.Preconditions;
-import java.util.concurrent.ExecutorService;
+import com.google.common.util.concurrent.ListeningExecutorService;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -21,38 +21,38 @@ public class NetconfDeviceBuilder {
     private NetconfDevice.SchemaResourcesDTO schemaResourcesDTO;
     private RemoteDeviceId id;
     private RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
-    private ExecutorService globalProcessingExecutor;
+    private ListeningExecutorService globalProcessingExecutor;
     private DeviceActionFactory deviceActionFactory;
 
     public NetconfDeviceBuilder() {
     }
 
-    public NetconfDeviceBuilder setReconnectOnSchemasChange(boolean reconnectOnSchemasChange) {
+    public NetconfDeviceBuilder setReconnectOnSchemasChange(final boolean reconnectOnSchemasChange) {
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
         return this;
     }
 
-    public NetconfDeviceBuilder setId(RemoteDeviceId id) {
+    public NetconfDeviceBuilder setId(final RemoteDeviceId id) {
         this.id = id;
         return this;
     }
 
-    public NetconfDeviceBuilder setSchemaResourcesDTO(NetconfDevice.SchemaResourcesDTO schemaResourcesDTO) {
+    public NetconfDeviceBuilder setSchemaResourcesDTO(final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO) {
         this.schemaResourcesDTO = schemaResourcesDTO;
         return this;
     }
 
-    public NetconfDeviceBuilder setSalFacade(RemoteDeviceHandler<NetconfSessionPreferences> salFacade) {
+    public NetconfDeviceBuilder setSalFacade(final RemoteDeviceHandler<NetconfSessionPreferences> salFacade) {
         this.salFacade = salFacade;
         return this;
     }
 
-    public NetconfDeviceBuilder setGlobalProcessingExecutor(ExecutorService globalProcessingExecutor) {
+    public NetconfDeviceBuilder setGlobalProcessingExecutor(final ListeningExecutorService globalProcessingExecutor) {
         this.globalProcessingExecutor = globalProcessingExecutor;
         return this;
     }
 
-    public NetconfDeviceBuilder setDeviceActionFactory(DeviceActionFactory deviceActionFactory) {
+    public NetconfDeviceBuilder setDeviceActionFactory(final DeviceActionFactory deviceActionFactory) {
         this.deviceActionFactory = deviceActionFactory;
         return this;
     }
