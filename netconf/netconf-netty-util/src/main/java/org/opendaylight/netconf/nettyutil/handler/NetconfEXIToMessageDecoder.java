@@ -10,6 +10,7 @@ package org.opendaylight.netconf.nettyutil.handler;
 import static java.util.Objects.requireNonNull;
 
 import com.siemens.ct.exi.core.exceptions.EXIException;
+import com.siemens.ct.exi.main.api.sax.SAXDecoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufUtil;
@@ -17,6 +18,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.TransformerConfigurationException;
@@ -47,6 +51,25 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
         }
 
         FACTORY = (SAXTransformerFactory)f;
+    }
+
+    private static final Field SAXDECODER_DECODER;
+
+    static {
+        SAXDECODER_DECODER = AccessController.doPrivileged((PrivilegedAction<Field>)() -> {
+            final Field f;
+            try {
+                f = SAXDecoder.class.getDeclaredField("decoder");
+            } catch (NoSuchFieldException e) {
+                // FIXME: this will fail consistently with EXIficient>=1.0.2. When we upgrade to 1.0.2 we can safely
+                //        remove this entire machinery.
+                LOG.warn("Unrecognised EXIficient version is present, skipping SAXDecoder cleanup", e);
+                return null;
+            }
+
+            f.setAccessible(true);
+            return f;
+        });
     }
 
     /**
@@ -94,9 +117,27 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
 
         try (InputStream is = new ByteBufInputStream(in)) {
             // Performs internal reset before doing anything
-            reader.parse(new InputSource(is));
+            try {
+                reader.parse(new InputSource(is));
+            } finally {
+                cleanupReader();
+            }
         }
 
         out.add(new NetconfMessage((Document) domResult.getNode()));
+    }
+
+    /**
+     * EXIficient leaves significant state in SAXDecoder. This method resets it via reflection.
+     */
+    private void cleanupReader() {
+        if (reader instanceof SAXDecoder && SAXDECODER_DECODER != null) {
+            try {
+                SAXDECODER_DECODER.set(reader, null);
+            } catch (IllegalAccessException e) {
+                // This should never happen, but if it does, it is not really a problem
+                LOG.debug("Failed to reset decoder in {}", reader, e);
+            }
+        }
     }
 }
