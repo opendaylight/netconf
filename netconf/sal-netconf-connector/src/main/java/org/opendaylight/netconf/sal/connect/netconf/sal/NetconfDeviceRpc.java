@@ -7,12 +7,13 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.Collections2;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.util.Collection;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcAvailabilityListener;
@@ -38,16 +39,14 @@ public final class NetconfDeviceRpc implements DOMRpcService {
 
     private final RemoteDeviceCommunicator<NetconfMessage> communicator;
     private final MessageTransformer<NetconfMessage> transformer;
-    private final Collection<DOMRpcIdentifier> availableRpcs;
+    private final SchemaContext schemaContext;
 
     public NetconfDeviceRpc(final SchemaContext schemaContext,
             final RemoteDeviceCommunicator<NetconfMessage> communicator,
             final MessageTransformer<NetconfMessage> transformer) {
         this.communicator = communicator;
         this.transformer = transformer;
-
-        availableRpcs = Collections2.transform(schemaContext.getOperations(),
-            input -> DOMRpcIdentifier.create(input.getPath()));
+        this.schemaContext = requireNonNull(schemaContext);
     }
 
     @Nonnull
@@ -76,7 +75,8 @@ public final class NetconfDeviceRpc implements DOMRpcService {
     public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
             @Nonnull final T listener) {
 
-        listener.onRpcAvailable(availableRpcs);
+        listener.onRpcAvailable(Collections2.transform(schemaContext.getOperations(),
+            input -> DOMRpcIdentifier.create(input.getPath())));
 
         return new ListenerRegistration<T>() {
             @Override
