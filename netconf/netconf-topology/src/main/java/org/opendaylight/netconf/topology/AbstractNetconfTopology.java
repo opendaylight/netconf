@@ -16,6 +16,7 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.netty.handler.ssl.SslHandler;
@@ -206,7 +207,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     private final DeviceActionFactory deviceActionFactory;
     private final NetconfKeystoreAdapter keystoreAdapter;
     protected final ScheduledThreadPool keepaliveExecutor;
-    protected final ThreadPool processingExecutor;
+    protected final ListeningExecutorService processingExecutor;
     protected final SharedSchemaRepository sharedSchemaRepository;
     protected final DataBroker dataBroker;
     protected final DOMMountPointService mountPointService;
@@ -230,7 +231,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.clientDispatcher = clientDispatcher;
         this.eventExecutor = eventExecutor;
         this.keepaliveExecutor = keepaliveExecutor;
-        this.processingExecutor = processingExecutor;
+        this.processingExecutor = MoreExecutors.listeningDecorator(processingExecutor.getExecutor());
         this.deviceActionFactory = deviceActionFactory;
         this.sharedSchemaRepository = schemaRepositoryProvider.getSharedSchemaRepository();
         this.dataBroker = dataBroker;
@@ -362,7 +363,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
             NetconfDeviceBuilder netconfDeviceBuilder = new NetconfDeviceBuilder()
                     .setReconnectOnSchemasChange(reconnectOnChangedSchema)
                     .setSchemaResourcesDTO(schemaResourcesDTO)
-                    .setGlobalProcessingExecutor(this.processingExecutor.getExecutor())
+                    .setGlobalProcessingExecutor(this.processingExecutor)
                     .setId(remoteDeviceId)
                     .setSalFacade(salFacade);
             if (this.deviceActionFactory != null) {
