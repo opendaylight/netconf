@@ -80,20 +80,28 @@ public final class NetconfDeviceRpc implements DOMRpcService {
     @Override
     public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
             @Nonnull final T listener) {
-
         listener.onRpcAvailable(Collections2.transform(schemaContext.getOperations(),
             input -> DOMRpcIdentifier.create(input.getPath())));
 
-        return new ListenerRegistration<T>() {
-            @Override
-            public void close() {
-                // NOOP, no rpcs appear and disappear in this implementation
-            }
+        return new NoOpListenerRegistration<>(listener);
+    }
 
-            @Override
-            public T getInstance() {
-                return listener;
-            }
-        };
+    private static final class NoOpListenerRegistration<T extends DOMRpcAvailabilityListener>
+            implements ListenerRegistration<T> {
+        private final T listener;
+
+        NoOpListenerRegistration(final T listener) {
+            this.listener = requireNonNull(listener);
+        }
+
+        @Override
+        public T getInstance() {
+            return listener;
+        }
+
+        @Override
+        public void close() {
+            // NOOP, no rpcs appear and disappear in this implementation
+        }
     }
 }
