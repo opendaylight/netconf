@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
@@ -112,7 +113,9 @@ public class NetconfTopologyManagerTest {
 
         final RpcProviderRegistry rpcProviderRegistry = mock(RpcProviderRegistry.class);
         final ScheduledThreadPool keepaliveExecutor = mock(ScheduledThreadPool.class);
-        final ThreadPool processingExecutor = mock(ThreadPool.class);
+        final ThreadPool processingThreadPool = mock(ThreadPool.class);
+        final ExecutorService processingService = mock(ExecutorService.class);
+        doReturn(processingService).when(processingThreadPool).getExecutor();
         final ActorSystemProvider actorSystemProvider = mock(ActorSystemProvider.class);
         final EventExecutor eventExecutor = mock(EventExecutor.class);
         final NetconfClientDispatcher clientDispatcher = mock(NetconfClientDispatcher.class);
@@ -121,12 +124,12 @@ public class NetconfTopologyManagerTest {
 
         final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(0).build();
         netconfTopologyManager = new NetconfTopologyManager(dataBroker, rpcProviderRegistry,
-                clusterSingletonServiceProvider, keepaliveExecutor, processingExecutor,
+                clusterSingletonServiceProvider, keepaliveExecutor, processingThreadPool,
                 actorSystemProvider, eventExecutor, clientDispatcher, TOPOLOGY_ID, config,
                 mountPointService, encryptionService) {
             @Override
-            protected NetconfTopologyContext newNetconfTopologyContext(NetconfTopologySetup setup,
-                    ServiceGroupIdentifier serviceGroupIdent, Timeout actorResponseWaitTime) {
+            protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
+                    final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime) {
                 assertEquals(ACTOR_RESPONSE_WAIT_TIME, actorResponseWaitTime.duration().toSeconds());
                 return Objects.requireNonNull(mockContextMap.get(setup.getInstanceIdentifier()),
                         "No mock context for " + setup.getInstanceIdentifier()).apply(setup);
