@@ -11,8 +11,8 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -24,14 +24,13 @@ import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
 import com.google.common.net.InetAddresses;
+import com.google.common.util.concurrent.ListeningExecutorService;
 import io.netty.util.concurrent.EventExecutor;
 import java.net.InetSocketAddress;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
-import org.opendaylight.controller.config.threadpool.ThreadPool;
 import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
@@ -81,10 +80,10 @@ public class RemoteDeviceConnectorImplTest {
     private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
 
     @Mock
-    private ScheduledThreadPool keepaliveExecutor;
+    private ScheduledExecutorService keepaliveExecutor;
 
     @Mock
-    private ThreadPool processingExecutor;
+    private ListeningExecutorService processingExecutor;
 
     @Mock
     private ActorSystem actorSystem;
@@ -169,9 +168,6 @@ public class RemoteDeviceConnectorImplTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testKeapAliveFacade() {
-        final ExecutorService executorService = mock(ExecutorService.class);
-        doReturn(executorService).when(processingExecutor).getExecutor();
-
         final Credentials credentials = new LoginPasswordBuilder()
                 .setPassword("admin").setUsername("admin").build();
         final NetconfNode netconfNode = new NetconfNodeBuilder()
