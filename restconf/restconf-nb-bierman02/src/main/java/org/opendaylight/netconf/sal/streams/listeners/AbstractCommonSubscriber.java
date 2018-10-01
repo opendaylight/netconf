@@ -51,8 +51,11 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
 
     @Override
     public final void close() {
-        this.registration.close();
-        this.registration = null;
+        if (registration != null) {
+            this.registration.close();
+            this.registration = null;
+        }
+
         unregister();
     }
 
