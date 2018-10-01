@@ -63,7 +63,29 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
             } catch (NoSuchFieldException e) {
                 // FIXME: this will fail consistently with EXIficient>=1.0.2. When we upgrade to 1.0.2 we can safely
                 //        remove this entire machinery.
-                LOG.warn("Unrecognised EXIficient version is present, skipping SAXDecoder cleanup", e);
+                LOG.warn("Unrecognised EXIficient version is present, skipping SAXDecoder.decoder cleanup", e);
+                return null;
+            }
+
+            f.setAccessible(true);
+            return f;
+        });
+    }
+
+    // FIXME: remove this once we have a way to do buffer management
+    private static final int CBUFFER_CACHE_SIZE = 4096;
+    private static final int CBUFFER_CACHE_MAX = 65536;
+    private static final ThreadLocal<char[]> CBUFFER_CACHE = ThreadLocal.withInitial(
+        () -> new char[CBUFFER_CACHE_SIZE]);
+    private static final Field SAXDECODER_CBUFFER;
+
+    static {
+        SAXDECODER_CBUFFER = AccessController.doPrivileged((PrivilegedAction<Field>)() -> {
+            final Field f;
+            try {
+                f = SAXDecoder.class.getDeclaredField("cbuffer");
+            } catch (NoSuchFieldException e) {
+                LOG.warn("Unrecognised EXIficient version is present, skipping SAXDecoder.cbuffer cleanup", e);
                 return null;
             }
 
@@ -83,6 +105,14 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
     private NetconfEXIToMessageDecoder(final XMLReader reader) {
         this.reader = requireNonNull(reader);
         this.documentBuilder = UntrustedXML.newDocumentBuilder();
+
+        if (reader instanceof SAXDecoder && SAXDECODER_CBUFFER != null) {
+            try {
+                SAXDECODER_CBUFFER.set(reader, null);
+            } catch (IllegalAccessException e) {
+                LOG.debug("Failed to clean up cbuffer in {}", reader, e);
+            }
+        }
     }
 
     public static NetconfEXIToMessageDecoder create(final NetconfEXICodec codec) throws EXIException {
@@ -116,21 +146,56 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
         handler.setResult(domResult);
 
         try (InputStream is = new ByteBufInputStream(in)) {
-            // Performs internal reset before doing anything
+            setupCbuffer();
             try {
-                reader.parse(new InputSource(is));
+                try {
+                    reader.parse(new InputSource(is));
+                } finally {
+                    cleanupDecoder();
+                }
             } finally {
-                cleanupReader();
+                cleanupCbuffer();
             }
         }
 
         out.add(new NetconfMessage((Document) domResult.getNode()));
     }
 
+
     /**
-     * EXIficient leaves significant state in SAXDecoder. This method resets it via reflection.
+     * EXIficient has a pre-allocated char[] buffer. This method sets it up so that we retain this state on a per-thread
+     * basis.
      */
-    private void cleanupReader() {
+    private void setupCbuffer() {
+        if (reader instanceof SAXDecoder && SAXDECODER_CBUFFER != null) {
+            try {
+                SAXDECODER_CBUFFER.set(reader, CBUFFER_CACHE.get());
+            } catch (IllegalAccessException e) {
+                throw new IllegalStateException("Failed to set cbuffer in " + reader, e);
+            }
+        }
+    }
+
+    private void cleanupCbuffer() {
+        if (reader instanceof SAXDecoder && SAXDECODER_CBUFFER != null) {
+            final char[] buffer;
+            try {
+                buffer = (char[]) SAXDECODER_DECODER.get(reader);
+                SAXDECODER_DECODER.set(reader, null);
+            } catch (IllegalAccessException e) {
+                // This should never happen, but if it does, it is not really a problem
+                LOG.debug("Failed to reset cbuffer in {}", reader, e);
+                return;
+            }
+
+            if (buffer != null && buffer.length <= CBUFFER_CACHE_MAX) {
+                CBUFFER_CACHE.set(buffer);
+            }
+        }
+    }
+
+    private void cleanupDecoder() {
+        // See https://github.com/EXIficient/exificient/pull/22
         if (reader instanceof SAXDecoder && SAXDECODER_DECODER != null) {
             try {
                 SAXDECODER_DECODER.set(reader, null);
