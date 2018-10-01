@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
@@ -27,7 +29,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.GuardedBy;
@@ -118,13 +119,14 @@ public class NetconfDevice
 
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id,
                          final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
-                         final ExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
+                         final ListeningExecutorService globalProcessingExecutor,
+                         final boolean reconnectOnSchemasChange) {
         this(schemaResourcesDTO, id, salFacade, globalProcessingExecutor, reconnectOnSchemasChange, null);
     }
 
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id,
             final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
-            final ExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange,
+            final ListeningExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange,
             final DeviceActionFactory deviceActionFactory) {
         this.id = id;
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
@@ -134,7 +136,7 @@ public class NetconfDevice
         this.schemaContextFactory = schemaResourcesDTO.getSchemaContextFactory();
         this.salFacade = salFacade;
         this.stateSchemasResolver = schemaResourcesDTO.getStateSchemasResolver();
-        this.processingExecutor = MoreExecutors.listeningDecorator(globalProcessingExecutor);
+        this.processingExecutor = requireNonNull(globalProcessingExecutor);
         this.notificationHandler = new NotificationHandler(salFacade, id);
     }
 
