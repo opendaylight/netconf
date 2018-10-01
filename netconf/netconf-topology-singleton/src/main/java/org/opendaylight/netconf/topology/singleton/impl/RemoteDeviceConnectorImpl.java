@@ -159,7 +159,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         if (keepaliveDelay > 0) {
             LOG.info("{}: Adding keepalive facade.", remoteDeviceId);
             salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade,
-                    netconfTopologyDeviceSetup.getKeepaliveExecutor().getExecutor(), keepaliveDelay,
+                    netconfTopologyDeviceSetup.getKeepaliveExecutor(), keepaliveDelay,
                     defaultRequestTimeoutMillis);
         }
 
@@ -200,7 +200,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
             device = new NetconfDeviceBuilder()
                     .setReconnectOnSchemasChange(reconnectOnChangedSchema)
                     .setSchemaResourcesDTO(schemaResourcesDTO)
-                    .setGlobalProcessingExecutor(netconfTopologyDeviceSetup.getProcessingExecutor().getExecutor())
+                    .setGlobalProcessingExecutor(netconfTopologyDeviceSetup.getProcessingExecutor())
                     .setId(remoteDeviceId)
                     .setSalFacade(salFacade)
                     .build();
