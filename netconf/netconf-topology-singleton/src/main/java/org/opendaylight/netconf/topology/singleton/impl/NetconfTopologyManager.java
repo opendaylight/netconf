@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import akka.actor.ActorSystem;
@@ -13,11 +12,13 @@ import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -70,8 +71,8 @@ public class NetconfTopologyManager
     private final DataBroker dataBroker;
     private final RpcProviderRegistry rpcProviderRegistry;
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
-    private final ScheduledThreadPool keepaliveExecutor;
-    private final ThreadPool processingExecutor;
+    private final ScheduledExecutorService keepaliveExecutor;
+    private final ListeningExecutorService processingExecutor;
     private final ActorSystem actorSystem;
     private final EventExecutor eventExecutor;
     private final NetconfClientDispatcher clientDispatcher;
@@ -95,8 +96,8 @@ public class NetconfTopologyManager
         this.dataBroker = Preconditions.checkNotNull(dataBroker);
         this.rpcProviderRegistry = Preconditions.checkNotNull(rpcProviderRegistry);
         this.clusterSingletonServiceProvider = Preconditions.checkNotNull(clusterSingletonServiceProvider);
-        this.keepaliveExecutor = Preconditions.checkNotNull(keepaliveExecutor);
-        this.processingExecutor = Preconditions.checkNotNull(processingExecutor);
+        this.keepaliveExecutor = keepaliveExecutor.getExecutor();
+        this.processingExecutor = MoreExecutors.listeningDecorator(processingExecutor.getExecutor());
         this.actorSystem = Preconditions.checkNotNull(actorSystemProvider).getActorSystem();
         this.eventExecutor = Preconditions.checkNotNull(eventExecutor);
         this.clientDispatcher = Preconditions.checkNotNull(clientDispatcher);
@@ -197,8 +198,8 @@ public class NetconfTopologyManager
     }
 
     @VisibleForTesting
-    protected NetconfTopologyContext newNetconfTopologyContext(NetconfTopologySetup setup,
-            ServiceGroupIdentifier serviceGroupIdent, Timeout actorResponseWaitTime) {
+    protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
+            final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime) {
         return new NetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime, mountPointService);
     }
 
@@ -217,7 +218,7 @@ public class NetconfTopologyManager
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    private static void close(AutoCloseable closeable) {
+    private static void close(final AutoCloseable closeable) {
         try {
             closeable.close();
         } catch (Exception e) {
