@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8eb520c8_00f5cc5c",
+        "filename": "restconf/restconf-nb-bierman02/src/test/resources/nn-to-json/simple-data-types/xml/data.xml",
+        "patchSetId": 39
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-10-03T21:46:37Z",
+      "side": 1,
+      "message": "Robert, I believe this is changed by mistake right?",
+      "revId": "132d782e05ea67b50e08b0d7f2d5b01d56fb7f13",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
