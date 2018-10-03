@@ -16,6 +16,24 @@
       "revId": "132d782e05ea67b50e08b0d7f2d5b01d56fb7f13",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ce854f1_53506f8b",
+        "filename": "restconf/restconf-nb-bierman02/src/test/resources/nn-to-json/simple-data-types/xml/data.xml",
+        "patchSetId": 39
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2018-10-03T22:22:50Z",
+      "side": 1,
+      "message": "Yes, sorry.",
+      "parentUuid": "8eb520c8_00f5cc5c",
+      "revId": "132d782e05ea67b50e08b0d7f2d5b01d56fb7f13",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
