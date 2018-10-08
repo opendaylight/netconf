@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
+import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -48,17 +49,12 @@ public class NetconfDeviceNotificationService implements DOMNotificationService 
             listeners.put(type, listener);
         }
 
-        return new ListenerRegistration<T>() {
+        return new AbstractListenerRegistration<T>(listener) {
             @Override
-            public void close() {
+            protected void removeRegistration() {
                 for (final SchemaPath type : types) {
                     listeners.remove(type, listener);
                 }
-            }
-
-            @Override
-            public T getInstance() {
-                return listener;
             }
         };
     }
