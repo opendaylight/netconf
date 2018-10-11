@@ -14,6 +14,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -30,11 +32,16 @@ import org.apache.sshd.common.io.IoHandler;
 import org.apache.sshd.common.io.IoServiceFactory;
 import org.apache.sshd.common.session.Session;
 import org.apache.sshd.common.session.SessionListener;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 public class NetconfCallHomeServerTest {
+    private static EventLoopGroup EVENT_LOOP_GROUP;
+    private static InetSocketAddress MOCK_ADDRESS;
+
     private SshClient mockSshClient;
     private CallHomeAuthorizationProvider mockCallHomeAuthProv;
     private CallHomeAuthorization mockAuth;
@@ -45,13 +52,26 @@ public class NetconfCallHomeServerTest {
 
     private NetconfCallHomeServer instance;
 
+    @BeforeClass
+    public static void beforeClass() {
+        EVENT_LOOP_GROUP = new NioEventLoopGroup();
+        MOCK_ADDRESS = InetSocketAddress.createUnresolved("127.0.0.1", 123);
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        EVENT_LOOP_GROUP.shutdownGracefully();
+        EVENT_LOOP_GROUP = null;
+        MOCK_ADDRESS = null;
+    }
+
     @Before
     public void setup() {
         mockSshClient = Mockito.spy(SshClient.setUpDefaultClient());
         mockCallHomeAuthProv = mock(CallHomeAuthorizationProvider.class);
         mockAuth = mock(CallHomeAuthorization.class);
         mockFactory = mock(CallHomeSessionContext.Factory.class);
-        mockAddress = InetSocketAddress.createUnresolved("1.2.3.4", 123);
+        Mockito.doReturn(EVENT_LOOP_GROUP).when(mockFactory).getNettyGroup();
         mockSession = mock(ClientSession.class);
         mockStatusRecorder = mock(StatusRecorder.class);
 
@@ -60,7 +80,7 @@ public class NetconfCallHomeServerTest {
         Mockito.doReturn(props).when(mockSshClient).getProperties();
         Mockito.doReturn("test").when(mockSession).toString();
         instance = new NetconfCallHomeServer(
-            mockSshClient, mockCallHomeAuthProv, mockFactory, mockAddress, mockStatusRecorder);
+            mockSshClient, mockCallHomeAuthProv, mockFactory, MOCK_ADDRESS, mockStatusRecorder);
     }
 
     @Test
@@ -133,29 +153,6 @@ public class NetconfCallHomeServerTest {
         assertFalse(instance.verifyServerKey(mockClientSession, mockSocketAddr, mockPublicKey));
     }
 
-    static class TestableCallHomeServer extends NetconfCallHomeServer {
-        static IoServiceFactory minaServiceFactory;
-
-        static SshClient factoryHook(final SshClient client, final IoServiceFactory minaFactory) {
-            minaServiceFactory = minaFactory;
-            return client;
-        }
-
-        SshClient client;
-
-        TestableCallHomeServer(final SshClient sshClient, final CallHomeAuthorizationProvider authProvider,
-                               final CallHomeSessionContext.Factory factory, final InetSocketAddress socketAddress,
-                               final IoServiceFactory minaFactory, final StatusRecorder recorder) {
-            super(factoryHook(sshClient, minaFactory), authProvider, factory, socketAddress, recorder);
-            client = sshClient;
-        }
-
-        @Override
-        protected IoServiceFactory createMinaServiceFactory(final SshClient sshClient) {
-            return minaServiceFactory;
-        }
-    }
-
     @Test
     public void bindShouldStartTheClientAndBindTheAddress() throws IOException {
         // given
@@ -165,8 +162,8 @@ public class NetconfCallHomeServerTest {
         Mockito.doReturn(mockAcceptor).when(mockMinaFactory).createAcceptor(any(IoHandler.class));
         Mockito.doReturn(mockAcceptor).when(mockMinaFactory).createAcceptor(any(IoHandler.class));
         Mockito.doNothing().when(mockAcceptor).bind(mockAddress);
-        instance = new TestableCallHomeServer(
-            mockSshClient, mockCallHomeAuthProv, mockFactory, mockAddress, mockMinaFactory, mockStatusRecorder);
+        instance = new NetconfCallHomeServer(
+            mockSshClient, mockCallHomeAuthProv, mockFactory, mockAddress, mockStatusRecorder, mockMinaFactory);
         // when
         instance.bind();
         // then
