@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -85,7 +86,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Writing request on channel: {}, message: {}", ctx.channel(), byteBufToString(byteBufMsg));
             }
-            asyncIn.write(toBuffer(byteBufMsg)).addListener(future -> {
+            asyncIn.writePacket(toBuffer(byteBufMsg)).addListener(future -> {
                 // synchronized block due to deadlock that happens on ssh window resize
                 // writes and pending writes would lock the underlyinch channel session
                 // window resize write would try to write the message on an already locked channelSession,
@@ -122,7 +123,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
                 writePendingIfAny();
             });
 
-        } catch (final WritePendingException e) {
+        } catch (final IOException | WritePendingException e) {
 
             if (!wasPending) {
                 queueRequest(ctx, byteBufMsg, promise);
