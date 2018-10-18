@@ -106,14 +106,14 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
                         promise.setFailure(future.getException());
                     }
 
-                    // Not needed anymore, release
-                    byteBufMsg.release();
-
                     //rescheduling message from queue after successfully sent
                     if (wasPending) {
                         byteBufMsg.resetReaderIndex();
                         pending.remove();
                     }
+
+                    // Not needed anymore, release
+                    byteBufMsg.release();
                 }
 
                 // Check pending queue and schedule next
