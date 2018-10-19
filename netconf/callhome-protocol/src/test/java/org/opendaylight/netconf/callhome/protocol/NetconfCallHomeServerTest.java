@@ -149,11 +149,6 @@ public class NetconfCallHomeServerTest {
             super(factoryHook(sshClient, minaFactory), authProvider, factory, socketAddress, recorder);
             client = sshClient;
         }
-
-        @Override
-        protected IoServiceFactory createMinaServiceFactory(final SshClient sshClient) {
-            return minaServiceFactory;
-        }
     }
 
     @Test
