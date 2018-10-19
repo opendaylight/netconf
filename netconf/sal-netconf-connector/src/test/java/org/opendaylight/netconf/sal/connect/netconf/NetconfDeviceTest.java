@@ -11,7 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollectionOf;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
@@ -40,7 +39,6 @@ import java.util.concurrent.Executors;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -162,7 +160,7 @@ public class NetconfDeviceTest {
         device.onRemoteSessionUp(sessionCaps, listener);
 
         Mockito.verify(facade, Mockito.timeout(5000)).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class), isNull());
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
         Mockito.verify(schemaFactory, times(2)).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
     }
 
@@ -249,7 +247,7 @@ public class NetconfDeviceTest {
         device.onRemoteSessionUp(sessionCaps, listener);
 
         Mockito.verify(facade, Mockito.timeout(5000)).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class), isNull());
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
         Mockito.verify(schemaFactory, times(1)).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
     }
 
@@ -327,8 +325,7 @@ public class NetconfDeviceTest {
 
         verify(schemaContextProviderFactory, timeout(5000)).createSchemaContext(any(Collection.class));
         verify(facade, timeout(5000)).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
-                isNull());
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
 
         device.onRemoteSessionDown();
         verify(facade, timeout(5000)).onDeviceDisconnected();
@@ -337,8 +334,7 @@ public class NetconfDeviceTest {
 
         verify(schemaContextProviderFactory, timeout(5000).times(2)).createSchemaContext(any(Collection.class));
         verify(facade, timeout(5000).times(2)).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
-                isNull());
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
     }
 
     @Test
@@ -368,7 +364,7 @@ public class NetconfDeviceTest {
         //complete schema setup
         schemaFuture.set(getSchema());
         //facade.onDeviceDisconnected() was called, so facade.onDeviceConnected() shouldn't be called anymore
-        verify(facade, after(1000).never()).onDeviceConnected(any(), any(), any(), any(DOMActionService.class));
+        verify(facade, after(1000).never()).onDeviceConnected(any(), any(), any());
     }
 
     @Test
@@ -401,7 +397,7 @@ public class NetconfDeviceTest {
         final ArgumentCaptor<NetconfSessionPreferences> argument =
                 ArgumentCaptor.forClass(NetconfSessionPreferences.class);
         verify(facade, timeout(5000))
-                .onDeviceConnected(any(SchemaContext.class), argument.capture(), any(DOMRpcService.class), isNull());
+                .onDeviceConnected(any(SchemaContext.class), argument.capture(), any(DOMRpcService.class));
         final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().getNetconfDeviceCapabilities();
 
         netconfDeviceCaps.getResolvedCapabilities()
@@ -425,8 +421,7 @@ public class NetconfDeviceTest {
         final RemoteDeviceHandler<NetconfSessionPreferences> remoteDeviceHandler =
                 mockCloseableClass(RemoteDeviceHandler.class);
         doNothing().when(remoteDeviceHandler).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class),
-                any(DOMActionService.class));
+                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
         doNothing().when(remoteDeviceHandler).onDeviceDisconnected();
         doNothing().when(remoteDeviceHandler).onNotification(any(DOMNotification.class));
         return remoteDeviceHandler;
