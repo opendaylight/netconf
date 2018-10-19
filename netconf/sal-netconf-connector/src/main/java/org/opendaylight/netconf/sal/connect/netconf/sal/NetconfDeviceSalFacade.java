@@ -52,6 +52,13 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
     @Override
     public synchronized void onDeviceConnected(final SchemaContext schemaContext,
                                                final NetconfSessionPreferences netconfSessionPreferences,
+                                               final DOMRpcService deviceRpc) {
+        onDeviceConnected(schemaContext, netconfSessionPreferences, deviceRpc, null);
+    }
+
+    @Override
+    public synchronized void onDeviceConnected(final SchemaContext schemaContext,
+                                               final NetconfSessionPreferences netconfSessionPreferences,
                                                final DOMRpcService deviceRpc, DOMActionService deviceAction) {
 
         final DOMDataBroker domBroker =
