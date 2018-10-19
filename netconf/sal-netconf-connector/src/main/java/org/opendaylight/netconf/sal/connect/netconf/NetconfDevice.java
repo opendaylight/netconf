@@ -237,14 +237,19 @@ public class NetconfDevice
             final BaseSchema baseSchema =
                 remoteSessionCapabilities.isNotificationsSupported()
                         ? BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS : BaseSchema.BASE_NETCONF_CTX;
-            this.messageTransformer = new NetconfMessageTransformer(result, true, baseSchema);
+            messageTransformer = new NetconfMessageTransformer(result, true, baseSchema);
 
-            updateTransformer(this.messageTransformer);
+            updateTransformer(messageTransformer);
             // salFacade.onDeviceConnected has to be called before the notification handler is initialized
-            this.salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc,
-                    this.deviceActionFactory == null ? null : this.deviceActionFactory.createDeviceAction(
-                            this.messageTransformer, listener, result));
-            this.notificationHandler.onRemoteSchemaUp(this.messageTransformer);
+
+            if (deviceActionFactory != null) {
+                salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc,
+                        deviceActionFactory.createDeviceAction(messageTransformer, listener, result));
+            } else {
+                salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc);
+            }
+
+           notificationHandler.onRemoteSchemaUp(this.messageTransformer);
 
             LOG.info("{}: Netconf connector initialized successfully", id);
         } else {
