@@ -5,12 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.protocol;
 
 import com.google.common.base.Optional;
+import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.local.LocalEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -117,7 +116,7 @@ public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServ
     }
 
     private static EventLoopGroup defaultNettyGroup() {
-        return new LocalEventLoopGroup();
+        return new DefaultEventLoopGroup();
     }
 
     private static InetSocketAddress defaultBindAddress() {
