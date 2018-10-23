@@ -11,6 +11,7 @@ package org.opendaylight.netconf.callhome.mount;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListenableFuture;
+import io.netty.channel.nio.NioEventLoopGroup;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Collection;
@@ -106,6 +107,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         if (port > 0) {
             builder.setBindAddress(new InetSocketAddress(port));
         }
+        builder.setNettyGroup(new NioEventLoopGroup());
         server = builder.build();
         server.bind();
         mountDispacher.createTopology();
