@@ -88,10 +88,5 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>netconf-netty-util</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.siemens.ct.exi</groupId>
-            <artifactId>exificient</artifactId>
-            <version>1.0.1</version>
-        </dependency>
     </dependencies>
 </project>
