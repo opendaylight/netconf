@@ -11,11 +11,11 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.io.ByteSource;
 import com.google.common.io.Resources;
-import com.siemens.ct.exi.core.exceptions.EXIException;
-import com.siemens.ct.exi.core.grammars.Grammars;
-import com.siemens.ct.exi.grammars.GrammarFactory;
 import java.io.IOException;
 import java.io.InputStream;
+import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
+import org.opendaylight.netconf.shaded.exificient.core.grammars.Grammars;
+import org.opendaylight.netconf.shaded.exificient.grammars.GrammarFactory;
 
 /**
  * Enumeration of schema modes defined by the NETCONF EXI capability.
