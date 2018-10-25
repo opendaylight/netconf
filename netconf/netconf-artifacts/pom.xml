@@ -248,6 +248,12 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>shaded-exificient</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- netconf features -->
             <dependency>
                 <groupId>${project.groupId}</groupId>

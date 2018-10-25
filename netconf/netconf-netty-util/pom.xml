@@ -22,16 +22,6 @@
   <version>1.6.0-SNAPSHOT</version>
   <name>${project.artifactId}</name>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.siemens.ct.exi</groupId>
-        <artifactId>exificient</artifactId>
-        <version>1.0.4</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <!-- compile dependencies -->
     <dependency>
@@ -64,15 +54,10 @@
     </dependency>
 
     <dependency>
-      <groupId>com.siemens.ct.exi</groupId>
-      <artifactId>exificient</artifactId>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>shaded-exificient</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
-      <version>1.4.01</version>
-    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
