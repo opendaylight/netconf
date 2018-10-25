@@ -10,14 +10,14 @@ package org.opendaylight.netconf.nettyutil.handler.exi;
 
 import static org.junit.Assert.assertTrue;
 
-import com.siemens.ct.exi.core.CodingMode;
-import com.siemens.ct.exi.core.FidelityOptions;
 import java.util.Arrays;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.opendaylight.netconf.shaded.exificient.core.CodingMode;
+import org.opendaylight.netconf.shaded.exificient.core.FidelityOptions;
 
 @RunWith(Parameterized.class)
 public class NetconfStartExiMessageTest {
