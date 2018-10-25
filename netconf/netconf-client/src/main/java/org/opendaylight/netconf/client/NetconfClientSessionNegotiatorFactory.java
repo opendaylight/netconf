@@ -10,9 +10,6 @@ package org.opendaylight.netconf.client;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
-import com.siemens.ct.exi.core.CodingMode;
-import com.siemens.ct.exi.core.FidelityOptions;
-import com.siemens.ct.exi.core.exceptions.UnsupportedOption;
 import io.netty.channel.Channel;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
@@ -27,6 +24,9 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiatorFactory;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
+import org.opendaylight.netconf.shaded.exificient.core.CodingMode;
+import org.opendaylight.netconf.shaded.exificient.core.FidelityOptions;
+import org.opendaylight.netconf.shaded.exificient.core.exceptions.UnsupportedOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
