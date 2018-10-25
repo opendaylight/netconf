@@ -33,7 +33,6 @@
         <module>odl-netconf-clustered-topology</module>
         <module>odl-netconf-connector</module>
         <module>odl-netconf-connector-all</module>
-        <module>odl-netconf-connector-ssh</module>
         <module>odl-netconf-callhome-ssh</module>
         <module>odl-netconf-console</module>
         <module>odl-netconf-topology</module>
