@@ -9,7 +9,6 @@ package org.opendaylight.netconf.nettyutil.handler;
 
 import static java.util.Objects.requireNonNull;
 
-import com.siemens.ct.exi.core.exceptions.EXIException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufUtil;
@@ -26,6 +25,7 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
