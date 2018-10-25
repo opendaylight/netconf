@@ -99,6 +99,9 @@
   <service ref="jsonRestconfServiceDraft02" odl:type="default"
       interface="org.opendaylight.netconf.sal.restconf.api.JSONRestconfService" />
 
+  <service ref="restconfImpl" odl:type="default"
+      interface="org.opendaylight.netconf.sal.rest.api.RestconfService" />
+
   <!-- Bierman02WebRegistrar -->
 
   <reference id="customFilterAdapterConfig"
