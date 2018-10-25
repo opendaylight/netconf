@@ -61,5 +61,8 @@
     <module>callhome-provider</module>
 
     <module>netconf-artifacts</module>
+
+    <module>shaded-exificient-jar</module>
+    <module>shaded-exificient</module>
   </modules>
 </project>
