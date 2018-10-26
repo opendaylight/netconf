@@ -42,7 +42,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.xml.transform.dom.DOMSource;
-import org.apache.xerces.dom.TextImpl;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -433,8 +432,8 @@ public class NetconfMessageTransformerTest {
         Node childName = childServer.getFirstChild();
         checkNode(childName, "name", "name", qname.getNamespace().toString());
 
-        TextImpl childTest = (TextImpl) childName.getFirstChild();
-        assertEquals(childTest.getData(), "test");
+        Node childTest = childName.getFirstChild();
+        assertEquals(childTest.getNodeValue(), "test");
 
         checkAction(actionResetQName, childName.getNextSibling(), "reset-at", "reset-at", "now");
     }
@@ -507,18 +506,18 @@ public class NetconfMessageTransformerTest {
         assertEquals("now", leaf.getValue());
     }
 
-    private void checkAction(final QName actionQname, final Node action , final String inputLocalName,
+    private static void checkAction(final QName actionQname, final Node action , final String inputLocalName,
             final String inputNodeName, final String inputValue) {
         checkNode(action, null, actionQname.getLocalName(), null);
 
         Node childResetAt = action.getFirstChild();
         checkNode(childResetAt, inputLocalName, inputNodeName, actionQname.getNamespace().toString());
 
-        TextImpl firstChild = (TextImpl) childResetAt.getFirstChild();
-        assertEquals(firstChild.getData(), inputValue);
+        Node firstChild = childResetAt.getFirstChild();
+        assertEquals(firstChild.getNodeValue(), inputValue);
     }
 
-    private Node checkBasePartOfActionRequest(final NetconfMessage actionRequest) {
+    private static Node checkBasePartOfActionRequest(final NetconfMessage actionRequest) {
         Node baseRpc = actionRequest.getDocument().getFirstChild();
         checkNode(baseRpc, "rpc", "rpc", NetconfMessageTransformUtil.NETCONF_QNAME.getNamespace().toString());
         assertTrue(baseRpc.getLocalName().equals("rpc"));
@@ -533,7 +532,7 @@ public class NetconfMessageTransformerTest {
         return childAction;
     }
 
-    private DOMDataTreeIdentifier prepareDataTreeId(final Set<PathArgument> nodeIdentifiers) {
+    private static DOMDataTreeIdentifier prepareDataTreeId(final Set<PathArgument> nodeIdentifiers) {
         YangInstanceIdentifier yangInstanceIdentifier =
                 YangInstanceIdentifier.builder().append(nodeIdentifiers).build();
         DOMDataTreeIdentifier domDataTreeIdentifier =
@@ -542,7 +541,7 @@ public class NetconfMessageTransformerTest {
         return domDataTreeIdentifier;
     }
 
-    private ContainerNode initInputAction(final QName qname, final String value) {
+    private static ContainerNode initInputAction(final QName qname, final String value) {
         ImmutableLeafNodeBuilder<String> immutableLeafNodeBuilder = new ImmutableLeafNodeBuilder<>();
         DataContainerChild<NodeIdentifier, String> build = immutableLeafNodeBuilder.withNodeIdentifier(
                 NodeIdentifier.create(qname)).withValue(value).build();
@@ -551,7 +550,7 @@ public class NetconfMessageTransformerTest {
         return data;
     }
 
-    private void checkNode(final Node childServer, final String expectedLocalName, final String expectedNodeName,
+    private static void checkNode(final Node childServer, final String expectedLocalName, final String expectedNodeName,
             final String expectedNamespace) {
         assertNotNull(childServer);
         assertEquals(childServer.getLocalName(), expectedLocalName);
@@ -559,11 +558,11 @@ public class NetconfMessageTransformerTest {
         assertEquals(childServer.getNamespaceURI(), expectedNamespace);
     }
 
-    private SchemaContext getActionSchema() {
+    private static SchemaContext getActionSchema() {
         return YangParserTestUtils.parseYangResource("/schemas/example-server-farm.yang");
     }
 
-    private NetconfMessageTransformer getActionMessageTransformer() {
+    private static NetconfMessageTransformer getActionMessageTransformer() {
         return new NetconfMessageTransformer(getActionSchema(), true);
     }
 }
