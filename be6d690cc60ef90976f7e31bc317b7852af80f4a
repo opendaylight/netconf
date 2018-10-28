@@ -45,6 +45,30 @@
       "revId": "be6d690cc60ef90976f7e31bc317b7852af80f4a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6fedffe4_980d6d78",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/JSONRestconfServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2018-10-28T14:33:27Z",
+      "side": 1,
+      "message": "Can’t assume http... websockets can be configured with TLS",
+      "parentUuid": "1e1b9f8d_5797741a",
+      "range": {
+        "startLine": 222,
+        "startChar": 40,
+        "endLine": 222,
+        "endChar": 61
+      },
+      "revId": "be6d690cc60ef90976f7e31bc317b7852af80f4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
