@@ -17,7 +17,12 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
+import javax.annotation.Nonnull;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriInfo;
+
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
@@ -31,6 +36,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.common.util.MultivaluedHashMap;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -208,6 +214,24 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
             propagateExceptionAs(uriPath, e, "PATCH");
         }
         return Optional.fromNullable(output);
+    }
+
+    @Override
+    public Optional<String> subscribeToStream(@Nonnull String identifier,
+                                      @Nonnull MultivaluedMap<String, String> params) throws OperationFailedException {
+        //Note: We use http://127.0.0.1 because the Uri parser requires something there though it does nothing
+        String uri = new StringBuilder("http://127.0.0.1:8081/restconf/streams/stream/").append(identifier).toString();
+        UriInfo uriInfo = new SimpleUriInfo(uri, params);
+
+        String jsonRes = null;
+        try {
+            NormalizedNodeContext res = restconfService.subscribeToStream(identifier, uriInfo);
+            jsonRes = toJson(res);
+        } catch (final Exception e) {
+            propagateExceptionAs(identifier, e, "RPC");
+        }
+
+        return Optional.of(jsonRes);
     }
 
     @Override
