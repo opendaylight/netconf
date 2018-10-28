@@ -9,8 +9,11 @@ package org.opendaylight.netconf.sal.restconf.api;
 
 import com.google.common.base.Optional;
 import javax.annotation.Nonnull;
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
+
 
 /**
  * Provides restconf CRUD operations via code with input/output data in JSON format.
@@ -84,4 +87,15 @@ public interface JSONRestconfService {
      * @throws OperationFailedException if the request fails.
      */
     Optional<String> patch(@Nonnull String uriPath, @Nonnull String payload) throws OperationFailedException;
+
+    /**
+     * Subscribe to a stream.
+     * @param identifier the identifier of the stream, e.g., "data-change-event-subscription/neutron:neutron/...
+     *                   ...neutron:ports/datastore=OPERATIONAL/scope=SUBTREE".
+     * @param params HTTP query parameters or null.
+     * @return On optional containing the JSON response.
+     * @throws OperationFailedException if the requests fails.
+     */
+    Optional<String> subscribeToStream(@Nonnull String identifier, MultivaluedMap<String, String> params)
+                                                                                    throws OperationFailedException;
 }
