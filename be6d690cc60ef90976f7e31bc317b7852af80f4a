@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "018811dd_c3ee42c5",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/api/JSONRestconfService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 5357
+      },
+      "writtenOn": "2018-10-28T14:46:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ccd65640_d0679f73",
+      "range": {
+        "startLine": 99,
+        "startChar": 76,
+        "endLine": 99,
+        "endChar": 113
+      },
+      "revId": "be6d690cc60ef90976f7e31bc317b7852af80f4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e1b9f8d_5797741a",
         "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/JSONRestconfServiceImpl.java",
         "patchSetId": 2
@@ -60,6 +84,54 @@
       "side": 1,
       "message": "Can’t assume http... websockets can be configured with TLS",
       "parentUuid": "1e1b9f8d_5797741a",
+      "range": {
+        "startLine": 222,
+        "startChar": 40,
+        "endLine": 222,
+        "endChar": 61
+      },
+      "revId": "be6d690cc60ef90976f7e31bc317b7852af80f4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ec608314_6e8c2cb5",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/JSONRestconfServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 5357
+      },
+      "writtenOn": "2018-10-28T14:46:03Z",
+      "side": 1,
+      "message": "Yup. The websocket can negotiate up to ssl regardless of the URI used here. The only effect it has here is on the returned websocket URI which is ignored and irrelevant for this case since it\u0027s being run from the server, not the client who will go and connect to it.",
+      "parentUuid": "1e1b9f8d_5797741a",
+      "range": {
+        "startLine": 222,
+        "startChar": 40,
+        "endLine": 222,
+        "endChar": 61
+      },
+      "revId": "be6d690cc60ef90976f7e31bc317b7852af80f4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "19426c92_4a3fb3a3",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/JSONRestconfServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 5357
+      },
+      "writtenOn": "2018-10-28T14:46:03Z",
+      "side": 1,
+      "message": "Please see my comment to Tom, it doesn\u0027t actually effect that. It just effects the returned URI which is ignored in this case.",
+      "parentUuid": "6fedffe4_980d6d78",
       "range": {
         "startLine": 222,
         "startChar": 40,
