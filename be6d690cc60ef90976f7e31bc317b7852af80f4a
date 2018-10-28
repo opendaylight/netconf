@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ccd65640_d0679f73",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/api/JSONRestconfService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-10-28T14:13:17Z",
+      "side": 1,
+      "message": "I assume it wouldn\u0027t be common to pass in query params - if so can we make this Optional?",
+      "range": {
+        "startLine": 99,
+        "startChar": 76,
+        "endLine": 99,
+        "endChar": 113
+      },
+      "revId": "be6d690cc60ef90976f7e31bc317b7852af80f4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e1b9f8d_5797741a",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/JSONRestconfServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-10-28T14:13:17Z",
+      "side": 1,
+      "message": "From your comment I assume neither host or port is actually used - it looks like the restconf code only checks the scheme part. However is it safe to hardcode \"http\"?",
+      "range": {
+        "startLine": 222,
+        "startChar": 40,
+        "endLine": 222,
+        "endChar": 61
+      },
+      "revId": "be6d690cc60ef90976f7e31bc317b7852af80f4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
