@@ -73,8 +73,10 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
     public void writeTo(final NormalizedNodeContext context, final Class<?> type, final Type genericType,
             final Annotation[] annotations, final MediaType mediaType, final MultivaluedMap<String, Object> httpHeaders,
             final OutputStream entityStream) throws IOException, WebApplicationException {
-        for (final Entry<String, Object> entry : context.getNewHeaders().entrySet()) {
-            httpHeaders.add(entry.getKey(), entry.getValue());
+        if (httpHeaders != null) {
+            for (final Entry<String, Object> entry : context.getNewHeaders().entrySet()) {
+                httpHeaders.add(entry.getKey(), entry.getValue());
+            }
         }
         final NormalizedNode<?, ?> data = context.getData();
         if (data == null) {
