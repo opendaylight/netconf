@@ -141,6 +141,23 @@
       "revId": "be6d690cc60ef90976f7e31bc317b7852af80f4a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7677bbcc_114e92be",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/JSONRestconfServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-10-29T16:05:47Z",
+      "side": 1,
+      "message": "If jsonRes is null, Optional.of will blowup. Of course if catch clause is reached above, an exception will be propagated so it wouldn\u0027t reach here anyway. Still can we make that a bit clearer? ie change line 228 to Optional.of(toJson(res) (could also just combine lines 227 and 228). Then change 233 to Optional.empty() (or add return after line 230).",
+      "revId": "be6d690cc60ef90976f7e31bc317b7852af80f4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
