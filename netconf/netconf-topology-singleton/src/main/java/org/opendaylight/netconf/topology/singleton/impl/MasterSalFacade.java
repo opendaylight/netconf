@@ -18,6 +18,7 @@ import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
+import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
@@ -64,6 +65,19 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
         this.actorSystem = actorSystem;
         this.masterActorRef = masterActorRef;
         this.actorResponseWaitTime = actorResponseWaitTime;
+    }
+
+    @Override
+    public void onDeviceConnected(final SchemaContext remoteSchemaContext,
+                                  final NetconfSessionPreferences sessionPreferences,
+                                  final DOMRpcService domRpcService, final DOMActionService domActionService) {
+        // We do not support actions in clustered topology yet
+        if (domActionService != null) {
+            LOG.warn("{}: YANG 1.1 actions are not supported in clustered netconf topology, "
+                    + "DOMActionService will not be exposed for the device");
+        }
+
+        onDeviceConnected(remoteSchemaContext, sessionPreferences, domRpcService);
     }
 
     @Override
