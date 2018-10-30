@@ -158,6 +158,24 @@
       "revId": "be6d690cc60ef90976f7e31bc317b7852af80f4a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2ea8bb5d_2311d086",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/JSONRestconfServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 5357
+      },
+      "writtenOn": "2018-10-30T07:58:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7677bbcc_114e92be",
+      "revId": "be6d690cc60ef90976f7e31bc317b7852af80f4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
