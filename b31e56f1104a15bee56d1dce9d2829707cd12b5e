@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9e8a56a3_44042da4",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/api/JSONRestconfService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-10-30T12:47:34Z",
+      "side": 1,
+      "message": "Actually I meant to use Optional\u003cMultivaluedMap\u003cString, String\u003e\u003e but it\u0027s fine either way.",
+      "revId": "b31e56f1104a15bee56d1dce9d2829707cd12b5e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
