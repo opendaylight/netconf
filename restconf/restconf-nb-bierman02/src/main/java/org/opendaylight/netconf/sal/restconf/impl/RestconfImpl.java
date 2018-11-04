@@ -21,6 +21,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.net.URI;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -52,7 +53,6 @@ import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.common.api.data.OptimisticLockFailedException;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
@@ -425,7 +425,7 @@ public final class RestconfImpl implements RestconfService {
             final UriInfo uriInfo) {
         final SchemaPath type = payload.getInstanceIdentifierContext().getSchemaNode().getPath();
         final URI namespace = payload.getInstanceIdentifierContext().getSchemaNode().getQName().getNamespace();
-        final CheckedFuture<DOMRpcResult, DOMRpcException> response;
+        final ListenableFuture<DOMRpcResult> response;
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final SchemaContext schemaContext;
 
@@ -519,7 +519,7 @@ public final class RestconfImpl implements RestconfService {
                     ErrorType.RPC, ErrorTag.INVALID_VALUE);
         }
 
-        final CheckedFuture<DOMRpcResult, DOMRpcException> response;
+        final ListenableFuture<DOMRpcResult> response;
         if (mountPoint != null) {
             final Optional<DOMRpcService> mountRpcServices = mountPoint.getService(DOMRpcService.class);
             if (!mountRpcServices.isPresent()) {
@@ -537,7 +537,7 @@ public final class RestconfImpl implements RestconfService {
     }
 
     @SuppressWarnings("checkstyle:avoidHidingCauseException")
-    private static DOMRpcResult checkRpcResponse(final CheckedFuture<DOMRpcResult, DOMRpcException> response) {
+    private static DOMRpcResult checkRpcResponse(final ListenableFuture<DOMRpcResult> response) {
         if (response == null) {
             return null;
         }
@@ -590,8 +590,7 @@ public final class RestconfImpl implements RestconfService {
         }
     }
 
-    private CheckedFuture<DOMRpcResult, DOMRpcException>
-            invokeSalRemoteRpcSubscribeRPC(final NormalizedNodeContext payload) {
+    private ListenableFuture<DOMRpcResult> invokeSalRemoteRpcSubscribeRPC(final NormalizedNodeContext payload) {
         final ContainerNode value = (ContainerNode) payload.getData();
         final QName rpcQName = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
         final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> path = value.getChild(
@@ -644,9 +643,7 @@ public final class RestconfImpl implements RestconfService {
             Notificator.createListener(pathIdentifier, streamName, outputType, controllerContext);
         }
 
-        final DOMRpcResult defaultDOMRpcResult = new DefaultDOMRpcResult(output);
-
-        return Futures.immediateCheckedFuture(defaultDOMRpcResult);
+        return Futures.immediateFuture(new DefaultDOMRpcResult(output));
     }
 
     private static RpcDefinition findRpc(final SchemaContext schemaContext, final String identifierDecoded) {
@@ -1482,8 +1479,7 @@ public final class RestconfImpl implements RestconfService {
      *            contains list of qnames of notifications
      * @return - checked future object
      */
-    private CheckedFuture<DOMRpcResult, DOMRpcException> invokeSalRemoteRpcNotifiStrRPC(
-            final NormalizedNodeContext payload) {
+    private ListenableFuture<DOMRpcResult> invokeSalRemoteRpcNotifiStrRPC(final NormalizedNodeContext payload) {
         final ContainerNode data = (ContainerNode) payload.getData();
         LeafSetNode leafSet = null;
         String outputType = "XML";
@@ -1537,8 +1533,6 @@ public final class RestconfImpl implements RestconfService {
             Notificator.createNotificationListener(paths, streamName, outputType, controllerContext);
         }
 
-        final DOMRpcResult defaultDOMRpcResult = new DefaultDOMRpcResult(output);
-
-        return Futures.immediateCheckedFuture(defaultDOMRpcResult);
+        return Futures.immediateFuture(new DefaultDOMRpcResult(output));
     }
 }
