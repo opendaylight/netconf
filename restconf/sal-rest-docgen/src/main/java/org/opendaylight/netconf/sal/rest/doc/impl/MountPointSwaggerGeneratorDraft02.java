@@ -7,9 +7,8 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
-import java.util.Objects;
 import java.util.Optional;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 
@@ -22,8 +21,9 @@ public class MountPointSwaggerGeneratorDraft02 extends BaseYangSwaggerGeneratorD
 
     private final MountPointSwagger mountPointSwagger;
 
-    public MountPointSwaggerGeneratorDraft02(DOMSchemaService schemaService, DOMMountPointService mountService) {
-        super(Optional.of(Objects.requireNonNull(schemaService)));
+    public MountPointSwaggerGeneratorDraft02(final DOMSchemaService schemaService,
+            final DOMMountPointService mountService) {
+        super(Optional.of(schemaService));
         mountPointSwagger = new MountPointSwagger(schemaService, mountService, this);
         mountPointSwagger.init();
     }
