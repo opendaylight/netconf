@@ -7,21 +7,22 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.mountpoints;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Api;
@@ -55,9 +56,9 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
 
     public MountPointSwagger(final DOMSchemaService globalSchema, final DOMMountPointService mountService,
             final BaseYangSwaggerGenerator swaggerGenerator) {
-        this.globalSchema = Objects.requireNonNull(globalSchema);
-        this.mountService = Objects.requireNonNull(mountService);
-        this.swaggerGenerator = Objects.requireNonNull(swaggerGenerator);
+        this.globalSchema = requireNonNull(globalSchema);
+        this.mountService = requireNonNull(mountService);
+        this.swaggerGenerator = requireNonNull(swaggerGenerator);
     }
 
     public void init() {
@@ -129,12 +130,11 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     }
 
     private SchemaContext getSchemaContext(final YangInstanceIdentifier id) {
-
         if (id == null) {
             return null;
         }
 
-        Preconditions.checkState(mountService != null);
+        checkState(mountService != null);
         final Optional<DOMMountPoint> mountPoint = this.mountService.getMountPoint(id);
         if (!mountPoint.isPresent()) {
             return null;
