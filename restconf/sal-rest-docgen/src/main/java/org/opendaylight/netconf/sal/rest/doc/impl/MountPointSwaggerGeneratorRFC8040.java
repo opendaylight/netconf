@@ -7,9 +7,8 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
-import java.util.Objects;
 import java.util.Optional;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 
@@ -21,8 +20,9 @@ import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 public class MountPointSwaggerGeneratorRFC8040 extends BaseYangSwaggerGeneratorRFC8040 implements AutoCloseable {
     private final MountPointSwagger mountPointSwagger;
 
-    public MountPointSwaggerGeneratorRFC8040(DOMSchemaService schemaService, DOMMountPointService mountService) {
-        super(Optional.of(Objects.requireNonNull(schemaService)));
+    public MountPointSwaggerGeneratorRFC8040(final DOMSchemaService schemaService,
+            final DOMMountPointService mountService) {
+        super(Optional.of(schemaService));
         mountPointSwagger = new MountPointSwagger(schemaService, mountService, this);
         mountPointSwagger.init();
     }
