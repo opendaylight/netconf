@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.List;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import java.util.Optional;
 import org.opendaylight.controller.messagebus.spi.EventSourceRegistration;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
@@ -88,7 +88,7 @@ public final class NetconfEventSourceRegistration implements AutoCloseable {
     }
 
     Optional<EventSourceRegistration<NetconfEventSource>> getEventSourceRegistration() {
-        return Optional.fromNullable(eventSourceRegistration);
+        return Optional.ofNullable(eventSourceRegistration);
     }
 
     NetconfNode getNetconfNode() {

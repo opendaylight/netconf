@@ -13,7 +13,7 @@
   <odl:clustered-app-config id="yanglibConfig"
       binding-class="org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.yanglib.impl.rev141210.YanglibConfig"/>
 
-  <reference id="dataBroker" interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"/>
+  <reference id="dataBroker" interface="org.opendaylight.mdsal.binding.api.DataBroker"/>
   <reference id="webServer" interface="org.opendaylight.aaa.web.WebServer"/>
   <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer"/>
   <reference id="servletSupport" interface="org.opendaylight.aaa.web.servlet.ServletSupport" />

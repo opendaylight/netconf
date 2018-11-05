@@ -5,35 +5,33 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector;
-
-import static org.opendaylight.netconf.mdsal.connector.DOMDataTransactionValidator.ValidationFailedException;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import java.util.ArrayList;
 import java.util.List;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import java.util.concurrent.ExecutionException;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.DocumentedException.ErrorType;
+import org.opendaylight.netconf.mdsal.connector.DOMDataTransactionValidator.ValidationFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TransactionProvider implements AutoCloseable {
-
     private static final Logger LOG = LoggerFactory.getLogger(TransactionProvider.class);
 
     private final DOMDataBroker dataBroker;
 
-    private DOMDataReadWriteTransaction candidateTransaction = null;
-    private DOMDataReadWriteTransaction runningTransaction = null;
-    private final List<DOMDataReadWriteTransaction> allOpenReadWriteTransactions = new ArrayList<>();
+    private DOMDataTreeReadWriteTransaction candidateTransaction = null;
+    private DOMDataTreeReadWriteTransaction runningTransaction = null;
+    private final List<DOMDataTreeReadWriteTransaction> allOpenReadWriteTransactions = new ArrayList<>();
     private final DOMDataTransactionValidator transactionValidator;
 
     private final String netconfSessionIdForReporting;
@@ -43,20 +41,19 @@ public class TransactionProvider implements AutoCloseable {
     public TransactionProvider(final DOMDataBroker dataBroker, final String netconfSessionIdForReporting) {
         this.dataBroker = dataBroker;
         this.netconfSessionIdForReporting = netconfSessionIdForReporting;
-        this.transactionValidator = (DOMDataTransactionValidator)dataBroker.getSupportedExtensions()
-            .get(DOMDataTransactionValidator.class);
+        this.transactionValidator = dataBroker.getExtensions().getInstance(DOMDataTransactionValidator.class);
     }
 
     @Override
     public synchronized void close() {
-        for (final DOMDataReadWriteTransaction rwt : allOpenReadWriteTransactions) {
+        for (final DOMDataTreeReadWriteTransaction rwt : allOpenReadWriteTransactions) {
             rwt.cancel();
         }
 
         allOpenReadWriteTransactions.clear();
     }
 
-    public synchronized Optional<DOMDataReadWriteTransaction> getCandidateTransaction() {
+    public synchronized Optional<DOMDataTreeReadWriteTransaction> getCandidateTransaction() {
         if (candidateTransaction == null) {
             return Optional.absent();
         }
@@ -64,7 +61,7 @@ public class TransactionProvider implements AutoCloseable {
         return Optional.of(candidateTransaction);
     }
 
-    public synchronized DOMDataReadWriteTransaction getOrCreateTransaction() {
+    public synchronized DOMDataTreeReadWriteTransaction getOrCreateTransaction() {
         if (getCandidateTransaction().isPresent()) {
             return getCandidateTransaction().get();
         }
@@ -92,11 +89,10 @@ public class TransactionProvider implements AutoCloseable {
         } catch (final ValidationFailedException e) {
             LOG.debug("Candidate transaction validation {} failed on session {}", candidateTransaction,
                 netconfSessionIdForReporting, e);
-            final String cause = e.getCause() != null ? (" Cause: " + e.getCause().getMessage()) : "";
-            throw new DocumentedException(
-                "Candidate transaction validate failed [sessionId=" + netconfSessionIdForReporting + "]: "
-                    + e.getMessage() + cause,
-                e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
+            final String cause = e.getCause() != null ? " Cause: " + e.getCause().getMessage() : "";
+            throw new DocumentedException("Candidate transaction validate failed [sessionId="
+                    + netconfSessionIdForReporting + "]: " + e.getMessage() + cause, e, ErrorType.APPLICATION,
+                    ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
         }
     }
 
@@ -107,15 +103,15 @@ public class TransactionProvider implements AutoCloseable {
             return true;
         }
 
-        final CheckedFuture<Void, TransactionCommitFailedException> future = candidateTransaction.submit();
+        final FluentFuture<? extends CommitInfo> future = candidateTransaction.commit();
         try {
-            future.checkedGet();
-        } catch (final TransactionCommitFailedException e) {
+            future.get();
+        } catch (final InterruptedException | ExecutionException e) {
             LOG.debug("Transaction {} failed on", candidateTransaction, e);
             final String cause = e.getCause() != null ? " Cause: " + e.getCause().getMessage() : "";
-            throw new DocumentedException(
-                    "Transaction commit failed on " + e.getMessage() + " " + netconfSessionIdForReporting + cause, e,
-                    ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED, ErrorSeverity.ERROR);
+            throw new DocumentedException("Transaction commit failed on " + e.getMessage() + " "
+                    + netconfSessionIdForReporting + cause, e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
+                    ErrorSeverity.ERROR);
         } finally {
             allOpenReadWriteTransactions.remove(candidateTransaction);
             candidateTransaction = null;
@@ -126,7 +122,7 @@ public class TransactionProvider implements AutoCloseable {
 
     public synchronized void abortTransaction() {
         LOG.debug("Aborting current candidateTransaction");
-        final Optional<DOMDataReadWriteTransaction> otx = getCandidateTransaction();
+        final Optional<DOMDataTreeReadWriteTransaction> otx = getCandidateTransaction();
         if (!otx.isPresent()) {
             LOG.warn("discard-changes triggerd on an empty transaction for session: {}", netconfSessionIdForReporting);
             return;
@@ -136,18 +132,17 @@ public class TransactionProvider implements AutoCloseable {
         candidateTransaction = null;
     }
 
-    public synchronized DOMDataReadWriteTransaction createRunningTransaction() {
+    public synchronized DOMDataTreeReadWriteTransaction createRunningTransaction() {
         runningTransaction = dataBroker.newReadWriteTransaction();
         allOpenReadWriteTransactions.add(runningTransaction);
         return runningTransaction;
     }
 
-    public synchronized void abortRunningTransaction(final DOMDataReadWriteTransaction tx) {
+    public synchronized void abortRunningTransaction(final DOMDataTreeReadWriteTransaction tx) {
         LOG.debug("Aborting current running Transaction");
         Preconditions.checkState(runningTransaction != null,
                 NO_TRANSACTION_FOUND_FOR_SESSION + netconfSessionIdForReporting);
         tx.cancel();
         allOpenReadWriteTransactions.remove(tx);
     }
-
 }

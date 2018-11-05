@@ -10,12 +10,12 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import java.util.List;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -52,7 +52,7 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
     @Override
     public synchronized void onDeviceConnected(final SchemaContext schemaContext,
                                                final NetconfSessionPreferences netconfSessionPreferences,
-                                               final DOMRpcService deviceRpc, DOMActionService deviceAction) {
+                                               final DOMRpcService deviceRpc, final DOMActionService deviceAction) {
 
         final DOMDataBroker domBroker =
                 new NetconfDeviceDataBroker(id, schemaContext, deviceRpc, netconfSessionPreferences);

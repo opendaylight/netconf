@@ -13,10 +13,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.net.URI;
+import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -336,8 +337,9 @@ public final class NetconfMessageTransformUtil {
     }
 
     public static AnyXmlNode createEditConfigAnyxml(
-            final SchemaContext ctx, final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation,
-            final Optional<NormalizedNode<?, ?>> lastChildOverride) {
+            final SchemaContext ctx, final YangInstanceIdentifier dataPath,
+            final java.util.Optional<ModifyAction> operation,
+            final java.util.Optional<NormalizedNode<?, ?>> lastChildOverride) {
         final NormalizedNode<?, ?> configContent;
 
         if (dataPath.isEmpty()) {
@@ -350,7 +352,7 @@ public final class NetconfMessageTransformUtil {
         } else {
             final Entry<QName, ModifyAction> modifyOperation = operation.isPresent()
                     ? new AbstractMap.SimpleEntry<>(NETCONF_OPERATION_QNAME, operation.get()) : null;
-            configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride.toJavaUtil(),
+            configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride,
                 java.util.Optional.ofNullable(modifyOperation));
         }
 
@@ -366,9 +368,9 @@ public final class NetconfMessageTransformUtil {
                 .build();
     }
 
-    public static DataContainerChild<?, ?> createEditConfigStructure(
-            final SchemaContext ctx, final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation,
-            final Optional<NormalizedNode<?, ?>> lastChildOverride) {
+    public static DataContainerChild<?, ?> createEditConfigStructure(final SchemaContext ctx,
+            final YangInstanceIdentifier dataPath, final java.util.Optional<ModifyAction> operation,
+            final java.util.Optional<NormalizedNode<?, ?>> lastChildOverride) {
         return Builders.choiceBuilder().withNodeIdentifier(EDIT_CONTENT_NODEID)
                 .withChild(createEditConfigAnyxml(ctx, dataPath, operation, lastChildOverride)).build();
     }
@@ -377,7 +379,7 @@ public final class NetconfMessageTransformUtil {
         return SchemaPath.ROOT.createChild(rpc);
     }
 
-    public static Map.Entry<Date, XmlElement> stripNotification(final NetconfMessage message) {
+    public static Map.Entry<Instant, XmlElement> stripNotification(final NetconfMessage message) {
         final XmlElement xmlElement = XmlElement.fromDomDocument(message.getDocument());
         final List<XmlElement> childElements = xmlElement.getChildElements();
         Preconditions.checkArgument(childElements.size() == 2, "Unable to parse notification %s, unexpected format."
@@ -397,8 +399,8 @@ public final class NetconfMessageTransformUtil {
         }
 
         try {
-            return new AbstractMap.SimpleEntry<>(
-                    NetconfNotification.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()),
+            return new SimpleEntry<>(
+                    NetconfNotification.RFC3339_DATE_PARSER.apply(eventTimeElement.getTextContent()).toInstant(),
                     notificationElement);
         } catch (final DocumentedException e) {
             throw new IllegalArgumentException("Notification payload does not contain " + EVENT_TIME + " " + message,
@@ -406,7 +408,8 @@ public final class NetconfMessageTransformUtil {
         } catch (final DateTimeParseException e) {
             LOG.warn("Unable to parse event time from {}. Setting time to {}", eventTimeElement,
                     NetconfNotification.UNKNOWN_EVENT_TIME, e);
-            return new AbstractMap.SimpleEntry<>(NetconfNotification.UNKNOWN_EVENT_TIME, notificationElement);
+            return new SimpleEntry<>(NetconfNotification.UNKNOWN_EVENT_TIME.toInstant(),
+                    notificationElement);
         }
     }
 
