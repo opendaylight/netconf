@@ -11,7 +11,7 @@ import java.net.URI;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
-import org.apache.commons.lang3.builder.Builder;
+import org.opendaylight.yangtools.concepts.Builder;
 
 final class ResponseFactory extends FutureDataFactory<Void> implements Builder<Response> {
 
