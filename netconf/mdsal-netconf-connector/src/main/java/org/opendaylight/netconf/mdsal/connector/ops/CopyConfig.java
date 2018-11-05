@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
@@ -19,13 +18,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
@@ -104,7 +103,7 @@ public final class CopyConfig extends AbstractEdit {
 
         // <copy-config>, unlike <edit-config>, always replaces entire configuration,
         // so remove old configuration first:
-        final DOMDataReadWriteTransaction rwTx = transactionProvider.getOrCreateTransaction();
+        final DOMDataTreeReadWriteTransaction rwTx = transactionProvider.getOrCreateTransaction();
         rwTx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.EMPTY, EMPTY_ROOT_NODE);
 
         // Then create nodes present in the <config> element:
@@ -169,16 +168,16 @@ public final class CopyConfig extends AbstractEdit {
 
     private ContainerNode readData(final XmlElement source) throws DocumentedException {
         final Datastore sourceDatastore = getDatastore(source);
-        final DOMDataReadWriteTransaction rwTx = getTransaction(sourceDatastore);
+        final DOMDataTreeReadWriteTransaction rwTx = getTransaction(sourceDatastore);
         final YangInstanceIdentifier dataRoot = YangInstanceIdentifier.EMPTY;
         try {
-            final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(
-                LogicalDatastoreType.CONFIGURATION, dataRoot).checkedGet();
+            final java.util.Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(
+                LogicalDatastoreType.CONFIGURATION, dataRoot).get();
             if (sourceDatastore == Datastore.running) {
                 transactionProvider.abortRunningTransaction(rwTx);
             }
             return (ContainerNode) normalizedNodeOptional.get();
-        } catch (ReadFailedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             throw new IllegalStateException("Unable to read data " + dataRoot, e);
         }
     }
@@ -194,7 +193,7 @@ public final class CopyConfig extends AbstractEdit {
         }
     }
 
-    private DOMDataReadWriteTransaction getTransaction(final Datastore datastore) throws DocumentedException {
+    private DOMDataTreeReadWriteTransaction getTransaction(final Datastore datastore) throws DocumentedException {
         if (datastore == Datastore.candidate) {
             return transactionProvider.getOrCreateTransaction();
         } else if (datastore == Datastore.running) {

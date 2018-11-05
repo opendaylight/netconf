@@ -5,13 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops.get;
 
 import com.google.common.base.Optional;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import java.util.concurrent.ExecutionException;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
@@ -53,10 +52,10 @@ public class Get extends AbstractGet {
 
         final YangInstanceIdentifier dataRoot = dataRootOptional.get();
 
-        final DOMDataReadWriteTransaction rwTx = getTransaction(Datastore.running);
+        final DOMDataTreeReadWriteTransaction rwTx = getTransaction(Datastore.running);
         try {
-            final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(
-                    LogicalDatastoreType.OPERATIONAL, dataRoot).checkedGet();
+            final java.util.Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(
+                    LogicalDatastoreType.OPERATIONAL, dataRoot).get();
             transactionProvider.abortRunningTransaction(rwTx);
 
             if (!normalizedNodeOptional.isPresent()) {
@@ -64,13 +63,13 @@ public class Get extends AbstractGet {
             }
 
             return serializeNodeWithParentStructure(document, dataRoot, normalizedNodeOptional.get());
-        } catch (final ReadFailedException e) {
+        } catch (final InterruptedException | ExecutionException e) {
             LOG.warn("Unable to read data: {}", dataRoot, e);
             throw new IllegalStateException("Unable to read data " + dataRoot, e);
         }
     }
 
-    private DOMDataReadWriteTransaction getTransaction(final Datastore datastore) throws DocumentedException {
+    private DOMDataTreeReadWriteTransaction getTransaction(final Datastore datastore) throws DocumentedException {
         if (datastore == Datastore.candidate) {
             return transactionProvider.getOrCreateTransaction();
         } else if (datastore == Datastore.running) {

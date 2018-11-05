@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
-import java.util.Date;
+import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventaggregator.rev141202.TopicId;
@@ -34,7 +34,7 @@ abstract class NotificationTopicRegistration implements AutoCloseable {
     private final String sourceName;
     private final String notificationUrnPrefix;
     private boolean replaySupported;
-    private Date lastEventTime;
+    private Instant lastEventTime;
     protected final ConcurrentHashMap<SchemaPath, Set<TopicId>> notificationTopicMap = new ConcurrentHashMap<>();
 
     protected NotificationTopicRegistration(final NotificationSourceType notificationSourceType,
@@ -93,11 +93,11 @@ abstract class NotificationTopicRegistration implements AutoCloseable {
         return nameSpace.startsWith(getNotificationUrnPrefix());
     }
 
-    Optional<Date> getLastEventTime() {
-        return Optional.fromNullable(lastEventTime);
+    Optional<Instant> getLastEventTime() {
+        return Optional.ofNullable(lastEventTime);
     }
 
-    void setLastEventTime(final Date lastEventTime) {
+    void setLastEventTime(final Instant lastEventTime) {
         this.lastEventTime = lastEventTime;
     }
 
