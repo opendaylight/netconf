@@ -7,10 +7,10 @@
  */
 package org.opendaylight.controller.config.yang.netconf.mdsal.notification;
 
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeChangeListener;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -29,7 +29,7 @@ abstract class OperationalDatastoreListener<T extends DataObject> implements Dat
      *
      * @param instanceIdentifier instance identifier of subtree, on which this instance should listen on changes.
      */
-    OperationalDatastoreListener(InstanceIdentifier<T> instanceIdentifier) {
+    OperationalDatastoreListener(final InstanceIdentifier<T> instanceIdentifier) {
         this.instanceIdentifier = instanceIdentifier;
     }
 
@@ -39,8 +39,8 @@ abstract class OperationalDatastoreListener<T extends DataObject> implements Dat
      * @param dataBroker data broker
      * @return listener registration
      */
-    ListenerRegistration<OperationalDatastoreListener<T>> registerOnChanges(DataBroker dataBroker) {
-        DataTreeIdentifier<T> id = new DataTreeIdentifier<>(LogicalDatastoreType.OPERATIONAL, instanceIdentifier);
+    ListenerRegistration<OperationalDatastoreListener<T>> registerOnChanges(final DataBroker dataBroker) {
+        DataTreeIdentifier<T> id = DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, instanceIdentifier);
         return dataBroker.registerDataTreeChangeListener(id, this);
     }
 
