@@ -21,8 +21,7 @@ import javax.annotation.Nonnull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
-
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.JsonToPatchBodyReader;
@@ -59,7 +58,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
     private final ControllerContext controllerContext;
     private final RestconfService restconfService;
 
-    public JSONRestconfServiceImpl(ControllerContext controllerContext, RestconfService restconfService) {
+    public JSONRestconfServiceImpl(final ControllerContext controllerContext, final RestconfService restconfService) {
         this.controllerContext = controllerContext;
         this.restconfService = restconfService;
     }
@@ -217,11 +216,11 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public Optional<String> subscribeToStream(@Nonnull String identifier,
-                                      MultivaluedMap<String, String> params) throws OperationFailedException {
+    public Optional<String> subscribeToStream(@Nonnull final String identifier,
+                                      final MultivaluedMap<String, String> params) throws OperationFailedException {
         //Note: We use http://127.0.0.1 because the Uri parser requires something there though it does nothing
         String uri = new StringBuilder("http://127.0.0.1:8081/restconf/streams/stream/").append(identifier).toString();
-        MultivaluedMap queryParams = (params != null) ? params : new MultivaluedHashMap<String, String>();
+        MultivaluedMap queryParams = params != null ? params : new MultivaluedHashMap<String, String>();
         UriInfo uriInfo = new SimpleUriInfo(uri, queryParams);
 
         String jsonRes = null;
