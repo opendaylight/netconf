@@ -15,13 +15,13 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 
 public class ReadTransactionActorTest extends ReadTransactionActorTestAdapter {
     private static ActorSystem system = ActorSystem.apply();
 
     @Mock
-    private DOMDataReadOnlyTransaction mockReadTx;
+    private DOMDataTreeReadTransaction mockReadTx;
 
     @Before
     public void setUp() {
