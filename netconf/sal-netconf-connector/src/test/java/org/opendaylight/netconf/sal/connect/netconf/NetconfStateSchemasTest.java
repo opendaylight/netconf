@@ -5,18 +5,19 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
@@ -33,12 +34,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcImplementationNotAvailableException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.common.api.ReadFailedException;
+import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -122,7 +121,7 @@ public class NetconfStateSchemasTest {
                 .withChild(data)
                 .build();
         when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any()))
-                .thenReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(rpcReply)));
+                .thenReturn(immediateFluentFuture(new DefaultDOMRpcResult(rpcReply)));
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         assertEquals(numberOfLegalSchemas, availableYangSchemasQNames.size());
@@ -141,9 +140,8 @@ public class NetconfStateSchemasTest {
 
     @Test
     public void testCreateFail() throws Exception {
-        final CheckedFuture<DOMRpcResult, DOMRpcException> resultFuture =
-                Futures.immediateFailedCheckedFuture(new DOMRpcImplementationNotAvailableException("not available"));
-        when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any())).thenReturn(resultFuture);
+        when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any())).thenReturn(
+            immediateFailedFluentFuture(new DOMRpcImplementationNotAvailableException("not available")));
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         Assert.assertTrue(availableYangSchemasQNames.isEmpty());
@@ -153,7 +151,7 @@ public class NetconfStateSchemasTest {
     public void testCreateRpcError() throws Exception {
         final RpcError rpcError = RpcResultBuilder.newError(RpcError.ErrorType.RPC, "fail", "fail");
         when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any()))
-                .thenReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(rpcError)));
+                .thenReturn(immediateFluentFuture(new DefaultDOMRpcResult(rpcError)));
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         Assert.assertTrue(availableYangSchemasQNames.isEmpty());
@@ -164,7 +162,7 @@ public class NetconfStateSchemasTest {
     public void testCreateInterrupted() throws Throwable {
         //NetconfStateSchemas.create calls Thread.currentThread().interrupt(), so it must run in its own thread
         final Future<?> testFuture = Executors.newSingleThreadExecutor().submit(() -> {
-            final ListenableFuture interruptedFuture = mock(ListenableFuture.class);
+            final ListenableFuture<?> interruptedFuture = mock(ListenableFuture.class);
             try {
                 when(interruptedFuture.get()).thenThrow(new InterruptedException("interrupted"));
                 final CheckedFuture checkedFuture = Futures.makeChecked(interruptedFuture, ReadFailedException.MAPPER);

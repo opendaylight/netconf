@@ -9,7 +9,7 @@
 package org.opendaylight.controller.config.yang.netconf.mdsal.notification;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
@@ -20,9 +20,9 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
@@ -40,12 +40,12 @@ public class OperationalDatastoreListenerTest {
     public void testDataStoreListener() {
         final InstanceIdentifier<DataObject> instanceIdentifier = InstanceIdentifier.create(DataObject.class);
         final DataTreeIdentifier<DataObject> testId =
-                new DataTreeIdentifier<>(LogicalDatastoreType.OPERATIONAL, instanceIdentifier);
+                DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, instanceIdentifier);
 
         final OperationalDatastoreListener<DataObject> op =
                 new OperationalDatastoreListener<DataObject>(instanceIdentifier) {
             @Override
-            public void onDataTreeChanged(@Nonnull Collection collection) {
+            public void onDataTreeChanged(@Nonnull final Collection collection) {
             }
         };
         doReturn(null).when(dataBroker).registerDataTreeChangeListener(any(), any());

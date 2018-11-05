@@ -5,25 +5,23 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.base.Optional;
-import com.google.common.util.concurrent.CheckedFuture;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import javax.annotation.Nullable;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
@@ -156,17 +154,17 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         final SchemaPath schemaPath = SchemaPath.create(Collections.singletonList(rpcDefinition.getQName()), true);
         final NormalizedNode<?, ?> inputNode = rpcToNNode(operationElement, rpcDefinition.getInput());
 
-        final CheckedFuture<DOMRpcResult, DOMRpcException> rpcFuture = rpcService.invokeRpc(schemaPath, inputNode);
+        final DOMRpcResult result;
         try {
-            final DOMRpcResult result = rpcFuture.checkedGet();
-            if (result.getResult() == null) {
-                return XmlUtil.createElement(document, XmlNetconfConstants.OK,
-                        Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
-            }
-            return (Element) transformNormalizedNode(document, result.getResult(), rpcDefinition.getOutput().getPath());
-        } catch (final DOMRpcException e) {
+            result = rpcService.invokeRpc(schemaPath, inputNode).get();
+        } catch (final InterruptedException | ExecutionException e) {
             throw DocumentedException.wrap(e);
         }
+        if (result.getResult() == null) {
+            return XmlUtil.createElement(document, XmlNetconfConstants.OK,
+                Optional.of(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
+        }
+        return (Element) transformNormalizedNode(document, result.getResult(), rpcDefinition.getOutput().getPath());
     }
 
     @Override

@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.notNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -22,23 +22,23 @@ import java.util.HashMap;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
-import org.opendaylight.controller.md.sal.binding.api.MountPointService;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationPublishService;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.messagebus.spi.EventSource;
 import org.opendaylight.controller.messagebus.spi.EventSourceRegistry;
-import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.api.MountPointService;
+import org.opendaylight.mdsal.binding.api.RpcProviderService;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.ReadFailedException;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
@@ -55,7 +55,7 @@ public class NetconfEventSourceManagerTest {
     MountPointService mountPointServiceMock;
     EventSourceRegistry eventSourceTopologyMock;
     DataTreeModification<Node> dataTreeModificationMock;
-    RpcProviderRegistry rpcProviderRegistryMock;
+    RpcProviderService rpcProviderRegistryMock;
     EventSourceRegistry eventSourceRegistry;
 
     @BeforeClass
@@ -70,7 +70,7 @@ public class NetconfEventSourceManagerTest {
                 mock(DOMNotificationPublishService.class);
         domMountPointServiceMock = mock(DOMMountPointService.class);
         eventSourceTopologyMock = mock(EventSourceRegistry.class);
-        rpcProviderRegistryMock = mock(RpcProviderRegistry.class);
+        rpcProviderRegistryMock = mock(RpcProviderService.class);
         eventSourceRegistry = mock(EventSourceRegistry.class);
 
         listenerRegistrationMock = mock(ListenerRegistration.class);
@@ -87,7 +87,7 @@ public class NetconfEventSourceManagerTest {
         doReturn(Optional.of(mock(DOMNotificationService.class))).when(domMountPointMock)
                 .getService(DOMNotificationService.class);
 
-        DOMDataReadOnlyTransaction rtx = mock(DOMDataReadOnlyTransaction.class);
+        DOMDataTreeReadTransaction rtx = mock(DOMDataTreeReadTransaction.class);
         doReturn(rtx).when(mpDataBroker).newReadOnlyTransaction();
         CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> checkFeature = Futures
                 .immediateCheckedFuture(Optional.of(NetconfTestUtils.getStreamsNode("stream-1")));
@@ -130,7 +130,7 @@ public class NetconfEventSourceManagerTest {
     }
 
     @SuppressWarnings("unchecked")
-    private void onDataChangedTestHelper(boolean create, boolean update, boolean isNetconf, String
+    private void onDataChangedTestHelper(final boolean create, final boolean update, final boolean isNetconf, final String
             notificationCapabilityPrefix) throws Exception {
         dataTreeModificationMock = mock(DataTreeModification.class);
         DataObjectModification<Node> mockModification = mock(DataObjectModification.class);
@@ -151,7 +151,7 @@ public class NetconfEventSourceManagerTest {
 
         doReturn(node01).when(mockModification).getDataAfter();
 
-        doReturn(new DataTreeIdentifier<>(LogicalDatastoreType.OPERATIONAL,
+        doReturn(DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL,
                 NetconfTestUtils.getInstanceIdentifier(node01))).when(dataTreeModificationMock).getRootPath();
     }
 
