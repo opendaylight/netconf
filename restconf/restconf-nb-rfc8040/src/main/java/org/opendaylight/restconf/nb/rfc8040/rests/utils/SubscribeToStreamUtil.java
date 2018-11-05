@@ -21,16 +21,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeIdentifier;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -67,7 +67,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Subscribe to stream util class.
- *
  */
 public final class SubscribeToStreamUtil {
 
@@ -119,7 +118,7 @@ public final class SubscribeToStreamUtil {
                     ErrorTag.UNKNOWN_ELEMENT);
         }
 
-        final DOMDataReadWriteTransaction wTx =
+        final DOMDataTreeReadWriteTransaction wTx =
                 handlersHolder.getTransactionChainHandler().get().newReadWriteTransaction();
         final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
         final boolean exist = checkExist(schemaContext, wTx);
@@ -223,7 +222,7 @@ public final class SubscribeToStreamUtil {
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
 
-        final DOMDataReadWriteTransaction wTx =
+        final DOMDataTreeReadWriteTransaction wTx =
                 handlersHolder.getTransactionChainHandler().get().newReadWriteTransaction();
         final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
         final boolean exist = checkExist(schemaContext, wTx);
@@ -266,7 +265,7 @@ public final class SubscribeToStreamUtil {
 
     @SuppressWarnings("rawtypes")
     static void writeDataToDS(final SchemaContext schemaContext,
-                              final String name, final DOMDataReadWriteTransaction readWriteTransaction,
+                              final String name, final DOMDataTreeReadWriteTransaction readWriteTransaction,
                               final boolean exist, final NormalizedNode mapToStreams) {
         String pathId = "";
         if (exist) {
@@ -278,10 +277,10 @@ public final class SubscribeToStreamUtil {
                 mapToStreams);
     }
 
-    static void submitData(final DOMDataReadWriteTransaction readWriteTransaction) {
+    static void submitData(final DOMDataTreeReadWriteTransaction readWriteTransaction) {
         try {
-            readWriteTransaction.submit().checkedGet();
-        } catch (final TransactionCommitFailedException e) {
+            readWriteTransaction.commit().get();
+        } catch (final InterruptedException | ExecutionException e) {
             throw new RestconfDocumentedException("Problem while putting data to DS.", e);
         }
     }
@@ -331,8 +330,8 @@ public final class SubscribeToStreamUtil {
             return;
         }
 
-        final DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)domDataBroker.getSupportedExtensions()
-                .get(DOMDataTreeChangeService.class);
+        final DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
+                .getInstance(DOMDataTreeChangeService.class);
         if (changeService == null) {
             throw new UnsupportedOperationException("DOMDataBroker does not support the DOMDataTreeChangeService");
         }
@@ -359,13 +358,13 @@ public final class SubscribeToStreamUtil {
     }
 
     static boolean checkExist(final SchemaContext schemaContext,
-                              final DOMDataReadWriteTransaction readWriteTransaction) {
+                              final DOMDataTreeReadTransaction readWriteTransaction) {
         boolean exist;
         try {
             exist = readWriteTransaction.exists(LogicalDatastoreType.OPERATIONAL,
-                    IdentifierCodec.deserialize(MonitoringModule.PATH_TO_STREAMS, schemaContext)).checkedGet();
-        } catch (final ReadFailedException e1) {
-            throw new RestconfDocumentedException("Problem while checking data if exists", e1);
+                    IdentifierCodec.deserialize(MonitoringModule.PATH_TO_STREAMS, schemaContext)).get();
+        } catch (final InterruptedException | ExecutionException e) {
+            throw new RestconfDocumentedException("Problem while checking data if exists", e);
         }
         return exist;
     }

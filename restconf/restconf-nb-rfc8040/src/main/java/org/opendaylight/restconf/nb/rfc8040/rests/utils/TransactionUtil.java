@@ -5,18 +5,16 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
@@ -52,7 +50,7 @@ public final class TransactionUtil {
      *             write transaction
      */
     public static void ensureParentsByMerge(final YangInstanceIdentifier path, final SchemaContext schemaContext,
-            final DOMDataWriteTransaction writeTx) {
+            final DOMDataTreeWriteTransaction writeTx) {
         final List<PathArgument> normalizedPathWithoutChildArgs = new ArrayList<>();
         YangInstanceIdentifier rootNormalizedPath = null;
 
@@ -90,10 +88,10 @@ public final class TransactionUtil {
      * @param operationType Type of operation (READ, POST, PUT, DELETE...)
      */
     public static void checkItemExists(final TransactionChainHandler transactionChainHandler,
-                                       final DOMDataReadWriteTransaction rwTransaction,
+                                       final DOMDataTreeReadWriteTransaction rwTransaction,
                                        final LogicalDatastoreType store, final YangInstanceIdentifier path,
                                        final String operationType) {
-        final CheckedFuture<Boolean, ReadFailedException> future = rwTransaction.exists(store, path);
+        final FluentFuture<Boolean> future = rwTransaction.exists(store, path);
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
 
         FutureCallbackTx.addCallback(future, operationType, response);
@@ -120,10 +118,10 @@ public final class TransactionUtil {
      * @param operationType Type of operation (READ, POST, PUT, DELETE...)
      */
     public static void checkItemDoesNotExists(final TransactionChainHandler transactionChainHandler,
-                                              final DOMDataReadWriteTransaction rwTransaction,
+                                              final DOMDataTreeReadWriteTransaction rwTransaction,
                                               final LogicalDatastoreType store, final YangInstanceIdentifier path,
                                               final String operationType) {
-        final CheckedFuture<Boolean, ReadFailedException> future = rwTransaction.exists(store, path);
+        final FluentFuture<Boolean> future = rwTransaction.exists(store, path);
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
 
         FutureCallbackTx.addCallback(future, operationType, response);

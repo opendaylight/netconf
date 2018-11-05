@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.services.simple.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -22,11 +21,11 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.md.sal.dom.broker.impl.mount.DOMMountPointServiceImpl;
-import org.opendaylight.controller.md.sal.dom.broker.spi.mount.SimpleDOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
+import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
+import org.opendaylight.mdsal.dom.spi.SimpleDOMMountPoint;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;

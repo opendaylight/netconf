@@ -5,24 +5,23 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.test;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
 import java.util.Collections;
+import java.util.Optional;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
@@ -40,7 +39,8 @@ public abstract class AbstractBodyReaderTest {
     protected final SchemaContextHandler schemaContextHandler;
     protected final DOMMountPointServiceHandler mountPointServiceHandler;
 
-    protected AbstractBodyReaderTest(SchemaContext schemaContext) throws NoSuchFieldException, IllegalAccessException {
+    protected AbstractBodyReaderTest(final SchemaContext schemaContext) throws NoSuchFieldException,
+            IllegalAccessException {
         mediaType = getMediaType();
 
         schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
