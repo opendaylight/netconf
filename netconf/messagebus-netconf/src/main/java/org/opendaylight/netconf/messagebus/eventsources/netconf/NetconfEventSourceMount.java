@@ -7,32 +7,31 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import javassist.ClassPool;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.api.DOMService;
 import org.opendaylight.mdsal.binding.dom.codec.gen.impl.StreamWriterGenerator;
 import org.opendaylight.mdsal.binding.dom.codec.impl.BindingNormalizedNodeCodecRegistry;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.binding.generator.util.BindingRuntimeContext;
 import org.opendaylight.mdsal.binding.generator.util.JavassistUtils;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInputBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
@@ -110,12 +109,11 @@ class NetconfEventSourceMount {
      * @param lastEventTime last event time
      * @return rpc result
      */
-    CheckedFuture<DOMRpcResult, DOMRpcException> invokeCreateSubscription(final Stream stream,
-                                                                          final Optional<Date> lastEventTime) {
+    FluentFuture<DOMRpcResult> invokeCreateSubscription(final Stream stream, final Optional<Instant> lastEventTime) {
         final CreateSubscriptionInputBuilder inputBuilder = new CreateSubscriptionInputBuilder()
                 .setStream(stream.getName());
         if (lastEventTime.isPresent() && stream.isReplaySupport()) {
-            final ZonedDateTime dateTime = lastEventTime.get().toInstant().atZone(ZoneId.systemDefault());
+            final ZonedDateTime dateTime = lastEventTime.get().atZone(ZoneId.systemDefault());
             final String formattedDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(dateTime);
             inputBuilder.setStartTime(new DateAndTime(formattedDate));
         }
@@ -130,21 +128,22 @@ class NetconfEventSourceMount {
      * @param stream stream
      * @return rpc result
      */
-    CheckedFuture<DOMRpcResult, DOMRpcException> invokeCreateSubscription(final Stream stream) {
-        return invokeCreateSubscription(stream, Optional.absent());
+    FluentFuture<DOMRpcResult> invokeCreateSubscription(final Stream stream) {
+        return invokeCreateSubscription(stream, Optional.empty());
     }
 
     /**
-     * Returns list of streams avaliable on device.
+     * Returns list of streams available on device.
      *
      * @return list of streams
-     * @throws ReadFailedException if data read fails
+     * @throws ExecutionException if data read fails
+     * @throws InterruptedException if data read fails
      */
-    List<Stream> getAvailableStreams() throws ReadFailedException {
-        DOMDataReadOnlyTransaction tx = dataBroker.newReadOnlyTransaction();
-        CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> checkFeature = tx
-                .read(LogicalDatastoreType.OPERATIONAL, STREAMS_PATH);
-        Optional<NormalizedNode<?, ?>> streams = checkFeature.checkedGet();
+    List<Stream> getAvailableStreams() throws InterruptedException, ExecutionException {
+        DOMDataTreeReadTransaction tx = dataBroker.newReadOnlyTransaction();
+        FluentFuture<Optional<NormalizedNode<?, ?>>> checkFeature = tx.read(LogicalDatastoreType.OPERATIONAL,
+            STREAMS_PATH);
+        Optional<NormalizedNode<?, ?>> streams = checkFeature.get();
         if (streams.isPresent()) {
             Streams streams1 = (Streams) CODEC_REGISTRY.fromNormalizedNode(STREAMS_PATH, streams.get()).getValue();
             return streams1.getStream();

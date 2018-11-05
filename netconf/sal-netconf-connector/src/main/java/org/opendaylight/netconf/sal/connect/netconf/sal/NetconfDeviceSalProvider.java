@@ -8,18 +8,17 @@
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import com.google.common.base.Preconditions;
-import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.Transaction;
+import org.opendaylight.mdsal.binding.api.TransactionChain;
+import org.opendaylight.mdsal.binding.api.TransactionChainListener;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -36,12 +35,12 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
 
     private volatile NetconfDeviceTopologyAdapter topologyDatastoreAdapter;
 
-    private BindingTransactionChain txChain;
+    private TransactionChain txChain;
 
     private final TransactionChainListener transactionChainListener =  new TransactionChainListener() {
         @Override
-        public void onTransactionChainFailed(final TransactionChain<?, ?> chain,
-                                             final AsyncTransaction<?, ?> transaction, final Throwable cause) {
+        public void onTransactionChainFailed(final TransactionChain chain, final Transaction transaction,
+                final Throwable cause) {
             LOG.error("{}: TransactionChain({}) {} FAILED!", id, chain, transaction.getIdentifier(), cause);
             chain.close();
             resetTransactionChainForAdapaters();
@@ -49,7 +48,7 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
         }
 
         @Override
-        public void onTransactionChainSuccessful(final TransactionChain<?, ?> chain) {
+        public void onTransactionChainSuccessful(final TransactionChain chain) {
             LOG.trace("{}: TransactionChain({}) SUCCESSFUL", id, chain);
         }
     };
