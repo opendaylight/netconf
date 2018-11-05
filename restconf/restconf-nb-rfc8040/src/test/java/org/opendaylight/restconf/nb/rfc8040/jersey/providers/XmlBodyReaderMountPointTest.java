@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import static org.junit.Assert.assertEquals;
@@ -20,7 +19,7 @@ import javax.ws.rs.core.MediaType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;

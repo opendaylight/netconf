@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
@@ -17,11 +16,12 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -147,7 +147,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
             }
 
             LOG.debug("Data missing - returning absent");
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
@@ -180,7 +180,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
             propagateExceptionAs(uriPath, e, "RPC");
         }
 
-        return Optional.fromNullable(output);
+        return Optional.ofNullable(output);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
@@ -208,7 +208,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
         } catch (final Exception e) {
             propagateExceptionAs(uriPath, e, "PATCH");
         }
-        return Optional.fromNullable(output);
+        return Optional.ofNullable(output);
     }
 
     @Override

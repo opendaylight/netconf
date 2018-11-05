@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
@@ -13,21 +12,21 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.doReturn;
 
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.Futures;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcImplementationNotAvailableException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMRpcException;
+import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -76,7 +75,7 @@ public class RestconfInvokeOperationsUtilTest {
 
     @Test
     public void invokeRpcViaMountPointTest() {
-        doReturn(Optional.fromNullable(rpcService)).when(moutPoint).getService(DOMRpcService.class);
+        doReturn(Optional.ofNullable(rpcService)).when(moutPoint).getService(DOMRpcService.class);
         final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, Collections.emptyList());
         doReturn(Futures.immediateCheckedFuture(mockResult)).when(rpcService).invokeRpc(DATA.rpc, DATA.input);
         final DOMRpcResult rpcResult =
@@ -87,7 +86,7 @@ public class RestconfInvokeOperationsUtilTest {
 
     @Test(expected = RestconfDocumentedException.class)
     public void invokeRpcMissingMountPointServiceTest() {
-        doReturn(Optional.absent()).when(moutPoint).getService(DOMRpcService.class);
+        doReturn(Optional.empty()).when(moutPoint).getService(DOMRpcService.class);
         final DOMRpcResult mockResult = new DefaultDOMRpcResult(DATA.output, Collections.emptyList());
         doReturn(Futures.immediateCheckedFuture(mockResult)).when(rpcService).invokeRpc(DATA.rpc, DATA.input);
         final DOMRpcResult rpcResult =
