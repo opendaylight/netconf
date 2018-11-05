@@ -29,12 +29,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>sal-binding-api</artifactId>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-binding-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>sal-core-api</artifactId>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-dom-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
@@ -49,13 +49,8 @@
             <artifactId>sal-netconf-connector</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>sal-common-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-common-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>

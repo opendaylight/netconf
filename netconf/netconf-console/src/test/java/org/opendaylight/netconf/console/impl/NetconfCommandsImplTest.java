@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.console.impl;
 
 import static junit.framework.TestCase.assertFalse;
@@ -26,10 +25,10 @@ import java.util.concurrent.TimeoutException;
 import org.awaitility.Awaitility;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
-import org.opendaylight.controller.md.sal.binding.test.ConcurrentDataBrokerTestCustomizer;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.WriteTransaction;
+import org.opendaylight.mdsal.binding.dom.adapter.test.ConcurrentDataBrokerTestCustomizer;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 import org.opendaylight.netconf.console.utils.NetconfConsoleUtils;
 import org.opendaylight.netconf.console.utils.NetconfIidFactory;

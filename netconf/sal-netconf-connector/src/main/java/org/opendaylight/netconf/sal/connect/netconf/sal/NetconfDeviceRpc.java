@@ -10,19 +10,17 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Collections2;
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.SettableFuture;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcAvailabilityListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcIdentifier;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcImplementationNotAvailableException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
+import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
@@ -50,25 +48,26 @@ public final class NetconfDeviceRpc implements DOMRpcService {
         this.schemaContext = requireNonNull(schemaContext);
     }
 
-    @Nonnull
     @Override
-    public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type,
-                                                                  @Nullable final NormalizedNode<?, ?> input) {
-        final NetconfMessage message = transformer.toRpcRequest(type, input);
-        final ListenableFuture<RpcResult<NetconfMessage>> delegateFutureWithPureResult =
-                communicator.sendRequest(message, type.getLastComponent());
+    public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+        final FluentFuture<RpcResult<NetconfMessage>> delegateFuture = communicator.sendRequest(
+            transformer.toRpcRequest(type, input), type.getLastComponent());
 
-        final ListenableFuture<DOMRpcResult> transformed =
-            Futures.transform(delegateFutureWithPureResult, input1 -> {
-                if (input1.isSuccessful()) {
-                    return transformer.toRpcResult(input1.getResult(), type);
-                } else {
-                    return new DefaultDOMRpcResult(input1.getErrors());
-                }
-            }, MoreExecutors.directExecutor());
+        final SettableFuture<DOMRpcResult> ret = SettableFuture.create();
+        delegateFuture.addCallback(new FutureCallback<RpcResult<NetconfMessage>>() {
+            @Override
+            public void onSuccess(RpcResult<NetconfMessage> result) {
+                ret.set(result.isSuccessful() ? transformer.toRpcResult(result.getResult(), type)
+                        : new DefaultDOMRpcResult(result.getErrors()));
+            }
 
-        return Futures.makeChecked(transformed, exception ->
-            new DOMRpcImplementationNotAvailableException(exception, "Unable to invoke rpc %s", type));
+            @Override
+            public void onFailure(Throwable cause) {
+                ret.setException(new DOMRpcImplementationNotAvailableException(cause, "Unable to invoke rpc %s", type));
+            }
+
+        }, MoreExecutors.directExecutor());
+        return ret;
     }
 
     @Nonnull
