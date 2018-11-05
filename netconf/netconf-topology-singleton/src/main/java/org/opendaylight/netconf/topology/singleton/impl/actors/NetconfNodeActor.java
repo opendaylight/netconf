@@ -28,13 +28,13 @@ import org.opendaylight.controller.cluster.common.actor.AbstractUntypedActor;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMRpcService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyYangTextSourceProvider;
@@ -119,7 +119,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             final CreateInitialMasterActorData masterActorData = (CreateInitialMasterActorData) message;
             sourceIdentifiers = masterActorData.getSourceIndentifiers();
             this.deviceDataBroker = masterActorData.getDeviceDataBroker();
-            final DOMDataReadOnlyTransaction tx = deviceDataBroker.newReadOnlyTransaction();
+            final DOMDataTreeReadTransaction tx = deviceDataBroker.newReadOnlyTransaction();
             readTxActor = context().actorOf(ReadTransactionActor.props(tx));
             this.deviceRpc = masterActorData.getDeviceRpc();
 
@@ -153,7 +153,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             sender().tell(new Success(readTxActor), self());
         } else if (message instanceof NewWriteTransactionRequest) { // master
             try {
-                final DOMDataWriteTransaction tx = deviceDataBroker.newWriteOnlyTransaction();
+                final DOMDataTreeWriteTransaction tx = deviceDataBroker.newWriteOnlyTransaction();
                 final ActorRef txActor = context().actorOf(WriteTransactionActor.props(tx, writeTxIdleTimeout));
                 sender().tell(new Success(txActor), self());
             } catch (final Exception t) {
@@ -162,7 +162,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
 
         } else if (message instanceof NewReadWriteTransactionRequest) {
             try {
-                final DOMDataReadWriteTransaction tx = deviceDataBroker.newReadWriteTransaction();
+                final DOMDataTreeReadWriteTransaction tx = deviceDataBroker.newReadWriteTransaction();
                 final ActorRef txActor = context().actorOf(ReadWriteTransactionActor.props(tx, writeTxIdleTimeout));
                 sender().tell(new Success(txActor), self());
             } catch (final Exception t) {
@@ -291,7 +291,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     }
 
     private void resolveSchemaContext(final SchemaContextFactory schemaContextFactory,
-            final SlaveSalFacade localSlaveSalManager, final ActorRef masterReference, int tries) {
+            final SlaveSalFacade localSlaveSalManager, final ActorRef masterReference, final int tries) {
         final ListenableFuture<SchemaContext> schemaContextFuture =
                 schemaContextFactory.createSchemaContext(sourceIdentifiers);
         Futures.addCallback(schemaContextFuture, new FutureCallback<SchemaContext>() {

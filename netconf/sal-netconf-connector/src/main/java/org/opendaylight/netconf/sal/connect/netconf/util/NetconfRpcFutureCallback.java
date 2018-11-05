@@ -5,12 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
 import com.google.common.util.concurrent.FutureCallback;
 import javax.annotation.Nonnull;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -5,20 +5,19 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import com.google.common.base.Preconditions;
-import java.util.Collections;
-import java.util.Map;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBrokerExtension;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableClassToInstanceMap;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadOnlyTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadWriteTx;
@@ -53,17 +52,17 @@ public final class NetconfDeviceDataBroker implements DOMDataBroker {
     }
 
     @Override
-    public DOMDataReadOnlyTransaction newReadOnlyTransaction() {
+    public DOMDataTreeReadTransaction newReadOnlyTransaction() {
         return new ReadOnlyTx(netconfOps, id);
     }
 
     @Override
-    public DOMDataReadWriteTransaction newReadWriteTransaction() {
+    public DOMDataTreeReadWriteTransaction newReadWriteTransaction() {
         return new ReadWriteTx(newReadOnlyTransaction(), newWriteOnlyTransaction());
     }
 
     @Override
-    public DOMDataWriteTransaction newWriteOnlyTransaction() {
+    public DOMDataTreeWriteTransaction newWriteOnlyTransaction() {
         if (candidateSupported) {
             if (runningWritable) {
                 return new WriteCandidateRunningTx(id, netconfOps, rollbackSupport);
@@ -76,13 +75,12 @@ public final class NetconfDeviceDataBroker implements DOMDataBroker {
     }
 
     @Override
-    public DOMTransactionChain createTransactionChain(final TransactionChainListener listener) {
+    public DOMTransactionChain createTransactionChain(final DOMTransactionChainListener listener) {
         return new TxChain(this, listener);
     }
 
     @Override
-    public Map<Class<? extends DOMDataBrokerExtension>, DOMDataBrokerExtension> getSupportedExtensions() {
-        return Collections.emptyMap();
+    public ClassToInstanceMap<DOMDataBrokerExtension> getExtensions() {
+        return ImmutableClassToInstanceMap.of();
     }
-
 }

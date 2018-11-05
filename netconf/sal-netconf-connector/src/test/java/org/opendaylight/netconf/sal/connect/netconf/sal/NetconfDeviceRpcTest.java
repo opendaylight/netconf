@@ -11,7 +11,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,11 +22,10 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcAvailabilityListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcIdentifier;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
+import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
+import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
@@ -79,8 +78,8 @@ public class NetconfDeviceRpcTest {
     @Test
     public void testInvokeRpc() throws Exception {
         NormalizedNode<?, ?> input = createNode("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "filter");
-        final CheckedFuture<DOMRpcResult, DOMRpcException> future = rpc.invokeRpc(path, input);
-        final DOMRpcResult result = future.checkedGet();
+        final FluentFuture<DOMRpcResult> future = rpc.invokeRpc(path, input);
+        final DOMRpcResult result = future.get();
         Assert.assertEquals(expectedReply, result);
     }
 
@@ -101,7 +100,7 @@ public class NetconfDeviceRpcTest {
         }
     }
 
-    private static ContainerNode createNode(String namespace, String date, String localName) {
+    private static ContainerNode createNode(final String namespace, final String date, final String localName) {
         return Builders.containerBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(QName.create(namespace, date, localName))).build();
     }

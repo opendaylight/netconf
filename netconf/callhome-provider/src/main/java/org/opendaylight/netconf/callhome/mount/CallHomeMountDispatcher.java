@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.mount;
 
 import io.netty.util.concurrent.EventExecutor;
@@ -15,8 +14,8 @@ import java.net.InetSocketAddress;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.callhome.mount.CallHomeMountSessionContext.CloseCallback;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeNetconfSubsystemListener;
@@ -48,15 +47,12 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
 
     protected CallHomeTopology topology;
 
-    private final CloseCallback onCloseHandler = new CloseCallback() {
-        @Override
-        public void onClosed(final CallHomeMountSessionContext deviceContext) {
-            LOG.info("Removing {} from Netconf Topology.", deviceContext.getId());
-            topology.disconnectNode(deviceContext.getId());
-        }
+    private final CloseCallback onCloseHandler = deviceContext -> {
+        LOG.info("Removing {} from Netconf Topology.", deviceContext.getId());
+        topology.disconnectNode(deviceContext.getId());
     };
 
-    private DeviceActionFactory deviceActionFactory;
+    private final DeviceActionFactory deviceActionFactory;
 
     public CallHomeMountDispatcher(final String topologyId, final EventExecutor eventExecutor,
                                    final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
@@ -71,7 +67,7 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
             final SchemaRepositoryProvider schemaRepositoryProvider, final DataBroker dataBroker,
             final DOMMountPointService mountService,
-            final AAAEncryptionService encryptionService, DeviceActionFactory deviceActionFactory) {
+            final AAAEncryptionService encryptionService, final DeviceActionFactory deviceActionFactory) {
         this.topologyId = topologyId;
         this.eventExecutor = eventExecutor;
         this.keepaliveExecutor = keepaliveExecutor;
