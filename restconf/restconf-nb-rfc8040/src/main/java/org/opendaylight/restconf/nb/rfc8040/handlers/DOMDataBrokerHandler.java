@@ -7,11 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 
 /**
  * Implementation of {@link DOMDataBrokerHandler}.
- *
  */
 public class DOMDataBrokerHandler implements Handler<DOMDataBroker> {
 

@@ -5,14 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.md.sal.rest.common;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.io.File;
@@ -23,12 +21,13 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.rest.impl.test.providers.TestJsonBodyWriter;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -61,17 +60,18 @@ public final class TestRestconfUtils {
         throw new UnsupportedOperationException("Test utility class");
     }
 
-    public static ControllerContext newControllerContext(SchemaContext schemaContext) {
+    public static ControllerContext newControllerContext(final SchemaContext schemaContext) {
         return newControllerContext(schemaContext, null);
     }
 
-    public static ControllerContext newControllerContext(SchemaContext schemaContext, DOMMountPoint mountInstance) {
+    public static ControllerContext newControllerContext(final SchemaContext schemaContext,
+            final DOMMountPoint mountInstance) {
         final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
 
         if (mountInstance != null) {
             doReturn(schemaContext).when(mountInstance).getSchemaContext();
-            doReturn(Optional.fromNullable(mountInstance)).when(mockMountService)
-                    .getMountPoint(any(YangInstanceIdentifier.class));
+            doReturn(Optional.ofNullable(mountInstance)).when(mockMountService).getMountPoint(
+                any(YangInstanceIdentifier.class));
         }
 
         DOMSchemaService mockSchemaService = mock(DOMSchemaService.class);
