@@ -7,15 +7,13 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
-import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.CONFIGURATION;
-import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.OPERATIONAL;
+import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION;
+import static org.opendaylight.mdsal.common.api.LogicalDatastoreType.OPERATIONAL;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.Closeable;
 import java.util.ArrayList;
@@ -24,25 +22,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
-import javax.annotation.Nullable;
+import java.util.concurrent.ExecutionException;
 import javax.ws.rs.core.Response.Status;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeIdentifier;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.ReadFailedException;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -58,7 +56,6 @@ import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -138,7 +135,7 @@ public class BrokerFacade implements Closeable {
      * @return read date
      */
     public NormalizedNode<?, ?> readConfigurationData(final YangInstanceIdentifier path, final String withDefa) {
-        try (DOMDataReadOnlyTransaction tx = this.domDataBroker.newReadOnlyTransaction()) {
+        try (DOMDataTreeReadTransaction tx = this.domDataBroker.newReadOnlyTransaction()) {
             return readDataViaTransaction(tx, CONFIGURATION, path, withDefa);
         }
     }
@@ -172,7 +169,7 @@ public class BrokerFacade implements Closeable {
             final String withDefa) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            try (DOMDataReadOnlyTransaction tx = domDataBrokerService.get().newReadOnlyTransaction()) {
+            try (DOMDataTreeReadTransaction tx = domDataBrokerService.get().newReadOnlyTransaction()) {
                 return readDataViaTransaction(tx, CONFIGURATION, path, withDefa);
             }
         }
@@ -187,7 +184,7 @@ public class BrokerFacade implements Closeable {
      * @return read data
      */
     public NormalizedNode<?, ?> readOperationalData(final YangInstanceIdentifier path) {
-        try (DOMDataReadOnlyTransaction tx = this.domDataBroker.newReadOnlyTransaction()) {
+        try (DOMDataTreeReadTransaction tx = this.domDataBroker.newReadOnlyTransaction()) {
             return readDataViaTransaction(tx, OPERATIONAL, path);
         }
     }
@@ -204,7 +201,7 @@ public class BrokerFacade implements Closeable {
     public NormalizedNode<?, ?> readOperationalData(final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            try (DOMDataReadOnlyTransaction tx = domDataBrokerService.get().newReadOnlyTransaction()) {
+            try (DOMDataTreeReadTransaction tx = domDataBrokerService.get().newReadOnlyTransaction()) {
                 return readDataViaTransaction(tx, OPERATIONAL, path);
             }
         }
@@ -237,10 +234,10 @@ public class BrokerFacade implements Closeable {
         Preconditions.checkNotNull(path);
         Preconditions.checkNotNull(payload);
 
-        final DOMDataReadWriteTransaction newReadWriteTransaction = this.domDataBroker.newReadWriteTransaction();
+        final DOMDataTreeReadWriteTransaction newReadWriteTransaction = this.domDataBroker.newReadWriteTransaction();
         final Status status = readDataViaTransaction(newReadWriteTransaction, CONFIGURATION, path) != null ? Status.OK
                 : Status.CREATED;
-        final CheckedFuture<Void, TransactionCommitFailedException> future = putDataViaTransaction(
+        final FluentFuture<? extends CommitInfo> future = putDataViaTransaction(
                 newReadWriteTransaction, CONFIGURATION, path, payload, globalSchema, insert, point);
         return new PutResult(status, future);
     }
@@ -274,11 +271,11 @@ public class BrokerFacade implements Closeable {
 
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
-            final DOMDataReadWriteTransaction newReadWriteTransaction =
+            final DOMDataTreeReadWriteTransaction newReadWriteTransaction =
                     domDataBrokerService.get().newReadWriteTransaction();
             final Status status = readDataViaTransaction(newReadWriteTransaction, CONFIGURATION, path) != null
                     ? Status.OK : Status.CREATED;
-            final CheckedFuture<Void, TransactionCommitFailedException> future = putDataViaTransaction(
+            final FluentFuture<? extends CommitInfo> future = putDataViaTransaction(
                     newReadWriteTransaction, CONFIGURATION, path, payload, mountPoint.getSchemaContext(), insert,
                     point);
             return new PutResult(status, future);
@@ -292,7 +289,7 @@ public class BrokerFacade implements Closeable {
 
         // get new transaction and schema context on server or on mounted device
         final SchemaContext schemaContext;
-        final DOMDataReadWriteTransaction patchTransaction;
+        final DOMDataTreeReadWriteTransaction patchTransaction;
         if (mountPoint == null) {
             schemaContext = patchContext.getInstanceIdentifierContext().getSchemaContext();
             patchTransaction = this.domDataBroker.newReadWriteTransaction();
@@ -416,12 +413,12 @@ public class BrokerFacade implements Closeable {
 
         // if no errors commit transaction
         final CountDownLatch waiter = new CountDownLatch(1);
-        final CheckedFuture<Void, TransactionCommitFailedException> future = patchTransaction.submit();
+        final FluentFuture<? extends CommitInfo> future = patchTransaction.commit();
         final PatchStatusContextHelper status = new PatchStatusContextHelper();
 
-        Futures.addCallback(future, new FutureCallback<Void>() {
+        future.addCallback(new FutureCallback<CommitInfo>() {
             @Override
-            public void onSuccess(@Nullable final Void result) {
+            public void onSuccess(final CommitInfo result) {
                 status.setStatus(new PatchStatusContext(patchContext.getPatchId(), ImmutableList.copyOf(editCollection),
                         true, null));
                 waiter.countDown();
@@ -443,14 +440,14 @@ public class BrokerFacade implements Closeable {
     }
 
     // POST configuration
-    public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPost(
+    public FluentFuture<? extends CommitInfo> commitConfigurationDataPost(
             final SchemaContext globalSchema, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final String insert, final String point) {
         return postDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path, payload,
                 globalSchema, insert, point);
     }
 
-    public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataPost(
+    public FluentFuture<? extends CommitInfo> commitConfigurationDataPost(
             final DOMMountPoint mountPoint, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final String insert, final String point) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
@@ -462,12 +459,11 @@ public class BrokerFacade implements Closeable {
     }
 
     // DELETE configuration
-    public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataDelete(
-            final YangInstanceIdentifier path) {
+    public FluentFuture<? extends CommitInfo> commitConfigurationDataDelete(final YangInstanceIdentifier path) {
         return deleteDataViaTransaction(this.domDataBroker.newReadWriteTransaction(), CONFIGURATION, path);
     }
 
-    public CheckedFuture<Void, TransactionCommitFailedException> commitConfigurationDataDelete(
+    public FluentFuture<? extends CommitInfo> commitConfigurationDataDelete(
             final DOMMountPoint mountPoint, final YangInstanceIdentifier path) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
@@ -477,8 +473,7 @@ public class BrokerFacade implements Closeable {
     }
 
     // RPC
-    public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(final SchemaPath type,
-                                                                  final NormalizedNode<?, ?> input) {
+    public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
         if (this.rpcService == null) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
@@ -493,8 +488,8 @@ public class BrokerFacade implements Closeable {
         }
 
         final YangInstanceIdentifier path = listener.getPath();
-        DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)
-                                    this.domDataBroker.getSupportedExtensions().get(DOMDataTreeChangeService.class);
+        DOMDataTreeChangeService changeService = this.domDataBroker.getExtensions()
+                .getInstance(DOMDataTreeChangeService.class);
         if (changeService == null) {
             throw new UnsupportedOperationException("DOMDataBroker does not support the DOMDataTreeChangeService"
                                                         + this.domDataBroker);
@@ -505,31 +500,22 @@ public class BrokerFacade implements Closeable {
         listener.setRegistration(registration);
     }
 
-    private NormalizedNode<?, ?> readDataViaTransaction(final DOMDataReadTransaction transaction,
+    private NormalizedNode<?, ?> readDataViaTransaction(final DOMDataTreeReadTransaction transaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
         return readDataViaTransaction(transaction, datastore, path, null);
     }
 
-    private NormalizedNode<?, ?> readDataViaTransaction(final DOMDataReadTransaction transaction,
+    private NormalizedNode<?, ?> readDataViaTransaction(final DOMDataTreeReadTransaction transaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final String withDefa) {
         LOG.trace("Read {} via Restconf: {}", datastore.name(), path);
 
         try {
-            final Optional<NormalizedNode<?, ?>> optional = transaction.read(datastore, path).checkedGet();
+            final Optional<NormalizedNode<?, ?>> optional = transaction.read(datastore, path).get();
             return !optional.isPresent() ? null : withDefa == null ? optional.get() :
                 prepareDataByParamWithDef(optional.get(), path, withDefa);
-        } catch (ReadFailedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             LOG.warn("Error reading {} from datastore {}", path, datastore.name(), e);
-            for (final RpcError error : e.getErrorList()) {
-                if (error.getErrorType() == RpcError.ErrorType.TRANSPORT
-                        && error.getTag().equals(ErrorTag.RESOURCE_DENIED.getTagValue())) {
-                    throw new RestconfDocumentedException(
-                            error.getMessage(),
-                            ErrorType.TRANSPORT,
-                            ErrorTag.RESOURCE_DENIED_TRANSPORT, e);
-                }
-            }
-            throw new RestconfDocumentedException("Error reading data.", e, e.getErrorList());
+            throw RestconfDocumentedException.decodeAndThrow("Error reading data.", e);
         }
     }
 
@@ -660,26 +646,26 @@ public class BrokerFacade implements Closeable {
     /**
      * POST data and submit transaction {@link DOMDataReadWriteTransaction}.
      */
-    private CheckedFuture<Void, TransactionCommitFailedException> postDataViaTransaction(
-            final DOMDataReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
+    private FluentFuture<? extends CommitInfo> postDataViaTransaction(
+            final DOMDataTreeReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
             final String insert, final String point) {
         LOG.trace("POST {} via Restconf: {} with payload {}", datastore.name(), path, payload);
         postData(rwTransaction, datastore, path, payload, schemaContext, insert, point);
-        return rwTransaction.submit();
+        return rwTransaction.commit();
     }
 
     /**
      * POST data and do NOT submit transaction {@link DOMDataReadWriteTransaction}.
      */
     private void postDataWithinTransaction(
-            final DOMDataReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
+            final DOMDataTreeReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         LOG.trace("POST {} within Restconf Patch: {} with payload {}", datastore.name(), path, payload);
         postData(rwTransaction, datastore, path, payload, schemaContext, null, null);
     }
 
-    private void postData(final DOMDataReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
+    private void postData(final DOMDataTreeReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
                           final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final String insert, final String point) {
         if (insert == null) {
@@ -769,7 +755,7 @@ public class BrokerFacade implements Closeable {
         }
     }
 
-    private void insertWithPointLeafListPost(final DOMDataReadWriteTransaction rwTransaction,
+    private void insertWithPointLeafListPost(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
             final boolean before) {
@@ -801,7 +787,7 @@ public class BrokerFacade implements Closeable {
         }
     }
 
-    private void insertWithPointListPost(final DOMDataReadWriteTransaction rwTransaction,
+    private void insertWithPointListPost(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
             final String point, final MapNode readList, final boolean before) {
@@ -855,7 +841,7 @@ public class BrokerFacade implements Closeable {
         throw new RestconfDocumentedException("Insert parameter can be used only with list or leaf-list");
     }
 
-    private static void makeNormalPost(final DOMDataReadWriteTransaction rwTransaction,
+    private static void makeNormalPost(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext) {
         final Collection<? extends NormalizedNode<?, ?>> children;
@@ -910,7 +896,7 @@ public class BrokerFacade implements Closeable {
         }
     }
 
-    private static void simplePostPut(final DOMDataReadWriteTransaction rwTransaction,
+    private static void simplePostPut(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext) {
         checkItemDoesNotExists(rwTransaction, datastore, path);
@@ -918,14 +904,13 @@ public class BrokerFacade implements Closeable {
         rwTransaction.put(datastore, path, payload);
     }
 
-    private static boolean doesItemExist(final DOMDataReadWriteTransaction rwTransaction,
+    private static boolean doesItemExist(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         try {
-            return rwTransaction.exists(store, path).checkedGet();
-        } catch (ReadFailedException e) {
+            return rwTransaction.exists(store, path).get();
+        } catch (InterruptedException | ExecutionException e) {
             rwTransaction.cancel();
-            throw new RestconfDocumentedException("Could not determine the existence of path " + path,
-                    e, e.getErrorList());
+            throw RestconfDocumentedException.decodeAndThrow("Could not determine the existence of path " + path, e);
         }
     }
 
@@ -935,7 +920,7 @@ public class BrokerFacade implements Closeable {
      * @param store Used datastore
      * @param path Path to item to verify its existence
      */
-    private static void checkItemExists(final DOMDataReadWriteTransaction rwTransaction,
+    private static void checkItemExists(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         if (!doesItemExist(rwTransaction, store, path)) {
             LOG.trace("Operation via Restconf was not executed because data at {} does not exist", path);
@@ -951,7 +936,7 @@ public class BrokerFacade implements Closeable {
      * @param store Used datastore
      * @param path Path to item to verify its existence
      */
-    private static void checkItemDoesNotExists(final DOMDataReadWriteTransaction rwTransaction,
+    private static void checkItemDoesNotExists(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         if (doesItemExist(rwTransaction, store, path)) {
             LOG.trace("Operation via Restconf was not executed because data at {} already exists", path);
@@ -969,27 +954,27 @@ public class BrokerFacade implements Closeable {
      * @param insert
      *            insert
      */
-    private CheckedFuture<Void, TransactionCommitFailedException> putDataViaTransaction(
-            final DOMDataReadWriteTransaction readWriteTransaction, final LogicalDatastoreType datastore,
+    private FluentFuture<? extends CommitInfo> putDataViaTransaction(
+            final DOMDataTreeReadWriteTransaction readWriteTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
             final String insert, final String point) {
         LOG.trace("Put {} via Restconf: {} with payload {}", datastore.name(), path, payload);
         putData(readWriteTransaction, datastore, path, payload, schemaContext, insert, point);
-        return readWriteTransaction.submit();
+        return readWriteTransaction.commit();
     }
 
     /**
      * PUT data and do NOT submit {@link DOMDataReadWriteTransaction}.
      */
     private void putDataWithinTransaction(
-            final DOMDataReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
+            final DOMDataTreeReadWriteTransaction writeTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         LOG.trace("Put {} within Restconf Patch: {} with payload {}", datastore.name(), path, payload);
         putData(writeTransaction, datastore, path, payload, schemaContext, null, null);
     }
 
     // FIXME: This is doing correct put for container and list children, not sure if this will work for choice case
-    private void putData(final DOMDataReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
+    private void putData(final DOMDataTreeReadWriteTransaction rwTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
             final String insert, final String point) {
         if (insert == null) {
@@ -1076,7 +1061,7 @@ public class BrokerFacade implements Closeable {
         }
     }
 
-    private void insertWithPointLeafListPut(final DOMDataWriteTransaction tx,
+    private void insertWithPointLeafListPut(final DOMDataTreeWriteTransaction tx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
             final boolean before) {
@@ -1106,7 +1091,7 @@ public class BrokerFacade implements Closeable {
         }
     }
 
-    private void insertWithPointListPut(final DOMDataWriteTransaction tx, final LogicalDatastoreType datastore,
+    private void insertWithPointListPut(final DOMDataTreeWriteTransaction tx, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext,
             final String point, final OrderedMapNode readList, final boolean before) {
         tx.delete(datastore, path.getParent());
@@ -1135,7 +1120,7 @@ public class BrokerFacade implements Closeable {
         }
     }
 
-    private static void makePut(final DOMDataWriteTransaction tx, final LogicalDatastoreType datastore,
+    private static void makePut(final DOMDataTreeWriteTransaction tx, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload, final SchemaContext schemaContext) {
         if (payload instanceof MapNode) {
             final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
@@ -1151,27 +1136,27 @@ public class BrokerFacade implements Closeable {
     }
 
     private static void simplePut(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
-            final DOMDataWriteTransaction tx, final SchemaContext schemaContext, final NormalizedNode<?, ?> payload) {
+            final DOMDataTreeWriteTransaction tx, final SchemaContext schemaContext, final NormalizedNode<?, ?> payload) {
         ensureParentsByMerge(datastore, path, tx, schemaContext);
         tx.put(datastore, path, payload);
     }
 
-    private static CheckedFuture<Void, TransactionCommitFailedException> deleteDataViaTransaction(
-            final DOMDataReadWriteTransaction readWriteTransaction, final LogicalDatastoreType datastore,
+    private static FluentFuture<? extends CommitInfo> deleteDataViaTransaction(
+            final DOMDataTreeReadWriteTransaction readWriteTransaction, final LogicalDatastoreType datastore,
             final YangInstanceIdentifier path) {
         LOG.trace("Delete {} via Restconf: {}", datastore.name(), path);
         checkItemExists(readWriteTransaction, datastore, path);
         readWriteTransaction.delete(datastore, path);
-        return readWriteTransaction.submit();
+        return readWriteTransaction.commit();
     }
 
-    private static void deleteDataWithinTransaction(final DOMDataWriteTransaction tx,
+    private static void deleteDataWithinTransaction(final DOMDataTreeWriteTransaction tx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
         LOG.trace("Delete {} within Restconf Patch: {}", datastore.name(), path);
         tx.delete(datastore, path);
     }
 
-    private static void mergeDataWithinTransaction(final DOMDataWriteTransaction tx,
+    private static void mergeDataWithinTransaction(final DOMDataTreeWriteTransaction tx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext) {
         LOG.trace("Merge {} within Restconf Patch: {} with payload {}", datastore.name(), path, payload);
@@ -1195,7 +1180,7 @@ public class BrokerFacade implements Closeable {
     }
 
     private static void ensureParentsByMerge(final LogicalDatastoreType store,
-            final YangInstanceIdentifier normalizedPath, final DOMDataWriteTransaction tx,
+            final YangInstanceIdentifier normalizedPath, final DOMDataTreeWriteTransaction tx,
             final SchemaContext schemaContext) {
         final List<PathArgument> normalizedPathWithoutChildArgs = new ArrayList<>();
         YangInstanceIdentifier rootNormalizedPath = null;
