@@ -8,7 +8,6 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.CheckedFuture;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -80,8 +79,7 @@ public final class CreateStreamUtil {
      * @param refSchemaCtx
      *             reference to {@link SchemaContext} -
      *            {@link SchemaContextRef}
-     * @return {@link CheckedFuture} with {@link DOMRpcResult} - This mean
-     *         output of RPC - example in JSON:
+     * @return {@link DOMRpcResult} - This means output of RPC - example in JSON:
      *
      *         <pre>
      *         {@code

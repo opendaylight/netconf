@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.List;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
@@ -47,11 +47,11 @@ final class FutureCallbackTx {
      *             if the Future throws an exception
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
-    static <T, X extends Exception> void addCallback(final CheckedFuture<T, X> listenableFuture, final String txType,
+    static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
             final FutureDataFactory<T> dataFactory) throws RestconfDocumentedException {
 
         try {
-            final T result = listenableFuture.checkedGet();
+            final T result = listenableFuture.get();
             dataFactory.setResult(result);
             LOG.trace("Transaction({}) SUCCESSFUL", txType);
         } catch (Exception e) {

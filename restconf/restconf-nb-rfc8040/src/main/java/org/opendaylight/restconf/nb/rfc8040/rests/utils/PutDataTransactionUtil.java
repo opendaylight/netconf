@@ -7,18 +7,18 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -161,17 +161,17 @@ public final class PutDataTransactionUtil {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
         final SchemaContext schemaContext = schemaCtxRef.get();
 
-        final DOMDataReadWriteTransaction readWriteTransaction =
+        final DOMDataTreeReadWriteTransaction readWriteTransaction =
                 transactionNode.getTransactionChain().newReadWriteTransaction();
 
-        final CheckedFuture<Boolean, ReadFailedException> existsFuture =
-                readWriteTransaction.exists(LogicalDatastoreType.CONFIGURATION, path);
+        final FluentFuture<Boolean> existsFuture = readWriteTransaction.exists(LogicalDatastoreType.CONFIGURATION,
+            path);
         final FutureDataFactory<Boolean> existsResponse = new FutureDataFactory<>();
         FutureCallbackTx.addCallback(existsFuture, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, existsResponse);
 
         final ResponseFactory responseFactory =
                 new ResponseFactory(existsResponse.result ? Status.NO_CONTENT : Status.CREATED);
-        final CheckedFuture<Void, TransactionCommitFailedException> submitData = submitData(path, schemaContext,
+        final FluentFuture<? extends CommitInfo> submitData = submitData(path, schemaContext,
                 transactionNode.getTransactionChainHandler(), readWriteTransaction, payload.getData(), insert, point);
         FutureCallbackTx.addCallback(submitData, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, responseFactory);
         return responseFactory.build();
@@ -194,9 +194,9 @@ public final class PutDataTransactionUtil {
      *             query parameter
      * @return {@link CheckedFuture}
      */
-    private static CheckedFuture<Void, TransactionCommitFailedException> submitData(final YangInstanceIdentifier path,
+    private static FluentFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
             final SchemaContext schemaContext, final TransactionChainHandler transactionChainHandler,
-            final DOMDataReadWriteTransaction readWriteTransaction,
+            final DOMDataTreeReadWriteTransaction readWriteTransaction,
             final NormalizedNode<?, ?> data, final String insert, final String point) {
         if (insert == null) {
             return makePut(path, schemaContext, readWriteTransaction, data);
@@ -216,7 +216,7 @@ public final class PutDataTransactionUtil {
                                     schemaContext, data);
                             listPut(LogicalDatastoreType.CONFIGURATION, path.getParent(), readWriteTransaction,
                                     schemaContext, readList);
-                            return readWriteTransaction.submit();
+                            return readWriteTransaction.commit();
                         }
                     } else {
                         final NormalizedNode<?, ?> readData =
@@ -231,7 +231,7 @@ public final class PutDataTransactionUtil {
                                     schemaContext, data);
                             listPut(LogicalDatastoreType.CONFIGURATION, path.getParent(), readWriteTransaction,
                                     schemaContext, readLeafList);
-                            return readWriteTransaction.submit();
+                            return readWriteTransaction.commit();
                         }
                     }
                 case "last":
@@ -246,7 +246,7 @@ public final class PutDataTransactionUtil {
                         } else {
                             insertWithPointListPut(readWriteTransaction, LogicalDatastoreType.CONFIGURATION, path,
                                     data, schemaContext, point, readList, true);
-                            return readWriteTransaction.submit();
+                            return readWriteTransaction.commit();
                         }
                     } else {
                         final NormalizedNode<?, ?> readData =
@@ -258,7 +258,7 @@ public final class PutDataTransactionUtil {
                         } else {
                             insertWithPointLeafListPut(readWriteTransaction, LogicalDatastoreType.CONFIGURATION,
                                     path, data, schemaContext, point, readLeafList, true);
-                            return readWriteTransaction.submit();
+                            return readWriteTransaction.commit();
                         }
                     }
                 case "after":
@@ -271,7 +271,7 @@ public final class PutDataTransactionUtil {
                         } else {
                             insertWithPointListPut(readWriteTransaction, LogicalDatastoreType.CONFIGURATION,
                                     path, data, schemaContext, point, readList, false);
-                            return readWriteTransaction.submit();
+                            return readWriteTransaction.commit();
                         }
                     } else {
                         final NormalizedNode<?, ?> readData =
@@ -283,7 +283,7 @@ public final class PutDataTransactionUtil {
                         } else {
                             insertWithPointLeafListPut(readWriteTransaction, LogicalDatastoreType.CONFIGURATION,
                                     path, data, schemaContext, point, readLeafList, true);
-                            return readWriteTransaction.submit();
+                            return readWriteTransaction.commit();
                         }
                     }
                 default:
@@ -304,13 +304,13 @@ public final class PutDataTransactionUtil {
         return readData;
     }
 
-    private static void insertWithPointLeafListPut(final DOMDataReadWriteTransaction rwTransaction,
+    private static void insertWithPointLeafListPut(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
             final NormalizedNode<?, ?> data, final SchemaContext schemaContext, final String point,
             final OrderedLeafSetNode<?> readLeafList, final boolean before) {
         rwTransaction.delete(datastore, path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
-                ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.absent());
+                ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
         int lastItemPosition = 0;
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
@@ -334,13 +334,13 @@ public final class PutDataTransactionUtil {
         }
     }
 
-    private static void insertWithPointListPut(final DOMDataReadWriteTransaction writeTx,
+    private static void insertWithPointListPut(final DOMDataTreeReadWriteTransaction writeTx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
             final NormalizedNode<?, ?> data, final SchemaContext schemaContext, final String point,
             final OrderedMapNode readList, final boolean before) {
         writeTx.delete(datastore, path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
-                ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.absent());
+                ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
         int lastItemPosition = 0;
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
             if (mapEntryNode.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
@@ -365,7 +365,7 @@ public final class PutDataTransactionUtil {
     }
 
     private static void listPut(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
-            final DOMDataReadWriteTransaction writeTx, final SchemaContext schemaContext,
+            final DOMDataTreeWriteTransaction writeTx, final SchemaContext schemaContext,
             final OrderedLeafSetNode<?> payload) {
         final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
         writeTx.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
@@ -377,7 +377,7 @@ public final class PutDataTransactionUtil {
     }
 
     private static void listPut(final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
-            final DOMDataReadWriteTransaction writeTx, final SchemaContext schemaContext,
+            final DOMDataTreeWriteTransaction writeTx, final SchemaContext schemaContext,
             final OrderedMapNode payload) {
         final NormalizedNode<?, ?> emptySubtree = ImmutableNodes.fromInstanceId(schemaContext, path);
         writeTx.merge(datastore, YangInstanceIdentifier.create(emptySubtree.getIdentifier()), emptySubtree);
@@ -389,17 +389,18 @@ public final class PutDataTransactionUtil {
     }
 
     private static void simplePut(final LogicalDatastoreType configuration, final YangInstanceIdentifier path,
-            final DOMDataReadWriteTransaction writeTx, final SchemaContext schemaContext,
+            final DOMDataTreeWriteTransaction writeTx, final SchemaContext schemaContext,
             final NormalizedNode<?, ?> data) {
         TransactionUtil.ensureParentsByMerge(path, schemaContext, writeTx);
         writeTx.put(LogicalDatastoreType.CONFIGURATION, path, data);
     }
 
-    private static CheckedFuture<Void, TransactionCommitFailedException> makePut(final YangInstanceIdentifier path,
-            final SchemaContext schemaContext, final DOMDataWriteTransaction writeTx, final NormalizedNode<?, ?> data) {
+    private static FluentFuture<? extends CommitInfo> makePut(final YangInstanceIdentifier path,
+            final SchemaContext schemaContext, final DOMDataTreeWriteTransaction writeTx,
+            final NormalizedNode<?, ?> data) {
         TransactionUtil.ensureParentsByMerge(path, schemaContext, writeTx);
         writeTx.put(LogicalDatastoreType.CONFIGURATION, path, data);
-        return writeTx.submit();
+        return writeTx.commit();
     }
 
     public static DataSchemaNode checkListAndOrderedType(final SchemaContext ctx, final YangInstanceIdentifier path) {

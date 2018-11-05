@@ -93,7 +93,7 @@ public class RestconfImplTest {
         binaryKeyTest(al, al);
     }
 
-    private void binaryKeyTest(final List<Byte> al, final List<Byte> al2) {
+    private static void binaryKeyTest(final List<Byte> al, final List<Byte> al2) {
 
         final QName keyDef = QName.create("test:key:binary", "2017-08-14", "b1");
 

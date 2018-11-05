@@ -5,12 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.restconf.impl;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
@@ -19,7 +17,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.URI;
@@ -40,6 +38,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -49,14 +48,15 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.OptimisticLockFailedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcImplementationNotAvailableException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.OptimisticLockFailedException;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
@@ -815,9 +815,9 @@ public final class RestconfImpl implements RestconfService {
             }
 
             try {
-                result.getFutureOfPutData().checkedGet();
+                result.getFutureOfPutData().get();
                 return Response.status(result.getStatus()).build();
-            } catch (final TransactionCommitFailedException e) {
+            } catch (final TransactionCommitFailedException | InterruptedException | ExecutionException e) {
                 if (e instanceof OptimisticLockFailedException) {
                     if (--tries <= 0) {
                         LOG.debug("Got OptimisticLockFailedException on last try - failing {}", identifier);
@@ -955,7 +955,7 @@ public final class RestconfImpl implements RestconfService {
                     "Point parameter can be used only with 'after' or 'before' values of Insert parameter.");
         }
 
-        CheckedFuture<Void, TransactionCommitFailedException> future;
+        FluentFuture<? extends CommitInfo> future;
         if (mountPoint != null) {
             future = this.broker.commitConfigurationDataPost(mountPoint, normalizedII, payload.getData(), insert,
                     point);
@@ -965,10 +965,10 @@ public final class RestconfImpl implements RestconfService {
         }
 
         try {
-            future.checkedGet();
+            future.get();
         } catch (final RestconfDocumentedException e) {
             throw e;
-        } catch (final TransactionCommitFailedException e) {
+        } catch (final InterruptedException | ExecutionException | TransactionCommitFailedException e) {
             LOG.info("Error creating data {}", uriInfo != null ? uriInfo.getPath() : "", e);
             throw new RestconfDocumentedException(e.getMessage(), e, e.getErrorList());
         }
@@ -1009,7 +1009,7 @@ public final class RestconfImpl implements RestconfService {
         final DOMMountPoint mountPoint = iiWithData.getMountPoint();
         final YangInstanceIdentifier normalizedII = iiWithData.getInstanceIdentifier();
 
-        final CheckedFuture<Void, TransactionCommitFailedException> future;
+        final FluentFuture<? extends CommitInfo> future;
         if (mountPoint != null) {
             future = this.broker.commitConfigurationDataDelete(mountPoint, normalizedII);
         } else {
@@ -1017,10 +1017,10 @@ public final class RestconfImpl implements RestconfService {
         }
 
         try {
-            future.checkedGet();
-        } catch (final TransactionCommitFailedException e) {
+            future.get();
+        } catch (final TransactionCommitFailedException | InterruptedException | ExecutionException e) {
             final Optional<Throwable> searchedException = Iterables.tryFind(Throwables.getCausalChain(e),
-                    Predicates.instanceOf(ModifiedNodeDoesNotExistException.class));
+                    Predicates.instanceOf(ModifiedNodeDoesNotExistException.class)).toJavaUtil();
             if (searchedException.isPresent()) {
                 throw new RestconfDocumentedException("Data specified for delete doesn't exist.",
                         ErrorType.APPLICATION, ErrorTag.DATA_MISSING, e);
