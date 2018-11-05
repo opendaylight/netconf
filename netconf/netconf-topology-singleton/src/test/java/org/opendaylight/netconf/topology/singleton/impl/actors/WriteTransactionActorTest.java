@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import akka.actor.ActorSystem;
@@ -16,14 +15,14 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import scala.concurrent.duration.Duration;
 
 public class WriteTransactionActorTest extends WriteTransactionActorTestAdapter {
     private static ActorSystem system = ActorSystem.apply();
 
     @Mock
-    private DOMDataWriteTransaction mockWriteTx;
+    private DOMDataTreeWriteTransaction mockWriteTx;
 
     @Before
     public void setUp() {

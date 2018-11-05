@@ -18,26 +18,26 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMEvent;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationPublishService;
 import org.opendaylight.controller.messagebus.app.util.TopicDOMNotification;
 import org.opendaylight.controller.messagebus.app.util.Util;
 import org.opendaylight.controller.messagebus.spi.EventSource;
+import org.opendaylight.mdsal.dom.api.DOMEvent;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
+import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventaggregator.rev141202.NotificationPattern;
@@ -144,8 +144,8 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
         try {
             availableStreams = mount.getAvailableStreams();
             streamMap = Maps.uniqueIndex(availableStreams, input -> input.getName().getValue());
-        } catch (ReadFailedException e) {
-            LOG.warn("Can not read streams for node {}", mount.getNodeId());
+        } catch (InterruptedException | ExecutionException e) {
+            LOG.warn("Can not read streams for node {}", mount.getNodeId(), e);
         }
         return streamMap;
     }
@@ -213,9 +213,9 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
     @Override
     public void onNotification(final DOMNotification notification) {
         SchemaPath notificationPath = notification.getType();
-        Date notificationEventTime = null;
+        Instant notificationEventTime = null;
         if (notification instanceof DOMEvent) {
-            notificationEventTime = ((DOMEvent) notification).getEventTime();
+            notificationEventTime = ((DOMEvent) notification).getEventInstant();
         }
         final String namespace = notification.getType().getLastComponent().getNamespace().toString();
         for (NotificationTopicRegistration notifReg : notificationTopicRegistrations.get(namespace)) {
