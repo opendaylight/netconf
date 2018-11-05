@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.LinkedList;
 import java.util.List;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
+import java.util.Optional;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
