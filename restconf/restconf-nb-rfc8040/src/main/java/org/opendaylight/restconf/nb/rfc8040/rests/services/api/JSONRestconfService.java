@@ -7,9 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.api;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import javax.annotation.Nonnull;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 
 /**

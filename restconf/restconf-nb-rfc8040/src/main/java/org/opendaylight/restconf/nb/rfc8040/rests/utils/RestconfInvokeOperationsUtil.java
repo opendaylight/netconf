@@ -7,14 +7,13 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import com.google.common.base.Optional;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
+import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import javax.ws.rs.core.Response.Status;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
@@ -45,14 +44,13 @@ public final class RestconfInvokeOperationsUtil {
      *             input data
      * @param schemaPath
      *             schema path of data
-     * @return {@link CheckedFuture}
+     * @return {@link DOMRpcResult}
      */
     public static DOMRpcResult invokeRpcViaMountPoint(final DOMMountPoint mountPoint, final NormalizedNode<?, ?> data,
             final SchemaPath schemaPath) {
         final Optional<DOMRpcService> mountPointService = mountPoint.getService(DOMRpcService.class);
         if (mountPointService.isPresent()) {
-            final CheckedFuture<DOMRpcResult, DOMRpcException> rpc = mountPointService.get().invokeRpc(schemaPath,
-                    data);
+            final FluentFuture<DOMRpcResult> rpc = mountPointService.get().invokeRpc(schemaPath, data);
             return prepareResult(rpc);
         }
         final String errmsg = "RPC service is missing.";
@@ -69,7 +67,7 @@ public final class RestconfInvokeOperationsUtil {
      *             schema path of data
      * @param rpcServiceHandler
      *             rpc service handler to invoke rpc
-     * @return {@link CheckedFuture}
+     * @return {@link DOMRpcResult}
      */
     public static DOMRpcResult invokeRpc(final NormalizedNode<?, ?> data, final SchemaPath schemaPath,
             final RpcServiceHandler rpcServiceHandler) {
@@ -78,7 +76,7 @@ public final class RestconfInvokeOperationsUtil {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
 
-        final CheckedFuture<DOMRpcResult, DOMRpcException> rpc = rpcService.invokeRpc(schemaPath, data);
+        final FluentFuture<DOMRpcResult> rpc = rpcService.invokeRpc(schemaPath, data);
         return prepareResult(rpc);
     }
 
@@ -106,7 +104,7 @@ public final class RestconfInvokeOperationsUtil {
         }
     }
 
-    private static DOMRpcResult prepareResult(final CheckedFuture<DOMRpcResult, DOMRpcException> rpc) {
+    private static DOMRpcResult prepareResult(final FluentFuture<DOMRpcResult> rpc) {
         final RpcResultFactory dataFactory = new RpcResultFactory();
         FutureCallbackTx.addCallback(rpc, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory);
         return dataFactory.build();

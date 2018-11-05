@@ -5,15 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi;
 
-import com.google.common.base.Optional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Optional;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -22,7 +21,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
@@ -41,8 +40,8 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
     private final SchemaContextHandler schemaContextHandler;
     private final DOMMountPointServiceHandler mountPointServiceHandler;
 
-    protected AbstractIdentifierAwareJaxRsProvider(SchemaContextHandler schemaContextHandler,
-            DOMMountPointServiceHandler mountPointServiceHandler) {
+    protected AbstractIdentifierAwareJaxRsProvider(final SchemaContextHandler schemaContextHandler,
+            final DOMMountPointServiceHandler mountPointServiceHandler) {
         this.schemaContextHandler = schemaContextHandler;
         this.mountPointServiceHandler = mountPointServiceHandler;
     }
@@ -90,7 +89,7 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
 
     private InstanceIdentifierContext<?> getInstanceIdentifierContext() {
         return ParserIdentifier.toInstanceIdentifier(getIdentifier(), getSchemaContext(),
-                Optional.fromNullable(getMountPointService()));
+                Optional.ofNullable(getMountPointService()));
     }
 
     protected UriInfo getUriInfo() {
