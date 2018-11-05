@@ -18,8 +18,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.api.capability.BasicCapability;
@@ -153,7 +153,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
     @Override
     public AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
         // Advertise validate capability only if DOMDataBroker provides DOMDataTransactionValidator
-        if (dataBroker.getSupportedExtensions().get(DOMDataTransactionValidator.class) != null) {
+        if (dataBroker.getExtensions().get(DOMDataTransactionValidator.class) != null) {
             listener.onCapabilitiesChanged(Collections.singleton(VALIDATE_CAPABILITY), Collections.emptySet());
         }
         // Advertise namespaces of supported YANG models as NETCONF capabilities
