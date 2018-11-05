@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.opendaylight.yangtools.concepts.Builder;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 

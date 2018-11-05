@@ -24,7 +24,7 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.util.SingletonSet;

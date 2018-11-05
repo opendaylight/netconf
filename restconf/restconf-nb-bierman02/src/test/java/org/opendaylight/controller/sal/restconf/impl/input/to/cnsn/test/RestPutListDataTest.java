@@ -15,7 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Iterables;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import java.io.FileNotFoundException;
 import java.util.List;
 import javax.ws.rs.core.Response.Status;
@@ -76,7 +76,7 @@ public class RestPutListDataTest {
         when(brokerFacade.commitConfigurationDataPut(any(SchemaContext.class), any(YangInstanceIdentifier.class),
                 any(NormalizedNode.class), Mockito.anyString(), Mockito.anyString()))
                         .thenReturn(result);
-        when(result.getFutureOfPutData()).thenReturn(mock(CheckedFuture.class));
+        when(result.getFutureOfPutData()).thenReturn(mock(FluentFuture.class));
         when(result.getStatus()).thenReturn(Status.OK);
     }
 

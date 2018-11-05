@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
@@ -14,11 +13,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.Futures;
 import java.util.Collections;
+import java.util.Optional;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
@@ -26,10 +25,10 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -62,7 +61,7 @@ public class ReadDataTransactionUtilTest {
     @Mock
     private InstanceIdentifierContext<ContainerSchemaNode> context;
     @Mock
-    private DOMDataReadOnlyTransaction read;
+    private DOMDataTreeReadTransaction read;
     @Mock
     private SchemaContext schemaContext;
     @Mock
@@ -91,7 +90,7 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readDataConfigTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data3))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
@@ -102,9 +101,9 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readAllHavingOnlyConfigTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data3))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(read)
+        doReturn(immediateFluentFuture(Optional.empty())).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
@@ -115,9 +114,9 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readAllHavingOnlyNonConfigTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data2))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path2);
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(read)
+        doReturn(immediateFluentFuture(Optional.empty())).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path2);
         doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
@@ -128,7 +127,7 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readDataNonConfigTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data2))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.data2))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path2);
         doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.NONCONFIG;
@@ -139,9 +138,9 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readContainerDataAllTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data3))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data4))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.data4))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
@@ -158,9 +157,9 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readContainerDataConfigNoValueOfContentTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data3))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.data3))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.data4))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.data4))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path);
         doReturn(DATA.path).when(context).getInstanceIdentifier();
         final NormalizedNode<?, ?> normalizedNode = ReadDataTransactionUtil.readData(
@@ -176,9 +175,9 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readListDataAllTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.listData))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.listData))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path3);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.listData2))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.listData2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path3);
         doReturn(DATA.path3).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.ALL;
@@ -194,9 +193,9 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readOrderedListDataAllTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.orderedMapNode1))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.orderedMapNode1))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path3);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.orderedMapNode2))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.orderedMapNode2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path3);
         doReturn(DATA.path3).when(context).getInstanceIdentifier();
 
@@ -211,9 +210,9 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readUnkeyedListDataAllTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.unkeyedListNode1))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.unkeyedListNode1))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.path3);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.unkeyedListNode2))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.unkeyedListNode2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path3);
         doReturn(DATA.path3).when(context).getInstanceIdentifier();
 
@@ -231,9 +230,9 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readLeafListDataAllTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.leafSetNode1))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.leafSetNode1))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.leafSetNodePath);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.leafSetNode2))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.leafSetNode2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.leafSetNodePath);
         doReturn(DATA.leafSetNodePath).when(context).getInstanceIdentifier();
 
@@ -249,9 +248,9 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readOrderedLeafListDataAllTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.orderedLeafSetNode1))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.orderedLeafSetNode1))).when(read)
                 .read(LogicalDatastoreType.OPERATIONAL, DATA.leafSetNodePath);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(DATA.orderedLeafSetNode2))).when(read)
+        doReturn(immediateFluentFuture(Optional.of(DATA.orderedLeafSetNode2))).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.leafSetNodePath);
         doReturn(DATA.leafSetNodePath).when(context).getInstanceIdentifier();
 
@@ -267,7 +266,7 @@ public class ReadDataTransactionUtilTest {
 
     @Test
     public void readDataWrongPathOrNoContentTest() {
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(read)
+        doReturn(immediateFluentFuture(Optional.empty())).when(read)
                 .read(LogicalDatastoreType.CONFIGURATION, DATA.path2);
         doReturn(DATA.path2).when(context).getInstanceIdentifier();
         final String valueOfContent = RestconfDataServiceConstant.ReadData.CONFIG;
