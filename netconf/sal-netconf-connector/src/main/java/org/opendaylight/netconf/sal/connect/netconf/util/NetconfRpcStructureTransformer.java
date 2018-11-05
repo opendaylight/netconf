@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
@@ -31,7 +31,7 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
     public Optional<NormalizedNode<?, ?>> selectFromDataStructure(
             final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> data,
             final YangInstanceIdentifier path) {
-        return Optional.fromJavaUtil(NormalizedNodes.findNode(data, path.getPathArguments()));
+        return NormalizedNodes.findNode(data, path.getPathArguments());
     }
 
     @Override

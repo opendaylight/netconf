@@ -20,8 +20,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventaggregator.rev141202.TopicId;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.EventSourceStatus;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -84,7 +84,7 @@ public class ConnectionNotificationTopicRegistrationTest {
         Assert.assertFalse(afterUnregister.contains(topic3));
     }
 
-    private TopicId registerTopic(String value) {
+    private TopicId registerTopic(final String value) {
         final TopicId topic = TopicId.getDefaultInstance(value);
         registration.registerNotificationTopic(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH, topic);
         return topic;
@@ -97,7 +97,7 @@ public class ConnectionNotificationTopicRegistrationTest {
      * @param listener listener
      * @param status   expected value
      */
-    private static void checkStatus(DOMNotificationListener listener, EventSourceStatus status) {
+    private static void checkStatus(final DOMNotificationListener listener, final EventSourceStatus status) {
         ArgumentCaptor<DOMNotification> notificationCaptor = ArgumentCaptor.forClass(DOMNotification.class);
         verify(listener).onNotification(notificationCaptor.capture());
         final DOMNotification value = notificationCaptor.getValue();
