@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.sal.connect.api;
 
-import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
@@ -21,8 +21,8 @@ public interface DeviceActionFactory {
      * @param schemaContext - schema context of device
      * @return {@link DOMActionService} of specific device
      */
-    default DOMActionService createDeviceAction(MessageTransformer<NetconfMessage> messageTransformer,
-            RemoteDeviceCommunicator<NetconfMessage> listener, SchemaContext schemaContext) {
+    default DOMActionService createDeviceAction(final MessageTransformer<NetconfMessage> messageTransformer,
+            final RemoteDeviceCommunicator<NetconfMessage> listener, final SchemaContext schemaContext) {
         return null;
     }
 }

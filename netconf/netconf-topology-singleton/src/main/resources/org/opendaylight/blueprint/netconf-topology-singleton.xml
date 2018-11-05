@@ -13,9 +13,9 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
            odl:use-default-for-reference-types="true">
 
     <reference id="dataBroker"
-               interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"/>
+               interface="org.opendaylight.mdsal.binding.api.DataBroker"/>
     <reference id="rpcRegistry"
-               interface="org.opendaylight.controller.sal.binding.api.RpcProviderRegistry"/>
+               interface="org.opendaylight.mdsal.binding.api.RpcProviderRegistry"/>
     <reference id="clusterSingletonService"
                interface="org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider"/>
     <reference id="keepAliveExecutor"
@@ -33,7 +33,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
                interface="org.opendaylight.netconf.client.NetconfClientDispatcher"
                odl:type="netconf-client-dispatcher"/>
     <reference id="mountPointService"
-               interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"
+               interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"
                odl:type="default"/>
     <odl:clustered-app-config
             id="singletonConfig"
