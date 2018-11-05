@@ -19,9 +19,9 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import javax.annotation.Nonnull;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.ReadFailedException;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -38,7 +38,7 @@ final class BatchedExistenceCheck {
         this.outstanding = total;
     }
 
-    static BatchedExistenceCheck start(final DOMDataReadTransaction readTx,
+    static BatchedExistenceCheck start(final DOMDataTreeReadTransaction readTx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier parentPath,
             final Collection<? extends NormalizedNode<?, ?>> children) {
         final BatchedExistenceCheck ret = new BatchedExistenceCheck(children.size());
