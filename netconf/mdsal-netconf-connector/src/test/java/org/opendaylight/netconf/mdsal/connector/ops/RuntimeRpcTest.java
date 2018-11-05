@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import static org.junit.Assert.assertTrue;
@@ -15,16 +14,15 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteSource;
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.FluentFuture;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -32,12 +30,12 @@ import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcAvailabilityListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
+import org.opendaylight.mdsal.dom.api.DOMRpcException;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
@@ -48,6 +46,7 @@ import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.concepts.NoOpListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -86,44 +85,34 @@ public class RuntimeRpcTest {
     }
 
     private static final DOMRpcService RPC_SERVICE_VOID_INVOKER = new DOMRpcService() {
-        @Nonnull
         @Override
-        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(
-                @Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
-            return Futures.immediateCheckedFuture(new DefaultDOMRpcResult(null, Collections.emptyList()));
+        public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+            return immediateFluentFuture(new DefaultDOMRpcResult(null, Collections.emptyList()));
         }
 
-        @Nonnull
         @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
-                @Nonnull final T listener) {
-            return null;
+        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(final T listener) {
+            return NoOpListenerRegistration.of(listener);
         }
     };
 
     private static final DOMRpcService RPC_SERVICE_FAILED_INVOCATION = new DOMRpcService() {
-        @Nonnull
         @Override
-        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(
-                @Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
-            return Futures.immediateFailedCheckedFuture(new DOMRpcException("rpc invocation not implemented yet") {
+        public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+            return immediateFailedFluentFuture(new DOMRpcException("rpc invocation not implemented yet") {
                 private static final long serialVersionUID = 1L;
             });
         }
 
-        @Nonnull
         @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
-                @Nonnull final T listener) {
-            return null;
+        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(final T listener) {
+            return NoOpListenerRegistration.of(listener);
         }
     };
 
     private final DOMRpcService rpcServiceSuccessfulInvocation = new DOMRpcService() {
-        @Nonnull
         @Override
-        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(
-                @Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input) {
+        public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
             final Collection<DataContainerChild<? extends PathArgument, ?>> children =
                     (Collection<DataContainerChild<? extends PathArgument, ?>>) input.getValue();
             final Module module = schemaContext.findModules(type.getLastComponent().getNamespace()).stream()
@@ -135,14 +124,12 @@ public class RuntimeRpcTest {
                     .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(outputSchemaNode.getQName()))
                     .withValue(children).build();
 
-            return Futures.immediateCheckedFuture(new DefaultDOMRpcResult(node));
+            return immediateFluentFuture(new DefaultDOMRpcResult(node));
         }
 
-        @Nonnull
         @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
-                @Nonnull final T lsnr) {
-            return null;
+        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(final T lsnr) {
+            return NoOpListenerRegistration.of(lsnr);
         }
     };
 
@@ -177,8 +164,7 @@ public class RuntimeRpcTest {
             final SourceIdentifier sId = (SourceIdentifier) invocationOnMock.getArguments()[0];
             final YangTextSchemaSource yangTextSchemaSource =
                     YangTextSchemaSource.delegateForByteSource(sId, ByteSource.wrap("module test".getBytes()));
-            return Futures.immediateCheckedFuture(yangTextSchemaSource);
-
+            return immediateFluentFuture(yangTextSchemaSource);
         }).when(sourceProvider).getSource(any(SourceIdentifier.class));
 
         this.schemaContext = YangParserTestUtils.parseYangResource("/yang/mdsal-netconf-rpc-test.yang");

@@ -9,13 +9,12 @@ package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import akka.actor.ActorRef;
 import akka.actor.Status.Failure;
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.util.Optional;
 import javax.annotation.Nonnull;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ExistsRequest;
@@ -25,9 +24,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 class ReadAdapter {
 
-    private final DOMDataReadTransaction tx;
+    private final DOMDataTreeReadTransaction tx;
 
-    ReadAdapter(final DOMDataReadTransaction tx) {
+    ReadAdapter(final DOMDataTreeReadTransaction tx) {
         this.tx = tx;
     }
 
@@ -50,10 +49,9 @@ class ReadAdapter {
 
     private void read(final YangInstanceIdentifier path, final LogicalDatastoreType store, final ActorRef sender,
                       final ActorRef self) {
-        Futures.addCallback(tx.read(store, path), new FutureCallback<Optional<NormalizedNode<?, ?>>>() {
-
+        tx.read(store, path).addCallback(new FutureCallback<Optional<NormalizedNode<?, ?>>>() {
             @Override
-            public void onSuccess(@Nonnull final Optional<NormalizedNode<?, ?>> result) {
+            public void onSuccess(final Optional<NormalizedNode<?, ?>> result) {
                 if (!result.isPresent()) {
                     sender.tell(new EmptyReadResponse(), self);
                     return;
@@ -70,7 +68,7 @@ class ReadAdapter {
 
     private void exists(final YangInstanceIdentifier path, final LogicalDatastoreType store, final ActorRef sender,
                         final ActorRef self) {
-        Futures.addCallback(tx.exists(store, path), new FutureCallback<Boolean>() {
+        tx.exists(store, path).addCallback(new FutureCallback<Boolean>() {
             @Override
             public void onSuccess(final Boolean result) {
                 if (result == null) {
