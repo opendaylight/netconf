@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.sal.rest.impl.test.providers;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -17,7 +16,7 @@ import java.io.InputStream;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.sal.rest.impl.JsonToPatchBodyReader;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;

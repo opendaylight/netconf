@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.common.context;
 
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -42,5 +42,4 @@ public class InstanceIdentifierContext<T extends SchemaNode> {
     public SchemaContext getSchemaContext() {
         return schemaContext;
     }
-
 }

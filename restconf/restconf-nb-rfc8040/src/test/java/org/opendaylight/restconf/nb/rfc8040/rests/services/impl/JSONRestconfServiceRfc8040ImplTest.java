@@ -10,8 +10,10 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -20,38 +22,42 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.io.Resources;
-import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcImplementationNotAvailableException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMRpcException;
+import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
@@ -117,13 +123,13 @@ public class JSONRestconfServiceRfc8040ImplTest {
     private DOMTransactionChain mockTxChain;
 
     @Mock
-    private DOMDataReadWriteTransaction mockReadWriteTx;
+    private DOMDataTreeReadWriteTransaction mockReadWriteTx;
 
     @Mock
-    private DOMDataReadOnlyTransaction mockReadOnlyTx;
+    private DOMDataTreeReadTransaction mockReadOnlyTx;
 
     @Mock
-    private DOMDataWriteTransaction mockWriteTx;
+    private DOMDataTreeWriteTransaction mockWriteTx;
 
     @Mock
     private DOMMountPointService mockMountPointService;
@@ -153,7 +159,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         doReturn(ImmutableClassToInstanceMap.of()).when(domSchemaService).getExtensions();
 
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(mockReadOnlyTx).read(
+        doReturn(immediateFluentFuture(Optional.empty())).when(mockReadOnlyTx).read(
                 eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
 
         doNothing().when(mockWriteTx).put(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class),
@@ -161,14 +167,14 @@ public class JSONRestconfServiceRfc8040ImplTest {
         doNothing().when(mockWriteTx).merge(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class),
                 any(NormalizedNode.class));
         doNothing().when(mockWriteTx).delete(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
-        doReturn(Futures.immediateCheckedFuture(null)).when(mockWriteTx).submit();
+        doReturn(CommitInfo.emptyFluentFuture()).when(mockWriteTx).commit();
 
         doNothing().when(mockReadWriteTx).put(eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class),
                 any(NormalizedNode.class));
-        doReturn(Futures.immediateCheckedFuture(null)).when(mockReadWriteTx).submit();
-        doReturn(Futures.immediateCheckedFuture(Optional.absent())).when(mockReadWriteTx).read(
+        doReturn(CommitInfo.emptyFluentFuture()).when(mockReadWriteTx).commit();
+        doReturn(immediateFluentFuture(Optional.empty())).when(mockReadWriteTx).read(
                 eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
-        doReturn(Futures.immediateCheckedFuture(Boolean.FALSE)).when(mockReadWriteTx).exists(
+        doReturn(immediateFalseFluentFuture()).when(mockReadWriteTx).exists(
                 eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
 
         doReturn(mockReadOnlyTx).when(mockTxChain).newReadOnlyTransaction();
@@ -254,8 +260,8 @@ public class JSONRestconfServiceRfc8040ImplTest {
     @Test(expected = OperationFailedException.class)
     @SuppressWarnings("checkstyle:IllegalThrows")
     public void testPutFailure() throws Throwable {
-        doReturn(Futures.immediateFailedCheckedFuture(new TransactionCommitFailedException("mock")))
-                .when(mockReadWriteTx).submit();
+        doReturn(immediateFailedFluentFuture(new TransactionCommitFailedException("mock")))
+                .when(mockReadWriteTx).commit();
 
         final String uriPath = "ietf-interfaces:interfaces/interface=eth0";
         final String payload = loadData("/parts/ietf-interfaces_interfaces.json");
@@ -327,20 +333,19 @@ public class JSONRestconfServiceRfc8040ImplTest {
         verifyLeafNode(actualNode, TEST_LF12_QNAME, "lf12 data");
     }
 
-    @Test(expected = TransactionCommitFailedException.class)
-    @SuppressWarnings({ "checkstyle:IllegalThrows", "checkstyle:avoidHidingCauseException" })
-    public void testPostFailure() throws Throwable {
-        doReturn(Futures.immediateFailedCheckedFuture(new TransactionCommitFailedException("mock")))
-                .when(mockReadWriteTx).submit();
+    @Test
+    public void testPostFailure() throws IOException {
+        final Exception failure = new TransactionCommitFailedException("mock");
+        doReturn(immediateFailedFluentFuture(failure)).when(mockReadWriteTx).commit();
 
-        final String uriPath = null;
         final String payload = loadData("/parts/ietf-interfaces_interfaces_absolute_path.json");
-
         try {
-            this.service.post(uriPath, payload);
+            this.service.post(null, payload);
+            fail();
         } catch (final OperationFailedException e) {
-            assertNotNull(e.getCause());
-            throw e.getCause();
+            final Throwable cause = e.getCause();
+            assertNotNull(cause);
+            assertSame(failure, cause.getCause());
         }
     }
 
@@ -403,8 +408,8 @@ public class JSONRestconfServiceRfc8040ImplTest {
     @Test
     @SuppressWarnings("checkstyle:IllegalThrows")
     public void testPatchFailure() throws Throwable {
-        doReturn(Futures.immediateFailedCheckedFuture(new TransactionCommitFailedException("mock")))
-                .when(mockReadWriteTx).submit();
+        doReturn(immediateFailedFluentFuture(new TransactionCommitFailedException("mock")))
+                .when(mockReadWriteTx).commit();
 
         final String uriPath = "ietf-interfaces:interfaces/interface=eth0";
 
@@ -418,7 +423,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
     @Test
     public void testDelete() throws Exception {
-        doReturn(Futures.immediateCheckedFuture(Boolean.TRUE)).when(mockReadWriteTx).exists(
+        doReturn(immediateTrueFluentFuture()).when(mockReadWriteTx).exists(
                 eq(LogicalDatastoreType.CONFIGURATION), any(YangInstanceIdentifier.class));
 
         final String uriPath = "ietf-interfaces:interfaces/interface=eth0";
@@ -469,8 +474,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         final SchemaPath path = SchemaPath.create(true, MAKE_TOAST_QNAME);
 
         final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
-        doReturn(Futures.immediateCheckedFuture(expResult)).when(mockRpcService).invokeRpc(eq(path),
-                any(NormalizedNode.class));
+        doReturn(immediateFluentFuture(expResult)).when(mockRpcService).invokeRpc(eq(path), any(NormalizedNode.class));
 
         final String uriPath = "toaster:make-toast";
         final String input = loadData("/full-versions/make-toast-rpc-input.json");
@@ -494,11 +498,11 @@ public class JSONRestconfServiceRfc8040ImplTest {
         final SchemaPath path = SchemaPath.create(true, CANCEL_TOAST_QNAME);
 
         final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
-        doReturn(Futures.immediateCheckedFuture(expResult)).when(mockRpcService).invokeRpc(eq(path), isNull());
+        doReturn(immediateFluentFuture(expResult)).when(mockRpcService).invokeRpc(eq(path), isNull());
 
         final String uriPath = "toaster:cancel-toast";
 
-        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.absent());
+        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.empty());
 
         assertEquals("Output present", false, output.isPresent());
 
@@ -513,11 +517,11 @@ public class JSONRestconfServiceRfc8040ImplTest {
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(TEST_OUTPUT_QNAME))
                 .withChild(ImmutableNodes.leafNode(TEXT_OUT_QNAME, "foo")).build();
         final DOMRpcResult expResult = new DefaultDOMRpcResult(outputNode);
-        doReturn(Futures.immediateCheckedFuture(expResult)).when(mockRpcService).invokeRpc(eq(path), isNull());
+        doReturn(immediateFluentFuture(expResult)).when(mockRpcService).invokeRpc(eq(path), isNull());
 
         final String uriPath = "toaster:testOutput";
 
-        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.absent());
+        final Optional<String> output = this.service.invokeRpc(uriPath, Optional.empty());
 
         assertEquals("Output present", true, output.isPresent());
         assertNotNull("Returned null response", output.get());
@@ -529,12 +533,12 @@ public class JSONRestconfServiceRfc8040ImplTest {
     @Test(expected = OperationFailedException.class)
     public void testInvokeRpcFailure() throws Exception {
         final DOMRpcException exception = new DOMRpcImplementationNotAvailableException("testExeption");
-        doReturn(Futures.immediateFailedCheckedFuture(exception)).when(mockRpcService).invokeRpc(any(SchemaPath.class),
+        doReturn(immediateFailedFluentFuture(exception)).when(mockRpcService).invokeRpc(any(SchemaPath.class),
                 any(NormalizedNode.class));
 
         final String uriPath = "toaster:cancel-toast";
 
-        this.service.invokeRpc(uriPath, Optional.absent());
+        this.service.invokeRpc(uriPath, Optional.empty());
     }
 
     void testGet(final LogicalDatastoreType datastoreType) throws OperationFailedException {
@@ -545,7 +549,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
                 .withChild(ImmutableNodes.leafNode(DESC_QNAME, "eth interface"))
                 .build();
 
-        doReturn(Futures.immediateCheckedFuture(Optional.of(entryNode))).when(mockReadOnlyTx).read(
+        doReturn(immediateFluentFuture(Optional.of(entryNode))).when(mockReadOnlyTx).read(
                 eq(datastoreType), any(YangInstanceIdentifier.class));
 
         final String uriPath = "ietf-interfaces:interfaces/interface=eth0";

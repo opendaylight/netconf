@@ -21,10 +21,11 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
 import com.google.common.base.Optional;
 import com.google.common.io.Resources;
-import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -37,14 +38,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcImplementationNotAvailableException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMRpcException;
+import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.JSONRestconfServiceImpl;
@@ -139,8 +141,7 @@ public class JSONRestconfServiceImplTest {
         when(brokerFacade.commitConfigurationDataPut(notNull(SchemaContext.class),
                 notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), isNull(), isNull()))
                 .thenReturn(result);
-        when(result.getFutureOfPutData())
-                .thenReturn(Futures.immediateCheckedFuture(null));
+        doReturn(CommitInfo.emptyFluentFuture()).when(result).getFutureOfPutData();
         when(result.getStatus()).thenReturn(Status.OK);
         final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
         final String payload = loadData("/parts/ietf-interfaces_interfaces.json");
@@ -172,7 +173,7 @@ public class JSONRestconfServiceImplTest {
         when(brokerFacade.commitMountPointDataPut(notNull(DOMMountPoint.class),
                 notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), isNull(), isNull()))
                 .thenReturn(result);
-        when(result.getFutureOfPutData()).thenReturn(Futures.immediateCheckedFuture(null));
+        doReturn(CommitInfo.emptyFluentFuture()).when(result).getFutureOfPutData();
         when(result.getStatus()).thenReturn(Status.OK);
         final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont/cont1";
         final String payload = loadData("/full-versions/testCont1Data.json");
@@ -199,8 +200,8 @@ public class JSONRestconfServiceImplTest {
     public void testPutFailure() throws Throwable {
         final PutResult result = mock(PutResult.class);
 
-        when(result.getFutureOfPutData())
-                .thenReturn(Futures.immediateFailedCheckedFuture(new TransactionCommitFailedException("mock")));
+        doReturn(immediateFailedFluentFuture(new TransactionCommitFailedException("mock"))).when(result)
+        .getFutureOfPutData();
         when(result.getStatus()).thenReturn(Status.OK);
         when(brokerFacade.commitConfigurationDataPut(notNull(SchemaContext.class),
                 notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), Mockito.anyString(),
@@ -215,7 +216,7 @@ public class JSONRestconfServiceImplTest {
     @SuppressWarnings("rawtypes")
     @Test
     public void testPost() throws Exception {
-        doReturn(Futures.immediateCheckedFuture(null)).when(brokerFacade).commitConfigurationDataPost(
+        doReturn(CommitInfo.emptyFluentFuture()).when(brokerFacade).commitConfigurationDataPost(
                 any(SchemaContext.class), any(YangInstanceIdentifier.class), any(NormalizedNode.class),
                 isNull(), isNull());
 
@@ -256,7 +257,7 @@ public class JSONRestconfServiceImplTest {
     @SuppressWarnings("rawtypes")
     @Test
     public void testPostBehindMountPoint() throws Exception {
-        doReturn(Futures.immediateCheckedFuture(null)).when(brokerFacade).commitConfigurationDataPost(
+        doReturn(CommitInfo.emptyFluentFuture()).when(brokerFacade).commitConfigurationDataPost(
                 notNull(DOMMountPoint.class), notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class),
                 isNull(), isNull());
 
@@ -283,7 +284,7 @@ public class JSONRestconfServiceImplTest {
     @Test(expected = TransactionCommitFailedException.class)
     @SuppressWarnings({ "checkstyle:IllegalThrows", "checkstyle:avoidHidingCauseException" })
     public void testPostFailure() throws Throwable {
-        doReturn(Futures.immediateFailedCheckedFuture(new TransactionCommitFailedException("mock"))).when(brokerFacade)
+        doReturn(immediateFailedFluentFuture(new TransactionCommitFailedException("mock"))).when(brokerFacade)
                 .commitConfigurationDataPost(any(SchemaContext.class), any(YangInstanceIdentifier.class),
                         any(NormalizedNode.class), isNull(), isNull());
 
@@ -298,7 +299,6 @@ public class JSONRestconfServiceImplTest {
         }
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testPatch() throws Exception {
         final PatchStatusContext result = mock(PatchStatusContext.class);
@@ -322,7 +322,6 @@ public class JSONRestconfServiceImplTest {
         assertTrue(patchResult.get().contains("\"ok\":[null]"));
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testPatchBehindMountPoint() throws Exception {
         final PatchStatusContext result = mock(PatchStatusContext.class);
@@ -367,7 +366,7 @@ public class JSONRestconfServiceImplTest {
 
     @Test
     public void testDelete() throws Exception {
-        doReturn(Futures.immediateCheckedFuture(null)).when(brokerFacade)
+        doReturn(CommitInfo.emptyFluentFuture()).when(brokerFacade)
                 .commitConfigurationDataDelete(notNull(YangInstanceIdentifier.class));
 
         final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
@@ -419,8 +418,7 @@ public class JSONRestconfServiceImplTest {
         final SchemaPath path = SchemaPath.create(true, MAKE_TOAST_QNAME);
 
         final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
-        doReturn(Futures.immediateCheckedFuture(expResult)).when(brokerFacade).invokeRpc(eq(path),
-                any(NormalizedNode.class));
+        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(path), any(NormalizedNode.class));
 
         final String uriPath = "toaster:make-toast";
         final String input = loadData("/full-versions/make-toast-rpc-input.json");
@@ -444,8 +442,7 @@ public class JSONRestconfServiceImplTest {
         final SchemaPath path = SchemaPath.create(true, CANCEL_TOAST_QNAME);
 
         final DOMRpcResult expResult = new DefaultDOMRpcResult((NormalizedNode<?, ?>)null);
-        doReturn(Futures.immediateCheckedFuture(expResult)).when(brokerFacade).invokeRpc(any(SchemaPath.class),
-                isNull());
+        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(any(SchemaPath.class), isNull());
 
         final String uriPath = "toaster:cancel-toast";
 
@@ -464,8 +461,7 @@ public class JSONRestconfServiceImplTest {
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(TEST_OUTPUT_QNAME))
                 .withChild(ImmutableNodes.leafNode(TEXT_OUT_QNAME, "foo")).build();
         final DOMRpcResult expResult = new DefaultDOMRpcResult(outputNode);
-        doReturn(Futures.immediateCheckedFuture(expResult)).when(brokerFacade).invokeRpc(any(SchemaPath.class),
-                isNull());
+        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(any(SchemaPath.class), isNull());
 
         final String uriPath = "toaster:testOutput";
 
@@ -481,7 +477,7 @@ public class JSONRestconfServiceImplTest {
     @Test(expected = OperationFailedException.class)
     public void testInvokeRpcFailure() throws Exception {
         final DOMRpcException exception = new DOMRpcImplementationNotAvailableException("testExeption");
-        doReturn(Futures.immediateFailedCheckedFuture(exception)).when(brokerFacade).invokeRpc(any(SchemaPath.class),
+        doReturn(immediateFailedFluentFuture(exception)).when(brokerFacade).invokeRpc(any(SchemaPath.class),
                 any(NormalizedNode.class));
 
         final String uriPath = "toaster:cancel-toast";

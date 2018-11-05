@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.sal.rest.impl.test.providers;
 
 import static org.junit.Assert.assertNotNull;
@@ -20,8 +19,8 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.sal.rest.api.RestconfConstants;
 import org.opendaylight.netconf.sal.rest.impl.AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -49,7 +48,7 @@ public abstract class AbstractBodyReaderTest {
     protected final ControllerContext controllerContext;
     protected final MediaType mediaType;
 
-    protected AbstractBodyReaderTest(SchemaContext schemaContext, DOMMountPoint mountInstance) {
+    protected AbstractBodyReaderTest(final SchemaContext schemaContext, final DOMMountPoint mountInstance) {
         this.mediaType = getMediaType();
 
         controllerContext = TestRestconfUtils.newControllerContext(schemaContext, mountInstance);
