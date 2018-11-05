@@ -18,12 +18,12 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.annotation.Nonnull;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeChangeListener;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.callhome.protocol.AuthorizedKeysDecoder;
 import org.opendaylight.netconf.callhome.protocol.CallHomeAuthorization;
 import org.opendaylight.netconf.callhome.protocol.CallHomeAuthorization.Builder;
@@ -44,14 +44,14 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
     private static final InstanceIdentifier<Global> GLOBAL_PATH =
             InstanceIdentifier.create(NetconfCallhomeServer.class).child(Global.class);
     private static final DataTreeIdentifier<Global> GLOBAL =
-            new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, GLOBAL_PATH);
+            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, GLOBAL_PATH);
 
     private static final InstanceIdentifier<Device> ALLOWED_DEVICES_PATH =
             InstanceIdentifier.create(NetconfCallhomeServer.class).child(AllowedDevices.class).child(Device.class);
     private static final DataTreeIdentifier<Device> ALLOWED_DEVICES =
-            new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, ALLOWED_DEVICES_PATH);
+            DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, ALLOWED_DEVICES_PATH);
     private static final DataTreeIdentifier<Device> ALLOWED_OP_DEVICES =
-            new DataTreeIdentifier<>(LogicalDatastoreType.OPERATIONAL, ALLOWED_DEVICES_PATH);
+            DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, ALLOWED_DEVICES_PATH);
 
     private final GlobalConfig globalConfig = new GlobalConfig();
     private final DeviceConfig deviceConfig = new DeviceConfig();

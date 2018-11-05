@@ -5,15 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector;
 
 import com.google.common.annotations.Beta;
 import com.google.common.util.concurrent.CheckedFuture;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBrokerExtension;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMServiceExtension;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMServiceExtension;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -26,7 +25,7 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 @Beta
 public interface DOMDataTransactionValidator extends DOMDataBrokerExtension {
     /**
-     * Validates state of the data tree associated with the provided {@link DOMDataWriteTransaction}.
+     * Validates state of the data tree associated with the provided {@link DOMDataTreeWriteTransaction}.
      *
      * <p>The operation should not have any side-effects on the transaction state.
      *
@@ -40,7 +39,7 @@ public interface DOMDataTransactionValidator extends DOMDataBrokerExtension {
      *     operation is complete. A successful validate returns nothing. On failure, the Future will fail
      *     with a {@link ValidationFailedException} or an exception derived from ValidationFailedException.
      */
-    CheckedFuture<Void, ValidationFailedException> validate(DOMDataWriteTransaction transaction);
+    CheckedFuture<Void, ValidationFailedException> validate(DOMDataTreeWriteTransaction transaction);
 
     /**
      * Failed validation of asynchronous transaction. This exception is raised and returned when transaction validation

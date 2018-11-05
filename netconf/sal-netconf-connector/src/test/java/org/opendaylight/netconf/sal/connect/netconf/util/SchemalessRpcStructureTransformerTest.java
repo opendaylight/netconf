@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -16,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -56,8 +56,8 @@ public class SchemalessRpcStructureTransformerTest {
     private final String testDataset;
 
     public SchemalessRpcStructureTransformerTest(
-            YangInstanceIdentifier path, String testDataset,
-            Class<? extends Exception> expectedException) throws IOException, SAXException, URISyntaxException {
+            final YangInstanceIdentifier path, final String testDataset,
+            final Class<? extends Exception> expectedException) throws IOException, SAXException, URISyntaxException {
         this.path = path;
         this.testDataset = testDataset;
         this.expectedException = expectedException;
@@ -141,18 +141,18 @@ public class SchemalessRpcStructureTransformerTest {
         Assert.assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
     }
 
-    private static YangInstanceIdentifier.NodeIdentifier createNodeId(String name) {
+    private static YangInstanceIdentifier.NodeIdentifier createNodeId(final String name) {
         return new YangInstanceIdentifier.NodeIdentifier(QName.create(NAMESPACE, name));
     }
 
     private static YangInstanceIdentifier.NodeIdentifierWithPredicates createListNodeId(
-            String nodeName, String keyName, String id) {
+            final String nodeName, final String keyName, final String id) {
         return new YangInstanceIdentifier
                 .NodeIdentifierWithPredicates(QName.create(NAMESPACE, nodeName), QName.create(NAMESPACE, keyName), id);
     }
 
     private static YangInstanceIdentifier.NodeIdentifierWithPredicates createListNodeId(
-            String nodeName, Map<QName, Object> keys) {
+            final String nodeName, final Map<QName, Object> keys) {
         return new YangInstanceIdentifier.NodeIdentifierWithPredicates(QName.create(NAMESPACE, nodeName), keys);
     }
 }
