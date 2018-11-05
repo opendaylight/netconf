@@ -7,13 +7,14 @@
  */
 package org.opendaylight.netconf.sal.connect.api;
 
-import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 
 public interface RemoteDeviceCommunicator<M> extends AutoCloseable {
 
-    ListenableFuture<RpcResult<M>> sendRequest(M message, QName rpc);
+    FluentFuture<RpcResult<M>> sendRequest(M message, QName rpc);
 
+    @Override
     void close();
 }

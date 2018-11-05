@@ -5,22 +5,20 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import akka.actor.ActorRef;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import java.util.Collections;
-import java.util.Map;
-import javax.annotation.Nonnull;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBrokerExtension;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableClassToInstanceMap;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.tx.ProxyReadTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.tx.ProxyReadWriteTransaction;
@@ -55,33 +53,32 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public DOMDataReadOnlyTransaction newReadOnlyTransaction() {
+    public DOMDataTreeReadTransaction newReadOnlyTransaction() {
         final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewReadTransactionRequest(), askTimeout);
         return new ProxyReadTransaction(id, txActorFuture, executionContext, askTimeout);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public DOMDataReadWriteTransaction newReadWriteTransaction() {
+    public DOMDataTreeReadWriteTransaction newReadWriteTransaction() {
         final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewReadWriteTransactionRequest(), askTimeout);
         return new ProxyReadWriteTransaction(id, txActorFuture, executionContext, askTimeout);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public DOMDataWriteTransaction newWriteOnlyTransaction() {
+    public DOMDataTreeWriteTransaction newWriteOnlyTransaction() {
         final Future<Object> txActorFuture = Patterns.ask(masterNode, new NewWriteTransactionRequest(), askTimeout);
         return new ProxyReadWriteTransaction(id, txActorFuture, executionContext, askTimeout);
     }
 
     @Override
-    public DOMTransactionChain createTransactionChain(final TransactionChainListener listener) {
+    public DOMTransactionChain createTransactionChain(final DOMTransactionChainListener listener) {
         throw new UnsupportedOperationException(id + ": Transaction chains not supported for netconf mount point");
     }
 
-    @Nonnull
     @Override
-    public Map<Class<? extends DOMDataBrokerExtension>, DOMDataBrokerExtension> getSupportedExtensions() {
-        return Collections.emptyMap();
+    public ClassToInstanceMap<DOMDataBrokerExtension> getExtensions() {
+        return ImmutableClassToInstanceMap.of();
     }
 }
