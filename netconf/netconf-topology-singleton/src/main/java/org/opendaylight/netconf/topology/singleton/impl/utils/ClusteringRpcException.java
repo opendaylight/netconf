@@ -5,19 +5,18 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
+import org.opendaylight.mdsal.dom.api.DOMRpcException;
 
 public class ClusteringRpcException extends DOMRpcException {
     private static final long serialVersionUID = 1L;
 
-    public ClusteringRpcException(String message) {
+    public ClusteringRpcException(final String message) {
         super(message);
     }
 
-    public ClusteringRpcException(String message, Throwable cause) {
+    public ClusteringRpcException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

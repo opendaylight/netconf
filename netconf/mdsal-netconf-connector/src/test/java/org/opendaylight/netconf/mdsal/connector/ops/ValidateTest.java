@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import static org.junit.Assert.assertEquals;
@@ -20,14 +19,14 @@ import static org.opendaylight.netconf.mdsal.connector.ops.AbstractNetconfOperat
 import static org.opendaylight.netconf.mdsal.connector.ops.AbstractNetconfOperationTest.executeOperation;
 import static org.opendaylight.netconf.mdsal.connector.ops.AbstractNetconfOperationTest.verifyResponse;
 
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.Futures;
-import java.util.Collections;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.mdsal.connector.DOMDataTransactionValidator;
 import org.opendaylight.netconf.mdsal.connector.DOMDataTransactionValidator.ValidationFailedException;
@@ -40,7 +39,7 @@ public class ValidateTest {
     @Mock
     private DOMDataTransactionValidator failingValidator;
     @Mock
-    private DOMDataReadWriteTransaction readWriteTx;
+    private DOMDataTreeReadWriteTransaction readWriteTx;
     @Mock
     private DOMDataBroker dataBroker;
 
@@ -123,12 +122,12 @@ public class ValidateTest {
     }
 
     private void whenValidatorIsNotDefined() {
-        doReturn(Collections.emptyMap()).when(dataBroker).getSupportedExtensions();
+        doReturn(ImmutableClassToInstanceMap.of()).when(dataBroker).getExtensions();
     }
 
     private void whenUsingValidator(final DOMDataTransactionValidator validator) {
-        doReturn(Collections.singletonMap(DOMDataTransactionValidator.class, validator))
-            .when(dataBroker).getSupportedExtensions();
+        doReturn(ImmutableClassToInstanceMap.of(DOMDataTransactionValidator.class, validator))
+            .when(dataBroker).getExtensions();
     }
 
     private TransactionProvider initCandidateTransaction() {
@@ -137,8 +136,7 @@ public class ValidateTest {
         return transactionProvider;
     }
 
-    private Document validate(final String resource,
-                              final TransactionProvider transactionProvider) throws Exception {
+    private Document validate(final String resource,  final TransactionProvider transactionProvider) throws Exception {
         final Validate validate = new Validate(SESSION_ID_FOR_REPORTING, transactionProvider);
         return executeOperation(validate, resource);
     }
