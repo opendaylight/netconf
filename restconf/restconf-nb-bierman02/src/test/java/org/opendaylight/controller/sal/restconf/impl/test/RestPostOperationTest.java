@@ -10,6 +10,7 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -17,8 +18,7 @@ import static org.mockito.Mockito.when;
 import static org.opendaylight.controller.sal.restconf.impl.test.RestOperationUtils.XML;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.FluentFuture;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -32,8 +32,9 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
@@ -102,7 +103,7 @@ public class RestPostOperationTest extends JerseyTest {
     public void postDataViaUrlMountPoint() throws UnsupportedEncodingException {
         setSchemaControllerContext(schemaContextYangsIetf);
         when(brokerFacade.commitConfigurationDataPost(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
-                any(NormalizedNode.class), null, null)).thenReturn(mock(CheckedFuture.class));
+                any(NormalizedNode.class), null, null)).thenReturn(mock(FluentFuture.class));
 
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
 
@@ -121,7 +122,7 @@ public class RestPostOperationTest extends JerseyTest {
     public void createConfigurationDataTest() throws UnsupportedEncodingException, ParseException {
         when(brokerFacade.commitConfigurationDataPost((SchemaContext) null, any(YangInstanceIdentifier.class),
                 any(NormalizedNode.class), null, null))
-                .thenReturn(mock(CheckedFuture.class));
+                .thenReturn(mock(FluentFuture.class));
 
         final ArgumentCaptor<YangInstanceIdentifier> instanceIdCaptor =
                 ArgumentCaptor.forClass(YangInstanceIdentifier.class);
@@ -150,9 +151,9 @@ public class RestPostOperationTest extends JerseyTest {
 
     @Test
     public void createConfigurationDataNullTest() throws UnsupportedEncodingException {
-        when(brokerFacade.commitConfigurationDataPost(any(SchemaContext.class), any(YangInstanceIdentifier.class),
-                any(NormalizedNode.class), isNull(), isNull()))
-                .thenReturn(Futures.immediateCheckedFuture(null));
+        doReturn(CommitInfo.emptyFluentFuture()).
+        when(brokerFacade).commitConfigurationDataPost(any(SchemaContext.class), any(YangInstanceIdentifier.class),
+                any(NormalizedNode.class), isNull(), isNull());
 
         //FIXME : find who is set schemaContext
 //        final String URI_1 = "/config";

@@ -88,7 +88,7 @@ public class DummyFuture<T> implements Future<RpcResult<T>> {
         }
 
         public Future<RpcResult<T>> build() {
-            return new DummyFuture<T>(this);
+            return new DummyFuture<>(this);
         }
     }
 }

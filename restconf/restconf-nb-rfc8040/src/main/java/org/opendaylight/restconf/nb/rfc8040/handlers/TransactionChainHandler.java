@@ -5,20 +5,16 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Implementation of {@link TransactionChainHandler}.
@@ -27,23 +23,23 @@ import org.slf4j.LoggerFactory;
 public class TransactionChainHandler implements Handler<DOMTransactionChain>, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(TransactionChainHandler.class);
 
-    private final TransactionChainListener transactionChainListener = new TransactionChainListener() {
+    private final DOMTransactionChainListener transactionChainListener = new DOMTransactionChainListener() {
         @Override
-        public void onTransactionChainFailed(final TransactionChain<?, ?> chain,
-                final AsyncTransaction<?, ?> transaction, final Throwable cause) {
+        public void onTransactionChainFailed(final DOMTransactionChain chain, final DOMDataTreeTransaction transaction,
+                final Throwable cause) {
             LOG.warn("TransactionChain({}) {} FAILED!", chain, transaction.getIdentifier(), cause);
             reset();
             throw new RestconfDocumentedException("TransactionChain(" + chain + ") not committed correctly", cause);
         }
 
         @Override
-        public void onTransactionChainSuccessful(final TransactionChain<?, ?> chain) {
+        public void onTransactionChainSuccessful(final DOMTransactionChain chain) {
             LOG.trace("TransactionChain({}) SUCCESSFUL", chain);
         }
     };
 
-    @Nullable
     private final DOMDataBroker dataBroker;
+
     private volatile DOMTransactionChain transactionChain;
 
     /**
