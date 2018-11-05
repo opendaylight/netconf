@@ -19,9 +19,9 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.opendaylight.controller.md.sal.binding.api.DataObjectModification.ModificationType.DELETE;
-import static org.opendaylight.controller.md.sal.binding.api.DataObjectModification.ModificationType.SUBTREE_MODIFIED;
-import static org.opendaylight.controller.md.sal.binding.api.DataObjectModification.ModificationType.WRITE;
+import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.DELETE;
+import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.SUBTREE_MODIFIED;
+import static org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType.WRITE;
 
 import akka.actor.ActorSystem;
 import akka.actor.Props;
@@ -49,15 +49,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -219,7 +219,7 @@ public class NetconfNodeManagerTest {
         doReturn(node).when(mockDataObjModification).getDataAfter();
 
         netconfNodeManager.onDataTreeChanged(Collections.singletonList(
-                new NetconfTopologyManagerTest.CustomTreeModification(new DataTreeIdentifier<>(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         verify(mockMountPointBuilder, timeout(5000)).register();
@@ -235,7 +235,7 @@ public class NetconfNodeManagerTest {
         doReturn(null).when(mockDataObjModification).getDataAfter();
 
         netconfNodeManager.onDataTreeChanged(Collections.singletonList(
-                new NetconfTopologyManagerTest.CustomTreeModification(new DataTreeIdentifier<>(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         verify(mockMountPointReg, timeout(5000)).close();
@@ -249,7 +249,7 @@ public class NetconfNodeManagerTest {
         doReturn(node).when(mockDataObjModification).getDataAfter();
 
         netconfNodeManager.onDataTreeChanged(Collections.singletonList(
-                new NetconfTopologyManagerTest.CustomTreeModification(new DataTreeIdentifier<>(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         verify(mockMountPointBuilder, timeout(5000)).register();
@@ -262,7 +262,7 @@ public class NetconfNodeManagerTest {
         doReturn(node).when(mockDataObjModification).getDataBefore();
 
         netconfNodeManager.onDataTreeChanged(Collections.singletonList(
-                new NetconfTopologyManagerTest.CustomTreeModification(new DataTreeIdentifier<>(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         verify(mockMountPointReg, timeout(5000)).close();
@@ -283,7 +283,7 @@ public class NetconfNodeManagerTest {
         doReturn(updatedNode).when(mockDataObjModification).getDataAfter();
 
         netconfNodeManager.onDataTreeChanged(Collections.singletonList(
-                new NetconfTopologyManagerTest.CustomTreeModification(new DataTreeIdentifier<>(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         verify(mockMountPointReg, timeout(5000)).close();
@@ -313,7 +313,7 @@ public class NetconfNodeManagerTest {
         // First try the registration where the perceived master hasn't been initialized as the master.
 
         netconfNodeManager.onDataTreeChanged(Collections.singletonList(
-                new NetconfTopologyManagerTest.CustomTreeModification(new DataTreeIdentifier<>(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         verify(mockMountPointBuilder, after(1000).never()).register();
@@ -328,7 +328,7 @@ public class NetconfNodeManagerTest {
                 yangTextSchemaSourceRequestFuture);
 
         netconfNodeManager.onDataTreeChanged(Collections.singletonList(
-                new NetconfTopologyManagerTest.CustomTreeModification(new DataTreeIdentifier<>(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         yangTextSchemaSourceRequestFuture.get(5, TimeUnit.SECONDS);
@@ -344,7 +344,7 @@ public class NetconfNodeManagerTest {
                 askForMasterMountPointFuture);
 
         netconfNodeManager.onDataTreeChanged(Collections.singletonList(
-                new NetconfTopologyManagerTest.CustomTreeModification(new DataTreeIdentifier<>(
+                new NetconfTopologyManagerTest.CustomTreeModification(DataTreeIdentifier.create(
                         LogicalDatastoreType.OPERATIONAL, nodeListPath), mockDataObjModification)));
 
         askForMasterMountPointFuture.get(5, TimeUnit.SECONDS);
@@ -390,15 +390,15 @@ public class NetconfNodeManagerTest {
     private static class TestMasterActor extends NetconfNodeActor {
         final Map<Class<?>, CompletableFuture<? extends Object>> messagesToDrop = new ConcurrentHashMap<>();
 
-        TestMasterActor(NetconfTopologySetup setup, RemoteDeviceId deviceId, Timeout actorResponseWaitTime,
-                DOMMountPointService mountPointService) {
+        TestMasterActor(final NetconfTopologySetup setup, final RemoteDeviceId deviceId,
+                final Timeout actorResponseWaitTime, final DOMMountPointService mountPointService) {
             super(setup, deviceId, setup.getSchemaResourcesDTO().getSchemaRegistry(),
                     setup.getSchemaResourcesDTO().getSchemaRepository(), actorResponseWaitTime, mountPointService);
         }
 
         @SuppressWarnings({ "rawtypes", "unchecked" })
         @Override
-        public void handleReceive(Object message) {
+        public void handleReceive(final Object message) {
             CompletableFuture dropFuture = messagesToDrop.remove(message.getClass());
             if (dropFuture != null) {
                 dropFuture.complete(message);
