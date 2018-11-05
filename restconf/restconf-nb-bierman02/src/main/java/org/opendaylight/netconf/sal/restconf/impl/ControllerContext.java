@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -29,14 +28,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizationException;
 import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizationOperation;
 import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizer;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
@@ -101,8 +101,8 @@ public final class ControllerContext implements SchemaContextListener, Closeable
     private volatile SchemaContext globalSchema;
     private volatile DataNormalizer dataNormalizer;
 
-    private ControllerContext(DOMSchemaService schemaService, DOMMountPointService mountService,
-            DOMYangTextSourceProvider yangTextSourceProvider) {
+    private ControllerContext(final DOMSchemaService schemaService, final DOMMountPointService mountService,
+            final DOMYangTextSourceProvider yangTextSourceProvider) {
         this.mountService = mountService;
         this.yangTextSourceProvider = yangTextSourceProvider;
 
@@ -110,8 +110,8 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         listenerRegistration = schemaService.registerSchemaContextListener(this);
     }
 
-    public static ControllerContext newInstance(DOMSchemaService schemaService, DOMMountPointService mountService,
-            DOMSchemaService domSchemaService) {
+    public static ControllerContext newInstance(final DOMSchemaService schemaService,
+            final DOMMountPointService mountService, final DOMSchemaService domSchemaService) {
         final DOMYangTextSourceProvider yangTextSourceProvider = domSchemaService.getExtensions()
                 .getInstance(DOMYangTextSourceProvider.class);
 

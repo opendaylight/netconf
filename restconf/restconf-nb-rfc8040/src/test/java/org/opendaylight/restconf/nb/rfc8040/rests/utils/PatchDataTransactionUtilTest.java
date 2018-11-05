@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
@@ -26,10 +25,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
@@ -58,7 +57,7 @@ public class PatchDataTransactionUtilTest {
     private DOMTransactionChain transactionChain;
 
     @Mock
-    private DOMDataReadWriteTransaction rwTransaction;
+    private DOMDataTreeReadWriteTransaction rwTransaction;
 
     @Mock
     private DOMDataBroker mockDataBroker;
@@ -161,7 +160,7 @@ public class PatchDataTransactionUtilTest {
 
         /* Mocks */
         doReturn(this.rwTransaction).when(this.transactionChain).newReadWriteTransaction();
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.rwTransaction).submit();
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.rwTransaction).commit();
     }
 
     @Test

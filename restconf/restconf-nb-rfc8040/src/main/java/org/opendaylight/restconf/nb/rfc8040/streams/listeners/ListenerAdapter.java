@@ -16,7 +16,7 @@ import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import org.json.XML;
-import org.opendaylight.controller.md.sal.dom.api.ClusteredDOMDataTreeChangeListener;
+import org.opendaylight.mdsal.dom.api.ClusteredDOMDataTreeChangeListener;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -255,7 +255,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     }
 
     private Node createCreatedChangedDataChangeEventElement(final Document doc,
-            final YangInstanceIdentifier eventPath, NormalizedNode<?, ?> normalized, final Operation operation,
+            final YangInstanceIdentifier eventPath, final NormalizedNode<?, ?> normalized, final Operation operation,
             final SchemaContext schemaContext, final DataSchemaContextTree dataSchemaContextTree) {
         final Element dataChangeEventElement = doc.createElement("data-change-event");
         final Element pathElement = doc.createElement("path");
