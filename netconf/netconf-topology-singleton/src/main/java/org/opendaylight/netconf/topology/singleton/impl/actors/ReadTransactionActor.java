@@ -5,22 +5,21 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import akka.actor.Props;
 import akka.actor.UntypedAbstractActor;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadActorMessage;
 
 /**
- * ReadTransactionActor is an interface to device's {@link DOMDataReadOnlyTransaction} for cluster nodes.
+ * ReadTransactionActor is an interface to device's {@link DOMDataTreeReadTransaction} for cluster nodes.
  */
 public final class ReadTransactionActor extends UntypedAbstractActor {
 
     private final ReadAdapter readAdapter;
 
-    private ReadTransactionActor(final DOMDataReadOnlyTransaction tx) {
+    private ReadTransactionActor(final DOMDataTreeReadTransaction tx) {
         readAdapter = new ReadAdapter(tx);
     }
 
@@ -30,7 +29,7 @@ public final class ReadTransactionActor extends UntypedAbstractActor {
      * @param tx delegate device read transaction
      * @return props
      */
-    static Props props(final DOMDataReadOnlyTransaction tx) {
+    static Props props(final DOMDataTreeReadTransaction tx) {
         return Props.create(ReadTransactionActor.class, () -> new ReadTransactionActor(tx));
     }
 

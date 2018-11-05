@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FluentFuture;
@@ -19,14 +18,15 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.annotation.Nonnull;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
+public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
 
     private static final Logger LOG  = LoggerFactory.getLogger(AbstractWriteTx.class);
 
@@ -106,10 +106,9 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
             return;
         }
 
-        final DataContainerChild<?, ?> editStructure =
-                netOps.createEditConfigStrcture(Optional.fromNullable(data),
+        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.ofNullable(data),
                         Optional.of(ModifyAction.REPLACE), path);
-        editConfig(path, Optional.fromNullable(data), editStructure, Optional.absent(), "put");
+        editConfig(path, Optional.ofNullable(data), editStructure, Optional.empty(), "put");
     }
 
     @Override
@@ -124,10 +123,9 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
             return;
         }
 
-        final DataContainerChild<?, ?> editStructure =
-                netOps.createEditConfigStrcture(Optional.fromNullable(data),
-                        Optional.absent(), path);
-        editConfig(path, Optional.fromNullable(data), editStructure, Optional.absent(), "merge");
+        final DataContainerChild<?, ?> editStructure =  netOps.createEditConfigStrcture(Optional.ofNullable(data),
+            Optional.empty(), path);
+        editConfig(path, Optional.ofNullable(data), editStructure, Optional.empty(), "merge");
     }
 
     /**
@@ -143,11 +141,9 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
     @Override
     public synchronized void delete(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         checkEditable(store);
-        final DataContainerChild<?, ?> editStructure =
-                netOps.createEditConfigStrcture(Optional.absent(),
+        final DataContainerChild<?, ?> editStructure = netOps.createEditConfigStrcture(Optional.empty(),
                         Optional.of(ModifyAction.DELETE), path);
-        editConfig(path, Optional.absent(),
-                editStructure, Optional.of(ModifyAction.NONE), "delete");
+        editConfig(path, Optional.empty(), editStructure, Optional.of(ModifyAction.NONE), "delete");
     }
 
     @Override
@@ -155,7 +151,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
         final SettableFuture<CommitInfo> resultFuture = SettableFuture.create();
         Futures.addCallback(commitConfiguration(), new FutureCallback<RpcResult<Void>>() {
             @Override
-            public void onSuccess(RpcResult<Void> result) {
+            public void onSuccess(final RpcResult<Void> result) {
                 if (!result.isSuccessful()) {
                     final Collection<RpcError> errors = result.getErrors();
                     resultFuture.setException(new TransactionCommitFailedException(
@@ -168,7 +164,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
             }
 
             @Override
-            public void onFailure(Throwable failure) {
+            public void onFailure(final Throwable failure) {
                 resultFuture.setException(new TransactionCommitFailedException(
                         String.format("Commit of transaction %s failed", getIdentifier()), failure));
             }

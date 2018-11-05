@@ -25,13 +25,12 @@ import java.util.concurrent.ScheduledFuture;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -84,7 +83,7 @@ public class KeepaliveSalFacadeTest {
             invocationOnMock -> {
                 invocationOnMock.callRealMethod();
                 return currentKeepalive;
-            }).when(executorServiceSpy).schedule(Mockito.<Runnable>any(), Mockito.anyLong(), Matchers.any());
+            }).when(executorServiceSpy).schedule(Mockito.<Runnable>any(), Mockito.anyLong(), Mockito.any());
 
         Mockito.when(currentKeepalive.isDone()).thenReturn(true);
 
