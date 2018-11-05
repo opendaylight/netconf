@@ -308,7 +308,7 @@ public class NetconfMessageTransformerTest {
                 .nodeWithKey(Schema.QNAME, keys).build();
         final DataContainerChild<?, ?> editConfigStructure =
                 createEditConfigStructure(BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext(), id,
-                    com.google.common.base.Optional.absent(), com.google.common.base.Optional.fromNullable(schemaNode));
+                    Optional.empty(), Optional.ofNullable(schemaNode));
 
         final DataContainerChild<?, ?> target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_QNAME);
 
