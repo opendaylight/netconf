@@ -11,7 +11,7 @@
            odl:restart-dependents-on-updates="true">
 
     <reference id="dataBroker"
-               interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"
+               interface="org.opendaylight.mdsal.binding.api.DataBroker"
                odl:type="default"/>
     <reference id="netconfOperationServiceFactoryListener"
                interface="org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener"
