@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
@@ -14,8 +13,9 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 
-import com.google.common.util.concurrent.Futures;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -24,12 +24,13 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -57,11 +58,11 @@ public class PostDataTransactionUtilTest {
     @Mock
     private DOMTransactionChain transactionChain;
     @Mock
-    private DOMDataReadWriteTransaction readWrite;
+    private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
-    private DOMDataReadOnlyTransaction read;
+    private DOMDataTreeReadTransaction read;
     @Mock
-    private DOMDataWriteTransaction write;
+    private DOMDataTreeWriteTransaction write;
     @Mock
     private UriInfo uriInfo;
     @Mock
@@ -139,16 +140,15 @@ public class PostDataTransactionUtilTest {
                 new InstanceIdentifierContext<>(this.iid2, null, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(Futures.immediateCheckedFuture(false))
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
+        doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
+            this.iid2);
         final YangInstanceIdentifier.NodeIdentifier identifier =
                 ((ContainerNode) ((SingletonSet<?>) payload.getData().getValue()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
-        doReturn(Futures.immediateCheckedFuture(false))
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
+        doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
+        doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         final TransactionVarsWrapper wrapper =
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler);
         final Response response =
@@ -170,10 +170,9 @@ public class PostDataTransactionUtilTest {
                 data.getValue().iterator().next().getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
-        doReturn(Futures.immediateCheckedFuture(false))
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
+        doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
+        doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         final TransactionVarsWrapper wrapper =
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler);
         final Response response =
@@ -189,18 +188,16 @@ public class PostDataTransactionUtilTest {
                 new InstanceIdentifierContext<>(this.iid2, null, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildBaseCont);
 
-        doReturn(Futures.immediateCheckedFuture(false))
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
+        doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
+            this.iid2);
         final YangInstanceIdentifier.NodeIdentifier identifier =
                 ((ContainerNode) ((SingletonSet<?>) payload.getData().getValue()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
-        doReturn(Futures.immediateCheckedFuture(false))
-                .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
-        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node,
-                payload.getData());
+        doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
+        doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, payload.getData());
         final DOMException domException = new DOMException((short) 414, "Post request failed");
-        doReturn(Futures.immediateFailedCheckedFuture(domException)).when(this.readWrite).submit();
+        doReturn(immediateFailedFluentFuture(domException)).when(this.readWrite).commit();
         final TransactionVarsWrapper wrapper =
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler);
 
@@ -216,5 +213,4 @@ public class PostDataTransactionUtilTest {
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
     }
-
 }
