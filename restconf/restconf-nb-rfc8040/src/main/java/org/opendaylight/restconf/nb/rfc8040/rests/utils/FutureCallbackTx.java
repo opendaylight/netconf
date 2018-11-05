@@ -8,12 +8,13 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.CheckedFuture;
-import java.util.ArrayList;
+import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.FluentFuture;
 import java.util.List;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import java.util.concurrent.ExecutionException;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMRpcException;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -24,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Add callback for future objects and result set to the data factory.
- *
  */
 final class FutureCallbackTx {
 
@@ -47,28 +47,32 @@ final class FutureCallbackTx {
      *             if the Future throws an exception
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
-    static <T, X extends Exception> void addCallback(final CheckedFuture<T, X> listenableFuture, final String txType,
-            final FutureDataFactory<T> dataFactory) throws RestconfDocumentedException {
+    static <T> void addCallback(final FluentFuture<T> listenableFuture, final String txType,
+            final FutureDataFactory<? super T> dataFactory) throws RestconfDocumentedException {
 
         try {
-            final T result = listenableFuture.checkedGet();
+            final T result = listenableFuture.get();
             dataFactory.setResult(result);
             LOG.trace("Transaction({}) SUCCESSFUL", txType);
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
             dataFactory.setFailureStatus();
             LOG.warn("Transaction({}) FAILED!", txType, e);
-            if (e instanceof DOMRpcException) {
-                final List<RpcError> rpcErrorList = new ArrayList<>();
-                rpcErrorList.add(
-                        RpcResultBuilder.newError(RpcError.ErrorType.RPC, "operation-failed", e.getMessage()));
-                dataFactory.setResult((T) new DefaultDOMRpcResult(rpcErrorList));
-            } else if (e instanceof TransactionCommitFailedException) {
+            throw new RestconfDocumentedException("Transaction failed", e);
+        } catch (ExecutionException e) {
+            dataFactory.setFailureStatus();
+            LOG.warn("Transaction({}) FAILED!", txType, e);
+
+            final Throwable cause = e.getCause();
+            if (cause instanceof DOMRpcException) {
+                dataFactory.setResult((T) new DefaultDOMRpcResult(ImmutableList.of(
+                    RpcResultBuilder.newError(RpcError.ErrorType.RPC, "operation-failed", cause.getMessage()))));
+            } else if (cause instanceof TransactionCommitFailedException) {
                 /* If device send some error message we want this message to get to client
                    and not just to throw it away or override it with new generic message.
                    We search for NetconfDocumentedException that was send from netconfSB
                    and we create RestconfDocumentedException accordingly.
                 */
-                final List<Throwable> causalChain = Throwables.getCausalChain(e);
+                final List<Throwable> causalChain = Throwables.getCausalChain(cause);
                 for (Throwable error : causalChain) {
                     if (error instanceof NetconfDocumentedException) {
                         throw new RestconfDocumentedException(error.getMessage(),
