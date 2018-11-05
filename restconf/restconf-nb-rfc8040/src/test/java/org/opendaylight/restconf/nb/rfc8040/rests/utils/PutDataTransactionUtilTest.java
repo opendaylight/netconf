@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.mockito.Mockito.doNothing;
@@ -18,12 +17,12 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -50,11 +49,11 @@ public class PutDataTransactionUtilTest {
     @Mock
     private DOMTransactionChain transactionChain;
     @Mock
-    private DOMDataReadWriteTransaction readWrite;
+    private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
-    private DOMDataReadOnlyTransaction read;
+    private DOMDataTreeReadTransaction read;
     @Mock
-    private DOMDataWriteTransaction write;
+    private DOMDataTreeWriteTransaction write;
     @Mock
     private DOMDataBroker mockDataBroker;
 
@@ -218,7 +217,7 @@ public class PutDataTransactionUtilTest {
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).commit();
 
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
@@ -242,7 +241,7 @@ public class PutDataTransactionUtilTest {
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).commit();
 
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
@@ -266,7 +265,7 @@ public class PutDataTransactionUtilTest {
                 .when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, this.iid2);
         doNothing().when(this.readWrite).put(LogicalDatastoreType.CONFIGURATION,
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData());
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).submit();
+        doReturn(Futures.immediateCheckedFuture(null)).when(this.readWrite).commit();
         PutDataTransactionUtil.putData(payload, this.refSchemaCtx,
                 new TransactionVarsWrapper(payload.getInstanceIdentifierContext(), null, transactionChainHandler), null,
                 null);

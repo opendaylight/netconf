@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.sal.rest.impl.StringModuleInstanceIdentifierCodec;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO.IdentityValue;
@@ -224,7 +224,7 @@ public final class RestCodec {
                     identityValue.setPredicates(predicates);
                 } else if (pathArgument instanceof NodeWithValue && identityValue != null) {
                     final List<Predicate> predicates = new ArrayList<>();
-                    final String value = String.valueOf(((NodeWithValue) pathArgument).getValue());
+                    final String value = String.valueOf(((NodeWithValue<?>) pathArgument).getValue());
                     predicates.add(new Predicate(null, value));
                     identityValue.setPredicates(predicates);
                 }

@@ -7,9 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.transactions;
 
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 
@@ -72,7 +72,6 @@ public final class TransactionVarsWrapper {
      */
     public void setLogicalDatastoreType(final LogicalDatastoreType datastoreType) {
         this.configuration = datastoreType;
-
     }
 
     /**

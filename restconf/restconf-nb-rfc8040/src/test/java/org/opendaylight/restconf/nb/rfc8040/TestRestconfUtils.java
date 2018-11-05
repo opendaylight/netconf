@@ -5,10 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,6 +16,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
@@ -75,7 +74,7 @@ public final class TestRestconfUtils {
     public static NormalizedNodeContext loadNormalizedContextFromXmlFile(final String pathToInputFile,
             final String uri, final SchemaContext schemaContext) {
         final InstanceIdentifierContext<?> iiContext =
-                ParserIdentifier.toInstanceIdentifier(uri, schemaContext, Optional.absent());
+                ParserIdentifier.toInstanceIdentifier(uri, schemaContext, Optional.empty());
         final InputStream inputStream = TestRestconfUtils.class.getResourceAsStream(pathToInputFile);
         try {
             final Document doc = UntrustedXML.newDocumentBuilder().parse(inputStream);
