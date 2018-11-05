@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.sal.connect.api;
 
-import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
@@ -30,7 +30,7 @@ public interface MessageTransformer<M> {
      * @param payload - input of action
      * @return message
      */
-    default M toActionRequest(SchemaPath action, DOMDataTreeIdentifier domDataTreeIdentifier, NormalizedNode<?,
+    default M toActionRequest(final SchemaPath action, final DOMDataTreeIdentifier domDataTreeIdentifier, final NormalizedNode<?,
             ?> payload) {
         throw new UnsupportedOperationException();
     }
@@ -42,7 +42,7 @@ public interface MessageTransformer<M> {
      * @param message - message to parsing
      * @return {@link DOMActionResult}
      */
-    default DOMActionResult toActionResult(SchemaPath action, M message) {
+    default DOMActionResult toActionResult(final SchemaPath action, final M message) {
         throw new UnsupportedOperationException();
     }
 }
