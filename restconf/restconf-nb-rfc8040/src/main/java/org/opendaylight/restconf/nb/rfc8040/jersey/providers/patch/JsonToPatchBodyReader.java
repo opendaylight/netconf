@@ -5,10 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.stream.JsonReader;
@@ -21,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
@@ -58,8 +57,8 @@ import org.slf4j.LoggerFactory;
 public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(JsonToPatchBodyReader.class);
 
-    public JsonToPatchBodyReader(SchemaContextHandler schemaContextHandler,
-            DOMMountPointServiceHandler mountPointServiceHandler) {
+    public JsonToPatchBodyReader(final SchemaContextHandler schemaContextHandler,
+            final DOMMountPointServiceHandler mountPointServiceHandler) {
         super(schemaContextHandler, mountPointServiceHandler);
     }
 
@@ -90,7 +89,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
         try {
             return readFrom(
                     ParserIdentifier.toInstanceIdentifier(uriPath, getSchemaContext(),
-                            Optional.fromNullable(getMountPointService())), entityStream);
+                            Optional.ofNullable(getMountPointService())), entityStream);
         } catch (final Exception e) {
             propagateExceptionAs(e);
             return null; // no-op

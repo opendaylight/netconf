@@ -7,17 +7,18 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import java.net.URI;
+import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -71,7 +72,7 @@ public final class PostDataTransactionUtil {
     public static Response postData(final UriInfo uriInfo, final NormalizedNodeContext payload,
             final TransactionVarsWrapper transactionNode, final SchemaContextRef schemaContextRef, final String insert,
             final String point) {
-        final CheckedFuture<Void, TransactionCommitFailedException> future = submitData(
+        final FluentFuture<? extends CommitInfo> future = submitData(
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(),
                 transactionNode, schemaContextRef.get(), insert, point);
         final URI location = PostDataTransactionUtil.resolveLocation(uriInfo, transactionNode, schemaContextRef);
@@ -97,14 +98,14 @@ public final class PostDataTransactionUtil {
      *             query parameter
      * @return {@link CheckedFuture}
      */
-    private static CheckedFuture<Void, TransactionCommitFailedException> submitData(final YangInstanceIdentifier path,
+    private static FluentFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
             final NormalizedNode<?, ?> data, final TransactionVarsWrapper transactionNode,
             final SchemaContext schemaContext, final String insert, final String point) {
         final DOMTransactionChain domTransactionChain = transactionNode.getTransactionChain();
-        final DOMDataReadWriteTransaction newReadWriteTransaction = domTransactionChain.newReadWriteTransaction();
+        final DOMDataTreeReadWriteTransaction newReadWriteTransaction = domTransactionChain.newReadWriteTransaction();
         if (insert == null) {
             makePost(path, data, schemaContext, transactionNode.getTransactionChainHandler(), newReadWriteTransaction);
-            return newReadWriteTransaction.submit();
+            return newReadWriteTransaction.commit();
         } else {
             final DataSchemaNode schemaNode = PutDataTransactionUtil.checkListAndOrderedType(schemaContext, path);
             switch (insert) {
@@ -116,7 +117,7 @@ public final class PostDataTransactionUtil {
                         if (readList == null || readList.getValue().isEmpty()) {
                             makePost(path, data, schemaContext, transactionNode.getTransactionChainHandler(),
                                     newReadWriteTransaction);
-                            return newReadWriteTransaction.submit();
+                            return newReadWriteTransaction.commit();
                         } else {
                             newReadWriteTransaction.delete(LogicalDatastoreType.CONFIGURATION,
                                     path.getParent().getParent());
@@ -124,7 +125,7 @@ public final class PostDataTransactionUtil {
                                     schemaContext, transactionNode.getTransactionChainHandler());
                             makePost(path, readData, schemaContext, transactionNode.getTransactionChainHandler(),
                                     newReadWriteTransaction);
-                            return newReadWriteTransaction.submit();
+                            return newReadWriteTransaction.commit();
                         }
                     } else {
                         final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
@@ -134,7 +135,7 @@ public final class PostDataTransactionUtil {
                         if (readLeafList == null || readLeafList.getValue().isEmpty()) {
                             makePost(path, data, schemaContext, transactionNode.getTransactionChainHandler(),
                                     newReadWriteTransaction);
-                            return newReadWriteTransaction.submit();
+                            return newReadWriteTransaction.commit();
                         } else {
                             newReadWriteTransaction.delete(LogicalDatastoreType.CONFIGURATION,
                                     path.getParent().getParent());
@@ -142,13 +143,13 @@ public final class PostDataTransactionUtil {
                                     schemaContext, transactionNode.getTransactionChainHandler());
                             makePost(path, readData, schemaContext, transactionNode.getTransactionChainHandler(),
                                     newReadWriteTransaction);
-                            return newReadWriteTransaction.submit();
+                            return newReadWriteTransaction.commit();
                         }
                     }
                 case "last":
                     makePost(path, data, schemaContext, transactionNode.getTransactionChainHandler(),
                             newReadWriteTransaction);
-                    return newReadWriteTransaction.submit();
+                    return newReadWriteTransaction.commit();
                 case "before":
                     if (schemaNode instanceof ListSchemaNode) {
                         final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
@@ -157,12 +158,12 @@ public final class PostDataTransactionUtil {
                         if (readList == null || readList.getValue().isEmpty()) {
                             makePost(path, data, schemaContext, transactionNode.getTransactionChainHandler(),
                                     newReadWriteTransaction);
-                            return newReadWriteTransaction.submit();
+                            return newReadWriteTransaction.commit();
                         } else {
                             insertWithPointListPost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path,
                                     data, schemaContext, point, readList, true,
                                     transactionNode.getTransactionChainHandler());
-                            return newReadWriteTransaction.submit();
+                            return newReadWriteTransaction.commit();
                         }
                     } else {
                         final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
@@ -172,12 +173,12 @@ public final class PostDataTransactionUtil {
                         if (readLeafList == null || readLeafList.getValue().isEmpty()) {
                             makePost(path, data, schemaContext, transactionNode.getTransactionChainHandler(),
                                     newReadWriteTransaction);
-                            return newReadWriteTransaction.submit();
+                            return newReadWriteTransaction.commit();
                         } else {
                             insertWithPointLeafListPost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION,
                                     path, data, schemaContext, point, readLeafList, true,
                                     transactionNode.getTransactionChainHandler());
-                            return newReadWriteTransaction.submit();
+                            return newReadWriteTransaction.commit();
                         }
                     }
                 case "after":
@@ -188,12 +189,12 @@ public final class PostDataTransactionUtil {
                         if (readList == null || readList.getValue().isEmpty()) {
                             makePost(path, data, schemaContext, transactionNode.getTransactionChainHandler(),
                                     newReadWriteTransaction);
-                            return newReadWriteTransaction.submit();
+                            return newReadWriteTransaction.commit();
                         } else {
                             insertWithPointListPost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path,
                                     data, schemaContext, point, readList, false,
                                     transactionNode.getTransactionChainHandler());
-                            return newReadWriteTransaction.submit();
+                            return newReadWriteTransaction.commit();
                         }
                     } else {
                         final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
@@ -203,12 +204,12 @@ public final class PostDataTransactionUtil {
                         if (readLeafList == null || readLeafList.getValue().isEmpty()) {
                             makePost(path, data, schemaContext, transactionNode.getTransactionChainHandler(),
                                     newReadWriteTransaction);
-                            return newReadWriteTransaction.submit();
+                            return newReadWriteTransaction.commit();
                         } else {
                             insertWithPointLeafListPost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION,
                                     path, data, schemaContext, point, readLeafList, true,
                                     transactionNode.getTransactionChainHandler());
-                            return newReadWriteTransaction.submit();
+                            return newReadWriteTransaction.commit();
                         }
                     }
                 default:
@@ -219,13 +220,13 @@ public final class PostDataTransactionUtil {
         }
     }
 
-    private static void insertWithPointLeafListPost(final DOMDataReadWriteTransaction rwTransaction,
+    private static void insertWithPointLeafListPost(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
             final boolean before, final TransactionChainHandler transactionChainHandler) {
         rwTransaction.delete(datastore, path.getParent().getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
-                ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.absent());
+                ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
         int lastItemPosition = 0;
         for (final LeafSetEntryNode<?> nodeChild : readLeafList.getValue()) {
             if (nodeChild.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
@@ -254,13 +255,13 @@ public final class PostDataTransactionUtil {
         }
     }
 
-    private static void insertWithPointListPost(final DOMDataReadWriteTransaction rwTransaction,
+    private static void insertWithPointListPost(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final String point, final MapNode readList, final boolean before,
             final TransactionChainHandler transactionChainHandler) {
         rwTransaction.delete(datastore, path.getParent().getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
-                ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.absent());
+                ParserIdentifier.toInstanceIdentifier(point, schemaContext, Optional.empty());
         int lastItemPosition = 0;
         for (final MapEntryNode mapEntryNode : readList.getValue()) {
             if (mapEntryNode.getIdentifier().equals(instanceIdentifier.getInstanceIdentifier().getLastPathArgument())) {
@@ -291,7 +292,7 @@ public final class PostDataTransactionUtil {
 
     private static void makePost(final YangInstanceIdentifier path, final NormalizedNode<?, ?> data,
             final SchemaContext schemaContext, final TransactionChainHandler transactionChainHandler,
-            final DOMDataReadWriteTransaction transaction) {
+            final DOMDataTreeReadWriteTransaction transaction) {
         if (data instanceof MapNode) {
             boolean merge = false;
             for (final MapEntryNode child : ((MapNode) data).getValue()) {
@@ -344,7 +345,7 @@ public final class PostDataTransactionUtil {
         return uriBuilder.build();
     }
 
-    private static void simplePost(final DOMDataReadWriteTransaction rwTransaction,
+    private static void simplePost(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
             final SchemaContext schemaContext, final TransactionChainHandler transactionChainHandler) {
         TransactionUtil.checkItemDoesNotExists(transactionChainHandler, rwTransaction, datastore, path,

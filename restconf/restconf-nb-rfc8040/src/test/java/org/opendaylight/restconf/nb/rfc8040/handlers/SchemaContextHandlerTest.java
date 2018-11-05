@@ -11,14 +11,13 @@ package org.opendaylight.restconf.nb.rfc8040.handlers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import com.google.common.util.concurrent.CheckedFuture;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -41,12 +40,9 @@ public class SchemaContextHandlerTest {
         final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
         final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
         Mockito.when(txHandler.get()).thenReturn(domTx);
-        final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
+        final DOMDataTreeWriteTransaction wTx = Mockito.mock(DOMDataTreeWriteTransaction.class);
         Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        final CheckedFuture<Void,TransactionCommitFailedException> checked = Mockito.mock(CheckedFuture.class);
-        Mockito.when(wTx.submit()).thenReturn(checked);
-        Mockito.when(checked.checkedGet()).thenReturn(null);
-
+        Mockito.doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
 
         this.schemaContextHandler = SchemaContextHandler.newInstance(txHandler, mockDOMSchemaService);
 

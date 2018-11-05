@@ -7,14 +7,12 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 
 /**
  * Implementation of {@link RpcServiceHandler}.
- *
  */
 public class RpcServiceHandler implements Handler<DOMRpcService> {
-
     private final DOMRpcService rpcService;
 
     public RpcServiceHandler(final DOMRpcService rpcService) {

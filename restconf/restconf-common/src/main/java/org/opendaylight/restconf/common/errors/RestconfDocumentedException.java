@@ -10,13 +10,14 @@ package org.opendaylight.restconf.common.errors;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
+import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -162,8 +163,20 @@ public class RestconfDocumentedException extends WebApplicationException {
         status = null;
     }
 
+    public static RestconfDocumentedException decodeAndThrow(final String message,
+            final OperationFailedException cause) {
+        for (final RpcError error : cause.getErrorList()) {
+            if (error.getErrorType() == RpcError.ErrorType.TRANSPORT
+                    && error.getTag().equals(ErrorTag.RESOURCE_DENIED.getTagValue())) {
+                throw new RestconfDocumentedException(error.getMessage(), ErrorType.TRANSPORT,
+                    ErrorTag.RESOURCE_DENIED_TRANSPORT, cause);
+            }
+        }
+        throw new RestconfDocumentedException(message, cause, cause.getErrorList());
+    }
+
     private static List<RestconfError> convertToRestconfErrors(final Collection<? extends RpcError> rpcErrors) {
-        final List<RestconfError> errorList = Lists.newArrayList();
+        final List<RestconfError> errorList = new ArrayList<>();
         if (rpcErrors != null) {
             for (RpcError rpcError : rpcErrors) {
                 errorList.add(new RestconfError(rpcError));
