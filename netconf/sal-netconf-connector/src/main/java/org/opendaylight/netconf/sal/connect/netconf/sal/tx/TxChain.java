@@ -5,19 +5,18 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
 import com.google.common.base.Preconditions;
 import java.util.HashMap;
 import java.util.Map;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChainClosedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.binding.api.TransactionChainClosedException;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,11 +28,11 @@ public class TxChain implements DOMTransactionChain, TxListener {
     private static final Logger LOG = LoggerFactory.getLogger(TxChain.class);
 
     private final DOMDataBroker dataBroker;
-    private final TransactionChainListener listener;
+    private final DOMTransactionChainListener listener;
     /**
      * Submitted transactions that haven't completed yet.
      */
-    private final Map<DOMDataWriteTransaction, AutoCloseable> pendingTransactions = new HashMap<>();
+    private final Map<DOMDataTreeWriteTransaction, AutoCloseable> pendingTransactions = new HashMap<>();
 
     /**
      * Transaction created by this chain that hasn't been submitted or cancelled yet.
@@ -42,13 +41,13 @@ public class TxChain implements DOMTransactionChain, TxListener {
     private boolean closed = false;
     private boolean successful = true;
 
-    public TxChain(final DOMDataBroker dataBroker, final TransactionChainListener listener) {
+    public TxChain(final DOMDataBroker dataBroker, final DOMTransactionChainListener listener) {
         this.dataBroker = dataBroker;
         this.listener = listener;
     }
 
     @Override
-    public synchronized DOMDataReadOnlyTransaction newReadOnlyTransaction() {
+    public synchronized DOMDataTreeReadTransaction newReadOnlyTransaction() {
         checkOperationPermitted();
         return dataBroker.newReadOnlyTransaction();
     }
@@ -56,7 +55,7 @@ public class TxChain implements DOMTransactionChain, TxListener {
     @Override
     public synchronized AbstractWriteTx newWriteOnlyTransaction() {
         checkOperationPermitted();
-        final DOMDataWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
+        final DOMDataTreeWriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         Preconditions.checkState(writeTransaction instanceof AbstractWriteTx);
         final AbstractWriteTx pendingWriteTx = (AbstractWriteTx) writeTransaction;
         pendingTransactions.put(pendingWriteTx, pendingWriteTx.addListener(this));
@@ -65,7 +64,7 @@ public class TxChain implements DOMTransactionChain, TxListener {
     }
 
     @Override
-    public synchronized DOMDataReadWriteTransaction newReadWriteTransaction() {
+    public synchronized DOMDataTreeReadWriteTransaction newReadWriteTransaction() {
         return new ReadWriteTx(dataBroker.newReadOnlyTransaction(), newWriteOnlyTransaction());
     }
 

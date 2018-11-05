@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.impl.tx;
 
 import static org.junit.Assert.assertEquals;
@@ -21,18 +20,18 @@ import akka.pattern.AskTimeoutException;
 import akka.testkit.TestProbe;
 import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.net.InetSocketAddress;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.ReadFailedException;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
@@ -81,7 +80,7 @@ public class ProxyReadWriteTransactionTest {
         return newSuccessfulProxyTx(Timeout.apply(5, TimeUnit.SECONDS));
     }
 
-    private ProxyReadWriteTransaction newSuccessfulProxyTx(Timeout timeout) {
+    private ProxyReadWriteTransaction newSuccessfulProxyTx(final Timeout timeout) {
         return new ProxyReadWriteTransaction(DEVICE_ID, Futures.successful(masterActor.ref()),
                 system.dispatcher(), timeout);
     }
@@ -192,7 +191,7 @@ public class ProxyReadWriteTransactionTest {
         }
     }
 
-    private void commit(ProxyReadWriteTransaction tx)
+    private void commit(final ProxyReadWriteTransaction tx)
             throws InterruptedException, ExecutionException, TimeoutException {
         final ListenableFuture<?> submit = tx.commit();
         masterActor.expectMsgClass(SubmitRequest.class);
@@ -398,7 +397,7 @@ public class ProxyReadWriteTransactionTest {
         }
     }
 
-    private static void verifyDocumentedException(Throwable cause) {
+    private static void verifyDocumentedException(final Throwable cause) {
         assertTrue("Unexpected cause " + cause, cause instanceof DocumentedException);
         final DocumentedException de = (DocumentedException) cause;
         assertEquals(DocumentedException.ErrorSeverity.WARNING, de.getErrorSeverity());

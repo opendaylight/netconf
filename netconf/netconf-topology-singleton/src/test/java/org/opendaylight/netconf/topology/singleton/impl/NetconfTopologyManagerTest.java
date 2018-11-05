@@ -25,13 +25,13 @@ import static org.opendaylight.controller.md.sal.binding.api.DataObjectModificat
 import static org.opendaylight.controller.md.sal.binding.api.DataObjectModification.ModificationType.WRITE;
 
 import akka.util.Timeout;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -45,16 +45,16 @@ import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
-import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.binding.test.ConstantSchemaAbstractDataBrokerTest;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.api.ReadTransaction;
 import org.opendaylight.mdsal.binding.spec.reflect.BindingReflections;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
@@ -146,7 +146,7 @@ public class NetconfTopologyManagerTest {
         netconfTopologyManager.init();
 
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
-            ReadOnlyTransaction readTx = dataBroker.newReadOnlyTransaction();
+            ReadTransaction readTx = dataBroker.newReadOnlyTransaction();
             Optional<Topology> config = readTx.read(LogicalDatastoreType.CONFIGURATION,
                     NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
             Optional<Topology> oper = readTx.read(LogicalDatastoreType.OPERATIONAL,
@@ -157,7 +157,7 @@ public class NetconfTopologyManagerTest {
         // verify registration is called with right parameters
 
         verify(dataBroker).registerDataTreeChangeListener(
-                new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, NetconfTopologyUtils
+                DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, NetconfTopologyUtils
                         .createTopologyListPath(TOPOLOGY_ID).child(Node.class)), netconfTopologyManager);
 
         netconfTopologyManager.close();
@@ -232,9 +232,9 @@ public class NetconfTopologyManagerTest {
                 .registerClusterSingletonService(mockContext2);
 
         netconfTopologyManager.onDataTreeChanged(Arrays.asList(
-                new CustomTreeModification(new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                         nodeInstanceId1), dataObjectModification1),
-                new CustomTreeModification(new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                         nodeInstanceId2), dataObjectModification2)));
 
         verify(clusterSingletonServiceProvider).registerClusterSingletonService(mockContext1);
@@ -261,9 +261,9 @@ public class NetconfTopologyManagerTest {
         doNothing().when(mockContext2).refresh(any());
 
         netconfTopologyManager.onDataTreeChanged(Arrays.asList(
-                new CustomTreeModification(new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                         nodeInstanceId1), dataObjectModification1),
-                new CustomTreeModification(new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                         nodeInstanceId2), dataObjectModification2)));
 
         ArgumentCaptor<NetconfTopologySetup> mockContext1Setup = ArgumentCaptor.forClass(NetconfTopologySetup.class);
@@ -281,7 +281,7 @@ public class NetconfTopologyManagerTest {
         doReturn(null).when(dataObjectModification1).getDataAfter();
 
         netconfTopologyManager.onDataTreeChanged(Arrays.asList(
-                new CustomTreeModification(new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                         nodeInstanceId1), dataObjectModification1)));
 
         verify(mockClusterRegistration1).close();
@@ -310,7 +310,7 @@ public class NetconfTopologyManagerTest {
         });
 
         netconfTopologyManager.onDataTreeChanged(Arrays.asList(
-                new CustomTreeModification(new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                         nodeInstanceId1), dataObjectModification1)));
 
         verify(clusterSingletonServiceProvider, times(2)).registerClusterSingletonService(newMockContext1);
@@ -361,7 +361,7 @@ public class NetconfTopologyManagerTest {
         netconfTopologyManager.init();
 
         netconfTopologyManager.onDataTreeChanged(Arrays.asList(
-                new CustomTreeModification(new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
+                new CustomTreeModification(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
                         nodeInstanceId), dataObjectModification)));
 
         verify(clusterSingletonServiceProvider, times(3)).registerClusterSingletonService(mockContext);

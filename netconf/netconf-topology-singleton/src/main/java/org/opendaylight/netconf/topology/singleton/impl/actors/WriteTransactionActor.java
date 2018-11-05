@@ -12,7 +12,7 @@ import akka.actor.Props;
 import akka.actor.ReceiveTimeout;
 import akka.actor.UntypedAbstractActor;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.WriteActorMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +25,11 @@ public final class WriteTransactionActor extends UntypedAbstractActor {
 
     private static final Logger LOG = LoggerFactory.getLogger(WriteTransactionActor.class);
 
-    private final DOMDataWriteTransaction tx;
+    private final DOMDataTreeWriteTransaction tx;
     private final long idleTimeout;
     private final WriteAdapter writeAdapter;
 
-    private WriteTransactionActor(final DOMDataWriteTransaction tx, final Duration idleTimeout) {
+    private WriteTransactionActor(final DOMDataTreeWriteTransaction tx, final Duration idleTimeout) {
         this.tx = tx;
         this.idleTimeout = idleTimeout.toSeconds();
         if (this.idleTimeout > 0) {
@@ -45,7 +45,7 @@ public final class WriteTransactionActor extends UntypedAbstractActor {
      * @param idleTimeout idle time in seconds, after which transaction is closed automatically
      * @return props
      */
-    static Props props(final DOMDataWriteTransaction tx, final Duration idleTimeout) {
+    static Props props(final DOMDataTreeWriteTransaction tx, final Duration idleTimeout) {
         return Props.create(WriteTransactionActor.class, () -> new WriteTransactionActor(tx, idleTimeout));
     }
 
@@ -62,6 +62,4 @@ public final class WriteTransactionActor extends UntypedAbstractActor {
             unhandled(message);
         }
     }
-
-
 }
