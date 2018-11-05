@@ -5,28 +5,28 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.mount;
 
-import com.google.common.base.Optional;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import javax.annotation.Nonnull;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeChangeListener;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
-import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.binding.api.ReadWriteTransaction;
-import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.api.ReadTransaction;
+import org.opendaylight.mdsal.binding.api.WriteTransaction;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.callhome.protocol.AuthorizedKeysDecoder;
 import org.opendaylight.netconf.callhome.protocol.StatusRecorder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.callhome.device.status.rev170112.Device1;
@@ -63,12 +63,12 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
 
     CallhomeStatusReporter(final DataBroker broker) {
         this.dataBroker = broker;
-        this.reg = dataBroker.registerDataTreeChangeListener(new DataTreeIdentifier<>(LogicalDatastoreType.OPERATIONAL,
+        this.reg = dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL,
             NETCONF_TOPO_IID.child(Node.class)), this);
     }
 
     @Override
-    public void onDataTreeChanged(@Nonnull final Collection<DataTreeModification<Node>> changes) {
+    public void onDataTreeChanged(final Collection<DataTreeModification<Node>> changes) {
         for (DataTreeModification<Node> change: changes) {
             final DataObjectModification<Node> rootNode = change.getRootNode();
             final InstanceIdentifier<Node> identifier = change.getRootPath().getRootIdentifier();
@@ -205,26 +205,25 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
     }
 
     private Device readAndGetDevice(final NodeId nodeId) {
-        return readDevice(nodeId).orNull();
+        return readDevice(nodeId).orElse(null);
     }
 
-    @Nonnull
     private Optional<Device> readDevice(final NodeId nodeId) {
-        ReadOnlyTransaction opTx = dataBroker.newReadOnlyTransaction();
+        ReadTransaction opTx = dataBroker.newReadOnlyTransaction();
 
         InstanceIdentifier<Device> deviceIID = buildDeviceInstanceIdentifier(nodeId);
         ListenableFuture<Optional<Device>> devFuture = opTx.read(LogicalDatastoreType.OPERATIONAL, deviceIID);
         try {
             return devFuture.get();
         } catch (InterruptedException | ExecutionException e) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
     private void writeDevice(final NodeId nodeId, final Device modifiedDevice) {
-        ReadWriteTransaction opTx = dataBroker.newReadWriteTransaction();
+        WriteTransaction opTx = dataBroker.newWriteOnlyTransaction();
         opTx.merge(LogicalDatastoreType.OPERATIONAL, buildDeviceInstanceIdentifier(nodeId), modifiedDevice);
-        opTx.commit();
+        commit(opTx, modifiedDevice.key());
     }
 
     private static InstanceIdentifier<Device> buildDeviceInstanceIdentifier(final NodeId nodeId) {
@@ -259,21 +258,34 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
 
     private void setDeviceStatus(final Device device) {
         WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
-        InstanceIdentifier<Device> deviceIId =
-                InstanceIdentifier.create(NetconfCallhomeServer.class)
+        InstanceIdentifier<Device> deviceIId = InstanceIdentifier.create(NetconfCallhomeServer.class)
                         .child(AllowedDevices.class)
                         .child(Device.class, device.key());
 
         tx.merge(LogicalDatastoreType.OPERATIONAL, deviceIId, device);
-        tx.commit();
+        commit(tx, device.key());
+    }
+
+    private static void commit(WriteTransaction tx, DeviceKey device) {
+        tx.commit().addCallback(new FutureCallback<CommitInfo>() {
+            @Override
+            public void onSuccess(CommitInfo result) {
+                LOG.debug("Device {} committed", device);
+            }
+
+            @Override
+            public void onFailure(Throwable cause) {
+                LOG.warn("Failed to commit device {}", device, cause);
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     private AllowedDevices getDevices() {
-        ReadOnlyTransaction rxTransaction = dataBroker.newReadOnlyTransaction();
+        ReadTransaction rxTransaction = dataBroker.newReadOnlyTransaction();
         ListenableFuture<Optional<AllowedDevices>> devicesFuture =
                 rxTransaction.read(LogicalDatastoreType.OPERATIONAL, IetfZeroTouchCallHomeServerProvider.ALL_DEVICES);
         try {
-            return devicesFuture.get().orNull();
+            return devicesFuture.get().orElse(null);
         } catch (ExecutionException | InterruptedException e) {
             LOG.error("Error trying to read the whitelist devices: {}", e);
             return null;

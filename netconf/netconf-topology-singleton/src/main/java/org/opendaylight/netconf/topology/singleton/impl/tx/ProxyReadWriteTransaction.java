@@ -10,24 +10,21 @@ package org.opendaylight.netconf.topology.singleton.impl.tx;
 import akka.actor.ActorRef;
 import akka.dispatch.OnComplete;
 import akka.util.Timeout;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import javax.annotation.concurrent.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.controller.md.sal.common.api.MappingCheckedFuture;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncWriteTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -40,7 +37,7 @@ import scala.concurrent.Future;
  * ProxyReadWriteTransaction uses provided {@link ActorRef} to delegate method calls to master
  * {@link org.opendaylight.netconf.topology.singleton.impl.actors.ReadWriteTransactionActor}.
  */
-public class ProxyReadWriteTransaction implements DOMDataReadWriteTransaction {
+public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransaction {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyReadWriteTransaction.class);
 
     private final RemoteDeviceId id;
@@ -79,28 +76,33 @@ public class ProxyReadWriteTransaction implements DOMDataReadWriteTransaction {
             return false;
         }
 
-        processTransactionOperation(AsyncWriteTransaction::cancel);
+        processTransactionOperation(DOMDataTreeWriteTransaction::cancel);
         return true;
     }
 
     @Override
-    public CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> read(final LogicalDatastoreType store,
+    public void close() {
+        cancel();
+    }
+
+    @Override
+    public FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         LOG.debug("{}: Read {} {}", id, store, path);
 
         final SettableFuture<Optional<NormalizedNode<?, ?>>> returnFuture = SettableFuture.create();
         processTransactionOperation(facade -> returnFuture.setFuture(facade.read(store, path)));
-        return MappingCheckedFuture.create(returnFuture, ReadFailedException.MAPPER);
+        return returnFuture;
     }
 
     @Override
-    public CheckedFuture<Boolean, ReadFailedException> exists(final LogicalDatastoreType store,
+    public FluentFuture<Boolean> exists(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         LOG.debug("{}: Exists {} {}", id, store, path);
 
         final SettableFuture<Boolean> returnFuture = SettableFuture.create();
         processTransactionOperation(facade -> returnFuture.setFuture(facade.exists(store, path)));
-        return MappingCheckedFuture.create(returnFuture, ReadFailedException.MAPPER);
+        return returnFuture;
     }
 
     @Override

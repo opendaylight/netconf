@@ -15,7 +15,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import org.junit.Assert;
@@ -23,13 +22,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.AbstractWriteTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateRunningTx;
@@ -38,6 +37,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteRunningTx;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.$YangModuleInfoImpl;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -61,21 +61,21 @@ public class NetconfDeviceDataBrokerTest {
         schemaContext = moduleInfoBackedContext.tryToCreateSchemaContext().get();
         DOMRpcResult result = new DefaultDOMRpcResult();
         when(rpcService.invokeRpc(any(SchemaPath.class), any(NormalizedNode.class)))
-                .thenReturn(Futures.immediateCheckedFuture(result));
+                .thenReturn(FluentFutures.immediateFluentFuture(result));
 
         dataBroker = getDataBroker(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
     }
 
     @Test
     public void testNewReadOnlyTransaction() throws Exception {
-        final DOMDataReadOnlyTransaction tx = dataBroker.newReadOnlyTransaction();
+        final DOMDataTreeReadTransaction tx = dataBroker.newReadOnlyTransaction();
         tx.read(LogicalDatastoreType.OPERATIONAL, null);
         verify(rpcService).invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any(ContainerNode.class));
     }
 
     @Test
     public void testNewReadWriteTransaction() throws Exception {
-        final DOMDataReadWriteTransaction tx = dataBroker.newReadWriteTransaction();
+        final DOMDataTreeReadWriteTransaction tx = dataBroker.newReadWriteTransaction();
         tx.read(LogicalDatastoreType.OPERATIONAL, null);
         verify(rpcService).invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any(ContainerNode.class));
     }
@@ -97,12 +97,13 @@ public class NetconfDeviceDataBrokerTest {
         testWriteTransaction(WriteRunningTx.class, NetconfMessageTransformUtil.NETCONF_RUNNING_WRITABLE_URI.toString());
     }
 
-    private void testWriteTransaction(Class<? extends AbstractWriteTx> transaction, String... capabilities) {
+    private void testWriteTransaction(final Class<? extends AbstractWriteTx> transaction,
+            final String... capabilities) {
         NetconfDeviceDataBroker db = getDataBroker(capabilities);
         Assert.assertEquals(transaction, db.newWriteOnlyTransaction().getClass());
     }
 
-    private NetconfDeviceDataBroker getDataBroker(String... caps) {
+    private NetconfDeviceDataBroker getDataBroker(final String... caps) {
         NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(Arrays.asList(caps));
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));

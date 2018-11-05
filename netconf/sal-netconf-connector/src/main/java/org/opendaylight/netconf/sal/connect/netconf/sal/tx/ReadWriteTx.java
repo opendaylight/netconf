@@ -8,25 +8,24 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import com.google.common.base.Optional;
-import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FluentFuture;
+import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
-public class ReadWriteTx implements DOMDataReadWriteTransaction {
+public class ReadWriteTx implements DOMDataTreeReadWriteTransaction {
 
-    private final DOMDataReadTransaction delegateReadTx;
-    private final DOMDataWriteTransaction delegateWriteTx;
+    private final DOMDataTreeReadTransaction delegateReadTx;
+    private final DOMDataTreeWriteTransaction delegateWriteTx;
 
-    public ReadWriteTx(final DOMDataReadTransaction delegateReadTx, final DOMDataWriteTransaction delegateWriteTx) {
+    public ReadWriteTx(final DOMDataTreeReadTransaction delegateReadTx,
+            final DOMDataTreeWriteTransaction delegateWriteTx) {
         this.delegateReadTx = delegateReadTx;
         this.delegateWriteTx = delegateWriteTx;
     }
@@ -34,6 +33,11 @@ public class ReadWriteTx implements DOMDataReadWriteTransaction {
     @Override
     public boolean cancel() {
         return delegateWriteTx.cancel();
+    }
+
+    @Override
+    public void close() {
+        cancel();
     }
 
     @Override
@@ -54,19 +58,18 @@ public class ReadWriteTx implements DOMDataReadWriteTransaction {
     }
 
     @Override
-    public @NonNull FluentFuture<? extends @NonNull CommitInfo> commit() {
+    public FluentFuture<? extends @NonNull CommitInfo> commit() {
         return delegateWriteTx.commit();
     }
 
     @Override
-    public CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> read(
-            final LogicalDatastoreType store, final YangInstanceIdentifier path) {
+    public FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
+            final YangInstanceIdentifier path) {
         return delegateReadTx.read(store, path);
     }
 
-    @Override public CheckedFuture<Boolean, ReadFailedException> exists(
-        final LogicalDatastoreType store,
-        final YangInstanceIdentifier path) {
+    @Override
+    public FluentFuture<Boolean> exists(final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         return delegateReadTx.exists(store, path);
     }
 

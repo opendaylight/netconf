@@ -24,8 +24,8 @@ import akka.actor.Status.Failure;
 import akka.actor.Status.Success;
 import akka.testkit.TestProbe;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteRequest;
@@ -42,12 +42,13 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
  * @author Thomas Pantelis
  */
 public abstract class WriteTransactionActorTestAdapter {
-    private DOMDataWriteTransaction mockWriteTx;
+    private DOMDataTreeWriteTransaction mockWriteTx;
     private TestProbe probe;
     private ActorRef actorRef;
     private ActorSystem system;
 
-    public void init(DOMDataWriteTransaction inMockWriteTx, ActorSystem inSystem, ActorRef inActorRef) {
+    public void init(final DOMDataTreeWriteTransaction inMockWriteTx, final ActorSystem inSystem,
+            final ActorRef inActorRef) {
         this.mockWriteTx = inMockWriteTx;
         this.probe = TestProbe.apply(inSystem);
         this.actorRef = inActorRef;
