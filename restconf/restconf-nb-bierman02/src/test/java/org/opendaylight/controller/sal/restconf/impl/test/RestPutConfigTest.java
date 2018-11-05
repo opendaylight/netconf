@@ -5,11 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.sal.restconf.impl.test;
 
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
 import java.util.HashSet;
 import javax.ws.rs.core.MultivaluedMap;
@@ -21,9 +18,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.PutResult;
@@ -133,11 +130,9 @@ public class RestPutConfigTest {
 
     private void mockingBrokerPut(final YangInstanceIdentifier yii, final NormalizedNode<?, ?> data) {
         final PutResult result = Mockito.mock(PutResult.class);
-        final CheckedFuture<Void, TransactionCommitFailedException> checkedFuture =
-                Futures.immediateCheckedFuture(null);
         Mockito.when(this.brokerFacade.commitConfigurationDataPut(schemaContext, yii, data, null, null))
                 .thenReturn(result);
-        Mockito.when(result.getFutureOfPutData()).thenReturn(checkedFuture);
+        Mockito.doReturn(CommitInfo.emptyFluentFuture()).when(result).getFutureOfPutData();
         Mockito.when(result.getStatus()).thenReturn(Status.OK);
     }
 }

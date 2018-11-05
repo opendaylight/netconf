@@ -8,14 +8,12 @@
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,10 +29,11 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.common.api.data.OptimisticLockFailedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.OptimisticLockFailedException;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
@@ -133,12 +132,10 @@ public class RestPutOperationTest extends JerseyTest {
     @Test
     public void testRpcResultCommitedToStatusCodesWithMountPoint() throws UnsupportedEncodingException,
             FileNotFoundException, URISyntaxException {
-        final CheckedFuture<Void, TransactionCommitFailedException> dummyFuture = Futures.immediateCheckedFuture(null);
         final PutResult result = mock(PutResult.class);
-        when(
-                brokerFacade.commitMountPointDataPut(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
-                        any(NormalizedNode.class), null, null)).thenReturn(result);
-        when(result.getFutureOfPutData()).thenReturn(dummyFuture);
+        when(brokerFacade.commitMountPointDataPut(any(DOMMountPoint.class), any(YangInstanceIdentifier.class),
+            any(NormalizedNode.class), null, null)).thenReturn(result);
+        doReturn(CommitInfo.emptyFluentFuture()).when(result).getFutureOfPutData();
         when(result.getStatus()).thenReturn(Status.OK);
 
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
@@ -152,11 +149,10 @@ public class RestPutOperationTest extends JerseyTest {
 
     @Test
     public void putDataMountPointIntoHighestElement() throws UnsupportedEncodingException, URISyntaxException {
-        final CheckedFuture<Void, TransactionCommitFailedException> dummyFuture = Futures.immediateCheckedFuture(null);
         final PutResult result = mock(PutResult.class);
         doReturn(result).when(brokerFacade).commitMountPointDataPut(any(DOMMountPoint.class),
                 any(YangInstanceIdentifier.class), any(NormalizedNode.class), null, null);
-        when(result.getFutureOfPutData()).thenReturn(dummyFuture);
+        doReturn(CommitInfo.emptyFluentFuture()).when(result).getFutureOfPutData();
         when(result.getStatus()).thenReturn(Status.OK);
 
         when(mountInstance.getSchemaContext()).thenReturn(schemaContextTestModule);
