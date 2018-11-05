@@ -7,18 +7,18 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.tx;
 
-import com.google.common.base.Optional;
-import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import java.util.Objects;
+import java.util.Optional;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.controller.md.sal.common.api.data.AsyncWriteTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.ReadFailedException;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.slf4j.Logger;
@@ -51,18 +51,18 @@ class FailedProxyTransactionFacade implements ProxyTransactionFacade {
     }
 
     @Override
-    public CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> read(final LogicalDatastoreType store,
+    public FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         LOG.debug("{}: Read {} {} - failure", id, store, path, failure);
-        return Futures.immediateFailedCheckedFuture(ReadFailedException.MAPPER.apply(
+        return FluentFutures.immediateFailedFluentFuture(ReadFailedException.MAPPER.apply(
                 failure instanceof Exception ? (Exception)failure : new ReadFailedException("read", failure)));
     }
 
     @Override
-    public CheckedFuture<Boolean, ReadFailedException> exists(final LogicalDatastoreType store,
+    public FluentFuture<Boolean> exists(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         LOG.debug("{}: Exists {} {} - failure", id, store, path, failure);
-        return Futures.immediateFailedCheckedFuture(ReadFailedException.MAPPER.apply(
+        return FluentFutures.immediateFailedFluentFuture(ReadFailedException.MAPPER.apply(
                 failure instanceof Exception ? (Exception)failure : new ReadFailedException("read", failure)));
     }
 

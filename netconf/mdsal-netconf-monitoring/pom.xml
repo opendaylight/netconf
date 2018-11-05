@@ -40,13 +40,13 @@
       <artifactId>netconf-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>sal-binding-api</artifactId>
+      <groupId>org.opendaylight.mdsal</groupId>
+      <artifactId>mdsal-binding-api</artifactId>
      </dependency>
     <dependency>
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>sal-common-util</artifactId>
-     </dependency>
+    </dependency>
 
     <dependency>
       <groupId>com.google.guava</groupId>
