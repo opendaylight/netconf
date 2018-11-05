@@ -12,8 +12,8 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.concurrent.ScheduledExecutorService;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
@@ -24,7 +24,7 @@ import scala.concurrent.duration.Duration;
 public class NetconfTopologySetup {
 
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
-    private final RpcProviderRegistry rpcProviderRegistry;
+    private final DOMRpcProviderService rpcProviderRegistry;
     private final DataBroker dataBroker;
     private final InstanceIdentifier<Node> instanceIdentifier;
     private final Node node;
@@ -63,7 +63,7 @@ public class NetconfTopologySetup {
         return clusterSingletonServiceProvider;
     }
 
-    public RpcProviderRegistry getRpcProviderRegistry() {
+    public DOMRpcProviderService getRpcProviderRegistry() {
         return rpcProviderRegistry;
     }
 
@@ -126,7 +126,7 @@ public class NetconfTopologySetup {
     public static class NetconfTopologySetupBuilder {
 
         private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
-        private RpcProviderRegistry rpcProviderRegistry;
+        private DOMRpcProviderService rpcProviderRegistry;
         private DataBroker dataBroker;
         private InstanceIdentifier<Node> instanceIdentifier;
         private Node node;
@@ -155,11 +155,11 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        private RpcProviderRegistry getRpcProviderRegistry() {
+        private DOMRpcProviderService getRpcProviderRegistry() {
             return rpcProviderRegistry;
         }
 
-        public NetconfTopologySetupBuilder setRpcProviderRegistry(final RpcProviderRegistry rpcProviderRegistry) {
+        public NetconfTopologySetupBuilder setRpcProviderRegistry(final DOMRpcProviderService rpcProviderRegistry) {
             this.rpcProviderRegistry = rpcProviderRegistry;
             return this;
         }

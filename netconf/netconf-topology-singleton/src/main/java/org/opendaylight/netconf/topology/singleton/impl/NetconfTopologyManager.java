@@ -25,16 +25,16 @@ import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
-import org.opendaylight.controller.md.sal.binding.api.ClusteredDataTreeChangeListener;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
-import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
+import org.opendaylight.mdsal.binding.api.ClusteredDataTreeChangeListener;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
@@ -69,7 +69,7 @@ public class NetconfTopologyManager
             clusterRegistrations = new ConcurrentHashMap<>();
 
     private final DataBroker dataBroker;
-    private final RpcProviderRegistry rpcProviderRegistry;
+    private final DOMRpcProviderService rpcProviderRegistry;
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
     private final ScheduledExecutorService keepaliveExecutor;
     private final ListeningExecutorService processingExecutor;
@@ -84,7 +84,7 @@ public class NetconfTopologyManager
     private String privateKeyPath;
     private String privateKeyPassphrase;
 
-    public NetconfTopologyManager(final DataBroker dataBroker, final RpcProviderRegistry rpcProviderRegistry,
+    public NetconfTopologyManager(final DataBroker dataBroker, final DOMRpcProviderService rpcProviderRegistry,
                                   final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
                                   final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
                                   final ActorSystemProvider actorSystemProvider,
@@ -257,9 +257,8 @@ public class NetconfTopologyManager
         }, MoreExecutors.directExecutor());
 
         LOG.debug("Registering datastore listener");
-        return dataBroker.registerDataTreeChangeListener(
-                new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION,
-                        NetconfTopologyUtils.createTopologyListPath(topologyId).child(Node.class)), this);
+        return dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION,
+            NetconfTopologyUtils.createTopologyListPath(topologyId).child(Node.class)), this);
     }
 
     private void initTopology(final WriteTransaction wtx, final LogicalDatastoreType datastoreType) {
