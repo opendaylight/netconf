@@ -7,12 +7,12 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.tx;
 
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 
 /**
  * Interfaces with a transaction back-end.
  *
  * @author Thomas Pantelis
  */
-interface ProxyTransactionFacade extends DOMDataReadWriteTransaction {
+interface ProxyTransactionFacade extends DOMDataTreeReadWriteTransaction {
 }

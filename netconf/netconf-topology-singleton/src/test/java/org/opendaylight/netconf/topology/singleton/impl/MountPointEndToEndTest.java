@@ -26,10 +26,9 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import akka.actor.ActorSystem;
 import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -44,6 +43,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -57,38 +57,36 @@ import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
-import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
-import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
-import org.opendaylight.controller.md.sal.binding.test.AbstractConcurrentDataBrokerTest;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcIdentifier;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcImplementation;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.api.DOMService;
-import org.opendaylight.controller.md.sal.dom.broker.impl.DOMRpcRouter;
-import org.opendaylight.controller.md.sal.dom.broker.impl.mount.DOMMountPointServiceImpl;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
-import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.api.ReadTransaction;
+import org.opendaylight.mdsal.binding.api.Transaction;
+import org.opendaylight.mdsal.binding.api.TransactionChain;
+import org.opendaylight.mdsal.binding.api.TransactionChainListener;
+import org.opendaylight.mdsal.binding.api.WriteTransaction;
+import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.binding.spec.reflect.BindingReflections;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
+import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMRpcImplementation;
+import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMService;
+import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
+import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.eos.dom.simple.SimpleDOMEntityOwnershipService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
@@ -123,6 +121,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -152,7 +151,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Pantelis
  */
 public class MountPointEndToEndTest {
-    private static Logger LOG = LoggerFactory.getLogger(MountPointEndToEndTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MountPointEndToEndTest.class);
 
     private static final String TOP_MODULE_NAME = "opendaylight-mdsal-list-test";
     private static final String ACTOR_SYSTEM_NAME = "test";
@@ -161,7 +160,7 @@ public class MountPointEndToEndTest {
     private static final InstanceIdentifier<Node> NODE_INSTANCE_ID = NetconfTopologyUtils.createTopologyNodeListPath(
             new NodeKey(NODE_ID), TOPOLOGY_ID);
 
-    @Mock private RpcProviderRegistry mockRpcProviderRegistry;
+    @Mock private DOMRpcProviderService mockRpcProviderRegistry;
     @Mock private NetconfClientDispatcher mockClientDispatcher;
     @Mock private AAAEncryptionService mockEncryptionService;
     @Mock private ThreadPool mockThreadPool;
@@ -187,7 +186,7 @@ public class MountPointEndToEndTest {
     private ActorSystem slaveSystem;
     private NetconfTopologyManager slaveNetconfTopologyManager;
     private final SettableFuture<NetconfTopologyContext> slaveNetconfTopologyContextFuture = SettableFuture.create();
-    private BindingTransactionChain slaveTxChain;
+    private TransactionChain slaveTxChain;
 
     private final EventExecutor eventExecutor = GlobalEventExecutor.INSTANCE;
     private final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(0).build();
@@ -217,7 +216,7 @@ public class MountPointEndToEndTest {
         putTopRpcSchemaPath = findRpcDefinition("put-top").getPath();
         getTopRpcSchemaPath = findRpcDefinition("get-top").getPath();
 
-        deviceRpcService.registerRpcImplementation(topRpcImplementation,
+        deviceRpcService.getRpcProviderService().registerRpcImplementation(topRpcImplementation,
                 DOMRpcIdentifier.create(putTopRpcSchemaPath), DOMRpcIdentifier.create(getTopRpcSchemaPath));
 
         setupMaster();
@@ -322,12 +321,12 @@ public class MountPointEndToEndTest {
 
         slaveTxChain = slaveDataBroker.createTransactionChain(new TransactionChainListener() {
             @Override
-            public void onTransactionChainSuccessful(final TransactionChain<?, ?> chain) {
+            public void onTransactionChainSuccessful(final TransactionChain chain) {
             }
 
             @Override
-            public void onTransactionChainFailed(final TransactionChain<?, ?> chain,
-                    final AsyncTransaction<?, ?> transaction, final Throwable cause) {
+            public void onTransactionChainFailed(final TransactionChain chain, final Transaction transaction,
+                    final Throwable cause) {
                 LOG.error("Slave transaction chain failed", cause);
             }
         });
@@ -354,7 +353,7 @@ public class MountPointEndToEndTest {
         final MasterSalFacade masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
 
         masterSalFacade.onDeviceConnected(deviceSchemaContext,
-                NetconfSessionPreferences.fromStrings(Collections.emptyList()), deviceRpcService);
+                NetconfSessionPreferences.fromStrings(Collections.emptyList()), deviceRpcService.getRpcService());
 
         DOMMountPoint masterMountPoint = awaitMountPoint(masterMountPointService);
 
@@ -379,7 +378,7 @@ public class MountPointEndToEndTest {
         // This is essentially what happens in a clustered environment but we'll use a DTCL here.
 
         masterDataBroker.registerDataTreeChangeListener(
-            new DataTreeIdentifier<>(LogicalDatastoreType.OPERATIONAL, NODE_INSTANCE_ID), changes -> {
+            DataTreeIdentifier.create(LogicalDatastoreType.OPERATIONAL, NODE_INSTANCE_ID), changes -> {
                 final WriteTransaction slaveTx = slaveTxChain.newWriteOnlyTransaction();
                 for (DataTreeModification<Node> dataTreeModification : changes) {
                     DataObjectModification<Node> rootNode = dataTreeModification.getRootNode();
@@ -429,7 +428,7 @@ public class MountPointEndToEndTest {
         MasterSalFacade masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
 
         masterSalFacade.onDeviceConnected(deviceSchemaContext,
-                NetconfSessionPreferences.fromStrings(Collections.emptyList()), deviceRpcService);
+                NetconfSessionPreferences.fromStrings(Collections.emptyList()), deviceRpcService.getRpcService());
 
         verify(masterMountPointListener, timeout(5000)).onMountPointCreated(yangNodeInstanceId);
 
@@ -448,7 +447,7 @@ public class MountPointEndToEndTest {
         awaitMountPointNotPresent(masterMountPointService);
 
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
-            try (ReadOnlyTransaction readTx = masterDataBroker.newReadOnlyTransaction()) {
+            try (ReadTransaction readTx = masterDataBroker.newReadOnlyTransaction()) {
                 Optional<Node> node = readTx.read(LogicalDatastoreType.OPERATIONAL,
                         NODE_INSTANCE_ID).get(5, TimeUnit.SECONDS);
                 assertTrue(node.isPresent());
@@ -498,7 +497,9 @@ public class MountPointEndToEndTest {
     private void testRpc(final DOMRpcService domRpcService, final SchemaPath schemaPath,
             final NormalizedNode<?, ?> input, final DOMRpcResult result) throws InterruptedException,
             ExecutionException, TimeoutException {
-        final DOMRpcResult actual = invokeRpc(domRpcService, schemaPath, input, Futures.immediateCheckedFuture(result));
+        final FluentFuture<DOMRpcResult> future = result == null ? FluentFutures.immediateNullFluentFuture()
+                : FluentFutures.immediateFluentFuture(result);
+        final DOMRpcResult actual = invokeRpc(domRpcService, schemaPath, input, future);
         if (result == null) {
             assertNull(actual);
             return;
@@ -525,7 +526,7 @@ public class MountPointEndToEndTest {
     private void testFailedRpc(final DOMRpcService domRpcService, final SchemaPath schemaPath,
             final NormalizedNode<?, ?> input) throws InterruptedException, TimeoutException {
         try {
-            invokeRpc(domRpcService, schemaPath, input, Futures.immediateFailedCheckedFuture(
+            invokeRpc(domRpcService, schemaPath, input, FluentFutures.immediateFailedFluentFuture(
                     new ClusteringRpcException("mock")));
             fail("Expected exception");
         } catch (ExecutionException e) {
@@ -535,7 +536,7 @@ public class MountPointEndToEndTest {
     }
 
     private DOMRpcResult invokeRpc(final DOMRpcService domRpcService, final SchemaPath schemaPath,
-            final NormalizedNode<?, ?> input, final CheckedFuture<DOMRpcResult, DOMRpcException> returnFuture)
+            final NormalizedNode<?, ?> input, final FluentFuture<DOMRpcResult> returnFuture)
                     throws InterruptedException, ExecutionException, TimeoutException {
         topRpcImplementation.init(returnFuture);
         final ListenableFuture<DOMRpcResult> resultFuture = domRpcService.invokeRpc(schemaPath, input);
@@ -548,7 +549,7 @@ public class MountPointEndToEndTest {
     private static void testDOMDataBrokerOperations(final DOMDataBroker dataBroker)
             throws InterruptedException, ExecutionException, TimeoutException {
 
-        DOMDataWriteTransaction writeTx = dataBroker.newWriteOnlyTransaction();
+        DOMDataTreeWriteTransaction writeTx = dataBroker.newWriteOnlyTransaction();
 
         final ContainerNode topNode = Builders.containerBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(Top.QNAME)).build();
@@ -570,7 +571,7 @@ public class MountPointEndToEndTest {
         writeTx.delete(LogicalDatastoreType.CONFIGURATION, topPath);
         writeTx.commit().get(5, TimeUnit.SECONDS);
 
-        DOMDataReadWriteTransaction readTx = dataBroker.newReadWriteTransaction();
+        DOMDataTreeReadWriteTransaction readTx = dataBroker.newReadWriteTransaction();
         assertFalse(readTx.exists(LogicalDatastoreType.CONFIGURATION, topPath).get(5, TimeUnit.SECONDS));
         assertTrue(readTx.cancel());
     }
@@ -598,7 +599,7 @@ public class MountPointEndToEndTest {
         writeTx.commit().get(5, TimeUnit.SECONDS);
     }
 
-    private static void verifyDataInStore(final DOMDataReadTransaction readTx, final YangInstanceIdentifier path,
+    private static void verifyDataInStore(final DOMDataTreeReadTransaction readTx, final YangInstanceIdentifier path,
             final NormalizedNode<?, ?> expNode) throws InterruptedException, ExecutionException, TimeoutException {
         final Optional<NormalizedNode<?, ?>> read = readTx.read(LogicalDatastoreType.CONFIGURATION, path)
                 .get(5, TimeUnit.SECONDS);
@@ -611,7 +612,7 @@ public class MountPointEndToEndTest {
 
     private static void verifyTopologyNodesCreated(final DataBroker dataBroker) {
         await().atMost(5, TimeUnit.SECONDS).until(() -> {
-            try (ReadOnlyTransaction readTx = dataBroker.newReadOnlyTransaction()) {
+            try (ReadTransaction readTx = dataBroker.newReadOnlyTransaction()) {
                 Optional<Topology> configTopology = readTx.read(LogicalDatastoreType.CONFIGURATION,
                         NetconfTopologyUtils.createTopologyListPath(TOPOLOGY_ID)).get(3, TimeUnit.SECONDS);
                 Optional<Topology> operTopology = readTx.read(LogicalDatastoreType.OPERATIONAL,
@@ -681,16 +682,16 @@ public class MountPointEndToEndTest {
 
     private static class TopDOMRpcImplementation implements DOMRpcImplementation {
         private volatile SettableFuture<Entry<DOMRpcIdentifier, NormalizedNode<?, ?>>> rpcInvokedFuture;
-        private volatile CheckedFuture<DOMRpcResult, DOMRpcException> returnFuture;
+        private volatile FluentFuture<DOMRpcResult> returnFuture;
 
         @Override
-        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(final DOMRpcIdentifier rpc,
+        public FluentFuture<DOMRpcResult> invokeRpc(final DOMRpcIdentifier rpc,
                 final NormalizedNode<?, ?> input) {
             rpcInvokedFuture.set(new SimpleEntry<>(rpc, input));
             return returnFuture;
         }
 
-        void init(final CheckedFuture<DOMRpcResult, DOMRpcException> retFuture) {
+        void init(final FluentFuture<DOMRpcResult> retFuture) {
             this.returnFuture = retFuture;
             rpcInvokedFuture = SettableFuture.create();
         }

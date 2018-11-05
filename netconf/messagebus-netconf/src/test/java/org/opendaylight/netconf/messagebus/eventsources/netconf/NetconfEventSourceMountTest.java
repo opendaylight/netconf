@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -14,13 +13,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Futures;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,12 +27,12 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
@@ -58,7 +57,7 @@ public class NetconfEventSourceMountTest {
     @Mock
     DOMRpcService rpcService;
     @Mock
-    private DOMDataReadOnlyTransaction tx;
+    private DOMDataTreeReadTransaction tx;
     private NetconfEventSourceMount mount;
 
     @Before
@@ -82,7 +81,7 @@ public class NetconfEventSourceMountTest {
         Stream stream = new StreamBuilder()
                 .setName(new StreamNameType(STREAM_1))
                 .build();
-        mount.invokeCreateSubscription(stream, Optional.absent());
+        mount.invokeCreateSubscription(stream, Optional.empty());
         final SchemaPath type = SchemaPath.create(true, QName.create(CreateSubscriptionInput.QNAME,
                 "create-subscription"));
         ArgumentCaptor<ContainerNode> captor = ArgumentCaptor.forClass(ContainerNode.class);
@@ -96,15 +95,14 @@ public class NetconfEventSourceMountTest {
                 .setName(new StreamNameType(STREAM_1))
                 .setReplaySupport(true)
                 .build();
-        final Date date = new Date();
+        final Instant date = Instant.now();
         mount.invokeCreateSubscription(stream, Optional.of(date));
         final SchemaPath type = SchemaPath.create(true, QName.create(CreateSubscriptionInput.QNAME,
                 "create-subscription"));
         ArgumentCaptor<ContainerNode> captor = ArgumentCaptor.forClass(ContainerNode.class);
         verify(rpcService).invokeRpc(eq(type), captor.capture());
         Assert.assertEquals(STREAM_1, getStreamName(captor.getValue()));
-        final String expDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date.toInstant().atZone(ZoneId
-                .systemDefault()));
+        final String expDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date.atZone(ZoneId.systemDefault()));
         final Optional<LeafNode> actual = (Optional<LeafNode>) getDate(captor.getValue());
         Assert.assertTrue(actual.isPresent());
         String actualDate = (String) actual.get().getValue();
@@ -117,7 +115,7 @@ public class NetconfEventSourceMountTest {
                 .setName(new StreamNameType(STREAM_1))
                 .setReplaySupport(true)
                 .build();
-        mount.invokeCreateSubscription(stream, Optional.absent());
+        mount.invokeCreateSubscription(stream, Optional.empty());
         final SchemaPath type = SchemaPath.create(true, QName.create(CreateSubscriptionInput.QNAME,
                 "create-subscription"));
         ArgumentCaptor<ContainerNode> captor = ArgumentCaptor.forClass(ContainerNode.class);
@@ -152,6 +150,6 @@ public class NetconfEventSourceMountTest {
     private static Optional<?> getDate(final ContainerNode value) {
         YangInstanceIdentifier.NodeIdentifier startTime =
                 new YangInstanceIdentifier.NodeIdentifier(QName.create(CreateSubscriptionInput.QNAME, "startTime"));
-        return Optional.fromJavaUtil(value.getChild(startTime));
+        return value.getChild(startTime);
     }
 }

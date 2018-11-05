@@ -5,32 +5,31 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
-import org.junit.Assert;
+import com.google.common.util.concurrent.FluentFuture;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 
 public class ReadWriteTxTest {
     @Mock
-    private DOMDataReadTransaction delegateReadTx;
+    private DOMDataTreeReadTransaction delegateReadTx;
     @Mock
-    private DOMDataWriteTransaction delegateWriteTx;
+    private DOMDataTreeWriteTransaction delegateWriteTx;
     private ReadWriteTx tx;
 
     @Before
@@ -70,17 +69,15 @@ public class ReadWriteTxTest {
     @Test
     public void exists() throws Exception {
         final YangInstanceIdentifier id = TxTestUtils.getContainerId();
-        final CheckedFuture<Boolean, ReadFailedException> resultFuture =
-                Futures.immediateCheckedFuture(true);
-        when(delegateReadTx.exists(LogicalDatastoreType.CONFIGURATION, id)).thenReturn(resultFuture);
-        final CheckedFuture<Boolean, ReadFailedException> exists = tx.exists(LogicalDatastoreType.CONFIGURATION, id);
-        Assert.assertTrue(exists.get());
+        when(delegateReadTx.exists(LogicalDatastoreType.CONFIGURATION, id)).thenReturn(
+            FluentFutures.immediateTrueFluentFuture());
+        final FluentFuture<Boolean> exists = tx.exists(LogicalDatastoreType.CONFIGURATION, id);
+        assertTrue(exists.get());
     }
 
     @Test
     public void getIdentifier() throws Exception {
         final ReadWriteTx tx2 = new ReadWriteTx(null, null);
-        Assert.assertNotEquals(tx.getIdentifier(), tx2.getIdentifier());
+        assertNotEquals(tx.getIdentifier(), tx2.getIdentifier());
     }
-
 }

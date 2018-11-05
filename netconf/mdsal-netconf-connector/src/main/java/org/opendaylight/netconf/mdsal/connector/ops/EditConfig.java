@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.base.Optional;
@@ -14,8 +13,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
@@ -87,7 +86,7 @@ public final class EditConfig extends AbstractEdit {
     }
 
     private void executeOperations(final DataTreeChangeTracker changeTracker) throws DocumentedException {
-        final DOMDataReadWriteTransaction rwTx = transactionProvider.getOrCreateTransaction();
+        final DOMDataTreeReadWriteTransaction rwTx = transactionProvider.getOrCreateTransaction();
         final List<DataTreeChange> aa = changeTracker.getDataTreeChanges();
         final ListIterator<DataTreeChange> iterator = aa.listIterator(aa.size());
 
@@ -97,7 +96,7 @@ public final class EditConfig extends AbstractEdit {
         }
     }
 
-    private void executeChange(final DOMDataReadWriteTransaction rwtx, final DataTreeChange change)
+    private void executeChange(final DOMDataTreeReadWriteTransaction rwtx, final DataTreeChange change)
             throws DocumentedException {
         final YangInstanceIdentifier path = YangInstanceIdentifier.create(change.getPath());
         final NormalizedNode<?, ?> changeData = change.getChangeRoot();
@@ -110,9 +109,7 @@ public final class EditConfig extends AbstractEdit {
                 break;
             case CREATE:
                 try {
-                    final Optional<NormalizedNode<?, ?>> readResult =
-                            rwtx.read(LogicalDatastoreType.CONFIGURATION, path).get();
-                    if (readResult.isPresent()) {
+                    if (rwtx.read(LogicalDatastoreType.CONFIGURATION, path).get().isPresent()) {
                         throw new DocumentedException("Data already exists, cannot execute CREATE operation",
                             ErrorType.PROTOCOL, ErrorTag.DATA_EXISTS, ErrorSeverity.ERROR);
                     }
@@ -128,9 +125,7 @@ public final class EditConfig extends AbstractEdit {
                 break;
             case DELETE:
                 try {
-                    final Optional<NormalizedNode<?, ?>> readResult =
-                            rwtx.read(LogicalDatastoreType.CONFIGURATION, path).get();
-                    if (!readResult.isPresent()) {
+                    if (!rwtx.read(LogicalDatastoreType.CONFIGURATION, path).get().isPresent()) {
                         throw new DocumentedException("Data is missing, cannot execute DELETE operation",
                             ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, ErrorSeverity.ERROR);
                     }
@@ -147,7 +142,7 @@ public final class EditConfig extends AbstractEdit {
         }
     }
 
-    private void mergeParentMixin(final DOMDataReadWriteTransaction rwtx, final YangInstanceIdentifier path,
+    private void mergeParentMixin(final DOMDataTreeReadWriteTransaction rwtx, final YangInstanceIdentifier path,
                                 final NormalizedNode<?, ?> change) {
         final YangInstanceIdentifier parentNodeYid = path.getParent();
         if (change instanceof MapEntryNode) {
@@ -206,5 +201,4 @@ public final class EditConfig extends AbstractEdit {
     protected String getOperationName() {
         return OPERATION_NAME;
     }
-
 }
