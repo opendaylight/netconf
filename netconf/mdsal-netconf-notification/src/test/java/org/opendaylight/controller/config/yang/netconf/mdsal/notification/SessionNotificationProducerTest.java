@@ -7,7 +7,7 @@
  */
 package org.opendaylight.controller.config.yang.netconf.mdsal.notification;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -21,12 +21,12 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
-import org.opendaylight.controller.md.sal.binding.api.DataObjectModification.ModificationType;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeChangeListener;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType;
+import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.HostBuilder;
@@ -114,11 +114,11 @@ public class SessionNotificationProducerTest {
         Assert.assertEquals(session.getUsername(), value.getUsername());
     }
 
-    private static Session createSession(long id) {
+    private static Session createSession(final long id) {
         return createSessionWithInRpcCount(id, 0);
     }
 
-    private static Session createSessionWithInRpcCount(long id, long inRpc) {
+    private static Session createSessionWithInRpcCount(final long id, final long inRpc) {
         return new SessionBuilder()
                 .setSessionId(id)
                 .setSourceHost(HostBuilder.getDefaultInstance("0.0.0.0"))
@@ -128,7 +128,7 @@ public class SessionNotificationProducerTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static DataTreeModification<Session> getTreeModification(Session session, ModificationType type) {
+    private static DataTreeModification<Session> getTreeModification(final Session session, final ModificationType type) {
         final DataTreeModification<Session> treeChange = mock(DataTreeModification.class);
         final DataObjectModification<Session> changeObject = mock(DataObjectModification.class);
         switch (type) {
