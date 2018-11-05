@@ -13,7 +13,7 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
 
 import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -24,12 +24,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opendaylight.controller.md.sal.dom.api.DOMActionService;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcAvailabilityListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -264,9 +264,9 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
      */
     private static final class RequestTimeoutTask implements Runnable {
 
-        private final CheckedFuture<DOMRpcResult, DOMRpcException> rpcResultFuture;
+        private final FluentFuture<DOMRpcResult> rpcResultFuture;
 
-        RequestTimeoutTask(final CheckedFuture<DOMRpcResult, DOMRpcException> rpcResultFuture) {
+        RequestTimeoutTask(final FluentFuture<DOMRpcResult> rpcResultFuture) {
             this.rpcResultFuture = rpcResultFuture;
         }
 
@@ -303,9 +303,9 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
 
         @Nonnull
         @Override
-        public CheckedFuture<DOMRpcResult, DOMRpcException> invokeRpc(@Nonnull final SchemaPath type,
+        public @NonNull FluentFuture<DOMRpcResult> invokeRpc(@Nonnull final SchemaPath type,
                                                                       final NormalizedNode<?, ?> input) {
-            final CheckedFuture<DOMRpcResult, DOMRpcException> domRpcResultDOMRpcExceptionCheckedFuture =
+            final FluentFuture<DOMRpcResult> domRpcResultDOMRpcExceptionCheckedFuture =
                     deviceRpc.invokeRpc(type, input);
             Futures.addCallback(domRpcResultDOMRpcExceptionCheckedFuture, resetKeepaliveTask,
                                 MoreExecutors.directExecutor());

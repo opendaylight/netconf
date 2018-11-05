@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.config.yang.netconf.mdsal.notification;
 
 import com.google.common.collect.ImmutableList;
@@ -15,9 +14,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
@@ -30,7 +29,6 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Listens on capabilities changes in data store and publishes them to base
@@ -54,7 +52,7 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
     }
 
     @Override
-    public void onDataTreeChanged(@Nonnull Collection<DataTreeModification<Capabilities>> changes) {
+    public void onDataTreeChanged(@Nonnull final Collection<DataTreeModification<Capabilities>> changes) {
         for (DataTreeModification<Capabilities> change : changes) {
             final DataObjectModification<Capabilities> rootNode = change.getRootNode();
             final DataObjectModification.ModificationType modificationType = rootNode.getModificationType();
@@ -86,7 +84,7 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
 
     }
 
-    private void publishNotification(Set<Uri> added, Set<Uri> removed) {
+    private void publishNotification(final Set<Uri> added, final Set<Uri> removed) {
         final NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
         netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(new ServerBuilder()
                 .setServer(true).build()).build());
@@ -100,6 +98,7 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
     /**
      * Invoked by blueprint.
      */
+    @Override
     public void close() {
         if (baseNotificationPublisherRegistration != null) {
             baseNotificationPublisherRegistration.close();

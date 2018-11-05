@@ -48,10 +48,10 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider;
@@ -308,7 +308,7 @@ public class NetconfMessageTransformerTest {
                 .nodeWithKey(Schema.QNAME, keys).build();
         final DataContainerChild<?, ?> editConfigStructure =
                 createEditConfigStructure(BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext(), id,
-                    com.google.common.base.Optional.absent(), com.google.common.base.Optional.fromNullable(schemaNode));
+                    Optional.empty(), Optional.ofNullable(schemaNode));
 
         final DataContainerChild<?, ?> target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_QNAME);
 

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import com.google.common.base.Preconditions;
@@ -16,10 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
-import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.binding.api.TransactionChain;
+import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
@@ -55,13 +54,13 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceTopologyAdapter.class);
 
     private final RemoteDeviceId id;
-    private BindingTransactionChain txChain;
+    private TransactionChain txChain;
 
     private final InstanceIdentifier<NetworkTopology> networkTopologyPath;
     private final KeyedInstanceIdentifier<Topology, TopologyKey> topologyListPath;
     private static final String UNKNOWN_REASON = "Unknown reason";
 
-    NetconfDeviceTopologyAdapter(final RemoteDeviceId id, final BindingTransactionChain txChain) {
+    NetconfDeviceTopologyAdapter(final RemoteDeviceId id, final TransactionChain txChain) {
         this.id = id;
         this.txChain = Preconditions.checkNotNull(txChain);
 
@@ -256,7 +255,7 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         removeDeviceConfiguration();
     }
 
-    public void setTxChain(final BindingTransactionChain txChain) {
+    public void setTxChain(final TransactionChain txChain) {
         this.txChain = Preconditions.checkNotNull(txChain);
     }
 }

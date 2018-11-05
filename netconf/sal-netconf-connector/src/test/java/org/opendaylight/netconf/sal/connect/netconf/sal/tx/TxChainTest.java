@@ -8,7 +8,7 @@
 
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,20 +18,20 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChainClosedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChainClosedException;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
 
 public class TxChainTest {
 
     @Mock
     private DOMDataBroker broker;
     @Mock
-    private TransactionChainListener listener;
+    private DOMTransactionChainListener listener;
     @Mock
-    private DOMDataReadOnlyTransaction readOnlyTx;
+    private DOMDataTreeReadTransaction readOnlyTx;
     @Mock
     private AbstractWriteTx writeOnlyTx1;
     @Mock
@@ -101,7 +101,7 @@ public class TxChainTest {
         chain.newWriteOnlyTransaction();
     }
 
-    @Test(expected = TransactionChainClosedException.class)
+    @Test(expected = DOMTransactionChainClosedException.class)
     public void testCloseAfterFinished() throws Exception {
         chain.close();
         verify(listener).onTransactionChainSuccessful(chain);
