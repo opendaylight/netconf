@@ -5,11 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.mount;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.channel.nio.NioEventLoopGroup;
 import java.io.IOException;
@@ -18,17 +16,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import javax.annotation.Nonnull;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeChangeListener;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
-import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.binding.api.ReadWriteTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.api.ReadTransaction;
+import org.opendaylight.mdsal.binding.api.ReadWriteTransaction;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.callhome.protocol.CallHomeAuthorizationProvider;
 import org.opendaylight.netconf.callhome.protocol.NetconfCallHomeServer;
 import org.opendaylight.netconf.callhome.protocol.NetconfCallHomeServerBuilder;
@@ -77,7 +75,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
             LOG.info("Initializing provider for {}", APPNAME);
             initializeServer();
             listenerReg = dataBroker.registerDataTreeChangeListener(
-                    new DataTreeIdentifier<>(LogicalDatastoreType.CONFIGURATION, ALL_DEVICES), this);
+                DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, ALL_DEVICES), this);
             LOG.info("Initialization complete for {}", APPNAME);
         } catch (IOException | Configuration.ConfigurationException e) {
             LOG.error("Unable to successfully initialize", e);
@@ -139,13 +137,13 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
     }
 
     @Override
-    public void onDataTreeChanged(@Nonnull final Collection<DataTreeModification<AllowedDevices>> changes) {
+    public void onDataTreeChanged(final Collection<DataTreeModification<AllowedDevices>> changes) {
         // In case of any changes to the devices datatree, register the changed values with callhome server
         // As of now, no way to add a new callhome client key to the CallHomeAuthorization instance since
         // its created under CallHomeAuthorizationProvider.
         // Will have to redesign a bit here.
         // CallHomeAuthorization.
-        ReadOnlyTransaction roConfigTx = dataBroker.newReadOnlyTransaction();
+        ReadTransaction roConfigTx = dataBroker.newReadOnlyTransaction();
         ListenableFuture<Optional<AllowedDevices>> devicesFuture = roConfigTx
                 .read(LogicalDatastoreType.CONFIGURATION, IetfZeroTouchCallHomeServerProvider.ALL_DEVICES);
 
@@ -189,8 +187,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
 
     private static List<Device> getReadDevices(final ListenableFuture<Optional<AllowedDevices>> devicesFuture)
             throws InterruptedException, ExecutionException {
-        Optional<AllowedDevices> opt = devicesFuture.get();
-        return opt.isPresent() ? opt.get().getDevice() : Collections.emptyList();
+        return devicesFuture.get().map(AllowedDevices::getDevice).orElse(Collections.emptyList());
     }
 
     private void readAndUpdateStatus(Device cfgDevice) throws InterruptedException, ExecutionException {
