@@ -15,8 +15,8 @@ import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import javax.annotation.Nonnull;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.CancelRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteRequest;
@@ -30,9 +30,9 @@ class WriteAdapter {
 
     private static final Logger LOG = LoggerFactory.getLogger(WriteAdapter.class);
 
-    private final DOMDataWriteTransaction tx;
+    private final DOMDataTreeWriteTransaction tx;
 
-    WriteAdapter(final DOMDataWriteTransaction tx) {
+    WriteAdapter(final DOMDataTreeWriteTransaction tx) {
         this.tx = tx;
     }
 

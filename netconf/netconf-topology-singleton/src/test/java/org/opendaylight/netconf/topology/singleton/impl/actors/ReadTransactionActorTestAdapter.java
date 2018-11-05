@@ -8,21 +8,23 @@
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Status.Failure;
 import akka.testkit.TestProbe;
 import akka.util.Timeout;
-import com.google.common.base.Optional;
-import com.google.common.util.concurrent.Futures;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadTransaction;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.ReadFailedException;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ExistsRequest;
@@ -44,11 +46,11 @@ public abstract class ReadTransactionActorTestAdapter {
     static final NormalizedNode<?, ?> NODE = Builders.containerBuilder()
             .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont"))).build();
 
-    private DOMDataReadTransaction mockReadTx;
+    private DOMDataTreeReadTransaction mockReadTx;
     private TestProbe probe;
     private ActorRef actorRef;
 
-    public void init(DOMDataReadTransaction inMockReadTx, ActorSystem system, ActorRef inActorRef) {
+    public void init(final DOMDataTreeReadTransaction inMockReadTx, final ActorSystem system, final ActorRef inActorRef) {
         this.mockReadTx = inMockReadTx;
         this.probe = TestProbe.apply(system);
         this.actorRef = inActorRef;
@@ -56,7 +58,7 @@ public abstract class ReadTransactionActorTestAdapter {
 
     @Test
     public void testRead() {
-        when(mockReadTx.read(STORE, PATH)).thenReturn(Futures.immediateCheckedFuture(Optional.of(NODE)));
+        doReturn(immediateFluentFuture(Optional.of(NODE))).when(mockReadTx).read(STORE, PATH);
         actorRef.tell(new ReadRequest(STORE, PATH), probe.ref());
 
         verify(mockReadTx).read(STORE, PATH);
@@ -66,7 +68,7 @@ public abstract class ReadTransactionActorTestAdapter {
 
     @Test
     public void testReadEmpty() {
-        when(mockReadTx.read(STORE, PATH)).thenReturn(Futures.immediateCheckedFuture(Optional.absent()));
+        doReturn(immediateFluentFuture(Optional.empty())).when(mockReadTx).read(STORE, PATH);
         actorRef.tell(new ReadRequest(STORE, PATH), probe.ref());
 
         verify(mockReadTx).read(STORE, PATH);
@@ -76,7 +78,7 @@ public abstract class ReadTransactionActorTestAdapter {
     @Test
     public void testReadFailure() {
         final ReadFailedException cause = new ReadFailedException("fail");
-        when(mockReadTx.read(STORE, PATH)).thenReturn(Futures.immediateFailedCheckedFuture(cause));
+        doReturn(immediateFailedFluentFuture(cause)).when(mockReadTx).read(STORE, PATH);
         actorRef.tell(new ReadRequest(STORE, PATH), probe.ref());
 
         verify(mockReadTx).read(STORE, PATH);
@@ -86,7 +88,7 @@ public abstract class ReadTransactionActorTestAdapter {
 
     @Test
     public void testExists() {
-        when(mockReadTx.exists(STORE, PATH)).thenReturn(Futures.immediateCheckedFuture(Boolean.TRUE));
+        doReturn(immediateTrueFluentFuture()).when(mockReadTx).exists(STORE, PATH);
         actorRef.tell(new ExistsRequest(STORE, PATH), probe.ref());
 
         verify(mockReadTx).exists(STORE, PATH);
@@ -96,7 +98,7 @@ public abstract class ReadTransactionActorTestAdapter {
     @Test
     public void testExistsFailure() {
         final ReadFailedException cause = new ReadFailedException("fail");
-        when(mockReadTx.exists(STORE, PATH)).thenReturn(Futures.immediateFailedCheckedFuture(cause));
+        doReturn(immediateFailedFluentFuture(cause)).when(mockReadTx).exists(STORE, PATH);
         actorRef.tell(new ExistsRequest(STORE, PATH), probe.ref());
 
         verify(mockReadTx).exists(STORE, PATH);
