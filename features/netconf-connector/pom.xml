@@ -21,7 +21,6 @@
 
     <properties>
       <commons.opendaylight.version>1.12.0-SNAPSHOT</commons.opendaylight.version>
-      <controller.mdsal.version>1.9.0-SNAPSHOT</controller.mdsal.version>
       <mdsal.version>3.0.2</mdsal.version>
       <netconf.version>1.6.0-SNAPSHOT</netconf.version>
       <netconf.connector.version>1.9.0-SNAPSHOT</netconf.connector.version>
@@ -63,14 +62,6 @@
       <artifactId>features-yangtools</artifactId>
       <classifier>features</classifier>
       <type>xml</type>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>features-mdsal</artifactId>
-      <version>${controller.mdsal.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

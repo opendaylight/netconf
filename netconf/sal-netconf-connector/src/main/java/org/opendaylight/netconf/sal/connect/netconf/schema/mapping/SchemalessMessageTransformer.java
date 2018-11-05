@@ -7,12 +7,12 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Map;
 import javax.xml.transform.dom.DOMSource;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -50,7 +50,7 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
 
     @Override
     public DOMNotification toNotification(final NetconfMessage message) {
-        final Map.Entry<Date, XmlElement> stripped = NetconfMessageTransformUtil.stripNotification(message);
+        final Map.Entry<Instant, XmlElement> stripped = NetconfMessageTransformUtil.stripNotification(message);
         final QName notificationNoRev;
         try {
             notificationNoRev =

@@ -24,9 +24,9 @@
                interface="io.netty.util.concurrent.EventExecutor"
                odl:type="global-event-executor"/>
     <reference id="dataBroker"
-               interface="org.opendaylight.controller.md.sal.binding.api.DataBroker"/>
+               interface="org.opendaylight.mdsal.binding.api.DataBroker"/>
     <reference id="mountPointService"
-               interface="org.opendaylight.controller.md.sal.dom.api.DOMMountPointService"
+               interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"
                odl:type="default"/>
     <reference id="encryptionService"
                interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />

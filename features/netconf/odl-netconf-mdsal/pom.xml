@@ -26,7 +26,6 @@
 
     <properties>
         <netconf.version>1.6.0-SNAPSHOT</netconf.version>
-        <controller.mdsal.version>${project.version}</controller.mdsal.version>
     </properties>
 
     <dependencyManagement>
@@ -67,13 +66,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-client</artifactId>
             <version>${netconf.version}</version>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>odl-mdsal-broker</artifactId>
-            <version>${controller.mdsal.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
