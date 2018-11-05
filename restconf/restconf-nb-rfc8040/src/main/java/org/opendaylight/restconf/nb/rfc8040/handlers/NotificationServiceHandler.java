@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 
 public class NotificationServiceHandler implements Handler<DOMNotificationService> {
 

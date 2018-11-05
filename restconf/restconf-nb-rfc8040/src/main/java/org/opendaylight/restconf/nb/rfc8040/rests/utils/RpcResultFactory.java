@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.yangtools.concepts.Builder;
 
 public class RpcResultFactory extends FutureDataFactory<DOMRpcResult> implements Builder<DOMRpcResult> {

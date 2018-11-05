@@ -5,13 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import com.google.common.util.concurrent.Futures;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.junit.Before;
@@ -19,16 +17,18 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
 public class DeleteDataTransactionUtilTest {
@@ -37,7 +37,7 @@ public class DeleteDataTransactionUtilTest {
     @Mock
     private InstanceIdentifierContext<?> context;
     @Mock
-    private DOMDataReadWriteTransaction readWrite;
+    private DOMDataTreeReadWriteTransaction readWrite;
     @Mock
     private DOMDataBroker mockDataBroker;
 
@@ -47,7 +47,7 @@ public class DeleteDataTransactionUtilTest {
     public void init() throws Exception {
         MockitoAnnotations.initMocks(this);
         Mockito.when(this.transactionChain.newReadWriteTransaction()).thenReturn(this.readWrite);
-        Mockito.when(this.readWrite.submit()).thenReturn(Futures.immediateCheckedFuture(null));
+        Mockito.doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
         Mockito.when(this.context.getInstanceIdentifier()).thenReturn(YangInstanceIdentifier.EMPTY);
 
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
@@ -62,7 +62,7 @@ public class DeleteDataTransactionUtilTest {
         // assert that data to delete exists
         Mockito.when(this.transactionChain.newReadWriteTransaction().exists(LogicalDatastoreType.CONFIGURATION,
                 YangInstanceIdentifier.EMPTY))
-                .thenReturn(Futures.immediateCheckedFuture(Boolean.TRUE));
+                .thenReturn(FluentFutures.immediateTrueFluentFuture());
 
         // test
         final Response response = DeleteDataTransactionUtil.deleteData(
@@ -80,7 +80,7 @@ public class DeleteDataTransactionUtilTest {
         // assert that data to delete does NOT exist
         Mockito.when(this.transactionChain.newReadWriteTransaction().exists(LogicalDatastoreType.CONFIGURATION,
                 YangInstanceIdentifier.EMPTY))
-                .thenReturn(Futures.immediateCheckedFuture(Boolean.FALSE));
+                .thenReturn(FluentFutures.immediateFalseFluentFuture());
 
         // test and assert error
         try {

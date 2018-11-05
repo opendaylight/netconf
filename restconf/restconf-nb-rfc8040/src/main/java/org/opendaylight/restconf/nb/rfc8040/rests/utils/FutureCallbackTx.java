@@ -8,12 +8,12 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.base.Throwables;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.List;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMRpcException;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Add callback for future objects and result set to the data factory.
- *
  */
 final class FutureCallbackTx {
 
@@ -47,11 +46,11 @@ final class FutureCallbackTx {
      *             if the Future throws an exception
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
-    static <T, X extends Exception> void addCallback(final CheckedFuture<T, X> listenableFuture, final String txType,
+    static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
             final FutureDataFactory<T> dataFactory) throws RestconfDocumentedException {
 
         try {
-            final T result = listenableFuture.checkedGet();
+            final T result = listenableFuture.get();
             dataFactory.setResult(result);
             LOG.trace("Transaction({}) SUCCESSFUL", txType);
         } catch (Exception e) {

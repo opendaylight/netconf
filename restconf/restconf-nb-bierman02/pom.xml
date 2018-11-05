@@ -39,8 +39,12 @@
       <artifactId>sal-connector-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>sal-core-api</artifactId>
+      <groupId>org.opendaylight.mdsal</groupId>
+      <artifactId>mdsal-dom-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.mdsal</groupId>
+      <artifactId>mdsal-dom-spi</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
@@ -57,10 +61,6 @@
     <dependency>
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>sal-common-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>sal-binding-broker-impl</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
@@ -98,10 +98,6 @@
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>jaxrs-api</artifactId>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>sal-core-spi</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
@@ -186,8 +182,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>sal-binding-broker-impl</artifactId>
+      <groupId>org.opendaylight.mdsal</groupId>
+      <artifactId>mdsal-binding-dom-adapter</artifactId>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>

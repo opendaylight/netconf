@@ -10,24 +10,23 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAMS_PATH;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH_PART;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.core.UriInfo;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.context.WriterParameters.WriterParametersBuilder;
@@ -278,7 +277,7 @@ public final class ReadDataTransactionUtil {
                                                 final SchemaContextRef schemaContextRef, final UriInfo uriInfo) {
         final SchemaContext schemaContext = schemaContextRef.get();
         if (identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
-            final DOMDataReadWriteTransaction wTx = transactionNode.getTransactionChain().newReadWriteTransaction();
+            final DOMDataTreeReadWriteTransaction wTx = transactionNode.getTransactionChain().newReadWriteTransaction();
             final boolean exist = SubscribeToStreamUtil.checkExist(schemaContext, wTx);
 
             for (final NotificationDefinition notificationDefinition : schemaContextRef.get().getNotifications()) {
@@ -441,8 +440,8 @@ public final class ReadDataTransactionUtil {
     private static NormalizedNode<?, ?> readDataViaTransaction(
             @Nonnull final TransactionVarsWrapper transactionNode) {
         final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
-        try (DOMDataReadOnlyTransaction tx = transactionNode.getTransactionChain().newReadOnlyTransaction()) {
-            final CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> listenableFuture = tx.read(
+        try (DOMDataTreeReadTransaction tx = transactionNode.getTransactionChain().newReadOnlyTransaction()) {
+            final FluentFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = tx.read(
                 transactionNode.getLogicalDatastoreType(),
                 transactionNode.getInstanceIdentifier().getInstanceIdentifier());
             FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,

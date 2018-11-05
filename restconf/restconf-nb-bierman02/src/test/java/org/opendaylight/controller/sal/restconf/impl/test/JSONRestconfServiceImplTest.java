@@ -21,6 +21,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 
 import com.google.common.base.Optional;
 import com.google.common.io.Resources;
@@ -37,14 +38,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcImplementationNotAvailableException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMRpcException;
+import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.JSONRestconfServiceImpl;
@@ -139,8 +141,7 @@ public class JSONRestconfServiceImplTest {
         when(brokerFacade.commitConfigurationDataPut(notNull(SchemaContext.class),
                 notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), isNull(), isNull()))
                 .thenReturn(result);
-        when(result.getFutureOfPutData())
-                .thenReturn(Futures.immediateCheckedFuture(null));
+        doReturn(CommitInfo.emptyFluentFuture()).when(result).getFutureOfPutData();
         when(result.getStatus()).thenReturn(Status.OK);
         final String uriPath = "ietf-interfaces:interfaces/interface/eth0";
         final String payload = loadData("/parts/ietf-interfaces_interfaces.json");
@@ -172,7 +173,7 @@ public class JSONRestconfServiceImplTest {
         when(brokerFacade.commitMountPointDataPut(notNull(DOMMountPoint.class),
                 notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), isNull(), isNull()))
                 .thenReturn(result);
-        when(result.getFutureOfPutData()).thenReturn(Futures.immediateCheckedFuture(null));
+        doReturn(CommitInfo.emptyFluentFuture()).when(result).getFutureOfPutData();
         when(result.getStatus()).thenReturn(Status.OK);
         final String uriPath = "ietf-interfaces:interfaces/yang-ext:mount/test-module:cont/cont1";
         final String payload = loadData("/full-versions/testCont1Data.json");
@@ -199,8 +200,8 @@ public class JSONRestconfServiceImplTest {
     public void testPutFailure() throws Throwable {
         final PutResult result = mock(PutResult.class);
 
-        when(result.getFutureOfPutData())
-                .thenReturn(Futures.immediateFailedCheckedFuture(new TransactionCommitFailedException("mock")));
+        doReturn(immediateFailedFluentFuture(new TransactionCommitFailedException("mock"))).
+        when(result.getFutureOfPutData());
         when(result.getStatus()).thenReturn(Status.OK);
         when(brokerFacade.commitConfigurationDataPut(notNull(SchemaContext.class),
                 notNull(YangInstanceIdentifier.class), notNull(NormalizedNode.class), Mockito.anyString(),
@@ -298,7 +299,6 @@ public class JSONRestconfServiceImplTest {
         }
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testPatch() throws Exception {
         final PatchStatusContext result = mock(PatchStatusContext.class);
@@ -322,7 +322,6 @@ public class JSONRestconfServiceImplTest {
         assertTrue(patchResult.get().contains("\"ok\":[null]"));
     }
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testPatchBehindMountPoint() throws Exception {
         final PatchStatusContext result = mock(PatchStatusContext.class);
