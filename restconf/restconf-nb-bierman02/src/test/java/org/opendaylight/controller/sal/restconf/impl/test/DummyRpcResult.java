@@ -65,9 +65,7 @@ public class DummyRpcResult<T> implements RpcResult<T> {
         }
 
         public RpcResult<T> build() {
-            return new DummyRpcResult<T>(this);
+            return new DummyRpcResult<>(this);
         }
-
     }
-
 }
