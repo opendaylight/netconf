@@ -18,7 +18,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
@@ -31,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
@@ -39,10 +39,10 @@ import javax.ws.rs.core.UriInfo;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
@@ -93,7 +93,7 @@ public class RestconfImplTest {
         binaryKeyTest(al, al);
     }
 
-    private void binaryKeyTest(final List<Byte> al, final List<Byte> al2) {
+    private static void binaryKeyTest(final List<Byte> al, final List<Byte> al2) {
 
         final QName keyDef = QName.create("test:key:binary", "2017-08-14", "b1");
 
@@ -140,7 +140,7 @@ public class RestconfImplTest {
         doReturn(new MultivaluedHashMap<>()).when(uriInfo).getQueryParameters(anyBoolean());
 
         final NormalizedNodeContext ctx = mock(NormalizedNodeContext.class);
-        final InstanceIdentifierContext iiCtx = mock(InstanceIdentifierContext.class);
+        final InstanceIdentifierContext<?> iiCtx = mock(InstanceIdentifierContext.class);
         doReturn(iiCtx).when(ctx).getInstanceIdentifierContext();
         final SchemaNode schemaNode = mock(SchemaNode.class);
         doReturn(schemaNode).when(iiCtx).getSchemaNode();

@@ -12,7 +12,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;

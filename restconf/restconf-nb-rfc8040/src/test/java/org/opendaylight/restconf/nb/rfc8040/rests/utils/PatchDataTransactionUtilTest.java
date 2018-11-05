@@ -5,12 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.CREATE;
@@ -18,6 +18,8 @@ import static org.opendaylight.restconf.common.patch.PatchEditOperation.DELETE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.MERGE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REMOVE;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.REPLACE;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import com.google.common.util.concurrent.Futures;
 import java.util.ArrayList;
@@ -25,11 +27,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
@@ -58,7 +60,7 @@ public class PatchDataTransactionUtilTest {
     private DOMTransactionChain transactionChain;
 
     @Mock
-    private DOMDataReadWriteTransaction rwTransaction;
+    private DOMDataTreeReadWriteTransaction rwTransaction;
 
     @Mock
     private DOMDataBroker mockDataBroker;
@@ -77,7 +79,7 @@ public class PatchDataTransactionUtilTest {
     public void setUp() throws Exception {
         initMocks(this);
 
-        Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
+        doReturn(transactionChain).when(mockDataBroker).createTransactionChain(any());
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
 
         this.refSchemaCtx = new SchemaContextRef(
@@ -161,12 +163,12 @@ public class PatchDataTransactionUtilTest {
 
         /* Mocks */
         doReturn(this.rwTransaction).when(this.transactionChain).newReadWriteTransaction();
-        doReturn(Futures.immediateCheckedFuture(null)).when(this.rwTransaction).submit();
+        doReturn(CommitInfo.emptyFluentFuture()).when(this.rwTransaction).commit();
     }
 
     @Test
     public void testPatchDataReplaceMergeAndRemove() {
-        doReturn(Futures.immediateCheckedFuture(false)).doReturn(Futures.immediateCheckedFuture(true))
+        doReturn(immediateFalseFluentFuture()).doReturn(immediateTrueFluentFuture())
                 .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeMerge);
 
         final PatchEntity entityReplace =
@@ -194,10 +196,10 @@ public class PatchDataTransactionUtilTest {
 
     @Test
     public void testPatchDataCreateAndDelete() throws Exception {
-        doReturn(Futures.immediateCheckedFuture(false))
-                .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.instanceIdContainer);
-        doReturn(Futures.immediateCheckedFuture(true))
-        .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
+        doReturn(immediateFalseFluentFuture()).when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
+            this.instanceIdContainer);
+        doReturn(immediateTrueFluentFuture()).when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION,
+            this.targetNodeForCreateAndDelete);
 
         final PatchEntity entityCreate =
                 new PatchEntity("edit1", CREATE, this.instanceIdContainer, this.buildBaseContainerForTests);
@@ -248,7 +250,7 @@ public class PatchDataTransactionUtilTest {
 
     @Test
     public void testPatchMergePutContainer() throws Exception {
-        doReturn(Futures.immediateCheckedFuture(false)).doReturn(Futures.immediateCheckedFuture(true))
+        doReturn(immediateFalseFluentFuture()).doReturn(immediateTrueFluentFuture())
                 .when(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.targetNodeForCreateAndDelete);
 
         final PatchEntity entityMerge =

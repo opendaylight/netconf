@@ -10,10 +10,8 @@ package org.opendaylight.netconf.sal.restconf.api;
 import com.google.common.base.Optional;
 import javax.annotation.Nonnull;
 import javax.ws.rs.core.MultivaluedMap;
-
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
-
 
 /**
  * Provides restconf CRUD operations via code with input/output data in JSON format.
