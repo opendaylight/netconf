@@ -5,25 +5,25 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
+
 import javax.ws.rs.core.UriInfo;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
@@ -54,47 +54,43 @@ public class RestconfInvokeOperationsServiceImplTest {
         MockitoAnnotations.initMocks(this);
         final SchemaContextRef contextRef = new SchemaContextRef(
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
-        final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
-        final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
-        Mockito.when(txHandler.get()).thenReturn(domTx);
-        final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
-        Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        final CheckedFuture<Void, TransactionCommitFailedException> checked = Mockito.mock(CheckedFuture.class);
-        Mockito.when(wTx.submit()).thenReturn(checked);
-        Mockito.when(checked.checkedGet()).thenReturn(null);
-        final SchemaContextHandler schemaContextHandler =
-                SchemaContextHandler.newInstance(txHandler, Mockito.mock(DOMSchemaService.class));
+        final TransactionChainHandler txHandler = mock(TransactionChainHandler.class);
+        final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
+        when(txHandler.get()).thenReturn(domTx);
+        final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
+        when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
+        doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
+        final SchemaContextHandler schemaContextHandler = SchemaContextHandler.newInstance(txHandler,
+            mock(DOMSchemaService.class));
         schemaContextHandler.onGlobalContextUpdated(contextRef.get());
         this.invokeOperationsService =
                 new RestconfInvokeOperationsServiceImpl(this.rpcServiceHandler, schemaContextHandler);
-        Mockito.when(this.rpcServiceHandler.get()).thenReturn(this.rpcService);
+        when(this.rpcServiceHandler.get()).thenReturn(this.rpcService);
     }
 
     @Test
     public void testInvokeRpc() throws Exception {
         final String identifier = "invoke-rpc-module:rpcTest";
-        final NormalizedNode<?, ?> result = Mockito.mock(NormalizedNode.class);
+        final NormalizedNode<?, ?> result = mock(NormalizedNode.class);
         final NormalizedNodeContext payload = prepNNC(result);
-        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final UriInfo uriInfo = mock(UriInfo.class);
 
         final NormalizedNodeContext rpc = this.invokeOperationsService.invokeRpc(identifier, payload, uriInfo);
-        Assert.assertEquals(result, rpc.getData());
+        assertEquals(result, rpc.getData());
     }
 
-    private NormalizedNodeContext prepNNC(final NormalizedNode result) {
-        final InstanceIdentifierContext context = Mockito.mock(InstanceIdentifierContext.class);
-        final RpcDefinition schemaNode = Mockito.mock(RpcDefinition.class);
+    private NormalizedNodeContext prepNNC(final NormalizedNode<?, ?> result) {
+        final InstanceIdentifierContext<?> context = mock(InstanceIdentifierContext.class);
+        final RpcDefinition schemaNode = mock(RpcDefinition.class);
         final QName qname = QName.create("invoke:rpc:module", "2013-12-03", "rpcTest");
         final SchemaPath schemaPath = SchemaPath.create(true, qname);
-        Mockito.when(schemaNode.getPath()).thenReturn(schemaPath);
-        Mockito.when(schemaNode.getQName()).thenReturn(qname);
-        Mockito.when(context.getSchemaNode()).thenReturn(schemaNode);
-        final NormalizedNode<?, ?> data = Mockito.mock(NormalizedNode.class);
-        final DOMRpcResult domRpcResult = Mockito.mock(DOMRpcResult.class);
-        final CheckedFuture<DOMRpcResult, DOMRpcException> checkdFuture = Futures.immediateCheckedFuture(domRpcResult);
-        Mockito.when(this.rpcService.invokeRpc(schemaPath, data)).thenReturn(checkdFuture);
-        Mockito.when(domRpcResult.getResult()).thenReturn(result);
+        when(schemaNode.getPath()).thenReturn(schemaPath);
+        when(schemaNode.getQName()).thenReturn(qname);
+        doReturn(schemaNode).when(context).getSchemaNode();
+        final NormalizedNode<?, ?> data = mock(NormalizedNode.class);
+        final DOMRpcResult domRpcResult = mock(DOMRpcResult.class);
+        when(this.rpcService.invokeRpc(schemaPath, data)).thenReturn(immediateFluentFuture(domRpcResult));
+        doReturn(result).when(domRpcResult).getResult();
         return new NormalizedNodeContext(context, data);
     }
-
 }

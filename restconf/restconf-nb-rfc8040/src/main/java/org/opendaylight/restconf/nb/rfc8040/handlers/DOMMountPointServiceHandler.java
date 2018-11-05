@@ -7,8 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
-import java.util.Objects;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
+import static java.util.Objects.requireNonNull;
+
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 
 /**
  * Implementation of {@link DOMMountPointServiceHandler}.
@@ -24,10 +25,10 @@ public final class DOMMountPointServiceHandler implements Handler<DOMMountPointS
      *             mount point service
      */
     private DOMMountPointServiceHandler(final DOMMountPointService domMountPointService) {
-        this.domMountPointService = Objects.requireNonNull(domMountPointService);
+        this.domMountPointService = requireNonNull(domMountPointService);
     }
 
-    public static DOMMountPointServiceHandler newInstance(DOMMountPointService domMountPointService) {
+    public static DOMMountPointServiceHandler newInstance(final DOMMountPointService domMountPointService) {
         return new DOMMountPointServiceHandler(domMountPointService);
     }
 

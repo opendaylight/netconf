@@ -7,13 +7,13 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.mapping;
 
-import com.google.common.base.Optional;
 import java.net.URI;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
@@ -581,7 +581,7 @@ public final class RestconfMappingNodeUtil {
             final Module monitoringModule, final boolean existParent, final SchemaContext schemaContext) {
         final SchemaNode schemaNode = ParserIdentifier
                 .toInstanceIdentifier(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext),
-                        schemaContext, Optional.absent())
+                        schemaContext, Optional.empty())
                 .getSchemaNode();
         final DataSchemaNode streamListSchema = ((ContainerSchemaNode) ((ContainerSchemaNode) monitoringModule
                 .getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME))

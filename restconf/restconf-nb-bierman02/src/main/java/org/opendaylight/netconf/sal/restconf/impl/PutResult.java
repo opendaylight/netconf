@@ -7,17 +7,16 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import javax.ws.rs.core.Response.Status;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 
 /**
  * Wrapper for status and future of PUT operation.
- *
  */
 public class PutResult {
     private final Status status;
-    private final CheckedFuture<Void, TransactionCommitFailedException> future;
+    private final FluentFuture<? extends CommitInfo> future;
 
     /**
      * Wrap status and future by constructor - make this immutable.
@@ -27,7 +26,7 @@ public class PutResult {
      * @param future
      *            result of submit of PUT operation
      */
-    public PutResult(final Status status, final CheckedFuture<Void, TransactionCommitFailedException> future) {
+    public PutResult(final Status status, final FluentFuture<? extends CommitInfo> future) {
         this.status = status;
         this.future = future;
     }
@@ -44,9 +43,9 @@ public class PutResult {
     /**
      * Get future.
      *
-     * @return {@link CheckedFuture} result
+     * @return {@link FluentFuture} result
      */
-    public CheckedFuture<Void, TransactionCommitFailedException> getFutureOfPutData() {
+    public FluentFuture<? extends CommitInfo> getFutureOfPutData() {
         return this.future;
     }
 }

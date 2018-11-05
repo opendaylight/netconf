@@ -5,19 +5,18 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import java.lang.reflect.Field;
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,16 +32,14 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
@@ -58,7 +55,6 @@ import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev14070
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-@SuppressWarnings("deprecation")
 public class RestconfStreamsSubscriptionServiceImplTest {
 
     private static final String URI = "/restconf/18/data/ietf-restconf-monitoring:restconf-state/streams/stream/"
@@ -81,41 +77,36 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         MockitoAnnotations.initMocks(this);
 
         final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
-        final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
-        Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        final DOMDataReadWriteTransaction rwTx = Mockito.mock(DOMDataReadWriteTransaction.class);
-        final CheckedFuture<Boolean, ReadFailedException> checkedFuture = Futures.immediateCheckedFuture(Boolean.TRUE);
-        Mockito.when(rwTx.exists(Mockito.any(), Mockito.any())).thenReturn(checkedFuture);
-        final CheckedFuture<Void, TransactionCommitFailedException> checkedFutureEmpty =
-                Futures.immediateCheckedFuture(null);
-        Mockito.when(rwTx.submit()).thenReturn(checkedFutureEmpty);
-        Mockito.when(domTx.newReadWriteTransaction()).thenReturn(rwTx);
-        final CheckedFuture<Void, TransactionCommitFailedException> checked = mock(CheckedFuture.class);
-        Mockito.when(wTx.submit()).thenReturn(checked);
-        Mockito.when(checked.checkedGet()).thenReturn(null);
+        final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
+        when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
+        final DOMDataTreeReadWriteTransaction rwTx = mock(DOMDataTreeReadWriteTransaction.class);
+        when(rwTx.exists(any(), any())).thenReturn(immediateTrueFluentFuture());
+        doReturn(CommitInfo.emptyFluentFuture()).when(rwTx).commit();
+        when(domTx.newReadWriteTransaction()).thenReturn(rwTx);
+        doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
 
         final DOMDataBroker dataBroker = mock(DOMDataBroker.class);
         doReturn(domTx).when(dataBroker).createTransactionChain(any());
 
         transactionHandler = new TransactionChainHandler(dataBroker);
-        schemaHandler = SchemaContextHandler.newInstance(transactionHandler, Mockito.mock(DOMSchemaService.class));
+        schemaHandler = SchemaContextHandler.newInstance(transactionHandler, mock(DOMSchemaService.class));
 
         DOMDataTreeChangeService dataTreeChangeService = mock(DOMDataTreeChangeService.class);
         doReturn(mock(ListenerRegistration.class)).when(dataTreeChangeService)
                 .registerDataTreeChangeListener(any(), any());
 
-        doReturn(Collections.singletonMap(DOMDataTreeChangeService.class, dataTreeChangeService))
-                .when(dataBroker).getSupportedExtensions();
+        doReturn(ImmutableClassToInstanceMap.of(DOMDataTreeChangeService.class, dataTreeChangeService))
+                .when(dataBroker).getExtensions();
 
         doReturn(dataBroker).when(this.dataBrokerHandler).get();
 
         final MultivaluedMap<String, String> map = mock(MultivaluedMap.class);
         final Set<Entry<String, List<String>>> set = new HashSet<>();
-        Mockito.when(map.entrySet()).thenReturn(set);
-        Mockito.when(this.uriInfo.getQueryParameters()).thenReturn(map);
+        when(map.entrySet()).thenReturn(set);
+        when(this.uriInfo.getQueryParameters()).thenReturn(map);
         final UriBuilder baseUriBuilder = new LocalUriInfo().getBaseUriBuilder();
-        Mockito.when(uriInfo.getBaseUri()).thenReturn(baseUriBuilder.build());
-        Mockito.when(uriInfo.getBaseUriBuilder()).thenReturn(baseUriBuilder);
+        when(uriInfo.getBaseUri()).thenReturn(baseUriBuilder.build());
+        when(uriInfo.getBaseUriBuilder()).thenReturn(baseUriBuilder);
         this.schemaHandler.onGlobalContextUpdated(
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications")));
     }
