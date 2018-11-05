@@ -10,7 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf.listener;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.concurrent.Future;
@@ -38,6 +38,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResult;
@@ -343,13 +344,13 @@ public class NetconfDeviceCommunicator
     }
 
     @Override
-    public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message, final QName rpc) {
+    public FluentFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message, final QName rpc) {
         sessionLock.lock();
         try {
             if (semaphore != null && !semaphore.tryAcquire()) {
                 LOG.warn("Limit of concurrent rpc messages was reached (limit: {}). Rpc reply message is needed. "
                     + "Discarding request of Netconf device with id {}", concurentRpcMsgs, id.getName());
-                return Futures.immediateFailedFuture(new NetconfDocumentedException(
+                return FluentFutures.immediateFailedFluentFuture(new NetconfDocumentedException(
                         "Limit of rpc messages was reached (Limit :" + concurentRpcMsgs
                         + ") waiting for emptying the queue of Netconf device with id" + id.getName()));
             }
@@ -360,7 +361,7 @@ public class NetconfDeviceCommunicator
         }
     }
 
-    private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message,
+    private FluentFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message,
                                                                             final QName rpc) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("{}: Sending message {}", id, msgToS(message));
@@ -369,7 +370,7 @@ public class NetconfDeviceCommunicator
         if (currentSession == null) {
             LOG.warn("{}: Session is disconnected, failing RPC request {}",
                     id, message);
-            return Futures.immediateFuture(createSessionDownRpcResult());
+            return FluentFutures.immediateFluentFuture(createSessionDownRpcResult());
         }
 
         final Request req = new Request(new UncancellableFuture<>(true), message);
