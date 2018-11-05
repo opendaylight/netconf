@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.streams.listeners;
 
 import static java.time.Instant.EPOCH;
@@ -21,14 +20,14 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
 import org.opendaylight.controller.md.sal.binding.test.AbstractConcurrentDataBrokerTest;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.WriteTransaction;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.PatchCont;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1;
@@ -53,7 +52,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     private static final String JSON_NOTIF_UPDATE = "/listener-adapter-test/notif-update.json";
     private static final String JSON_NOTIF_DEL = "/listener-adapter-test/notif-del.json";
 
-    private static YangInstanceIdentifier PATCH_CONT_YIID =
+    private static final YangInstanceIdentifier PATCH_CONT_YIID =
             YangInstanceIdentifier.create(new YangInstanceIdentifier.NodeIdentifier(PatchCont.QNAME));
 
     private static SchemaContext schemaContext;
@@ -129,8 +128,8 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     public void testJsonNotifsLeaves() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
                                         NotificationOutputTypeGrouping.NotificationOutputType.JSON, true);
-        DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)
-                domDataBroker.getSupportedExtensions().get(DOMDataTreeChangeService.class);
+        DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
+                .getInstance(DOMDataTreeChangeService.class);
         DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
         changeService.registerDataTreeChangeListener(root, adapter);
 
@@ -139,18 +138,18 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
                 .child(MyList1.class, new MyList1Key("Althea"));
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
-        writeTransaction.submit();
+        writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_CREATE));
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
         builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
         writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
-        writeTransaction.submit();
+        writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_UPDATE));
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
-        writeTransaction.submit();
+        writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_DEL));
     }
 
@@ -158,8 +157,8 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     public void testJsonNotifs() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
                 NotificationOutputTypeGrouping.NotificationOutputType.JSON, false);
-        DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)
-                domDataBroker.getSupportedExtensions().get(DOMDataTreeChangeService.class);
+        DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
+                .getInstance(DOMDataTreeChangeService.class);
         DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
         changeService.registerDataTreeChangeListener(root, adapter);
 
@@ -168,18 +167,18 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
                 .child(MyList1.class, new MyList1Key("Althea"));
         writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
-        writeTransaction.submit();
+        writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_CREATE));
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
         builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
         writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
-        writeTransaction.submit();
+        writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_UPDATE));
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
-        writeTransaction.submit();
+        writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_DEL));
     }
 }

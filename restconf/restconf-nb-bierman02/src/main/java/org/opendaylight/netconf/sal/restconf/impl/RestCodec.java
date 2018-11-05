@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.sal.rest.impl.StringModuleInstanceIdentifierCodec;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO.IdentityValue;

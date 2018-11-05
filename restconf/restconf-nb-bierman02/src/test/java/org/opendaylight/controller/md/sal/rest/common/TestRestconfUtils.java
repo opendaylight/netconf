@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.md.sal.rest.common;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -26,9 +25,9 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.sal.rest.impl.test.providers.TestJsonBodyWriter;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -61,11 +60,11 @@ public final class TestRestconfUtils {
         throw new UnsupportedOperationException("Test utility class");
     }
 
-    public static ControllerContext newControllerContext(SchemaContext schemaContext) {
+    public static ControllerContext newControllerContext(final SchemaContext schemaContext) {
         return newControllerContext(schemaContext, null);
     }
 
-    public static ControllerContext newControllerContext(SchemaContext schemaContext, DOMMountPoint mountInstance) {
+    public static ControllerContext newControllerContext(final SchemaContext schemaContext, final DOMMountPoint mountInstance) {
         final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
 
         if (mountInstance != null) {

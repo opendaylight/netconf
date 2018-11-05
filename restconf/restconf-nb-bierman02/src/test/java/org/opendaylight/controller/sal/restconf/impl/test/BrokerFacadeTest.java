@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertEquals;
@@ -14,8 +13,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -24,11 +23,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.concurrent.Future;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,22 +35,24 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcException;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.common.api.ReadFailedException;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMRpcException;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.PutResult;
@@ -68,6 +69,7 @@ import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -94,11 +96,11 @@ public class BrokerFacadeTest {
     @Mock
     private DOMMountPoint mockMountInstance;
     @Mock
-    private DOMDataReadOnlyTransaction readTransaction;
+    private DOMDataTreeReadTransaction readTransaction;
     @Mock
-    private DOMDataWriteTransaction writeTransaction;
+    private DOMDataTreeWriteTransaction writeTransaction;
     @Mock
-    private DOMDataReadWriteTransaction rwTransaction;
+    private DOMDataTreeReadWriteTransaction rwTransaction;
 
     private BrokerFacade brokerFacade;
     private final NormalizedNode<?, ?> dummyNode = createDummyNode("test:module", "2014-01-09", "interfaces");
@@ -123,7 +125,7 @@ public class BrokerFacadeTest {
         when(this.domDataBroker.newReadWriteTransaction()).thenReturn(this.rwTransaction);
         HashMap extensions = new HashMap();
         extensions.put(DOMDataTreeChangeService.class, Mockito.mock(DOMDataTreeChangeService.class));
-        when(this.domDataBroker.getSupportedExtensions()).thenReturn(extensions);
+        when(this.domDataBroker.getExtensions()).thenReturn(extensions);
     }
 
     private static CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> wrapDummyNode(
@@ -201,7 +203,7 @@ public class BrokerFacadeTest {
     public void testCommitConfigurationDataPut() throws Exception {
         @SuppressWarnings("unchecked")
         final CheckedFuture<Void, TransactionCommitFailedException> expFuture = mock(CheckedFuture.class);
-        when(this.rwTransaction.submit()).thenReturn(expFuture);
+        when(this.rwTransaction.commit()).thenReturn(expFuture);
 
         final Optional<NormalizedNode<?, ?>> optionalMock = mock(Optional.class);
         when(optionalMock.get()).thenReturn(null);
@@ -220,7 +222,7 @@ public class BrokerFacadeTest {
         final InOrder inOrder = inOrder(this.domDataBroker, this.rwTransaction);
         inOrder.verify(this.domDataBroker).newReadWriteTransaction();
         inOrder.verify(this.rwTransaction).put(LogicalDatastoreType.CONFIGURATION, this.instanceID, this.dummyNode);
-        inOrder.verify(this.rwTransaction).submit();
+        inOrder.verify(this.rwTransaction).commit();
     }
 
     @Test
@@ -231,7 +233,7 @@ public class BrokerFacadeTest {
         when(this.rwTransaction.exists(LogicalDatastoreType.CONFIGURATION, this.instanceID))
                 .thenReturn(wrapExistence(false));
 
-        when(this.rwTransaction.submit()).thenReturn(expFuture);
+        when(this.rwTransaction.commit()).thenReturn(expFuture);
 
         final CheckedFuture<Void, TransactionCommitFailedException> actualFuture = this.brokerFacade
                 .commitConfigurationDataPost(mock(SchemaContext.class), this.instanceID, this.dummyNode, null, null);
@@ -242,7 +244,7 @@ public class BrokerFacadeTest {
         inOrder.verify(this.domDataBroker).newReadWriteTransaction();
         inOrder.verify(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.instanceID);
         inOrder.verify(this.rwTransaction).put(LogicalDatastoreType.CONFIGURATION, this.instanceID, this.dummyNode);
-        inOrder.verify(this.rwTransaction).submit();
+        inOrder.verify(this.rwTransaction).commit();
     }
 
     @Test(expected = RestconfDocumentedException.class)
@@ -271,7 +273,7 @@ public class BrokerFacadeTest {
         // expected result
         @SuppressWarnings("unchecked")
         final CheckedFuture<Void, TransactionCommitFailedException> expFuture = mock(CheckedFuture.class);
-        when(this.rwTransaction.submit()).thenReturn(expFuture);
+        when(this.rwTransaction.commit()).thenReturn(expFuture);
 
         // test
         final CheckedFuture<Void, TransactionCommitFailedException> actualFuture = this.brokerFacade
@@ -284,7 +286,7 @@ public class BrokerFacadeTest {
         final InOrder inOrder = inOrder(this.domDataBroker, this.rwTransaction);
         inOrder.verify(this.rwTransaction).exists(LogicalDatastoreType.CONFIGURATION, this.instanceID);
         inOrder.verify(this.rwTransaction).delete(LogicalDatastoreType.CONFIGURATION, this.instanceID);
-        inOrder.verify(this.rwTransaction).submit();
+        inOrder.verify(this.rwTransaction).commit();
     }
 
     /**
@@ -313,7 +315,7 @@ public class BrokerFacadeTest {
      */
     private void prepareDataForDelete(final boolean assumeDataExists) {
         when(this.rwTransaction.exists(LogicalDatastoreType.CONFIGURATION, this.instanceID))
-                .thenReturn(Futures.immediateCheckedFuture(new Boolean(assumeDataExists)));
+                .thenReturn(FluentFutures.immediateFluentFuture(assumeDataExists));
     }
 
     @Test
@@ -324,8 +326,8 @@ public class BrokerFacadeTest {
         @SuppressWarnings("unchecked")
         final ListenerRegistration<ListenerAdapter> mockRegistration = mock(ListenerRegistration.class);
 
-        DOMDataTreeChangeService changeService = (DOMDataTreeChangeService)
-                this.domDataBroker.getSupportedExtensions().get(DOMDataTreeChangeService.class);
+        DOMDataTreeChangeService changeService = this.domDataBroker.getExtensions()
+                .getInstance(DOMDataTreeChangeService.class);
         DOMDataTreeIdentifier loc = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, this.instanceID);
         when(changeService.registerDataTreeChangeListener(eq(loc), eq(listener))).thenReturn(mockRegistration);
 
@@ -395,7 +397,7 @@ public class BrokerFacadeTest {
         // no mount point
         when(identifierContext.getMountPoint()).thenReturn(null);
 
-        when(this.rwTransaction.submit()).thenReturn(expFuture);
+        when(this.rwTransaction.commit()).thenReturn(expFuture);
 
         final PatchStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
 
@@ -442,7 +444,7 @@ public class BrokerFacadeTest {
         final InstanceIdentifierContext identifierContext = mock(InstanceIdentifierContext.class);
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         final DOMDataBroker mountDataBroker = mock(DOMDataBroker.class);
-        final DOMDataReadWriteTransaction transaction = mock(DOMDataReadWriteTransaction.class);
+        final DOMDataTreeReadWriteTransaction transaction = mock(DOMDataTreeReadWriteTransaction.class);
         final CheckedFuture<Void, TransactionCommitFailedException> expFuture = Futures.immediateCheckedFuture(null);
 
         when(patchContext.getData()).thenReturn(Lists.newArrayList());
@@ -450,10 +452,10 @@ public class BrokerFacadeTest {
         when(identifierContext.getMountPoint()).thenReturn(mountPoint);
 
         // missing broker on mounted device
-        when(mountPoint.getService(DOMDataBroker.class)).thenReturn(Optional.absent());
+        when(mountPoint.getService(DOMDataBroker.class)).thenReturn(Optional.empty());
 
         when(mountDataBroker.newReadWriteTransaction()).thenReturn(transaction);
-        when(transaction.submit()).thenReturn(expFuture);
+        when(transaction.commit()).thenReturn(expFuture);
 
         final PatchStatusContext status = this.brokerFacade.patchConfigurationDataWithinTransaction(patchContext);
 

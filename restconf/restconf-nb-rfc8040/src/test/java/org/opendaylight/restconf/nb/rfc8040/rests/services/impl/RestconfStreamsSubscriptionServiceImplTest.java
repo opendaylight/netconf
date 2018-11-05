@@ -5,19 +5,18 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.CheckedFuture;
 import com.google.common.util.concurrent.Futures;
 import java.lang.reflect.Field;
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,14 +34,14 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.api.data.ReadFailedException;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataTreeChangeService;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMTransactionChain;
+import org.opendaylight.mdsal.common.api.ReadFailedException;
+import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
@@ -81,17 +80,17 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         MockitoAnnotations.initMocks(this);
 
         final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
-        final DOMDataWriteTransaction wTx = Mockito.mock(DOMDataWriteTransaction.class);
+        final DOMDataTreeWriteTransaction wTx = Mockito.mock(DOMDataTreeWriteTransaction.class);
         Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        final DOMDataReadWriteTransaction rwTx = Mockito.mock(DOMDataReadWriteTransaction.class);
+        final DOMDataTreeReadWriteTransaction rwTx = Mockito.mock(DOMDataTreeReadWriteTransaction.class);
         final CheckedFuture<Boolean, ReadFailedException> checkedFuture = Futures.immediateCheckedFuture(Boolean.TRUE);
         Mockito.when(rwTx.exists(Mockito.any(), Mockito.any())).thenReturn(checkedFuture);
         final CheckedFuture<Void, TransactionCommitFailedException> checkedFutureEmpty =
                 Futures.immediateCheckedFuture(null);
-        Mockito.when(rwTx.submit()).thenReturn(checkedFutureEmpty);
+        Mockito.when(rwTx.commit()).thenReturn(checkedFutureEmpty);
         Mockito.when(domTx.newReadWriteTransaction()).thenReturn(rwTx);
         final CheckedFuture<Void, TransactionCommitFailedException> checked = mock(CheckedFuture.class);
-        Mockito.when(wTx.submit()).thenReturn(checked);
+        Mockito.when(wTx.commit()).thenReturn(checked);
         Mockito.when(checked.checkedGet()).thenReturn(null);
 
         final DOMDataBroker dataBroker = mock(DOMDataBroker.class);
@@ -104,8 +103,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(mock(ListenerRegistration.class)).when(dataTreeChangeService)
                 .registerDataTreeChangeListener(any(), any());
 
-        doReturn(Collections.singletonMap(DOMDataTreeChangeService.class, dataTreeChangeService))
-                .when(dataBroker).getSupportedExtensions();
+        doReturn(ImmutableClassToInstanceMap.of(DOMDataTreeChangeService.class, dataTreeChangeService))
+                .when(dataBroker).getExtensions();
 
         doReturn(dataBroker).when(this.dataBrokerHandler).get();
 
