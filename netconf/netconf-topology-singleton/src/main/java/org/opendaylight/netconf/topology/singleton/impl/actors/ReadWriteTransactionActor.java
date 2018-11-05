@@ -5,13 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.impl.actors;
 
 import akka.actor.Props;
 import akka.actor.ReceiveTimeout;
 import akka.actor.UntypedAbstractActor;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ReadActorMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.WriteActorMessage;
 import org.slf4j.Logger;
@@ -22,12 +21,12 @@ public final class ReadWriteTransactionActor extends UntypedAbstractActor {
 
     private static final Logger LOG = LoggerFactory.getLogger(ReadWriteTransactionActor.class);
 
-    private final DOMDataReadWriteTransaction tx;
+    private final DOMDataTreeReadWriteTransaction tx;
     private final long idleTimeout;
     private final ReadAdapter readAdapter;
     private final WriteAdapter writeAdapter;
 
-    private ReadWriteTransactionActor(final DOMDataReadWriteTransaction tx, final Duration idleTimeout) {
+    private ReadWriteTransactionActor(final DOMDataTreeReadWriteTransaction tx, final Duration idleTimeout) {
         this.tx = tx;
         this.idleTimeout = idleTimeout.toSeconds();
         if (this.idleTimeout > 0) {
@@ -44,7 +43,7 @@ public final class ReadWriteTransactionActor extends UntypedAbstractActor {
      * @param idleTimeout idle time in seconds, after which transaction is closed automatically
      * @return props
      */
-    static Props props(final DOMDataReadWriteTransaction tx, final Duration idleTimeout) {
+    static Props props(final DOMDataTreeReadWriteTransaction tx, final Duration idleTimeout) {
         return Props.create(ReadWriteTransactionActor.class, () -> new ReadWriteTransactionActor(tx, idleTimeout));
     }
 

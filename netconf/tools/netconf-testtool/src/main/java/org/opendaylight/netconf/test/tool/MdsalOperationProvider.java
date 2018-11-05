@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool;
 
 import com.google.common.collect.ClassToInstanceMap;
@@ -19,14 +18,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.broker.impl.SerializedDOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.store.impl.InMemoryDOMDataStoreFactory;
-import org.opendaylight.controller.sal.core.spi.data.DOMStore;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaServiceExtension;
+import org.opendaylight.mdsal.dom.broker.SerializedDOMDataBroker;
+import org.opendaylight.mdsal.dom.spi.store.DOMStore;
+import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMDataStoreFactory;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.impl.SessionIdProvider;
@@ -135,7 +134,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             YangInstanceIdentifier yangInstanceIdentifier = YangInstanceIdentifier.builder().node(NetconfState.QNAME)
                     .build();
 
-            final DOMDataWriteTransaction tx = dataBroker.newWriteOnlyTransaction();
+            final DOMDataTreeWriteTransaction tx = dataBroker.newWriteOnlyTransaction();
             tx.put(LogicalDatastoreType.OPERATIONAL, yangInstanceIdentifier, netconf);
 
             try {
@@ -213,10 +212,8 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
         private static DOMDataBroker createDataStore(final DOMSchemaService schemaService, final long sessionId) {
             LOG.debug("Session {}: Creating data stores for simulated device", sessionId);
-            final DOMStore operStore = InMemoryDOMDataStoreFactory
-                    .create("DOM-OPER", schemaService);
-            final DOMStore configStore = InMemoryDOMDataStoreFactory
-                    .create("DOM-CFG", schemaService);
+            final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
+            final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
 
             ExecutorService listenableFutureExecutor = SpecialExecutors.newBlockingBoundedCachedThreadPool(
                     16, 16, "CommitFutures", MdsalOperationProvider.class);

@@ -19,10 +19,10 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
 import org.junit.Test;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadOnlyTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataReadWriteTransaction;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.DeleteRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadTransactionRequest;
@@ -53,7 +53,7 @@ public class ProxyDOMDataBrokerTest {
 
     @Test
     public void testNewReadOnlyTransaction() {
-        final DOMDataReadOnlyTransaction tx = proxy.newReadOnlyTransaction();
+        final DOMDataTreeReadTransaction tx = proxy.newReadOnlyTransaction();
         masterActor.expectMsgClass(NewReadTransactionRequest.class);
         masterActor.reply(new Success(masterActor.ref()));
 
@@ -65,7 +65,7 @@ public class ProxyDOMDataBrokerTest {
 
     @Test
     public void testNewWriteOnlyTransaction() {
-        final DOMDataWriteTransaction tx = proxy.newWriteOnlyTransaction();
+        final DOMDataTreeWriteTransaction tx = proxy.newWriteOnlyTransaction();
         masterActor.expectMsgClass(NewWriteTransactionRequest.class);
         masterActor.reply(new Success(masterActor.ref()));
 
@@ -77,7 +77,7 @@ public class ProxyDOMDataBrokerTest {
 
     @Test
     public void testNewReadWriteTransaction() {
-        final DOMDataReadWriteTransaction tx = proxy.newReadWriteTransaction();
+        final DOMDataTreeReadWriteTransaction tx = proxy.newReadWriteTransaction();
         masterActor.expectMsgClass(NewReadWriteTransactionRequest.class);
         masterActor.reply(new Success(masterActor.ref()));
 
@@ -94,6 +94,6 @@ public class ProxyDOMDataBrokerTest {
 
     @Test
     public void testGetSupportedExtensions() {
-        assertTrue(proxy.getSupportedExtensions().isEmpty());
+        assertTrue(proxy.getExtensions().isEmpty());
     }
 }

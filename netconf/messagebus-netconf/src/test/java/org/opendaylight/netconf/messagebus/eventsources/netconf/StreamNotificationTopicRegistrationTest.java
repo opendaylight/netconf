@@ -5,25 +5,24 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
 import static org.hamcrest.CoreMatchers.hasItems;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateNullFluentFuture;
 
-import com.google.common.base.Optional;
-import com.google.common.util.concurrent.Futures;
-import java.util.Date;
+import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotificationService;
+import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
+import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventaggregator.rev141202.TopicId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
@@ -60,8 +59,8 @@ public class StreamNotificationTopicRegistrationTest {
         when(mount.registerNotificationListener(source, ConnectionNotificationTopicRegistration
                 .EVENT_SOURCE_STATUS_PATH))
                 .thenReturn(listenerRegistration);
-        when(mount.invokeCreateSubscription(any(), any())).thenReturn(Futures.immediateCheckedFuture(null));
-        when(mount.invokeCreateSubscription(any())).thenReturn(Futures.immediateCheckedFuture(null));
+        when(mount.invokeCreateSubscription(any(), any())).thenReturn(immediateNullFluentFuture());
+        when(mount.invokeCreateSubscription(any())).thenReturn(immediateNullFluentFuture());
 
         when(source.getMount()).thenReturn(mount);
         stream = new StreamBuilder().setName(StreamNameType.getDefaultInstance(STREAM_NAME)).setReplaySupport(true)
@@ -84,12 +83,12 @@ public class StreamNotificationTopicRegistrationTest {
         registration.reActivateNotificationSource();
 
         Assert.assertTrue(registration.isActive());
-        verify(mount).invokeCreateSubscription(stream, Optional.absent());
+        verify(mount).invokeCreateSubscription(stream, Optional.empty());
     }
 
     @Test
     public void testReActivateNotificationSourceWithReplay() throws Exception {
-        final Date lastEventTime = new Date();
+        final Instant lastEventTime = Instant.now();
         registration.setActive(true);
         registration.setLastEventTime(lastEventTime);
         registration.reActivateNotificationSource();
@@ -123,7 +122,7 @@ public class StreamNotificationTopicRegistrationTest {
         Assert.assertFalse(afterUnregister.contains(topic3));
     }
 
-    private TopicId registerTopic(String value) {
+    private TopicId registerTopic(final String value) {
         final TopicId topic = TopicId.getDefaultInstance(value);
         registration.registerNotificationTopic(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH, topic);
         return topic;

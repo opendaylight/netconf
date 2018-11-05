@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -14,12 +13,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
+import com.google.common.util.concurrent.FluentFuture;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcService;
+import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
@@ -73,23 +73,23 @@ public class NetconfBaseOpsTest {
         final NetconfMessage ok = new NetconfMessage(XmlUtil.readXmlToDocument(okStream));
         final NetconfMessage data = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)))
-                .thenReturn(RpcResultBuilder.success(data).buildFuture());
+                .thenReturn(FluentFuture.from(RpcResultBuilder.success(data).buildFuture()));
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME)))
-                .thenReturn(RpcResultBuilder.success(data).buildFuture());
+                .thenReturn(FluentFuture.from(RpcResultBuilder.success(data).buildFuture()));
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)))
-                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
+                .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_COPY_CONFIG_QNAME)))
-                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
+                .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME)))
-                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
+                .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_VALIDATE_QNAME)))
-                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
+                .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME)))
-                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
+                .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME)))
-                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
+                .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME)))
-                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
+                .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
         final SchemaContext schemaContext =
                 YangParserTestUtils.parseYangResource("/schemas/test-module.yang");
         final MessageTransformer<NetconfMessage> transformer = new NetconfMessageTransformer(schemaContext, true);
@@ -193,13 +193,13 @@ public class NetconfBaseOpsTest {
 
     @Test
     public void testGetConfigRunning() throws Exception {
-        baseOps.getConfigRunning(callback, Optional.absent());
+        baseOps.getConfigRunning(callback, Optional.empty());
         verifyMessageSent("getConfig", NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
     }
 
     @Test
     public void testGetConfigCandidate() throws Exception {
-        baseOps.getConfigCandidate(callback, Optional.absent());
+        baseOps.getConfigCandidate(callback, Optional.empty());
         verifyMessageSent("getConfig_candidate", NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
     }
 
@@ -214,7 +214,7 @@ public class NetconfBaseOpsTest {
 
     @Test
     public void testGet() throws Exception {
-        baseOps.get(callback, Optional.absent());
+        baseOps.get(callback, Optional.empty());
         verifyMessageSent("get", NetconfMessageTransformUtil.NETCONF_GET_QNAME);
     }
 
