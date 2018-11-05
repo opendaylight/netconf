@@ -10,9 +10,9 @@ package org.opendaylight.controller.config.yang.netconf.mdsal.notification;
 import com.google.common.base.Preconditions;
 import java.util.Collection;
 import javax.annotation.Nonnull;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
-import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.SessionIdOrZeroType;
@@ -52,7 +52,7 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
 
     @SuppressWarnings("checkstyle:MissingSwitchDefault")
     @Override
-    public void onDataTreeChanged(@Nonnull Collection<DataTreeModification<Session>> changes) {
+    public void onDataTreeChanged(@Nonnull final Collection<DataTreeModification<Session>> changes) {
         for (DataTreeModification<Session> change : changes) {
             final DataObjectModification<Session> rootNode = change.getRootNode();
             final DataObjectModification.ModificationType modificationType = rootNode.getModificationType();
@@ -75,7 +75,7 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
         }
     }
 
-    private void publishStartedSession(DataObject dataObject) {
+    private void publishStartedSession(final DataObject dataObject) {
         Preconditions.checkArgument(dataObject instanceof Session);
         Session session = (Session) dataObject;
         final NetconfSessionStart sessionStart = new NetconfSessionStartBuilder()
@@ -86,7 +86,7 @@ public class SessionNotificationProducer extends OperationalDatastoreListener<Se
         baseNotificationPublisherRegistration.onSessionStarted(sessionStart);
     }
 
-    private void publishEndedSession(DataObject dataObject) {
+    private void publishEndedSession(final DataObject dataObject) {
         Preconditions.checkArgument(dataObject instanceof Session);
         Session session = (Session) dataObject;
         final NetconfSessionEnd sessionEnd = new NetconfSessionEndBuilder()

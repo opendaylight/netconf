@@ -20,22 +20,21 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-import org.opendaylight.controller.md.sal.dom.api.DOMEvent;
-import org.opendaylight.controller.md.sal.dom.api.DOMNotification;
-import org.opendaylight.controller.md.sal.dom.api.DOMRpcResult;
-import org.opendaylight.controller.md.sal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMEvent;
+import org.opendaylight.mdsal.dom.api.DOMNotification;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
@@ -110,7 +109,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         return builder.build();
     }
 
-    private void findAction(DataSchemaNode dataSchemaNode, Builder<ActionDefinition> builder) {
+    private void findAction(final DataSchemaNode dataSchemaNode, final Builder<ActionDefinition> builder) {
         if (dataSchemaNode instanceof ActionNodeContainer) {
             final ActionNodeContainer containerSchemaNode = (ActionNodeContainer) dataSchemaNode;
             for (ActionDefinition actionDefinition : containerSchemaNode.getActions()) {
@@ -126,7 +125,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     @Override
     public synchronized DOMNotification toNotification(final NetconfMessage message) {
-        final Map.Entry<Date, XmlElement> stripped = NetconfMessageTransformUtil.stripNotification(message);
+        final Map.Entry<Instant, XmlElement> stripped = NetconfMessageTransformUtil.stripNotification(message);
         final QName notificationNoRev;
         try {
             notificationNoRev = QName.create(
@@ -212,7 +211,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     @Override
-    public NetconfMessage toActionRequest(SchemaPath action, DOMDataTreeIdentifier domDataTreeIdentifier,
+    public NetconfMessage toActionRequest(SchemaPath action, final DOMDataTreeIdentifier domDataTreeIdentifier,
             final NormalizedNode<?, ?> payload) {
         ActionDefinition actionDefinition = null;
         SchemaPath schemaPath = action;
@@ -307,7 +306,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     @Override
-    public DOMActionResult toActionResult(SchemaPath action, NetconfMessage message) {
+    public DOMActionResult toActionResult(final SchemaPath action, final NetconfMessage message) {
         ActionDefinition actionDefinition = null;
         for (ActionDefinition actionDef : actions) {
             if (actionDef.getPath().getLastComponent().equals(action.getLastComponent())) {
@@ -346,29 +345,26 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     static class NetconfDeviceNotification implements DOMNotification, DOMEvent {
         private final ContainerNode content;
         private final SchemaPath schemaPath;
-        private final Date eventTime;
+        private final Instant eventTime;
 
-        NetconfDeviceNotification(final ContainerNode content, final Date eventTime) {
+        NetconfDeviceNotification(final ContainerNode content, final Instant eventTime) {
             this.content = content;
             this.eventTime = eventTime;
             this.schemaPath = toPath(content.getNodeType());
         }
 
-        @Nonnull
         @Override
         public SchemaPath getType() {
             return schemaPath;
-
         }
 
-        @Nonnull
         @Override
         public ContainerNode getBody() {
             return content;
         }
 
         @Override
-        public Date getEventTime() {
+        public Instant getEventInstant() {
             return eventTime;
         }
     }
