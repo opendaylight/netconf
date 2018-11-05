@@ -15,24 +15,23 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
-import com.google.common.base.Optional;
 import java.net.InetSocketAddress;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.binding.api.BindingTransactionChain;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.md.sal.binding.api.WriteTransaction;
-import org.opendaylight.controller.md.sal.binding.test.ConcurrentDataBrokerTestCustomizer;
-import org.opendaylight.controller.md.sal.common.api.data.AsyncTransaction;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChain;
-import org.opendaylight.controller.md.sal.common.api.data.TransactionChainListener;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataBroker;
-import org.opendaylight.controller.md.sal.dom.api.DOMDataWriteTransaction;
+import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.Transaction;
+import org.opendaylight.mdsal.binding.api.TransactionChain;
+import org.opendaylight.mdsal.binding.api.TransactionChainListener;
+import org.opendaylight.mdsal.binding.api.WriteTransaction;
+import org.opendaylight.mdsal.binding.dom.adapter.test.ConcurrentDataBrokerTestCustomizer;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -55,7 +54,7 @@ public class NetconfDeviceTopologyAdapterTest {
     @Mock
     private WriteTransaction writeTx;
     @Mock
-    private BindingTransactionChain txChain;
+    private TransactionChain txChain;
     @Mock
     private NetconfNode data;
 
@@ -64,7 +63,7 @@ public class NetconfDeviceTopologyAdapterTest {
     private SchemaContext schemaContext = null;
     private final String sessionIdForReporting = "netconf-test-session1";
 
-    private BindingTransactionChain transactionChain;
+    private TransactionChain transactionChain;
 
     private DataBroker dataBroker;
 
@@ -94,13 +93,13 @@ public class NetconfDeviceTopologyAdapterTest {
 
         transactionChain = dataBroker.createTransactionChain(new TransactionChainListener() {
             @Override
-            public void onTransactionChainFailed(final TransactionChain<?, ?> chain,
-                    final AsyncTransaction<?, ?> transaction, final Throwable cause) {
+            public void onTransactionChainFailed(final TransactionChain chain, final Transaction transaction,
+                    final Throwable cause) {
 
             }
 
             @Override
-            public void onTransactionChainSuccessful(final TransactionChain<?, ?> chain) {
+            public void onTransactionChainSuccessful(final TransactionChain chain) {
 
             }
         });
@@ -125,7 +124,7 @@ public class NetconfDeviceTopologyAdapterTest {
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
             Optional<NetconfNode> netconfNode = dataBroker.newReadWriteTransaction()
                     .read(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath().augmentation(NetconfNode.class))
-                    .checkedGet(5, TimeUnit.SECONDS);
+                    .get(5, TimeUnit.SECONDS);
             return netconfNode.isPresent() && netconfNode.get().getConnectionStatus()
                     == NetconfNodeConnectionStatus.ConnectionStatus.UnableToConnect;
         });
@@ -165,7 +164,7 @@ public class NetconfDeviceTopologyAdapterTest {
         NormalizedNode<?, ?> augmentNode = ImmutableLeafNodeBuilder.create().withValue(dataTestId)
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(netconfTestLeafQname)).build();
 
-        DOMDataWriteTransaction wtx =  domDataBroker.newWriteOnlyTransaction();
+        DOMDataTreeWriteTransaction wtx =  domDataBroker.newWriteOnlyTransaction();
         wtx.put(LogicalDatastoreType.OPERATIONAL, pathToAugmentedLeaf, augmentNode);
         wtx.commit().get(5, TimeUnit.SECONDS);
 
