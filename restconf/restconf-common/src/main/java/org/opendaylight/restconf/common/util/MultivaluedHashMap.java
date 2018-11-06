@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.common.util;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -44,19 +45,9 @@ public class MultivaluedHashMap<K, V> implements MultivaluedMap<K, V> {
     }
 
     @Override
-    public void addAll(K key, V... newValues) {
-        Objects.requireNonNull(newValues, "Supplied array of values must not be null.");
-
-        if (newValues.length == 0) {
-            return;
-        }
-
-        List<V> values = getValues(key);
-        for (V value : newValues) {
-            if (value != null) {
-                values.add(value);
-            }
-        }
+    @SafeVarargs
+    public final void addAll(K key, V... newValues) {
+        addAll(key, Arrays.asList(newValues));
     }
 
     @Override
