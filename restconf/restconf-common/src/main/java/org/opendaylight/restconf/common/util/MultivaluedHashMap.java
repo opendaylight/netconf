@@ -78,11 +78,7 @@ public class MultivaluedHashMap<K, V> implements MultivaluedMap<K, V> {
     @Override
     public V getFirst(K key) {
         List<V> values = store.get(key);
-        if (values != null && values.size() > 0) {
-            return values.get(0);
-        } else {
-            return null;
-        }
+        return values == null || values.isEmpty() ? null : values.get(0);
     }
 
     @Override
