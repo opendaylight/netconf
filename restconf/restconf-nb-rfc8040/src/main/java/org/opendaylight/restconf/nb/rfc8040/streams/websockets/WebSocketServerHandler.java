@@ -13,6 +13,7 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
 import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpUtil.isKeepAlive;
 import static io.netty.handler.codec.http.HttpUtil.setContentLength;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
@@ -126,7 +127,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     private static void sendHttpResponse(final ChannelHandlerContext ctx, final HttpRequest req,
             final FullHttpResponse res) {
         // Generate an error page if response getStatus code is not OK (200).
-        if (res.status().code() != 200) {
+        final boolean notOkay = !OK.equals(res.status());
+        if (notOkay) {
             final ByteBuf buf = Unpooled.copiedBuffer(res.status().toString(), CharsetUtil.UTF_8);
             res.content().writeBytes(buf);
             buf.release();
@@ -135,7 +137,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
         // Send the response and close the connection if necessary.
         final ChannelFuture f = ctx.channel().writeAndFlush(res);
-        if (!isKeepAlive(req) || res.status().code() != 200) {
+        if (notOkay || !isKeepAlive(req)) {
             f.addListener(ChannelFutureListener.CLOSE);
         }
     }
