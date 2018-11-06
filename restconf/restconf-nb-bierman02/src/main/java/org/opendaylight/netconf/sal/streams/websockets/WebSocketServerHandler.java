@@ -12,6 +12,7 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
 import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpUtil.isKeepAlive;
 import static io.netty.handler.codec.http.HttpUtil.setContentLength;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
@@ -46,7 +47,6 @@ import org.slf4j.LoggerFactory;
  * {@link FullHttpRequest} and {@link WebSocketFrame} messages.
  */
 public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> {
-
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketServerHandler.class);
 
     private WebSocketServerHandshaker handshaker;
@@ -63,10 +63,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     /**
      * Checks if HTTP request method is GET and if is possible to decode HTTP result of request.
      *
-     * @param ctx
-     *            ChannelHandlerContext
-     * @param req
-     *            FullHttpRequest
+     * @param ctx ChannelHandlerContext
+     * @param req FullHttpRequest
      */
     private void handleHttpRequest(final ChannelHandlerContext ctx, final FullHttpRequest req) {
         // Handle a bad request.
@@ -114,23 +112,20 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         } else {
             this.handshaker.handshake(ctx.channel(), req);
         }
-
     }
 
     /**
      * Checks response status, send response and close connection if necessary.
      *
-     * @param ctx
-     *            ChannelHandlerContext
-     * @param req
-     *            HttpRequest
-     * @param res
-     *            FullHttpResponse
+     * @param ctx ChannelHandlerContext
+     * @param req HttpRequest
+     * @param res FullHttpResponse
      */
     private static void sendHttpResponse(final ChannelHandlerContext ctx, final HttpRequest req,
             final FullHttpResponse res) {
         // Generate an error page if response getStatus code is not OK (200).
-        if (res.status().code() != 200) {
+        final boolean notOkay = !OK.equals(res.status());
+        if (notOkay) {
             final ByteBuf buf = Unpooled.copiedBuffer(res.status().toString(), CharsetUtil.UTF_8);
             res.content().writeBytes(buf);
             buf.release();
@@ -139,7 +134,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
         // Send the response and close the connection if necessary.
         final ChannelFuture f = ctx.channel().writeAndFlush(res);
-        if (!isKeepAlive(req) || res.status().code() != 200) {
+        if (notOkay || !isKeepAlive(req)) {
             f.addListener(ChannelFutureListener.CLOSE);
         }
     }
@@ -147,10 +142,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     /**
      * Handles web socket frame.
      *
-     * @param ctx
-     *            {@link ChannelHandlerContext}
-     * @param frame
-     *            {@link WebSocketFrame}
+     * @param ctx {@link ChannelHandlerContext}
+     * @param frame {@link WebSocketFrame}
      */
     private void handleWebSocketFrame(final ChannelHandlerContext ctx, final WebSocketFrame frame) {
         if (frame instanceof CloseWebSocketFrame) {
@@ -187,8 +180,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     /**
      * Get web socket location from HTTP request.
      *
-     * @param req
-     *            HTTP request from which the location will be returned
+     * @param req HTTP request from which the location will be returned
      * @return String representation of web socket location.
      */
     private static String getWebSocketLocation(final HttpRequest req) {
