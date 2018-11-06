@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -158,9 +158,9 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
 
     private String writeBodyToString() {
         final Writer writer = new StringWriter();
-        final NormalizedNodeStreamWriter jsonStream =
-                JSONNormalizedNodeStreamWriter.createExclusiveWriter(JSONCodecFactory.getShared(this.schemaContext),
-                        this.notification.getType(), null, JsonWriterFactory.createJsonWriter(writer));
+        final NormalizedNodeStreamWriter jsonStream = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
+            JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(this.schemaContext),
+            this.notification.getType(), null, JsonWriterFactory.createJsonWriter(writer));
         final NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(jsonStream);
         try {
             nodeWriter.write(this.notification.getBody());

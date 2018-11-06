@@ -50,7 +50,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.ForwardingNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
@@ -91,7 +91,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
     private final ControllerContext controllerContext;
 
-    public RestconfDocumentedExceptionMapper(ControllerContext controllerContext) {
+    public RestconfDocumentedExceptionMapper(final ControllerContext controllerContext) {
         this.controllerContext = Preconditions.checkNotNull(controllerContext);
     }
 
@@ -238,7 +238,8 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
         final JsonWriter jsonWriter = JsonWriterFactory.createJsonWriter(outputWriter);
         final NormalizedNodeStreamWriter jsonStreamWriter = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
-                JSONCodecFactory.getShared(context.getSchemaContext()), path, initialNs, jsonWriter);
+            JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(context.getSchemaContext()), path,
+            initialNs, jsonWriter);
 
         // We create a delegating writer to special-case error-info as error-info is defined as an empty
         // container in the restconf yang schema but we create a leaf node so we can output it. The delegate
