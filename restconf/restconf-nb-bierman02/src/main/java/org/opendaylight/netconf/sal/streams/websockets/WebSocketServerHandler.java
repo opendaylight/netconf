@@ -17,8 +17,6 @@ import static io.netty.handler.codec.http.HttpUtil.isKeepAlive;
 import static io.netty.handler.codec.http.HttpUtil.setContentLength;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -126,9 +124,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         // Generate an error page if response getStatus code is not OK (200).
         final boolean notOkay = !OK.equals(res.status());
         if (notOkay) {
-            final ByteBuf buf = Unpooled.copiedBuffer(res.status().toString(), CharsetUtil.UTF_8);
-            res.content().writeBytes(buf);
-            buf.release();
+            res.content().writeCharSequence(res.status().toString(), CharsetUtil.UTF_8);
             setContentLength(res, res.content().readableBytes());
         }
 
