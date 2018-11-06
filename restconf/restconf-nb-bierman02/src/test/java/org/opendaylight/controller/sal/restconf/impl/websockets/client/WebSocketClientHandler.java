@@ -28,7 +28,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
     private ChannelPromise handshakeFuture;
     private final IClientMessageCallback messageListener;
 
-    public WebSocketClientHandler(WebSocketClientHandshaker handshaker, IClientMessageCallback listener) {
+    public WebSocketClientHandler(final WebSocketClientHandshaker handshaker, final IClientMessageCallback listener) {
         this.handshaker = handshaker;
         this.messageListener = listener;
     }
@@ -38,22 +38,22 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
     }
 
     @Override
-    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+    public void handlerAdded(final ChannelHandlerContext ctx) throws Exception {
         handshakeFuture = ctx.newPromise();
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(final ChannelHandlerContext ctx) throws Exception {
         handshaker.handshake(ctx.channel());
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
         LOG.info("WebSocket Client disconnected!");
     }
 
     @Override
-    public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead0(final ChannelHandlerContext ctx, final Object msg) throws Exception {
         Channel ch = ctx.channel();
         if (!handshaker.isHandshakeComplete()) {
             handshaker.finishHandshake(ch, (FullHttpResponse) msg);
@@ -64,7 +64,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
 
         if (msg instanceof FullHttpResponse) {
             FullHttpResponse response = (FullHttpResponse) msg;
-            throw new Exception("Unexpected FullHttpResponse (getStatus=" + response.getStatus() + ", content="
+            throw new Exception("Unexpected FullHttpResponse (getStatus=" + response.status() + ", content="
                     + response.content().toString(CharsetUtil.UTF_8) + ')');
         }
 
@@ -80,7 +80,7 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> 
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) throws Exception {
         LOG.info("Cause: {} .", cause.toString());
 
         if (!handshakeFuture.isDone()) {
