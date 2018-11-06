@@ -18,8 +18,6 @@ import static io.netty.handler.codec.http.HttpUtil.isKeepAlive;
 import static io.netty.handler.codec.http.HttpUtil.setContentLength;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -48,7 +46,6 @@ import org.slf4j.LoggerFactory;
  * {@link FullHttpRequest} and {@link WebSocketFrame} messages.
  */
 public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> {
-
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketServerHandler.class);
 
     private WebSocketServerHandshaker handshaker;
@@ -129,9 +126,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         // Generate an error page if response getStatus code is not OK (200).
         final boolean notOkay = !OK.equals(res.status());
         if (notOkay) {
-            final ByteBuf buf = Unpooled.copiedBuffer(res.status().toString(), CharsetUtil.UTF_8);
-            res.content().writeBytes(buf);
-            buf.release();
+            res.content().writeCharSequence(res.status().toString(), CharsetUtil.UTF_8);
             setContentLength(res, res.content().readableBytes());
         }
 
@@ -145,10 +140,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     /**
      * Handles web socket frame.
      *
-     * @param ctx
-     *            {@link ChannelHandlerContext}
-     * @param frame
-     *            {@link WebSocketFrame}
+     * @param ctx {@link ChannelHandlerContext}
+     * @param frame {@link WebSocketFrame}
      */
     private void handleWebSocketFrame(final ChannelHandlerContext ctx, final WebSocketFrame frame) {
         if (frame instanceof CloseWebSocketFrame) {
