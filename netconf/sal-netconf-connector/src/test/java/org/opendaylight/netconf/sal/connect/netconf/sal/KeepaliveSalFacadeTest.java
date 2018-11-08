@@ -25,7 +25,6 @@ import java.util.concurrent.ScheduledFuture;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -84,7 +83,7 @@ public class KeepaliveSalFacadeTest {
             invocationOnMock -> {
                 invocationOnMock.callRealMethod();
                 return currentKeepalive;
-            }).when(executorServiceSpy).schedule(Mockito.<Runnable>any(), Mockito.anyLong(), Matchers.any());
+            }).when(executorServiceSpy).schedule(Mockito.<Runnable>any(), Mockito.anyLong(), any());
 
         Mockito.when(currentKeepalive.isDone()).thenReturn(true);
 
