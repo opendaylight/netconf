@@ -8,7 +8,7 @@
 
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
 import com.google.common.util.concurrent.Futures;
