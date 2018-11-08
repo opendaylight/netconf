@@ -22,6 +22,30 @@
       "revId": "75ee5d1ce7302beb4de4b5067a7a1127e27703de",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "62ed8694_c47d1c55",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/sal/KeepaliveSalFacadeTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-11-08T14:09:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f67ecd5_6ee425b5",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 35
+      },
+      "revId": "75ee5d1ce7302beb4de4b5067a7a1127e27703de",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
