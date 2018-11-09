@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.mdsal.connector.ops;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,10 +26,6 @@ import java.util.Collection;
 import java.util.Collections;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -46,6 +43,7 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
+import org.opendaylight.netconf.util.test.NetconfXmlUnitRecursiveSelector;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -67,6 +65,9 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.Diff;
 
 public class RuntimeRpcTest {
     private static final Logger LOG = LoggerFactory.getLogger(RuntimeRpcTest.class);
@@ -170,9 +171,6 @@ public class RuntimeRpcTest {
             return registration;
         }).when(schemaService).registerSchemaContextListener(any(SchemaContextListener.class));
 
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
-
         doAnswer(invocationOnMock -> {
             final SourceIdentifier sId = (SourceIdentifier) invocationOnMock.getArguments()[0];
             final YangTextSchemaSource yangTextSchemaSource =
@@ -272,10 +270,15 @@ public class RuntimeRpcTest {
     }
 
     private static void verifyResponse(final Document response, final Document template) {
-        final DetailedDiff dd = new DetailedDiff(new Diff(response, template));
-        dd.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
-        //we care about order so response has to be identical
-        assertTrue(dd.identical());
+        final Diff diff = DiffBuilder.compare(template)
+                .withTest(response)
+                .ignoreWhitespace()
+                .checkForIdentical()
+                .withNodeMatcher(new DefaultNodeMatcher(new NetconfXmlUnitRecursiveSelector()))
+                .ignoreWhitespace()
+                .build();
+
+        assertFalse(diff.hasDifferences());
     }
 
     private static RpcDefinition getRpcDefinitionFromModule(final Module module, final URI namespaceURI,

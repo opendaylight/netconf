@@ -8,16 +8,18 @@
 
 package org.opendaylight.netconf.nettyutil.handler.exi;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import com.siemens.ct.exi.core.CodingMode;
 import com.siemens.ct.exi.core.FidelityOptions;
 import java.util.Arrays;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.ElementSelectors;
 
 @RunWith(Parameterized.class)
 public class NetconfStartExiMessageTest {
@@ -68,12 +70,15 @@ public class NetconfStartExiMessageTest {
     }
 
     @Test
-    public void testCreate() throws Exception {
+    public void testCreate() {
         final NetconfStartExiMessage startExiMessage = NetconfStartExiMessage.create(exiOptions, "id");
 
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
-        final Diff diff = XMLUnit.compareXML(XMLUnit.buildControlDocument(controlXml), startExiMessage.getDocument());
-        assertTrue(diff.toString(), diff.similar());
+        final Diff diff = DiffBuilder.compare(controlXml)
+                .withTest(startExiMessage.getDocument())
+                .ignoreWhitespace()
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byName))
+                .checkForSimilar()
+                .build();
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 }

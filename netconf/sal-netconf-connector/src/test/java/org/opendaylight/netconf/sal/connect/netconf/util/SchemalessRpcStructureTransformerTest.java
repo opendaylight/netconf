@@ -17,10 +17,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import javax.xml.transform.dom.DOMSource;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -36,6 +33,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 @RunWith(Parameterized.class)
 public class SchemalessRpcStructureTransformerTest {
@@ -56,8 +55,8 @@ public class SchemalessRpcStructureTransformerTest {
     private final String testDataset;
 
     public SchemalessRpcStructureTransformerTest(
-            YangInstanceIdentifier path, String testDataset,
-            Class<? extends Exception> expectedException) throws IOException, SAXException, URISyntaxException {
+            final YangInstanceIdentifier path, String testDataset, final Class<? extends Exception> expectedException)
+            throws IOException, SAXException, URISyntaxException {
         this.path = path;
         this.testDataset = testDataset;
         this.expectedException = expectedException;
@@ -73,7 +72,7 @@ public class SchemalessRpcStructureTransformerTest {
 
     @Parameterized.Parameters
     public static Collection parameters() {
-        Object[][] params = {
+        final Object[][] params = {
                 {YangInstanceIdentifier.builder()
                         .node(createNodeId("top"))
                         .node(createNodeId("users"))
@@ -98,38 +97,41 @@ public class SchemalessRpcStructureTransformerTest {
         return Arrays.asList(params);
     }
 
-    @BeforeClass
-    public static void suiteSetup() {
-        XMLUnit.setIgnoreWhitespace(true);
-    }
-
     @Test
-    public void testCreateEditConfigStructure() throws Exception {
+    public void testCreateEditConfigStructure() {
         if (expectedException != null) {
             thrown.expect(expectedException);
         }
-        AnyXmlNode data = Builders.anyXmlBuilder()
+        final AnyXmlNode data = Builders.anyXmlBuilder()
                 .withNodeIdentifier(createNodeId(path.getLastPathArgument().getNodeType().getLocalName()))
                 .withValue(source)
                 .build();
         final AnyXmlNode anyXmlNode =
                 adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(ModifyAction.REPLACE));
         final String s = XmlUtil.toString((Element) anyXmlNode.getValue().getNode());
-        Diff diff = new Diff(expectedConfig, s);
-        Assert.assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
+        final Diff diff = DiffBuilder.compare(expectedConfig)
+                .withTest(s)
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
+        Assert.assertFalse(String.format("Input %s: %s", testDataset, diff.toString()), diff.hasDifferences());
     }
 
     @Test
-    public void testToFilterStructure() throws Exception {
+    public void testToFilterStructure() {
         final AnyXmlNode anyXmlNode = (AnyXmlNode) adapter.toFilterStructure(path);
         final String s = XmlUtil.toString((Element) anyXmlNode.getValue().getNode());
-        Diff diff = new Diff(expectedFilter, s);
-        Assert.assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
+        final Diff diff = DiffBuilder.compare(expectedFilter)
+                .withTest(s)
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
+        Assert.assertFalse(String.format("Input %s: %s", testDataset, diff.toString()), diff.hasDifferences());
     }
 
     @Test
     public void testSelectFromDataStructure() throws Exception {
-        AnyXmlNode data = Builders.anyXmlBuilder()
+        final AnyXmlNode data = Builders.anyXmlBuilder()
                 .withNodeIdentifier(createNodeId(path.getLastPathArgument().getNodeType().getLocalName()))
                 .withValue(new DOMSource(XmlUtil.readXmlToDocument(getConfigData).getDocumentElement()))
                 .build();
@@ -137,8 +139,12 @@ public class SchemalessRpcStructureTransformerTest {
         final XmlElement s = XmlElement.fromDomDocument((Document) dataStructure.getValue().getNode());
         final String dataFromReply = XmlUtil.toString(s.getOnlyChildElement().getDomElement());
         final String expectedData = XmlUtil.toString((Element) source.getNode());
-        Diff diff = new Diff(expectedData, dataFromReply);
-        Assert.assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
+        final Diff diff = DiffBuilder.compare(expectedData)
+                .withTest(dataFromReply)
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
+        Assert.assertFalse(String.format("Input %s: %s", testDataset, diff.toString()), diff.hasDifferences());
     }
 
     private static YangInstanceIdentifier.NodeIdentifier createNodeId(String name) {
@@ -146,13 +152,13 @@ public class SchemalessRpcStructureTransformerTest {
     }
 
     private static YangInstanceIdentifier.NodeIdentifierWithPredicates createListNodeId(
-            String nodeName, String keyName, String id) {
+            final String nodeName, final String keyName, final String id) {
         return new YangInstanceIdentifier
                 .NodeIdentifierWithPredicates(QName.create(NAMESPACE, nodeName), QName.create(NAMESPACE, keyName), id);
     }
 
     private static YangInstanceIdentifier.NodeIdentifierWithPredicates createListNodeId(
-            String nodeName, Map<QName, Object> keys) {
+            final String nodeName, final Map<QName, Object> keys) {
         return new YangInstanceIdentifier.NodeIdentifierWithPredicates(QName.create(NAMESPACE, nodeName), keys);
     }
 }

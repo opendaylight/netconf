@@ -11,8 +11,6 @@ package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 import java.io.InputStream;
 import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,13 +32,12 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.ElementSelectors;
 
 public class BaseRpcSchemalessTransformerTest {
-
-    static {
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
-    }
 
     private static final String EXP_RPC = "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
             + "   <edit-config>\n"
@@ -104,8 +101,15 @@ public class BaseRpcSchemalessTransformerTest {
                 .build();
         final NetconfMessage msg = transformer.toRpcRequest(
                 SchemaPath.create(true, NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME), editConfig);
-        final Diff diff = XMLUnit.compareXML(EXP_RPC, XmlUtil.toString(msg.getDocument()));
-        Assert.assertTrue(diff.toString(), diff.similar());
+
+        final Diff diff = DiffBuilder.compare(EXP_RPC)
+                .withTest(XmlUtil.toString(msg.getDocument()))
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byName))
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
+
+        Assert.assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     @Test
@@ -126,8 +130,13 @@ public class BaseRpcSchemalessTransformerTest {
                 new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_QNAME));
         Assert.assertTrue(dataOpt.isPresent());
         final AnyXmlNode data = (AnyXmlNode) dataOpt.get();
-        final Diff diff = XMLUnit.compareXML(dataElement.getOwnerDocument(), (Document) data.getValue().getNode());
-        Assert.assertTrue(diff.toString(), diff.similar());
+        final Diff diff = DiffBuilder.compare(dataElement)
+                .withTest(data.getValue().getNode())
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byName))
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
+        Assert.assertFalse(diff.toString(), diff.hasDifferences());
     }
 
 }

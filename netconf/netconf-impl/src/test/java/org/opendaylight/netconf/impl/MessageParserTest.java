@@ -8,11 +8,11 @@
 
 package org.opendaylight.netconf.impl;
 
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import io.netty.buffer.ByteBuf;
@@ -33,6 +33,7 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.util.messages.FramingMechanism;
 import org.opendaylight.netconf.util.messages.NetconfMessageConstants;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
+import org.xmlunit.matchers.CompareMatcher;
 
 public class MessageParserTest {
 
@@ -45,7 +46,7 @@ public class MessageParserTest {
 
     @Test
     public void testChunkedFramingMechanismOnPipeline() throws Exception {
-        EmbeddedChannel testChunkChannel = new EmbeddedChannel(
+        final EmbeddedChannel testChunkChannel = new EmbeddedChannel(
                 FramingMechanismHandlerFactory.createHandler(FramingMechanism.CHUNK),
                 new NetconfMessageToXMLEncoder(),
 
@@ -53,20 +54,20 @@ public class MessageParserTest {
                 new NetconfXMLToMessageDecoder());
 
         testChunkChannel.writeOutbound(this.msg);
-        Queue<Object> messages = testChunkChannel.outboundMessages();
+        final Queue<Object> messages = testChunkChannel.outboundMessages();
         assertFalse(messages.isEmpty());
 
         final NetconfMessageToXMLEncoder enc = new NetconfMessageToXMLEncoder();
         final ByteBuf out = Unpooled.buffer();
         enc.encode(null, msg, out);
-        int msgLength = out.readableBytes();
+        final int msgLength = out.readableBytes();
 
         int chunkCount = msgLength / ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE;
         if (msgLength % ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE != 0) {
             chunkCount++;
         }
 
-        byte[] endOfChunkBytes = NetconfMessageConstants.END_OF_CHUNK.getBytes(StandardCharsets.UTF_8);
+        final byte[] endOfChunkBytes = NetconfMessageConstants.END_OF_CHUNK.getBytes(StandardCharsets.UTF_8);
         for (int i = 1; i <= chunkCount; i++) {
             ByteBuf recievedOutbound = (ByteBuf) messages.poll();
             int exptHeaderLength = ChunkedFramingMechanismEncoder.DEFAULT_CHUNK_SIZE;
@@ -86,33 +87,33 @@ public class MessageParserTest {
         }
         assertTrue(messages.isEmpty());
 
-        NetconfMessage receivedMessage = testChunkChannel.readInbound();
+        final NetconfMessage receivedMessage = testChunkChannel.readInbound();
         assertNotNull(receivedMessage);
-        assertXMLEqual(this.msg.getDocument(), receivedMessage.getDocument());
+        assertThat(receivedMessage.getDocument(), CompareMatcher.isSimilarTo(msg.getDocument()));
     }
 
     @Test
-    public void testEOMFramingMechanismOnPipeline() throws Exception {
-        EmbeddedChannel testChunkChannel = new EmbeddedChannel(
+    public void testEOMFramingMechanismOnPipeline() {
+        final EmbeddedChannel testChunkChannel = new EmbeddedChannel(
                 FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM),
                 new NetconfMessageToXMLEncoder(), new NetconfEOMAggregator(), new NetconfXMLToMessageDecoder());
 
         testChunkChannel.writeOutbound(this.msg);
-        ByteBuf recievedOutbound = testChunkChannel.readOutbound();
+        final ByteBuf recievedOutbound = testChunkChannel.readOutbound();
 
-        byte[] endOfMsgBytes = NetconfMessageConstants.END_OF_MESSAGE.getBytes(StandardCharsets.UTF_8);
-        byte[] eom = new byte[endOfMsgBytes.length];
+        final byte[] endOfMsgBytes = NetconfMessageConstants.END_OF_MESSAGE.getBytes(StandardCharsets.UTF_8);
+        final byte[] eom = new byte[endOfMsgBytes.length];
         recievedOutbound.getBytes(recievedOutbound.readableBytes() - endOfMsgBytes.length, eom);
         assertArrayEquals(endOfMsgBytes, eom);
 
         testChunkChannel.writeInbound(recievedOutbound);
-        NetconfMessage receivedMessage = testChunkChannel.readInbound();
+        final NetconfMessage receivedMessage = testChunkChannel.readInbound();
         assertNotNull(receivedMessage);
-        assertXMLEqual(this.msg.getDocument(), receivedMessage.getDocument());
+        assertThat(receivedMessage.getDocument(), CompareMatcher.isSimilarTo(msg.getDocument()));
     }
 
-    private static long getHeaderLength(byte[] bytes) {
-        byte[] headerStart = new byte[]{(byte) 0x0a, (byte) 0x23};
+    private static long getHeaderLength(final byte[] bytes) {
+        final byte[] headerStart = new byte[]{(byte) 0x0a, (byte) 0x23};
         return Long.parseLong(StandardCharsets.US_ASCII.decode(
                 ByteBuffer.wrap(bytes, headerStart.length, bytes.length - headerStart.length - 1)).toString());
     }

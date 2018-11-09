@@ -8,45 +8,39 @@
 
 package org.opendaylight.netconf.util.test;
 
-import org.custommonkey.xmlunit.ElementNameAndTextQualifier;
-import org.custommonkey.xmlunit.ElementQualifier;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xmlunit.diff.ByNameAndTextRecSelector;
+import org.xmlunit.diff.ElementSelector;
 
 /**
  * Custom xmlunit qualifier that doesn't care about order when deeper in the recursion
  * defaults to comparing element name and text content.
  */
-public class NetconfXmlUnitRecursiveQualifier implements ElementQualifier {
+public class NetconfXmlUnitRecursiveSelector implements ElementSelector {
 
-    private final ElementQualifier qualifier;
+    private final ElementSelector elementSelector;
 
-    public NetconfXmlUnitRecursiveQualifier() {
-        this.qualifier = new ElementNameAndTextQualifier();
-    }
-
-    public NetconfXmlUnitRecursiveQualifier(final ElementQualifier qualifier) {
-        this.qualifier = qualifier;
+    public NetconfXmlUnitRecursiveSelector() {
+        this.elementSelector = new ByNameAndTextRecSelector();
     }
 
     @Override
-    public boolean qualifyForComparison(Element currentControl,
-                                        Element currentTest) {
-        return compareNodes(currentControl, currentTest);
+    public boolean canBeCompared(final Element controlElement, final Element testElement) {
+        return compareNodes(controlElement, testElement);
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    private boolean compareNodes(Node currentControl, Node currentTest) {
+    private boolean compareNodes(final Node currentControl, final Node currentTest) {
         try {
 
-            if (!qualifier.qualifyForComparison((Element) currentControl,
-                    (Element) currentTest)) {
+            if (!elementSelector.canBeCompared((Element) currentControl, (Element) currentTest)) {
                 return false;
             }
 
-            NodeList controlNodes;
-            NodeList testNodes;
+            final NodeList controlNodes;
+            final NodeList testNodes;
 
             if (currentControl.hasChildNodes() && currentTest.hasChildNodes()) {
                 controlNodes = currentControl.getChildNodes();
@@ -58,17 +52,17 @@ public class NetconfXmlUnitRecursiveQualifier implements ElementQualifier {
             return (countNodesWithoutConsecutiveTextNodes(controlNodes)
                     == countNodesWithoutConsecutiveTextNodes(testNodes)) && checkChildren(controlNodes, testNodes);
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return false;
         }
     }
 
-    private boolean checkChildren(NodeList controlNodes, NodeList testNodes) {
+    private boolean checkChildren(final NodeList controlNodes, final NodeList testNodes) {
         for (int i = 0; i < controlNodes.getLength(); i++) {
             boolean matchFound = false;
             for (int j = 0; j < testNodes.getLength(); j++) {
-                Node controlNode = controlNodes.item(i);
-                Node testNode = testNodes.item(j);
+                final Node controlNode = controlNodes.item(i);
+                final Node testNode = testNodes.item(j);
 
                 if (controlNode.getNodeType() != testNode.getNodeType()) {
                     continue;
@@ -93,8 +87,8 @@ public class NetconfXmlUnitRecursiveQualifier implements ElementQualifier {
         return true;
     }
 
-    private static String concatenateText(Node textNode) {
-        StringBuilder builder = new StringBuilder();
+    private static String concatenateText(final Node textNode) {
+        final StringBuilder builder = new StringBuilder();
         Node next = textNode;
 
         do {
@@ -107,7 +101,7 @@ public class NetconfXmlUnitRecursiveQualifier implements ElementQualifier {
         return builder.toString();
     }
 
-    private static int countNodesWithoutConsecutiveTextNodes(NodeList nodeList) {
+    private static int countNodesWithoutConsecutiveTextNodes(final NodeList nodeList) {
         int count = 0;
         boolean lastNodeWasText = false;
         final int length = nodeList.getLength();

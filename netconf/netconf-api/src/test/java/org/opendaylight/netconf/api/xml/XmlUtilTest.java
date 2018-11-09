@@ -9,17 +9,18 @@
 package org.opendaylight.netconf.api.xml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import com.google.common.base.Optional;
 import java.io.ByteArrayInputStream;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXParseException;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 public class XmlUtilTest {
 
@@ -43,11 +44,13 @@ public class XmlUtilTest {
         document.appendChild(top);
         assertEquals("top", XmlUtil.createDocumentCopy(document).getDocumentElement().getTagName());
 
-        XMLUnit.setIgnoreAttributeOrder(true);
-        XMLUnit.setIgnoreWhitespace(true);
+        final Diff diff = DiffBuilder.compare(xml)
+                .withTest(document)
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
 
-        final Diff diff = XMLUnit.compareXML(XMLUnit.buildControlDocument(xml), document);
-        assertTrue(diff.toString(), diff.similar());
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     @Test

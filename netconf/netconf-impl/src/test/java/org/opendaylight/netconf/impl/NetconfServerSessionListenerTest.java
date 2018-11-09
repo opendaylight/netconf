@@ -16,11 +16,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
 import io.netty.channel.embedded.EmbeddedChannel;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
@@ -34,6 +31,8 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.impl.osgi.NetconfOperationRouter;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.w3c.dom.Document;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 public class NetconfServerSessionListenerTest {
 
@@ -49,11 +48,6 @@ public class NetconfServerSessionListenerTest {
     private EmbeddedChannel channel;
     private NetconfServerSessionListener listener;
 
-    @BeforeClass
-    public static void classSetUp() throws Exception {
-        XMLUnit.setIgnoreWhitespace(true);
-    }
-
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -67,7 +61,7 @@ public class NetconfServerSessionListenerTest {
     }
 
     @Test
-    public void testOnSessionUp() throws Exception {
+    public void testOnSessionUp() {
         listener.onSessionUp(session);
         verify(monitoringListener).onSessionUp(session);
     }
@@ -100,8 +94,14 @@ public class NetconfServerSessionListenerTest {
         verify(monitoringListener).onSessionEvent(argThat(sessionEventIs(SessionEvent.Type.IN_RPC_SUCCESS)));
         channel.runPendingTasks();
         final NetconfMessage sentMsg = channel.readOutbound();
-        final Diff diff = XMLUnit.compareXML(reply, sentMsg.getDocument());
-        Assert.assertTrue(diff.toString(), diff.similar());
+
+        final Diff diff = DiffBuilder.compare(reply)
+                .withTest(sentMsg.getDocument())
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
+
+        Assert.assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     @Test
@@ -144,8 +144,14 @@ public class NetconfServerSessionListenerTest {
         final NetconfMessage sentMsg = channel.readOutbound();
         System.out.println(XmlUtil.toString(sentMsg.getDocument()));
         System.out.println(XmlUtil.toString(reply));
-        final Diff diff = XMLUnit.compareXML(reply, sentMsg.getDocument());
-        Assert.assertTrue(diff.toString(), diff.similar());
+
+        final Diff diff = DiffBuilder.compare(reply)
+                .withTest(sentMsg.getDocument())
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
+
+        Assert.assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     @Test

@@ -13,10 +13,7 @@ import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import javax.xml.transform.dom.DOMResult;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -34,13 +31,10 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Document;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 public class NetconfUtilTest {
-
-    @BeforeClass
-    public static void classSetUp() {
-        XMLUnit.setIgnoreWhitespace(true);
-    }
 
     @Test
     public void testConflictingVersionDetection() throws Exception {
@@ -81,7 +75,13 @@ public class NetconfUtilTest {
         NetconfUtil.writeNormalizedNode(sessions, result, path, context);
         final Document expected = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/sessions.xml"));
         final Document actual = (Document) result.getNode();
-        final Diff diff = XMLUnit.compareXML(expected, actual);
-        Assert.assertTrue(diff.toString(), diff.similar());
+
+        final Diff diff = DiffBuilder.compare(expected)
+                .withTest(actual)
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
+
+        Assert.assertFalse(diff.toString(), diff.hasDifferences());
     }
 }

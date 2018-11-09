@@ -8,15 +8,11 @@
 
 package org.opendaylight.netconf.util.messages;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -25,7 +21,8 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 @RunWith(value = Parameterized.class)
 public class SubtreeFilterRpcTest {
@@ -42,28 +39,30 @@ public class SubtreeFilterRpcTest {
         return result;
     }
 
-    public SubtreeFilterRpcTest(int directoryIndex) {
+    public SubtreeFilterRpcTest(final int directoryIndex) {
         this.directoryIndex = directoryIndex;
-    }
-
-    @Before
-    public void setUp() {
-        XMLUnit.setIgnoreWhitespace(true);
     }
 
     @Test
     public void test() throws Exception {
-        Document requestDocument = getDocument("request.xml");
-        Document preFilterDocument = getDocument("pre-filter.xml");
-        Document postFilterDocument = getDocument("post-filter.xml");
-        Document actualPostFilterDocument = SubtreeFilter.applyRpcSubtreeFilter(requestDocument, preFilterDocument);
+        final Document requestDocument = getDocument("request.xml");
+        final Document preFilterDocument = getDocument("pre-filter.xml");
+        final Document postFilterDocument = getDocument("post-filter.xml");
+        final Document actualPostFilterDocument =
+                SubtreeFilter.applyRpcSubtreeFilter(requestDocument, preFilterDocument);
         LOG.info("Actual document: {}", XmlUtil.toString(actualPostFilterDocument));
-        Diff diff = XMLUnit.compareXML(postFilterDocument, actualPostFilterDocument);
-        assertTrue(diff.toString(), diff.similar());
+
+        final Diff diff = DiffBuilder.compare(postFilterDocument)
+                .withTest(actualPostFilterDocument)
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
+
+        assertFalse(diff.toString(), diff.hasDifferences());
 
     }
 
-    public Document getDocument(String fileName) throws SAXException, IOException {
+    private Document getDocument(final String fileName) throws Exception {
         return XmlUtil.readXmlToDocument(
                 getClass().getResourceAsStream("/subtree/rpc/" + directoryIndex + "/" + fileName));
     }

@@ -9,8 +9,6 @@
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
 import javax.xml.transform.dom.DOMSource;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,12 +25,10 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 public class SchemalessMessageTransformerTest {
-
-    static {
-        XMLUnit.setIgnoreWhitespace(true);
-    }
 
     private static final String EXP_REQUEST =
             "<rpc message-id=\"m-0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
@@ -69,9 +65,13 @@ public class SchemalessMessageTransformerTest {
                 QName.create("org:opendaylight:notification:test:ns:yang:user-notification", "user-visited-page");
         final AnyXmlNode dataContainerChild =
                 (AnyXmlNode) domNotification.getBody().getChild(new YangInstanceIdentifier.NodeIdentifier(qName)).get();
-        final Diff diff = XMLUnit.compareXML(payload, dataContainerChild.getValue().getNode().getOwnerDocument());
-        Assert.assertTrue(diff.toString(), diff.similar());
+        final Diff diff = DiffBuilder.compare(payload)
+                .withTest(dataContainerChild.getValue().getNode().getOwnerDocument())
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
 
+        Assert.assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     @Test
@@ -82,8 +82,12 @@ public class SchemalessMessageTransformerTest {
                 .withValue(new DOMSource(src))
                 .build();
         final NetconfMessage netconfMessage = transformer.toRpcRequest(SCHEMA_PATH, input);
-        final Diff diff = XMLUnit.compareXML(XmlUtil.readXmlToDocument(EXP_REQUEST), netconfMessage.getDocument());
-        Assert.assertTrue(diff.toString(), diff.similar());
+        final Diff diff = DiffBuilder.compare(XmlUtil.readXmlToDocument(EXP_REQUEST))
+                .withTest(netconfMessage.getDocument())
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
+        Assert.assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     @Test
@@ -94,8 +98,12 @@ public class SchemalessMessageTransformerTest {
         final DOMSource value = (DOMSource) result.getResult().getValue();
         Assert.assertNotNull(result.getResult());
         final Document domSourceDoc = (Document) value.getNode();
-        final Diff diff = XMLUnit.compareXML(XmlUtil.readXmlToDocument(EXP_REPLY), domSourceDoc);
-        Assert.assertTrue(diff.toString(), diff.similar());
+        final Diff diff = DiffBuilder.compare(XmlUtil.readXmlToDocument(EXP_REPLY))
+                .withTest(domSourceDoc)
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
+        Assert.assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     @Test

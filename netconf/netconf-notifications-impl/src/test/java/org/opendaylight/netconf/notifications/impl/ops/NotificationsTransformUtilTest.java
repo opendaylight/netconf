@@ -8,15 +8,10 @@
 
 package org.opendaylight.netconf.notifications.impl.ops;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import com.google.common.collect.Lists;
-import java.io.IOException;
 import java.util.Date;
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
 import org.junit.Test;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.NetconfNotification;
@@ -24,7 +19,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.xml.sax.SAXException;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.ElementSelectors;
 
 public class NotificationsTransformUtilTest {
 
@@ -45,7 +43,7 @@ public class NotificationsTransformUtilTest {
                     + "</notification>";
 
     @Test
-    public void testTransform() throws Exception {
+    public void testTransform() {
         final NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
 
         netconfCapabilityChangeBuilder.setAddedCapability(Lists.newArrayList(new Uri("uri1"), new Uri("uri1")));
@@ -60,21 +58,21 @@ public class NotificationsTransformUtilTest {
         compareXml(EXPECTED_NOTIFICATION, serialized);
     }
 
-    static void compareXml(final String expected, final String actual) throws SAXException, IOException {
-        XMLUnit.setIgnoreWhitespace(true);
-        final Diff diff = new Diff(expected, actual);
-        final DetailedDiff detailedDiff = new DetailedDiff(diff);
-        detailedDiff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier());
-        assertTrue(detailedDiff.toString(), detailedDiff.similar());
-    }
-
     @Test
     public void testTransformFromDOM() throws Exception {
         final NetconfNotification netconfNotification =
                 new NetconfNotification(XmlUtil.readXmlToDocument(INNER_NOTIFICATION), DATE);
 
-        XMLUnit.setIgnoreWhitespace(true);
         compareXml(EXPECTED_NOTIFICATION, netconfNotification.toString());
     }
 
+    static void compareXml(final String expected, final String actual) {
+        final Diff diff = DiffBuilder.compare(expected)
+                .withTest(actual)
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
+        assertFalse(diff.toString(), diff.hasDifferences());
+    }
 }

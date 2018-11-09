@@ -84,10 +84,6 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.xmlunit</groupId>
-      <artifactId>xmlunit-legacy</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>mockito-configuration</artifactId>
     </dependency>
@@ -102,6 +98,11 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>netconf-util</artifactId>
       <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xmlunit</groupId>
+      <artifactId>xmlunit-core</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

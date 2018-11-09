@@ -20,8 +20,6 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,13 +48,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.SAXException;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.ElementSelectors;
 
 public class NetconfBaseOpsTest {
-
-    static {
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreComments(true);
-    }
 
     private static final QName CONTAINER_Q_NAME = QName.create("test:namespace", "2013-07-22", "c");
 
@@ -101,75 +98,75 @@ public class NetconfBaseOpsTest {
     }
 
     @Test
-    public void testLock() throws Exception {
+    public void testLock() {
         baseOps.lock(callback, NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME);
         verifyMessageSent("lock", NetconfMessageTransformUtil.NETCONF_LOCK_QNAME);
     }
 
     @Test
-    public void testLockCandidate() throws Exception {
+    public void testLockCandidate() {
         baseOps.lockCandidate(callback);
         verifyMessageSent("lock", NetconfMessageTransformUtil.NETCONF_LOCK_QNAME);
     }
 
     @Test
-    public void testUnlock() throws Exception {
+    public void testUnlock() {
         baseOps.unlock(callback, NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME);
         verifyMessageSent("unlock", NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME);
     }
 
     @Test
-    public void testUnlockCandidate() throws Exception {
+    public void testUnlockCandidate() {
         baseOps.unlockCandidate(callback);
         verifyMessageSent("unlock", NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME);
     }
 
     @Test
-    public void testLockRunning() throws Exception {
+    public void testLockRunning() {
         baseOps.lockRunning(callback);
         verifyMessageSent("lock-running", NetconfMessageTransformUtil.NETCONF_LOCK_QNAME);
     }
 
     @Test
-    public void testUnlockRunning() throws Exception {
+    public void testUnlockRunning() {
         baseOps.unlockRunning(callback);
         verifyMessageSent("unlock-running", NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME);
     }
 
     @Test
-    public void testDiscardChanges() throws Exception {
+    public void testDiscardChanges() {
         baseOps.discardChanges(callback);
         verifyMessageSent("discardChanges", NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME);
     }
 
     @Test
-    public void testCommit() throws Exception {
+    public void testCommit() {
         baseOps.commit(callback);
         verifyMessageSent("commit", NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME);
     }
 
     @Test
-    public void testValidateCandidate() throws Exception {
+    public void testValidateCandidate() {
         baseOps.validateCandidate(callback);
         verifyMessageSent("validate", NetconfMessageTransformUtil.NETCONF_VALIDATE_QNAME);
     }
 
     @Test
-    public void testValidateRunning() throws Exception {
+    public void testValidateRunning() {
         baseOps.validateRunning(callback);
         verifyMessageSent("validate-running", NetconfMessageTransformUtil.NETCONF_VALIDATE_QNAME);
     }
 
 
     @Test
-    public void testCopyConfig() throws Exception {
+    public void testCopyConfig() {
         baseOps.copyConfig(callback, NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME,
                 NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME);
         verifyMessageSent("copy-config", NetconfMessageTransformUtil.NETCONF_COPY_CONFIG_QNAME);
     }
 
     @Test
-    public void testCopyRunningToCandidate() throws Exception {
+    public void testCopyRunningToCandidate() {
         baseOps.copyRunningToCandidate(callback);
         verifyMessageSent("copy-config", NetconfMessageTransformUtil.NETCONF_COPY_CONFIG_QNAME);
     }
@@ -192,19 +189,19 @@ public class NetconfBaseOpsTest {
     }
 
     @Test
-    public void testGetConfigRunning() throws Exception {
+    public void testGetConfigRunning() {
         baseOps.getConfigRunning(callback, Optional.absent());
         verifyMessageSent("getConfig", NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
     }
 
     @Test
-    public void testGetConfigCandidate() throws Exception {
+    public void testGetConfigCandidate() {
         baseOps.getConfigCandidate(callback, Optional.absent());
         verifyMessageSent("getConfig_candidate", NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME);
     }
 
     @Test
-    public void testGetConfigCandidateWithFilter() throws Exception {
+    public void testGetConfigCandidateWithFilter() {
         final YangInstanceIdentifier id = YangInstanceIdentifier.builder()
                 .node(CONTAINER_Q_NAME)
                 .build();
@@ -213,13 +210,13 @@ public class NetconfBaseOpsTest {
     }
 
     @Test
-    public void testGet() throws Exception {
+    public void testGet() {
         baseOps.get(callback, Optional.absent());
         verifyMessageSent("get", NetconfMessageTransformUtil.NETCONF_GET_QNAME);
     }
 
     @Test
-    public void testEditConfigCandidate() throws Exception {
+    public void testEditConfigCandidate() {
         final QName leafQName = QName.create(CONTAINER_Q_NAME, "a");
         final LeafNode<Object> leaf = Builders.leafBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(leafQName))
@@ -236,7 +233,7 @@ public class NetconfBaseOpsTest {
     }
 
     @Test
-    public void testEditConfigRunning() throws Exception {
+    public void testEditConfigRunning() {
         final QName containerQName = QName.create("test:namespace", "2013-07-22", "c");
         final QName leafQName = QName.create(containerQName, "a");
         final LeafNode<Object> leaf = Builders.leafBuilder()
@@ -280,8 +277,14 @@ public class NetconfBaseOpsTest {
             final Document actualDoc = removeAttrs(message.getDocument());
             actualDoc.normalizeDocument();
             expected.normalizeDocument();
-            final Diff diff = XMLUnit.compareXML(expected, actualDoc);
-            return diff.similar();
+            final Diff diff = DiffBuilder.compare(expected)
+                    .withTest(actualDoc)
+                    .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byName))
+                    .ignoreWhitespace()
+                    .ignoreComments()
+                    .checkForSimilar()
+                    .build();
+            return !diff.hasDifferences();
         }
 
         private static Document removeAttrs(final Document input) {

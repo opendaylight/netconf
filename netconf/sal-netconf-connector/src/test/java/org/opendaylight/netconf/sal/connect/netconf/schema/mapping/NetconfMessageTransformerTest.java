@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -42,9 +43,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.xml.transform.dom.DOMSource;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,6 +81,10 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.ElementSelectors;
 
 public class NetconfMessageTransformerTest {
 
@@ -95,17 +97,13 @@ public class NetconfMessageTransformerTest {
 
     @Before
     public void setUp() throws Exception {
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
-        XMLUnit.setIgnoreComments(true);
-
         schema = getSchema(true);
         netconfMessageTransformer = getTransformer(schema);
         actionNetconfMessageTransformer = getActionMessageTransformer();
     }
 
     @Test
-    public void testLockRequestBaseSchemaNotPresent() throws Exception {
+    public void testLockRequestBaseSchemaNotPresent() {
         final SchemaContext partialSchema = getSchema(false);
         final NetconfMessageTransformer transformer = getTransformer(partialSchema);
         final NetconfMessage netconfMessage = transformer.toRpcRequest(toPath(NETCONF_LOCK_QNAME),
@@ -116,7 +114,7 @@ public class NetconfMessageTransformerTest {
     }
 
     @Test
-    public void testCreateSubscriberNotificationSchemaNotPresent() throws Exception {
+    public void testCreateSubscriberNotificationSchemaNotPresent() {
         final SchemaContext partialSchema = getSchema(true);
         final NetconfMessageTransformer transformer = new NetconfMessageTransformer(
                 partialSchema,
@@ -142,7 +140,7 @@ public class NetconfMessageTransformerTest {
     }
 
     @Test
-    public void testDiscardChangesRequest() throws Exception {
+    public void testDiscardChangesRequest() {
         final NetconfMessage netconfMessage =
                 netconfMessageTransformer.toRpcRequest(toPath(NETCONF_DISCARD_CHANGES_QNAME), null);
         assertThat(XmlUtil.toString(netconfMessage.getDocument()), CoreMatchers.containsString("<discard"));
@@ -338,10 +336,15 @@ public class NetconfMessageTransformerTest {
     }
 
     private static void assertSimilarXml(final NetconfMessage netconfMessage, final String xmlContent)
-            throws SAXException, IOException {
-        final Diff diff = XMLUnit.compareXML(netconfMessage.getDocument(), XmlUtil.readXmlToDocument(xmlContent));
-        diff.overrideElementQualifier(new ElementNameAndAttributeQualifier());
-        assertTrue(diff.toString(), diff.similar());
+            throws IOException, SAXException {
+        final Diff diff = DiffBuilder.compare(netconfMessage.getDocument())
+                .withTest(XmlUtil.readXmlToDocument(xmlContent))
+                .ignoreWhitespace()
+                .ignoreComments()
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndAllAttributes))
+                .checkForSimilar()
+                .build();
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 
     @Test
@@ -396,14 +399,14 @@ public class NetconfMessageTransformerTest {
 
     @Test
     public void getActionsTest() {
-        QName reset = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "reset");
-        QName start = QName.create(reset, "start");
-        QName open = QName.create(start, "open");
-        Set<QName> qnames = new HashSet<>(Arrays.asList(reset, start, open));
-        Set<ActionDefinition> actions = actionNetconfMessageTransformer.getActions();
+        final QName reset = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "reset");
+        final QName start = QName.create(reset, "start");
+        final QName open = QName.create(start, "open");
+        final Set<QName> qnames = new HashSet<>(Arrays.asList(reset, start, open));
+        final Set<ActionDefinition> actions = actionNetconfMessageTransformer.getActions();
         assertTrue(!actions.isEmpty());
         for (ActionDefinition actionDefinition : actions) {
-            QName qname = actionDefinition.getQName();
+            final QName qname = actionDefinition.getQName();
             assertTrue(qnames.contains(qname));
             qnames.remove(qname);
         }
@@ -411,28 +414,28 @@ public class NetconfMessageTransformerTest {
 
     @Test
     public void toActionRequestListTopLevelTest() {
-        QName qname = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "server");
-        QName nameQname = QName.create(qname, "name");
-        QName actionResetQName = QName.create(qname, "reset");
+        final QName qname = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "server");
+        final QName nameQname = QName.create(qname, "name");
+        final QName actionResetQName = QName.create(qname, "reset");
 
-        Set<PathArgument> nodeIdentifiers =
+        final Set<PathArgument> nodeIdentifiers =
                 Collections.singleton(new NodeIdentifierWithPredicates(qname, nameQname, "test"));
-        DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
+        final DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        ContainerNode data = initInputAction(QName.create(qname, "reset-at"), "now");
+        final ContainerNode data = initInputAction(QName.create(qname, "reset-at"), "now");
 
-        NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
+        final NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
                 SchemaPath.create(true, actionResetQName), domDataTreeIdentifier, data);
 
-        Node childAction = checkBasePartOfActionRequest(actionRequest);
+        final Node childAction = checkBasePartOfActionRequest(actionRequest);
 
-        Node childServer = childAction.getFirstChild();
+        final Node childServer = childAction.getFirstChild();
         checkNode(childServer, "server", "server", qname.getNamespace().toString());
 
-        Node childName = childServer.getFirstChild();
+        final Node childName = childServer.getFirstChild();
         checkNode(childName, "name", "name", qname.getNamespace().toString());
 
-        Node childTest = childName.getFirstChild();
+        final Node childTest = childName.getFirstChild();
         assertEquals(childTest.getNodeValue(), "test");
 
         checkAction(actionResetQName, childName.getNextSibling(), "reset-at", "reset-at", "now");
@@ -440,19 +443,19 @@ public class NetconfMessageTransformerTest {
 
     @Test
     public void toActionRequestContainerTopLevelTest() {
-        QName qname = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "device");
-        QName actionStartQName = QName.create(qname, "start");
+        final QName qname = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "device");
+        final QName actionStartQName = QName.create(qname, "start");
 
-        Set<PathArgument> nodeIdentifiers = Collections.singleton(NodeIdentifier.create(qname));
-        DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
+        final Set<PathArgument> nodeIdentifiers = Collections.singleton(NodeIdentifier.create(qname));
+        final DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        NormalizedNode<?, ?> payload = initInputAction(QName.create(qname, "start-at"), "now");
-        NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
+        final NormalizedNode<?, ?> payload = initInputAction(QName.create(qname, "start-at"), "now");
+        final NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
                 SchemaPath.create(true, actionStartQName), domDataTreeIdentifier, payload);
 
-        Node childAction = checkBasePartOfActionRequest(actionRequest);
+        final Node childAction = checkBasePartOfActionRequest(actionRequest);
 
-        Node childDevice = childAction.getFirstChild();
+        final Node childDevice = childAction.getFirstChild();
         checkNode(childDevice, "device", "device", qname.getNamespace().toString());
 
         checkAction(actionStartQName, childDevice.getFirstChild(), "start-at", "start-at", "now");
@@ -460,49 +463,49 @@ public class NetconfMessageTransformerTest {
 
     @Test
     public void toActionRequestContainerInContainerTest() {
-        QName boxOutQName = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "box-out");
-        QName boxInQName = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "box-in");
-        QName actionOpenQName = QName.create(boxOutQName, "open");
+        final QName boxOutQName = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "box-out");
+        final QName boxInQName = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "box-in");
+        final QName actionOpenQName = QName.create(boxOutQName, "open");
 
-        Set<PathArgument> nodeIdentifiers = new HashSet<>();
+        final Set<PathArgument> nodeIdentifiers = new HashSet<>();
         nodeIdentifiers.add(NodeIdentifier.create(boxOutQName));
         nodeIdentifiers.add(NodeIdentifier.create(boxInQName));
 
-        DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
+        final DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        NormalizedNode<?, ?> payload = initInputAction(QName.create(boxOutQName, "start-at"), "now");
-        NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
+        final NormalizedNode<?, ?> payload = initInputAction(QName.create(boxOutQName, "start-at"), "now");
+        final NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
                 SchemaPath.create(true, actionOpenQName), domDataTreeIdentifier, payload);
 
-        Node childAction = checkBasePartOfActionRequest(actionRequest);
+        final Node childAction = checkBasePartOfActionRequest(actionRequest);
 
-        Node childBoxOut = childAction.getFirstChild();
+        final Node childBoxOut = childAction.getFirstChild();
         checkNode(childBoxOut, "box-out", "box-out", boxOutQName.getNamespace().toString());
 
-        Node childBoxIn = childBoxOut.getFirstChild();
+        final Node childBoxIn = childBoxOut.getFirstChild();
         checkNode(childBoxIn, "box-in", "box-in", boxOutQName.getNamespace().toString());
 
-        Node action = childBoxIn.getFirstChild();
+        final Node action = childBoxIn.getFirstChild();
         checkNode(action, null, actionOpenQName.getLocalName(), null);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void toActionResultTest() throws Exception {
-        QName qname = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "reset");
+        final QName qname = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "reset");
 
-        NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
+        final NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
                 + "<reset-finished-at xmlns=\"urn:example:server-farm\">"
                 + "now"
                 + "</reset-finished-at>"
                 + "</rpc-reply>"));
-        DOMActionResult actionResult = actionNetconfMessageTransformer.toActionResult(
+        final DOMActionResult actionResult = actionNetconfMessageTransformer.toActionResult(
                 SchemaPath.create(true, qname), message);
         assertNotNull(actionResult);
-        ContainerNode containerNode = actionResult.getOutput().get();
+        final ContainerNode containerNode = actionResult.getOutput().get();
         assertNotNull(containerNode);
-        LeafNode<String> leaf = (LeafNode) containerNode.getValue().iterator().next();
+        final LeafNode<String> leaf = (LeafNode) containerNode.getValue().iterator().next();
         assertEquals("now", leaf.getValue());
     }
 
@@ -518,36 +521,33 @@ public class NetconfMessageTransformerTest {
     }
 
     private static Node checkBasePartOfActionRequest(final NetconfMessage actionRequest) {
-        Node baseRpc = actionRequest.getDocument().getFirstChild();
+        final Node baseRpc = actionRequest.getDocument().getFirstChild();
         checkNode(baseRpc, "rpc", "rpc", NetconfMessageTransformUtil.NETCONF_QNAME.getNamespace().toString());
         assertTrue(baseRpc.getLocalName().equals("rpc"));
         assertTrue(baseRpc.getNodeName().equals("rpc"));
 
-        Node messageId = baseRpc.getAttributes().getNamedItem("message-id");
+        final Node messageId = baseRpc.getAttributes().getNamedItem("message-id");
         assertNotNull(messageId);
         assertTrue(messageId.getNodeValue().contains("m-"));
 
-        Node childAction = baseRpc.getFirstChild();
+        final Node childAction = baseRpc.getFirstChild();
         checkNode(childAction, "action", "action", NetconfMessageTransformUtil.NETCONF_ACTION_NAMESPACE.toString());
         return childAction;
     }
 
     private static DOMDataTreeIdentifier prepareDataTreeId(final Set<PathArgument> nodeIdentifiers) {
-        YangInstanceIdentifier yangInstanceIdentifier =
+        final YangInstanceIdentifier yangInstanceIdentifier =
                 YangInstanceIdentifier.builder().append(nodeIdentifiers).build();
-        DOMDataTreeIdentifier domDataTreeIdentifier =
-                new DOMDataTreeIdentifier(org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION,
-                        yangInstanceIdentifier);
-        return domDataTreeIdentifier;
+        return new DOMDataTreeIdentifier(org.opendaylight.mdsal.common.api.LogicalDatastoreType.CONFIGURATION,
+                yangInstanceIdentifier);
     }
 
     private static ContainerNode initInputAction(final QName qname, final String value) {
-        ImmutableLeafNodeBuilder<String> immutableLeafNodeBuilder = new ImmutableLeafNodeBuilder<>();
-        DataContainerChild<NodeIdentifier, String> build = immutableLeafNodeBuilder.withNodeIdentifier(
+        final ImmutableLeafNodeBuilder<String> immutableLeafNodeBuilder = new ImmutableLeafNodeBuilder<>();
+        final DataContainerChild<NodeIdentifier, String> build = immutableLeafNodeBuilder.withNodeIdentifier(
                 NodeIdentifier.create(qname)).withValue(value).build();
-        ContainerNode data = ImmutableContainerNodeBuilder.create().withNodeIdentifier(NodeIdentifier.create(
+        return ImmutableContainerNodeBuilder.create().withNodeIdentifier(NodeIdentifier.create(
                 QName.create(qname, "input"))).withChild(build).build();
-        return data;
     }
 
     private static void checkNode(final Node childServer, final String expectedLocalName, final String expectedNodeName,

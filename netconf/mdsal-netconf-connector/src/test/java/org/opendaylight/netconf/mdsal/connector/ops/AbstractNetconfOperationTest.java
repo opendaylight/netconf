@@ -24,9 +24,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.custommonkey.xmlunit.DetailedDiff;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -41,7 +38,7 @@ import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.get.Get;
 import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
-import org.opendaylight.netconf.util.test.NetconfXmlUnitRecursiveQualifier;
+import org.opendaylight.netconf.util.test.NetconfXmlUnitRecursiveSelector;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -51,6 +48,10 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.ElementSelectors;
 
 public abstract class AbstractNetconfOperationTest {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfOperationTest.class);
@@ -63,11 +64,8 @@ public abstract class AbstractNetconfOperationTest {
     private TransactionProvider transactionProvider;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
-
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
 
         final SchemaContext schemaContext = getSchemaContext();
         final DOMSchemaService schemaService = new SchemaServiceStub(schemaContext);
@@ -217,14 +215,19 @@ public abstract class AbstractNetconfOperationTest {
     }
 
     protected static void verifyResponse(final Document response, final Document template) throws Exception {
-        final DetailedDiff dd = new DetailedDiff(new Diff(response, template));
-        dd.overrideElementQualifier(new NetconfXmlUnitRecursiveQualifier());
-        if (!dd.similar()) {
+        final Diff diff = DiffBuilder.compare(template)
+                .withTest(response)
+                .withNodeMatcher(new DefaultNodeMatcher(new NetconfXmlUnitRecursiveSelector(), ElementSelectors.byName))
+                .ignoreWhitespace()
+                .checkForSimilar()
+                .build();
+
+        if (diff.hasDifferences()) {
             LOG.warn("Actual response:");
             printDocument(response);
             LOG.warn("Expected response:");
             printDocument(template);
-            fail("Differences found: " + dd.toString());
+            fail("Differences found: " + diff);
         }
     }
 

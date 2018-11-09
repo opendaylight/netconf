@@ -22,7 +22,6 @@ import static org.opendaylight.netconf.mdsal.connector.ops.AbstractNetconfOperat
 
 import com.google.common.util.concurrent.Futures;
 import java.util.Collections;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -45,13 +44,12 @@ public class ValidateTest {
     private DOMDataBroker dataBroker;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         initMocks(this);
         doReturn(Futures.immediateCheckedFuture(null)).when(noopValidator).validate(any());
         doReturn(Futures.immediateFailedCheckedFuture(new ValidationFailedException("invalid data")))
             .when(failingValidator).validate(any());
         doReturn(readWriteTx).when(dataBroker).newReadWriteTransaction();
-        XMLUnit.setIgnoreWhitespace(true);
     }
 
     @Test

@@ -10,6 +10,7 @@ package org.opendaylight.netconf.nettyutil.handler;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import com.siemens.ct.exi.core.exceptions.EXIException;
 import com.siemens.ct.exi.main.api.sax.SAXEncoder;
@@ -23,12 +24,13 @@ import java.util.List;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Diff;
 
 public class NetconfEXIHandlersTest {
 
@@ -74,6 +76,9 @@ public class NetconfEXIHandlersTest {
         final List<Object> out = new ArrayList<>();
         netconfEXIToMessageDecoder.decode(null, buffer, out);
 
-        XMLUnit.compareXML(msg.getDocument(), ((NetconfMessage) out.get(0)).getDocument());
+        final Diff diff = DiffBuilder.compare(msg.getDocument())
+                .withTest(((NetconfMessage) out.get(0)).getDocument())
+                .build();
+        assertFalse(diff.toString(), diff.hasDifferences());
     }
 }
