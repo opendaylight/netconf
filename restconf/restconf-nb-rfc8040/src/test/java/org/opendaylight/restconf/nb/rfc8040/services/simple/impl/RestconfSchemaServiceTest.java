@@ -14,18 +14,14 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableClassToInstanceMap;
-import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.broker.impl.mount.DOMMountPointServiceImpl;
-import org.opendaylight.controller.md.sal.dom.broker.spi.mount.SimpleDOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -72,10 +68,6 @@ public class RestconfSchemaServiceTest {
     // schema context with mount points
     private SchemaContext schemaContextWithMountPoints;
 
-    // mount point with schema context with modules behind mount point
-    private DOMMountPoint mountPoint;
-    // mount point with null schema context
-    private DOMMountPoint mountPointWithNullSchemaContext;
     // mount point service
     private DOMMountPointService mountPointService;
 
@@ -89,22 +81,13 @@ public class RestconfSchemaServiceTest {
         this.schemaContextWithMountPoints =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/modules/mount-points"));
 
-        // create and register mount points
-        this.mountPoint = SimpleDOMMountPoint.create(
-                YangInstanceIdentifier.of(QName.create("mount:point:1", "2016-01-01", "cont")),
-                ImmutableClassToInstanceMap.copyOf(new HashMap<>()),
-                this.schemaContextBehindMountPoint
-        );
-
-        this.mountPointWithNullSchemaContext = SimpleDOMMountPoint.create(
-                YangInstanceIdentifier.of(QName.create("mount:point:2", "2016-01-01", "cont")),
-                ImmutableClassToInstanceMap.copyOf(new HashMap<>()),
-                null
-        );
-
         this.mountPointService = new DOMMountPointServiceImpl();
-        ((DOMMountPointServiceImpl) this.mountPointService).registerMountPoint(this.mountPoint);
-        ((DOMMountPointServiceImpl) this.mountPointService).registerMountPoint(this.mountPointWithNullSchemaContext);
+        // create and register mount points
+        mountPointService.createMountPoint(
+            YangInstanceIdentifier.of(QName.create("mount:point:1", "2016-01-01", "cont")))
+        .addInitialSchemaContext(schemaContextBehindMountPoint).register();
+        mountPointService.createMountPoint(
+            YangInstanceIdentifier.of(QName.create("mount:point:2", "2016-01-01", "cont"))).register();
 
         this.schemaService = new RestconfSchemaServiceImpl(this.mockContextHandler,
                 DOMMountPointServiceHandler.newInstance(mountPointService), sourceProvider);

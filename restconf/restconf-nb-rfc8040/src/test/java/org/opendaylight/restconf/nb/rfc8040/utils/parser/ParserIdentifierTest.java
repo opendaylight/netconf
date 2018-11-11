@@ -15,8 +15,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableClassToInstanceMap;
-import com.google.common.collect.Maps;
 import java.util.Map.Entry;
 import org.junit.Before;
 import org.junit.Rule;
@@ -27,7 +25,6 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
 import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
 import org.opendaylight.controller.md.sal.dom.broker.impl.mount.DOMMountPointServiceImpl;
-import org.opendaylight.controller.md.sal.dom.broker.spi.mount.SimpleDOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -115,18 +112,14 @@ public class ParserIdentifierTest {
         this.schemaContextOnMountPoint =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/parser-identifier"));
 
-        // create and register mount point
-        this.mountPoint = SimpleDOMMountPoint.create(
-                YangInstanceIdentifier.builder()
-                        .node(QName.create("mount:point", "2016-06-02", "mount-container"))
-                        .node(QName.create("mount:point", "2016-06-02", "point-number"))
-                        .build(),
-                ImmutableClassToInstanceMap.copyOf(Maps.newHashMap()),
-                this.schemaContextOnMountPoint
-        );
-
         this.mountPointService = new DOMMountPointServiceImpl();
-        ((DOMMountPointServiceImpl) this.mountPointService).registerMountPoint(this.mountPoint);
+
+        // create and register mount point
+        mountPoint = mountPointService.createMountPoint(YangInstanceIdentifier.builder()
+            .node(QName.create("mount:point", "2016-06-02", "mount-container"))
+            .node(QName.create("mount:point", "2016-06-02", "point-number"))
+            .build())
+        .addInitialSchemaContext(this.schemaContextOnMountPoint).register().getInstance();
 
         // register mount point with null schema context
         when(this.mockMountPoint.getSchemaContext()).thenReturn(null);
