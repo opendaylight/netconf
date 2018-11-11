@@ -115,11 +115,15 @@ public class ParserIdentifierTest {
         this.mountPointService = new DOMMountPointServiceImpl();
 
         // create and register mount point
-        mountPoint = mountPointService.createMountPoint(YangInstanceIdentifier.builder()
-            .node(QName.create("mount:point", "2016-06-02", "mount-container"))
-            .node(QName.create("mount:point", "2016-06-02", "point-number"))
-            .build())
-        .addInitialSchemaContext(this.schemaContextOnMountPoint).register().getInstance();
+        final YangInstanceIdentifier mountPointId = YangInstanceIdentifier.builder()
+                .node(QName.create("mount:point", "2016-06-02", "mount-container"))
+                .node(QName.create("mount:point", "2016-06-02", "point-number"))
+                .build();
+
+        mountPoint = mountPointService.createMountPoint(mountPointId)
+                .addInitialSchemaContext(this.schemaContextOnMountPoint)
+                .register()
+                .getInstance();
 
         // register mount point with null schema context
         when(this.mockMountPoint.getSchemaContext()).thenReturn(null);
