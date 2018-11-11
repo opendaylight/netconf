@@ -83,11 +83,13 @@ public class RestconfSchemaServiceTest {
 
         this.mountPointService = new DOMMountPointServiceImpl();
         // create and register mount points
-        mountPointService.createMountPoint(
-            YangInstanceIdentifier.of(QName.create("mount:point:1", "2016-01-01", "cont")))
-        .addInitialSchemaContext(schemaContextBehindMountPoint).register();
-        mountPointService.createMountPoint(
-            YangInstanceIdentifier.of(QName.create("mount:point:2", "2016-01-01", "cont"))).register();
+        mountPointService
+                .createMountPoint(YangInstanceIdentifier.of(QName.create("mount:point:1", "2016-01-01", "cont")))
+                .addInitialSchemaContext(schemaContextBehindMountPoint)
+                .register();
+        mountPointService
+                .createMountPoint(YangInstanceIdentifier.of(QName.create("mount:point:2", "2016-01-01", "cont")))
+                .register();
 
         this.schemaService = new RestconfSchemaServiceImpl(this.mockContextHandler,
                 DOMMountPointServiceHandler.newInstance(mountPointService), sourceProvider);
