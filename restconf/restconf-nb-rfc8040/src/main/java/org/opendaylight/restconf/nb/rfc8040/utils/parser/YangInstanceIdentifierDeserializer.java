@@ -394,8 +394,11 @@ public final class YangInstanceIdentifierDeserializer {
             checkValid(RestconfConstants.SLASH == currentChar(variables.getOffset(), variables.getData()),
                     "Identifier must start with '/'.", variables.getData(), variables.getOffset());
 
-            // skip slash
-            skipCurrentChar(variables);
+            // skip consecutive slashes, see NETCONF-24
+            while (!allCharsConsumed(variables)
+                    && RestconfConstants.SLASH == currentChar(variables.getOffset(), variables.getData())) {
+                skipCurrentChar(variables);
+            }
 
             // check if slash is not also the last char in identifier
             checkValid(!allCharsConsumed(variables), "Identifier cannot end with '/'.",
