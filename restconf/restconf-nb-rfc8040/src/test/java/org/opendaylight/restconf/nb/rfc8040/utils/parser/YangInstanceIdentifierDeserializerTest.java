@@ -223,6 +223,43 @@ public class YangInstanceIdentifierDeserializerTest {
         assertTrue("Empty result expected", Iterables.isEmpty(result));
     }
 
+
+    /**
+     * Test of deserialization <code>String</code> URI with identifiers separated by multiple slashes to
+     * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
+     */
+    @Test
+    public void deserializeMultipleSlashesTest() {
+        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer
+                .create(this.schemaContext, "deserializer-test:contA////list-A=40//list-key");
+
+        assertEquals("Result does not contains expected number of path arguments", 4, Iterables.size(result));
+
+        final Iterator<YangInstanceIdentifier.PathArgument> iterator = result.iterator();
+
+        // container
+        assertEquals("Not expected path argument",
+                YangInstanceIdentifier.NodeIdentifier.create(QName.create("deserializer:test", "2016-06-06", "contA")),
+                iterator.next());
+
+        // list
+        final QName list = QName.create("deserializer:test", "2016-06-06", "list-A");
+        assertEquals("Not expected path argument",
+                YangInstanceIdentifier.NodeIdentifier.create(list),
+                iterator.next());
+        assertEquals("Not expected path argument",
+                new YangInstanceIdentifier.NodeIdentifierWithPredicates(
+                        list, QName.create(list, "list-key"), 40).toString(),
+                iterator.next().toString());
+
+        // leaf
+        assertEquals("Not expected path argument",
+                new YangInstanceIdentifier.NodeIdentifier(
+                        QName.create("deserializer:test", "2016-06-06", "list-key")),
+                iterator.next());
+    }
+
+
     /**
      * Negative test when supplied <code>SchemaContext</code> is null. Test is expected to fail with
      * <code>NullPointerException</code>.
@@ -264,13 +301,33 @@ public class YangInstanceIdentifierDeserializerTest {
     }
 
     /**
+     * Negative test of validating identifier when there are multiple slashes after container without next identifier.
+     * Test is expected to fail with <code>IllegalArgumentException</code>.
+     */
+    @Test
+    public void validArgIdentifierContainerEndsWithMultipleSlashesNegativeTest() {
+        this.thrown.expect(IllegalArgumentException.class);
+        YangInstanceIdentifierDeserializer.create(this.schemaContext, "deserializer-test:contA///");
+    }
+
+    /**
      * Negative test of validating identifier when there is a slash after list key values without next identifier. Test
      * is expected to fail with <code>IllegalArgumentException</code>.
      */
     @Test
-    public void validArgIdentifierListEndsWithSlashLNegativeTest() {
+    public void validArgIdentifierListEndsWithSlashNegativeTest() {
         this.thrown.expect(IllegalArgumentException.class);
         YangInstanceIdentifierDeserializer.create(this.schemaContext, "deserializer-test:list-one-key=value/");
+    }
+
+    /**
+     * Negative test of validating identifier when there are multiple slashes after list key values without next
+     * identifier. Test is expected to fail with <code>IllegalArgumentException</code>.
+     */
+    @Test
+    public void validArgIdentifierListEndsWithSlashesNegativeTest() {
+        this.thrown.expect(IllegalArgumentException.class);
+        YangInstanceIdentifierDeserializer.create(this.schemaContext, "deserializer-test:list-one-key=value//");
     }
 
     /**
@@ -281,16 +338,6 @@ public class YangInstanceIdentifierDeserializerTest {
     public void prepareQnameEmptyIdentifierNegativeTest() {
         this.thrown.expect(IllegalArgumentException.class);
         YangInstanceIdentifierDeserializer.create(this.schemaContext, "/");
-    }
-
-    /**
-     * Negative test of creating <code>QName</code> when two identifiers are separated by two slashes. Test is
-     * expected to fail with <code>IllegalArgumentException</code>.
-     */
-    @Test
-    public void prepareQnameTwoSlashesNegativeTest() {
-        this.thrown.expect(IllegalArgumentException.class);
-        YangInstanceIdentifierDeserializer.create(this.schemaContext, "deserializer-test:contA//leaf-A");
     }
 
     /**
