@@ -516,6 +516,10 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         } else {
             throw new IllegalStateException("Unsupported protocol type: " + node.getProtocol().getName().getClass());
         }
+        if (node.getOdlHelloMessageCapabilities() != null) {
+            reconnectingClientConfigurationBuilder
+                    .withOdlHelloCapabilities(node.getOdlHelloMessageCapabilities().getCapability());
+        }
 
         return reconnectingClientConfigurationBuilder
                 .withAddress(socketAddress)
