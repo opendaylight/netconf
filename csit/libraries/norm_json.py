@@ -167,7 +167,7 @@ def hide_volatile(obj, keys_with_volatiles=[]):
             # Unicode is not str and vice versa, isinstance has to check for both.
             # Luckily, "in" recognizes equivalent strings in different encodings.
             # Type "bytes" is added for Python 3 compatibility.
-            if key in keys_with_volatiles and isinstance(value, (unicode, str, bytes, int)):
+            if key in keys_with_volatiles and isinstance(value, (unicode, str, bytes, int, bool)):
                 obj[key] = "*"
             else:
                 hide_volatile(value, keys_with_volatiles)
