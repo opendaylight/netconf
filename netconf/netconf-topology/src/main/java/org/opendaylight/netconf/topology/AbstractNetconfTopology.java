@@ -447,7 +447,15 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         final AuthenticationHandler authHandler = getHandlerFromCredentials(node.getCredentials());
 
-        return NetconfReconnectingClientConfigurationBuilder.create()
+        final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder =
+                NetconfReconnectingClientConfigurationBuilder.create();
+
+        if (node.getOdlHelloMessageCapabilities() != null) {
+            reconnectingClientConfigurationBuilder
+                    .withOdlHelloCapabilities(node.getOdlHelloMessageCapabilities().getCapability());
+        }
+
+        return reconnectingClientConfigurationBuilder
                 .withAddress(socketAddress)
                 .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
                 .withReconnectStrategy(strategy)
