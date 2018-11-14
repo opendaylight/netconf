@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cfe7358b_1e199f6d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2018-11-14T14:30:39Z",
+      "side": 1,
+      "message": "this is properly done just above Change-Id via:\n\nJIRA: NETCONF-580",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 47
+      },
+      "revId": "4a94ccea8418d3d80735189fcd0a34a2ae63db06",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
