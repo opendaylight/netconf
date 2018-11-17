@@ -10,12 +10,11 @@ package org.opendaylight.controller.sal.restconf.impl.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.Set;
@@ -28,6 +27,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.common.api.data.TransactionCommitFailedException;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
+import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
@@ -79,8 +79,8 @@ public class RestDeleteOperationTest extends JerseyTest {
     @Test
     public void deleteConfigStatusCodes() throws UnsupportedEncodingException {
         final String uri = "/config/test-interface:interfaces";
-        when(brokerFacade.commitConfigurationDataDelete(any(YangInstanceIdentifier.class))).thenReturn(
-                Futures.immediateCheckedFuture(null));
+        doReturn(CommitInfo.emptyFluentFuture()).when(brokerFacade)
+            .commitConfigurationDataDelete(any(YangInstanceIdentifier.class));
         Response response = target(uri).request(MediaType.APPLICATION_XML).delete();
         assertEquals(200, response.getStatus());
 
@@ -93,9 +93,8 @@ public class RestDeleteOperationTest extends JerseyTest {
     @Test
     public void deleteFailTest() throws Exception {
         final String uri = "/config/test-interface:interfaces";
-        final CheckedFuture<Void, TransactionCommitFailedException> future =
-                Futures.immediateFailedCheckedFuture(new TransactionCommitFailedException("failed test"));
-        when(brokerFacade.commitConfigurationDataDelete(any(YangInstanceIdentifier.class))).thenReturn(future);
+        doReturn(immediateFailedFluentFuture(new TransactionCommitFailedException("failed test"))).when(brokerFacade)
+            .commitConfigurationDataDelete(any(YangInstanceIdentifier.class));
         final Response response = target(uri).request(MediaType.APPLICATION_XML).delete();
         assertEquals(500, response.getStatus());
     }

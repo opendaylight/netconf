@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static org.junit.Assert.assertEquals;
@@ -14,19 +13,19 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPoint;
-import org.opendaylight.controller.md.sal.dom.api.DOMMountPointService;
-import org.opendaylight.controller.md.sal.dom.broker.impl.mount.DOMMountPointServiceImpl;
+import org.opendaylight.mdsal.dom.api.DOMMountPoint;
+import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
+import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -142,7 +141,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierTest() {
         final InstanceIdentifierContext<?> context = ParserIdentifier.toInstanceIdentifier(
-                TEST_IDENT, this.schemaContext, Optional.absent());
+                TEST_IDENT, this.schemaContext, Optional.empty());
 
         assertEquals("Returned not expected identifier",
                 TEST_IDENT_RESULT, context .getInstanceIdentifier().toString());
@@ -155,7 +154,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierOtherModulesTest() {
         final InstanceIdentifierContext<?> context = ParserIdentifier.toInstanceIdentifier(
-                TEST_IDENT_OTHERS, this.schemaContext, Optional.absent());
+                TEST_IDENT_OTHERS, this.schemaContext, Optional.empty());
 
         assertEquals("Returned not expected identifier",
                 TEST_IDENT_OTHERS_RESULT, context.getInstanceIdentifier().toString());
@@ -187,7 +186,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierNullIdentifierTest() {
         final InstanceIdentifierContext<?> context = ParserIdentifier.toInstanceIdentifier(
-                null, this.schemaContext, Optional.absent());
+                null, this.schemaContext, Optional.empty());
         assertEquals("Returned not expected identifier",
                 YangInstanceIdentifier.EMPTY, context.getInstanceIdentifier());
     }
@@ -199,7 +198,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierNullSchemaContextNegativeTest() {
         this.thrown.expect(NullPointerException.class);
-        ParserIdentifier.toInstanceIdentifier(TEST_IDENT, null, Optional.absent());
+        ParserIdentifier.toInstanceIdentifier(TEST_IDENT, null, Optional.empty());
     }
 
     /**
@@ -208,7 +207,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierEmptyIdentifierTest() {
         final InstanceIdentifierContext<?> context = ParserIdentifier.toInstanceIdentifier(
-                "", this.schemaContext, Optional.absent());
+                "", this.schemaContext, Optional.empty());
         assertEquals("Returned not expected identifier",
                 YangInstanceIdentifier.EMPTY, context.getInstanceIdentifier());
     }
@@ -219,7 +218,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierInvalidIdentifierNegativeTest() {
         this.thrown.expect(IllegalArgumentException.class);
-        ParserIdentifier.toInstanceIdentifier(INVALID_TEST_IDENT, this.schemaContext, Optional.absent());
+        ParserIdentifier.toInstanceIdentifier(INVALID_TEST_IDENT, this.schemaContext, Optional.empty());
     }
 
     /**
@@ -262,7 +261,7 @@ public class ParserIdentifierTest {
     @Test
     public void toInstanceIdentifierMissingMountPointServiceNegativeTest() {
         try {
-            ParserIdentifier.toInstanceIdentifier(RestconfConstants.MOUNT, this.schemaContext, Optional.absent());
+            ParserIdentifier.toInstanceIdentifier(RestconfConstants.MOUNT, this.schemaContext, Optional.empty());
             fail("Test should fail due to absent mount point service");
         } catch (final RestconfDocumentedException e) {
             assertEquals("Not expected error type",
@@ -661,7 +660,7 @@ public class ParserIdentifierTest {
     @Test
     public void invokeRpcTest() {
         final InstanceIdentifierContext<?> result = ParserIdentifier.toInstanceIdentifier(
-                INVOKE_RPC, this.schemaContext, Optional.absent());
+                INVOKE_RPC, this.schemaContext, Optional.empty());
 
         // RPC schema node
         final QName rpcQName = result.getSchemaNode().getQName();
