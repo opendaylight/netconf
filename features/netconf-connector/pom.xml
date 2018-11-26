@@ -22,7 +22,7 @@
     <properties>
       <commons.opendaylight.version>1.12.0-SNAPSHOT</commons.opendaylight.version>
       <controller.mdsal.version>1.9.0-SNAPSHOT</controller.mdsal.version>
-      <mdsal.version>3.0.1</mdsal.version>
+      <mdsal.version>3.0.2-SNAPSHOT</mdsal.version>
       <netconf.version>1.6.0-SNAPSHOT</netconf.version>
       <netconf.connector.version>1.9.0-SNAPSHOT</netconf.connector.version>
     </properties>
@@ -50,7 +50,7 @@
       <dependency>
         <groupId>org.opendaylight.yangtools</groupId>
         <artifactId>yangtools-artifacts</artifactId>
-        <version>2.1.2</version>
+        <version>2.1.4</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
