@@ -31,4 +31,43 @@
         <module>restconf</module>
     </modules>
 
+    <profiles>
+        <profile>
+            <id>sonar-jacoco-aggregate</id>
+            <activation>
+                <property>
+                    <name>odl.jacoco.aggregatefile</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupid>org.jacoco</groupid>
+                        <artifactid>jacoco-maven-plugin</artifactid>
+                        <executions>
+                            <execution>
+                                <id>merge</id>
+                                <goals>
+                                    <goal>merge</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <destfile>${odl.jacoco.aggregatefile}</destfile>
+                                    <filesets>
+                                        <fileset>
+                                            <directory>${project.basedir}</directory>
+                                            <includes>
+                                                <include>**/target/code-coverage/*.exec</include>
+                                            </includes>
+                                        </fileset>
+                                    </filesets>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
