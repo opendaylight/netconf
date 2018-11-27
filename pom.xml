@@ -23,6 +23,11 @@
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.install.skip>true</maven.install.skip>
+    </properties>
+
     <modules>
         <module>features</module>
         <module>karaf</module>
