@@ -21,12 +21,17 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import java.net.InetSocketAddress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProxyServer implements AutoCloseable {
+    private static final Logger LOG = LoggerFactory.getLogger(ProxyServer.class);
+
     private final EventLoopGroup bossGroup = new NioEventLoopGroup();
     private final EventLoopGroup workerGroup = new NioEventLoopGroup();
     private final ChannelFuture channelFuture;
 
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public ProxyServer(InetSocketAddress address, final LocalAddress localAddress) {
         // Configure the server.
         final Bootstrap clientBootstrap = new Bootstrap();
@@ -44,7 +49,13 @@ public class ProxyServer implements AutoCloseable {
                 });
 
         // Start the server.
-        channelFuture = serverBootstrap.bind(address).syncUninterruptibly();
+        try {
+            channelFuture = serverBootstrap.bind(address).syncUninterruptibly();
+        } catch (Throwable throwable) {
+            // sync() re-throws exceptions declared as Throwable, so the compiler doesn't see them
+            LOG.error("Error while binding to address {}", address, throwable);
+            throw throwable;
+        }
     }
 
     @Override

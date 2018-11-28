@@ -107,6 +107,7 @@ public final class WebSocketServer implements Runnable {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public void run() {
         bossGroup = new NioEventLoopGroup();
         workerGroup = new NioEventLoopGroup();
@@ -121,6 +122,10 @@ public final class WebSocketServer implements Runnable {
             channel.closeFuture().sync();
         } catch (final InterruptedException e) {
             LOG.error("Web socket server encountered an error during startup attempt on port {}", port, e);
+        } catch (Throwable throwable) {
+            // sync() re-throws exceptions declared as Throwable, so the compiler doesn't see them
+            LOG.error("Error while binding to address {}, port {}", address, port, throwable);
+            throw throwable;
         } finally {
             stop();
         }
