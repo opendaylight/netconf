@@ -181,7 +181,7 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
             client.start();
             acceptor.bind(bindAddress);
         } catch (IOException e) {
-            LOG.error("Unable to start NETCONF CallHome Service", e);
+            LOG.error("Unable to start NETCONF CallHome Service on {}", bindAddress, e);
             throw e;
         }
     }
