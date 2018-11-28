@@ -1394,7 +1394,7 @@ public final class RestconfImpl implements RestconfService {
         return listModuleBuilder.build();
     }
 
-    protected MapEntryNode toModuleEntryNode(final Module module, final DataSchemaNode moduleSchemaNode) {
+    private MapEntryNode toModuleEntryNode(final Module module, final DataSchemaNode moduleSchemaNode) {
         Preconditions.checkArgument(moduleSchemaNode instanceof ListSchemaNode,
                 "moduleSchemaNode has to be of type ListSchemaNode");
         final ListSchemaNode listModuleSchemaNode = (ListSchemaNode) moduleSchemaNode;
@@ -1408,22 +1408,22 @@ public final class RestconfImpl implements RestconfService {
         moduleNodeValues
                 .withChild(Builders.leafBuilder((LeafSchemaNode) nameSchemaNode).withValue(module.getName()).build());
 
+        final QNameModule qNameModule = module.getQNameModule();
+
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "revision");
         final DataSchemaNode revisionSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(revisionSchemaNode instanceof LeafSchemaNode);
-        final java.util.Optional<Revision> revision = module.getQNameModule().getRevision();
-        if (revision.isPresent()) {
-            moduleNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) revisionSchemaNode)
-                .withValue(revision.get().toString()).build());
-        }
+        final java.util.Optional<Revision> revision = qNameModule.getRevision();
+        moduleNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) revisionSchemaNode)
+                .withValue(revision.map(Revision::toString).orElse("")).build());
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "namespace");
         final DataSchemaNode namespaceSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(namespaceSchemaNode instanceof LeafSchemaNode);
         moduleNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) namespaceSchemaNode)
-                .withValue(module.getNamespace().toString()).build());
+                .withValue(qNameModule.getNamespace().toString()).build());
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "feature");
