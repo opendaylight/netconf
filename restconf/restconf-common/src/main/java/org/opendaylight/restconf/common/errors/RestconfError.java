@@ -9,7 +9,6 @@
 package org.opendaylight.restconf.common.errors;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -220,18 +219,18 @@ public class RestconfError {
         this.errorMessage = rpcError.getMessage();
         this.errorAppTag = rpcError.getApplicationTag();
 
-        String errorInfo = null;
+        String localErrorInfo = null;
         if (rpcError.getInfo() == null) {
             if (rpcError.getCause() != null) {
-                errorInfo = Throwables.getStackTraceAsString(rpcError.getCause());
+                localErrorInfo = rpcError.getCause().getMessage();
             } else if (rpcError.getSeverity() != null) {
-                errorInfo = "<severity>" + rpcError.getSeverity().toString().toLowerCase() + "</severity>";
+                localErrorInfo = "<severity>" + rpcError.getSeverity().toString().toLowerCase() + "</severity>";
             }
         } else {
-            errorInfo = rpcError.getInfo();
+            localErrorInfo = rpcError.getInfo();
         }
 
-        this.errorInfo = errorInfo;
+        this.errorInfo = localErrorInfo;
         this.errorPath = null;
     }
 
