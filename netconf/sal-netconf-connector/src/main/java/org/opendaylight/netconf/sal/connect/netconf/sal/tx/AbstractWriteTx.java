@@ -201,7 +201,7 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
             public void onFailure(final Throwable throwable) {
                 final NetconfDocumentedException exception =
                         new NetconfDocumentedException(
-                                id + ":RPC during tx returned an exception",
+                                id + ":RPC during tx returned an exception" + throwable.getMessage(),
                                 new Exception(throwable),
                                 DocumentedException.ErrorType.APPLICATION,
                                 DocumentedException.ErrorTag.OPERATION_FAILED,
@@ -214,58 +214,61 @@ public abstract class AbstractWriteTx implements DOMDataWriteTransaction {
     }
 
     private void extractResult(final List<DOMRpcResult> domRpcResults,
-                               final SettableFuture<RpcResult<TransactionStatus>> transformed) {
+                               final SettableFuture<RpcResult<Void>> transformed) {
+        DocumentedException.ErrorType errType = DocumentedException.ErrorType.APPLICATION;
+        DocumentedException.ErrorSeverity errSeverity = DocumentedException.ErrorSeverity.ERROR;
+        StringBuilder msgBuilder = new StringBuilder();
+        boolean errorsEncouneterd = false;
+        String errorTag = "operation-failed";
+
         for (final DOMRpcResult domRpcResult : domRpcResults) {
             if (!domRpcResult.getErrors().isEmpty()) {
+                errorsEncouneterd = true;
                 final RpcError error = domRpcResult.getErrors().iterator().next();
                 final RpcError.ErrorType errorType = error.getErrorType();
-                final DocumentedException.ErrorType eType;
                 switch (errorType) {
                     case RPC:
-                        eType = DocumentedException.ErrorType.RPC;
+                        errType = DocumentedException.ErrorType.RPC;
                         break;
                     case PROTOCOL:
-                        eType = DocumentedException.ErrorType.PROTOCOL;
+                        errType = DocumentedException.ErrorType.PROTOCOL;
                         break;
                     case TRANSPORT:
-                        eType = DocumentedException.ErrorType.TRANSPORT;
+                        errType = DocumentedException.ErrorType.TRANSPORT;
                         break;
                     case APPLICATION:
-                        eType = DocumentedException.ErrorType.APPLICATION;
+                        errType = DocumentedException.ErrorType.APPLICATION;
                         break;
                     default:
-                        eType = DocumentedException.ErrorType.APPLICATION;
+                        errType = DocumentedException.ErrorType.APPLICATION;
                         break;
                 }
                 final RpcError.ErrorSeverity severity = error.getSeverity();
-                final DocumentedException.ErrorSeverity eSeverity;
                 switch (severity) {
                     case ERROR:
-                        eSeverity = DocumentedException.ErrorSeverity.ERROR;
+                        errSeverity = DocumentedException.ErrorSeverity.ERROR;
                         break;
                     case WARNING:
-                        eSeverity = DocumentedException.ErrorSeverity.WARNING;
+                        errSeverity = DocumentedException.ErrorSeverity.WARNING;
                         break;
                     default:
-                        eSeverity = DocumentedException.ErrorSeverity.ERROR;
+                        errSeverity = DocumentedException.ErrorSeverity.ERROR;
                         break;
                 }
-                final String message;
-                if (error.getMessage() == null || error.getMessage().isEmpty()) {
-                    message = id + ":RPC during tx failed";
-                } else {
-                    message = error.getMessage();
-                }
-                final NetconfDocumentedException exception = new NetconfDocumentedException(message,
-                        eType,
-                        DocumentedException.ErrorTag.from(error.getTag()),
-                        eSeverity);
-                transformed.setException(exception);
-                return;
+                msgBuilder.append(error.getMessage());
+                errorTag = error.getTag();
             }
         }
-
-        transformed.set(RpcResultBuilder.success(TransactionStatus.COMMITED).build());
+        if (errorsEncouneterd) {
+            final NetconfDocumentedException exception = new NetconfDocumentedException(id
+                    + ":RPC during tx failed. " + msgBuilder.toString(),
+                    errType,
+                    DocumentedException.ErrorTag.from(errorTag),
+                    errSeverity);
+            transformed.setException(exception);
+            return;
+        }
+        transformed.set(RpcResultBuilder.<Void>success().build());
     }
 
     AutoCloseable addListener(final TxListener listener) {
