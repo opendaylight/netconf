@@ -167,7 +167,7 @@ public class NetconfDeviceCommunicator
 
     public void disconnect() {
         // If session is already in closing, no need to close it again
-        if (currentSession != null && isSessionClosing.compareAndSet(false, true)) {
+        if (currentSession != null && isSessionClosing.compareAndSet(false, true) && currentSession.isUp()) {
             currentSession.close();
         }
     }
