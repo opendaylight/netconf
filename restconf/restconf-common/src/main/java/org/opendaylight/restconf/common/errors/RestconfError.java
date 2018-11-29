@@ -9,7 +9,8 @@
 package org.opendaylight.restconf.common.errors;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
+import java.io.Serializable;
+import java.util.Locale;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -223,7 +224,7 @@ public class RestconfError {
         String errorInfo = null;
         if (rpcError.getInfo() == null) {
             if (rpcError.getCause() != null) {
-                errorInfo = Throwables.getStackTraceAsString(rpcError.getCause());
+                localErrorInfo = rpcError.getCause().getMessage();
             } else if (rpcError.getSeverity() != null) {
                 errorInfo = "<severity>" + rpcError.getSeverity().toString().toLowerCase() + "</severity>";
             }
