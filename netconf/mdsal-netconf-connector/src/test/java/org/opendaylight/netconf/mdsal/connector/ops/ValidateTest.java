@@ -20,7 +20,6 @@ import static org.opendaylight.netconf.mdsal.connector.ops.AbstractNetconfOperat
 import static org.opendaylight.netconf.mdsal.connector.ops.AbstractNetconfOperationTest.verifyResponse;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
-import com.google.common.util.concurrent.Futures;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +30,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.mdsal.connector.DOMDataTransactionValidator;
 import org.opendaylight.netconf.mdsal.connector.DOMDataTransactionValidator.ValidationFailedException;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.w3c.dom.Document;
 
 public class ValidateTest {
@@ -46,8 +46,8 @@ public class ValidateTest {
     @Before
     public void setUp() throws Exception {
         initMocks(this);
-        doReturn(Futures.immediateCheckedFuture(null)).when(noopValidator).validate(any());
-        doReturn(Futures.immediateFailedCheckedFuture(new ValidationFailedException("invalid data")))
+        doReturn(FluentFutures.immediateNullFluentFuture()).when(noopValidator).validate(any());
+        doReturn(FluentFutures.immediateFailedFluentFuture(new ValidationFailedException("invalid data")))
             .when(failingValidator).validate(any());
         doReturn(readWriteTx).when(dataBroker).newReadWriteTransaction();
         XMLUnit.setIgnoreWhitespace(true);

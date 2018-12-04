@@ -85,8 +85,8 @@ public class TransactionProvider implements AutoCloseable {
         }
 
         try {
-            transactionValidator.validate(candidateTransaction).checkedGet();
-        } catch (final ValidationFailedException e) {
+            transactionValidator.validate(candidateTransaction).get();
+        } catch (final InterruptedException | ExecutionException e) {
             LOG.debug("Candidate transaction validation {} failed on session {}", candidateTransaction,
                 netconfSessionIdForReporting, e);
             final String cause = e.getCause() != null ? " Cause: " + e.getCause().getMessage() : "";
