@@ -11,7 +11,6 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-import com.google.common.util.concurrent.Futures;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -20,6 +19,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfConnectorDT
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 
 class TestingRemoteDeviceConnectorImpl extends RemoteDeviceConnectorImpl {
 
@@ -36,7 +36,7 @@ class TestingRemoteDeviceConnectorImpl extends RemoteDeviceConnectorImpl {
     public NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
             RemoteDeviceHandler<NetconfSessionPreferences> salFacade) {
         final NetconfConnectorDTO connectorDTO = new NetconfConnectorDTO(communicator, salFacade);
-        doReturn(Futures.immediateCheckedFuture(null)).when(communicator).initializeRemoteConnection(any(), any());
+        doReturn(FluentFutures.immediateNullFluentFuture()).when(communicator).initializeRemoteConnection(any(), any());
         return connectorDTO;
     }
 

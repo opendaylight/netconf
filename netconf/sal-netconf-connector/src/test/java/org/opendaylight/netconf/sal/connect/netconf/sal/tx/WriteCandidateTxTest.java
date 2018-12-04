@@ -13,7 +13,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +24,7 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -41,7 +41,7 @@ public class WriteCandidateTxTest {
         MockitoAnnotations.initMocks(this);
         final SchemaContext schemaContext =
                 YangParserTestUtils.parseYangResource("/schemas/test-module.yang");
-        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult())).when(rpc).invokeRpc(any(), any());
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(rpc).invokeRpc(any(), any());
         netconfOps = new NetconfBaseOps(rpc, schemaContext);
         id = new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830));
     }
