@@ -87,7 +87,7 @@ public class TestingNetconfClient implements Closeable {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("TestingNetconfClient{");
+        final StringBuilder sb = new StringBuilder("TestingNetconfClient{");
         sb.append("label=").append(label);
         sb.append(", sessionId=").append(sessionId);
         sb.append('}');

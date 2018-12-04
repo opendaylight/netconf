@@ -138,7 +138,7 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
 
         @Override
         public String toString() {
-            final StringBuffer sb = new StringBuffer("Notifications{");
+            final StringBuilder sb = new StringBuilder("Notifications{");
             sb.append("notificationList=").append(notificationList);
             sb.append('}');
             return sb.toString();
@@ -170,7 +170,7 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
 
         @Override
         public String toString() {
-            final StringBuffer sb = new StringBuffer("Notification{");
+            final StringBuilder sb = new StringBuilder("Notification{");
             sb.append("delayInSeconds=").append(delayInSeconds);
             sb.append(", times=").append(times);
             sb.append(", content='").append(content).append('\'');

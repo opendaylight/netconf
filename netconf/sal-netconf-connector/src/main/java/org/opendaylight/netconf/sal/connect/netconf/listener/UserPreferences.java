@@ -51,7 +51,7 @@ public class UserPreferences {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("UserPreferences{");
+        final StringBuilder sb = new StringBuilder("UserPreferences{");
         sb.append("sessionPreferences=").append(sessionPreferences);
         sb.append(", overrideModuleCapabilities=").append(overrideModuleCapabilities);
         sb.append(", overrideNonModuleCapabilities=").append(overrideNonModuleCapabilities);

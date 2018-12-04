@@ -89,7 +89,7 @@ public class RestconfImplTest {
     @Test
     public void binaryKeyTest() {
         final List<Byte> al = new ArrayList<>();
-        al.add(new Byte((byte) 1));
+        al.add((byte) 1);
         binaryKeyTest(al, al);
     }
 
@@ -113,7 +113,7 @@ public class RestconfImplTest {
     @Test
     public void binaryKeyFailTest() {
         final List<Byte> al = new ArrayList<>();
-        al.add(new Byte((byte) 1));
+        al.add((byte) 1);
         final List<Byte> al2 = new ArrayList<>();
         try {
             binaryKeyTest(al, al2);

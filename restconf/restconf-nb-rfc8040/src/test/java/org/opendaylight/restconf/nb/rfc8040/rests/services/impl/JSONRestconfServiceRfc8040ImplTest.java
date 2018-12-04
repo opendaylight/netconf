@@ -489,7 +489,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         assertTrue("Expected ContainerNode. Actual " + capturedNode.getValue().getClass(),
                 capturedNode.getValue() instanceof ContainerNode);
         final ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
-        verifyLeafNode(actualNode, TOASTER_DONENESS_QNAME, Long.valueOf(10));
+        verifyLeafNode(actualNode, TOASTER_DONENESS_QNAME, 10L);
         verifyLeafNode(actualNode, TOASTER_TYPE_QNAME, WHEAT_BREAD_QNAME);
     }
 

@@ -20,7 +20,6 @@ import com.google.common.collect.Maps;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import org.opendaylight.netconf.client.NetconfClientSession;
@@ -86,9 +85,8 @@ public final class NetconfSessionPreferences {
 
     // allows partial matches - assuming parameters are in the same order
     public boolean containsPartialNonModuleCapability(final String capability) {
-        final Iterator<String> iterator = getNonModuleCaps().iterator();
-        while (iterator.hasNext()) {
-            if (iterator.next().startsWith(capability)) {
+        for (final String nonModuleCap : getNonModuleCaps()) {
+            if (nonModuleCap.startsWith(capability)) {
                 LOG.trace("capability {} partially matches {}", capability, nonModuleCaps);
                 return true;
             }
