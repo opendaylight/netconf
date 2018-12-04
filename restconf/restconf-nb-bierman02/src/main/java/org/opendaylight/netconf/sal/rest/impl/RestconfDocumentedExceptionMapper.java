@@ -265,7 +265,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         final NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(streamWriter);
         try {
             if (isDataRoot) {
-                writeDataRoot(outputWriter,nnWriter,(ContainerNode) data);
+                writeDataRoot(nnWriter, (ContainerNode) data);
             } else {
                 if (data instanceof MapEntryNode) {
                     data = ImmutableNodes.mapNodeBuilder(data.getNodeType()).withChild((MapEntryNode) data).build();
@@ -383,11 +383,17 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         }
     }
 
-    private static void writeDataRoot(final OutputStreamWriter outputWriter, final NormalizedNodeWriter nnWriter,
-                                      final ContainerNode data) throws IOException {
-        for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
-            nnWriter.write(child);
-            nnWriter.flush();
-        }
+    private static void writeDataRoot(final NormalizedNodeWriter nnWriter, final ContainerNode data)
+            throws IOException {
+
+        data.getValue().forEach(node -> {
+            try {
+                nnWriter.write(node);
+            } catch (final IOException e) {
+                LOG.warn("Failed to write data root {}", data, e);
+            }
+        });
+
+        nnWriter.flush();
     }
 }
