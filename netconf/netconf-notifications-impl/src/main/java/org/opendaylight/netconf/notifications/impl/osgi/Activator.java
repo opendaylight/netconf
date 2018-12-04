@@ -47,7 +47,7 @@ public class Activator implements BundleActivator {
         final Dictionary<String, String> props = new Hashtable<>();
         props.put(NetconfConstants.SERVICE_NAME, NetconfConstants.NETCONF_NOTIFICATION);
         netconfNotificationCollectorServiceRegistration = context.registerService(NetconfNotificationCollector.class,
-                netconfNotificationManager, new Hashtable<String, Object>());
+                netconfNotificationManager, new Hashtable<>());
 
         final NetconfOperationServiceFactory netconfOperationServiceFactory = new NetconfOperationServiceFactory() {
 
