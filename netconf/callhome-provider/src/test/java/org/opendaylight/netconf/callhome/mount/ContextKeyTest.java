@@ -79,7 +79,7 @@ public class ContextKeyTest {
         // expect
         assertTrue(instance1.equals(instance1));
         assertFalse(instance1.equals(null));
-        assertFalse(instance1.equals(new Long(123456)));
+        assertFalse(instance1.equals(123456L));
         assertFalse(instance1.equals(instance2));
         assertFalse(instance1.equals(instance3));
         assertFalse(instance1.equals(instance4));

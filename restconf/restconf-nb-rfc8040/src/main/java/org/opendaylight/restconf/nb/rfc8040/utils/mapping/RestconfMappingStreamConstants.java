@@ -14,7 +14,7 @@ package org.opendaylight.restconf.nb.rfc8040.utils.mapping;
 public final class RestconfMappingStreamConstants {
 
     public static final String DESCRIPTION = "DESCRIPTION_PLACEHOLDER";
-    public static final Boolean REPLAY_SUPPORT = Boolean.valueOf(true);
+    public static final Boolean REPLAY_SUPPORT = Boolean.TRUE;
     public static final String REPLAY_LOG = "";
     public static final String EVENTS = "";
 
