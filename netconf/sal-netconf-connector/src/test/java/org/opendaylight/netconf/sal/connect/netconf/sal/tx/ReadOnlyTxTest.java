@@ -12,7 +12,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,6 +26,7 @@ import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -44,7 +44,7 @@ public class ReadOnlyTxTest {
     @Before
     public void setUp() throws DataNormalizationException {
         MockitoAnnotations.initMocks(this);
-        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(mockedNode))).when(rpc)
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult(mockedNode))).when(rpc)
                 .invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
         doReturn("node").when(mockedNode).toString();
     }

@@ -81,6 +81,7 @@ import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterAc
 import org.opendaylight.netconf.topology.singleton.messages.RegisterMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -442,7 +443,7 @@ public class NetconfNodeActorTest {
 
         // RPC with no response output.
 
-        doReturn(Futures.immediateCheckedFuture(null)).when(mockDOMRpcService).invokeRpc(any(), any());
+        doReturn(FluentFutures.immediateNullFluentFuture()).when(mockDOMRpcService).invokeRpc(any(), any());
 
         DOMRpcResult result = slaveDomRPCService.invokeRpc(schemaPath, outputNode).get(2, TimeUnit.SECONDS);
 
@@ -450,7 +451,7 @@ public class NetconfNodeActorTest {
 
         // RPC with response output.
 
-        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(outputNode)))
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult(outputNode)))
                 .when(mockDOMRpcService).invokeRpc(any(), any());
 
         result = slaveDomRPCService.invokeRpc(schemaPath, outputNode).get(2, TimeUnit.SECONDS);
@@ -460,7 +461,7 @@ public class NetconfNodeActorTest {
 
         // RPC with response error.
 
-        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(rpcError)))
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult(rpcError)))
                 .when(mockDOMRpcService).invokeRpc(any(), any());
 
         result = slaveDomRPCService.invokeRpc(schemaPath, outputNode).get(2, TimeUnit.SECONDS);
@@ -470,7 +471,7 @@ public class NetconfNodeActorTest {
 
         // RPC with response output and error.
 
-        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult(outputNode, rpcError)))
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult(outputNode, rpcError)))
                 .when(mockDOMRpcService).invokeRpc(any(), any());
 
         final DOMRpcResult resultOutputError =
@@ -483,7 +484,7 @@ public class NetconfNodeActorTest {
 
         exception.expect(DOMRpcException.class);
 
-        doReturn(Futures.immediateFailedCheckedFuture(new ClusteringRpcException("mock")))
+        doReturn(FluentFutures.immediateFailedFluentFuture(new ClusteringRpcException("mock")))
                 .when(mockDOMRpcService).invokeRpc(any(), any());
 
         try {
