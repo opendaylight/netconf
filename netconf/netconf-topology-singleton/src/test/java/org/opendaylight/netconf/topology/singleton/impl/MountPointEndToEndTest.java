@@ -659,9 +659,8 @@ public class MountPointEndToEndTest {
     }
 
     private DOMMountPoint awaitMountPoint(final DOMMountPointService mountPointService) {
-        await().atMost(5, TimeUnit.SECONDS).until(() -> {
-            return mountPointService.getMountPoint(yangNodeInstanceId).isPresent();
-        });
+        await().atMost(5, TimeUnit.SECONDS).until(() ->
+                mountPointService.getMountPoint(yangNodeInstanceId).isPresent());
 
         return mountPointService.getMountPoint(yangNodeInstanceId).get();
     }
