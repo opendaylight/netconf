@@ -69,12 +69,7 @@ public class ProxyServer implements Runnable {
     }
 
     public static void main(String[] args) {
-        ProxyHandlerFactory proxyHandlerFactory = new ProxyHandlerFactory() {
-            @Override
-            public ChannelHandler create(EventLoopGroup bossGroup, LocalAddress localAddress) {
-                return new ProxyServerHandler(bossGroup, localAddress);
-            }
-        };
+        ProxyHandlerFactory proxyHandlerFactory = ProxyServerHandler::new;
         start(proxyHandlerFactory);
     }
 
