@@ -62,9 +62,7 @@ public class PatchXmlBodyWriter implements MessageBodyWriter<PatchStatusContext>
             final XMLStreamWriter xmlWriter =
                     XML_FACTORY.createXMLStreamWriter(entityStream, StandardCharsets.UTF_8.name());
             writeDocument(xmlWriter, patchStatusContext);
-        } catch (final XMLStreamException e) {
-            throw new IllegalStateException(e);
-        } catch (final FactoryConfigurationError e) {
+        } catch (final XMLStreamException | FactoryConfigurationError e) {
             throw new IllegalStateException(e);
         }
     }
