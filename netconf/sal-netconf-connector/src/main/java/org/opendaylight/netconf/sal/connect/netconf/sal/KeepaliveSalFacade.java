@@ -305,15 +305,13 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         @Override
         public @NonNull FluentFuture<DOMRpcResult> invokeRpc(@Nonnull final SchemaPath type,
                                                                       final NormalizedNode<?, ?> input) {
-            final FluentFuture<DOMRpcResult> domRpcResultDOMRpcExceptionCheckedFuture =
-                    deviceRpc.invokeRpc(type, input);
-            Futures.addCallback(domRpcResultDOMRpcExceptionCheckedFuture, resetKeepaliveTask,
-                                MoreExecutors.directExecutor());
+            final FluentFuture<DOMRpcResult> rpcResultFuture = deviceRpc.invokeRpc(type, input);
+            Futures.addCallback(rpcResultFuture, resetKeepaliveTask, MoreExecutors.directExecutor());
 
-            final RequestTimeoutTask timeoutTask = new RequestTimeoutTask(domRpcResultDOMRpcExceptionCheckedFuture);
+            final RequestTimeoutTask timeoutTask = new RequestTimeoutTask(rpcResultFuture);
             executor.schedule(timeoutTask, defaultRequestTimeoutMillis, TimeUnit.MILLISECONDS);
 
-            return domRpcResultDOMRpcExceptionCheckedFuture;
+            return rpcResultFuture;
         }
 
         @Override
