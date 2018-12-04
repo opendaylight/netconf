@@ -22,6 +22,30 @@
       "revId": "bd0f44d86d93b8d35b42a69ca5ba8adf595650f2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0c00fe42_6ba0c921",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/RestconfDocumentedExceptionMapper.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2018-12-04T15:31:07Z",
+      "side": 1,
+      "message": "Yeah this is even nicer, however it is not supported in Java 5 yet.\n\nI will address this in https://git.opendaylight.org/gerrit/#/c/78418/",
+      "parentUuid": "69534fdd_b84ffabb",
+      "range": {
+        "startLine": 391,
+        "startChar": 12,
+        "endLine": 391,
+        "endChar": 29
+      },
+      "revId": "bd0f44d86d93b8d35b42a69ca5ba8adf595650f2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
