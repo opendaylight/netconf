@@ -20,7 +20,6 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
 import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.DocumentedException.ErrorType;
-import org.opendaylight.netconf.mdsal.connector.DOMDataTransactionValidator.ValidationFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,8 +84,8 @@ public class TransactionProvider implements AutoCloseable {
         }
 
         try {
-            transactionValidator.validate(candidateTransaction).checkedGet();
-        } catch (final ValidationFailedException e) {
+            transactionValidator.validate(candidateTransaction).get();
+        } catch (final InterruptedException | ExecutionException e) {
             LOG.debug("Candidate transaction validation {} failed on session {}", candidateTransaction,
                 netconfSessionIdForReporting, e);
             final String cause = e.getCause() != null ? " Cause: " + e.getCause().getMessage() : "";
