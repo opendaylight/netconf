@@ -386,9 +386,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
     private static void writeDataRoot(final OutputStreamWriter outputWriter, final NormalizedNodeWriter nnWriter,
                                       final ContainerNode data) throws IOException {
-        final Iterator<DataContainerChild<? extends PathArgument, ?>> iterator = data.getValue().iterator();
-        while (iterator.hasNext()) {
-            final DataContainerChild<? extends PathArgument, ?> child = iterator.next();
+        for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
             nnWriter.write(child);
             nnWriter.flush();
         }
