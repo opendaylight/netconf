@@ -218,10 +218,11 @@
       </plugin>
     </plugins>
   </build>
+
   <scm>
-    <connection>scm:git:http://git.opendaylight.org/gerrit/controller.git</connection>
-    <developerConnection>scm:git:ssh://git.opendaylight.org:29418/controller.git</developerConnection>
+    <connection>scm:git:ssh://git.opendaylight.org:29418/netconf.git</connection>
+    <developerConnection>scm:git:ssh://git.opendaylight.org:29418/netconf.git</developerConnection>
     <tag>HEAD</tag>
-    <url>https://wiki.opendaylight.org/view/OpenDaylight_Controller:MD-SAL</url>
+    <url>https://git.opendaylight.org/gerrit/gitweb?p=netconf.git;a=summary</url>
   </scm>
 </project>
