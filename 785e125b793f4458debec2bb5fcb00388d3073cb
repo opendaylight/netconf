@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b960cb82_ab75f056",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/RestconfDocumentedExceptionMapper.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2018-12-04T16:38:36Z",
+      "side": 1,
+      "message": "oh, there\u0027s a throws... better keep it a for loop then and propagate the exception...",
+      "range": {
+        "startLine": 389,
+        "startChar": 0,
+        "endLine": 395,
+        "endChar": 11
+      },
+      "revId": "785e125b793f4458debec2bb5fcb00388d3073cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
