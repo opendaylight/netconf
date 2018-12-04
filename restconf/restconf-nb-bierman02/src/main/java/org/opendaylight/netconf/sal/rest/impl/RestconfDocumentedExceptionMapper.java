@@ -294,9 +294,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         final XMLStreamWriter xmlWriter;
         try {
             xmlWriter = XML_FACTORY.createXMLStreamWriter(outStream, StandardCharsets.UTF_8.name());
-        } catch (final XMLStreamException e) {
-            throw new IllegalStateException(e);
-        } catch (final FactoryConfigurationError e) {
+        } catch (final XMLStreamException | FactoryConfigurationError e) {
             throw new IllegalStateException(e);
         }
         NormalizedNode<?, ?> data = errorsNode.getData();

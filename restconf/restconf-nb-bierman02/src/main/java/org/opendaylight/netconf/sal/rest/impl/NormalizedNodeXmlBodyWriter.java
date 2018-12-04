@@ -92,9 +92,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             if (context.getWriterParameters().isPrettyPrint()) {
                 xmlWriter = new IndentingXMLStreamWriter(xmlWriter);
             }
-        } catch (final XMLStreamException e) {
-            throw new IllegalStateException(e);
-        } catch (final FactoryConfigurationError e) {
+        } catch (final XMLStreamException | FactoryConfigurationError e) {
             throw new IllegalStateException(e);
         }
         final NormalizedNode<?, ?> data = context.getData();
