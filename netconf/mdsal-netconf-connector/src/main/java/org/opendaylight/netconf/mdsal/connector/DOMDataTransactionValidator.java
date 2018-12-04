@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.mdsal.connector;
 
 import com.google.common.annotations.Beta;
-import com.google.common.util.concurrent.CheckedFuture;
+import com.google.common.util.concurrent.FluentFuture;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -35,11 +35,11 @@ public interface DOMDataTransactionValidator extends DOMDataBrokerExtension {
      * @param transaction
      *     transaction to be validated
      * @return
-     *     a CheckedFuture containing the result of the validate operation. The future blocks until the validation
+     *     a FluentFuture containing the result of the validate operation. The future blocks until the validation
      *     operation is complete. A successful validate returns nothing. On failure, the Future will fail
      *     with a {@link ValidationFailedException} or an exception derived from ValidationFailedException.
      */
-    CheckedFuture<Void, ValidationFailedException> validate(DOMDataTreeWriteTransaction transaction);
+    FluentFuture<Void> validate(DOMDataTreeWriteTransaction transaction);
 
     /**
      * Failed validation of asynchronous transaction. This exception is raised and returned when transaction validation
