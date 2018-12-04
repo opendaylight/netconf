@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "240ed08c_0936f236",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/DOMDataTransactionValidator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5719
+      },
+      "writtenOn": "2018-12-04T16:21:38Z",
+      "side": 1,
+      "message": "FF",
+      "range": {
+        "startLine": 38,
+        "startChar": 13,
+        "endLine": 38,
+        "endChar": 26
+      },
+      "revId": "d18722e67a5df7db5fbe8d32f9401e6e20d2b21e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
