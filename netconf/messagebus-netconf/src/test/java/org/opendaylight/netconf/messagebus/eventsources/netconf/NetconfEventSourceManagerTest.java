@@ -14,8 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.FluentFuture;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
@@ -31,7 +30,6 @@ import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.MountPointService;
 import org.opendaylight.mdsal.binding.api.RpcProviderService;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -44,6 +42,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.r
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
@@ -89,12 +88,12 @@ public class NetconfEventSourceManagerTest {
 
         DOMDataTreeReadTransaction rtx = mock(DOMDataTreeReadTransaction.class);
         doReturn(rtx).when(mpDataBroker).newReadOnlyTransaction();
-        CheckedFuture<Optional<NormalizedNode<?, ?>>, ReadFailedException> checkFeature = Futures
-                .immediateCheckedFuture(Optional.of(NetconfTestUtils.getStreamsNode("stream-1")));
+        final FluentFuture<Optional<NormalizedNode<?, ?>>> readStreamFuture =
+                FluentFutures.immediateFluentFuture(Optional.of(NetconfTestUtils.getStreamsNode("stream-1")));
 
         YangInstanceIdentifier pathStream = YangInstanceIdentifier.builder().node(Netconf.QNAME).node(Streams.QNAME)
                 .build();
-        doReturn(checkFeature).when(rtx).read(LogicalDatastoreType.OPERATIONAL, pathStream);
+        doReturn(readStreamFuture).when(rtx).read(LogicalDatastoreType.OPERATIONAL, pathStream);
 
         netconfEventSourceManager = new NetconfEventSourceManager(dataBrokerMock,
                 domNotificationPublishServiceMock, domMountPointServiceMock, eventSourceRegistry);

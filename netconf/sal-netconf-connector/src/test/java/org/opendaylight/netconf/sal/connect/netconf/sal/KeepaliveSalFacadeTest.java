@@ -17,7 +17,6 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.Futures;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,6 +35,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommun
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -102,10 +102,10 @@ public class KeepaliveSalFacadeTest {
         final DOMRpcResult result = new DefaultDOMRpcResult(Builders.containerBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME)).build());
 
-        doReturn(Futures.immediateCheckedFuture(result))
+        doReturn(FluentFutures.immediateFluentFuture(result))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), isNull());
 
-        doReturn(Futures.immediateCheckedFuture(result))
+        doReturn(FluentFutures.immediateFluentFuture(result))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
@@ -119,7 +119,7 @@ public class KeepaliveSalFacadeTest {
     @Test
     public void testKeepaliveRpcFailure() {
 
-        doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("illegal-state")))
+        doReturn(FluentFutures.immediateFluentFuture(new IllegalStateException("illegal-state")))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
@@ -136,7 +136,7 @@ public class KeepaliveSalFacadeTest {
 
         final DOMRpcResult rpcSuccessWithError = new DefaultDOMRpcResult(mock(RpcError.class));
 
-        doReturn(Futures.immediateCheckedFuture(rpcSuccessWithError))
+        doReturn(FluentFutures.immediateFluentFuture(rpcSuccessWithError))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
@@ -157,7 +157,7 @@ public class KeepaliveSalFacadeTest {
                 return null;
             }).when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(DOMRpcService.class), isNull());
 
-        doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("illegal-state")))
+        doReturn(FluentFutures.immediateFluentFuture(new IllegalStateException("illegal-state")))
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         keepaliveSalFacade =

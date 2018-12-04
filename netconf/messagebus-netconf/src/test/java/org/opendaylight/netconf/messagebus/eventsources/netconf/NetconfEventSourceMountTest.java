@@ -14,7 +14,6 @@ import static org.mockito.Mockito.verify;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.Futures;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -39,6 +38,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.r
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.StreamBuilder;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -71,8 +71,8 @@ public class NetconfEventSourceMountTest {
         final YangInstanceIdentifier path = YangInstanceIdentifier.builder().node(Netconf.QNAME).node(Streams.QNAME)
                 .build();
         final NormalizedNode<?, ?> streamsNode = NetconfTestUtils.getStreamsNode(STREAM_1, STREAM_2);
-        doReturn(Futures.immediateCheckedFuture(Optional.of(streamsNode))).when(tx).read(LogicalDatastoreType
-                .OPERATIONAL, path);
+        doReturn(FluentFutures.immediateFluentFuture(Optional.of(streamsNode)))
+                .when(tx).read(LogicalDatastoreType.OPERATIONAL, path);
         mount = new NetconfEventSourceMount(NetconfTestUtils.getNode("node-1"), domMountPoint);
     }
 

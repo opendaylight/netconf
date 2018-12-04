@@ -22,8 +22,7 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.FluentFuture;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
@@ -41,6 +40,7 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -62,11 +62,10 @@ public class NetconfDeviceWriteOnlyTxTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        final CheckedFuture<DefaultDOMRpcResult, Exception> successFuture =
-                Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null));
+        final FluentFuture<DefaultDOMRpcResult> successFuture = FluentFutures.immediateNullFluentFuture();
 
         doReturn(successFuture)
-                .doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("Failed tx")))
+                .doReturn(FluentFutures.immediateFailedFluentFuture(new IllegalStateException("Failed tx")))
                 .doReturn(successFuture)
                 .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
@@ -88,8 +87,7 @@ public class NetconfDeviceWriteOnlyTxTest {
 
     @Test
     public void testDiscardChanges() throws InterruptedException {
-        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
-                .when(rpc).invokeRpc(any(SchemaPath.class), isNull());
+        doReturn(FluentFutures.immediateNullFluentFuture()).when(rpc).invokeRpc(any(SchemaPath.class), isNull());
 
         final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(SchemaContext.class)),
                 false);
@@ -114,11 +112,11 @@ public class NetconfDeviceWriteOnlyTxTest {
 
     @Test
     public void testFailedCommit() throws Exception {
-        final CheckedFuture<DefaultDOMRpcResult, Exception> rpcErrorFuture = Futures.immediateCheckedFuture(
+        final FluentFuture<DefaultDOMRpcResult> rpcErrorFuture = FluentFutures.immediateFluentFuture(
                 new DefaultDOMRpcResult(RpcResultBuilder.newError(RpcError.ErrorType.APPLICATION, "a", "m")));
 
-        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
-        .doReturn(rpcErrorFuture).when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        doReturn(FluentFutures.immediateNullFluentFuture())
+                .doReturn(rpcErrorFuture).when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         final WriteCandidateTx tx = new WriteCandidateTx(id, new NetconfBaseOps(rpc, mock(SchemaContext.class)),
                 false);
@@ -133,8 +131,8 @@ public class NetconfDeviceWriteOnlyTxTest {
 
     @Test
     public void testDiscardChangesNotSentWithoutCandidate() {
-        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
-                .doReturn(Futures.immediateFailedCheckedFuture(new IllegalStateException("Failed tx")))
+        doReturn(FluentFutures.immediateNullFluentFuture())
+                .doReturn(FluentFutures.immediateFailedFluentFuture(new IllegalStateException("Failed tx")))
                 .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         final WriteRunningTx tx = new WriteRunningTx(
@@ -154,7 +152,7 @@ public class NetconfDeviceWriteOnlyTxTest {
 
     @Test
     public void testListenerSuccess() throws Exception {
-        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
+        doReturn(FluentFutures.immediateNullFluentFuture())
                 .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
         final WriteCandidateTx tx = new WriteCandidateTx(
                 id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()), false);
@@ -170,7 +168,7 @@ public class NetconfDeviceWriteOnlyTxTest {
 
     @Test
     public void testListenerCancellation() throws Exception {
-        doReturn(Futures.immediateCheckedFuture(new DefaultDOMRpcResult((NormalizedNode<?, ?>) null)))
+        doReturn(FluentFutures.immediateNullFluentFuture())
                 .when(rpc).invokeRpc(any(SchemaPath.class), isNull());
         final WriteCandidateTx tx = new WriteCandidateTx(
                 id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()), false);
@@ -187,7 +185,7 @@ public class NetconfDeviceWriteOnlyTxTest {
     @Test
     public void testListenerFailure() throws Exception {
         final IllegalStateException cause = new IllegalStateException("Failed tx");
-        doReturn(Futures.immediateFailedCheckedFuture(cause))
+        doReturn(FluentFutures.immediateFailedFluentFuture(cause))
                 .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
         final WriteCandidateTx tx = new WriteCandidateTx(
                 id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()), false);

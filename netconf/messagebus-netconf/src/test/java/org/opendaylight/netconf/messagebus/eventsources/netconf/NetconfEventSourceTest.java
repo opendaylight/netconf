@@ -13,7 +13,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.Futures;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,6 +41,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.r
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -92,8 +92,8 @@ public class NetconfEventSourceTest {
         streams.add(createStream("stream-2"));
         doReturn(streams).when(mount).getAvailableStreams();
         doReturn(schemaContext).when(mount).getSchemaContext();
-        doReturn(Futures.immediateCheckedFuture(null)).when(mount).invokeCreateSubscription(any(), any());
-        doReturn(Futures.immediateCheckedFuture(null)).when(mount).invokeCreateSubscription(any());
+        doReturn(FluentFutures.immediateNullFluentFuture()).when(mount).invokeCreateSubscription(any(), any());
+        doReturn(FluentFutures.immediateNullFluentFuture()).when(mount).invokeCreateSubscription(any());
         doReturn(mock(ListenerRegistration.class)).when(mount).registerNotificationListener(any(), any());
         final Node nodeId1 = NetconfTestUtils.getNetconfNode("NodeId1", "node.test.local", ConnectionStatus
                 .Connected, NetconfTestUtils.NOTIFICATION_CAPABILITY_PREFIX);
