@@ -68,29 +68,15 @@ public final class ScaleUtil {
                 TimeUnit.MINUTES);
             final Configuration configuration = new ConfigurationBuilder().from(params).build();
             final NetconfDeviceSimulator netconfDeviceSimulator = new NetconfDeviceSimulator(configuration);
-            try {
-                final List<Integer> openDevices = netconfDeviceSimulator.start();
-                if (openDevices.size() == 0) {
-                    root.error("Failed to start any simulated devices, exiting...");
-                    System.exit(1);
-                }
 
-                if (params.distroFolder == null) {
-                    root.error("Distro folder is not set, exiting...");
-                    System.exit(1);
-                }
+            final List<Integer> openDevices = netconfDeviceSimulator.start();
+            if (openDevices.size() == 0) {
+                root.error("Failed to start any simulated devices, exiting...");
+                System.exit(1);
+            }
 
-                final Main.ConfigGenerator configGenerator = new Main.ConfigGenerator(
-                        params.distroFolder, openDevices);
-                final List<File> generated = configGenerator.generate(
-                        params.ssh, params.generateConfigBatchSize,
-                        params.generateConfigsTimeout, params.generateConfigsAddress,
-                        params.devicesPerPort);
-                configGenerator.updateFeatureFile(generated);
-                configGenerator.changeLoadOrder();
-            } catch (final Exception e) {
-                root.error("Unhandled exception", e);
-                netconfDeviceSimulator.close();
+            if (params.distroFolder == null) {
+                root.error("Distro folder is not set, exiting...");
                 System.exit(1);
             }
 
