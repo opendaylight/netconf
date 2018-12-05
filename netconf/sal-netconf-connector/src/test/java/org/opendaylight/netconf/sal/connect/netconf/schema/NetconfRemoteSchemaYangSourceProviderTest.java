@@ -11,8 +11,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.CheckedFuture;
-import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.FluentFuture;
 import java.net.InetSocketAddress;
 import java.util.Collections;
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,12 +21,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -55,7 +54,7 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
         MockitoAnnotations.initMocks(this);
 
         final DOMRpcResult value = new DefaultDOMRpcResult(getNode(), Collections.emptySet());
-        CheckedFuture<DOMRpcResult, DOMRpcException> response = Futures.immediateCheckedFuture(value);
+        final FluentFuture<DOMRpcResult> response = FluentFutures.immediateFluentFuture(value);
         doReturn(response).when(service).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
 
         provider = new NetconfRemoteSchemaYangSourceProvider(
