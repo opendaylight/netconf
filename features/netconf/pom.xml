@@ -45,9 +45,9 @@
   </modules>
 
   <scm>
-    <connection>scm:git:http://git.opendaylight.org/gerrit/controller.git</connection>
-    <developerConnection>scm:git:ssh://git.opendaylight.org:29418/controller.git</developerConnection>
+    <connection>scm:git:https://git.opendaylight.org/gerrit/netconf</connection>
+    <developerConnection>scm:git:ssh://git.opendaylight.org:29418/netconf</developerConnection>
     <tag>HEAD</tag>
-    <url>https://wiki.opendaylight.org/view/OpenDaylight_Controller:MD-SAL</url>
+    <url>https://git.opendaylight.org/gerrit/gitweb?p=netconf.git;a=tree</url>
   </scm>
 </project>
