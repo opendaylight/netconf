@@ -105,7 +105,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession,L extends 
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer(getClass().getSimpleName() + "{");
+        final StringBuilder sb = new StringBuilder(getClass().getSimpleName() + "{");
         sb.append("sessionId=").append(sessionId);
         sb.append(", channel=").append(channel);
         sb.append('}');

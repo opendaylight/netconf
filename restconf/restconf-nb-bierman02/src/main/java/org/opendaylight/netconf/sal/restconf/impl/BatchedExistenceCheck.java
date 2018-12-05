@@ -48,7 +48,7 @@ final class BatchedExistenceCheck {
             Futures.addCallback(f, new FutureCallback<Boolean>() {
                 @Override
                 public void onSuccess(@Nonnull final Boolean result) {
-                    ret.complete(path, result.booleanValue());
+                    ret.complete(path, result);
                 }
 
                 @Override

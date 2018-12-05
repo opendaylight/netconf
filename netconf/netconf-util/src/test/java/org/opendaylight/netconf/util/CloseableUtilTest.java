@@ -21,11 +21,8 @@ public class CloseableUtilTest {
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Test
     public void testCloseAllFail() throws Exception {
-        final AutoCloseable failingCloseable = new AutoCloseable() {
-            @Override
-            public void close() throws Exception {
-                throw new RuntimeException("testing failing close");
-            }
+        final AutoCloseable failingCloseable = () -> {
+            throw new RuntimeException("testing failing close");
         };
 
         try {

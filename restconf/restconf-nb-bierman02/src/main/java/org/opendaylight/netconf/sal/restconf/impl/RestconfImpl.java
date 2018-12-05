@@ -1465,7 +1465,7 @@ public final class RestconfImpl implements RestconfService {
         final DataSchemaNode replaySupportSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(replaySupportSchemaNode instanceof LeafSchemaNode);
         streamNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) replaySupportSchemaNode)
-                .withValue(Boolean.valueOf(true)).build());
+                .withValue(Boolean.TRUE).build());
 
         instanceDataChildrenByName =
                 ControllerContext.findInstanceDataChildrenByName(listStreamSchemaNode, "replay-log-creation-time");
