@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c716dee5_f3e4b550",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2018-12-13T14:03:00Z",
+      "side": 1,
+      "message": "I moved the jira to NETCONF-587",
+      "revId": "e41b97a3e071389caf02928f96985c7639001360",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
