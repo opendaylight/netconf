@@ -7,20 +7,17 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.util.Map.Entry;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
+import org.opendaylight.netconf.sal.rest.doc.swagger.MountPointInstance;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
 
 /**
@@ -96,29 +93,16 @@ public class ApiDocServiceImpl implements ApiDocService {
 
     @Override
     public synchronized Response getListOfMounts(final UriInfo uriInfo) {
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (OutputStreamWriter streamWriter = new OutputStreamWriter(baos, StandardCharsets.UTF_8)) {
-            JsonGenerator writer = new JsonFactory().createGenerator(streamWriter);
-            writer.writeStartArray();
-            for (final Entry<String, Long> entry : mountPointSwaggerDraft02.getInstanceIdentifiers()
-                    .entrySet()) {
-                writer.writeStartObject();
-                writer.writeObjectField("instance", entry.getKey());
-                writer.writeObjectField("id", entry.getValue());
-                writer.writeEndObject();
-            }
-            writer.writeEndArray();
-            writer.flush();
-        } catch (IOException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        final MountPointSwagger mountPointSwagger;
+        if (isNew(uriInfo)) {
+            mountPointSwagger = mountPointSwaggerRFC8040;
+        } else {
+            mountPointSwagger = mountPointSwaggerDraft02;
         }
-
-        try {
-            String responseStr = baos.toString(StandardCharsets.UTF_8.name());
-            return Response.status(Response.Status.OK).entity(responseStr).build();
-        } catch (UnsupportedEncodingException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-        }
+        final List<MountPointInstance> entity = mountPointSwagger
+                .getInstanceIdentifiers().entrySet().stream()
+                .map(MountPointInstance::new).collect(Collectors.toList());
+        return Response.ok(entity).build();
     }
 
     @Override
