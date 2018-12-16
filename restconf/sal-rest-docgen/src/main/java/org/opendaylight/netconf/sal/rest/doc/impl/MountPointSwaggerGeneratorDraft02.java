@@ -23,7 +23,14 @@ public class MountPointSwaggerGeneratorDraft02 extends BaseYangSwaggerGeneratorD
     private final MountPointSwagger mountPointSwagger;
 
     public MountPointSwaggerGeneratorDraft02(DOMSchemaService schemaService, DOMMountPointService mountService) {
-        super(Optional.of(Objects.requireNonNull(schemaService)));
+        super(Optional.of(Objects.requireNonNull(schemaService)), Optional.empty());
+        mountPointSwagger = new MountPointSwagger(schemaService, mountService, this);
+        mountPointSwagger.init();
+    }
+
+    public MountPointSwaggerGeneratorDraft02(DOMSchemaService schemaService, DOMMountPointService mountService,
+                                             Optional<String> basePath) {
+        super(Optional.of(Objects.requireNonNull(schemaService)), basePath);
         mountPointSwagger = new MountPointSwagger(schemaService, mountService, this);
         mountPointSwagger.init();
     }
