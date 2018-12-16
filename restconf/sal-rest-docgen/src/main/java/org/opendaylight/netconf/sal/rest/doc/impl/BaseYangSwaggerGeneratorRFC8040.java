@@ -17,18 +17,25 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
  */
 public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGenerator {
 
-    private static final String BASE_PATH = "rests";
+    private static final String DEFAULT_BASE_PATH = "rests";
+    private final String basePath;
 
     protected BaseYangSwaggerGeneratorRFC8040(Optional<DOMSchemaService> schemaService) {
         super(schemaService);
+        this.basePath = DEFAULT_BASE_PATH;
+    }
+
+    protected BaseYangSwaggerGeneratorRFC8040(Optional<DOMSchemaService> schemaService, String basePath) {
+        super(schemaService);
+        this.basePath = basePath;
     }
 
     @Override
     public String getDataStorePath(final String dataStore, final String context) {
         if ("config".contains(dataStore) || "operational".contains(dataStore)) {
-            return "/" + BASE_PATH + "/data" + context;
+            return "/" + basePath + "/data" + context;
         }
-        return "/" + BASE_PATH + "/operations" + context;
+        return "/" + basePath + "/operations" + context;
     }
 
     @Override
