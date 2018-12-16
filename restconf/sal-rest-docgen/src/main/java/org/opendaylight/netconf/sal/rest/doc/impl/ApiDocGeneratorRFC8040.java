@@ -20,6 +20,10 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 public class ApiDocGeneratorRFC8040 extends BaseYangSwaggerGeneratorRFC8040 {
 
     public ApiDocGeneratorRFC8040(DOMSchemaService schemaService) {
-        super(Optional.of(Objects.requireNonNull(schemaService)));
+        super(Optional.of(Objects.requireNonNull(schemaService)),  Optional.empty());
+    }
+
+    public ApiDocGeneratorRFC8040(DOMSchemaService schemaService, Optional<String> basePath) {
+        super(Optional.of(Objects.requireNonNull(schemaService)),  basePath);
     }
 }
