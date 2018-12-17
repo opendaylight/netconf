@@ -10,8 +10,8 @@ package org.opendaylight.controller.sal.rest.doc.impl;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.ws.rs.core.UriInfo;
 
@@ -67,12 +67,12 @@ public class ApiDocServiceImplTest {
     }
 
     @Test
-    public void getListOfMounts() throws java.net.URISyntaxException {
+    public void getListOfMounts() throws java.net.URISyntaxException, JsonProcessingException {
         final UriInfo mockInfo = this.helper.createMockUriInfo(HTTP_URL);
         // simulate the behavior of GsonProvider
-        Gson gson = (new GsonBuilder()).serializeNulls()
-                .enableComplexMapKeySerialization().create();
-        String result = gson.toJson(apiDocService.getListOfMounts(mockInfo).getEntity());
+        ObjectMapper mapper = new ObjectMapper();
+        String result = mapper.writer().writeValueAsString(
+                apiDocService.getListOfMounts(mockInfo).getEntity());
         Assert.assertEquals("[{\"instance\":\"/nodes/node/123/\",\"id\":1}]", result);
     }
 }
