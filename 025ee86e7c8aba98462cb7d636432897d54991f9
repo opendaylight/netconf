@@ -22,6 +22,30 @@
       "revId": "025ee86e7c8aba98462cb7d636432897d54991f9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd70b62f_d9aec50a",
+        "filename": "restconf/sal-rest-docgen/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 7614
+      },
+      "writtenOn": "2018-12-18T15:20:24Z",
+      "side": 1,
+      "message": "Yes, this dependency should be removed and I will fix the related unit tests.",
+      "parentUuid": "423b0357_77b91195",
+      "range": {
+        "startLine": 99,
+        "startChar": 4,
+        "endLine": 102,
+        "endChar": 16
+      },
+      "revId": "025ee86e7c8aba98462cb7d636432897d54991f9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
