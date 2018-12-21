@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <modules xmlns="urn:ietf:params:xml:ns:yang:ietf-yang-library">
     <module>
         <name>module-with-revision</name>
@@ -18,7 +19,7 @@
     <module>
         <name>module-without-revision</name>
         <namespace>module-without-revision:namespace</namespace>
-        <revision></revision>
+        <revision/>
         <schema>
             http://localhost:8181/yanglib/schemas/module-without-revision/
         </schema>
