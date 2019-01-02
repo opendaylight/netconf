@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.util.xml;
 
 import com.google.common.collect.ImmutableMap;
@@ -49,9 +48,8 @@ public class HardcodedNamespaceResolver implements NamespaceContext {
     }
 
     @Override
-    public Iterator<?> getPrefixes(final String namespaceURI) {
+    public Iterator<String> getPrefixes(final String namespaceURI) {
         // Not needed in this context.
         return null;
     }
-
 }
