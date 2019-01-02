@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertEquals;
@@ -19,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import com.google.gson.JsonArray;
@@ -114,6 +114,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapperTest.class);
+    private static final String IETF_RESTCONF = "ietf-restconf";
     static RestconfService mockRestConf = mock(RestconfService.class);
 
     static XPath XPATH = XPathFactory.newInstance().newXPath();
@@ -132,8 +133,8 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
 
         final NamespaceContext nsContext = new NamespaceContext() {
             @Override
-            public Iterator<?> getPrefixes(final String namespaceURI) {
-                return null;
+            public Iterator<String> getPrefixes(final String namespaceURI) {
+                return Iterators.singletonIterator(IETF_RESTCONF);
             }
 
             @Override
@@ -143,7 +144,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
 
             @Override
             public String getNamespaceURI(final String prefix) {
-                return "ietf-restconf".equals(prefix) ? Draft02.RestConfModule.NAMESPACE : null;
+                return IETF_RESTCONF.equals(prefix) ? Draft02.RestConfModule.NAMESPACE : null;
             }
         };
 
