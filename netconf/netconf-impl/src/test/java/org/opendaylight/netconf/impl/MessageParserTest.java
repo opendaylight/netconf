@@ -21,6 +21,7 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Queue;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -88,6 +89,7 @@ public class MessageParserTest {
 
         NetconfMessage receivedMessage = testChunkChannel.readInbound();
         assertNotNull(receivedMessage);
+        XMLUnit.setIgnoreWhitespace(true);
         assertXMLEqual(this.msg.getDocument(), receivedMessage.getDocument());
     }
 
@@ -108,10 +110,11 @@ public class MessageParserTest {
         testChunkChannel.writeInbound(recievedOutbound);
         NetconfMessage receivedMessage = testChunkChannel.readInbound();
         assertNotNull(receivedMessage);
+        XMLUnit.setIgnoreWhitespace(true);
         assertXMLEqual(this.msg.getDocument(), receivedMessage.getDocument());
     }
 
-    private static long getHeaderLength(byte[] bytes) {
+    private static long getHeaderLength(final byte[] bytes) {
         byte[] headerStart = new byte[]{(byte) 0x0a, (byte) 0x23};
         return Long.parseLong(StandardCharsets.US_ASCII.decode(
                 ByteBuffer.wrap(bytes, headerStart.length, bytes.length - headerStart.length - 1)).toString());
