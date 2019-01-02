@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -47,7 +48,7 @@ public class TesttoolParameters {
         "http://{ADDRESS:PORT}/restconf/config/network-topology:network-topology/topology/topology-netconf/";
     private static final Pattern YANG_FILENAME_PATTERN = Pattern
         .compile("(?<name>.*)@(?<revision>\\d{4}-\\d{2}-\\d{2})\\.yang");
-    private static final Pattern DATE_PATTERN = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})");
+    private static final Pattern REVISION_DATE_PATTERN = Pattern.compile("revision\\s+\"?(\\d{4}-\\d{2}-\\d{2})\"?");
 
     private static final String RESOURCE = "/config-template.json";
     @Arg(dest = "edit-content")
@@ -313,12 +314,12 @@ public class TesttoolParameters {
                 if (!matcher.matches()) {
                     try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                         String line = reader.readLine();
-                        while (!DATE_PATTERN.matcher(line).find()) {
+                        while (Objects.nonNull(line) && !REVISION_DATE_PATTERN.matcher(line).find()) {
                             line = reader.readLine();
                         }
-                        final Matcher m = DATE_PATTERN.matcher(line);
-
-                        if (m.find()) {
+                        if (Objects.nonNull(line)) {
+                            final Matcher m = REVISION_DATE_PATTERN.matcher(line);
+                            Preconditions.checkState(m.find());
                             String moduleName = file.getAbsolutePath();
                             if (file.getName().endsWith(".yang")) {
                                 moduleName = moduleName.substring(0, moduleName.length() - 5);
@@ -327,7 +328,7 @@ public class TesttoolParameters {
                             final String correctName = moduleName + "@" + revision + ".yang";
                             final File correctNameFile = new File(correctName);
                             if (!file.renameTo(correctNameFile)) {
-                                System.err.println("Failed to rename " + file);
+                                throw new IllegalStateException("Failed to rename '%s'." + file);
                             }
                         }
                     } catch (final IOException e) {
