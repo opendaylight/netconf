@@ -58,6 +58,6 @@ public final class YangModuleCapability extends BasicCapability {
 
     @Override
     public Optional<String> getRevision() {
-        return Optional.of(revision);
+        return revision == null ? Optional.absent() : Optional.of(revision);
     }
 }
