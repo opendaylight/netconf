@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ac0aa31_4c06b59c",
+        "filename": "netconf/netconf-impl/src/test/java/org/opendaylight/netconf/impl/MessageParserTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-01-03T08:42:47Z",
+      "side": 1,
+      "message": "Why do we need these changes here in this test?\n\nAlso, how are they related to JAXB?",
+      "revId": "8f8ddfb83b36a30efce8c50d4e3fd52f31dfb176",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
