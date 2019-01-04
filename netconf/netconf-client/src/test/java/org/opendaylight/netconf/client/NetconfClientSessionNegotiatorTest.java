@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.client;
 
 import static org.junit.Assert.assertEquals;
@@ -19,7 +18,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -36,6 +34,7 @@ import io.netty.util.Timer;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import java.io.InputStream;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,7 +64,7 @@ public class NetconfClientSessionNegotiatorTest {
 
     @Before
     public void setUp() throws Exception {
-        helloMessage = NetconfHelloMessage.createClientHello(Sets.newSet("exi:1.0"), Optional.absent());
+        helloMessage = NetconfHelloMessage.createClientHello(Sets.newSet("exi:1.0"), Optional.empty());
         pipeline = mockChannelPipeline();
         future = mockChannelFuture();
         channel = mockChannel();
