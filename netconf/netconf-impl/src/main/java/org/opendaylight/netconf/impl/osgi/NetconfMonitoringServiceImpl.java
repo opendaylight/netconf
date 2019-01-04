@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.impl.osgi;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.monitoring.SessionListener;
@@ -23,13 +23,13 @@ public class NetconfMonitoringServiceImpl implements NetconfMonitoringService, A
     private final NetconfSessionMonitoringService sessionMonitoring;
 
     public NetconfMonitoringServiceImpl(NetconfOperationServiceFactory opProvider) {
-        this(opProvider, Optional.absent(), 0);
+        this(opProvider, Optional.empty(), 0);
     }
 
     public NetconfMonitoringServiceImpl(NetconfOperationServiceFactory opProvider,
                                         ScheduledThreadPool threadPool,
                                         long updateInterval) {
-        this(opProvider, Optional.fromNullable(threadPool), updateInterval);
+        this(opProvider, Optional.ofNullable(threadPool), updateInterval);
     }
 
     public NetconfMonitoringServiceImpl(NetconfOperationServiceFactory opProvider,

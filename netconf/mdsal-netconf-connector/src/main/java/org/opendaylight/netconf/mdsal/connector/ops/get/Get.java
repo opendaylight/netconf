@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops.get;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -47,7 +47,7 @@ public class Get extends AbstractGet {
 
         final Optional<YangInstanceIdentifier> dataRootOptional = getDataRootFromFilter(operationElement);
         if (!dataRootOptional.isPresent()) {
-            return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.absent());
+            return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY);
         }
 
         final YangInstanceIdentifier dataRoot = dataRootOptional.get();
@@ -59,7 +59,7 @@ public class Get extends AbstractGet {
             transactionProvider.abortRunningTransaction(rwTx);
 
             if (!normalizedNodeOptional.isPresent()) {
-                return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.absent());
+                return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY);
             }
 
             return serializeNodeWithParentStructure(document, dataRoot, normalizedNodeOptional.get());

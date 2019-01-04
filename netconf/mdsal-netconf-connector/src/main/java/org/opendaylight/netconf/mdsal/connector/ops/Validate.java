@@ -5,10 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -50,7 +48,7 @@ public final class Validate extends AbstractConfigOperation {
 
         transactionProvider.validateTransaction();
         LOG.trace("<validate> request completed successfully on session {}", getNetconfSessionIdForReporting());
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
     }
 
     protected static Datastore extractSourceParameter(final XmlElement operationElement, final String operationName)

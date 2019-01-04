@@ -5,10 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
-import com.google.common.base.Optional;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -39,7 +37,7 @@ public class Unlock extends AbstractSingletonNetconfOperation {
         final Datastore targetDatastore = Lock.extractTargetParameter(operationElement);
         if (targetDatastore == Datastore.candidate) {
             LOG.debug("Unlocking candidate datastore on session: {}", getNetconfSessionIdForReporting());
-            return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
+            return XmlUtil.createElement(document, XmlNetconfConstants.OK);
         }
 
         throw new DocumentedException("Unable to unlock " + targetDatastore + " datastore",

@@ -8,8 +8,8 @@
 
 package org.opendaylight.netconf.client;
 
-import com.google.common.base.Optional;
 import java.net.InetSocketAddress;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -39,7 +39,7 @@ public class NetconfClientConfigurationTest {
                 .withAuthHandler(handler).build();
 
         Assert.assertEquals(timeout, cfg.getConnectionTimeoutMillis());
-        Assert.assertEquals(Optional.fromNullable(header), cfg.getAdditionalHeader());
+        Assert.assertEquals(Optional.of(header), cfg.getAdditionalHeader());
         Assert.assertEquals(listener, cfg.getSessionListener());
         Assert.assertEquals(handler, cfg.getAuthHandler());
         Assert.assertEquals(strategy, cfg.getReconnectStrategy());
@@ -57,7 +57,7 @@ public class NetconfClientConfigurationTest {
                 .withSslHandlerFactory(sslHandlerFactory).build();
 
         Assert.assertEquals(timeout, cfg2.getConnectionTimeoutMillis());
-        Assert.assertEquals(Optional.fromNullable(header), cfg2.getAdditionalHeader());
+        Assert.assertEquals(Optional.of(header), cfg2.getAdditionalHeader());
         Assert.assertEquals(listener, cfg2.getSessionListener());
         Assert.assertEquals(sslHandlerFactory, cfg2.getSslHandlerFactory());
         Assert.assertEquals(strategy, cfg2.getReconnectStrategy());

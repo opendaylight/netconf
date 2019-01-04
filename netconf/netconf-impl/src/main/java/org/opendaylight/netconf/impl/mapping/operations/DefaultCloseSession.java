@@ -5,10 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl.mapping.operations;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.Collections;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -60,7 +58,7 @@ public class DefaultCloseSession extends AbstractSingletonNetconfOperation imple
                     DocumentedException.ErrorSeverity.ERROR, Collections.singletonMap(
                     DocumentedException.ErrorSeverity.ERROR.toString(), e.getMessage()));
         }
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
     }
 
     @Override

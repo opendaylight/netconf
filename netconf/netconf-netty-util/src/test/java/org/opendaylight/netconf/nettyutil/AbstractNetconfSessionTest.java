@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil;
 
 import static org.junit.Assert.assertEquals;
@@ -21,7 +20,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import com.google.common.base.Optional;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -32,6 +30,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.util.Collections;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -84,7 +83,7 @@ public class AbstractNetconfSessionTest {
             return null;
         }).when(eventLoop).execute(any(Runnable.class));
 
-        clientHello = NetconfHelloMessage.createClientHello(Collections.emptySet(), Optional.absent());
+        clientHello = NetconfHelloMessage.createClientHello(Collections.emptySet(), Optional.empty());
     }
 
     @Test
@@ -154,7 +153,7 @@ public class AbstractNetconfSessionTest {
     public void testSendMessage() throws Exception {
         final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
         final NetconfHelloMessage hello = NetconfHelloMessage.createClientHello(Collections.emptySet(),
-            Optional.absent());
+            Optional.empty());
         testingNetconfSession.sendMessage(hello);
         verify(channel).writeAndFlush(hello, writeFuture);
     }

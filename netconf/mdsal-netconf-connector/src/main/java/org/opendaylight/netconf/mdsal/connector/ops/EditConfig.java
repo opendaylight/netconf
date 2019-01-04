@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.ListIterator;
@@ -82,7 +81,7 @@ public final class EditConfig extends AbstractEdit {
             executeOperations(changeTracker);
         }
 
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
     }
 
     private void executeOperations(final DataTreeChangeTracker changeTracker) throws DocumentedException {
