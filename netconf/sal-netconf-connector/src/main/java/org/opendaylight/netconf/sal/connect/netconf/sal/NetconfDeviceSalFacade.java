@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.List;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
@@ -30,7 +31,7 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
 
     private final RemoteDeviceId id;
     private final NetconfDeviceSalProvider salProvider;
-    private final List<AutoCloseable> salRegistrations = Lists.newArrayList();
+    private final List<AutoCloseable> salRegistrations = new ArrayList<>();
 
     public NetconfDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
             final DataBroker dataBroker) {

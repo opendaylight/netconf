@@ -17,7 +17,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -26,6 +25,7 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.ImmediateEventExecutor;
 import io.netty.util.concurrent.SucceededFuture;
 import java.util.Collection;
+import java.util.HashSet;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -175,7 +175,7 @@ public class NetconfTopologyImplTest {
         when(newNode.getDataAfter()).thenReturn(nn.build());
 
 
-        final Collection<DataTreeModification<Node>> changes = Sets.newHashSet();
+        final Collection<DataTreeModification<Node>> changes = new HashSet<>();
         final DataTreeModification<Node> ch = mock(DataTreeModification.class);
         when(ch.getRootNode()).thenReturn(newNode);
         changes.add(ch);

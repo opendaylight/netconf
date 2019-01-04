@@ -11,8 +11,8 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,9 +39,9 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfSessionMonitoringService.class);
 
-    private final Set<NetconfManagementSession> sessions = Sets.newHashSet();
-    private final Set<NetconfManagementSession> changedSessions = Sets.newHashSet();
-    private final Set<NetconfMonitoringService.SessionsListener> listeners = Sets.newHashSet();
+    private final Set<NetconfManagementSession> sessions = new HashSet<>();
+    private final Set<NetconfManagementSession> changedSessions = new HashSet<>();
+    private final Set<NetconfMonitoringService.SessionsListener> listeners = new HashSet<>();
     private final ScheduledExecutorService executor;
     private final long updateInterval;
     private boolean running;

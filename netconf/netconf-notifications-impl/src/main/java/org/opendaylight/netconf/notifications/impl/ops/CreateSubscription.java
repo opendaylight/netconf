@@ -5,12 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.notifications.impl.ops;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -46,7 +45,7 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
     static final String CREATE_SUBSCRIPTION = "create-subscription";
 
     private final NetconfNotificationRegistry notifications;
-    private final List<NotificationListenerRegistration> subscriptions = Lists.newArrayList();
+    private final List<NotificationListenerRegistration> subscriptions = new ArrayList<>();
     private NetconfSession netconfSession;
 
     public CreateSubscription(final String netconfSessionIdForReporting,

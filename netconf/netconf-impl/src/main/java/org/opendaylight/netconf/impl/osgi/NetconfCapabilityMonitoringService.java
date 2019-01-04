@@ -18,10 +18,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -57,11 +57,11 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     private static final Function<Capability, Uri> CAPABILITY_TO_URI = input -> new Uri(input.getCapabilityUri());
 
     private final NetconfOperationServiceFactory netconfOperationProvider;
-    private final Map<Uri, Capability> capabilities = Maps.newHashMap();
-    private final Map<String, Map<String, String>> mappedModulesToRevisionToSchema = Maps.newHashMap();
+    private final Map<Uri, Capability> capabilities = new HashMap<>();
+    private final Map<String, Map<String, String>> mappedModulesToRevisionToSchema = new HashMap<>();
 
 
-    private final Set<NetconfMonitoringService.CapabilitiesListener> listeners = Sets.newHashSet();
+    private final Set<NetconfMonitoringService.CapabilitiesListener> listeners = new HashSet<>();
     private volatile BaseNotificationPublisherRegistration notificationPublisher;
 
     NetconfCapabilityMonitoringService(final NetconfOperationServiceFactory netconfOperationProvider) {
@@ -112,7 +112,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
 
             final String currentModuleName = cap.getModuleName().get();
             Map<String, String> revisionMap =
-                mappedModulesToRevisionToSchema.computeIfAbsent(currentModuleName, k -> Maps.newHashMap());
+                mappedModulesToRevisionToSchema.computeIfAbsent(currentModuleName, k -> new HashMap<>());
 
             final String currentRevision = cap.getRevision().get();
             revisionMap.put(currentRevision, cap.getCapabilitySchema().get());

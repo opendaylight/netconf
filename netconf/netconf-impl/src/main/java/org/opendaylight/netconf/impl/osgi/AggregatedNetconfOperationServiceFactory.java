@@ -5,21 +5,19 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl.osgi;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import com.google.common.collect.Sets;
-import io.netty.util.internal.ConcurrentSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
@@ -38,10 +36,10 @@ public class AggregatedNetconfOperationServiceFactory
 
     private static final Logger LOG = LoggerFactory.getLogger(AggregatedNetconfOperationServiceFactory.class);
 
-    private final Set<NetconfOperationServiceFactory> factories = new ConcurrentSet<>();
+    private final Set<NetconfOperationServiceFactory> factories = ConcurrentHashMap.newKeySet();
     private final Multimap<NetconfOperationServiceFactory, AutoCloseable> registrations =
             Multimaps.synchronizedMultimap(HashMultimap.create());
-    private final Set<CapabilityListener> listeners = new ConcurrentSet<>();
+    private final Set<CapabilityListener> listeners = ConcurrentHashMap.newKeySet();
 
     public AggregatedNetconfOperationServiceFactory() {
     }
@@ -78,7 +76,7 @@ public class AggregatedNetconfOperationServiceFactory
 
     @Override
     public Set<Capability> getCapabilities() {
-        final HashSet<Capability> capabilities = Sets.newHashSet();
+        final Set<Capability> capabilities = new HashSet<>();
         for (final NetconfOperationServiceFactory factory : factories) {
             capabilities.addAll(factory.getCapabilities());
         }
@@ -87,7 +85,7 @@ public class AggregatedNetconfOperationServiceFactory
 
     @Override
     public synchronized AutoCloseable registerCapabilityListener(final CapabilityListener listener) {
-        final Map<NetconfOperationServiceFactory, AutoCloseable> regs = Maps.newHashMap();
+        final Map<NetconfOperationServiceFactory, AutoCloseable> regs = new HashMap<>();
 
         for (final NetconfOperationServiceFactory factory : factories) {
             final AutoCloseable reg = factory.registerCapabilityListener(listener);
@@ -136,7 +134,7 @@ public class AggregatedNetconfOperationServiceFactory
 
         @Override
         public Set<NetconfOperation> getNetconfOperations() {
-            final HashSet<NetconfOperation> operations = Sets.newHashSet();
+            final Set<NetconfOperation> operations = new HashSet<>();
             for (final NetconfOperationService service : services) {
                 operations.addAll(service.getNetconfOperations());
             }

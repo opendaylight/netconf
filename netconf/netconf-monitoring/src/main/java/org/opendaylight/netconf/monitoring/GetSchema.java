@@ -5,11 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.monitoring;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
+import java.util.HashMap;
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
@@ -56,7 +55,7 @@ public class GetSchema extends AbstractSingletonNetconfOperation {
         try {
             schema = cap.getSchemaForCapability(entry.identifier, entry.version);
         } catch (final IllegalStateException e) {
-            final Map<String, String> errorInfo = Maps.newHashMap();
+            final Map<String, String> errorInfo = new HashMap<>();
             errorInfo.put(DocumentedException.ErrorTag.OPERATION_FAILED.toString(), e.getMessage());
             LOG.warn("Rpc error: {}", DocumentedException.ErrorTag.OPERATION_FAILED, e);
             throw new DocumentedException(e.getMessage(), e, DocumentedException.ErrorType.APPLICATION,

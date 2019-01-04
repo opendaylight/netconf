@@ -220,8 +220,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
         final String namespace = notification.getType().getLastComponent().getNamespace().toString();
         for (NotificationTopicRegistration notifReg : notificationTopicRegistrations.get(namespace)) {
             notifReg.setLastEventTime(notificationEventTime);
-            Set<TopicId> topicIdsForNotification = notifReg.getTopicsForNotification(notificationPath);
-            for (TopicId topicId : topicIdsForNotification) {
+            for (TopicId topicId : notifReg.getTopicsForNotification(notificationPath)) {
                 publishNotification(notification, topicId);
                 LOG.debug("Notification {} has been published for TopicId {}", notification.getType(),
                         topicId.getValue());
