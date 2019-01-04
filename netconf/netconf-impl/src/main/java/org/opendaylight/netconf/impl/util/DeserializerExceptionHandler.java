@@ -5,12 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl.util;
 
-import com.google.common.collect.Maps;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import java.util.HashMap;
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.util.messages.SendErrorExceptionUtil;
@@ -38,8 +37,7 @@ public final class DeserializerExceptionHandler implements ChannelHandler {
     }
 
     private static void handleDeserializerException(final ChannelHandlerContext ctx, final Throwable cause) {
-
-        final Map<String, String> info = Maps.newHashMap();
+        final Map<String, String> info = new HashMap<>();
         info.put("cause", cause.getMessage());
         final DocumentedException ex = new DocumentedException(cause.getMessage(),
                 DocumentedException.ErrorType.RPC, DocumentedException.ErrorTag.MALFORMED_MESSAGE,

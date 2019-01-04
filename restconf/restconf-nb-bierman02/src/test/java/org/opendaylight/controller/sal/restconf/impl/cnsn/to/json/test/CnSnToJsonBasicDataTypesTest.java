@@ -13,12 +13,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
-import com.google.common.collect.Maps;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.Map;
 import org.junit.BeforeClass;
 import org.opendaylight.controller.sal.restconf.impl.test.YangAndXmlAndDataSchemaLoader;
@@ -211,7 +211,7 @@ public class CnSnToJsonBasicDataTypesTest extends YangAndXmlAndDataSchemaLoader 
     private static void jsonReadContElements(final JsonReader jsonReader) throws IOException {
         jsonReader.beginObject();
 
-        final Map<String, LeafVerifier> expectedMap = Maps.newHashMap();
+        final Map<String, LeafVerifier> expectedMap = new HashMap<>();
         expectedMap.put("lfnint8Min", new NumberVerifier(-128));
         expectedMap.put("lfnint8Max", new NumberVerifier(127));
         expectedMap.put("lfnint16Min", new NumberVerifier(-32768));

@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -129,7 +130,7 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
     @Test
     public void writeContainerWithLimitedFieldsTest() throws Exception {
         final List<Set<QName>> limitedFields = new ArrayList<>();
-        limitedFields.add(Sets.newHashSet());
+        limitedFields.add(new HashSet<>());
 
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
                 writer, null, limitedFields);
@@ -172,7 +173,7 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
     @Test
     public void writeMapEntryNodeWithLimitedFieldsTest() throws Exception {
         final List<Set<QName>> limitedFields = new ArrayList<>();
-        limitedFields.add(Sets.newHashSet());
+        limitedFields.add(new HashSet<>());
 
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
                 writer, null, limitedFields);

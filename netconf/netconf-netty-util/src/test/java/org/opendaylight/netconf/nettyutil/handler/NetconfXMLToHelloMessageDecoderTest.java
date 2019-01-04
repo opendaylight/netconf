@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler;
 
 import static org.junit.Assert.assertEquals;
@@ -14,9 +13,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import java.util.ArrayList;
 import java.util.List;
 import org.hamcrest.CoreMatchers;
 import org.junit.Test;
@@ -30,7 +29,7 @@ public class NetconfXMLToHelloMessageDecoderTest {
         final ByteBuf src = Unpooled.wrappedBuffer(String.format("%s\n%s",
                 "[tomas;10.0.0.0:10000;tcp;client;]",
                 "<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>").getBytes());
-        final List<Object> out = Lists.newArrayList();
+        final List<Object> out = new ArrayList<>();
         new NetconfXMLToHelloMessageDecoder().decode(null, src, out);
 
         assertEquals(1, out.size());
@@ -47,7 +46,7 @@ public class NetconfXMLToHelloMessageDecoderTest {
     public void testDecodeNoHeader() throws Exception {
         final ByteBuf src =
                 Unpooled.wrappedBuffer("<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>".getBytes());
-        final List<Object> out = Lists.newArrayList();
+        final List<Object> out = new ArrayList<>();
         new NetconfXMLToHelloMessageDecoder().decode(null, src, out);
 
         assertEquals(1, out.size());
@@ -64,7 +63,7 @@ public class NetconfXMLToHelloMessageDecoderTest {
                 Unpooled.wrappedBuffer("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>".getBytes());
         final ByteBuf src =
                 Unpooled.wrappedBuffer("<hello xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>".getBytes());
-        final List<Object> out = Lists.newArrayList();
+        final List<Object> out = new ArrayList<>();
         final NetconfXMLToHelloMessageDecoder decoder = new NetconfXMLToHelloMessageDecoder();
         decoder.decode(null, src, out);
         decoder.decode(null, msg1, out);
@@ -79,7 +78,7 @@ public class NetconfXMLToHelloMessageDecoderTest {
     public void testDecodeNotHelloReceived() throws Exception {
         final ByteBuf msg1 =
                 Unpooled.wrappedBuffer("<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"/>".getBytes());
-        final List<Object> out = Lists.newArrayList();
+        final List<Object> out = new ArrayList<>();
         NetconfXMLToHelloMessageDecoder decoder = new NetconfXMLToHelloMessageDecoder();
         decoder.decode(null, msg1, out);
     }

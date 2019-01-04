@@ -9,7 +9,6 @@ package org.opendaylight.netconf.impl.osgi;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -130,7 +129,7 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
 
     private TreeMap<HandlingPriority, NetconfOperation> getSortedNetconfOperationsWithCanHandle(
             final Document message, final NetconfServerSession session) throws DocumentedException {
-        final TreeMap<HandlingPriority, NetconfOperation> sortedPriority = Maps.newTreeMap();
+        final TreeMap<HandlingPriority, NetconfOperation> sortedPriority = new TreeMap<>();
 
         for (final NetconfOperation netconfOperation : allNetconfOperations) {
             final HandlingPriority handlingPriority = netconfOperation.canHandle(message);

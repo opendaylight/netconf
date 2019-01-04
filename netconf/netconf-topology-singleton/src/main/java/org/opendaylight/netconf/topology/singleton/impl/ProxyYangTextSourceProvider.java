@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import akka.actor.ActorRef;
@@ -13,7 +12,7 @@ import akka.dispatch.Futures;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import com.google.common.collect.Sets;
+import java.util.Collections;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
@@ -40,7 +39,7 @@ public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider
     @Override
     public Future<Set<SourceIdentifier>> getProvidedSources() {
         // NOOP
-        return Futures.successful(Sets.newHashSet());
+        return Futures.successful(Collections.emptySet());
     }
 
     @Override

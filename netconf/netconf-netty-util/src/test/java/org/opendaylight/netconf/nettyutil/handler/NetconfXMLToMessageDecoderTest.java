@@ -5,13 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.Lists;
 import io.netty.buffer.Unpooled;
 import java.util.ArrayList;
 import org.junit.Test;
@@ -22,14 +20,14 @@ public class NetconfXMLToMessageDecoderTest {
 
     @Test
     public void testDecodeNoMoreContent() throws Exception {
-        final ArrayList<Object> out = Lists.newArrayList();
+        final ArrayList<Object> out = new ArrayList<>();
         new NetconfXMLToMessageDecoder().decode(null, Unpooled.buffer(), out);
         assertEquals(0, out.size());
     }
 
     @Test
     public void testDecode() throws Exception {
-        final ArrayList<Object> out = Lists.newArrayList();
+        final ArrayList<Object> out = new ArrayList<>();
         new NetconfXMLToMessageDecoder().decode(null, Unpooled.wrappedBuffer("<msg/>".getBytes()), out);
         assertEquals(1, out.size());
     }
@@ -40,7 +38,7 @@ public class NetconfXMLToMessageDecoderTest {
          * XML declaration in the XML prologue.
          * A leading LF is the case reported in BUG-2838.
          */
-        final ArrayList<Object> out = Lists.newArrayList();
+        final ArrayList<Object> out = new ArrayList<>();
         new NetconfXMLToMessageDecoder().decode(null,
                 Unpooled.wrappedBuffer("\n<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg/>".getBytes()), out);
         assertEquals(1, out.size());
@@ -53,7 +51,7 @@ public class NetconfXMLToMessageDecoderTest {
          * Leading CRLF can be seen with some Cisco routers
          * (eg CSR1000V running IOS 15.4(1)S)
          */
-        final ArrayList<Object> out = Lists.newArrayList();
+        final ArrayList<Object> out = new ArrayList<>();
         new NetconfXMLToMessageDecoder().decode(null,
                 Unpooled.wrappedBuffer("\r\n<?xml version=\"1.0\" encoding=\"UTF-8\"?><msg/>".getBytes()), out);
         assertEquals(1, out.size());
@@ -62,7 +60,7 @@ public class NetconfXMLToMessageDecoderTest {
     @Test
     public void testDecodeGibberish() throws Exception {
         /* Test that we reject inputs where we cannot find the xml start '<' character */
-        final ArrayList<Object> out = Lists.newArrayList();
+        final ArrayList<Object> out = new ArrayList<>();
         new NetconfXMLToMessageDecoder().decode(null, Unpooled.wrappedBuffer("\r\n?xml version>".getBytes()), out);
         assertEquals(1, out.size());
         assertTrue(FailedNetconfMessage.class.isInstance(out.get(0)));
@@ -74,7 +72,7 @@ public class NetconfXMLToMessageDecoderTest {
     public void testDecodeOnlyWhitespaces() throws Exception {
         /* Test that we handle properly a bunch of whitespaces.
          */
-        final ArrayList<Object> out = Lists.newArrayList();
+        final ArrayList<Object> out = new ArrayList<>();
         new NetconfXMLToMessageDecoder().decode(null, Unpooled.wrappedBuffer("\r\n".getBytes()), out);
         assertEquals(0, out.size());
     }
@@ -84,7 +82,7 @@ public class NetconfXMLToMessageDecoderTest {
         /* Test that every whitespace we want to skip is actually skipped.
          */
 
-        final ArrayList<Object> out = Lists.newArrayList();
+        final ArrayList<Object> out = new ArrayList<>();
         byte[] whitespaces = {' ', '\t', '\n', '\r', '\f', 0x0b /* vertical tab */};
         new NetconfXMLToMessageDecoder().decode(
                 null,

@@ -19,7 +19,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -30,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -730,7 +730,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
             final ErrorInfoVerifier errorInfoVerifier) {
 
         JsonElement errorInfoElement = null;
-        final Map<String, String> leafMap = Maps.newHashMap();
+        final Map<String, String> leafMap = new HashMap<>();
         for (final Entry<String, JsonElement> entry : errorEntryElement.getAsJsonObject().entrySet()) {
             final String leafName = entry.getKey();
             final JsonElement leafElement = entry.getValue();
