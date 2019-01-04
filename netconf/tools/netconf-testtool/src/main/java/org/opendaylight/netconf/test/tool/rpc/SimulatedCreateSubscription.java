@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.rpc;
 
 import com.google.common.base.Optional;
@@ -103,7 +102,7 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
                 }, delayAggregator, TimeUnit.SECONDS);
             }
         }
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
     }
 
     private static NetconfMessage parseNetconfNotification(String content) {

@@ -9,7 +9,6 @@ package org.opendaylight.netconf.client;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.siemens.ct.exi.core.CodingMode;
 import com.siemens.ct.exi.core.FidelityOptions;
@@ -17,6 +16,7 @@ import com.siemens.ct.exi.core.exceptions.UnsupportedOption;
 import io.netty.channel.Channel;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
+import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
 import org.opendaylight.netconf.api.NetconfMessage;

@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.monitoring;
 
-import com.google.common.base.Optional;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -92,7 +92,7 @@ public class GetSchema extends AbstractSingletonNetconfOperation {
             if (versionElement.isPresent()) {
                 version = Optional.of(versionElement.get().getTextContent());
             } else {
-                version = Optional.absent();
+                version = Optional.empty();
             }
         }
     }

@@ -15,12 +15,12 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0;
 
-import com.google.common.base.Optional;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
@@ -156,7 +156,7 @@ public class NetconfCapabilityMonitoringServiceTest {
         //remove one revision
         monitoringService.onCapabilitiesChanged(Collections.emptySet(), Collections.singleton(moduleCapability1));
         //only one revision present
-        final String schema3 = monitoringService.getSchemaForModuleRevision(TEST_MODULE_NAME, Optional.absent());
+        final String schema3 = monitoringService.getSchemaForModuleRevision(TEST_MODULE_NAME, Optional.empty());
         Assert.assertEquals(TEST_MODULE_CONTENT2, schema3);
     }
 

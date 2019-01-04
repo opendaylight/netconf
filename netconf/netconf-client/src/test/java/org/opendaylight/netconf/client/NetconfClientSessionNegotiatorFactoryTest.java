@@ -5,18 +5,17 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.client;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import com.google.common.base.Optional;
 import io.netty.channel.Channel;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
+import java.util.Optional;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 
@@ -32,7 +31,7 @@ public class NetconfClientSessionNegotiatorFactoryTest {
         Channel channel = mock(Channel.class);
         Promise<NetconfClientSession> promise = mock(Promise.class);
         NetconfClientSessionNegotiatorFactory negotiatorFactory = new NetconfClientSessionNegotiatorFactory(timer,
-                Optional.absent(), 200L);
+                Optional.empty(), 200L);
 
         NetconfClientSessionNegotiator sessionNegotiator = negotiatorFactory.getSessionNegotiator(listenerFactory,
             channel, promise);

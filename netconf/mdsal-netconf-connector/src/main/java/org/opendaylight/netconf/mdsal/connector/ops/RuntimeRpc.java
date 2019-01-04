@@ -7,12 +7,12 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops;
 
-import com.google.common.base.Optional;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.Nullable;
 import javax.xml.stream.XMLOutputFactory;
@@ -103,7 +103,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
     //this returns module with the newest revision if more then 1 module with same namespace is found
     private Optional<Module> getModule(final URI namespaceURI) {
-        return Optional.fromJavaUtil(schemaContext.getCurrentContext().findModules(namespaceURI).stream().findFirst());
+        return schemaContext.getCurrentContext().findModules(namespaceURI).stream().findFirst();
     }
 
     private static Optional<RpcDefinition> getRpcDefinitionFromModule(final Module module, final URI namespaceURI,
@@ -114,7 +114,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
                 return Optional.of(rpcDef);
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override

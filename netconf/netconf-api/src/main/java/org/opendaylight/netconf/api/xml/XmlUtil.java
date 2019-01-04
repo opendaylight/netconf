@@ -5,10 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.api.xml;
 
-import com.google.common.base.Optional;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -120,10 +119,14 @@ public final class XmlUtil {
         return DEFAULT_DOM_BUILDER.get().newDocument();
     }
 
-    public static Element createElement(final Document document, final String qmame,
+    public static Element createElement(final Document document, final String qname) {
+        return createElement(document, qname, Optional.empty());
+    }
+
+    public static Element createElement(final Document document, final String qname,
             final Optional<String> namespaceURI) {
         if (namespaceURI.isPresent()) {
-            final Element element = document.createElementNS(namespaceURI.get(), qmame);
+            final Element element = document.createElementNS(namespaceURI.get(), qname);
             String name = XMLNS_ATTRIBUTE_KEY;
             if (element.getPrefix() != null) {
                 name += ":" + element.getPrefix();
@@ -131,7 +134,7 @@ public final class XmlUtil {
             element.setAttributeNS(XMLNS_URI, name, namespaceURI.get());
             return element;
         }
-        return document.createElement(qmame);
+        return document.createElement(qname);
     }
 
     public static Element createTextElement(final Document document, final String qname, final String content,
@@ -145,7 +148,7 @@ public final class XmlUtil {
             final String prefix, final String namespace, final String contentWithoutPrefix) {
 
         return createTextElementWithNamespacedContent(document, qname, prefix, namespace, contentWithoutPrefix,
-                Optional.absent());
+                Optional.empty());
     }
 
     public static Element createTextElementWithNamespacedContent(final Document document, final String qname,

@@ -5,11 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.api.messages;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
+import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -41,7 +40,7 @@ public final class NetconfHelloMessage extends NetconfMessage {
     }
 
     public Optional<NetconfHelloMessageAdditionalHeader> getAdditionalHeader() {
-        return Optional.fromNullable(additionalHeader);
+        return Optional.ofNullable(additionalHeader);
     }
 
     private static void checkHelloMessage(final Document doc) {
@@ -54,7 +53,7 @@ public final class NetconfHelloMessage extends NetconfMessage {
 
     public static NetconfHelloMessage createClientHello(final Iterable<String> capabilities,
             final Optional<NetconfHelloMessageAdditionalHeader> additionalHeaderOptional) {
-        return new NetconfHelloMessage(createHelloMessageDoc(capabilities), additionalHeaderOptional.orNull());
+        return new NetconfHelloMessage(createHelloMessageDoc(capabilities), additionalHeaderOptional.orElse(null));
     }
 
     private static Document createHelloMessageDoc(final Iterable<String> capabilities) {

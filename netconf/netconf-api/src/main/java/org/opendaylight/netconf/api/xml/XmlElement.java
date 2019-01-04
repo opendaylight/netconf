@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.api.xml;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
@@ -18,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -234,7 +234,7 @@ public final class XmlElement {
     public Optional<XmlElement> getOnlyChildElementOptionally(final String childName) {
         List<XmlElement> nameElements = getChildElements(childName);
         if (nameElements.size() != 1) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return Optional.of(nameElements.get(0));
     }
@@ -244,7 +244,7 @@ public final class XmlElement {
         children = Lists.newArrayList(Collections2.filter(children,
             xmlElement -> xmlElement.getName().equals(childName)));
         if (children.size() != 1) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return Optional.of(children.get(0));
     }
@@ -252,7 +252,7 @@ public final class XmlElement {
     public Optional<XmlElement> getOnlyChildElementOptionally() {
         List<XmlElement> children = getChildElements();
         if (children.size() != 1) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return Optional.of(children.get(0));
     }
@@ -274,11 +274,11 @@ public final class XmlElement {
             children = Lists.newArrayList(Collections2.filter(children,
                 xmlElement -> xmlElement.getName().equals(childName)));
             if (children.size() != 1) {
-                return Optional.absent();
+                return Optional.empty();
             }
             return Optional.of(children.get(0));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public Optional<XmlElement> getOnlyChildElementWithSameNamespaceOptionally() {
@@ -289,7 +289,7 @@ public final class XmlElement {
                 && getNamespaceOptionally().get().equals(child.get().getNamespaceOptionally().get())) {
             return child;
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public XmlElement getOnlyChildElement(final String childName, final String namespace) throws DocumentedException {
@@ -357,7 +357,7 @@ public final class XmlElement {
                 return Optional.of(((Text) item).getWholeText());
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public String getNamespaceAttribute() throws MissingNameSpaceException {
@@ -375,7 +375,7 @@ public final class XmlElement {
     public Optional<String> getNamespaceAttributeOptionally() {
         String attribute = element.getAttribute(XmlUtil.XMLNS_ATTRIBUTE_KEY);
         if (attribute.isEmpty() || attribute.equals(DEFAULT_NAMESPACE_PREFIX)) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return Optional.of(attribute);
     }
@@ -383,7 +383,7 @@ public final class XmlElement {
     public Optional<String> getNamespaceOptionally() {
         String namespaceURI = element.getNamespaceURI();
         if (Strings.isNullOrEmpty(namespaceURI)) {
-            return Optional.absent();
+            return Optional.empty();
         } else {
             return Optional.of(namespaceURI);
         }
