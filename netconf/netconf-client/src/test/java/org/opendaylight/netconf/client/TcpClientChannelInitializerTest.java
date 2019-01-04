@@ -5,11 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.client;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -20,16 +19,15 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.util.concurrent.Promise;
 import org.junit.Test;
-import org.opendaylight.protocol.framework.SessionListenerFactory;
-import org.opendaylight.protocol.framework.SessionNegotiator;
+import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 
 public class TcpClientChannelInitializerTest {
     @Test
     public void testInitializeSessionNegotiator() throws Exception {
         NetconfClientSessionNegotiatorFactory factory = mock(NetconfClientSessionNegotiatorFactory.class);
-        SessionNegotiator<?> sessionNegotiator = mock(SessionNegotiator.class);
+        NetconfClientSessionNegotiator sessionNegotiator = mock(NetconfClientSessionNegotiator.class);
         doReturn("").when(sessionNegotiator).toString();
-        doReturn(sessionNegotiator).when(factory).getSessionNegotiator(any(SessionListenerFactory.class),
+        doReturn(sessionNegotiator).when(factory).getSessionNegotiator(any(NetconfSessionListenerFactory.class),
                 any(Channel.class), any(Promise.class));
         NetconfClientSessionListener listener = mock(NetconfClientSessionListener.class);
         final TcpClientChannelInitializer initializer = new TcpClientChannelInitializer(factory, listener);
