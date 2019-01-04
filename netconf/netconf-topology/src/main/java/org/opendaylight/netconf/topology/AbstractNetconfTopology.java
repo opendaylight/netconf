@@ -35,7 +35,6 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
-import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
@@ -66,6 +65,7 @@ import org.opendaylight.protocol.framework.TimedReconnectStrategy;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol.Name;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
@@ -485,24 +485,24 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 maxConnectionAttempts, betweenAttemptsTimeoutMillis, sleepFactor);
         final ReconnectStrategy strategy = sf.createReconnectStrategy();
 
-        final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder =
-                NetconfReconnectingClientConfigurationBuilder.create();
-
-        if (node.isTcpOnly() || node.getProtocol() == null || node.getProtocol().getName() == Name.SSH) {
-            final AuthenticationHandler authHandler = getHandlerFromCredentials(node.getCredentials());
-            reconnectingClientConfigurationBuilder
-                .withAuthHandler(authHandler)
-                .withProtocol(node.isTcpOnly() ? NetconfClientConfiguration.NetconfClientProtocol.TCP :
-                    NetconfClientConfiguration.NetconfClientProtocol.SSH);
-        } else if (node.getProtocol().getName() == Name.TLS) {
-            final SslHandlerFactory sslHandlerFactory = new SslHandlerFactoryImpl(keystoreAdapter,
-                    node.getProtocol().getSpecification());
-            reconnectingClientConfigurationBuilder
-                .withSslHandlerFactory(sslHandlerFactory)
+        final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
+        final Protocol protocol = node.getProtocol();
+        if (protocol == null || protocol.getName() == Name.SSH) {
+            reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
+                    .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
+                    .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
+        } else if (node.isTcpOnly()) {
+            reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
+                .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
+        } else if (protocol.getName() == Name.TLS) {
+            reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
+                .withSslHandlerFactory(new SslHandlerFactoryImpl(keystoreAdapter, protocol.getSpecification()))
                 .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS);
         } else {
-            throw new IllegalStateException("Unsupported protocol type: " + node.getProtocol().getName().getClass());
+            throw new IllegalStateException("Unsupported protocol type: " + protocol.getName());
         }
+
         if (node.getOdlHelloMessageCapabilities() != null) {
             reconnectingClientConfigurationBuilder
                     .withOdlHelloCapabilities(node.getOdlHelloMessageCapabilities().getCapability());
