@@ -15,7 +15,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import io.netty.util.concurrent.EventExecutor;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -54,7 +53,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySet
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.protocol.framework.ReconnectStrategy;
 import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
-import org.opendaylight.protocol.framework.TimedReconnectStrategy;
+import org.opendaylight.protocol.framework.TimedReconnectStrategyFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
@@ -337,31 +336,5 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                     keystoreAdapter, encryptionService);
         }
         throw new IllegalStateException("Unsupported credential type: " + credentials.getClass());
-    }
-
-    private static final class TimedReconnectStrategyFactory implements ReconnectStrategyFactory {
-        private final Long connectionAttempts;
-        private final EventExecutor executor;
-        private final double sleepFactor;
-        private final int minSleep;
-
-        TimedReconnectStrategyFactory(final EventExecutor executor, final Long maxConnectionAttempts,
-                                      final int minSleep, final BigDecimal sleepFactor) {
-            if (maxConnectionAttempts != null && maxConnectionAttempts > 0) {
-                connectionAttempts = maxConnectionAttempts;
-            } else {
-                connectionAttempts = null;
-            }
-
-            this.sleepFactor = sleepFactor.doubleValue();
-            this.executor = executor;
-            this.minSleep = minSleep;
-        }
-
-        @Override
-        public ReconnectStrategy createReconnectStrategy() {
-            return new TimedReconnectStrategy(executor, minSleep,
-                    minSleep, sleepFactor, null /*maxSleep*/, connectionAttempts, null /*deadline*/);
-        }
     }
 }
