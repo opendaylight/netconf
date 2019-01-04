@@ -5,13 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.util.messages;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -70,9 +69,10 @@ public final class NetconfMessageUtil {
         XmlElement responseElement = XmlElement.fromDomDocument(doc);
         // Extract child element <capabilities> from <hello> with or without(fallback) the same namespace
         Optional<XmlElement> capabilitiesElement = responseElement
-                .getOnlyChildElementWithSameNamespaceOptionally(XmlNetconfConstants.CAPABILITIES)
-                .or(responseElement
-                        .getOnlyChildElementOptionally(XmlNetconfConstants.CAPABILITIES));
+                .getOnlyChildElementWithSameNamespaceOptionally(XmlNetconfConstants.CAPABILITIES);
+        if (!capabilitiesElement.isPresent()) {
+            capabilitiesElement = responseElement.getOnlyChildElementOptionally(XmlNetconfConstants.CAPABILITIES);
+        }
 
         List<XmlElement> caps = capabilitiesElement.get().getChildElements(XmlNetconfConstants.CAPABILITY);
         return Collections2.transform(caps, (@Nonnull final XmlElement input) -> {

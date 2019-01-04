@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -13,12 +12,12 @@ import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER;
 
-import com.google.common.base.Optional;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.Promise;
 import java.util.Collections;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +58,7 @@ public class Netconf539Test {
             FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM));
         channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
         final NetconfHelloMessage serverHello = NetconfHelloMessage.createClientHello(Collections
-            .singleton(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.absent());
+            .singleton(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.empty());
         doReturn(promise).when(promise).setFailure(any());
         doReturn(promise).when(promise).setSuccess(any());
         negotiator = new TestSessionNegotiator(new NetconfSessionPreferences(serverHello), promise, channel,

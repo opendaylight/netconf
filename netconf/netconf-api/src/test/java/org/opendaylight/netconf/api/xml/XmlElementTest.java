@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.api.xml;
 
 import static org.hamcrest.CoreMatchers.both;
@@ -17,8 +16,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import com.google.common.base.Optional;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -114,7 +113,7 @@ public class XmlElementTest {
         final XmlElement inner = xmlElement.getOnlyChildElement("inner");
         final XmlElement deepInner = inner.getOnlyChildElementWithSameNamespaceOptionally().get();
         assertEquals(deepInner, inner.getOnlyChildElementWithSameNamespace());
-        assertEquals(Optional.<XmlElement>absent(), xmlElement.getOnlyChildElementOptionally("unknown"));
+        assertEquals(Optional.empty(), xmlElement.getOnlyChildElementOptionally("unknown"));
         assertEquals("deepValue", deepInner.getTextContent());
         assertEquals("deepValue", deepInner.getOnlyTextContentOptionally().get());
         assertEquals("deepValue", deepInner.getOnlyTextContentOptionally().get());
