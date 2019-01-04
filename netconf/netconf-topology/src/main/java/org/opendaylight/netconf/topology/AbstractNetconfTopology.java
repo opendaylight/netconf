@@ -59,9 +59,8 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYang
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.api.NetconfTopology;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
-import org.opendaylight.protocol.framework.ReconnectStrategy;
 import org.opendaylight.protocol.framework.ReconnectStrategyFactory;
-import org.opendaylight.protocol.framework.TimedReconnectStrategy;
+import org.opendaylight.protocol.framework.TimedReconnectStrategyFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -483,7 +482,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         final ReconnectStrategyFactory sf = new TimedReconnectStrategyFactory(eventExecutor,
                 maxConnectionAttempts, betweenAttemptsTimeoutMillis, sleepFactor);
-        final ReconnectStrategy strategy = sf.createReconnectStrategy();
 
         final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
         final Protocol protocol = node.getProtocol();
@@ -511,7 +509,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         return reconnectingClientConfigurationBuilder
                 .withAddress(socketAddress)
                 .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
-                .withReconnectStrategy(strategy)
+                .withReconnectStrategy(sf.createReconnectStrategy())
                 .withConnectStrategyFactory(sf)
                 .withSessionListener(listener)
                 .build();
@@ -586,32 +584,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         return Optional.of(new UserPreferences(NetconfSessionPreferences
             .fromStrings(capabilities, CapabilityOrigin.UserDefined), overrideYangModuleCaps, overrideNonModuleCaps));
-    }
-
-    private static final class TimedReconnectStrategyFactory implements ReconnectStrategyFactory {
-        private final Long connectionAttempts;
-        private final EventExecutor executor;
-        private final double sleepFactor;
-        private final int minSleep;
-
-        TimedReconnectStrategyFactory(final EventExecutor executor, final Long maxConnectionAttempts,
-                                      final int minSleep, final BigDecimal sleepFactor) {
-            if (maxConnectionAttempts != null && maxConnectionAttempts > 0) {
-                connectionAttempts = maxConnectionAttempts;
-            } else {
-                connectionAttempts = null;
-            }
-
-            this.sleepFactor = sleepFactor.doubleValue();
-            this.executor = executor;
-            this.minSleep = minSleep;
-        }
-
-        @Override
-        public ReconnectStrategy createReconnectStrategy() {
-            return new TimedReconnectStrategy(executor, minSleep,
-                    minSleep, sleepFactor, null /*maxSleep*/, connectionAttempts, null /*deadline*/);
-        }
     }
 
     protected static class NetconfConnectorDTO implements AutoCloseable {
