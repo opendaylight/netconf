@@ -111,10 +111,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>netconf-monitoring</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>netconf-ssh</artifactId>
         </dependency>
         <dependency>

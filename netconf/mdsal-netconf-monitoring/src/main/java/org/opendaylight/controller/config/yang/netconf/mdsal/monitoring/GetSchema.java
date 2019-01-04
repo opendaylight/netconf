@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.monitoring;
+package org.opendaylight.controller.config.yang.netconf.mdsal.monitoring;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
@@ -16,22 +16,23 @@ import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.monitoring.MonitoringConstants;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class GetSchema extends AbstractSingletonNetconfOperation {
-    public static final String GET_SCHEMA = "get-schema";
-    public static final String IDENTIFIER = "identifier";
-    public static final String VERSION = "version";
+final class GetSchema extends AbstractSingletonNetconfOperation {
+    private static final String GET_SCHEMA = "get-schema";
+    private static final String IDENTIFIER = "identifier";
+    private static final String VERSION = "version";
 
     private static final Logger LOG = LoggerFactory.getLogger(GetSchema.class);
     private final NetconfMonitoringService cap;
 
-    public GetSchema(final NetconfMonitoringService cap) {
-        super(MonitoringConstants.MODULE_NAME);
+    GetSchema(final String netconfSessionIdForReporting, final NetconfMonitoringService cap ) {
+        super(netconfSessionIdForReporting);
         this.cap = cap;
     }
 
@@ -58,7 +59,7 @@ public class GetSchema extends AbstractSingletonNetconfOperation {
         } catch (final IllegalStateException e) {
             final Map<String, String> errorInfo = Maps.newHashMap();
             errorInfo.put(DocumentedException.ErrorTag.OPERATION_FAILED.toString(), e.getMessage());
-            LOG.warn("Rpc error: {}", DocumentedException.ErrorTag.OPERATION_FAILED, e);
+            LOG.warn("{}: Rpc error: {}", DocumentedException.ErrorTag.OPERATION_FAILED, e);
             throw new DocumentedException(e.getMessage(), e, DocumentedException.ErrorType.APPLICATION,
                     DocumentedException.ErrorTag.OPERATION_FAILED,
                     DocumentedException.ErrorSeverity.ERROR, errorInfo);
@@ -80,7 +81,7 @@ public class GetSchema extends AbstractSingletonNetconfOperation {
             getSchemaElement.checkName(GET_SCHEMA);
             getSchemaElement.checkNamespace(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING);
 
-            XmlElement identifierElement = null;
+            XmlElement identifierElement;
             try {
                 identifierElement = getSchemaElement.getOnlyChildElementWithSameNamespace(IDENTIFIER);
             } catch (final DocumentedException e) {
