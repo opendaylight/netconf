@@ -110,8 +110,8 @@
             <artifactId>netconf-mapping-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>netconf-monitoring</artifactId>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>mdsal-netconf-monitoring</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

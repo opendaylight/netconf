@@ -5,27 +5,29 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.monitoring.osgi;
 
-import com.google.common.collect.ImmutableSet;
+package org.opendaylight.netconf.test.tool.monitoring;
+
+import com.google.common.collect.Sets;
 import java.util.Set;
+import org.opendaylight.controller.config.yang.netconf.mdsal.monitoring.GetSchema;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
-import org.opendaylight.netconf.monitoring.Get;
-import org.opendaylight.netconf.monitoring.GetSchema;
 
 public class NetconfMonitoringOperationService implements NetconfOperationService {
 
-    private final ImmutableSet<NetconfOperation> netconfOperations;
+    private static final String TESTTOOL_SESSION = "testtool-session";
+
+    private final NetconfMonitoringService monitor;
 
     public NetconfMonitoringOperationService(final NetconfMonitoringService monitor) {
-        netconfOperations = ImmutableSet.of(new Get(monitor), new GetSchema(monitor));
+        this.monitor = monitor;
     }
 
     @Override
     public Set<NetconfOperation> getNetconfOperations() {
-        return netconfOperations;
+        return Sets.newHashSet(new Get(monitor), new GetSchema(TESTTOOL_SESSION, monitor));
     }
 
     @Override

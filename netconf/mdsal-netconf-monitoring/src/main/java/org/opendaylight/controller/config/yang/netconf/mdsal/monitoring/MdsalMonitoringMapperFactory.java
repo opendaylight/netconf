@@ -17,13 +17,12 @@ import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener;
-import org.opendaylight.netconf.monitoring.GetSchema;
 
 public class MdsalMonitoringMapperFactory implements NetconfOperationServiceFactory, AutoCloseable {
 
-    private final NetconfOperationService operationService;
     private final MonitoringToMdsalWriter monitoringToMdsalWriter;
     private final NetconfOperationServiceFactoryListener netconfOperationServiceFactoryListener;
+    private final NetconfMonitoringService netconfMonitoringService;
 
     private static final Set<Capability> CAPABILITIES = Collections.emptySet();
 
@@ -33,12 +32,17 @@ public class MdsalMonitoringMapperFactory implements NetconfOperationServiceFact
             final MonitoringToMdsalWriter monitoringToMdsalWriter) {
 
         this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
+        this.netconfMonitoringService = netconfMonitoringService;
         this.monitoringToMdsalWriter = monitoringToMdsalWriter;
+        this.netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(this);
+    }
 
-        this.operationService = new NetconfOperationService() {
+    @Override
+    public NetconfOperationService createService(final String netconfSessionIdForReporting) {
+        return new NetconfOperationService() {
             @Override
             public Set<NetconfOperation> getNetconfOperations() {
-                return Collections.singleton(new GetSchema(netconfMonitoringService));
+                return Collections.singleton(new GetSchema(netconfSessionIdForReporting, netconfMonitoringService));
             }
 
             @Override
@@ -46,20 +50,13 @@ public class MdsalMonitoringMapperFactory implements NetconfOperationServiceFact
                 // NOOP
             }
         };
-
-        this.netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(this);
-    }
-
-    @Override
-    public NetconfOperationService createService(final String netconfSessionIdForReporting) {
-        return operationService;
     }
 
     @Override
     public Set<Capability> getCapabilities() {
-        // TODO No capabilities exposed to prevent clashes with schemas from mdsal-netconf-connector (it exposes
-        // all the schemas). If the schemas exposed by mdsal-netconf-connector are filtered, this class would expose
-        // monitoring related models.
+        // TODO No capabilities exposed to prevent clashes with schemas from mdsal-netconf-connector (it exposes all the
+        // schemas). If the schemas exposed by mdsal-netconf-connector are filtered, this class would expose monitoring
+        // related models.
         return CAPABILITIES;
     }
 

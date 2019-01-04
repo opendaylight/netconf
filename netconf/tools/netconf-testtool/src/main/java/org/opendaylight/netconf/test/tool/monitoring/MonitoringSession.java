@@ -5,12 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.monitoring.xml.model;
+package org.opendaylight.netconf.test.tool.monitoring;
 
 import com.google.common.base.Joiner;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
-import org.opendaylight.netconf.monitoring.MonitoringConstants;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.Session1;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
@@ -75,7 +74,7 @@ final class MonitoringSession {
     @XmlElement(name = "transport")
     public String getTransport() {
         try {
-            QName qualifiedName = (QName) managementSession.getTransport().getField("QNAME").get(null);
+            final QName qualifiedName = (QName) managementSession.getTransport().getField("QNAME").get(null);
             // Add extension prefix if transport type is from extension yang module
             if (qualifiedName.getNamespace().toString().equals(MonitoringConstants.EXTENSION_NAMESPACE)) {
                 return Joiner.on(':').join(MonitoringConstants.EXTENSION_NAMESPACE_PREFIX,
@@ -83,7 +82,7 @@ final class MonitoringSession {
             } else {
                 return qualifiedName.getLocalName();
             }
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+        } catch (final NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
             throw new IllegalArgumentException("Unknown transport type " + managementSession.getTransport(), e);
         }
     }

@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.monitoring.xml.model;
+package org.opendaylight.netconf.test.tool.monitoring;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
