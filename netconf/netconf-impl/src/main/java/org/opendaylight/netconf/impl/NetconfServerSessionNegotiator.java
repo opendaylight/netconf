@@ -5,10 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl;
 
-import com.google.common.base.Optional;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
 import io.netty.channel.local.LocalAddress;
@@ -18,6 +16,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.AbstractMap;
 import java.util.Map;
+import java.util.Optional;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfServerSessionPreferences;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
