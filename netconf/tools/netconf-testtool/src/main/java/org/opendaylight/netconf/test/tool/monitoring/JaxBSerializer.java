@@ -5,13 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.monitoring.xml;
+package org.opendaylight.netconf.test.tool.monitoring;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.transform.dom.DOMResult;
-import org.opendaylight.netconf.monitoring.xml.model.NetconfState;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -21,7 +20,7 @@ public class JaxBSerializer {
     static {
         try {
             JAXB_CONTEXT = JAXBContext.newInstance(NetconfState.class);
-        } catch (JAXBException e) {
+        } catch (final JAXBException e) {
             throw new ExceptionInInitializerError(e);
         }
     }
