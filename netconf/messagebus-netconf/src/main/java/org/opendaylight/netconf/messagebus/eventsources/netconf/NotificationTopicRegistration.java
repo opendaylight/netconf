@@ -7,8 +7,8 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
-import com.google.common.collect.Sets;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -74,7 +74,7 @@ abstract class NotificationTopicRegistration implements AutoCloseable {
      */
     Set<TopicId> getTopicsForNotification(final SchemaPath notificationPath) {
         final Set<TopicId> topicIds = notificationTopicMap.get(notificationPath);
-        return topicIds != null ? topicIds : Sets.newHashSet();
+        return topicIds != null ? topicIds : new HashSet<>();
     }
 
     /**

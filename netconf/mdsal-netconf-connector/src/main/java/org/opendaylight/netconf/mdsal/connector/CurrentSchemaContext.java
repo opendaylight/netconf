@@ -5,12 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -25,7 +24,7 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 public class CurrentSchemaContext implements SchemaContextListener, AutoCloseable {
     private final AtomicReference<SchemaContext> currentContext = new AtomicReference<>();
     private final ListenerRegistration<SchemaContextListener> schemaContextListenerListenerRegistration;
-    private final Set<CapabilityListener> listeners1 = Collections.synchronizedSet(Sets.newHashSet());
+    private final Set<CapabilityListener> listeners1 = Collections.synchronizedSet(new HashSet<>());
     private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider;
 
     public SchemaContext getCurrentContext() {

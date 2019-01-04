@@ -32,10 +32,10 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -213,7 +213,7 @@ public class NetconfMessageTransformerTest {
                 NetconfRemoteSchemaYangSourceProvider
                         .createGetSchemaRequest("module", Optional.of("2012-12-12")).getValue());
 
-        final Map<QName, Object> keys = Maps.newHashMap();
+        final Map<QName, Object> keys = new HashMap<>();
         for (final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> value : values) {
             keys.put(value.getNodeType(), value.getValue());
         }
@@ -293,7 +293,7 @@ public class NetconfMessageTransformerTest {
                 NetconfRemoteSchemaYangSourceProvider
                         .createGetSchemaRequest("module", Optional.of("2012-12-12")).getValue());
 
-        final Map<QName, Object> keys = Maps.newHashMap();
+        final Map<QName, Object> keys = new HashMap<>();
         for (final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> value : values) {
             keys.put(value.getNodeType(), value.getValue());
         }

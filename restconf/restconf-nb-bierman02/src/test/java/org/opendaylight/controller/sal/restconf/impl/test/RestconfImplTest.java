@@ -176,7 +176,7 @@ public class RestconfImplTest {
                 "2014-01-14", "create-notification-stream")).when(schemaNode).getQName();
         doReturn(null).when(iiCtx).getMountPoint();
 
-        final Set<DataContainerChild<?, ?>> children = Sets.newHashSet();
+        final Set<DataContainerChild<?, ?>> children = new HashSet<>();
         final DataContainerChild<?, ?> child = mock(DataContainerChild.class,
                 Mockito.withSettings().extraInterfaces(LeafSetNode.class));
 

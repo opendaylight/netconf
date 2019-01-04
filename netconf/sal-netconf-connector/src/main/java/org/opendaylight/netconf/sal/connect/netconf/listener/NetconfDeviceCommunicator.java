@@ -9,12 +9,12 @@ package org.opendaylight.netconf.sal.connect.netconf.listener;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.concurrent.Future;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
@@ -180,7 +180,7 @@ public class NetconfDeviceCommunicator
             LOG.warn("It's curious that no one to close the session but tearDown is called!");
         }
         LOG.debug("Tearing down {}", reason);
-        final List<UncancellableFuture<RpcResult<NetconfMessage>>> futuresToCancel = Lists.newArrayList();
+        final List<UncancellableFuture<RpcResult<NetconfMessage>>> futuresToCancel = new ArrayList<>();
         sessionLock.lock();
         try {
             if (currentSession != null) {

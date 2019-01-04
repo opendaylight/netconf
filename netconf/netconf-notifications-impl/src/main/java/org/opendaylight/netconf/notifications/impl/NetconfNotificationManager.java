@@ -5,17 +5,16 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.notifications.impl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Sets;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.concurrent.GuardedBy;
@@ -71,16 +70,16 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
             HashMultimap.create();
 
     @GuardedBy("this")
-    private final Set<NetconfNotificationStreamListener> streamListeners = Sets.newHashSet();
+    private final Set<NetconfNotificationStreamListener> streamListeners = new HashSet<>();
 
     @GuardedBy("this")
-    private final Map<StreamNameType, Stream> streamMetadata = Maps.newHashMap();
+    private final Map<StreamNameType, Stream> streamMetadata = new HashMap<>();
 
     @GuardedBy("this")
     private final Multiset<StreamNameType> availableStreams = HashMultiset.create();
 
     @GuardedBy("this")
-    private final Set<GenericNotificationPublisherReg> notificationPublishers = Sets.newHashSet();
+    private final Set<GenericNotificationPublisherReg> notificationPublishers = new HashSet<>();
 
     @Override
     public synchronized void onNotification(final StreamNameType stream, final NetconfNotification notification) {

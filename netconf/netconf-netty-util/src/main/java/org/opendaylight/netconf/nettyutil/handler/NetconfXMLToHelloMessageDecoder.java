@@ -10,7 +10,6 @@ package org.opendaylight.netconf.nettyutil.handler;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,6 +18,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -53,7 +53,7 @@ public final class NetconfXMLToHelloMessageDecoder extends ByteToMessageDecoder 
     // State variables do not have to by synchronized
     // Netty uses always the same (1) thread per pipeline
     // We use instance of this per pipeline
-    private final List<NetconfMessage> nonHelloMessages = Lists.newArrayList();
+    private final List<NetconfMessage> nonHelloMessages = new ArrayList<>();
     private boolean helloReceived = false;
 
     @Override

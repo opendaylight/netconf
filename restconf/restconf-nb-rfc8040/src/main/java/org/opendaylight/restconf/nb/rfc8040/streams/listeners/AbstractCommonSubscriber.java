@@ -10,8 +10,8 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import io.netty.channel.Channel;
-import io.netty.util.internal.ConcurrentSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.slf4j.Logger;
@@ -24,7 +24,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCommonSubscriber.class);
 
-    private final Set<Channel> subscribers = new ConcurrentSet<>();
+    private final Set<Channel> subscribers = ConcurrentHashMap.newKeySet();
     private final EventBus eventBus;
 
     @SuppressWarnings("rawtypes")

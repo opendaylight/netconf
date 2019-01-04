@@ -44,6 +44,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.SettableFuture;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
@@ -197,7 +198,7 @@ public class NetconfNodeActorTest {
 
         // Test CreateInitialMasterActorData.
 
-        initializeMaster(Lists.newArrayList());
+        initializeMaster(new ArrayList<>());
 
         // Test RefreshSetupMasterActorData.
 

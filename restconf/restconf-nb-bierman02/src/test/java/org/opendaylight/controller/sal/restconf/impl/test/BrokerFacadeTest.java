@@ -30,6 +30,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FluentFuture;
+import java.util.ArrayList;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -366,7 +367,7 @@ public class BrokerFacadeTest {
         final PatchContext patchContext = mock(PatchContext.class);
         final InstanceIdentifierContext<?> identifierContext = mock(InstanceIdentifierContext.class);
 
-        when(patchContext.getData()).thenReturn(Lists.newArrayList());
+        when(patchContext.getData()).thenReturn(new ArrayList<>());
         doReturn(identifierContext).when(patchContext).getInstanceIdentifierContext();
 
         // no mount point
@@ -391,7 +392,7 @@ public class BrokerFacadeTest {
         final DOMDataBroker mountDataBroker = mock(DOMDataBroker.class);
         final DOMDataTreeReadWriteTransaction transaction = mock(DOMDataTreeReadWriteTransaction.class);
 
-        when(patchContext.getData()).thenReturn(Lists.newArrayList());
+        when(patchContext.getData()).thenReturn(new ArrayList<>());
         doReturn(identifierContext).when(patchContext).getInstanceIdentifierContext();
 
         // return mount point with broker
@@ -418,7 +419,7 @@ public class BrokerFacadeTest {
         final DOMDataBroker mountDataBroker = mock(DOMDataBroker.class);
         final DOMDataTreeReadWriteTransaction transaction = mock(DOMDataTreeReadWriteTransaction.class);
 
-        when(patchContext.getData()).thenReturn(Lists.newArrayList());
+        when(patchContext.getData()).thenReturn(new ArrayList<>());
         doReturn(identifierContext).when(patchContext).getInstanceIdentifierContext();
         when(identifierContext.getMountPoint()).thenReturn(mountPoint);
 

@@ -20,9 +20,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -714,7 +714,7 @@ public class RestGetOperationTest extends JerseyTest {
             return;
         }
 
-        final Map<String, NodeData> expChildMap = Maps.newHashMap();
+        final Map<String, NodeData> expChildMap = new HashMap<>();
         for (final NodeData expChild : (List<NodeData>) nodeData.data) {
             expChildMap.put(expChild.key.toString(), expChild);
         }

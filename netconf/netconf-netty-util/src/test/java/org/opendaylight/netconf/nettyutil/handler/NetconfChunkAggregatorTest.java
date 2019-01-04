@@ -9,10 +9,10 @@ package org.opendaylight.netconf.nettyutil.handler;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class NetconfChunkAggregatorTest {
 
     @Test
     public void testMultipleChunks() throws Exception {
-        final List<Object> output = Lists.newArrayList();
+        final List<Object> output = new ArrayList<>();
         final ByteBuf input = Unpooled.copiedBuffer(CHUNKED_MESSAGE.getBytes(StandardCharsets.UTF_8));
         agr.decode(null, input, output);
 
@@ -57,7 +57,7 @@ public class NetconfChunkAggregatorTest {
 
     @Test
     public void testOneChunks() throws Exception {
-        final List<Object> output = Lists.newArrayList();
+        final List<Object> output = new ArrayList<>();
         final ByteBuf input = Unpooled.copiedBuffer(CHUNKED_MESSAGE_ONE.getBytes(StandardCharsets.UTF_8));
         agr.decode(null, input, output);
 
@@ -66,6 +66,4 @@ public class NetconfChunkAggregatorTest {
 
         assertEquals(EXPECTED_MESSAGE, chunk.toString(StandardCharsets.UTF_8));
     }
-
-
 }

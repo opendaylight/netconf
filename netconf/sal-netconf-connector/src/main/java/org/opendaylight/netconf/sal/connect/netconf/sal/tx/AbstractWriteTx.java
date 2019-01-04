@@ -5,17 +5,16 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +48,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     protected final RemoteDeviceId id;
     protected final NetconfBaseOps netOps;
     protected final boolean rollbackSupport;
-    protected final List<ListenableFuture<DOMRpcResult>> resultsFutures;
+    protected final List<ListenableFuture<DOMRpcResult>> resultsFutures = new ArrayList<>();
     private final List<TxListener> listeners = new CopyOnWriteArrayList<>();
     // Allow commit to be called only once
     protected volatile boolean finished = false;
@@ -58,7 +57,6 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         this.netOps = netOps;
         this.id = id;
         this.rollbackSupport = rollbackSupport;
-        this.resultsFutures = Lists.newArrayList();
         init();
     }
 
