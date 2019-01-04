@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -19,7 +18,6 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_AGGREGATOR;
 import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETCONF_MESSAGE_FRAME_ENCODER;
 
-import com.google.common.base.Optional;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -33,6 +31,7 @@ import io.netty.util.concurrent.Promise;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -78,9 +77,9 @@ public class AbstractNetconfSessionNegotiatorTest {
         channel.pipeline().addLast(NETCONF_MESSAGE_FRAME_ENCODER,
                 FramingMechanismHandlerFactory.createHandler(FramingMechanism.EOM));
         channel.pipeline().addLast(NETCONF_MESSAGE_AGGREGATOR, new NetconfEOMAggregator());
-        hello = NetconfHelloMessage.createClientHello(Collections.emptySet(), Optional.absent());
+        hello = NetconfHelloMessage.createClientHello(Collections.emptySet(), Optional.empty());
         helloBase11 = NetconfHelloMessage.createClientHello(Collections
-                .singleton(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.absent());
+                .singleton(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1), Optional.empty());
         prefs = new NetconfSessionPreferences(helloBase11);
         doReturn(promise).when(promise).setFailure(any());
         doReturn(promise).when(promise).setSuccess(any());

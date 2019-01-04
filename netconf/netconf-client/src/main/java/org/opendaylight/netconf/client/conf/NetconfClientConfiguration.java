@@ -9,10 +9,10 @@ package org.opendaylight.netconf.client.conf;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Optional;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
@@ -68,7 +68,7 @@ public class NetconfClientConfiguration {
     }
 
     public final Optional<NetconfHelloMessageAdditionalHeader> getAdditionalHeader() {
-        return Optional.fromNullable(additionalHeader);
+        return Optional.ofNullable(additionalHeader);
     }
 
     public final NetconfClientSessionListener getSessionListener() {
