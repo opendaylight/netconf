@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.protocol.framework;
+package org.opendaylight.netconf.nettyutil;
 
 import com.google.common.base.Preconditions;
 import io.netty.bootstrap.Bootstrap;
@@ -29,6 +29,8 @@ import io.netty.util.concurrent.Promise;
 import java.io.Closeable;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import org.opendaylight.netconf.api.NetconfSession;
+import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,26 +39,27 @@ import org.slf4j.LoggerFactory;
  * start method that will handle sockets in different thread.
  */
 @Deprecated
-public abstract class AbstractDispatcher<S extends ProtocolSession<?>, L extends SessionListener<?, ?, ?>> implements Closeable {
+public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L extends NetconfSessionListener<? super S>>
+        implements Closeable {
 
-
-    protected interface ChannelPipelineInitializer<CH extends Channel, S extends ProtocolSession<?>> {
+    protected interface ChannelPipelineInitializer<C extends Channel, S extends NetconfSession> {
         /**
-         * Initializes channel by specifying the handlers in its pipeline. Handlers are protocol specific, therefore this
-         * method needs to be implemented in protocol specific Dispatchers.
+         * Initializes channel by specifying the handlers in its pipeline. Handlers are protocol specific, therefore
+         * this method needs to be implemented in protocol specific Dispatchers.
          *
-         * @param channel whose pipeline should be defined, also to be passed to {@link SessionNegotiatorFactory}
-         * @param promise to be passed to {@link SessionNegotiatorFactory}
+         * @param channel whose pipeline should be defined, also to be passed to {@link NetconfSessionNegotiatorFactory}
+         * @param promise to be passed to {@link NetconfSessionNegotiatorFactory}
          */
-        void initializeChannel(CH channel, Promise<S> promise);
+        void initializeChannel(C channel, Promise<S> promise);
     }
 
-    protected interface PipelineInitializer<S extends ProtocolSession<?>> extends ChannelPipelineInitializer<SocketChannel, S> {
+    protected interface PipelineInitializer<S extends NetconfSession>
+        extends ChannelPipelineInitializer<SocketChannel, S> {
 
     }
 
 
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractDispatcher.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfDispatcher.class);
 
     private final EventLoopGroup bossGroup;
 
@@ -64,11 +67,12 @@ public abstract class AbstractDispatcher<S extends ProtocolSession<?>, L extends
 
     private final EventExecutor executor;
 
-    protected AbstractDispatcher(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup) {
+    protected AbstractNetconfDispatcher(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup) {
         this(GlobalEventExecutor.INSTANCE, bossGroup, workerGroup);
     }
 
-    protected AbstractDispatcher(final EventExecutor executor, final EventLoopGroup bossGroup, final EventLoopGroup workerGroup) {
+    protected AbstractNetconfDispatcher(final EventExecutor executor, final EventLoopGroup bossGroup,
+            final EventLoopGroup workerGroup) {
         this.bossGroup = Preconditions.checkNotNull(bossGroup);
         this.workerGroup = Preconditions.checkNotNull(workerGroup);
         this.executor = Preconditions.checkNotNull(executor);
@@ -96,13 +100,13 @@ public abstract class AbstractDispatcher<S extends ProtocolSession<?>, L extends
      *
      * @return ChannelFuture representing the binding process
      */
-    protected <CH extends Channel> ChannelFuture createServer(final SocketAddress address, final Class<? extends ServerChannel> channelClass,
-            final ChannelPipelineInitializer<CH, S> initializer) {
+    protected <C extends Channel> ChannelFuture createServer(final SocketAddress address,
+            final Class<? extends ServerChannel> channelClass, final ChannelPipelineInitializer<C, S> initializer) {
         final ServerBootstrap b = new ServerBootstrap();
-        b.childHandler(new ChannelInitializer<CH>() {
+        b.childHandler(new ChannelInitializer<C>() {
 
             @Override
-            protected void initChannel(final CH ch) {
+            protected void initChannel(final C ch) {
                 initializer.initializeChannel(ch, new DefaultPromise<>(executor));
             }
         });
@@ -137,9 +141,20 @@ public abstract class AbstractDispatcher<S extends ProtocolSession<?>, L extends
      * subclasses to assign non-default server options before the server is
      * created.
      *
-     * @param b Server bootstrap
+     * @param bootstrap Server bootstrap
      */
-    protected void customizeBootstrap(final ServerBootstrap b) {
+    protected void customizeBootstrap(final ServerBootstrap bootstrap) {
+        // The default is a no-op
+    }
+
+    /**
+     * Customize a client bootstrap before the connection is attempted. This
+     * allows subclasses to assign non-default options before the client is
+     * created.
+     *
+     * @param bootstrap Client bootstrap
+     */
+    protected void customizeBootstrap(final Bootstrap bootstrap) {
         // The default is a no-op
     }
 
@@ -152,9 +167,10 @@ public abstract class AbstractDispatcher<S extends ProtocolSession<?>, L extends
      * @return Future representing the connection process. Its result represents the combined success of TCP connection
      *         as well as session negotiation.
      */
-    protected Future<S> createClient(final InetSocketAddress address, final ReconnectStrategy strategy, final PipelineInitializer<S> initializer) {
+    protected Future<S> createClient(final InetSocketAddress address, final ReconnectStrategy strategy,
+            final PipelineInitializer<S> initializer) {
         final Bootstrap b = new Bootstrap();
-        final ProtocolSessionPromise<S> p = new ProtocolSessionPromise<>(executor, address, strategy, b);
+        final NetconfSessionPromise<S> p = new NetconfSessionPromise<>(executor, address, strategy, b);
         b.option(ChannelOption.SO_KEEPALIVE, true).handler(
                 new ChannelInitializer<SocketChannel>() {
                     @Override
@@ -172,20 +188,15 @@ public abstract class AbstractDispatcher<S extends ProtocolSession<?>, L extends
         return p;
     }
 
-    private void setWorkerGroup(final Bootstrap b) {
-        if (b.group() == null) {
-            b.group(workerGroup);
-        }
-    }
-
     /**
      * Create a client but use a pre-configured bootstrap.
      * This method however replaces the ChannelInitializer in the bootstrap. All other configuration is preserved.
      *
      * @param address remote address
      */
-    protected Future<S> createClient(final InetSocketAddress address, final ReconnectStrategy strategy, final Bootstrap bootstrap, final PipelineInitializer<S> initializer) {
-        final ProtocolSessionPromise<S> p = new ProtocolSessionPromise<>(executor, address, strategy, bootstrap);
+    protected Future<S> createClient(final InetSocketAddress address, final ReconnectStrategy strategy,
+            final Bootstrap bootstrap, final PipelineInitializer<S> initializer) {
+        final NetconfSessionPromise<S> p = new NetconfSessionPromise<>(executor, address, strategy, bootstrap);
 
         bootstrap.handler(
                 new ChannelInitializer<SocketChannel>() {
@@ -201,32 +212,21 @@ public abstract class AbstractDispatcher<S extends ProtocolSession<?>, L extends
     }
 
     /**
-     * Customize a client bootstrap before the connection is attempted. This
-     * allows subclasses to assign non-default options before the client is
-     * created.
-     *
-     * @param b Client bootstrap
-     */
-    protected void customizeBootstrap(final Bootstrap b) {
-        // The default is a no-op
-    }
-
-    /**
-     *
-     * @deprecated use {@link org.opendaylight.protocol.framework.AbstractDispatcher#createReconnectingClient(java.net.InetSocketAddress, ReconnectStrategyFactory, org.opendaylight.protocol.framework.AbstractDispatcher.PipelineInitializer)} with only one reconnectStrategyFactory instead.
-     *
      * Creates a client.
      *
      * @param address remote address
      * @param connectStrategyFactory Factory for creating reconnection strategy to be used when initial connection fails
      * @param reestablishStrategy Reconnection strategy to be used when the already-established session fails
-     *
      * @return Future representing the reconnection task. It will report completion based on reestablishStrategy, e.g.
      *         success if it indicates no further attempts should be made and failure if it reports an error
+     * @deprecated Use
+     *             {@link #createReconnectingClient(InetSocketAddress, ReconnectStrategyFactory, PipelineInitializer)}
+     *             instead.
      */
     @Deprecated
-    protected Future<Void> createReconnectingClient(final InetSocketAddress address, final ReconnectStrategyFactory connectStrategyFactory,
-            final ReconnectStrategy reestablishStrategy, final PipelineInitializer<S> initializer) {
+    protected Future<Void> createReconnectingClient(final InetSocketAddress address,
+            final ReconnectStrategyFactory connectStrategyFactory, final ReconnectStrategy reestablishStrategy,
+            final PipelineInitializer<S> initializer) {
         return createReconnectingClient(address, connectStrategyFactory, initializer);
     }
 
@@ -235,15 +235,15 @@ public abstract class AbstractDispatcher<S extends ProtocolSession<?>, L extends
      *
      * @param address remote address
      * @param connectStrategyFactory Factory for creating reconnection strategy for every reconnect attempt
-     *
      * @return Future representing the reconnection task. It will report completion based on reestablishStrategy, e.g.
      *         success is never reported, only failure when it runs out of reconnection attempts.
      */
-    protected Future<Void> createReconnectingClient(final InetSocketAddress address, final ReconnectStrategyFactory connectStrategyFactory,
-            final PipelineInitializer<S> initializer) {
+    protected Future<Void> createReconnectingClient(final InetSocketAddress address,
+            final ReconnectStrategyFactory connectStrategyFactory, final PipelineInitializer<S> initializer) {
         final Bootstrap b = new Bootstrap();
 
-        final ReconnectPromise<S, L> p = new ReconnectPromise<>(GlobalEventExecutor.INSTANCE, this, address, connectStrategyFactory, b, initializer);
+        final ReconnectPromise<S, L> p = new ReconnectPromise<>(GlobalEventExecutor.INSTANCE, this, address,
+                connectStrategyFactory, b, initializer);
 
         b.option(ChannelOption.SO_KEEPALIVE, true);
 
@@ -255,19 +255,22 @@ public abstract class AbstractDispatcher<S extends ProtocolSession<?>, L extends
         return p;
     }
 
-    private void setChannelFactory(final Bootstrap b) {
+    private static void setChannelFactory(final Bootstrap bootstrap) {
         // There is no way to detect if this was already set by
         // customizeBootstrap()
         try {
-            b.channel(NioSocketChannel.class);
+            bootstrap.channel(NioSocketChannel.class);
         } catch (final IllegalStateException e) {
-            LOG.trace("Not overriding channelFactory on bootstrap {}", b, e);
+            LOG.trace("Not overriding channelFactory on bootstrap {}", bootstrap, e);
         }
     }
 
-    /**
-     * @deprecated Should only be used with AbstractDispatcher#AbstractDispatcher()
-     */
+    private void setWorkerGroup(final Bootstrap bootstrap) {
+        if (bootstrap.group() == null) {
+            bootstrap.group(workerGroup);
+        }
+    }
+
     @Deprecated
     @Override
     public void close() {

@@ -22,8 +22,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.protocol.framework.SessionListenerFactory;
-import org.opendaylight.protocol.framework.SessionNegotiator;
+import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
+import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 
 public class TlsClientChannelInitializerTest {
     @Mock
@@ -41,8 +41,8 @@ public class TlsClientChannelInitializerTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testInitialize() throws Exception {
-        SessionNegotiator<?> sessionNegotiator = mock(SessionNegotiator.class);
-        doReturn(sessionNegotiator).when(negotiatorFactory).getSessionNegotiator(any(SessionListenerFactory.class),
+        NetconfSessionNegotiator<?> sessionNegotiator = mock(NetconfSessionNegotiator.class);
+        doReturn(sessionNegotiator).when(negotiatorFactory).getSessionNegotiator(any(NetconfSessionListenerFactory.class),
                 any(Channel.class), any(Promise.class));
         ChannelPipeline pipeline = mock(ChannelPipeline.class);
         doReturn(pipeline).when(pipeline).addAfter(anyString(), anyString(), any(ChannelHandler.class));

@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.protocol.framework;
+package org.opendaylight.netconf.nettyutil;
 
 import com.google.common.base.Preconditions;
 import io.netty.bootstrap.Bootstrap;
@@ -20,43 +20,43 @@ import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
+import org.opendaylight.netconf.api.NetconfSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Deprecated
 @ThreadSafe
-final class ProtocolSessionPromise<S extends ProtocolSession<?>> extends DefaultPromise<S> {
-    private static final Logger LOG = LoggerFactory.getLogger(ProtocolSessionPromise.class);
+final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromise<S> {
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfSessionPromise.class);
     private final ReconnectStrategy strategy;
     private InetSocketAddress address;
-    private final Bootstrap b;
+    private final Bootstrap bootstrap;
 
     @GuardedBy("this")
     private Future<?> pending;
 
-    ProtocolSessionPromise(final EventExecutor executor, final InetSocketAddress address, final ReconnectStrategy strategy,
-            final Bootstrap b) {
+    NetconfSessionPromise(final EventExecutor executor, final InetSocketAddress address,
+            final ReconnectStrategy strategy, final Bootstrap bootstrap) {
         super(executor);
         this.strategy = Preconditions.checkNotNull(strategy);
         this.address = Preconditions.checkNotNull(address);
-        this.b = Preconditions.checkNotNull(b);
+        this.bootstrap = Preconditions.checkNotNull(bootstrap);
     }
 
+    @SuppressWarnings("checkstyle:illegalCatch")
     synchronized void connect() {
-        final Object lock = this;
-
         try {
             final int timeout = this.strategy.getConnectTimeout();
 
-            LOG.debug("Promise {} attempting connect for {}ms", lock, timeout);
+            LOG.debug("Promise {} attempting connect for {}ms", this, timeout);
 
-            if(this.address.isUnresolved()) {
+            if (this.address.isUnresolved()) {
                 this.address = new InetSocketAddress(this.address.getHostName(), this.address.getPort());
             }
-            this.b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeout);
-            final ChannelFuture connectFuture = this.b.connect(this.address);
+            this.bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeout);
+            final ChannelFuture connectFuture = this.bootstrap.connect(this.address);
             // Add listener that attempts reconnect by invoking this method again.
-            connectFuture.addListener(new BootstrapConnectListener(lock));
+            connectFuture.addListener(new BootstrapConnectListener());
             this.pending = connectFuture;
         } catch (final Exception e) {
             LOG.info("Failed to connect to {}", address, e);
@@ -82,20 +82,14 @@ final class ProtocolSessionPromise<S extends ProtocolSession<?>> extends Default
     }
 
     private class BootstrapConnectListener implements ChannelFutureListener {
-        private final Object lock;
-
-        public BootstrapConnectListener(final Object lock) {
-            this.lock = lock;
-        }
-
         @Override
         public void operationComplete(final ChannelFuture cf) {
-            synchronized (lock) {
+            synchronized (NetconfSessionPromise.this) {
 
-                LOG.debug("Promise {} connection resolved", lock);
+                LOG.debug("Promise {} connection resolved", NetconfSessionPromise.this);
 
                 // Triggered when a connection attempt is resolved.
-                Preconditions.checkState(ProtocolSessionPromise.this.pending.equals(cf));
+                Preconditions.checkState(NetconfSessionPromise.this.pending.equals(cf));
 
                 /*
                  * The promise we gave out could have been cancelled,
@@ -108,31 +102,31 @@ final class ProtocolSessionPromise<S extends ProtocolSession<?>> extends Default
                  */
                 if (isCancelled()) {
                     if (cf.isSuccess()) {
-                        LOG.debug("Closing channel for cancelled promise {}", lock);
+                        LOG.debug("Closing channel for cancelled promise {}", NetconfSessionPromise.this);
                         cf.channel().close();
                     }
                     return;
                 }
 
-                if(cf.isSuccess()) {
-                    LOG.debug("Promise {} connection successful", lock);
+                if (cf.isSuccess()) {
+                    LOG.debug("Promise {} connection successful", NetconfSessionPromise.this);
                     return;
                 }
 
-                LOG.debug("Attempt to connect to {} failed", ProtocolSessionPromise.this.address, cf.cause());
+                LOG.debug("Attempt to connect to {} failed", NetconfSessionPromise.this.address, cf.cause());
 
-                final Future<Void> rf = ProtocolSessionPromise.this.strategy.scheduleReconnect(cf.cause());
+                final Future<Void> rf = NetconfSessionPromise.this.strategy.scheduleReconnect(cf.cause());
                 rf.addListener(new ReconnectingStrategyListener());
-                ProtocolSessionPromise.this.pending = rf;
+                NetconfSessionPromise.this.pending = rf;
             }
         }
 
         private class ReconnectingStrategyListener implements FutureListener<Void> {
             @Override
             public void operationComplete(final Future<Void> sf) {
-                synchronized (lock) {
+                synchronized (NetconfSessionPromise.this) {
                     // Triggered when a connection attempt is to be made.
-                    Preconditions.checkState(ProtocolSessionPromise.this.pending.equals(sf));
+                    Preconditions.checkState(NetconfSessionPromise.this.pending.equals(sf));
 
                     /*
                      * The promise we gave out could have been cancelled,
@@ -152,7 +146,5 @@ final class ProtocolSessionPromise<S extends ProtocolSession<?>> extends Default
                 }
             }
         }
-
     }
-
 }

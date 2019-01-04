@@ -5,26 +5,27 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.protocol.framework;
-
-import io.netty.util.concurrent.EventExecutor;
-import io.netty.util.concurrent.Future;
-
-import javax.annotation.concurrent.ThreadSafe;
+package org.opendaylight.netconf.nettyutil;
 
 import com.google.common.base.Preconditions;
+import io.netty.util.concurrent.EventExecutor;
+import io.netty.util.concurrent.Future;
+import javax.annotation.concurrent.ThreadSafe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility ReconnectStrategy singleton, which will cause the reconnect process
- * to always fail.
+ * to immediately schedule a reconnection attempt.
  */
 @Deprecated
 @ThreadSafe
-public final class NeverReconnectStrategy implements ReconnectStrategy {
+public final class ReconnectImmediatelyStrategy implements ReconnectStrategy {
+    private static final Logger LOG = LoggerFactory.getLogger(ReconnectImmediatelyStrategy.class);
     private final EventExecutor executor;
     private final int timeout;
 
-    public NeverReconnectStrategy(final EventExecutor executor, final int timeout) {
+    public ReconnectImmediatelyStrategy(final EventExecutor executor, final int timeout) {
         Preconditions.checkArgument(timeout >= 0);
         this.executor = Preconditions.checkNotNull(executor);
         this.timeout = timeout;
@@ -32,7 +33,8 @@ public final class NeverReconnectStrategy implements ReconnectStrategy {
 
     @Override
     public Future<Void> scheduleReconnect(final Throwable cause) {
-        return executor.newFailedFuture(new Throwable("Reconnect failed", cause));
+        LOG.debug("Connection attempt failed", cause);
+        return executor.newSucceededFuture(null);
     }
 
     @Override
