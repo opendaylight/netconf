@@ -5,12 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.api;
 
-import org.opendaylight.protocol.framework.TerminationReason;
-
-public class NetconfTerminationReason implements TerminationReason {
+public class NetconfTerminationReason {
 
     private final String reason;
 
@@ -18,7 +15,10 @@ public class NetconfTerminationReason implements TerminationReason {
         this.reason = reason;
     }
 
-    @Override
+    /**
+     * Get cause of session termination.
+     * @return human-readable cause.
+     */
     public String getErrorMessage() {
         return reason;
     }

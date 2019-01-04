@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.protocol.framework;
+package org.opendaylight.netconf.nettyutil;
 
 import io.netty.util.concurrent.Future;
 
@@ -13,6 +13,7 @@ import io.netty.util.concurrent.Future;
  * Interface exposed by a reconnection strategy provider. A reconnection
  * strategy decides whether to attempt reconnection and when to do that.
  *
+ * <p>
  * The proper way of using this API is such that when a connection attempt
  * has failed, the user will call scheduleReconnect() to obtain a future,
  * which tracks schedule of the next connect attempt. The user should add its

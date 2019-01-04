@@ -12,7 +12,9 @@ import com.siemens.ct.exi.core.exceptions.UnsupportedOption;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.io.IOException;
@@ -26,12 +28,12 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfEXICodec;
 import org.opendaylight.netconf.nettyutil.handler.NetconfEXIToMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToEXIEncoder;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
-import org.opendaylight.protocol.framework.AbstractProtocolSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractNetconfSession<S extends NetconfSession,L extends NetconfSessionListener<S>>
-        extends AbstractProtocolSession<NetconfMessage> implements NetconfSession, NetconfExiSession {
+        extends SimpleChannelInboundHandler<Object> implements NetconfSession, NetconfExiSession {
+
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSession.class);
     private final L sessionListener;
     private final long sessionId;
@@ -57,7 +59,6 @@ public abstract class AbstractNetconfSession<S extends NetconfSession,L extends 
         sessionListener.onSessionTerminated(thisInstance(), new NetconfTerminationReason("Session closed"));
     }
 
-    @Override
     protected void handleMessage(final NetconfMessage netconfMessage) {
         LOG.debug("handling incoming message");
         sessionListener.onMessage(thisInstance(), netconfMessage);
@@ -86,7 +87,6 @@ public abstract class AbstractNetconfSession<S extends NetconfSession,L extends 
         return promise;
     }
 
-    @Override
     protected void endOfInput() {
         LOG.debug("Session {} end of input detected while session was in state {}", toString(), isUp() ? "up"
                 : "initialized");
@@ -96,7 +96,6 @@ public abstract class AbstractNetconfSession<S extends NetconfSession,L extends 
         }
     }
 
-    @Override
     protected void sessionUp() {
         LOG.debug("Session {} up", toString());
         sessionListener.onSessionUp(thisInstance());
@@ -166,5 +165,30 @@ public abstract class AbstractNetconfSession<S extends NetconfSession,L extends 
 
     public final long getSessionId() {
         return sessionId;
+    }
+
+    @Override
+    @SuppressWarnings("checkstyle:illegalCatch")
+    public final void channelInactive(final ChannelHandlerContext ctx) {
+        LOG.debug("Channel {} inactive.", ctx.channel());
+        endOfInput();
+        try {
+            // Forward channel inactive event, all handlers in pipeline might be interested in the event e.g. close
+            // channel handler of reconnect promise
+            super.channelInactive(ctx);
+        } catch (final Exception e) {
+            throw new RuntimeException("Failed to delegate channel inactive event on channel " + ctx.channel(), e);
+        }
+    }
+
+    @Override
+    protected final void channelRead0(final ChannelHandlerContext ctx, final Object msg) {
+        LOG.debug("Message was received: {}", msg);
+        handleMessage((NetconfMessage) msg);
+    }
+
+    @Override
+    public final void handlerAdded(final ChannelHandlerContext ctx) {
+        sessionUp();
     }
 }

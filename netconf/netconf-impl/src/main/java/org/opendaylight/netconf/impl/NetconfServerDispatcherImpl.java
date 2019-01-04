@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl;
 
 import io.netty.channel.Channel;
@@ -18,9 +17,9 @@ import java.net.InetSocketAddress;
 import org.opendaylight.netconf.api.NetconfServerDispatcher;
 import org.opendaylight.netconf.impl.util.DeserializerExceptionHandler;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
-import org.opendaylight.protocol.framework.AbstractDispatcher;
+import org.opendaylight.netconf.nettyutil.AbstractNetconfDispatcher;
 
-public class NetconfServerDispatcherImpl extends AbstractDispatcher<NetconfServerSession,
+public class NetconfServerDispatcherImpl extends AbstractNetconfDispatcher<NetconfServerSession,
         NetconfServerSessionListener> implements NetconfServerDispatcher {
 
     private final ServerChannelInitializer initializer;

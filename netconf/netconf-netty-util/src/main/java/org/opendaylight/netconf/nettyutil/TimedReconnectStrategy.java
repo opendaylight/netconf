@@ -5,40 +5,42 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.protocol.framework;
-
-import io.netty.util.concurrent.EventExecutor;
-import io.netty.util.concurrent.Future;
-
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import javax.annotation.concurrent.GuardedBy;
-import javax.annotation.concurrent.ThreadSafe;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.opendaylight.netconf.nettyutil;
 
 import com.google.common.base.Preconditions;
+import io.netty.util.concurrent.EventExecutor;
+import io.netty.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import javax.annotation.concurrent.GuardedBy;
+import javax.annotation.concurrent.ThreadSafe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Swiss army knife equivalent for reconnect strategies.
  *
+ * <p>
  * This strategy continues to schedule reconnect attempts, each having to complete in a fixed time (connectTime).
  *
+ * <p>
  * Initial sleep time is specified as minSleep. Each subsequent unsuccessful attempt multiplies this time by a constant
  * factor (sleepFactor) -- this allows for either constant reconnect times (sleepFactor = 1), or various degrees of
  * exponential back-off (sleepFactor &gt; 1). Maximum sleep time between attempts can be capped to a specific value
  * (maxSleep).
  *
+ * <p>
  * The strategy can optionally give up based on two criteria:
  *
+ * <p>
  * A preset number of connection retries (maxAttempts) has been reached, or
  *
+ * <p>
  * A preset absolute deadline is reached (deadline nanoseconds, as reported by System.nanoTime(). In this specific case,
  * both connectTime and maxSleep will be controlled such that the connection attempt is resolved as closely to the
  * deadline as possible.
  *
+ * <p>
  * Both these caps can be combined, with the strategy giving up as soon as the first one is reached.
  */
 @Deprecated
@@ -46,7 +48,9 @@ import com.google.common.base.Preconditions;
 public final class TimedReconnectStrategy implements ReconnectStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(TimedReconnectStrategy.class);
     private final EventExecutor executor;
-    private final Long deadline, maxAttempts, maxSleep;
+    private final Long deadline;
+    private final Long maxAttempts;
+    private final Long maxSleep;
     private final double sleepFactor;
     private final int connectTime;
     private final long minSleep;
@@ -60,8 +64,8 @@ public final class TimedReconnectStrategy implements ReconnectStrategy {
     @GuardedBy("this")
     private boolean scheduled;
 
-    public TimedReconnectStrategy(final EventExecutor executor, final int connectTime, final long minSleep, final double sleepFactor,
-            final Long maxSleep, final Long maxAttempts, final Long deadline) {
+    public TimedReconnectStrategy(final EventExecutor executor, final int connectTime, final long minSleep,
+            final double sleepFactor, final Long maxSleep, final Long maxAttempts, final Long deadline) {
         Preconditions.checkArgument(maxSleep == null || minSleep <= maxSleep);
         Preconditions.checkArgument(sleepFactor >= 1);
         Preconditions.checkArgument(connectTime >= 0);
