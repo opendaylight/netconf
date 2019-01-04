@@ -9,7 +9,6 @@ package org.opendaylight.netconf.mdsal.connector.ops;
 
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
 
-import com.google.common.base.Optional;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -93,7 +93,7 @@ public final class CopyConfig extends AbstractEdit {
                 ErrorTag.BAD_ELEMENT,
                 ErrorSeverity.ERROR);
         }
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
     }
 
     private void copyToCandidate(final XmlElement operationElement)

@@ -5,16 +5,15 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

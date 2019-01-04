@@ -14,9 +14,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.base.Optional;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.junit.Assert;
@@ -73,7 +73,7 @@ public class NetconfSessionMonitoringServiceTest {
         doNothing().when(notificationPublisher).onSessionStarted(any());
         doNothing().when(notificationPublisher).onSessionEnded(any());
 
-        monitoringService = new NetconfSessionMonitoringService(Optional.absent(), 0);
+        monitoringService = new NetconfSessionMonitoringService(Optional.empty(), 0);
         monitoringService.registerListener(listener);
     }
 

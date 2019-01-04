@@ -5,10 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
-import com.google.common.base.Optional;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -42,12 +40,11 @@ public class Commit extends AbstractSingletonNetconfOperation {
         boolean commitStatus = transactionProvider.commitTransaction();
         LOG.trace("Commit completed successfully {}", commitStatus);
 
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
     }
 
     @Override
     protected String getOperationName() {
         return OPERATION_NAME;
     }
-
 }

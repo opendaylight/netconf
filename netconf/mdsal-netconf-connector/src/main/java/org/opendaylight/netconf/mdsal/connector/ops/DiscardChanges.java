@@ -5,10 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
-import com.google.common.base.Optional;
 import java.util.HashMap;
 import java.util.Map;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -53,7 +51,7 @@ public class DiscardChanges extends AbstractSingletonNetconfOperation {
             throw new DocumentedException(e.getMessage(), e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
                     ErrorSeverity.ERROR, errorInfo);
         }
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
     }
 
     @Override

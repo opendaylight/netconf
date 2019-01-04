@@ -9,7 +9,6 @@ package org.opendaylight.netconf.mdsal.connector.ops.get;
 
 import static org.opendaylight.yangtools.yang.data.util.ParserStreamUtils.findSchemaNodeByNameAndNamespace;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -20,6 +19,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.netconf.api.DocumentedException;
