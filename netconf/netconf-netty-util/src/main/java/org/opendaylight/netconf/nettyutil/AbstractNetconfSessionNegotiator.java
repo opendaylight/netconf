@@ -5,11 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil;
 
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
+import org.opendaylight.netconf.api.NetconfSessionNegotiator;
 import org.opendaylight.netconf.api.NetconfSessionPreferences;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -34,7 +36,6 @@ import org.opendaylight.netconf.nettyutil.handler.NetconfMessageToXMLEncoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToHelloMessageDecoder;
 import org.opendaylight.netconf.nettyutil.handler.NetconfXMLToMessageDecoder;
 import org.opendaylight.netconf.util.messages.FramingMechanism;
-import org.opendaylight.protocol.framework.AbstractSessionNegotiator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -42,14 +43,16 @@ import org.w3c.dom.NodeList;
 
 public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionPreferences,
         S extends AbstractNetconfSession<S, L>, L extends NetconfSessionListener<S>>
-    extends AbstractSessionNegotiator<NetconfHelloMessage, S> {
+            extends ChannelInboundHandlerAdapter implements NetconfSessionNegotiator<S> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSessionNegotiator.class);
 
     public static final String NAME_OF_EXCEPTION_HANDLER = "lastExceptionHandler";
 
     protected final P sessionPreferences;
+    protected final Channel channel;
 
+    private final Promise<S> promise;
     private final L sessionListener;
     private Timeout timeout;
 
@@ -61,22 +64,20 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     }
 
     private State state = State.IDLE;
-    private final Promise<S> promise;
     private final Timer timer;
     private final long connectionTimeoutMillis;
 
     protected AbstractNetconfSessionNegotiator(final P sessionPreferences, final Promise<S> promise,
                                                final Channel channel, final Timer timer,
                                                final L sessionListener, final long connectionTimeoutMillis) {
-        super(promise, channel);
+        this.channel = requireNonNull(channel);
+        this.promise = requireNonNull(promise);
         this.sessionPreferences = sessionPreferences;
-        this.promise = promise;
         this.timer = timer;
         this.sessionListener = sessionListener;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
     }
 
-    @Override
     protected final void startNegotiation() {
         if (ifNegotiatedAlready()) {
             LOG.debug("Negotiation on channel {} already started", channel);
@@ -84,7 +85,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
             final Optional<SslHandler> sslHandler = getSslHandler(channel);
             if (sslHandler.isPresent()) {
                 sslHandler.get().handshakeFuture().addListener(future -> {
-                    Preconditions.checkState(future.isSuccess(), "Ssl handshake was not successful");
+                    checkState(future.isSuccess(), "Ssl handshake was not successful");
                     LOG.debug("Ssl handshake complete");
                     start();
                 });
@@ -163,8 +164,6 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
 
     protected final S getSessionForHelloMessage(final NetconfHelloMessage netconfMessage)
             throws NetconfDocumentedException {
-        Preconditions.checkNotNull(netconfMessage, "netconfMessage");
-
         final Document doc = netconfMessage.getDocument();
 
         if (shouldUseChunkFraming(doc)) {
@@ -201,7 +200,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         ChannelHandler helloMessageHandler = replaceChannelHandler(channel,
                 AbstractChannelInitializer.NETCONF_MESSAGE_DECODER, new NetconfXMLToMessageDecoder());
 
-        Preconditions.checkState(helloMessageHandler instanceof NetconfXMLToHelloMessageDecoder,
+        checkState(helloMessageHandler instanceof NetconfXMLToHelloMessageDecoder,
                 "Pipeline handlers misplaced on session: %s, pipeline: %s", session, channel.pipeline());
         Iterable<NetconfMessage> netconfMessagesFromNegotiation =
                 ((NetconfXMLToHelloMessageDecoder) helloMessageHandler).getPostHelloNetconfMessages();
@@ -234,7 +233,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
 
     private synchronized void changeState(final State newState) {
         LOG.debug("Changing state from : {} to : {} for channel: {}", state, newState, channel);
-        Preconditions.checkState(isStateChangePermitted(state, newState),
+        checkState(isStateChangePermitted(state, newState),
                 "Cannot change state from %s to %s for chanel %s", state, newState, channel);
         this.state = newState;
     }
@@ -277,4 +276,63 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
             changeState(State.FAILED);
         }
     }
+
+    protected final void negotiationSuccessful(final S session) {
+        LOG.debug("Negotiation on channel {} successful with session {}", channel, session);
+        channel.pipeline().replace(this, "session", session);
+        promise.setSuccess(session);
+    }
+
+    protected void negotiationFailed(final Throwable cause) {
+        LOG.debug("Negotiation on channel {} failed", channel, cause);
+        channel.close();
+        promise.setFailure(cause);
+    }
+
+    /**
+     * Send a message to peer and fail negotiation if it does not reach
+     * the peer.
+     *
+     * @param msg Message which should be sent.
+     */
+    protected final void sendMessage(final NetconfMessage msg) {
+        this.channel.writeAndFlush(msg).addListener(f -> {
+            if (!f.isSuccess()) {
+                LOG.info("Failed to send message {}", msg, f.cause());
+                negotiationFailed(f.cause());
+            } else {
+                LOG.trace("Message {} sent to socket", msg);
+            }
+        });
+    }
+
+    @Override
+    public final void channelActive(final ChannelHandlerContext ctx) {
+        LOG.debug("Starting session negotiation on channel {}", channel);
+        try {
+            startNegotiation();
+        } catch (final Exception e) {
+            LOG.warn("Unexpected negotiation failure", e);
+            negotiationFailed(e);
+        }
+    }
+
+    @Override
+    public final void channelRead(final ChannelHandlerContext ctx, final Object msg) {
+        LOG.debug("Negotiation read invoked on channel {}", channel);
+        try {
+            handleMessage((NetconfHelloMessage) msg);
+        } catch (final Exception e) {
+            LOG.debug("Unexpected error while handling negotiation message {}", msg, e);
+            negotiationFailed(e);
+        }
+    }
+
+    @Override
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
+        LOG.info("Unexpected error during negotiation", cause);
+        negotiationFailed(cause);
+    }
+
+    protected abstract void handleMessage(NetconfHelloMessage msg) throws Exception;
 }

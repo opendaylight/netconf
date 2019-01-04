@@ -20,19 +20,18 @@ import io.netty.util.concurrent.Promise;
 import java.util.Set;
 import org.opendaylight.netconf.api.NetconfClientSessionPreferences;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
+import org.opendaylight.netconf.api.NetconfSessionNegotiatorFactory;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
-import org.opendaylight.protocol.framework.SessionListenerFactory;
-import org.opendaylight.protocol.framework.SessionNegotiator;
-import org.opendaylight.protocol.framework.SessionNegotiatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfClientSessionNegotiatorFactory implements SessionNegotiatorFactory<NetconfMessage,
-        NetconfClientSession, NetconfClientSessionListener> {
+public class NetconfClientSessionNegotiatorFactory
+        implements NetconfSessionNegotiatorFactory<NetconfClientSession, NetconfClientSessionListener> {
 
     public static final Set<String> EXI_CLIENT_CAPABILITIES = ImmutableSet.of(
             XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
@@ -104,8 +103,8 @@ public class NetconfClientSessionNegotiatorFactory implements SessionNegotiatorF
     }
 
     @Override
-    public SessionNegotiator<NetconfClientSession> getSessionNegotiator(
-            final SessionListenerFactory<NetconfClientSessionListener> sessionListenerFactory,
+    public NetconfClientSessionNegotiator getSessionNegotiator(
+            final NetconfSessionListenerFactory<NetconfClientSessionListener> sessionListenerFactory,
             final Channel channel, final Promise<NetconfClientSession> promise) {
 
         NetconfMessage startExiMessage = NetconfStartExiMessage.create(options, START_EXI_MESSAGE_ID);

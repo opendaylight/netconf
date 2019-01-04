@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl;
 
 import com.google.common.base.Preconditions;
@@ -18,6 +17,8 @@ import io.netty.util.concurrent.Promise;
 import java.net.SocketAddress;
 import java.util.Set;
 import org.opendaylight.netconf.api.NetconfServerSessionPreferences;
+import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
+import org.opendaylight.netconf.api.NetconfSessionNegotiatorFactory;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -25,14 +26,11 @@ import org.opendaylight.netconf.impl.osgi.NetconfOperationRouter;
 import org.opendaylight.netconf.impl.osgi.NetconfOperationRouterImpl;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.opendaylight.protocol.framework.SessionListenerFactory;
-import org.opendaylight.protocol.framework.SessionNegotiator;
-import org.opendaylight.protocol.framework.SessionNegotiatorFactory;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 
-public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorFactory<NetconfHelloMessage,
-        NetconfServerSession, NetconfServerSessionListener> {
+public class NetconfServerSessionNegotiatorFactory
+    implements NetconfSessionNegotiatorFactory<NetconfServerSession, NetconfServerSessionListener> {
 
     public static final Set<String> DEFAULT_BASE_CAPABILITIES = ImmutableSet.of(
             XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
@@ -95,8 +93,8 @@ public class NetconfServerSessionNegotiatorFactory implements SessionNegotiatorF
      * @return session negotiator
      */
     @Override
-    public SessionNegotiator<NetconfServerSession> getSessionNegotiator(
-            final SessionListenerFactory<NetconfServerSessionListener> defunctSessionListenerFactory,
+    public NetconfServerSessionNegotiator getSessionNegotiator(
+            final NetconfSessionListenerFactory<NetconfServerSessionListener> defunctSessionListenerFactory,
             final Channel channel, final Promise<NetconfServerSession> promise) {
         final long sessionId = idProvider.getNextSessionId();
 

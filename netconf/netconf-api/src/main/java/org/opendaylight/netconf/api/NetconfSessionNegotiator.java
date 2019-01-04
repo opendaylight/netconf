@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.protocol.framework;
+package org.opendaylight.netconf.api;
 
 import io.netty.channel.ChannelInboundHandler;
 
@@ -18,6 +18,6 @@ import io.netty.channel.ChannelInboundHandler;
  * @param <T> Protocol session type.
  */
 @Deprecated
-public interface SessionNegotiator<T extends ProtocolSession<?>> extends ChannelInboundHandler {
+public interface NetconfSessionNegotiator<T extends NetconfSession> extends ChannelInboundHandler {
 
 }

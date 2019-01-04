@@ -5,11 +5,38 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.api;
 
-import org.opendaylight.protocol.framework.SessionListener;
+// FIXME: NETCONF-554: rework this interface
+public interface NetconfSessionListener<S extends NetconfSession> {
+    /**
+     * Fired when the session was established successfully.
+     *
+     * @param session New session
+     */
+    void onSessionUp(S session);
 
-public interface NetconfSessionListener
-        <S extends NetconfSession> extends SessionListener<NetconfMessage, S, NetconfTerminationReason> {
+    /**
+     * Fired when the session went down because of an IO error. Implementation should take care of closing underlying
+     * session.
+     *
+     * @param session that went down
+     * @param e Exception that was thrown as the cause of session being down
+     */
+    void onSessionDown(S session, Exception e);
+
+    /**
+     * Fired when the session is terminated locally. The session has already been closed and transitioned to IDLE state.
+     * Any outstanding queued messages were not sent. The user should not attempt to make any use of the session.
+     *
+     * @param reason the cause why the session went down
+     */
+    void onSessionTerminated(S session, NetconfTerminationReason reason);
+
+    /**
+     * Fired when a normal protocol message is received.
+     *
+     * @param message Protocol message
+     */
+    void onMessage(S session, NetconfMessage message);
 }

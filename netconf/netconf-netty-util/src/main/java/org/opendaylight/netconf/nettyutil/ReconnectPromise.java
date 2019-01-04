@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.protocol.framework;
+package org.opendaylight.netconf.nettyutil;
 
 import com.google.common.base.Preconditions;
 import io.netty.bootstrap.Bootstrap;
@@ -15,22 +15,25 @@ import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
 import java.net.InetSocketAddress;
+import org.opendaylight.netconf.api.NetconfSession;
+import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Deprecated
-final class ReconnectPromise<S extends ProtocolSession<?>, L extends SessionListener<?, ?, ?>> extends DefaultPromise<Void> {
+final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionListener<?>> extends DefaultPromise<Void> {
     private static final Logger LOG = LoggerFactory.getLogger(ReconnectPromise.class);
 
-    private final AbstractDispatcher<S, L> dispatcher;
+    private final AbstractNetconfDispatcher<S, L> dispatcher;
     private final InetSocketAddress address;
     private final ReconnectStrategyFactory strategyFactory;
     private final Bootstrap b;
-    private final AbstractDispatcher.PipelineInitializer<S> initializer;
+    private final AbstractNetconfDispatcher.PipelineInitializer<S> initializer;
     private Future<?> pending;
 
-    public ReconnectPromise(final EventExecutor executor, final AbstractDispatcher<S, L> dispatcher, final InetSocketAddress address,
-                            final ReconnectStrategyFactory connectStrategyFactory, final Bootstrap b, final AbstractDispatcher.PipelineInitializer<S> initializer) {
+    public ReconnectPromise(final EventExecutor executor, final AbstractNetconfDispatcher<S, L> dispatcher,
+            final InetSocketAddress address, final ReconnectStrategyFactory connectStrategyFactory, final Bootstrap b,
+            final AbstractNetconfDispatcher.PipelineInitializer<S> initializer) {
         super(executor);
         this.b = b;
         this.initializer = Preconditions.checkNotNull(initializer);

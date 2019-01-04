@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.protocol.framework;
+package org.opendaylight.netconf.nettyutil;
 
 import com.google.common.base.Preconditions;
 import io.netty.bootstrap.Bootstrap;
@@ -29,6 +29,9 @@ import io.netty.util.concurrent.Promise;
 import java.io.Closeable;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import org.opendaylight.netconf.api.NetconfSession;
+import org.opendaylight.netconf.api.NetconfSessionListener;
+import org.opendaylight.protocol.framework.SessionNegotiatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +40,10 @@ import org.slf4j.LoggerFactory;
  * start method that will handle sockets in different thread.
  */
 @Deprecated
-public abstract class AbstractDispatcher<S extends ProtocolSession<?>, L extends SessionListener<?, ?, ?>> implements Closeable {
+public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L extends NetconfSessionListener<?>>
+        implements Closeable {
 
-
-    protected interface ChannelPipelineInitializer<CH extends Channel, S extends ProtocolSession<?>> {
+    protected interface ChannelPipelineInitializer<CH extends Channel, S extends NetconfSession> {
         /**
          * Initializes channel by specifying the handlers in its pipeline. Handlers are protocol specific, therefore this
          * method needs to be implemented in protocol specific Dispatchers.
@@ -51,12 +54,12 @@ public abstract class AbstractDispatcher<S extends ProtocolSession<?>, L extends
         void initializeChannel(CH channel, Promise<S> promise);
     }
 
-    protected interface PipelineInitializer<S extends ProtocolSession<?>> extends ChannelPipelineInitializer<SocketChannel, S> {
+    protected interface PipelineInitializer<S extends NetconfSession> extends ChannelPipelineInitializer<SocketChannel, S> {
 
     }
 
 
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractDispatcher.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfDispatcher.class);
 
     private final EventLoopGroup bossGroup;
 
@@ -64,11 +67,11 @@ public abstract class AbstractDispatcher<S extends ProtocolSession<?>, L extends
 
     private final EventExecutor executor;
 
-    protected AbstractDispatcher(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup) {
+    protected AbstractNetconfDispatcher(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup) {
         this(GlobalEventExecutor.INSTANCE, bossGroup, workerGroup);
     }
 
-    protected AbstractDispatcher(final EventExecutor executor, final EventLoopGroup bossGroup, final EventLoopGroup workerGroup) {
+    protected AbstractNetconfDispatcher(final EventExecutor executor, final EventLoopGroup bossGroup, final EventLoopGroup workerGroup) {
         this.bossGroup = Preconditions.checkNotNull(bossGroup);
         this.workerGroup = Preconditions.checkNotNull(workerGroup);
         this.executor = Preconditions.checkNotNull(executor);
@@ -154,7 +157,7 @@ public abstract class AbstractDispatcher<S extends ProtocolSession<?>, L extends
      */
     protected Future<S> createClient(final InetSocketAddress address, final ReconnectStrategy strategy, final PipelineInitializer<S> initializer) {
         final Bootstrap b = new Bootstrap();
-        final ProtocolSessionPromise<S> p = new ProtocolSessionPromise<>(executor, address, strategy, b);
+        final NetconfSessionPromise<S> p = new NetconfSessionPromise<>(executor, address, strategy, b);
         b.option(ChannelOption.SO_KEEPALIVE, true).handler(
                 new ChannelInitializer<SocketChannel>() {
                     @Override
@@ -185,7 +188,7 @@ public abstract class AbstractDispatcher<S extends ProtocolSession<?>, L extends
      * @param address remote address
      */
     protected Future<S> createClient(final InetSocketAddress address, final ReconnectStrategy strategy, final Bootstrap bootstrap, final PipelineInitializer<S> initializer) {
-        final ProtocolSessionPromise<S> p = new ProtocolSessionPromise<>(executor, address, strategy, bootstrap);
+        final NetconfSessionPromise<S> p = new NetconfSessionPromise<>(executor, address, strategy, bootstrap);
 
         bootstrap.handler(
                 new ChannelInitializer<SocketChannel>() {
