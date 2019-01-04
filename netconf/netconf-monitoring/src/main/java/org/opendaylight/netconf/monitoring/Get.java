@@ -32,8 +32,7 @@ public class Get extends AbstractNetconfOperation {
         this.netconfMonitor = netconfMonitor;
     }
 
-    private Element getPlaceholder(final Document innerResult)
-            throws DocumentedException {
+    private static Element getPlaceholder(final Document innerResult) throws DocumentedException {
         final XmlElement rootElement = XmlElement.fromDomElementWithExpected(
                 innerResult.getDocumentElement(), XmlNetconfConstants.RPC_REPLY_KEY,
                 XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
