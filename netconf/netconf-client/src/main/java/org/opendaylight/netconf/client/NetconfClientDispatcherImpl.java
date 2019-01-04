@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.client;
 
 import io.netty.channel.EventLoopGroup;
@@ -16,12 +15,13 @@ import java.util.List;
 import java.util.Set;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
-import org.opendaylight.protocol.framework.AbstractDispatcher;
+import org.opendaylight.netconf.nettyutil.AbstractNetconfDispatcher;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfClientDispatcherImpl extends AbstractDispatcher<NetconfClientSession, NetconfClientSessionListener>
+public class NetconfClientDispatcherImpl
+        extends AbstractNetconfDispatcher<NetconfClientSession, NetconfClientSessionListener>
         implements NetconfClientDispatcher {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfClientDispatcherImpl.class);

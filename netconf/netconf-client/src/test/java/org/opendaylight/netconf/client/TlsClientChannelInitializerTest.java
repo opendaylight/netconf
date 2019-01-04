@@ -18,13 +18,14 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.util.concurrent.Promise;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.opendaylight.protocol.framework.SessionListenerFactory;
-import org.opendaylight.protocol.framework.SessionNegotiator;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
+import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TlsClientChannelInitializerTest {
     @Mock
     private SslHandlerFactory sslHandlerFactory;
@@ -33,17 +34,12 @@ public class TlsClientChannelInitializerTest {
     @Mock
     private NetconfClientSessionListener sessionListener;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
-
     @SuppressWarnings("unchecked")
     @Test
     public void testInitialize() throws Exception {
-        SessionNegotiator<?> sessionNegotiator = mock(SessionNegotiator.class);
-        doReturn(sessionNegotiator).when(negotiatorFactory).getSessionNegotiator(any(SessionListenerFactory.class),
-                any(Channel.class), any(Promise.class));
+        NetconfSessionNegotiator<?> sessionNegotiator = mock(NetconfSessionNegotiator.class);
+        doReturn(sessionNegotiator).when(negotiatorFactory).getSessionNegotiator(
+            any(NetconfSessionListenerFactory.class), any(Channel.class), any(Promise.class));
         ChannelPipeline pipeline = mock(ChannelPipeline.class);
         doReturn(pipeline).when(pipeline).addAfter(anyString(), anyString(), any(ChannelHandler.class));
         Channel channel = mock(Channel.class);

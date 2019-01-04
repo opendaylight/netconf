@@ -5,8 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.protocol.framework;
-
+package org.opendaylight.netconf.api;
 
 /**
  * Factory for generating Session Listeners. Used by a server. This interface should be
@@ -14,9 +13,10 @@ package org.opendaylight.protocol.framework;
  * a final class that implements the methods.
  */
 @Deprecated
-public interface SessionListenerFactory<T extends SessionListener<?, ?, ?>> {
+public interface NetconfSessionListenerFactory<T extends NetconfSessionListener<?>> {
     /**
-     * Returns one session listener
+     * Returns one session listener.
+     *
      * @return specific session listener
      */
     T getSessionListener();

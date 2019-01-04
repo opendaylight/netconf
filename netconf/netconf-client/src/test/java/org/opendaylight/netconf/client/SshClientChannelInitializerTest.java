@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.client;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -20,9 +19,9 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.util.concurrent.Promise;
 import org.junit.Test;
+import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
+import org.opendaylight.netconf.nettyutil.NetconfSessionNegotiator;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
-import org.opendaylight.protocol.framework.SessionListenerFactory;
-import org.opendaylight.protocol.framework.SessionNegotiator;
 
 public class SshClientChannelInitializerTest {
     @Test
@@ -32,10 +31,10 @@ public class SshClientChannelInitializerTest {
         NetconfClientSessionNegotiatorFactory negotiatorFactory = mock(NetconfClientSessionNegotiatorFactory.class);
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
 
-        SessionNegotiator<?> sessionNegotiator = mock(SessionNegotiator.class);
+        NetconfSessionNegotiator<?> sessionNegotiator = mock(NetconfSessionNegotiator.class);
         doReturn("").when(sessionNegotiator).toString();
-        doReturn(sessionNegotiator).when(negotiatorFactory).getSessionNegotiator(any(SessionListenerFactory.class),
-                any(Channel.class), any(Promise.class));
+        doReturn(sessionNegotiator).when(negotiatorFactory).getSessionNegotiator(
+            any(NetconfSessionListenerFactory.class), any(Channel.class), any(Promise.class));
         ChannelPipeline pipeline = mock(ChannelPipeline.class);
         doReturn(pipeline).when(pipeline).addAfter(anyString(), anyString(), any(ChannelHandler.class));
         Channel channel = mock(Channel.class);
