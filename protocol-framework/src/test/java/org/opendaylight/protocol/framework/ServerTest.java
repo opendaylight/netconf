@@ -34,6 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+@Deprecated
 public class ServerTest {
     SimpleDispatcher clientDispatcher, dispatcher;
 

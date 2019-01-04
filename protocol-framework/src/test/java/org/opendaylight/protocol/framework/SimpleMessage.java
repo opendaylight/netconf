@@ -7,6 +7,7 @@
  */
 package org.opendaylight.protocol.framework;
 
+@Deprecated
 public class SimpleMessage {
 
     private final String s;

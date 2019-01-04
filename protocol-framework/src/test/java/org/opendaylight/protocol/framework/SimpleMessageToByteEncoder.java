@@ -12,9 +12,7 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
-/**
- *
- */
+@Deprecated
 @Sharable
 public class SimpleMessageToByteEncoder extends MessageToByteEncoder<SimpleMessage> {
     @Override

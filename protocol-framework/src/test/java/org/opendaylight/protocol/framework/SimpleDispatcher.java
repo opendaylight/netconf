@@ -7,20 +7,18 @@
  */
 package org.opendaylight.protocol.framework;
 
+import com.google.common.base.Preconditions;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOutboundHandler;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.Promise;
-
 import java.net.InetSocketAddress;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-
+@Deprecated
 public class SimpleDispatcher extends AbstractDispatcher<SimpleSession, SimpleSessionListener> {
     private static final Logger LOG = LoggerFactory.getLogger(SimpleDispatcher.class);
 

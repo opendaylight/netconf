@@ -13,9 +13,7 @@ import io.netty.handler.codec.ByteToMessageDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-/**
- *
- */
+@Deprecated
 public class SimpleByteToMessageDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) {

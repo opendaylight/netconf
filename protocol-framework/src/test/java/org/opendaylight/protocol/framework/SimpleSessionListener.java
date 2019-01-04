@@ -9,13 +9,13 @@ package org.opendaylight.protocol.framework;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Simple Session Listener that is notified about messages and changes in the session.
  */
+@Deprecated
 public class SimpleSessionListener implements SessionListener<SimpleMessage, SimpleSession, TerminationReason> {
     private static final Logger LOG = LoggerFactory.getLogger(SimpleSessionListener.class);
 

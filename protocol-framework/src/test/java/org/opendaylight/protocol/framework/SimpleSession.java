@@ -7,6 +7,7 @@
  */
 package org.opendaylight.protocol.framework;
 
+@Deprecated
 public final class SimpleSession extends AbstractProtocolSession<SimpleMessage> {
 
     public SimpleSession() {

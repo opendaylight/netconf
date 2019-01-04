@@ -10,6 +10,7 @@ package org.opendaylight.protocol.framework;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
 
+@Deprecated
 public class SimpleSessionNegotiator extends AbstractSessionNegotiator<SimpleMessage, SimpleSession> {
 
     public SimpleSessionNegotiator(final Promise<SimpleSession> promise, final Channel channel) {

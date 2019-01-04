@@ -7,13 +7,12 @@
  */
 package org.opendaylight.protocol.framework;
 
+import com.google.common.collect.Lists;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-
+@Deprecated
 public class Session extends AbstractProtocolSession<SimpleMessage> {
 
     private static final Logger LOG = LoggerFactory.getLogger(Session.class);
