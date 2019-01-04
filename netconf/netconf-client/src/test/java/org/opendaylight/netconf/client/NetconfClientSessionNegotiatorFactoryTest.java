@@ -18,15 +18,15 @@ import io.netty.util.HashedWheelTimer;
 import io.netty.util.Timer;
 import io.netty.util.concurrent.Promise;
 import org.junit.Test;
-import org.opendaylight.protocol.framework.SessionListenerFactory;
-import org.opendaylight.protocol.framework.SessionNegotiator;
+import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 
 public class NetconfClientSessionNegotiatorFactoryTest {
     @Test
     public void testGetSessionNegotiator() throws Exception {
         NetconfClientSessionListener sessionListener = mock(NetconfClientSessionListener.class);
         Timer timer = new HashedWheelTimer();
-        SessionListenerFactory<NetconfClientSessionListener> listenerFactory = mock(SessionListenerFactory.class);
+        NetconfSessionListenerFactory<NetconfClientSessionListener> listenerFactory =
+                mock(NetconfSessionListenerFactory.class);
         doReturn(sessionListener).when(listenerFactory).getSessionListener();
 
         Channel channel = mock(Channel.class);
@@ -34,8 +34,8 @@ public class NetconfClientSessionNegotiatorFactoryTest {
         NetconfClientSessionNegotiatorFactory negotiatorFactory = new NetconfClientSessionNegotiatorFactory(timer,
                 Optional.absent(), 200L);
 
-        SessionNegotiator<?> sessionNegotiator = negotiatorFactory.getSessionNegotiator(listenerFactory, channel,
-                promise);
+        NetconfClientSessionNegotiator sessionNegotiator = negotiatorFactory.getSessionNegotiator(listenerFactory,
+            channel, promise);
         assertNotNull(sessionNegotiator);
     }
 }

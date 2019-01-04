@@ -5,19 +5,18 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.protocol;
 
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
+import org.opendaylight.netconf.api.NetconfSessionListenerFactory;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
-import org.opendaylight.protocol.framework.SessionListenerFactory;
 
 final class ReverseSshChannelInitializer extends AbstractChannelInitializer<NetconfClientSession>
-        implements SessionListenerFactory<NetconfClientSessionListener> {
+        implements NetconfSessionListenerFactory<NetconfClientSessionListener> {
 
     private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
     private final NetconfClientSessionListener sessionListener;

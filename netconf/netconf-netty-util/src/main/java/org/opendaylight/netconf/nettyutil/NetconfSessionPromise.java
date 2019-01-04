@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.protocol.framework;
+package org.opendaylight.netconf.nettyutil;
 
 import com.google.common.base.Preconditions;
 import io.netty.bootstrap.Bootstrap;
@@ -20,13 +20,14 @@ import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
+import org.opendaylight.netconf.api.NetconfSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Deprecated
 @ThreadSafe
-final class ProtocolSessionPromise<S extends ProtocolSession<?>> extends DefaultPromise<S> {
-    private static final Logger LOG = LoggerFactory.getLogger(ProtocolSessionPromise.class);
+final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromise<S> {
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfSessionPromise.class);
     private final ReconnectStrategy strategy;
     private InetSocketAddress address;
     private final Bootstrap b;
@@ -34,8 +35,8 @@ final class ProtocolSessionPromise<S extends ProtocolSession<?>> extends Default
     @GuardedBy("this")
     private Future<?> pending;
 
-    ProtocolSessionPromise(final EventExecutor executor, final InetSocketAddress address, final ReconnectStrategy strategy,
-            final Bootstrap b) {
+    NetconfSessionPromise(final EventExecutor executor, final InetSocketAddress address,
+            final ReconnectStrategy strategy, final Bootstrap b) {
         super(executor);
         this.strategy = Preconditions.checkNotNull(strategy);
         this.address = Preconditions.checkNotNull(address);
@@ -95,7 +96,7 @@ final class ProtocolSessionPromise<S extends ProtocolSession<?>> extends Default
                 LOG.debug("Promise {} connection resolved", lock);
 
                 // Triggered when a connection attempt is resolved.
-                Preconditions.checkState(ProtocolSessionPromise.this.pending.equals(cf));
+                Preconditions.checkState(NetconfSessionPromise.this.pending.equals(cf));
 
                 /*
                  * The promise we gave out could have been cancelled,
@@ -119,11 +120,11 @@ final class ProtocolSessionPromise<S extends ProtocolSession<?>> extends Default
                     return;
                 }
 
-                LOG.debug("Attempt to connect to {} failed", ProtocolSessionPromise.this.address, cf.cause());
+                LOG.debug("Attempt to connect to {} failed", NetconfSessionPromise.this.address, cf.cause());
 
-                final Future<Void> rf = ProtocolSessionPromise.this.strategy.scheduleReconnect(cf.cause());
+                final Future<Void> rf = NetconfSessionPromise.this.strategy.scheduleReconnect(cf.cause());
                 rf.addListener(new ReconnectingStrategyListener());
-                ProtocolSessionPromise.this.pending = rf;
+                NetconfSessionPromise.this.pending = rf;
             }
         }
 
@@ -132,7 +133,7 @@ final class ProtocolSessionPromise<S extends ProtocolSession<?>> extends Default
             public void operationComplete(final Future<Void> sf) {
                 synchronized (lock) {
                     // Triggered when a connection attempt is to be made.
-                    Preconditions.checkState(ProtocolSessionPromise.this.pending.equals(sf));
+                    Preconditions.checkState(NetconfSessionPromise.this.pending.equals(sf));
 
                     /*
                      * The promise we gave out could have been cancelled,

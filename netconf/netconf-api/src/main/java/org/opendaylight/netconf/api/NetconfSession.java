@@ -8,10 +8,20 @@
 package org.opendaylight.netconf.api;
 
 import io.netty.channel.ChannelFuture;
-import org.opendaylight.protocol.framework.ProtocolSession;
+import java.io.Closeable;
 
-public interface NetconfSession extends ProtocolSession<NetconfMessage> {
+/**
+ * Protocol Session represents the finite state machine in underlying protocol, including timers and its purpose is to
+ * create a connection between server and client. Session is automatically started, when TCP connection is created, but
+ * can be stopped manually. If the session is up, it has to redirect messages to/from user. Handles also malformed
+ * messages and unknown requests.
+ *
+ * This interface should be implemented by a final class representing a protocol specific session.
+ */
+public interface NetconfSession extends Closeable {
 
     ChannelFuture sendMessage(NetconfMessage message);
 
+    @Override
+    void close();
 }
