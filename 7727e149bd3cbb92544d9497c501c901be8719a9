@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "79002c84_d4ccec63",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-01-07T12:26:19Z",
+      "side": 1,
+      "message": "Please, separate subject from body with a blank line",
+      "revId": "7727e149bd3cbb92544d9497c501c901be8719a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f7de60fd_94501e87",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-01-07T12:26:19Z",
+      "side": 1,
+      "message": "You can leave one blank line also here.",
+      "revId": "7727e149bd3cbb92544d9497c501c901be8719a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b2f0a60a_4bce216c",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocGeneratorDraftO2.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-01-07T12:26:19Z",
+      "side": 1,
+      "message": "This does not have to be Optional\u003cString\u003e, you can use String directly and then wrap it into Optional (or create constructors that accept String also in super class).\n\nThis applies also to other Generator classes changed in the patch.",
+      "revId": "7727e149bd3cbb92544d9497c501c901be8719a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
