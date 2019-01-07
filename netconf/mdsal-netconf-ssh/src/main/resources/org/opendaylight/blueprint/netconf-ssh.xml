@@ -13,8 +13,11 @@
 
     <reference id="netconfServerDispatcher" interface="org.opendaylight.netconf.api.NetconfServerDispatcher"/>
     <reference id="globalWorkerGroup" interface="io.netty.channel.EventLoopGroup" odl:type="global-worker-group"/>
-    <reference id="executor" interface="io.netty.util.concurrent.EventExecutor" odl:type="global-event-executor"/>
     <reference id="authProvider" interface="org.opendaylight.netconf.auth.AuthProvider" odl:type="netconf-auth-provider"/>
+
+    <reference id="executor" interface="io.netty.util.concurrent.EventExecutor" odl:type="global-event-executor">
+        <reference-listener ref="netconfMdsalServer" unbind-method="unbind"/>
+    </reference>
 
     <!--    NETCONF server for MD-SAL (listening by default on port 2830)-->
 
