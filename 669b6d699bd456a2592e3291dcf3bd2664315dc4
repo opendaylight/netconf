@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4dc46748_ec52aa60",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/jaxrs/ApiDocApplication.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-01-07T12:36:37Z",
+      "side": 1,
+      "message": "Please do not introduce empty lines between import statements",
+      "revId": "669b6d699bd456a2592e3291dcf3bd2664315dc4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9cb73144_9ae69ef5",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/jaxrs/ApiDocApplication.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-01-07T12:36:37Z",
+      "side": 1,
+      "message": "Also here",
+      "revId": "669b6d699bd456a2592e3291dcf3bd2664315dc4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "11820331_4f431d29",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/jaxrs/ApiDocApplication.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-01-07T12:36:37Z",
+      "side": 1,
+      "message": "Also here",
+      "revId": "669b6d699bd456a2592e3291dcf3bd2664315dc4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "373f0ae1_88397ca9",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/controller/sal/rest/doc/impl/ApiDocServiceImplTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-01-07T12:36:37Z",
+      "side": 1,
+      "message": "We are not using GsonProvider anymore, so we should also adjust the comment here.",
+      "revId": "669b6d699bd456a2592e3291dcf3bd2664315dc4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
