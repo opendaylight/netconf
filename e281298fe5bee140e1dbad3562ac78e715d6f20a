@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5eb0ffd4_ab79433b",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/NetconfNorthboundSshServer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-01-07T11:08:55Z",
+      "side": 1,
+      "message": "final IOException e",
+      "revId": "e281298fe5bee140e1dbad3562ac78e715d6f20a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e50797a9_f001f672",
+        "filename": "netconf/netconf-ssh/src/main/java/org/opendaylight/netconf/ssh/NetconfNorthboundSshServer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-01-07T11:08:55Z",
+      "side": 1,
+      "message": "LOG.error(\"Unbind of reference listener failed\", e);\n\nThe {} placeholder should not be necessary when logging exceptions.\n\nAlso the log message is somewhat misleading (at least to if I understanding this correctly). What actually failed is SSH server close() method. So maybe something like \"Failed to close SSH server correctly, cannot unbind reference listener ...\" is more suitable.",
+      "revId": "e281298fe5bee140e1dbad3562ac78e715d6f20a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
