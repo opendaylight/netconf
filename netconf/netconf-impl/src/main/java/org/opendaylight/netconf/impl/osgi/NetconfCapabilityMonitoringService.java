@@ -11,7 +11,6 @@ import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARA
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
@@ -25,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.BasicCapability;
 import org.opendaylight.netconf.api.capability.Capability;

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.rpc;
 
 import com.google.common.base.Optional;
@@ -60,7 +59,7 @@ public class SimulatedGetConfig extends AbstractLastNetconfOperation {
 
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) {
-        final Element element = XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY, Optional.absent());
+        final Element element = XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY);
 
         for (final XmlElement e : storage.getConfigList()) {
             final Element domElement = e.getDomElement();

@@ -5,12 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +17,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.util.Base64;
+import java.util.Optional;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -56,19 +55,19 @@ abstract class AbstractConfigOperation extends AbstractSingletonNetconfOperation
         final Optional<XmlElement> configElement = parent.getOnlyChildElementOptionally(CONFIG_KEY);
         if (configElement.isPresent()) {
             return configElement.get();
-        } else {
-            final Optional<XmlElement> urlElement = parent.getOnlyChildElementOptionally(URL_KEY);
-            if (!urlElement.isPresent()) {
-                throw new DocumentedException("Invalid RPC, neither <config> not <url> element is present",
-                    DocumentedException.ErrorType.PROTOCOL,
-                    DocumentedException.ErrorTag.MISSING_ELEMENT,
-                    DocumentedException.ErrorSeverity.ERROR);
-            }
-
-            final Document document = getDocumentFromUrl(urlElement.get().getTextContent());
-            return XmlElement.fromDomElementWithExpected(document.getDocumentElement(), CONFIG_KEY,
-                XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
         }
+
+        final Optional<XmlElement> urlElement = parent.getOnlyChildElementOptionally(URL_KEY);
+        if (!urlElement.isPresent()) {
+            throw new DocumentedException("Invalid RPC, neither <config> not <url> element is present",
+                DocumentedException.ErrorType.PROTOCOL,
+                DocumentedException.ErrorTag.MISSING_ELEMENT,
+                DocumentedException.ErrorSeverity.ERROR);
+        }
+
+        final Document document = getDocumentFromUrl(urlElement.get().getTextContent());
+        return XmlElement.fromDomElementWithExpected(document.getDocumentElement(), CONFIG_KEY,
+            XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
     }
 
     /**

@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.callhome.protocol;
 
-import com.google.common.base.Optional;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.HashedWheelTimer;
 import java.net.InetSocketAddress;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.apache.sshd.client.SshClient;
 import org.opendaylight.netconf.callhome.protocol.CallHomeSessionContext.Factory;
@@ -112,7 +112,7 @@ public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServ
 
     private static NetconfClientSessionNegotiatorFactory defaultNegotiationFactory() {
         return new NetconfClientSessionNegotiatorFactory(new HashedWheelTimer(),
-                                                         Optional.absent(), DEFAULT_SESSION_TIMEOUT_MILLIS);
+                                                         Optional.empty(), DEFAULT_SESSION_TIMEOUT_MILLIS);
     }
 
     private static EventLoopGroup defaultNettyGroup() {

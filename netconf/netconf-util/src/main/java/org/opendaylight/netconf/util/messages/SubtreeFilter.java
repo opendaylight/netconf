@@ -5,11 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.util.messages;
 
-import com.google.common.base.Optional;
 import java.util.Map;
+import java.util.Optional;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -69,7 +68,7 @@ public final class SubtreeFilter {
                                                                     Document notification) throws DocumentedException {
         removeEventTimeNode(notification);
         if (isSupported(filter)) {
-            return Optional.fromNullable(filteredNotification(filter, notification));
+            return Optional.ofNullable(filteredNotification(filter, notification));
         }
         return Optional.of(extractNotificationContent(notification));
     }

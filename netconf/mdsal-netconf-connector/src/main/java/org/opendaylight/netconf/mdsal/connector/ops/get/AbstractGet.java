@@ -8,9 +8,9 @@
 package org.opendaylight.netconf.mdsal.connector.ops.get;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
+import java.util.Optional;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -127,7 +127,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         final Optional<XmlElement> filterElement = operationElement.getOnlyChildElementOptionally(FILTER);
         if (filterElement.isPresent()) {
             if (filterElement.get().getChildElements().size() == 0) {
-                return Optional.absent();
+                return Optional.empty();
             }
             return Optional.of(getInstanceIdentifierFromFilter(filterElement.get()));
         }
@@ -177,10 +177,9 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         private static Optional<Datastore> parseSource(final XmlElement xml) throws DocumentedException {
             final Optional<XmlElement> sourceElement = xml.getOnlyChildElementOptionally(XmlNetconfConstants.SOURCE_KEY,
                     XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0);
-
             return sourceElement.isPresent()
                     ? Optional.of(Datastore.valueOf(sourceElement.get().getOnlyChildElement().getName()))
-                    : Optional.absent();
+                    : Optional.empty();
         }
 
         private static void validateInputRpc(final XmlElement xml, final String operationName) throws

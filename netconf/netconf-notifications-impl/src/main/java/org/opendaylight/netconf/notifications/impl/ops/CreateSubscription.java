@@ -7,11 +7,11 @@
  */
 package org.opendaylight.netconf.notifications.impl.ops;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -88,7 +88,7 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
                 .registerNotificationListener(streamNameType, new NotificationSubscription(netconfSession, filter));
         subscriptions.add(notificationListenerRegistration);
 
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK, Optional.absent());
+        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
     }
 
     private static StreamNameType parseStreamIfPresent(final XmlElement operationElement) throws DocumentedException {
