@@ -21,6 +21,7 @@ import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddressBuilder;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +86,20 @@ public class NetconfNorthboundSshServer {
             localServer.channel().close();
         } else {
             localServer.cancel(true);
+        }
+    }
+
+    /*
+     * Called when the underlying reference to EventExecutor is about to be removed from the container allowing
+     * us to close the ssh server while it still exists.
+     */
+    public void unbind(final ServiceReference<?> reference) {
+        LOG.debug("EventExecutor is being removed, closing netconf ssh server. {}", reference);
+
+        try {
+            close();
+        } catch (final IOException e) {
+            LOG.error("Closing of ssh server failed while unbinding reference listener.", e);
         }
     }
 }
