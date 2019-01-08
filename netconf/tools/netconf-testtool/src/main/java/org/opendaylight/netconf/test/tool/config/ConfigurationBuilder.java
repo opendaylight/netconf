@@ -84,12 +84,6 @@ public class ConfigurationBuilder {
     }
 
     @Deprecated
-    public ConfigurationBuilder setMdSal(final boolean mdSal) {
-        this.configuration.setMdSal(mdSal);
-        return this;
-    }
-
-    @Deprecated
     public ConfigurationBuilder setRpcConfigFile(final File rpcConfigFile) {
         this.configuration.setRpcConfigFile(rpcConfigFile);
         return this;
@@ -123,7 +117,6 @@ public class ConfigurationBuilder {
         this.configuration.setIp(template.getIp());
         this.configuration.setRpcHandler(template.getRpcHandler());
         this.configuration.setOperationsCreator(template.getOperationsCreator());
-        this.configuration.setMdSal(template.isMdSal());
         this.configuration.setRpcConfigFile(template.getRpcConfigFile());
         this.configuration.setInitialConfigXMLFile(template.getInitialConfigXMLFile());
         this.configuration.setNotificationFile(template.getNotificationFile());
@@ -140,7 +133,6 @@ public class ConfigurationBuilder {
         this.configuration.setDeviceCount(testtoolParameters.deviceCount);
         this.configuration.setSsh(testtoolParameters.ssh);
         this.configuration.setIp(testtoolParameters.ip);
-        this.configuration.setMdSal(testtoolParameters.mdSal);
         this.configuration.setRpcConfigFile(testtoolParameters.rpcConfig);
         this.configuration.setInitialConfigXMLFile(testtoolParameters.initialConfigXMLFile);
         this.configuration.setNotificationFile(testtoolParameters.notificationFile);

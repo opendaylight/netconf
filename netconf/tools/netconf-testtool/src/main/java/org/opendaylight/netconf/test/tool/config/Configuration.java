@@ -72,9 +72,6 @@ public class Configuration {
     private PublickeyAuthenticator publickeyAuthenticator = DEFAULT_PUBLIC_KEY_AUTHENTICATOR;
 
     @Deprecated
-    private boolean mdSal = false;
-
-    @Deprecated
     private File rpcConfigFile;
 
     @Deprecated
@@ -191,16 +188,6 @@ public class Configuration {
 
     public void setOperationsCreator(final OperationsCreator operationsCreator) {
         this.operationsCreator = operationsCreator;
-    }
-
-    @Deprecated
-    public boolean isMdSal() {
-        return mdSal;
-    }
-
-    @Deprecated
-    public void setMdSal(final boolean mdSal) {
-        this.mdSal = mdSal;
     }
 
     @Deprecated

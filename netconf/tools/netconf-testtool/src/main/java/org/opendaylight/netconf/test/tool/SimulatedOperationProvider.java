@@ -9,9 +9,9 @@
 package org.opendaylight.netconf.test.tool;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Sets;
 import java.io.File;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
@@ -19,27 +19,23 @@ import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.opendaylight.netconf.test.tool.rpc.DataList;
-import org.opendaylight.netconf.test.tool.rpc.SimulatedCommit;
 import org.opendaylight.netconf.test.tool.rpc.SimulatedCreateSubscription;
-import org.opendaylight.netconf.test.tool.rpc.SimulatedDiscardChanges;
-import org.opendaylight.netconf.test.tool.rpc.SimulatedEditConfig;
-import org.opendaylight.netconf.test.tool.rpc.SimulatedGet;
-import org.opendaylight.netconf.test.tool.rpc.SimulatedGetConfig;
-import org.opendaylight.netconf.test.tool.rpc.SimulatedLock;
-import org.opendaylight.netconf.test.tool.rpc.SimulatedUnLock;
 
 class SimulatedOperationProvider implements NetconfOperationServiceFactory {
+
+    private SessionIdProvider idProvider;
     private final Set<Capability> caps;
-    private final SimulatedOperationService simulatedOperationService;
+    private final Optional<File> notificationsFile;
+    private final NetconfOperationServiceFactory delegateOperationServiceFactory;
 
     SimulatedOperationProvider(final SessionIdProvider idProvider,
                                final Set<Capability> caps,
                                final Optional<File> notificationsFile,
-                               final Optional<File> initialConfigXMLFile) {
+                               final NetconfOperationServiceFactory delegateOperationServiceFactory) {
+        this.idProvider = idProvider;
         this.caps = caps;
-        simulatedOperationService = new SimulatedOperationService(
-            idProvider.getCurrentSessionId(), notificationsFile, initialConfigXMLFile);
+        this.notificationsFile = notificationsFile;
+        this.delegateOperationServiceFactory = delegateOperationServiceFactory;
     }
 
     @Override
@@ -58,37 +54,32 @@ class SimulatedOperationProvider implements NetconfOperationServiceFactory {
     @Override
     public NetconfOperationService createService(
             final String netconfSessionIdForReporting) {
-        return simulatedOperationService;
+        return new SimulatedOperationService(
+                idProvider.getCurrentSessionId(), notificationsFile,
+                delegateOperationServiceFactory.createService(netconfSessionIdForReporting));
     }
 
     static class SimulatedOperationService implements NetconfOperationService {
         private final long currentSessionId;
         private final Optional<File> notificationsFile;
-        private final Optional<File> initialConfigXMLFile;
+        private final NetconfOperationService delegateOperationService;
 
         SimulatedOperationService(final long currentSessionId, final Optional<File> notificationsFile,
-                                  final Optional<File> initialConfigXMLFile) {
+                                         final NetconfOperationService delegateOperationService) {
             this.currentSessionId = currentSessionId;
             this.notificationsFile = notificationsFile;
-            this.initialConfigXMLFile = initialConfigXMLFile;
+            this.delegateOperationService = delegateOperationService;
         }
 
         @Override
         public Set<NetconfOperation> getNetconfOperations() {
-            final DataList storage = new DataList();
-            final SimulatedGet sGet = new SimulatedGet(String.valueOf(currentSessionId), storage);
-            final SimulatedEditConfig sEditConfig = new SimulatedEditConfig(String.valueOf(currentSessionId), storage);
-            final SimulatedGetConfig sGetConfig = new SimulatedGetConfig(
-                String.valueOf(currentSessionId), storage, initialConfigXMLFile);
-            final SimulatedCommit sCommit = new SimulatedCommit(String.valueOf(currentSessionId));
-            final SimulatedLock sLock = new SimulatedLock(String.valueOf(currentSessionId));
-            final SimulatedUnLock sUnlock = new SimulatedUnLock(String.valueOf(currentSessionId));
             final SimulatedCreateSubscription sCreateSubs = new SimulatedCreateSubscription(
                     String.valueOf(currentSessionId), notificationsFile);
-            final SimulatedDiscardChanges sDiscardChanges = new SimulatedDiscardChanges(
-                String.valueOf(currentSessionId));
-            return Sets.newHashSet(
-                sGet, sGetConfig, sEditConfig, sCommit, sLock, sUnlock, sCreateSubs, sDiscardChanges);
+
+            final Set<NetconfOperation> operations = new HashSet<>();
+            operations.addAll(delegateOperationService.getNetconfOperations());
+            operations.add(sCreateSubs);
+            return operations;
         }
 
         @Override
