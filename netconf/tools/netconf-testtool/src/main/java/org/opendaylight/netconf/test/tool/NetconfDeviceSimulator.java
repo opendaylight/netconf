@@ -56,7 +56,6 @@ import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.customrpc.SettableOperationProvider;
 import org.opendaylight.netconf.test.tool.monitoring.NetconfMonitoringOperationService;
 import org.opendaylight.netconf.test.tool.monitoring.NetconfMonitoringOperationServiceFactory;
-import org.opendaylight.netconf.test.tool.operations.DefaultOperationsCreator;
 import org.opendaylight.netconf.test.tool.operations.OperationsProvider;
 import org.opendaylight.netconf.test.tool.rpchandler.SettableOperationRpcProvider;
 import org.opendaylight.netconf.test.tool.schemacache.SchemaSourceCache;
@@ -141,20 +140,20 @@ public class NetconfDeviceSimulator implements Closeable {
             new AggregatedNetconfOperationServiceFactory();
 
         final NetconfOperationServiceFactory operationProvider;
-        if (configuration.isMdSal()) {
-            LOG.info("using MdsalOperationProvider.");
-            operationProvider = new MdsalOperationProvider(
-                idProvider, transformedCapabilities, schemaContext, sourceProvider);
-        } else if (configuration.isXmlConfigurationProvided()) {
-            LOG.info("using SimulatedOperationProvider.");
+        if (configuration.getNotificationFile() != null) {
+            LOG.info("Adding MdsalOperationProvider with simulated notifications.");
+            final MdsalOperationProvider mdsalOperationProvider =
+                    new MdsalOperationProvider(idProvider, transformedCapabilities, schemaContext, sourceProvider);
             operationProvider = new SimulatedOperationProvider(idProvider, transformedCapabilities,
-                    Optional.fromNullable(configuration.getNotificationFile()),
-                    Optional.fromNullable(configuration.getInitialConfigXMLFile()));
-        } else {
-            LOG.info("using OperationsProvider.");
+                    Optional.fromNullable(configuration.getNotificationFile()), mdsalOperationProvider);
+        } else if (configuration.getOperationsCreator() != null) {
+            LOG.info("Using injected OperationsProvider.");
             operationProvider = new OperationsProvider(idProvider, transformedCapabilities,
-                configuration.getOperationsCreator() != null ? configuration.getOperationsCreator()
-                    : DefaultOperationsCreator.getDefaultOperationServiceCreator(idProvider.getCurrentSessionId()));
+                    configuration.getOperationsCreator());
+        } else {
+            LOG.info("Using MdsalOperationProvider.");
+            operationProvider = new MdsalOperationProvider(
+                    idProvider, transformedCapabilities, schemaContext, sourceProvider);
         }
 
 
