@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.web;
 
-import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
 import org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration;
 import org.opendaylight.aaa.filterchain.filters.CustomFilterAdapter;
@@ -15,21 +14,34 @@ import org.opendaylight.aaa.web.FilterDetails;
 import org.opendaylight.aaa.web.ServletDetails;
 import org.opendaylight.aaa.web.WebContext;
 import org.opendaylight.aaa.web.WebContextBuilder;
-import org.opendaylight.aaa.web.WebContextRegistration;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
+import org.opendaylight.restconf.common.web.AbstractWebRegistrar;
 
 /**
  * Initializes the rfc8040 web app endpoint.
  *
  * @author Thomas Pantelis
  */
-public class WebInitializer {
-    private final WebContextRegistration registration;
+public class Rfc8040WebRegistrarImpl extends AbstractWebRegistrar implements Rfc8040WebRegistrar {
+    private final WebContextSecurer webContextSecurer;
+    private final ServletSupport servletSupport;
+    private final Application webApp;
+    private final CustomFilterAdapterConfiguration customFilterAdapterConfig;
 
-    public WebInitializer(WebServer webServer,  WebContextSecurer webContextSecurer, ServletSupport servletSupport,
-            Application webApp, CustomFilterAdapterConfiguration customFilterAdapterConfig) throws ServletException {
+    public Rfc8040WebRegistrarImpl(WebServer webServer, WebContextSecurer webContextSecurer,
+            ServletSupport servletSupport, Application webApp,
+            CustomFilterAdapterConfiguration customFilterAdapterConfig) {
+        super(webServer);
+        this.webContextSecurer = webContextSecurer;
+        this.servletSupport = servletSupport;
+        this.webApp = webApp;
+        this.customFilterAdapterConfig = customFilterAdapterConfig;
+    }
+
+    @Override
+    protected WebContext createWebContext(boolean authenticate) {
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath("rests").supportsSessions(true)
                 .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
                     .addUrlPattern("/*").build())
@@ -45,12 +57,6 @@ public class WebInitializer {
 
         webContextSecurer.requireAuthentication(webContextBuilder, "/*");
 
-        registration = webServer.registerWebContext(webContextBuilder.build());
-    }
-
-    public void close() {
-        if (registration != null) {
-            registration.close();
-        }
+        return webContextBuilder.build();
     }
 }

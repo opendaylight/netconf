@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.sal.restconf.web;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
 import org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration;
 import org.opendaylight.aaa.filterchain.filters.CustomFilterAdapter;
@@ -16,63 +14,34 @@ import org.opendaylight.aaa.web.FilterDetails;
 import org.opendaylight.aaa.web.ServletDetails;
 import org.opendaylight.aaa.web.WebContext;
 import org.opendaylight.aaa.web.WebContextBuilder;
-import org.opendaylight.aaa.web.WebContextRegistration;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opendaylight.restconf.common.web.AbstractWebRegistrar;
 
 /**
  * Implementation of Bierman02WebRegistrar.
  *
  * @author Thomas Pantelis
  */
-public class Bierman02WebRegistrarImpl implements Bierman02WebRegistrar {
-    private static final Logger LOG = LoggerFactory.getLogger(Bierman02WebRegistrarImpl.class);
-
-    private final WebServer webServer;
+public class Bierman02WebRegistrarImpl extends AbstractWebRegistrar implements Bierman02WebRegistrar {
     private final WebContextSecurer webContextSecurer;
     private final ServletSupport servletSupport;
     private final Application webApp;
     private final CustomFilterAdapterConfiguration customFilterAdapterConfig;
-    private volatile WebContextRegistration registraton;
-    private final AtomicBoolean registered = new AtomicBoolean(false);
 
     public Bierman02WebRegistrarImpl(WebServer webServer,  WebContextSecurer webContextSecurer,
             ServletSupport servletSupport, Application webApp,
             CustomFilterAdapterConfiguration customFilterAdapterConfig) {
-        this.webServer = webServer;
+        super(webServer);
         this.webContextSecurer = webContextSecurer;
         this.servletSupport = servletSupport;
         this.webApp = webApp;
         this.customFilterAdapterConfig = customFilterAdapterConfig;
     }
 
-    public void close() {
-        if (registered.compareAndSet(true, false)) {
-            if (registraton != null) {
-                registraton.close();
-            }
-        }
-    }
-
     @Override
-    public void registerWithAuthentication() {
-        register(true);
-    }
-
-    @Override
-    public void registerWithoutAuthentication() {
-        register(false);
-    }
-
-    private void register(boolean authenticate) {
-        if (!registered.compareAndSet(false, true)) {
-            LOG.warn("Web context has already been registered", new Exception("call site"));
-            return;
-        }
-
+    protected WebContext createWebContext(boolean authenticate) {
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath("restconf").supportsSessions(true)
                 .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
                     .addUrlPattern("/*").build())
@@ -90,10 +59,6 @@ public class Bierman02WebRegistrarImpl implements Bierman02WebRegistrar {
             webContextSecurer.requireAuthentication(webContextBuilder, "/*");
         }
 
-        try {
-            registraton = webServer.registerWebContext(webContextBuilder.build());
-        } catch (ServletException e) {
-            throw new RuntimeException("Failed to register the web context", e);
-        }
+        return webContextBuilder.build();
     }
 }
