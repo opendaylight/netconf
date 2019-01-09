@@ -86,8 +86,6 @@ public class TesttoolParameters {
     public boolean debug;
     @Arg(dest = "notification-file")
     public File notificationFile;
-    @Arg(dest = "md-sal")
-    public boolean mdSal;
     @Arg(dest = "initial-config-xml-file")
     public File initialConfigXMLFile;
     @Arg(dest = "time-out")
@@ -214,12 +212,6 @@ public class TesttoolParameters {
                 .setDefault(Boolean.FALSE)
                 .help("Whether to use debug log level instead of INFO")
                 .dest("debug");
-
-        parser.addArgument("--md-sal")
-                .type(Boolean.class)
-                .setDefault(Boolean.FALSE)
-                .help("Whether to use md-sal datastore instead of default simulated datastore.")
-                .dest("md-sal");
 
         parser.addArgument("--time-out")
                 .type(long.class)
