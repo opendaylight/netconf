@@ -34,6 +34,8 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
+  <!-- TODO Replace most of this by just using Bierman02RestConfWiring instead... -->
+
   <reference id="schemaService" interface="org.opendaylight.mdsal.dom.api.DOMSchemaService"/>
   <reference id="domRpcService" interface="org.opendaylight.mdsal.dom.api.DOMRpcService"/>
   <reference id="domMountPointService" interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"/>
