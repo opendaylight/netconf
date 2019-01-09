@@ -7,8 +7,11 @@
  */
 package org.opendaylight.netconf.sal.restconf.web;
 
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.ServletException;
-import javax.ws.rs.core.Application;
+import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration;
 import org.opendaylight.aaa.filterchain.filters.CustomFilterAdapter;
 import org.opendaylight.aaa.web.FilterDetails;
@@ -19,20 +22,24 @@ import org.opendaylight.aaa.web.WebContextRegistration;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
+import org.opendaylight.netconf.sal.rest.impl.RestconfApplication;
 
 /**
  * Initializes the bierman-02 endpoint.
  *
  * @author Thomas Pantelis
  */
+@Singleton
 public class WebInitializer {
+
     private final WebContextRegistration registration;
 
-    public WebInitializer(final WebServer webServer, final WebContextSecurer webContextSecurer,
-            final ServletSupport servletSupport, final Application webApp,
-            final CustomFilterAdapterConfiguration customFilterAdapterConfig) throws ServletException {
+    @Inject
+    public WebInitializer(@Reference WebServer webServer, @Reference WebContextSecurer webContextSecurer,
+            @Reference ServletSupport servletSupport, RestconfApplication webApp,
+            @Reference CustomFilterAdapterConfiguration customFilterAdapterConfig) throws ServletException {
 
-        final WebContextBuilder webContextBuilder = WebContext.builder().contextPath("restconf").supportsSessions(false)
+        WebContextBuilder webContextBuilder = WebContext.builder().contextPath("/restconf").supportsSessions(false)
                 .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
                     .addUrlPattern("/*").build())
 
@@ -50,6 +57,7 @@ public class WebInitializer {
         registration = webServer.registerWebContext(webContextBuilder.build());
     }
 
+    @PreDestroy
     public void close() {
         if (registration != null) {
             registration.close();

@@ -31,7 +31,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.core.Response.Status;
+import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizationException;
 import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizationOperation;
 import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizer;
@@ -77,6 +81,7 @@ import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public final class ControllerContext implements SchemaContextListener, Closeable {
     // FIXME: this should be in md-sal somewhere
     public static final String MOUNT = "yang-ext:mount";
@@ -101,21 +106,27 @@ public final class ControllerContext implements SchemaContextListener, Closeable
     private volatile SchemaContext globalSchema;
     private volatile DataNormalizer dataNormalizer;
 
-    private ControllerContext(final DOMSchemaService schemaService, final DOMMountPointService mountService,
-            final DOMYangTextSourceProvider yangTextSourceProvider) {
+    @Inject
+    public ControllerContext(@Reference DOMSchemaService schemaService, @Reference DOMMountPointService mountService,
+            @Reference DOMSchemaService domSchemaService) {
         this.mountService = mountService;
-        this.yangTextSourceProvider = yangTextSourceProvider;
+        this.yangTextSourceProvider = domSchemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
 
         onGlobalContextUpdated(schemaService.getGlobalContext());
         listenerRegistration = schemaService.registerSchemaContextListener(this);
     }
 
+    /**
+     * Factory method.
+     *
+     * @deprecated Just use the
+     *             {@link #ControllerContext(DOMSchemaService, DOMMountPointService, DOMSchemaService)}
+     *             constructor instead.
+     */
+    @Deprecated
     public static ControllerContext newInstance(final DOMSchemaService schemaService,
             final DOMMountPointService mountService, final DOMSchemaService domSchemaService) {
-        final DOMYangTextSourceProvider yangTextSourceProvider = domSchemaService.getExtensions()
-                .getInstance(DOMYangTextSourceProvider.class);
-
-        return new ControllerContext(schemaService, mountService, yangTextSourceProvider);
+        return new ControllerContext(schemaService, mountService, domSchemaService);
     }
 
     private void setGlobalSchema(final SchemaContext globalSchema) {
@@ -134,6 +145,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
     }
 
     @Override
+    @PreDestroy
     public void close() {
         listenerRegistration.close();
     }

@@ -18,9 +18,12 @@ import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
+import org.apache.aries.blueprint.annotation.service.Service;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
@@ -49,8 +52,10 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Pantelis
  * @deprecated Replaced by {JSONRestconfServiceRfc8040Impl from restconf-nb-rfc8040
  */
+@Singleton
 @Deprecated
-public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseable {
+@Service(classes = JSONRestconfService.class)
+public class JSONRestconfServiceImpl implements JSONRestconfService {
     private static final Logger LOG = LoggerFactory.getLogger(JSONRestconfServiceImpl.class);
 
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
@@ -58,7 +63,8 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
     private final ControllerContext controllerContext;
     private final RestconfService restconfService;
 
-    public JSONRestconfServiceImpl(final ControllerContext controllerContext, final RestconfService restconfService) {
+    @Inject
+    public JSONRestconfServiceImpl(final ControllerContext controllerContext, final RestconfImpl restconfService) {
         this.controllerContext = controllerContext;
         this.restconfService = restconfService;
     }
@@ -232,10 +238,6 @@ public class JSONRestconfServiceImpl implements JSONRestconfService, AutoCloseab
         }
 
         return Optional.fromNullable(jsonRes);
-    }
-
-    @Override
-    public void close() {
     }
 
     private  String toJson(final PatchStatusContext patchStatusContext) throws IOException {
