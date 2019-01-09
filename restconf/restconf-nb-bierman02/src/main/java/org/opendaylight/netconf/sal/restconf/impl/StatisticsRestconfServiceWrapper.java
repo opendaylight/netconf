@@ -9,6 +9,8 @@ package org.opendaylight.netconf.sal.restconf.impl;
 
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -17,6 +19,7 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 
+@Singleton
 public final class StatisticsRestconfServiceWrapper implements RestconfService {
 
     AtomicLong operationalGet = new AtomicLong();
@@ -38,11 +41,18 @@ public final class StatisticsRestconfServiceWrapper implements RestconfService {
 
     private final RestconfService delegate;
 
-    private StatisticsRestconfServiceWrapper(final RestconfService delegate) {
+    @Inject
+    public StatisticsRestconfServiceWrapper(final RestconfImpl delegate) {
         this.delegate = delegate;
     }
 
-    public static StatisticsRestconfServiceWrapper newInstance(RestconfService delegate) {
+    /**
+     * Factory method.
+     *
+     * @deprecated Just use {@link #StatisticsRestconfServiceWrapper(RestconfImpl)} constructor instead.
+     */
+    @Deprecated
+    public static StatisticsRestconfServiceWrapper newInstance(RestconfImpl delegate) {
         return new StatisticsRestconfServiceWrapper(delegate);
     }
 
