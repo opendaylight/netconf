@@ -26,7 +26,7 @@
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf-base</artifactId>
+            <artifactId>odl-restconf-nb-bierman02-base</artifactId>
             <version>${project.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
