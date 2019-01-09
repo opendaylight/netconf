@@ -59,6 +59,7 @@ public final class WebSocketServer implements Runnable {
         Preconditions.checkArgument(port >= 1024, "Privileged port (below 1024) is not allowed");
 
         instance = new WebSocketServer(address, port);
+        LOG.info("Created WebSocketServer on {}:{}", address, port);
         return instance;
     }
 
@@ -104,6 +105,7 @@ public final class WebSocketServer implements Runnable {
 
         instance.stop();
         instance = null;
+        LOG.info("Destroyed WebSocketServer.");
     }
 
     @Override
