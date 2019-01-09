@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright © 2017 Red Hat, Inc. and others.
+ Copyright © 2019 Pantheon Technologies, s.r.o. and others.
 
  This program and the accompanying materials are made available under the
  terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -17,11 +17,11 @@
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
-    <artifactId>odl-restconf-noauth</artifactId>
+    <artifactId>odl-restconf-nb-bierman02-noauth</artifactId>
     <version>1.9.0-SNAPSHOT</version>
     <packaging>feature</packaging>
 
-    <name>OpenDaylight :: Restconf :: no-auth</name>
+    <name>OpenDaylight :: Restconf :: NB :: bierman02 :: no-auth</name>
 
     <dependencyManagement>
         <dependencies>
@@ -38,10 +38,15 @@
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf-nb-bierman02-noauth</artifactId>
+            <artifactId>odl-restconf-nb-bierman02-base</artifactId>
             <version>${project.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-nb-bierman02-noauth</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
