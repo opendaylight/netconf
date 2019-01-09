@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright © 2017 Pantheon Technologies s.r.o. and others.
+ Copyright © 2019 Pantheon Technologies s.r.o. and others.
 
  This program and the accompanying materials are made available under the
  terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -17,11 +17,11 @@
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
-    <artifactId>odl-restconf-nb-rfc8040</artifactId>
+    <artifactId>odl-restconf-nb-rfc8040-base</artifactId>
     <version>1.9.0-SNAPSHOT</version>
     <packaging>feature</packaging>
 
-    <name>OpenDaylight :: Restconf :: NB :: RFC8040</name>
+    <name>OpenDaylight :: Restconf :: NB :: RFC8040 :: Base</name>
 
     <dependencyManagement>
         <dependencies>
@@ -32,19 +32,32 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>netconf-artifacts</artifactId>
+                <version>1.6.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>odl-restconf-nb-rfc8040-base</artifactId>
+            <artifactId>odl-restconf-common</artifactId>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>restconf-nb-rfc8040-auth</artifactId>
+            <artifactId>odl-netconf-api</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.opendaylight.netconf</groupId>
+            <artifactId>restconf-nb-rfc8040</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -5,15 +5,18 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.restconf.web;
+package org.opendaylight.restconf.common.web;
 
-import org.opendaylight.restconf.common.web.WebRegistrar;
+import com.google.common.annotations.Beta;
 
 /**
- * Registers the web components for the restconf bierman-02 endpoint.
+ * Initializes a {@link WebRegistrar} with authentication.
  *
  * @author Thomas Pantelis
  */
-public interface Bierman02WebRegistrar extends WebRegistrar {
-
+@Beta
+public class AuthWebInitializer {
+    public AuthWebInitializer(WebRegistrar registrar) {
+        registrar.registerWithAuthentication();
+    }
 }

@@ -101,7 +101,7 @@
 
   <reference id="servletSupport" interface="org.opendaylight.aaa.web.servlet.ServletSupport" />
 
-  <bean id="webInitializer" class="org.opendaylight.restconf.nb.rfc8040.web.WebInitializer"
+  <bean id="webRegistrar" class="org.opendaylight.restconf.nb.web.Rfc8040WebRegistrarImpl"
           destroy-method="close">
     <argument ref="webServer"/>
     <argument ref="webContextSecurer"/>
@@ -110,4 +110,6 @@
     <argument ref="customFilterAdapterConfig"/>
   </bean>
 
+  <service ref="webRegistrar"
+      interface="org.opendaylight.restconf.nb.web.Rfc8040WebRegistrar" />
 </blueprint>

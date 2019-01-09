@@ -5,15 +5,17 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.sal.restconf.web;
-
-import org.opendaylight.restconf.common.web.WebRegistrar;
+package org.opendaylight.restconf.common.web;
 
 /**
- * Registers the web components for the restconf bierman-02 endpoint.
+ * Registers the web components. This interface serves as a utility and should be extended for each RESTCONF
+ * implementation.
  *
  * @author Thomas Pantelis
  */
-public interface Bierman02WebRegistrar extends WebRegistrar {
+public interface WebRegistrar {
 
+    void registerWithAuthentication();
+
+    void registerWithoutAuthentication();
 }
