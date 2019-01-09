@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2567d52c_52f1bfa2",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-01-09T12:02:04Z",
+      "side": 1,
+      "message": "We should make this behavior default, we do not need switch to turn it on. Please remove this switch.",
+      "revId": "278ae10d5bfd0de9823c9c747ece605a54b272a9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
