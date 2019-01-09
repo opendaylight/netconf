@@ -64,12 +64,5 @@
       <type>xml</type>
       <classifier>features</classifier>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>odl-restconf-nb-rfc8040-all</artifactId>
-      <version>${project.version}</version>
-      <type>xml</type>
-      <classifier>features</classifier>
-    </dependency>
   </dependencies>
 </project>
