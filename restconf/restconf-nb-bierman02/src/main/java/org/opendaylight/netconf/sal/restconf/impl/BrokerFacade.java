@@ -26,7 +26,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.core.Response.Status;
+import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
@@ -87,6 +91,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 @SuppressWarnings("checkstyle:FinalClass")
 public class BrokerFacade implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(BrokerFacade.class);
@@ -97,20 +102,30 @@ public class BrokerFacade implements Closeable {
     private final DOMNotificationService domNotification;
     private final ControllerContext controllerContext;
 
-    private BrokerFacade(final DOMRpcService rpcService, final DOMDataBroker domDataBroker,
-            final DOMNotificationService domNotification, final ControllerContext controllerContext) {
+    @Inject
+    public BrokerFacade(@Reference DOMRpcService rpcService, final DOMDataBroker domDataBroker,
+            @Reference DOMNotificationService domNotification, final ControllerContext controllerContext) {
         this.rpcService = Objects.requireNonNull(rpcService);
         this.domDataBroker = Objects.requireNonNull(domDataBroker);
         this.domNotification = Objects.requireNonNull(domNotification);
         this.controllerContext = Objects.requireNonNull(controllerContext);
     }
 
+    /**
+     * Factory method.
+     *
+     * @deprecated Just use
+     *             {@link #BrokerFacade(DOMRpcService, DOMDataBroker, DOMNotificationService, ControllerContext)}
+     *             constructor instead.
+     */
+    @Deprecated
     public static BrokerFacade newInstance(final DOMRpcService rpcService, final DOMDataBroker domDataBroker,
             final DOMNotificationService domNotification, final ControllerContext controllerContext) {
         return new BrokerFacade(rpcService, domDataBroker, domNotification, controllerContext);
     }
 
     @Override
+    @PreDestroy
     public void close() {
     }
 

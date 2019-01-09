@@ -42,6 +42,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -116,6 +118,7 @@ import org.opendaylight.yangtools.yang.model.util.SimpleSchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 public final class RestconfImpl implements RestconfService {
     /**
      * Notifications are served on port 8181.
@@ -175,11 +178,18 @@ public final class RestconfImpl implements RestconfService {
 
     private final ControllerContext controllerContext;
 
-    private RestconfImpl(final BrokerFacade broker, final ControllerContext controllerContext) {
+    @Inject
+    public RestconfImpl(final BrokerFacade broker, final ControllerContext controllerContext) {
         this.broker = broker;
         this.controllerContext = controllerContext;
     }
 
+    /**
+     * Factory method.
+     *
+     * @deprecated Just use {@link #RestconfImpl(BrokerFacade, ControllerContext)} constructor instead.
+     */
+    @Deprecated
     public static RestconfImpl newInstance(final BrokerFacade broker, final ControllerContext controllerContext) {
         return new RestconfImpl(broker, controllerContext);
     }

@@ -34,13 +34,8 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <reference id="schemaService" interface="org.opendaylight.mdsal.dom.api.DOMSchemaService"/>
-  <reference id="domRpcService" interface="org.opendaylight.mdsal.dom.api.DOMRpcService"/>
-  <reference id="domMountPointService" interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"/>
-  <reference id="domNotificationService" interface="org.opendaylight.mdsal.dom.api.DOMNotificationService"/>
-  <reference id="domDataBroker" interface="org.opendaylight.mdsal.dom.api.DOMDataBroker"
+  <reference id="dOMDataBroker" interface="org.opendaylight.mdsal.dom.api.DOMDataBroker"
           ext:filter="(type=@{databroker-service-type})"/>
-  <reference id="domSchemaService" interface="org.opendaylight.mdsal.dom.api.DOMSchemaService"/>
 
   <bean id="webSocketPort" class="org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber">
     <argument value="${websocket-port}"/>
@@ -50,76 +45,10 @@
     <argument value="${websocket-address}"/>
   </bean>
 
-  <bean id="controllerContext" class="org.opendaylight.netconf.sal.restconf.impl.ControllerContext"
-      factory-method="newInstance" destroy-method="close">
-    <argument ref="schemaService"/>
-    <argument ref="domMountPointService"/>
-    <argument ref="domSchemaService"/>
-  </bean>
-
-  <bean id="brokerFacade" class="org.opendaylight.netconf.sal.restconf.impl.BrokerFacade"
-      factory-method="newInstance" destroy-method="close">
-    <argument ref="domRpcService"/>
-    <argument ref="domDataBroker"/>
-    <argument ref="domNotificationService"/>
-    <argument ref="controllerContext"/>
-  </bean>
-
-  <bean id="restconfImpl" class="org.opendaylight.netconf.sal.restconf.impl.RestconfImpl"
-      factory-method="newInstance">
-    <argument ref="brokerFacade"/>
-    <argument ref="controllerContext"/>
-  </bean>
-
-  <bean id="statsServiceWrapper" class="org.opendaylight.netconf.sal.restconf.impl.StatisticsRestconfServiceWrapper"
-      factory-method="newInstance">
-    <argument ref="restconfImpl"/>
-  </bean>
-
   <bean id="restconfProviderDraft02" class="org.opendaylight.netconf.sal.restconf.impl.RestconfProviderImpl"
           init-method="start" destroy-method="close">
-    <argument ref="statsServiceWrapper"/>
+    <argument ref="statisticsRestconfServiceWrapper"/>
     <argument ref="webSocketAddress"/>
     <argument ref="webSocketPort"/>
   </bean>
-
-  <bean id="restconfApplication" class="org.opendaylight.netconf.sal.rest.impl.RestconfApplication">
-    <argument ref="controllerContext"/>
-    <argument ref="statsServiceWrapper"/>
-  </bean>
-
-  <!-- JSONRestconfService -->
-  <bean id="jsonRestconfServiceDraft02"
-      class="org.opendaylight.netconf.sal.restconf.impl.JSONRestconfServiceImpl"
-      destroy-method="close">
-    <argument ref="controllerContext"/>
-    <argument ref="restconfImpl"/>
-  </bean>
-
-  <service ref="jsonRestconfServiceDraft02" odl:type="default"
-      interface="org.opendaylight.netconf.sal.restconf.api.JSONRestconfService" />
-
-  <!-- Bierman02WebRegistrar -->
-
-  <reference id="customFilterAdapterConfig"
-      interface="org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration"/>
-
-  <reference id="webServer" interface="org.opendaylight.aaa.web.WebServer" />
-
-  <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer" />
-
-  <reference id="servletSupport" interface="org.opendaylight.aaa.web.servlet.ServletSupport" />
-
-  <bean id="webRegistrar" class="org.opendaylight.netconf.sal.restconf.web.Bierman02WebRegistrarImpl"
-          destroy-method="close">
-    <argument ref="webServer"/>
-    <argument ref="webContextSecurer"/>
-    <argument ref="servletSupport"/>
-    <argument ref="restconfApplication"/>
-    <argument ref="customFilterAdapterConfig"/>
-  </bean>
-
-  <service ref="webRegistrar"
-      interface="org.opendaylight.netconf.sal.restconf.web.Bierman02WebRegistrar" />
-
 </blueprint>

@@ -25,6 +25,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 
 public class RestconfProviderImpl extends AbstractMXBean
         implements AutoCloseable, RestConnector, RestConnectorRuntimeMXBean {
+
     private final IpAddress websocketAddress;
     private final PortNumber websocketPort;
     private final StatisticsRestconfServiceWrapper stats;

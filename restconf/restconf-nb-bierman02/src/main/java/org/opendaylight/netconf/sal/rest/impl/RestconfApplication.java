@@ -10,6 +10,8 @@ package org.opendaylight.netconf.sal.rest.impl;
 import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.core.Application;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYangBodyWriter;
 import org.opendaylight.netconf.md.sal.rest.schema.SchemaExportContentYinBodyWriter;
@@ -17,10 +19,13 @@ import org.opendaylight.netconf.md.sal.rest.schema.SchemaRetrievalServiceImpl;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.StatisticsRestconfServiceWrapper;
 
+@Singleton
 public class RestconfApplication extends Application {
+
     private final ControllerContext controllerContext;
     private final StatisticsRestconfServiceWrapper statsServiceWrapper;
 
+    @Inject
     public RestconfApplication(ControllerContext controllerContext,
             StatisticsRestconfServiceWrapper statsServiceWrapper) {
         this.controllerContext = controllerContext;

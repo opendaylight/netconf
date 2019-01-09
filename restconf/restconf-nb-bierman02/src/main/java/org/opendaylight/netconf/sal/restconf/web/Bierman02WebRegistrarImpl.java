@@ -8,8 +8,13 @@
 package org.opendaylight.netconf.sal.restconf.web;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
+import org.apache.aries.blueprint.annotation.service.Reference;
+import org.apache.aries.blueprint.annotation.service.Service;
 import org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration;
 import org.opendaylight.aaa.filterchain.filters.CustomFilterAdapter;
 import org.opendaylight.aaa.web.FilterDetails;
@@ -20,6 +25,7 @@ import org.opendaylight.aaa.web.WebContextRegistration;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
+import org.opendaylight.netconf.sal.rest.impl.RestconfApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +34,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Pantelis
  */
+@Singleton
+@Service(classes = Bierman02WebRegistrar.class)
 public class Bierman02WebRegistrarImpl implements Bierman02WebRegistrar {
     private static final Logger LOG = LoggerFactory.getLogger(Bierman02WebRegistrarImpl.class);
 
@@ -39,9 +47,10 @@ public class Bierman02WebRegistrarImpl implements Bierman02WebRegistrar {
     private volatile WebContextRegistration registraton;
     private final AtomicBoolean registered = new AtomicBoolean(false);
 
-    public Bierman02WebRegistrarImpl(WebServer webServer,  WebContextSecurer webContextSecurer,
-            ServletSupport servletSupport, Application webApp,
-            CustomFilterAdapterConfiguration customFilterAdapterConfig) {
+    @Inject
+    public Bierman02WebRegistrarImpl(@Reference WebServer webServer, @Reference WebContextSecurer webContextSecurer,
+            @Reference ServletSupport servletSupport, RestconfApplication webApp,
+            @Reference CustomFilterAdapterConfiguration customFilterAdapterConfig) {
         this.webServer = webServer;
         this.webContextSecurer = webContextSecurer;
         this.servletSupport = servletSupport;
@@ -49,6 +58,7 @@ public class Bierman02WebRegistrarImpl implements Bierman02WebRegistrar {
         this.customFilterAdapterConfig = customFilterAdapterConfig;
     }
 
+    @PreDestroy
     public void close() {
         if (registered.compareAndSet(true, false)) {
             if (registraton != null) {
@@ -73,7 +83,7 @@ public class Bierman02WebRegistrarImpl implements Bierman02WebRegistrar {
             return;
         }
 
-        WebContextBuilder webContextBuilder = WebContext.builder().contextPath("restconf").supportsSessions(true)
+        WebContextBuilder webContextBuilder = WebContext.builder().contextPath("/restconf").supportsSessions(true)
                 .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
                     .addUrlPattern("/*").build())
 
