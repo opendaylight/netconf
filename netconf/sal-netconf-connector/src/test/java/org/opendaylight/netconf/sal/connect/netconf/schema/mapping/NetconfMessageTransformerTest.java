@@ -35,6 +35,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -399,7 +400,8 @@ public class NetconfMessageTransformerTest {
         QName reset = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "reset");
         QName start = QName.create(reset, "start");
         QName open = QName.create(start, "open");
-        Set<QName> qnames = new HashSet<>(Arrays.asList(reset, start, open));
+        QName enable = QName.create(open, "enable");
+        Set<QName> qnames = new HashSet<>(Arrays.asList(reset, start, open, enable));
         Set<ActionDefinition> actions = actionNetconfMessageTransformer.getActions();
         assertTrue(!actions.isEmpty());
         for (ActionDefinition actionDefinition : actions) {
@@ -414,9 +416,9 @@ public class NetconfMessageTransformerTest {
         QName qname = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "server");
         QName nameQname = QName.create(qname, "name");
         QName actionResetQName = QName.create(qname, "reset");
-
-        Set<PathArgument> nodeIdentifiers =
-                Collections.singleton(new NodeIdentifierWithPredicates(qname, nameQname, "test"));
+        List<PathArgument> nodeIdentifiers = new ArrayList<>();
+        nodeIdentifiers.add(new NodeIdentifier(qname));
+        nodeIdentifiers.add(new NodeIdentifierWithPredicates(qname, nameQname, "test"));
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
         ContainerNode data = initInputAction(QName.create(qname, "reset-at"), "now");
@@ -443,7 +445,7 @@ public class NetconfMessageTransformerTest {
         QName qname = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "device");
         QName actionStartQName = QName.create(qname, "start");
 
-        Set<PathArgument> nodeIdentifiers = Collections.singleton(NodeIdentifier.create(qname));
+        List<PathArgument> nodeIdentifiers = Collections.singletonList(NodeIdentifier.create(qname));
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
         NormalizedNode<?, ?> payload = initInputAction(QName.create(qname, "start-at"), "now");
@@ -464,7 +466,7 @@ public class NetconfMessageTransformerTest {
         QName boxInQName = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "box-in");
         QName actionOpenQName = QName.create(boxOutQName, "open");
 
-        Set<PathArgument> nodeIdentifiers = new HashSet<>();
+        List<PathArgument> nodeIdentifiers = new ArrayList<>();
         nodeIdentifiers.add(NodeIdentifier.create(boxOutQName));
         nodeIdentifiers.add(NodeIdentifier.create(boxInQName));
 
@@ -484,6 +486,42 @@ public class NetconfMessageTransformerTest {
 
         Node action = childBoxIn.getFirstChild();
         checkNode(action, null, actionOpenQName.getLocalName(), null);
+    }
+
+    @Test
+    public void toActionRequestListInContainerTest() {
+        QName qnameDevice = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "device");
+        QName qnameInterface = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "interface");
+        QName nameQname = QName.create(qnameInterface, "name");
+        QName actionEnableQName = QName.create(qnameInterface, "enable");
+
+        List<PathArgument> nodeIdentifiers = new ArrayList<>();
+        nodeIdentifiers.add(NodeIdentifier.create(qnameDevice));
+        nodeIdentifiers.add(NodeIdentifier.create(qnameInterface));
+        nodeIdentifiers.add(new NodeIdentifierWithPredicates(qnameInterface, nameQname, "test"));
+
+        DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
+
+        NormalizedNode<?, ?> payload = initEmptyInputAction(qnameInterface);
+        NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
+                SchemaPath.create(true, actionEnableQName), domDataTreeIdentifier, payload);
+
+        Node childAction = checkBasePartOfActionRequest(actionRequest);
+
+        Node childDevice = childAction.getFirstChild();
+        checkNode(childDevice, "device", "device", qnameDevice.getNamespace().toString());
+
+        Node childInterface = childDevice.getFirstChild();
+        checkNode(childInterface, "interface", "interface", qnameInterface.getNamespace().toString());
+
+        Node childName = childInterface.getFirstChild();
+        checkNode(childName, "name", "name", nameQname.getNamespace().toString());
+
+        Node childTest = childName.getFirstChild();
+        assertEquals(childTest.getNodeValue(), "test");
+
+        Node action = childInterface.getLastChild();
+        checkNode(action, null, actionEnableQName.getLocalName(), null);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -532,7 +570,7 @@ public class NetconfMessageTransformerTest {
         return childAction;
     }
 
-    private static DOMDataTreeIdentifier prepareDataTreeId(final Set<PathArgument> nodeIdentifiers) {
+    private static DOMDataTreeIdentifier prepareDataTreeId(final List<PathArgument> nodeIdentifiers) {
         YangInstanceIdentifier yangInstanceIdentifier =
                 YangInstanceIdentifier.builder().append(nodeIdentifiers).build();
         DOMDataTreeIdentifier domDataTreeIdentifier =
@@ -548,6 +586,11 @@ public class NetconfMessageTransformerTest {
         ContainerNode data = ImmutableContainerNodeBuilder.create().withNodeIdentifier(NodeIdentifier.create(
                 QName.create(qname, "input"))).withChild(build).build();
         return data;
+    }
+
+    private static ContainerNode initEmptyInputAction(final QName qname) {
+        return ImmutableContainerNodeBuilder.create().withNodeIdentifier(NodeIdentifier.create(
+                QName.create(qname, "input"))).build();
     }
 
     private static void checkNode(final Node childServer, final String expectedLocalName, final String expectedNodeName,
