@@ -50,10 +50,10 @@ public class DummyMonitoringService implements NetconfMonitoringService {
                     .setIdentifier(capability.getModuleName().get())
                     .setNamespace(new Uri(capability.getModuleNamespace().get()))
                     .setFormat(Yang.class)
-                    .setVersion(capability.getRevision().get())
+                    .setVersion(capability.getRevision().or(""))
                     .setLocation(Collections.singletonList(new Location(Enumeration.NETCONF)))
                     .withKey(new SchemaKey(Yang.class, capability.getModuleName().get(),
-                        capability.getRevision().get()))
+                        capability.getRevision().or("")))
                     .build();
         }
     };
