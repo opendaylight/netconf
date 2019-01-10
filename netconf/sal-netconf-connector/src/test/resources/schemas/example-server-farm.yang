@@ -40,6 +40,15 @@ module example-server-farm {
         }
       }
     }
+
+    list interface {
+      key name;
+      leaf name {
+        type string;
+      }
+      action enable {
+      }
+    }
   }
 
   container box-out {
