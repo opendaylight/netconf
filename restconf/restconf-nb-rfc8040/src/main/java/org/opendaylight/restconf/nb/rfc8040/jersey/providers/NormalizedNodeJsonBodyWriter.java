@@ -161,8 +161,17 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         } else {
             initialNs = null;
         }
-        final NormalizedNodeStreamWriter streamWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(
-                codecs, path, initialNs, jsonWriter);
+
+        final NormalizedNodeStreamWriter streamWriter;
+        if (depth == null || depth == 0) {
+            // if were at the top level element we need to prepend the module name
+            streamWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(
+                    codecs, path, null, jsonWriter);
+        } else {
+            streamWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(
+                    codecs, path, initialNs, jsonWriter);
+        }
+
         return ParameterAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth, fields);
     }
 
