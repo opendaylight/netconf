@@ -316,7 +316,11 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         Preconditions.checkNotNull(actionDefinition, "Action does not exist: %s", action);
         ContainerNode normalizedNode = (ContainerNode) parseResult(message, actionDefinition);
 
-        return new SimpleDOMActionResult(normalizedNode, Collections.<RpcError>emptyList());
+        if (normalizedNode == null) {
+            return new SimpleDOMActionResult(Collections.<RpcError>emptyList());
+        } else {
+            return new SimpleDOMActionResult(normalizedNode, Collections.<RpcError>emptyList());
+        }
     }
 
     private NormalizedNode<?, ?> parseResult(final NetconfMessage message,
