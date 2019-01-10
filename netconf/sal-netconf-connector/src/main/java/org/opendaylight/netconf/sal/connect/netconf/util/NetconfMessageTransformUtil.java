@@ -62,6 +62,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -389,8 +391,8 @@ public final class NetconfMessageTransformUtil {
         return new DOMResult(elementNS);
     }
 
-    public static DOMResult prepareDomResultForActionRequest(DOMDataTreeIdentifier domDataTreeIdentifier,
-            final SchemaPath actionSchemaPath, final MessageCounter counter, String action) {
+    public static DOMResult prepareDomResultForActionRequest(final DataSchemaContextTree dataSchemaContextTree,
+            final DOMDataTreeIdentifier domDataTreeIdentifier, final MessageCounter counter, String action) {
         final Document document = XmlUtil.newDocument();
         final Element rpcNS =
                 document.createElementNS(NETCONF_RPC_QNAME.getNamespace().toString(), NETCONF_RPC_QNAME.getLocalName());
@@ -398,8 +400,8 @@ public final class NetconfMessageTransformUtil {
         rpcNS.setAttribute(MESSAGE_ID_ATTR, counter.getNewMessageId(MESSAGE_ID_PREFIX));
 
         final Element actionNS = document.createElementNS(NETCONF_ACTION_NAMESPACE.toString(), NETCONF_ACTION);
-
-        final Element actionData = prepareActionData(actionNS,
+        final DataSchemaContextNode<?> rootSchemaContextNode = dataSchemaContextTree.getRoot();
+        final Element actionData = prepareActionData(rootSchemaContextNode, actionNS,
                 domDataTreeIdentifier.getRootIdentifier().getPathArguments().iterator(), document);
 
         Element specificActionElement = document.createElement(action);
@@ -409,10 +411,18 @@ public final class NetconfMessageTransformUtil {
         return new DOMResult(specificActionElement);
     }
 
-    private static Element prepareActionData(Element actionNS, Iterator<PathArgument> iterator, Document document) {
+    private static Element prepareActionData(final DataSchemaContextNode<?> currentParentSchemaNode,
+            final Element actionNS, final Iterator<PathArgument> iterator, final Document document) {
         if (iterator.hasNext()) {
-            PathArgument next = iterator.next();
+            final PathArgument next = iterator.next();
             final QName actualNS = next.getNodeType();
+
+            DataSchemaContextNode<?> current = currentParentSchemaNode.getChild(next);
+            Preconditions.checkArgument(current != null, "Invalid input: schema for argument %s not found", next);
+
+            if (current.isMixin()) {
+                return prepareActionData(current, actionNS, iterator, document);
+            }
 
             final Element actualElement = document.createElementNS(actualNS.getNamespace().toString(),
                     actualNS.getLocalName());
@@ -428,7 +438,7 @@ public final class NetconfMessageTransformUtil {
                 }
             }
             actionNS.appendChild(actualElement);
-            return prepareActionData(actualElement, iterator, document);
+            return prepareActionData(current, actualElement, iterator, document);
         } else {
             return actionNS;
         }
