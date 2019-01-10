@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.monitoring.xml.model;
+package org.opendaylight.netconf.test.tool.monitoring;
 
 import com.google.common.collect.Collections2;
 import java.util.Collection;
@@ -13,7 +13,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
-import org.opendaylight.netconf.monitoring.MonitoringConstants;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 

@@ -5,7 +5,8 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.monitoring;
+
+package org.opendaylight.controller.config.yang.netconf.mdsal.monitoring;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,16 +22,16 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class GetSchema extends AbstractSingletonNetconfOperation {
-    public static final String GET_SCHEMA = "get-schema";
-    public static final String IDENTIFIER = "identifier";
-    public static final String VERSION = "version";
+public final class GetSchema extends AbstractSingletonNetconfOperation {
+    private static final String GET_SCHEMA = "get-schema";
+    private static final String IDENTIFIER = "identifier";
+    private static final String VERSION = "version";
 
     private static final Logger LOG = LoggerFactory.getLogger(GetSchema.class);
     private final NetconfMonitoringService cap;
 
-    public GetSchema(final NetconfMonitoringService cap) {
-        super(MonitoringConstants.MODULE_NAME);
+    public GetSchema(final String netconfSessionIdForReporting, final NetconfMonitoringService cap) {
+        super(netconfSessionIdForReporting);
         this.cap = cap;
     }
 
@@ -79,7 +80,7 @@ public class GetSchema extends AbstractSingletonNetconfOperation {
             getSchemaElement.checkName(GET_SCHEMA);
             getSchemaElement.checkNamespace(XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_YANG_IETF_NETCONF_MONITORING);
 
-            XmlElement identifierElement = null;
+            final XmlElement identifierElement;
             try {
                 identifierElement = getSchemaElement.getOnlyChildElementWithSameNamespace(IDENTIFIER);
             } catch (final DocumentedException e) {

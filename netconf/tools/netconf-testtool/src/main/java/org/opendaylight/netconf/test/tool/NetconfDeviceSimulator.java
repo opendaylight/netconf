@@ -49,13 +49,13 @@ import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
 import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
-import org.opendaylight.netconf.monitoring.osgi.NetconfMonitoringActivator;
-import org.opendaylight.netconf.monitoring.osgi.NetconfMonitoringOperationService;
 import org.opendaylight.netconf.ssh.SshProxyServer;
 import org.opendaylight.netconf.ssh.SshProxyServerConfiguration;
 import org.opendaylight.netconf.ssh.SshProxyServerConfigurationBuilder;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.customrpc.SettableOperationProvider;
+import org.opendaylight.netconf.test.tool.monitoring.NetconfMonitoringOperationService;
+import org.opendaylight.netconf.test.tool.monitoring.NetconfMonitoringOperationServiceFactory;
 import org.opendaylight.netconf.test.tool.operations.DefaultOperationsCreator;
 import org.opendaylight.netconf.test.tool.operations.OperationsProvider;
 import org.opendaylight.netconf.test.tool.rpchandler.SettableOperationRpcProvider;
@@ -158,8 +158,8 @@ public class NetconfDeviceSimulator implements Closeable {
         }
 
 
-        final NetconfMonitoringActivator.NetconfMonitoringOperationServiceFactory monitoringService =
-                new NetconfMonitoringActivator.NetconfMonitoringOperationServiceFactory(
+        final NetconfMonitoringOperationServiceFactory monitoringService =
+                new NetconfMonitoringOperationServiceFactory(
                         new NetconfMonitoringOperationService(monitoringService1));
         aggregatedNetconfOperationServiceFactory.onAddNetconfOperationServiceFactory(operationProvider);
         aggregatedNetconfOperationServiceFactory.onAddNetconfOperationServiceFactory(monitoringService);
@@ -195,7 +195,7 @@ public class NetconfDeviceSimulator implements Closeable {
         final AsynchronousChannelGroup group;
         try {
             group = AsynchronousChannelGroup.withThreadPool(nioExecutor);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalStateException("Failed to create group", e);
         }
 
@@ -330,7 +330,7 @@ public class NetconfDeviceSimulator implements Closeable {
         }
 
         configuration.getDefaultYangResources().forEach(r -> {
-            SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create(r.getModuleName(),
+            final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create(r.getModuleName(),
                 Revision.ofNullable(r.getRevision()));
             registerSource(consumer, r.getResourcePath(), sourceIdentifier);
         });
@@ -363,7 +363,7 @@ public class NetconfDeviceSimulator implements Closeable {
                 consumer.getSchemaSource(moduleSourceIdentifier, YangTextSchemaSource.class).get().read());
             capabilities.add(new YangModuleCapability(module, moduleContent));
             //IOException would be thrown in creating SchemaContext already
-        } catch (ExecutionException | InterruptedException | IOException e) {
+        } catch (final ExecutionException | InterruptedException | IOException e) {
             throw new RuntimeException("Cannot retrieve schema source for module "
                 + moduleSourceIdentifier.toString() + " from schema repository", e);
         }
@@ -398,7 +398,7 @@ public class NetconfDeviceSimulator implements Closeable {
         for (final SshProxyServer sshWrapper : sshWrappers) {
             try {
                 sshWrapper.close();
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 LOG.debug("Wrapper {} failed to close", sshWrapper, e);
             }
         }
