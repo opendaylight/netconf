@@ -557,6 +557,8 @@ public class JSONRestconfServiceRfc8040ImplTest {
         final String jsonResp = optionalResp.get();
 
         assertNotNull("Returned null response", jsonResp);
+        assertThat("Top level module has incorrect format", jsonResp, containsString("\"ietf-interfaces:interface\""));
+        assertThat("Missing \"name\"", jsonResp, containsString("\"name\":\"eth0\""));
         assertThat("Missing \"name\"", jsonResp, containsString("\"name\":\"eth0\""));
         assertThat("Missing \"type\"", jsonResp, containsString("\"type\":\"ethernetCsmacd\""));
         assertThat("Missing \"enabled\"", jsonResp, containsString("\"enabled\":true"));

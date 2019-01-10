@@ -151,19 +151,22 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         final SchemaNode schema = context.getSchemaNode();
         final JSONCodecFactory codecs = getCodecFactory(context);
 
-        final URI initialNs;
-        if (schema instanceof DataSchemaNode
-                && !((DataSchemaNode)schema).isAugmenting()
-                && !(schema instanceof SchemaContext)) {
-            initialNs = schema.getQName().getNamespace();
-        } else if (schema instanceof RpcDefinition) {
-            initialNs = schema.getQName().getNamespace();
-        } else {
-            initialNs = null;
-        }
         final NormalizedNodeStreamWriter streamWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(
-                codecs, path, initialNs, jsonWriter);
+                codecs, path, initialNamespaceFor(schema, depth), jsonWriter);
+
         return ParameterAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth, fields);
+    }
+
+    private static URI initialNamespaceFor(final SchemaNode schema, final Integer depth) {
+        if (schema instanceof RpcDefinition) {
+            return schema.getQName().getNamespace();
+        }
+        // For top-level elements we always want to use namespace prefix, hence use a null initial namespace
+        if (depth == null || depth == 0 || schema instanceof SchemaContext) {
+            return null;
+        }
+        return schema instanceof DataSchemaNode && !((DataSchemaNode)schema).isAugmenting()
+                ? schema.getQName().getNamespace() : null;
     }
 
     private static JsonWriter createJsonWriter(final OutputStream entityStream, final boolean prettyPrint) {
