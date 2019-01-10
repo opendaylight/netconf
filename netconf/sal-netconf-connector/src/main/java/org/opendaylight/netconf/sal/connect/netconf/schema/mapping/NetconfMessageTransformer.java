@@ -53,6 +53,7 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -225,7 +226,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         if (actionDefinition.getInput().getChildNodes().isEmpty()) {
             return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForActionRequest(
-                    domDataTreeIdentifier, action, counter, actionDefinition.getQName().getLocalName())
+                    DataSchemaContextTree.from(schemaContext), domDataTreeIdentifier, action, counter,
+                    actionDefinition.getQName().getLocalName())
                     .getNode().getOwnerDocument());
         }
 
@@ -237,7 +239,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         // Set the path to the input of rpc for the node stream writer
         action = action.createChild(QName.create(action.getLastComponent(), "input").intern());
         final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForActionRequest(
-                domDataTreeIdentifier, action, counter, actionDefinition.getQName().getLocalName());
+                DataSchemaContextTree.from(schemaContext), domDataTreeIdentifier, action, counter,
+                actionDefinition.getQName().getLocalName());
 
         try {
             NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result,
