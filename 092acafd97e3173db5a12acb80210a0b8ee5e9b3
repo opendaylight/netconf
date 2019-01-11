@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "18488569_a0a025e0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-01-11T11:02:24Z",
+      "side": 1,
+      "message": "Line in commit message should be wrapped at 72 characters. Please adjust your commit message accordingly.",
+      "revId": "092acafd97e3173db5a12acb80210a0b8ee5e9b3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
