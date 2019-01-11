@@ -127,7 +127,8 @@ class FakeContainerSchemaNode implements ContainerSchemaNode {
 
     @Override
     public boolean isPresenceContainer() {
-        throw new UnsupportedOperationException("Not supported.");
+        // since this is a special case container used only for operations this is not a presence container.
+        return false;
     }
 
     @Override
