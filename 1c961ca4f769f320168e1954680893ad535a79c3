@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "113e0da1_e2e92a5b",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/NormalizedNodeJsonBodyWriter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-01-11T09:41:05Z",
+      "side": 1,
+      "message": "Will this not break RPCs? I would prefer this check being done in the above block, which looks like it could be moved to a separate method",
+      "range": {
+        "startLine": 166,
+        "startChar": 8,
+        "endLine": 166,
+        "endChar": 42
+      },
+      "revId": "1c961ca4f769f320168e1954680893ad535a79c3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
