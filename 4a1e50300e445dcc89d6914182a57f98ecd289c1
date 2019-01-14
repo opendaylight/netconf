@@ -16,6 +16,24 @@
       "revId": "4a1e50300e445dcc89d6914182a57f98ecd289c1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6ca00daa_f4f05b18",
+        "filename": "netconf/shaded-exificient-jar/check_jar.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-01-14T11:59:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fcfd64fd_bf314030",
+      "revId": "4a1e50300e445dcc89d6914182a57f98ecd289c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
