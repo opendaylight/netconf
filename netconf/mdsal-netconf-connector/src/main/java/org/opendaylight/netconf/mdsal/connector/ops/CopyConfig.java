@@ -34,6 +34,7 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
+import org.opendaylight.yangtools.util.ClassLoaderUtils;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -57,8 +58,10 @@ public final class CopyConfig extends AbstractEdit {
     private static final XMLOutputFactory XML_OUTPUT_FACTORY;
 
     static {
-        XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
-        XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
+        XMLOutputFactory factory = ClassLoaderUtils.getWithClassLoader(CopyConfig.class.getClassLoader(),
+            XMLOutputFactory::newFactory);
+        factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
+        XML_OUTPUT_FACTORY = factory;
     }
 
     // Top-level "data" node without child nodes
