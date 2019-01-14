@@ -34,6 +34,7 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
+import org.opendaylight.yangtools.util.ClassLoaderUtils;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -47,18 +48,25 @@ import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public final class CopyConfig extends AbstractEdit {
+    private static final Logger LOG = LoggerFactory.getLogger(CopyConfig.class);
     private static final String OPERATION_NAME = "copy-config";
     private static final String SOURCE_KEY = "source";
     private static final XMLOutputFactory XML_OUTPUT_FACTORY;
 
     static {
-        XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
-        XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, true);
+        XMLOutputFactory factory = ClassLoaderUtils.getWithClassLoader(CopyConfig.class.getClassLoader(),
+            XMLOutputFactory::newFactory);
+        factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
+        LOG.info("Initializing XML factory initialized to class {} instance {}", factory.getClass(), factory,
+            new Throwable());
+        XML_OUTPUT_FACTORY = factory;
     }
 
     // Top-level "data" node without child nodes

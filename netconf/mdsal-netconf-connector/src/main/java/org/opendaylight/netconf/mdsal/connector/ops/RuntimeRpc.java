@@ -34,6 +34,7 @@ import org.opendaylight.netconf.mapping.api.HandlingPriority;
 import org.opendaylight.netconf.mapping.api.NetconfOperationChainedExecution;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
+import org.opendaylight.yangtools.util.ClassLoaderUtils;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -59,11 +60,15 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
     private static final Logger LOG = LoggerFactory.getLogger(RuntimeRpc.class);
 
-    private static final XMLOutputFactory XML_OUTPUT_FACTORY;
+    protected static final XMLOutputFactory XML_OUTPUT_FACTORY;
 
     static {
-        XML_OUTPUT_FACTORY = XMLOutputFactory.newFactory();
-        XML_OUTPUT_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
+        XMLOutputFactory factory = ClassLoaderUtils.getWithClassLoader(RuntimeRpc.class.getClassLoader(),
+            XMLOutputFactory::newFactory);
+        factory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, Boolean.TRUE);
+        LOG.info("Initializing XML factory initialized to class {} instance {}", factory.getClass(), factory,
+            new Throwable());
+        XML_OUTPUT_FACTORY = factory;
     }
 
     private final CurrentSchemaContext schemaContext;
