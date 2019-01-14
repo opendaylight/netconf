@@ -18,6 +18,7 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.yangtools.util.ClassLoaderUtils;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -36,8 +37,10 @@ public final class NetconfUtil {
     public static final XMLOutputFactory XML_FACTORY;
 
     static {
-        XML_FACTORY = XMLOutputFactory.newFactory();
-        XML_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
+        XMLOutputFactory f = ClassLoaderUtils.getWithClassLoader(NetconfUtil.class.getClassLoader(),
+            XMLOutputFactory::newFactory);
+        f.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
+        XML_FACTORY = f;
     }
 
     private NetconfUtil() {}
