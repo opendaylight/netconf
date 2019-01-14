@@ -525,6 +525,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
 
         assertEquals("Output present", true, output.isPresent());
         assertNotNull("Returned null response", output.get());
+        assertThat("Output element is missing namespace", output.get(), containsString("\"toaster:output\""));
         assertThat("Missing \"textOut\"", output.get(), containsString("\"textOut\":\"foo\""));
 
         verify(mockRpcService).invokeRpc(eq(path), isNull());
