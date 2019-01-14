@@ -42,6 +42,7 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamW
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -113,7 +114,8 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
                     jsonWriter,
                     depth,
                     fields);
-            jsonWriter.name("output");
+            final Module module = context.getSchemaContext().findModule(data.getNodeType().getModule()).get();
+            jsonWriter.name(module.getName() + ":output");
             jsonWriter.beginObject();
             writeChildren(nnWriter, (ContainerNode) data);
             jsonWriter.endObject();
