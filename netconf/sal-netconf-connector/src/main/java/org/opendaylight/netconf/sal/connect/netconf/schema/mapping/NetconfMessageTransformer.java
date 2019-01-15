@@ -45,6 +45,7 @@ import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcError;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -168,22 +169,24 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     @Override
-    public NetconfMessage toRpcRequest(SchemaPath rpc, final NormalizedNode<?, ?> payload) {
+    public NetconfMessage toRpcRequest(final SchemaPath rpc, final NormalizedNode<?, ?> payload) {
         // In case no input for rpc is defined, we can simply construct the payload here
         final QName rpcQName = rpc.getLastComponent();
-        Map<QName, RpcDefinition> currentMappedRpcs = mappedRpcs;
 
         // Determine whether a base netconf operation is being invoked
         // and also check if the device exposed model for base netconf.
         // If no, use pre built base netconf operations model
         final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName);
+        final Map<QName, RpcDefinition> currentMappedRpcs;
         if (needToUseBaseCtx) {
             currentMappedRpcs = baseSchema.getMappedRpcs();
+        } else {
+            currentMappedRpcs = mappedRpcs;
         }
 
-        Preconditions.checkNotNull(currentMappedRpcs.get(rpcQName),
+        final RpcDefinition mappedRpc = Preconditions.checkNotNull(currentMappedRpcs.get(rpcQName),
                 "Unknown rpc %s, available rpcs: %s", rpcQName, currentMappedRpcs.keySet());
-        if (currentMappedRpcs.get(rpcQName).getInput().getChildNodes().isEmpty()) {
+        if (mappedRpc.getInput().getChildNodes().isEmpty()) {
             return new NetconfMessage(NetconfMessageTransformUtil
                     .prepareDomResultForRpcRequest(rpcQName, counter).getNode().getOwnerDocument());
         }
@@ -193,7 +196,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         Preconditions.checkArgument(payload instanceof ContainerNode,
                 "Transforming an rpc with input: %s, payload has to be a container, but was: %s", rpcQName, payload);
         // Set the path to the input of rpc for the node stream writer
-        rpc = rpc.createChild(QName.create(rpcQName, "input").intern());
+        final SchemaPath rpcInput = rpc.createChild(YangConstants.operationInputQName(rpcQName.getModule()));
         final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpcQName, counter);
 
         try {
@@ -201,9 +204,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             // use default pre build context with just the base model
             // This way operations like lock/unlock are supported even if the source for base model was not provided
             SchemaContext ctx = needToUseBaseCtx ? baseSchema.getSchemaContext() : schemaContext;
-            NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result, rpc, ctx);
+            NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result, rpcInput, ctx);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
-            throw new IllegalStateException("Unable to serialize " + rpc, e);
+            throw new IllegalStateException("Unable to serialize " + rpcInput, e);
         }
 
         final Document node = result.getNode().getOwnerDocument();

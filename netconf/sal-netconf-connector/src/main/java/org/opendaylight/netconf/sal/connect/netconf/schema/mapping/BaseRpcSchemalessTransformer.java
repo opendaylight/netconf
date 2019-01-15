@@ -23,6 +23,7 @@ import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -58,10 +59,10 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfM
         // In case no input for rpc is defined, we can simply construct the payload here
         final QName rpcQName = rpc.getLastComponent();
 
-        Preconditions.checkNotNull(MAPPED_RPCS.get(rpcQName), "Unknown rpc %s, available rpcs: %s",
-                rpcQName, MAPPED_RPCS.keySet());
+        final RpcDefinition mappedRpc = Preconditions.checkNotNull(MAPPED_RPCS.get(rpcQName),
+            "Unknown rpc %s, available rpcs: %s", rpcQName, MAPPED_RPCS.keySet());
         final DOMResult domResult = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpcQName, counter);
-        if (MAPPED_RPCS.get(rpcQName).getInput().getChildNodes().isEmpty()) {
+        if (mappedRpc.getInput().getChildNodes().isEmpty()) {
             return new NetconfMessage(domResult.getNode().getOwnerDocument());
         }
 
@@ -70,7 +71,7 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfM
                 "Transforming an rpc with input: %s, payload has to be a container, but was: %s", rpcQName, payload);
 
         // Set the path to the input of rpc for the payload stream writer
-        final SchemaPath inputPath = rpc.createChild(QName.create(rpcQName, "input").intern());
+        final SchemaPath inputPath = rpc.createChild(YangConstants.operationInputQName(rpcQName.getModule()));
         final DOMResult result = domResult;
 
         try {
