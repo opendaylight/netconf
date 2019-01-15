@@ -509,7 +509,7 @@ public final class ReadDataTransactionUtil {
     @Nonnull
     private static NormalizedNode<?, ?> mapNode(@Nonnull final NormalizedNode<?, ?> stateDataNode,
                                                          @Nonnull final NormalizedNode<?, ?> configDataNode) {
-        validPossibilityOfMergeNodes(stateDataNode, configDataNode);
+        validateNodeMerge(stateDataNode, configDataNode);
         if (configDataNode instanceof RpcDefinition) {
             return prepareRpcData(configDataNode, stateDataNode);
         } else {
@@ -518,19 +518,19 @@ public final class ReadDataTransactionUtil {
     }
 
     /**
-     * Valid of can be data merged together.
+     * Validates whether the two NormalizedNodes can be merged.
      *
      * @param stateDataNode
      *             data node of state data
      * @param configDataNode
      *             data node of config data
      */
-    private static void validPossibilityOfMergeNodes(@Nonnull final NormalizedNode<?, ?> stateDataNode,
-                                                     @Nonnull final NormalizedNode<?, ?> configDataNode) {
+    private static void validateNodeMerge(@Nonnull final NormalizedNode<?, ?> stateDataNode,
+                                          @Nonnull final NormalizedNode<?, ?> configDataNode) {
         final QNameModule moduleOfStateData = stateDataNode.getIdentifier().getNodeType().getModule();
         final QNameModule moduleOfConfigData = configDataNode.getIdentifier().getNodeType().getModule();
-        if (moduleOfStateData != moduleOfConfigData) {
-            throw new RestconfDocumentedException("It is not possible to merge ");
+        if (!moduleOfStateData.equals(moduleOfConfigData)) {
+            throw new RestconfDocumentedException("Unable to merge data from different modules.");
         }
     }
 
