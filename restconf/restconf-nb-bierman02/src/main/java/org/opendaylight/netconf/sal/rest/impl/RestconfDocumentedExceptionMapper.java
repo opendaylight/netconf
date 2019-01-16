@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.sal.rest.impl;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.gson.stream.JsonWriter;
 import java.io.ByteArrayOutputStream;
@@ -365,10 +364,9 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
     }
 
     private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,
-                                         final ContainerNode data)
-            throws IOException {
+                                         final ContainerNode data) throws IOException {
+        final QName name = SchemaContext.NAME;
         try {
-            final QName name = SchemaContext.NAME;
             xmlWriter.writeStartElement(name.getNamespace().toString(), name.getLocalName());
             for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
                 nnWriter.write(child);
@@ -377,7 +375,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
             xmlWriter.writeEndElement();
             xmlWriter.flush();
         } catch (final XMLStreamException e) {
-            Throwables.propagate(e);
+            throw new IOException("Failed to write elements", e);
         }
     }
 
