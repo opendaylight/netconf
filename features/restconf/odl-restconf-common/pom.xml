@@ -121,13 +121,6 @@
 
         <!-- TODO: Remove this when RESTCONF is converted to GSON -->
         <dependency>
-            <groupId>org.opendaylight.odlparent</groupId>
-            <artifactId>odl-jackson-2.9</artifactId>
-            <version>4.0.8</version>
-            <type>xml</type>
-            <classifier>features</classifier>
-        </dependency>
-        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
         </dependency>
