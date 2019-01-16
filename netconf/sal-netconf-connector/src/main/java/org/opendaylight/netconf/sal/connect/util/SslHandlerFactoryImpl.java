@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.topology;
+package org.opendaylight.netconf.sal.connect.util;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
@@ -26,11 +26,11 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.protocol.Specification;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.protocol.specification.TlsCase;
 
-final class SslHandlerFactoryImpl implements SslHandlerFactory {
+public final class SslHandlerFactoryImpl implements SslHandlerFactory {
     private final NetconfKeystoreAdapter keystoreAdapter;
     private final @Nullable Specification specification;
 
-    SslHandlerFactoryImpl(final NetconfKeystoreAdapter keystoreAdapter, final Specification specification) {
+    public SslHandlerFactoryImpl(final NetconfKeystoreAdapter keystoreAdapter, final Specification specification) {
         this.keystoreAdapter = requireNonNull(keystoreAdapter);
         this.specification = specification;
     }
