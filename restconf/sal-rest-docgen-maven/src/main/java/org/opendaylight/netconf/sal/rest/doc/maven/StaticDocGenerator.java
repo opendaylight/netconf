@@ -130,7 +130,7 @@ public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
     @Override
     public String createBasePathFromUriInfo(final UriInfo uriInfo) {
         if (uriInfo == null) {
-            return RESTCONF_CONTEXT_ROOT;
+            return DEFAULT_BASE_PATH;
         }
         return super.createBasePathFromUriInfo(uriInfo);
     }

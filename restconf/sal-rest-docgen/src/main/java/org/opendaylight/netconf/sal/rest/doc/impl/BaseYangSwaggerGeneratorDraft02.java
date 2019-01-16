@@ -16,15 +16,23 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
  * @author Thomas Pantelis
  */
 public abstract class BaseYangSwaggerGeneratorDraft02 extends BaseYangSwaggerGenerator {
-    protected static final String RESTCONF_CONTEXT_ROOT = "restconf";
 
-    protected BaseYangSwaggerGeneratorDraft02(Optional<DOMSchemaService> schemaService) {
+    protected static final String DEFAULT_BASE_PATH = "restconf";
+    private final String basePath;
+
+    protected BaseYangSwaggerGeneratorDraft02(final Optional<DOMSchemaService> schemaService) {
         super(schemaService);
+        this.basePath = DEFAULT_BASE_PATH;
+    }
+
+    protected BaseYangSwaggerGeneratorDraft02(final Optional<DOMSchemaService> schemaService, final String basePath) {
+        super(schemaService);
+        this.basePath = basePath;
     }
 
     @Override
     public String getDataStorePath(final String dataStore, final String context) {
-        return "/" + RESTCONF_CONTEXT_ROOT + "/" + dataStore + context;
+        return "/" + basePath + "/" + dataStore + context;
     }
 
     @Override

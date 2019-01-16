@@ -17,7 +17,11 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
  */
 public class ApiDocGeneratorDraftO2 extends BaseYangSwaggerGeneratorDraft02 {
 
-    public ApiDocGeneratorDraftO2(DOMSchemaService schemaService) {
+    public ApiDocGeneratorDraftO2(final DOMSchemaService schemaService) {
         super(Optional.of(Objects.requireNonNull(schemaService)));
+    }
+
+    public ApiDocGeneratorDraftO2(final DOMSchemaService schemaService, final String basePath) {
+        super(Optional.of(Objects.requireNonNull(schemaService)), basePath);
     }
 }
