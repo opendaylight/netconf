@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.sal.rest.impl;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Throwables;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -138,10 +137,9 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
     }
 
     private static void writeElements(final XMLStreamWriter xmlWriter, final RestconfNormalizedNodeWriter nnWriter,
-                               final ContainerNode data)
-            throws IOException {
+            final ContainerNode data) throws IOException {
+        final QName name = data.getNodeType();
         try {
-            final QName name = data.getNodeType();
             xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX, name.getLocalName(),
                     name.getNamespace().toString());
             xmlWriter.writeDefaultNamespace(name.getNamespace().toString());
@@ -152,7 +150,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             xmlWriter.writeEndElement();
             xmlWriter.flush();
         } catch (final XMLStreamException e) {
-            Throwables.propagate(e);
+            throw new IOException("Failed to write elements", e);
         }
     }
 }
