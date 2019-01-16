@@ -24,8 +24,20 @@
     <dependency>
       <groupId>com.github.mifmif</groupId>
       <artifactId>generex</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>dk.brics.automaton</groupId>
+          <artifactId>automaton</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
+    <dependency>
+      <groupId>dk.brics</groupId>
+      <artifactId>automaton</artifactId>
+      <version>1.12-1</version>
+    </dependency>
+
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
@@ -85,11 +97,6 @@
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>yang-data-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>dk.brics.automaton</groupId>
-      <artifactId>automaton</artifactId>
-      <version>1.11-8</version>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.aaa.web</groupId>
