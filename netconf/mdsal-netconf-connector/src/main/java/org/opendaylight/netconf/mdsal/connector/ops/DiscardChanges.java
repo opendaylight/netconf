@@ -15,7 +15,6 @@ import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.slf4j.Logger;
@@ -51,7 +50,7 @@ public class DiscardChanges extends AbstractSingletonNetconfOperation {
             throw new DocumentedException(e.getMessage(), e, ErrorType.APPLICATION, ErrorTag.OPERATION_FAILED,
                     ErrorSeverity.ERROR, errorInfo);
         }
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
+        return document.createElement(XmlNetconfConstants.OK);
     }
 
     @Override

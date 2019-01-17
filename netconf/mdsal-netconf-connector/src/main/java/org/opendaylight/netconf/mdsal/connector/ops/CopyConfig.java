@@ -31,7 +31,6 @@ import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -93,7 +92,7 @@ public final class CopyConfig extends AbstractEdit {
                 ErrorTag.BAD_ELEMENT,
                 ErrorSeverity.ERROR);
         }
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
+        return document.createElement(XmlNetconfConstants.OK);
     }
 
     private void copyToCandidate(final XmlElement operationElement)

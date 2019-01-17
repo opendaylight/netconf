@@ -12,7 +12,6 @@ import java.util.Collections;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.impl.NetconfServerSession;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.slf4j.Logger;
@@ -58,7 +57,7 @@ public class DefaultCloseSession extends AbstractSingletonNetconfOperation imple
                     DocumentedException.ErrorSeverity.ERROR, Collections.singletonMap(
                     DocumentedException.ErrorSeverity.ERROR.toString(), e.getMessage()));
         }
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
+        return document.createElement(XmlNetconfConstants.OK);
     }
 
     @Override

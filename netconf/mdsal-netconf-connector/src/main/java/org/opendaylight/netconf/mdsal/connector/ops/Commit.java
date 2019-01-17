@@ -10,7 +10,6 @@ package org.opendaylight.netconf.mdsal.connector.ops;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.slf4j.Logger;
@@ -40,7 +39,7 @@ public class Commit extends AbstractSingletonNetconfOperation {
         boolean commitStatus = transactionProvider.commitTransaction();
         LOG.trace("Commit completed successfully {}", commitStatus);
 
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
+        return document.createElement(XmlNetconfConstants.OK);
     }
 
     @Override
