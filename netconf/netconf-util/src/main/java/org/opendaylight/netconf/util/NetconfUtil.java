@@ -9,6 +9,7 @@ package org.opendaylight.netconf.util;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
@@ -49,6 +50,44 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public final class NetconfUtil {
+    /**
+     * Shim interface to handle differences around namespace handling between various XMLStreamWriter implementations.
+     * Specifically:
+     * <ul>
+     *   <li>OpenJDK DOM writer (com.sun.xml.internal.stream.writers.XMLDOMWriterImpl) throws
+     *       UnsupportedOperationException from its setNamespaceContext() method</li>
+     *   <li>Woodstox DOM writer (com.ctc.wstx.dom.WstxDOMWrappingWriter) works with namespace context, but treats
+     *       setPrefix() calls as hints -- which are not discoverable.</li>
+     * </ul>
+     *
+     * <p>
+     * Due to this we perform a quick test for behavior and decide the appropriate strategy.
+     */
+    @FunctionalInterface
+    private interface NamespaceSetter {
+        void initializeNamespace(final XMLStreamWriter writer) throws XMLStreamException;
+
+        static NamespaceSetter forFactory(final XMLOutputFactory xmlFactory) {
+            final String netconfNamespace = NETCONF_QNAME.getNamespace().toString();
+            final AnyXmlNamespaceContext namespaceContext = new AnyXmlNamespaceContext(ImmutableMap.of(
+                "op", netconfNamespace));
+
+            try {
+                final XMLStreamWriter testWriter = xmlFactory.createXMLStreamWriter(new DOMResult());
+                testWriter.setNamespaceContext(namespaceContext);
+            } catch (final UnsupportedOperationException e) {
+                // This happens with JDK's DOM writer, which we may be using
+                LOG.warn("Unable to set namespace context, falling back to setPrefix()", e);
+                return writer -> writer.setPrefix("op", netconfNamespace);
+            } catch (XMLStreamException e) {
+                throw new ExceptionInInitializerError(e);
+            }
+
+            // Success, we can use setNamespaceContext()
+            return writer -> writer.setNamespaceContext(namespaceContext);
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(NetconfUtil.class);
 
     // FIXME: document what exactly this QName means, as it is not referring to a tangible node nor the ietf-module.
@@ -60,6 +99,7 @@ public final class NetconfUtil {
         Revision.of("2011-06-01")), "netconf").intern();
     // FIXME: is this the device-bound revision?
     public static final QName NETCONF_DATA_QNAME = QName.create(NETCONF_QNAME, "data").intern();
+
     public static final XMLOutputFactory XML_FACTORY;
 
     static {
@@ -68,6 +108,8 @@ public final class NetconfUtil {
         f.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
         XML_FACTORY = f;
     }
+
+    private static final NamespaceSetter XML_NAMESPACE_SETTER = NamespaceSetter.forFactory(XML_FACTORY);
 
     private NetconfUtil() {
         // No-op
@@ -123,6 +165,7 @@ public final class NetconfUtil {
         }
 
         final XMLStreamWriter writer = XML_FACTORY.createXMLStreamWriter(result);
+        XML_NAMESPACE_SETTER.initializeNamespace(writer);
         try (
              NormalizedNodeStreamWriter normalizedNodeStreamWriter =
                      XMLStreamNormalizedNodeStreamWriter.create(writer, context, schemaPath);
