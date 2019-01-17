@@ -28,6 +28,7 @@ import javax.annotation.Nullable;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
+import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfigurationBuilder;
@@ -48,6 +49,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.topology.singleton.api.RemoteDeviceConnector;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfConnectorDTO;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
@@ -60,6 +62,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.OdlHelloMessageCapabilities;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability.CapabilityOrigin;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.KeyAuth;
@@ -284,27 +287,38 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final ReconnectStrategyFactory sf =
                 new TimedReconnectStrategyFactory(netconfTopologyDeviceSetup.getEventExecutor(), maxConnectionAttempts,
                         betweenAttemptsTimeoutMillis, sleepFactor);
-        final ReconnectStrategy strategy = sf.createReconnectStrategy();
 
-        final AuthenticationHandler authHandler = getHandlerFromCredentials(node.getCredentials());
+        final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder =
+                NetconfReconnectingClientConfigurationBuilder.create();
 
-        final NetconfReconnectingClientConfigurationBuilder builder =
-                NetconfReconnectingClientConfigurationBuilder.create()
-                        .withAddress(socketAddress)
-                        .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
-                        .withReconnectStrategy(strategy)
-                        .withAuthHandler(authHandler)
-                        .withProtocol(node.isTcpOnly()
-                                ? NetconfClientConfiguration.NetconfClientProtocol.TCP
-                                : NetconfClientConfiguration.NetconfClientProtocol.SSH)
-                        .withConnectStrategyFactory(sf)
-                        .withSessionListener(listener);
+        if (node.isTcpOnly() || node.getProtocol() == null || node.getProtocol().getName() == Protocol.Name.SSH) {
+            final AuthenticationHandler authHandler = getHandlerFromCredentials(node.getCredentials());
+            reconnectingClientConfigurationBuilder
+                    .withAuthHandler(authHandler)
+                    .withProtocol(node.isTcpOnly() ? NetconfClientConfiguration.NetconfClientProtocol.TCP :
+                            NetconfClientConfiguration.NetconfClientProtocol.SSH);
+        } else if (node.getProtocol().getName() == Protocol.Name.TLS) {
+            final SslHandlerFactory sslHandlerFactory = new SslHandlerFactoryImpl(keystoreAdapter,
+                    node.getProtocol().getSpecification());
+            reconnectingClientConfigurationBuilder
+                    .withSslHandlerFactory(sslHandlerFactory)
+                    .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS);
+        } else {
+            throw new IllegalStateException("Unsupported protocol type: " + node.getProtocol().getName().getClass());
+        }
 
         final List<Uri> odlHelloCapabilities = getOdlHelloCapabilities(node);
         if (odlHelloCapabilities != null) {
-            builder.withOdlHelloCapabilities(odlHelloCapabilities);
+            reconnectingClientConfigurationBuilder.withOdlHelloCapabilities(odlHelloCapabilities);
         }
-        return builder.build();
+
+        return reconnectingClientConfigurationBuilder
+                .withAddress(socketAddress)
+                .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
+                .withReconnectStrategy(sf.createReconnectStrategy())
+                .withConnectStrategyFactory(sf)
+                .withSessionListener(listener)
+                .build();
     }
 
     private static List<Uri> getOdlHelloCapabilities(final NetconfNode node) {
