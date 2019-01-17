@@ -13,14 +13,23 @@ import com.google.common.base.Strings;
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.opendaylight.netconf.console.api.NetconfCommands;
 
-@Command(name = "netconf:disconnect-device", scope = "netconf", description = "Disconnect netconf device.")
+@Service
+@Command(name = "disconnect-device", scope = "netconf", description = "Disconnect netconf device.")
 public class NetconfDisconnectDeviceCommand implements Action {
 
-    protected final NetconfCommands service;
+    @Reference
+    private NetconfCommands service;
 
-    public NetconfDisconnectDeviceCommand(final NetconfCommands service) {
+    public NetconfDisconnectDeviceCommand() {
+
+    }
+
+    @VisibleForTesting
+    NetconfDisconnectDeviceCommand(final NetconfCommands service) {
         this.service = service;
     }
 

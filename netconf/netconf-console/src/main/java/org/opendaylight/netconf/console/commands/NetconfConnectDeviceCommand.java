@@ -16,6 +16,8 @@ import java.util.Arrays;
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.opendaylight.netconf.console.api.NetconfCommands;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -30,20 +32,20 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
 
-@Command(name = "netconf:connect-device", scope = "netconf", description = "Connect to a netconf device.")
+@Service
+@Command(name = "connect-device", scope = "netconf", description = "Connect to a netconf device.")
 public class NetconfConnectDeviceCommand implements Action {
 
-    protected final NetconfCommands service;
+    @Reference
+    private NetconfCommands service;
 
-    public NetconfConnectDeviceCommand(final NetconfCommands service) {
-        this.service = service;
+    public NetconfConnectDeviceCommand() {
+
     }
 
     @VisibleForTesting
-    NetconfConnectDeviceCommand(final NetconfCommands service, final String deviceIp, final String devicePort) {
+    NetconfConnectDeviceCommand(final NetconfCommands service) {
         this.service = service;
-        this.deviceIp = deviceIp;
-        this.devicePort = devicePort;
     }
 
     @VisibleForTesting
