@@ -7,17 +7,15 @@
  */
 package org.opendaylight.netconf.mdsal.notification.impl.ops;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 import javassist.ClassPool;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.dom.DOMResult;
 import org.opendaylight.mdsal.binding.dom.codec.gen.impl.StreamWriterGenerator;
 import org.opendaylight.mdsal.binding.dom.codec.impl.BindingNormalizedNodeCodecRegistry;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
@@ -45,12 +43,10 @@ public final class NotificationsTransformUtil {
         moduleInfoBackedContext.addModuleInfos(Collections.singletonList(org.opendaylight.yang.gen.v1.urn.ietf.params
                 .xml.ns.yang.ietf.netconf.notifications.rev120206.$YangModuleInfoImpl.getInstance()));
         final Optional<SchemaContext> schemaContextOptional = moduleInfoBackedContext.tryToCreateSchemaContext();
-        Preconditions.checkState(schemaContextOptional.isPresent());
+        checkState(schemaContextOptional.isPresent());
         NOTIFICATIONS_SCHEMA_CTX = schemaContextOptional.get();
 
-        CREATE_SUBSCRIPTION_RPC = Preconditions.checkNotNull(findCreateSubscriptionRpc());
-
-        Preconditions.checkNotNull(CREATE_SUBSCRIPTION_RPC);
+        CREATE_SUBSCRIPTION_RPC = requireNonNull(findCreateSubscriptionRpc());
 
         final JavassistUtils javassist = JavassistUtils.forClassPool(ClassPool.getDefault());
         CODEC_REGISTRY = new BindingNormalizedNodeCodecRegistry(StreamWriterGenerator.create(javassist));
@@ -64,8 +60,9 @@ public final class NotificationsTransformUtil {
 
     @SuppressFBWarnings(value = "NP_NONNULL_PARAM_VIOLATION", justification = "Unrecognised NullableDecl")
     private static RpcDefinition findCreateSubscriptionRpc() {
-        return Iterables.getFirst(Collections2.filter(NOTIFICATIONS_SCHEMA_CTX.getOperations(),
-            input -> input.getQName().getLocalName().equals(CreateSubscription.CREATE_SUBSCRIPTION)), null);
+        return NOTIFICATIONS_SCHEMA_CTX.getOperations().stream()
+                .filter(input -> input.getQName().getLocalName().equals(CreateSubscription.CREATE_SUBSCRIPTION))
+                .findFirst().orElse(null);
     }
 
     /**
@@ -83,14 +80,12 @@ public final class NotificationsTransformUtil {
     private static NetconfNotification transform(final Notification notification, final Optional<Date> eventTime,
             final SchemaPath path) {
         final ContainerNode containerNode = CODEC_REGISTRY.toNormalizedNodeNotification(notification);
-        final DOMResult result = new DOMResult(XmlUtil.newDocument());
+        final Document node = XmlUtil.newDocument();
         try {
-            NetconfUtil.writeNormalizedNode(containerNode, result, path, NOTIFICATIONS_SCHEMA_CTX);
-        } catch (final XMLStreamException | IOException e) {
+            NetconfUtil.writeNormalizedNode(node, containerNode, NOTIFICATIONS_SCHEMA_CTX, path);
+        } catch (final IOException e) {
             throw new IllegalStateException("Unable to serialize " + notification, e);
         }
-        final Document node = (Document) result.getNode();
         return eventTime.isPresent() ? new NetconfNotification(node, eventTime.get()) : new NetconfNotification(node);
     }
-
 }
