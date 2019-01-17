@@ -59,7 +59,7 @@ public class SimulatedGetConfig extends AbstractLastNetconfOperation {
 
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) {
-        final Element element = XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY);
+        final Element element = document.createElement(XmlNetconfConstants.DATA_KEY);
 
         for (final XmlElement e : storage.getConfigList()) {
             final Element domElement = e.getDomElement();

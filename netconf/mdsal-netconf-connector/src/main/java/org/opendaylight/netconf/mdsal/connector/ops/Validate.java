@@ -15,7 +15,6 @@ import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,7 @@ public final class Validate extends AbstractConfigOperation {
 
         transactionProvider.validateTransaction();
         LOG.trace("<validate> request completed successfully on session {}", getNetconfSessionIdForReporting());
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
+        return document.createElement(XmlNetconfConstants.OK);
     }
 
     protected static Datastore extractSourceParameter(final XmlElement operationElement, final String operationName)

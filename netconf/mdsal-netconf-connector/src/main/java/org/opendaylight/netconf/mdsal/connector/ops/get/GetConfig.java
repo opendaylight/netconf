@@ -18,7 +18,6 @@ import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.Datastore;
@@ -56,7 +55,7 @@ public class GetConfig extends AbstractGet {
 
         final Optional<YangInstanceIdentifier> dataRootOptional = getDataRootFromFilter(operationElement);
         if (!dataRootOptional.isPresent()) {
-            return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY);
+            return document.createElement(XmlNetconfConstants.DATA_KEY);
         }
 
         final YangInstanceIdentifier dataRoot = dataRootOptional.get();
@@ -73,7 +72,7 @@ public class GetConfig extends AbstractGet {
             }
 
             if (!normalizedNodeOptional.isPresent()) {
-                return XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY);
+                return document.createElement(XmlNetconfConstants.DATA_KEY);
             }
 
             return serializeNodeWithParentStructure(document, dataRoot, normalizedNodeOptional.get());

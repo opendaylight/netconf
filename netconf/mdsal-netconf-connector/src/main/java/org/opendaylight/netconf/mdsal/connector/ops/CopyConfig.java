@@ -93,7 +93,7 @@ public final class CopyConfig extends AbstractEdit {
                 ErrorTag.BAD_ELEMENT,
                 ErrorSeverity.ERROR);
         }
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
+        return document.createElement(XmlNetconfConstants.OK);
     }
 
     private void copyToCandidate(final XmlElement operationElement)
