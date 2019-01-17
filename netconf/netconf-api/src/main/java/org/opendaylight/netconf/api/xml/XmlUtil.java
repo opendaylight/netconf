@@ -7,6 +7,9 @@
  */
 package org.opendaylight.netconf.api.xml;
 
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,8 +43,6 @@ import org.xml.sax.SAXException;
 
 public final class XmlUtil {
 
-    public static final String XMLNS_ATTRIBUTE_KEY = "xmlns";
-    public static final String XMLNS_URI = "http://www.w3.org/2000/xmlns/";
     private static final DocumentBuilderFactory BUILDER_FACTORY;
     private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
     private static final SchemaFactory SCHEMA_FACTORY = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -127,11 +128,11 @@ public final class XmlUtil {
             final Optional<String> namespaceURI) {
         if (namespaceURI.isPresent()) {
             final Element element = document.createElementNS(namespaceURI.get(), qname);
-            String name = XMLNS_ATTRIBUTE_KEY;
+            String name = XMLNS_ATTRIBUTE;
             if (element.getPrefix() != null) {
                 name += ":" + element.getPrefix();
             }
-            element.setAttributeNS(XMLNS_URI, name, namespaceURI.get());
+            element.setAttributeNS(XMLNS_ATTRIBUTE_NS_URI, name, namespaceURI.get());
             return element;
         }
         return document.createElement(qname);
@@ -157,8 +158,8 @@ public final class XmlUtil {
 
         String content = createPrefixedValue(XmlNetconfConstants.PREFIX, contentWithoutPrefix);
         Element element = createTextElement(document, qname, content, namespaceURI);
-        String prefixedNamespaceAttr = createPrefixedValue(XMLNS_ATTRIBUTE_KEY, prefix);
-        element.setAttributeNS(XMLNS_URI, prefixedNamespaceAttr, namespace);
+        String prefixedNamespaceAttr = createPrefixedValue(XMLNS_ATTRIBUTE, prefix);
+        element.setAttributeNS(XMLNS_ATTRIBUTE_NS_URI, prefixedNamespaceAttr, namespace);
         return element;
     }
 

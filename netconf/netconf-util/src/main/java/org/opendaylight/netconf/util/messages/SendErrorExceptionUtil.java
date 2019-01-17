@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import javax.xml.XMLConstants;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSession;
@@ -74,7 +75,7 @@ public final class SendErrorExceptionUtil {
             for (int i = 0; i < incomingAttributes.getLength(); i++) {
                 final Attr attr = (Attr) incomingAttributes.item(i);
                 // skip namespace
-                if (attr.getNodeName().equals(XmlUtil.XMLNS_ATTRIBUTE_KEY)) {
+                if (attr.getNodeName().equals(XMLConstants.XMLNS_ATTRIBUTE)) {
                     continue;
                 }
                 rpcReply.setAttributeNode((Attr) errorDocument.importNode(attr, true));

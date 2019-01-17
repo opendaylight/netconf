@@ -9,6 +9,7 @@ package org.opendaylight.netconf.util.messages;
 
 import java.util.Map;
 import java.util.Optional;
+import javax.xml.XMLConstants;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -31,8 +32,8 @@ public final class SubtreeFilter {
 
     }
 
-    public static Document applyRpcSubtreeFilter(Document requestDocument,
-                                                 Document rpcReply) throws DocumentedException {
+    public static Document applyRpcSubtreeFilter(final Document requestDocument,
+                                                 final Document rpcReply) throws DocumentedException {
         OperationNameAndNamespace operationNameAndNamespace = new OperationNameAndNamespace(requestDocument);
         if (XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0.equals(operationNameAndNamespace.getNamespace())
                 && XmlNetconfConstants.GET.equals(operationNameAndNamespace.getOperationName())
@@ -64,8 +65,8 @@ public final class SubtreeFilter {
      * @return document containing filtered notification content
      * @throws DocumentedException if operation fails
      */
-    public static Optional<Document> applySubtreeNotificationFilter(XmlElement filter,
-                                                                    Document notification) throws DocumentedException {
+    public static Optional<Document> applySubtreeNotificationFilter(final XmlElement filter,
+                                                                    final Document notification) throws DocumentedException {
         removeEventTimeNode(notification);
         if (isSupported(filter)) {
             return Optional.ofNullable(filteredNotification(filter, notification));
@@ -73,19 +74,19 @@ public final class SubtreeFilter {
         return Optional.of(extractNotificationContent(notification));
     }
 
-    private static void removeEventTimeNode(Document document) {
+    private static void removeEventTimeNode(final Document document) {
         final Node eventTimeNode = document.getDocumentElement().getElementsByTagNameNS(XmlNetconfConstants
                 .URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0, XmlNetconfConstants.EVENT_TIME).item(0);
         document.getDocumentElement().removeChild(eventTimeNode);
     }
 
-    private static boolean isSupported(XmlElement filter) {
+    private static boolean isSupported(final XmlElement filter) {
         return "subtree".equals(filter.getAttribute("type"))
                 || "subtree".equals(filter.getAttribute("type",
                 XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0));
     }
 
-    private static Document extractNotificationContent(Document notification) throws DocumentedException {
+    private static Document extractNotificationContent(final Document notification) throws DocumentedException {
         XmlElement root = XmlElement.fromDomElement(notification.getDocumentElement());
         XmlElement content = root.getOnlyChildElement();
         notification.removeChild(root.getDomElement());
@@ -93,8 +94,8 @@ public final class SubtreeFilter {
         return notification;
     }
 
-    private static Document filteredNotification(XmlElement filter,
-                                                 Document originalNotification) throws DocumentedException {
+    private static Document filteredNotification(final XmlElement filter,
+                                                 final Document originalNotification) throws DocumentedException {
         Document result = XmlUtil.newDocument();
         XmlElement dataSrc = XmlElement.fromDomDocument(originalNotification);
         Element dataDst = (Element) result.importNode(dataSrc.getDomElement(), false);
@@ -109,7 +110,7 @@ public final class SubtreeFilter {
         }
     }
 
-    private static Document filtered(XmlElement filter, Document originalReplyDocument) throws DocumentedException {
+    private static Document filtered(final XmlElement filter, final Document originalReplyDocument) throws DocumentedException {
         Document result = XmlUtil.newDocument();
         // even if filter is empty, copy /rpc/data
         Element rpcReply = originalReplyDocument.getDocumentElement();
@@ -124,7 +125,7 @@ public final class SubtreeFilter {
         return result;
     }
 
-    private static void addSubtree(XmlElement filter, XmlElement src, XmlElement dst) throws DocumentedException {
+    private static void addSubtree(final XmlElement filter, final XmlElement src, final XmlElement dst) throws DocumentedException {
         for (XmlElement srcChild : src.getChildElements()) {
             for (XmlElement filterChild : filter.getChildElements()) {
                 addSubtree2(filterChild, srcChild, dst);
@@ -132,8 +133,8 @@ public final class SubtreeFilter {
         }
     }
 
-    private static MatchingResult addSubtree2(XmlElement filter, XmlElement src,
-                                              XmlElement dstParent) throws DocumentedException {
+    private static MatchingResult addSubtree2(final XmlElement filter, final XmlElement src,
+                                              final XmlElement dstParent) throws DocumentedException {
         Document document = dstParent.getDomElement().getOwnerDocument();
         MatchingResult matches = matches(src, filter);
         if (matches != MatchingResult.NO_MATCH && matches != MatchingResult.CONTENT_MISMATCH) {
@@ -176,7 +177,7 @@ public final class SubtreeFilter {
      * Shallow compare src node to filter: tag name and namespace must match.
      * If filter node has no children and has text content, it also must match.
      */
-    private static MatchingResult matches(XmlElement src, XmlElement filter) throws DocumentedException {
+    private static MatchingResult matches(final XmlElement src, final XmlElement filter) throws DocumentedException {
         boolean tagMatch = src.getName().equals(filter.getName())
                 && src.getNamespaceOptionally().equals(filter.getNamespaceOptionally());
         MatchingResult result = null;
@@ -194,7 +195,7 @@ public final class SubtreeFilter {
             if (result == null) {
                 for (Attr attr : filter.getAttributes().values()) {
                     // ignore namespace declarations
-                    if (!XmlUtil.XMLNS_URI.equals(attr.getNamespaceURI())) {
+                    if (!XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(attr.getNamespaceURI())) {
                         // find attr with matching localName(),  namespaceURI(),  == value() in src
                         String found = src.getAttribute(attr.getLocalName(), attr.getNamespaceURI());
                         if (attr.getValue().equals(found) && result != MatchingResult.NO_MATCH) {

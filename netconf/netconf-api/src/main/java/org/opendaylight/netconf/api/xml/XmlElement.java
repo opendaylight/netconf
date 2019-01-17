@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.xml.XMLConstants;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,18 +78,18 @@ public final class XmlElement {
         for (int i = 0; i < attributes.getLength(); i++) {
             Node attribute = attributes.item(i);
             String attribKey = attribute.getNodeName();
-            if (attribKey.startsWith(XmlUtil.XMLNS_ATTRIBUTE_KEY)) {
+            if (attribKey.startsWith(XMLConstants.XMLNS_ATTRIBUTE)) {
                 String prefix;
-                if (attribKey.equals(XmlUtil.XMLNS_ATTRIBUTE_KEY)) {
+                if (attribKey.equals(XMLConstants.XMLNS_ATTRIBUTE)) {
                     prefix = DEFAULT_NAMESPACE_PREFIX;
                 } else {
-                    if (!attribKey.startsWith(XmlUtil.XMLNS_ATTRIBUTE_KEY + ":")) {
+                    if (!attribKey.startsWith(XMLConstants.XMLNS_ATTRIBUTE + ":")) {
                         throw new DocumentedException("Attribute doesn't start with :",
                                 DocumentedException.ErrorType.APPLICATION,
                                 DocumentedException.ErrorTag.INVALID_VALUE,
                                 DocumentedException.ErrorSeverity.ERROR);
                     }
-                    prefix = attribKey.substring(XmlUtil.XMLNS_ATTRIBUTE_KEY.length() + 1);
+                    prefix = attribKey.substring(XMLConstants.XMLNS_ATTRIBUTE.length() + 1);
                 }
                 namespaces.put(prefix, attribute.getNodeValue());
             }
@@ -361,7 +362,7 @@ public final class XmlElement {
     }
 
     public String getNamespaceAttribute() throws MissingNameSpaceException {
-        String attribute = element.getAttribute(XmlUtil.XMLNS_ATTRIBUTE_KEY);
+        String attribute = element.getAttribute(XMLConstants.XMLNS_ATTRIBUTE);
         if (attribute.isEmpty() || attribute.equals(DEFAULT_NAMESPACE_PREFIX)) {
             throw new MissingNameSpaceException(String.format("Element %s must specify namespace",
                     toString()),
@@ -373,7 +374,7 @@ public final class XmlElement {
     }
 
     public Optional<String> getNamespaceAttributeOptionally() {
-        String attribute = element.getAttribute(XmlUtil.XMLNS_ATTRIBUTE_KEY);
+        String attribute = element.getAttribute(XMLConstants.XMLNS_ATTRIBUTE);
         if (attribute.isEmpty() || attribute.equals(DEFAULT_NAMESPACE_PREFIX)) {
             return Optional.empty();
         }
