@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Jakub Morvay <jakub.morvay@gmail.com>
+Submitted-by: Jakub Morvay <jakub.morvay@gmail.com>
+Submitted-at: Thu, 17 Jan 2019 13:53:03 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/79612
+Project: netconf
+Branch: refs/heads/stable/fluorine
