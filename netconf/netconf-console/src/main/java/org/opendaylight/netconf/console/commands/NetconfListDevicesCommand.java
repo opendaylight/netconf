@@ -8,20 +8,30 @@
 
 package org.opendaylight.netconf.console.commands;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Command;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.table.ShellTable;
 import org.opendaylight.netconf.console.api.NetconfCommands;
 import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 
-@Command(name = "netconf:list-devices", scope = "netconf", description = "List all netconf devices in the topology.")
+@Service
+@Command(name = "list-devices", scope = "netconf", description = "List all netconf devices in the topology.")
 public class NetconfListDevicesCommand implements Action {
 
-    protected final NetconfCommands service;
+    @Reference
+    private NetconfCommands service;
 
-    public NetconfListDevicesCommand(final NetconfCommands service) {
+    public NetconfListDevicesCommand() {
+
+    }
+
+    @VisibleForTesting
+    NetconfListDevicesCommand(final NetconfCommands service) {
         this.service = service;
     }
 

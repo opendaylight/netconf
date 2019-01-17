@@ -17,16 +17,25 @@ import javax.annotation.Nonnull;
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.table.ShellTable;
 import org.opendaylight.netconf.console.api.NetconfCommands;
 import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 
-@Command(name = "netconf:show-device", scope = "netconf", description = "Shows netconf device attributes.")
+@Service
+@Command(name = "show-device", scope = "netconf", description = "Shows netconf device attributes.")
 public class NetconfShowDeviceCommand implements Action {
 
-    protected final NetconfCommands service;
+    @Reference
+    private NetconfCommands service;
 
-    public NetconfShowDeviceCommand(final NetconfCommands service) {
+    public NetconfShowDeviceCommand() {
+
+    }
+
+    @VisibleForTesting
+    NetconfShowDeviceCommand(final NetconfCommands service) {
         this.service = service;
     }
 
