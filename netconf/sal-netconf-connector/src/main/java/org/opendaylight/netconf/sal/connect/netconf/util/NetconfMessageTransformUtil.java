@@ -337,10 +337,8 @@ public final class NetconfMessageTransformUtil {
         return Builders.containerBuilder().withNodeIdentifier(name).withValue(ImmutableList.copyOf(node)).build();
     }
 
-    public static AnyXmlNode createEditConfigAnyxml(
-            final SchemaContext ctx, final YangInstanceIdentifier dataPath,
-            final Optional<ModifyAction> operation,
-            final Optional<NormalizedNode<?, ?>> lastChildOverride) {
+    public static AnyXmlNode createEditConfigAnyxml(final SchemaContext ctx, final YangInstanceIdentifier dataPath,
+            final Optional<ModifyAction> operation, final Optional<NormalizedNode<?, ?>> lastChildOverride) {
         final NormalizedNode<?, ?> configContent;
         final NormalizedMetadata metadata;
         if (dataPath.isEmpty()) {
@@ -352,6 +350,7 @@ public final class NetconfMessageTransformUtil {
             configContent = lastChildOverride.get();
             metadata = null;
         } else {
+<<<<<<< HEAD
             configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride);
             metadata = operation.map(oper -> leafMetadata(dataPath, oper)).orElse(null);
         }
@@ -362,11 +361,20 @@ public final class NetconfMessageTransformUtil {
         try {
             NetconfUtil.writeNormalizedNode(configContent, metadata, new DOMResult(element), SchemaPath.ROOT, ctx);
         } catch (IOException | XMLStreamException e) {
-            throw new IllegalStateException("Unable to serialize edit config content element for path " + dataPath, e);
+=======
+            final Entry<QName, ModifyAction> modifyOperation = operation.isPresent()
+                    ? new AbstractMap.SimpleEntry<>(NETCONF_OPERATION_QNAME, operation.get()) : null;
+            configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride,
+                Optional.ofNullable(modifyOperation));
         }
 
-        return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_CONFIG_NODEID).withValue(new DOMSource(element))
-                .build();
+        try {
+            return NetconfUtil.createAnyxmlNode(BLANK_DOCUMENT, NETCONF_CONFIG_NODEID, configContent, ctx,
+                SchemaPath.ROOT);
+        } catch (IOException e) {
+>>>>>>> Rework NetconfUtil.writeNormalizedNode()
+            throw new IllegalStateException("Unable to serialize edit config content element for path " + dataPath, e);
+        }
     }
 
     private static NormalizedMetadata leafMetadata(YangInstanceIdentifier path, final ModifyAction oper) {
