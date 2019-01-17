@@ -358,10 +358,10 @@ public final class NetconfMessageTransformUtil {
                 java.util.Optional.ofNullable(modifyOperation));
         }
 
-        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME.getLocalName(),
-                Optional.of(NETCONF_CONFIG_QNAME.getNamespace().toString()));
+        final Element element;
         try {
-            NetconfUtil.writeNormalizedNode(configContent, new DOMResult(element), SchemaPath.ROOT, ctx);
+            element = NetconfUtil.writeNormalizedNode(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME, configContent, ctx,
+                SchemaPath.ROOT);
         } catch (IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize edit config content element for path " + dataPath, e);
         }
