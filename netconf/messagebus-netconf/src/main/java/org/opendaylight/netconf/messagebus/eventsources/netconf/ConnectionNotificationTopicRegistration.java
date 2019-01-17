@@ -7,14 +7,15 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventaggregator.rev141202.TopicId;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.EventSourceStatus;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventsource.rev141202.EventSourceStatusNotification;
@@ -42,8 +43,6 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
             .create(true, QName.create(EventSourceStatusNotification.QNAME, "event-source-status"));
     private static final NodeIdentifier EVENT_SOURCE_STATUS_ARG = NodeIdentifier.create(
             EventSourceStatusNotification.QNAME);
-    private static final String XMLNS_ATTRIBUTE_KEY = "xmlns";
-    private static final String XMLNS_URI = "http://www.w3.org/2000/xmlns/";
 
     private final DOMNotificationListener domNotificationListener;
 
@@ -142,8 +141,8 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
     private static AnyXmlNode encapsulate(final EventSourceStatusNotification notification) {
         Document doc = UntrustedXML.newDocumentBuilder().newDocument();
 
-        final Optional<String> namespace = Optional.of(EVENT_SOURCE_STATUS_ARG.getNodeType().getNamespace().toString());
-        final Element rootElement = createElement(doc, "EventSourceStatusNotification", namespace);
+        final Element rootElement = XmlUtil.createElement(doc, "EventSourceStatusNotification",
+            Optional.of(EVENT_SOURCE_STATUS_ARG.getNodeType().getNamespace().toString()));
 
         final Element sourceElement = doc.createElement("status");
         sourceElement.appendChild(doc.createTextNode(notification.getStatus().name()));
@@ -151,20 +150,5 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
 
         return Builders.anyXmlBuilder().withNodeIdentifier(EVENT_SOURCE_STATUS_ARG)
                 .withValue(new DOMSource(rootElement)).build();
-    }
-
-    // Helper to create root XML element with correct namespace and attribute
-    private static Element createElement(final Document document, final String qualifiedName,
-                                         final Optional<String> namespaceURI) {
-        if (namespaceURI.isPresent()) {
-            final Element element = document.createElementNS(namespaceURI.get(), qualifiedName);
-            String name = XMLNS_ATTRIBUTE_KEY;
-            if (element.getPrefix() != null) {
-                name += ":" + element.getPrefix();
-            }
-            element.setAttributeNS(XMLNS_URI, name, namespaceURI.get());
-            return element;
-        }
-        return document.createElement(qualifiedName);
     }
 }
