@@ -16,7 +16,6 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.mapping.api.SessionAwareNetconfOperation;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.notifications.NetconfNotificationListener;
@@ -88,7 +87,7 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
                 .registerNotificationListener(streamNameType, new NotificationSubscription(netconfSession, filter));
         subscriptions.add(notificationListenerRegistration);
 
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
+        return document.createElement(XmlNetconfConstants.OK);
     }
 
     private static StreamNameType parseStreamIfPresent(final XmlElement operationElement) throws DocumentedException {

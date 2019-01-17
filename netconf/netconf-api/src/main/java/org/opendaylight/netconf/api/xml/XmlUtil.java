@@ -120,22 +120,20 @@ public final class XmlUtil {
         return DEFAULT_DOM_BUILDER.get().newDocument();
     }
 
-    public static Element createElement(final Document document, final String qname) {
-        return createElement(document, qname, Optional.empty());
-    }
-
     public static Element createElement(final Document document, final String qname,
             final Optional<String> namespaceURI) {
-        if (namespaceURI.isPresent()) {
-            final Element element = document.createElementNS(namespaceURI.get(), qname);
-            String name = XMLNS_ATTRIBUTE;
-            if (element.getPrefix() != null) {
-                name += ":" + element.getPrefix();
-            }
-            element.setAttributeNS(XMLNS_ATTRIBUTE_NS_URI, name, namespaceURI.get());
-            return element;
+        if (!namespaceURI.isPresent()) {
+            return document.createElement(qname);
         }
-        return document.createElement(qname);
+
+        final String uri = namespaceURI.get();
+        final Element element = document.createElementNS(uri, qname);
+        String name = XMLNS_ATTRIBUTE;
+        if (element.getPrefix() != null) {
+            name += ":" + element.getPrefix();
+        }
+        element.setAttributeNS(XMLNS_ATTRIBUTE_NS_URI, name, uri);
+        return element;
     }
 
     public static Element createTextElement(final Document document, final String qname, final String content,
