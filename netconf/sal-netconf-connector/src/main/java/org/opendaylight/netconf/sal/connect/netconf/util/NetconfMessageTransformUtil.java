@@ -338,10 +338,8 @@ public final class NetconfMessageTransformUtil {
         return Builders.containerBuilder().withNodeIdentifier(name).withValue(ImmutableList.copyOf(node)).build();
     }
 
-    public static AnyXmlNode createEditConfigAnyxml(
-            final SchemaContext ctx, final YangInstanceIdentifier dataPath,
-            final java.util.Optional<ModifyAction> operation,
-            final java.util.Optional<NormalizedNode<?, ?>> lastChildOverride) {
+    public static AnyXmlNode createEditConfigAnyxml(final SchemaContext ctx, final YangInstanceIdentifier dataPath,
+            final Optional<ModifyAction> operation, final Optional<NormalizedNode<?, ?>> lastChildOverride) {
         final NormalizedNode<?, ?> configContent;
 
         if (dataPath.isEmpty()) {
@@ -355,24 +353,20 @@ public final class NetconfMessageTransformUtil {
             final Entry<QName, ModifyAction> modifyOperation = operation.isPresent()
                     ? new AbstractMap.SimpleEntry<>(NETCONF_OPERATION_QNAME, operation.get()) : null;
             configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride,
-                java.util.Optional.ofNullable(modifyOperation));
+                Optional.ofNullable(modifyOperation));
         }
 
-        final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME.getLocalName(),
-                Optional.of(NETCONF_CONFIG_QNAME.getNamespace().toString()));
         try {
-            NetconfUtil.writeNormalizedNode(configContent, new DOMResult(element), SchemaPath.ROOT, ctx);
-        } catch (IOException | XMLStreamException e) {
+            return NetconfUtil.createAnyxmlNode(BLANK_DOCUMENT, NETCONF_CONFIG_NODEID, configContent, ctx,
+                SchemaPath.ROOT);
+        } catch (IOException e) {
             throw new IllegalStateException("Unable to serialize edit config content element for path " + dataPath, e);
         }
-
-        return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_CONFIG_NODEID).withValue(new DOMSource(element))
-                .build();
     }
 
     public static DataContainerChild<?, ?> createEditConfigStructure(final SchemaContext ctx,
-            final YangInstanceIdentifier dataPath, final java.util.Optional<ModifyAction> operation,
-            final java.util.Optional<NormalizedNode<?, ?>> lastChildOverride) {
+            final YangInstanceIdentifier dataPath, final Optional<ModifyAction> operation,
+            final Optional<NormalizedNode<?, ?>> lastChildOverride) {
         return Builders.choiceBuilder().withNodeIdentifier(EDIT_CONTENT_NODEID)
                 .withChild(createEditConfigAnyxml(ctx, dataPath, operation, lastChildOverride)).build();
     }

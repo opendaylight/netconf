@@ -23,13 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.controller.messagebus.app.util.TopicDOMNotification;
 import org.opendaylight.controller.messagebus.app.util.Util;
 import org.opendaylight.controller.messagebus.spi.EventSource;
@@ -60,12 +56,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * NetconfEventSource serves as proxy between nodes and messagebus. Subscribers can join topic stream from this source.
@@ -242,18 +235,10 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
 
     private AnyXmlNode encapsulate(final DOMNotification body) {
         // FIXME: Introduce something like YangModeledAnyXmlNode in Yangtools
-        final Document doc = XmlUtil.newDocument();
-        final Optional<String> namespace = Optional.of(PAYLOAD_ARG.getNodeType().getNamespace().toString());
-        final Element element = XmlUtil.createElement(doc, "payload", namespace);
-
-        final DOMResult result = new DOMResult(element);
-
-        final SchemaContext context = mount.getSchemaContext();
-        final SchemaPath schemaPath = body.getType();
         try {
-            NetconfUtil.writeNormalizedNode(body.getBody(), result, schemaPath, context);
-            return Builders.anyXmlBuilder().withNodeIdentifier(PAYLOAD_ARG).withValue(new DOMSource(element)).build();
-        } catch (IOException | XMLStreamException e) {
+            return NetconfUtil.createAnyxmlNode(XmlUtil.newDocument(), PAYLOAD_ARG, body.getBody(),
+                mount.getSchemaContext(), body.getType());
+        } catch (IOException e) {
             LOG.error("Unable to encapsulate notification.", e);
             throw new RuntimeException(e);
         }
