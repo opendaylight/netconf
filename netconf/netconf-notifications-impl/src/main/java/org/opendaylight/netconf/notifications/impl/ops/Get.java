@@ -10,8 +10,6 @@ package org.opendaylight.netconf.notifications.impl.ops;
 
 import com.google.common.base.Preconditions;
 import java.io.IOException;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.dom.DOMResult;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -73,13 +71,12 @@ public class Get extends AbstractNetconfOperation implements AutoCloseable {
             throws DocumentedException {
         final Netconf netconfSubtree = new NetconfBuilder().setStreams(availableStreams).build();
         final NormalizedNode<?, ?> normalized = toNormalized(netconfSubtree);
-
-        final DOMResult result = new DOMResult(getPlaceholder(partialResponse));
+        final Element element = getPlaceholder(partialResponse);
 
         try {
-            NetconfUtil.writeNormalizedNode(normalized, result, SchemaPath.ROOT,
-                    NotificationsTransformUtil.NOTIFICATIONS_SCHEMA_CTX);
-        } catch (final XMLStreamException | IOException e) {
+            NetconfUtil.writeNormalizedNode(element, normalized, NotificationsTransformUtil.NOTIFICATIONS_SCHEMA_CTX,
+                SchemaPath.ROOT);
+        } catch (final IOException e) {
             throw new IllegalStateException("Unable to serialize " + netconfSubtree, e);
         }
     }

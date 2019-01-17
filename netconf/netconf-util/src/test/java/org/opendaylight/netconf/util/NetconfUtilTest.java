@@ -12,7 +12,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.Collections;
-import javax.xml.transform.dom.DOMResult;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
@@ -76,11 +75,10 @@ public class NetconfUtilTest {
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(Sessions.QNAME))
                 .withChild(sessionList)
                 .build();
-        final DOMResult result = new DOMResult(XmlUtil.newDocument());
+        final Document actual = XmlUtil.newDocument();
         final SchemaPath path = SchemaPath.create(true, NetconfState.QNAME);
-        NetconfUtil.writeNormalizedNode(sessions, result, path, context);
+        NetconfUtil.writeNormalizedNode(actual, sessions, context, path);
         final Document expected = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/sessions.xml"));
-        final Document actual = (Document) result.getNode();
         final Diff diff = XMLUnit.compareXML(expected, actual);
         Assert.assertTrue(diff.toString(), diff.similar());
     }
