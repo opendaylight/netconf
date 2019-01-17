@@ -9,9 +9,11 @@ package org.opendaylight.netconf.util;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -61,6 +63,10 @@ public final class NetconfUtil {
     // FIXME: is this the device-bound revision?
     public static final QName NETCONF_DATA_QNAME = QName.create(NETCONF_QNAME, "data").intern();
     public static final XMLOutputFactory XML_FACTORY;
+
+    public static final NamespaceContext NAMESPACE_CONTEXT =
+            new AnyXmlNamespaceContext(ImmutableMap.of("op", "urn:ietf:params:xml:ns:netconf:base:1.0"));
+    private static boolean namespaceContextSupported = true;
 
     static {
         final XMLOutputFactory f = XMLOutputFactory.newFactory();
@@ -123,6 +129,7 @@ public final class NetconfUtil {
         }
 
         final XMLStreamWriter writer = XML_FACTORY.createXMLStreamWriter(result);
+        setNamespaceContext(writer);
         try (
              NormalizedNodeStreamWriter normalizedNodeStreamWriter =
                      XMLStreamNormalizedNodeStreamWriter.create(writer, context, schemaPath);
@@ -139,6 +146,20 @@ public final class NetconfUtil {
             } catch (final Exception e) {
                 LOG.warn("Unable to close resource properly", e);
             }
+        }
+    }
+
+    private static void setNamespaceContext(XMLStreamWriter writer) throws XMLStreamException {
+        if (namespaceContextSupported) {
+            try {
+                writer.setNamespaceContext(NAMESPACE_CONTEXT);
+            } catch (final UnsupportedOperationException exception) {
+                LOG.warn("Unable to set namespace context, falling back to setPrefix()", exception);
+                namespaceContextSupported = false;
+                writer.setPrefix("op", "urn:ietf:params:xml:ns:netconf:base:1.0");
+            }
+        } else {
+            writer.setPrefix("op", "urn:ietf:params:xml:ns:netconf:base:1.0");
         }
     }
 

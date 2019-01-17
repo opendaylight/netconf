@@ -77,8 +77,8 @@ public class NetconfUtilTest {
         final DOMResult result = new DOMResult(XmlUtil.newDocument());
         final SchemaPath path = SchemaPath.create(true, NetconfState.QNAME);
         NetconfUtil.writeNormalizedNode(sessions, result, path, context);
-        final Document expected = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/sessions.xml"));
         final Document actual = (Document) result.getNode();
+        final Document expected = XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/sessions.xml"));
         final Diff diff = XMLUnit.compareXML(expected, actual);
         Assert.assertTrue(diff.toString(), diff.similar());
     }
