@@ -9,7 +9,6 @@ package org.opendaylight.netconf.test.tool.rpc;
 
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.util.mapping.AbstractLastNetconfOperation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -25,7 +24,7 @@ public class SimulatedGet extends AbstractLastNetconfOperation {
 
     @Override
     protected Element handleWithNoSubsequentOperations(final Document document, final XmlElement operationElement) {
-        final Element element = XmlUtil.createElement(document, XmlNetconfConstants.DATA_KEY);
+        final Element element = document.createElement(XmlNetconfConstants.DATA_KEY);
 
         for (final XmlElement e : storage.getConfigList()) {
             final Element domElement = e.getDomElement();

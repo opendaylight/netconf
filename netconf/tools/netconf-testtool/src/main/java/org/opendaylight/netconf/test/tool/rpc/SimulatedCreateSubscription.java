@@ -102,7 +102,7 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
                 }, delayAggregator, TimeUnit.SECONDS);
             }
         }
-        return XmlUtil.createElement(document, XmlNetconfConstants.OK);
+        return document.createElement(XmlNetconfConstants.OK);
     }
 
     private static NetconfMessage parseNetconfNotification(String content) {

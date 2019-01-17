@@ -10,7 +10,6 @@ package org.opendaylight.netconf.mdsal.connector.ops;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
-import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,7 @@ public class Unlock extends AbstractSingletonNetconfOperation {
         final Datastore targetDatastore = Lock.extractTargetParameter(operationElement);
         if (targetDatastore == Datastore.candidate) {
             LOG.debug("Unlocking candidate datastore on session: {}", getNetconfSessionIdForReporting());
-            return XmlUtil.createElement(document, XmlNetconfConstants.OK);
+            return document.createElement(XmlNetconfConstants.OK);
         }
 
         throw new DocumentedException("Unable to unlock " + targetDatastore + " datastore",
