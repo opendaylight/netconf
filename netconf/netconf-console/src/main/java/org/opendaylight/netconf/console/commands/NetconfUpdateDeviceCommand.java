@@ -14,16 +14,20 @@ import java.util.Map;
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
+import org.apache.karaf.shell.api.action.lifecycle.Reference;
+import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.opendaylight.netconf.console.api.NetconfCommands;
 import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 
-@Command(name = "netconf:update-device", scope = "netconf", description = "Update netconf device attributes.")
+@Service
+@Command(name = "update-device", scope = "netconf", description = "Update netconf device attributes.")
 public class NetconfUpdateDeviceCommand implements Action {
 
-    protected final NetconfCommands service;
+    @Reference
+    private NetconfCommands service;
 
-    public NetconfUpdateDeviceCommand(final NetconfCommands service) {
-        this.service = service;
+    public NetconfUpdateDeviceCommand() {
+
     }
 
     @VisibleForTesting
@@ -96,8 +100,7 @@ public class NetconfUpdateDeviceCommand implements Action {
     private String newSchemaless = "false";
 
     @Override
-    public  Object execute() {
-
+    public Object execute() {
         Map<String, String> updated = new HashMap<>();
         updated.put(NetconfConsoleConstants.NETCONF_IP, newIp);
         updated.put(NetconfConsoleConstants.NETCONF_PORT, newPort);
