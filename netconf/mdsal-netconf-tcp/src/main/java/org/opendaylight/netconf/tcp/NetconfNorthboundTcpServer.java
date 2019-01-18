@@ -26,10 +26,9 @@ public class NetconfNorthboundTcpServer implements AutoCloseable {
 
     private final ChannelFuture tcpServer;
 
-    public NetconfNorthboundTcpServer(final NetconfServerDispatcher netconfServerDispatcher,
-                                      final String address,
-                                      final String port) {
-        InetSocketAddress inetAddress = getInetAddress(address, port);
+    public NetconfNorthboundTcpServer(final NetconfServerDispatcher netconfServerDispatcher, final String address,
+            final String port) {
+        final InetSocketAddress inetAddress = getInetAddress(address, port);
         tcpServer = netconfServerDispatcher.createServer(inetAddress);
         tcpServer.addListener(future -> {
             if (future.isDone() && future.isSuccess()) {
@@ -42,7 +41,7 @@ public class NetconfNorthboundTcpServer implements AutoCloseable {
     }
 
     private static InetSocketAddress getInetAddress(final String bindingAddress, final String portNumber) {
-        IpAddress ipAddress = IpAddressBuilder.getDefaultInstance(bindingAddress);
+        final IpAddress ipAddress = IpAddressBuilder.getDefaultInstance(bindingAddress);
         final InetAddress inetAd = IetfInetUtil.INSTANCE.inetAddressFor(ipAddress);
         return new InetSocketAddress(inetAd, Integer.parseInt(portNumber));
     }
