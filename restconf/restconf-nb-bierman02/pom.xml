@@ -97,6 +97,7 @@
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>yang-data-codec-xml</artifactId>
+      <version>2.1.8</version>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
@@ -145,12 +146,6 @@
     </dependency>
 
     <!-- Testing Dependencies -->
-    <!-- FIXME: remove this and fixup the one test which relies on it -->
-    <dependency>
-      <groupId>com.fasterxml.woodstox</groupId>
-      <artifactId>woodstox-core</artifactId>
-      <version>5.0.3</version>
-    </dependency>
     <dependency>
       <groupId>org.glassfish.jersey.test-framework.providers</groupId>
       <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
