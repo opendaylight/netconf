@@ -11,7 +11,7 @@
   <parent>
     <groupId>org.opendaylight.odlparent</groupId>
     <artifactId>karaf4-parent</artifactId>
-    <version>4.0.8</version>
+    <version>4.0.9</version>
     <relativePath/>
   </parent>
   <groupId>org.opendaylight.netconf</groupId>
@@ -81,25 +81,6 @@
           <skip>true</skip>
         </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.opendaylight.odlparent</groupId>
-        <artifactId>karaf-plugin</artifactId>
-        <version>4.0.9-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <id>populate-local-repo</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>populate-local-repo</goal>
-            </goals>
-            <configuration>
-              <localRepo>${project.build.directory}/assembly/system</localRepo>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
     </plugins>
   </build>
 
