@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.notifications.impl;
+package impl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
@@ -27,7 +27,7 @@ import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
 import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
 import org.opendaylight.netconf.notifications.NotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NotificationRegistration;
-import org.opendaylight.netconf.notifications.impl.ops.NotificationsTransformUtil;
+import impl.ops.NotificationsTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.StreamsBuilder;

@@ -13,7 +13,7 @@ import java.util.Set;
 import org.opendaylight.netconf.mapping.api.NetconfOperation;
 import org.opendaylight.netconf.mapping.api.NetconfOperationService;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
-import org.opendaylight.netconf.notifications.impl.ops.CreateSubscription;
+import impl.ops.CreateSubscription;
 
 public class NetconfNotificationOperationService implements NetconfOperationService {
     private final Set<NetconfOperation> netconfOperations;

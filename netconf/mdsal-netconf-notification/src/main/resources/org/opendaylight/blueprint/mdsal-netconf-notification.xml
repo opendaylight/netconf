@@ -20,7 +20,7 @@
     <!--This is the MD-SAL netconf server notification blueprint xml file-->
 
     <bean id="netconfNotificationManager"
-          class="org.opendaylight.netconf.notifications.impl.NetconfNotificationManager"
+          class="impl.NetconfNotificationManager"
           destroy-method="close">
     </bean>
     <service ref="netconfNotificationManager"
