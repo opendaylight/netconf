@@ -226,7 +226,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
         final String elName = "lfEmpty";
         final NormalizedNodeContext normalizedNodeContext = prepareNNC(
                 TypeDefinitionAwareCodec.from(BaseTypes.emptyType()).deserialize(""), elName);
-        nnToXml(normalizedNodeContext, "<" + elName + "></" + elName + ">");
+        nnToXml(normalizedNodeContext, "<" + elName + "/>");
     }
 
     @Test
