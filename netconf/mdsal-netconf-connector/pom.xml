@@ -46,7 +46,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-tcp</artifactId>
+      <artifactId>mdsal-netconf-tcp</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
