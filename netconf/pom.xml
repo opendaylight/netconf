@@ -46,7 +46,6 @@
     <module>netconf-client</module>
     <module>netconf-auth</module>
     <module>aaa-authn-odl-plugin</module>
-    <module>netconf-notifications-impl</module>
     <module>netconf-notifications-api</module>
     <module>netconf-topology</module>
     <module>netconf-topology-singleton</module>
