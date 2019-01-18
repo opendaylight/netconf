@@ -15,62 +15,57 @@
         <relativePath>../netconf-parent</relativePath>
     </parent>
 
-    <groupId>org.opendaylight.netconf</groupId>
     <artifactId>mdsal-netconf-notification</artifactId>
     <version>1.6.0-SNAPSHOT</version>
     <name>${project.artifactId}</name>
     <packaging>bundle</packaging>
 
     <dependencies>
-        <!-- compile dependencies -->
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>netconf-mapping-api</artifactId>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>netconf-notifications-impl</artifactId>
+            <groupId>org.opendaylight.controller</groupId>
+            <artifactId>sal-common-util</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>netconf-notifications-api</artifactId>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-binding-generator-impl</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.mdsal</groupId>
             <artifactId>mdsal-binding-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.controller</groupId>
-            <artifactId>sal-common-util</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>org.opendaylight.mdsal</groupId>
+            <artifactId>mdsal-binding-dom-codec</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ietf-netconf-notifications</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.opendaylight.yangtools</groupId>
-            <artifactId>mockito-configuration</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>netconf-notifications-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>netconf-mapping-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>netconf-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>netconf-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.xmlunit</groupId>
+            <artifactId>xmlunit-legacy</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Embed-Dependency>netconf-notifications-impl</Embed-Dependency>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
