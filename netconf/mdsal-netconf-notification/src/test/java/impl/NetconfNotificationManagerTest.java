@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.notifications.impl;
+package impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

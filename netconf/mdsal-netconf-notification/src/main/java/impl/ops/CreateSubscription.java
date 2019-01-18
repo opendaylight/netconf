@@ -5,9 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.notifications.impl.ops;
+package impl.ops;
 
 import com.google.common.base.Preconditions;
+import impl.NetconfNotificationManager;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,7 +22,6 @@ import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.notifications.NetconfNotificationListener;
 import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
 import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
-import org.opendaylight.netconf.notifications.impl.NetconfNotificationManager;
 import org.opendaylight.netconf.util.mapping.AbstractSingletonNetconfOperation;
 import org.opendaylight.netconf.util.messages.SubtreeFilter;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
