@@ -20,7 +20,7 @@
     <!--This is the MD-SAL netconf server notification blueprint xml file-->
 
     <bean id="netconfNotificationManager"
-          class="org.opendaylight.netconf.notifications.impl.NetconfNotificationManager"
+          class="org.opendaylight.netconf.mdsal.notification.impl.NetconfNotificationManager"
           destroy-method="close">
     </bean>
     <service ref="netconfNotificationManager"
@@ -33,7 +33,7 @@
     </service>
 
     <bean id="notificationToMdsalWriter"
-          class="org.opendaylight.controller.config.yang.netconf.mdsal.notification.NotificationToMdsalWriter"
+          class="org.opendaylight.netconf.mdsal.notification.impl.NotificationToMdsalWriter"
           init-method="start"
           destroy-method="close">
         <argument ref="netconfNotificationManager"/>
@@ -41,21 +41,21 @@
     </bean>
 
     <bean id="capabilityChangeNotificationProducer"
-          class="org.opendaylight.controller.config.yang.netconf.mdsal.notification.CapabilityChangeNotificationProducer"
+          class="org.opendaylight.netconf.mdsal.notification.impl.CapabilityChangeNotificationProducer"
           destroy-method="close">
         <argument ref="netconfNotificationManager"/>
         <argument ref="dataBroker"/>
     </bean>
 
     <bean id="sessionNotificationProducer"
-          class="org.opendaylight.controller.config.yang.netconf.mdsal.notification.SessionNotificationProducer"
+          class="org.opendaylight.netconf.mdsal.notification.impl.SessionNotificationProducer"
           destroy-method="close">
         <argument ref="netconfNotificationManager"/>
         <argument ref="dataBroker"/>
     </bean>
 
     <bean id="netconfNotificationOperationServiceFactory"
-          class="org.opendaylight.netconf.mdsal.notification.NetconfNotificationOperationServiceFactory"
+          class="org.opendaylight.netconf.mdsal.notification.impl.NetconfNotificationOperationServiceFactory"
           destroy-method="close">
         <argument ref="netconfNotificationManager"/>
         <argument ref="netconfOperationServiceFactoryListener"/>
