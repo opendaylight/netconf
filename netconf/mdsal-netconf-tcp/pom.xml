@@ -16,7 +16,6 @@
     <relativePath>../netconf-parent</relativePath>
   </parent>
 
-  <groupId>org.opendaylight.netconf</groupId>
   <artifactId>mdsal-netconf-tcp</artifactId>
   <version>1.6.0-SNAPSHOT</version>
   <name>${project.artifactId}</name>
@@ -25,23 +24,12 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-tcp</artifactId>
+      <artifactId>netconf-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>netconf-util</artifactId>
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Embed-Dependency>netconf-tcp</Embed-Dependency>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
