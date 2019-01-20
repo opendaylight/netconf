@@ -9,30 +9,22 @@ package org.opendaylight.netconf.sal.streams.listeners;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.time.Instant;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.dom.DOMResult;
+import java.util.Optional;
+import javax.xml.xpath.XPathExpressionException;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
-import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
+import org.opendaylight.restconf.common.formatters.JSONNotificationFormatter;
+import org.opendaylight.restconf.common.formatters.NotificationFormatter;
+import org.opendaylight.restconf.common.formatters.NotificationFormatterFactory;
+import org.opendaylight.restconf.common.formatters.XMLNotificationFormatter;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /**
  * {@link NotificationListenerAdapter} is responsible to track events on
@@ -43,10 +35,15 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationListenerAdapter.class);
 
+    private static final NotificationFormatterFactory JSON_FORMATTER_FACTORY = JSONNotificationFormatter.createFactory(
+        JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02);
+
     private final ControllerContext controllerContext;
     private final String streamName;
     private final SchemaPath path;
-    private final String outputType;
+    private final NotificationOutputType outputType;
+
+    @VisibleForTesting NotificationFormatter formatter;
 
     /**
      * Set path of listener and stream name, register event bus.
@@ -61,11 +58,39 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     NotificationListenerAdapter(final SchemaPath path, final String streamName, final String outputType,
             final ControllerContext controllerContext) {
         register(this);
-        this.outputType = Preconditions.checkNotNull(outputType);
+        this.outputType = NotificationOutputType.forName(outputType).get();
         this.path = Preconditions.checkNotNull(path);
         Preconditions.checkArgument(streamName != null && !streamName.isEmpty());
         this.streamName = streamName;
         this.controllerContext = controllerContext;
+        this.formatter = getFormatterFactory().getFormatter();
+    }
+
+    private NotificationFormatterFactory getFormatterFactory() {
+        switch (outputType) {
+            case JSON:
+                return JSON_FORMATTER_FACTORY;
+            case XML:
+                return XMLNotificationFormatter.FACTORY;
+            default:
+                throw new IllegalArgumentException("Unsupported outputType " + outputType);
+        }
+    }
+
+    private NotificationFormatter getFormatter(final Optional<String> filter) throws XPathExpressionException {
+        final NotificationFormatterFactory factory = getFormatterFactory();
+        return filter.isPresent() ? factory.getFormatter(filter.get()) : factory.getFormatter();
+    }
+
+    @Override
+    public void setQueryParams(final Instant start, final Optional<Instant> stop, final Optional<String> filter,
+            final boolean leafNodesOnly) {
+        super.setQueryParams(start, stop, filter, leafNodesOnly);
+        try {
+            this.formatter = getFormatter(filter);
+        } catch (XPathExpressionException e) {
+            throw new IllegalArgumentException("Failed to get filter", e);
+        }
     }
 
     /**
@@ -75,7 +100,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      */
     @Override
     public String getOutputType() {
-        return this.outputType;
+        return this.outputType.getName();
     }
 
     @Override
@@ -85,10 +110,17 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
             return;
         }
 
-        final SchemaContext schemaContext = controllerContext.getGlobalSchema();
-        final String xml = prepareXml(schemaContext, notification);
-        if (checkFilter(xml)) {
-            prepareAndPostData(outputType.equals("JSON") ? prepareJson(schemaContext, notification) : xml);
+        final Optional<String> maybeOutput;
+        try {
+            maybeOutput = formatter.eventData(controllerContext.getGlobalSchema(), notification, now);
+        } catch (IOException e) {
+            LOG.error("Failed to process notification {}", notification, e);
+            return;
+        }
+        if (maybeOutput.isPresent()) {
+            final Event event = new Event(EventType.NOTIFY);
+            event.setData(maybeOutput.get());
+            post(event);
         }
     }
 
@@ -109,73 +141,5 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      */
     public SchemaPath getSchemaPath() {
         return this.path;
-    }
-
-    /**
-     * Prepare data of notification and data to client.
-     *
-     * @param data   data
-     */
-    private void prepareAndPostData(final String data) {
-        final Event event = new Event(EventType.NOTIFY);
-        event.setData(data);
-        post(event);
-    }
-
-    /**
-     * Prepare json from notification data.
-     *
-     * @return json as {@link String}
-     */
-    @VisibleForTesting
-    String prepareJson(final SchemaContext schemaContext, final DOMNotification notification) {
-        final JsonParser jsonParser = new JsonParser();
-        final JsonObject json = new JsonObject();
-        json.add("ietf-restconf:notification", jsonParser.parse(writeBodyToString(schemaContext, notification)));
-        json.addProperty("event-time", ListenerAdapter.toRFC3339(Instant.now()));
-        return json.toString();
-    }
-
-    private static String writeBodyToString(final SchemaContext schemaContext, final DOMNotification notification) {
-        final Writer writer = new StringWriter();
-        final NormalizedNodeStreamWriter jsonStream = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
-            JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(schemaContext),
-            notification.getType(), null, JsonWriterFactory.createJsonWriter(writer));
-        final NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(jsonStream);
-        try {
-            nodeWriter.write(notification.getBody());
-            nodeWriter.close();
-        } catch (final IOException e) {
-            throw new RestconfDocumentedException("Problem while writing body of notification to JSON. ", e);
-        }
-        return writer.toString();
-    }
-
-    private String prepareXml(final SchemaContext schemaContext, final DOMNotification notification) {
-        final Document doc = createDocument();
-        final Element notificationElement = basePartDoc(doc);
-
-        final Element notificationEventElement = doc.createElementNS(
-                "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "create-notification-stream");
-        addValuesToNotificationEventElement(doc, notificationEventElement, schemaContext, notification);
-        notificationElement.appendChild(notificationEventElement);
-
-        return transformDoc(doc);
-    }
-
-    private void addValuesToNotificationEventElement(final Document doc, final Element element,
-            final SchemaContext schemaContext, final DOMNotification notification) {
-        try {
-
-            final DOMResult domResult = writeNormalizedNode(notification.getBody(), schemaContext, this.path);
-            final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
-            final Element dataElement = doc.createElement("notification");
-            dataElement.appendChild(result);
-            element.appendChild(dataElement);
-        } catch (final IOException e) {
-            LOG.error("Error in writer ", e);
-        } catch (final XMLStreamException e) {
-            LOG.error("Error processing stream", e);
-        }
     }
 }

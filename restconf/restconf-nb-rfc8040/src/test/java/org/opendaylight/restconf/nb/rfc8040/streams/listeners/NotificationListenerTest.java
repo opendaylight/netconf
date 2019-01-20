@@ -12,9 +12,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import java.net.URI;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -222,7 +222,6 @@ public class NotificationListenerTest {
         final List<NotificationListenerAdapter> listNotifi =
                 Notificator.createNotificationListener(paths, "stream-name", NotificationOutputType.JSON.toString());
         final NotificationListenerAdapter notifi = listNotifi.get(0);
-        final String result = notifi.prepareJson(schmeaCtx, notificationData);
-        return Preconditions.checkNotNull(result);
+        return notifi.formatter.eventData(schmeaCtx, notificationData, Instant.now()).get();
     }
 }
