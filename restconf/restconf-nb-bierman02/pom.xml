@@ -23,10 +23,6 @@
   <dependencies>
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
-      <artifactId>restconf-common-models</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.netconf</groupId>
       <artifactId>restconf-common</artifactId>
     </dependency>
     <dependency>
@@ -89,14 +85,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-data-codec-gson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.opendaylight.yangtools</groupId>
-      <artifactId>yang-data-codec-xml</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
