@@ -89,20 +89,11 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
         return leafNodesOnly;
     }
 
-    /**
-     * Checking query parameters on specific notification.
-     *
-     * @param xml       data of notification
-     * @param listener  listener of notification
-     * @return true if notification meets the requirements of query parameters,
-     *         false otherwise
-     */
     @SuppressWarnings("checkstyle:IllegalCatch")
-    protected <T extends BaseListenerInterface> boolean checkQueryParams(final String xml, final T listener) {
-        final Instant now = Instant.now();
+    <T extends BaseListenerInterface> boolean checkStartStop(final Instant now, final T listener) {
         if (this.stop != null) {
-            if ((this.start.compareTo(now) < 0) && (this.stop.compareTo(now) > 0)) {
-                return checkFilter(xml);
+            if (this.start.compareTo(now) < 0 && this.stop.compareTo(now) > 0) {
+                return true;
             }
             if (this.stop.compareTo(now) < 0) {
                 try {
@@ -114,10 +105,10 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
         } else if (this.start != null) {
             if (this.start.compareTo(now) < 0) {
                 this.start = null;
-                return checkFilter(xml);
+                return true;
             }
         } else {
-            return checkFilter(xml);
+            return true;
         }
         return false;
     }
@@ -128,7 +119,7 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      * @param xml   data of notification
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
-    private boolean checkFilter(final String xml) {
+    boolean checkFilter(final String xml) {
         if (this.filter == null) {
             return true;
         }

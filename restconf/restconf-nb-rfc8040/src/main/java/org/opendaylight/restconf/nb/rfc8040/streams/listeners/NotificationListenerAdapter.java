@@ -78,9 +78,14 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
 
     @Override
     public void onNotification(final DOMNotification notification) {
+        final Instant now = Instant.now();
+        if (!checkStartStop(now, this)) {
+            return;
+        }
+
         final SchemaContext schemaContext = schemaHandler.get();
         final String xml = prepareXml(schemaContext, notification);
-        if (checkQueryParams(xml, this)) {
+        if (checkFilter(xml)) {
             prepareAndPostData(outputType.equals("JSON") ? prepareJson(schemaContext, notification) : xml);
         }
     }
