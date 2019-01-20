@@ -234,9 +234,7 @@ public class NotificationListenerTest {
                 Notificator.createNotificationListener(paths, "stream-name", NotificationOutputType.JSON.toString(),
                         controllerContext);
         final NotificationListenerAdapter notifi = listNotifi.get(0);
-        notifi.setNotification(notificationData);
-        notifi.setSchemaContext(schemaContext);
-        final String result = notifi.prepareJson();
+        final String result = notifi.prepareJson(schemaContext, notificationData);
         return Preconditions.checkNotNull(result);
     }
 }

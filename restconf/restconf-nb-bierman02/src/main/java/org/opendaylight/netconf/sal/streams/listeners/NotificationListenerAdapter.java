@@ -21,7 +21,6 @@ import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
@@ -48,9 +47,6 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     private final String streamName;
     private final SchemaPath path;
     private final String outputType;
-
-    private SchemaContext schemaContext;
-    private DOMNotification notification;
 
     /**
      * Set path of listener and stream name, register event bus.
@@ -83,14 +79,11 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     }
 
     @Override
-    @SuppressWarnings("checkstyle:hiddenField")
     public void onNotification(final DOMNotification notification) {
-        this.schemaContext = controllerContext.getGlobalSchema();
-        this.notification = notification;
-
-        final String xml = prepareXml();
+        final SchemaContext schemaContext = controllerContext.getGlobalSchema();
+        final String xml = prepareXml(schemaContext, notification);
         if (checkQueryParams(xml, this)) {
-            prepareAndPostData(xml);
+            prepareAndPostData(outputType.equals("JSON") ? prepareJson(schemaContext, notification) : xml);
         }
     }
 
@@ -116,50 +109,38 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     /**
      * Prepare data of notification and data to client.
      *
-     * @param xml   data
+     * @param data   data
      */
-    private void prepareAndPostData(final String xml) {
+    private void prepareAndPostData(final String data) {
         final Event event = new Event(EventType.NOTIFY);
-        if (this.outputType.equals("JSON")) {
-            event.setData(prepareJson());
-        } else {
-            event.setData(xml);
-        }
+        event.setData(data);
         post(event);
     }
 
     /**
      * Prepare json from notification data.
+     * @param notification
+     * @param schemaContext
      *
      * @return json as {@link String}
      */
     @VisibleForTesting
-    String prepareJson() {
+    String prepareJson(final SchemaContext schemaContext, final DOMNotification notification) {
         final JsonParser jsonParser = new JsonParser();
         final JsonObject json = new JsonObject();
-        json.add("ietf-restconf:notification", jsonParser.parse(writeBodyToString()));
+        json.add("ietf-restconf:notification", jsonParser.parse(writeBodyToString(schemaContext, notification)));
         json.addProperty("event-time", ListenerAdapter.toRFC3339(Instant.now()));
         return json.toString();
     }
 
-    @VisibleForTesting
-    void setNotification(final DOMNotification notification) {
-        this.notification = Preconditions.checkNotNull(notification);
-    }
-
-    @VisibleForTesting
-    void setSchemaContext(final SchemaContext schemaContext) {
-        this.schemaContext = Preconditions.checkNotNull(schemaContext);
-    }
-
-    private String writeBodyToString() {
+    private static String writeBodyToString(final SchemaContext schemaContext, final DOMNotification notification) {
         final Writer writer = new StringWriter();
         final NormalizedNodeStreamWriter jsonStream = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
-            JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(this.schemaContext),
-            this.notification.getType(), null, JsonWriterFactory.createJsonWriter(writer));
+            JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(schemaContext),
+            notification.getType(), null, JsonWriterFactory.createJsonWriter(writer));
         final NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(jsonStream);
         try {
-            nodeWriter.write(this.notification.getBody());
+            nodeWriter.write(notification.getBody());
             nodeWriter.close();
         } catch (final IOException e) {
             throw new RestconfDocumentedException("Problem while writing body of notification to JSON. ", e);
@@ -167,23 +148,23 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
         return writer.toString();
     }
 
-    private String prepareXml() {
+    private String prepareXml(final SchemaContext schemaContext, final DOMNotification notification) {
         final Document doc = createDocument();
         final Element notificationElement = basePartDoc(doc);
 
         final Element notificationEventElement = doc.createElementNS(
                 "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "create-notification-stream");
-        addValuesToNotificationEventElement(doc, notificationEventElement);
+        addValuesToNotificationEventElement(doc, notificationEventElement, schemaContext, notification);
         notificationElement.appendChild(notificationEventElement);
 
         return transformDoc(doc);
     }
 
-    private void addValuesToNotificationEventElement(final Document doc, final Element element) {
-        final ContainerNode body = notification.getBody();
+    private void addValuesToNotificationEventElement(final Document doc, final Element element,
+            final SchemaContext schemaContext, final DOMNotification notification) {
         try {
 
-            final DOMResult domResult = writeNormalizedNode(body, schemaContext, this.path);
+            final DOMResult domResult = writeNormalizedNode(notification.getBody(), schemaContext, this.path);
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
             final Element dataElement = doc.createElement("notification");
             dataElement.appendChild(result);
