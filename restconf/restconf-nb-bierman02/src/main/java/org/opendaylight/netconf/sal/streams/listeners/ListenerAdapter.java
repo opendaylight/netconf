@@ -53,8 +53,6 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     private final String streamName;
     private final NotificationOutputType outputType;
 
-    private Collection<DataTreeCandidate> candidates;
-
     /**
      * Creates new {@link ListenerAdapter} listener specified by path and stream
      * name and register for subscribing.
@@ -78,8 +76,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
 
     @Override
     public void onDataTreeChanged(@Nonnull final Collection<DataTreeCandidate> dataTreeCandidates) {
-        this.candidates = dataTreeCandidates;
-        final String xml = prepareXml();
+        final String xml = prepareXml(dataTreeCandidates);
         if (checkQueryParams(xml, this)) {
             prepareAndPostData(xml);
         }
@@ -133,7 +130,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      *
      * @return Data in printable form.
      */
-    private String prepareXml() {
+    private String prepareXml(final Collection<DataTreeCandidate> candidates) {
         final SchemaContext schemaContext = controllerContext.getGlobalSchema();
         final DataSchemaContextTree dataContextTree = DataSchemaContextTree.from(schemaContext);
         final Document doc = createDocument();
@@ -142,8 +139,8 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
         final Element dataChangedNotificationEventElement = doc.createElementNS(
                 "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "data-changed-notification");
 
-        addValuesToDataChangedNotificationEventElement(doc, dataChangedNotificationEventElement,
-                                                            this.candidates, schemaContext, dataContextTree);
+        addValuesToDataChangedNotificationEventElement(doc, dataChangedNotificationEventElement, candidates,
+            schemaContext, dataContextTree);
         notificationElement.appendChild(dataChangedNotificationEventElement);
         return transformDoc(doc);
     }
