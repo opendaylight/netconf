@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import com.google.common.base.Preconditions;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -75,8 +76,13 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
 
     @Override
     public void onDataTreeChanged(final Collection<DataTreeCandidate> dataTreeCandidates) {
+        final Instant now = Instant.now();
+        if (!checkStartStop(now, this)) {
+            return;
+        }
+
         final String xml = prepareXml(dataTreeCandidates);
-        if (checkQueryParams(xml, this)) {
+        if (checkFilter(xml)) {
             prepareAndPostData(xml);
         }
     }
