@@ -13,7 +13,9 @@ import org.opendaylight.netconf.sal.restconf.web.Bierman02WebRegistrar;
  * Initializes the bierman-02 endpoint without authentication.
  *
  * @author Thomas Pantelis
+ * @deprecated Use bierman-02 endpoint with authentication instead.
  */
+@Deprecated
 public class WebInitializer {
     public WebInitializer(Bierman02WebRegistrar registrar) {
         registrar.registerWithoutAuthentication();
