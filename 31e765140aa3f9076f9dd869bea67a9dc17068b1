@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7c015099_638b6aaa",
+        "filename": "features/restconf/odl-restconf-noauth/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-01-21T11:51:50Z",
+      "side": 1,
+      "message": "\"deprecated, use odl-restconf instead\"\n?",
+      "range": {
+        "startLine": 24,
+        "startChar": 49,
+        "endLine": 24,
+        "endChar": 84
+      },
+      "revId": "31e765140aa3f9076f9dd869bea67a9dc17068b1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
