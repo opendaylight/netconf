@@ -37,7 +37,7 @@
     <!--NetconfMapperAggregator -->
 
     <bean id="aggregatedNetconfOperationServiceFactory"
-          class="org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory"
+          class="org.opendaylight.netconf.impl.mapping.AggregatedNetconfOperationServiceFactory"
           destroy-method="close">
     </bean>
     <service ref="aggregatedNetconfOperationServiceFactory"
@@ -48,10 +48,10 @@
     <!--NetconfServerDispatcher -->
 
     <bean id="sessionIdProvider"
-          class="org.opendaylight.netconf.impl.SessionIdProvider"/>
+          class="org.opendaylight.netconf.mapping.SessionIdProvider"/>
 
     <bean id="aggregatedNetconfOperationServiceFactoryMappers"
-          class="org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory"
+          class="org.opendaylight.netconf.impl.mapping.AggregatedNetconfOperationServiceFactory"
           destroy-method="close">
         <argument>
             <list value-type="org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory">
@@ -88,7 +88,7 @@
     <!--NetconfServerMonitoring -->
 
     <bean id="netconfMonitoringService"
-          class="org.opendaylight.netconf.impl.osgi.NetconfMonitoringServiceImpl"
+          class="org.opendaylight.netconf.impl.mapping.NetconfMonitoringServiceImpl"
           destroy-method="close">
         <argument ref="aggregatedNetconfOperationServiceFactory"/>
         <argument ref="scheduledThreadPool"/>

@@ -16,7 +16,7 @@ import java.net.InetSocketAddress;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
+import org.opendaylight.netconf.impl.mapping.AggregatedNetconfOperationServiceFactory;
 
 public class NetconfDispatcherImplTest {
 

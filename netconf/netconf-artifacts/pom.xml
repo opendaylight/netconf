@@ -66,11 +66,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-impl</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-mapping-api</artifactId>
                 <version>${project.version}</version>
             </dependency>

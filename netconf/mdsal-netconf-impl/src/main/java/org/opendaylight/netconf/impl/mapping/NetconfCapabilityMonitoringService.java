@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.impl.osgi;
+package org.opendaylight.netconf.impl.mapping;
 
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_CANDIDATE_1_0;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0;
