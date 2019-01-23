@@ -59,10 +59,5 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>netconf-impl</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 </project>

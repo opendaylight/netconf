@@ -110,7 +110,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>netconf-impl</artifactId>
+      <artifactId>mdsal-netconf-impl</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
