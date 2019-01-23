@@ -19,7 +19,7 @@ import org.opendaylight.netconf.api.monitoring.SessionEvent;
 import org.opendaylight.netconf.api.monitoring.SessionListener;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
-import org.opendaylight.netconf.impl.osgi.NetconfOperationRouter;
+import org.opendaylight.netconf.impl.mapping.NetconfOperationRouter;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.util.messages.SendErrorExceptionUtil;
 import org.opendaylight.netconf.util.messages.SubtreeFilter;

@@ -6,7 +6,7 @@
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.opendaylight.netconf.impl.osgi;
+package org.opendaylight.netconf.impl.mapping;
 
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.impl.NetconfServerSession;
