@@ -18,6 +18,7 @@ import java.util.Set;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -32,6 +33,7 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
+import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -63,6 +65,11 @@ public class RestconfImplNotificationSubscribingTest {
     @BeforeClass
     public static void init() throws FileNotFoundException {
         schemaContext = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications"));
+    }
+
+    @AfterClass
+    public static void cleanUp() {
+        WebSocketServer.destroyInstance(); // NETCONF-604
     }
 
     @Before

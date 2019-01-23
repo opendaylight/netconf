@@ -36,6 +36,7 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -47,6 +48,7 @@ import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.netconf.sal.streams.listeners.Notificator;
+import org.opendaylight.netconf.sal.streams.websockets.WebSocketServer;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -84,6 +86,11 @@ public class RestconfImplTest {
         schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
         final Set<Module> allModules = schemaContext.getModules();
         assertNotNull(allModules);
+    }
+
+    @AfterClass
+    public static void cleanUp() {
+        WebSocketServer.destroyInstance(); // NETCONF-604
     }
 
     @Test
