@@ -96,11 +96,6 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-ssh</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-testtool</artifactId>
                 <version>${project.version}</version>
             </dependency>
