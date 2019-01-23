@@ -350,9 +350,7 @@ public final class SubscribeToStreamUtil {
      *            - port
      */
     private static void prepareNotificationPort(final int port) {
-        try {
-            WebSocketServer.getInstance();
-        } catch (final NullPointerException e) {
+        if (WebSocketServer.getInstance() == null) {
             WebSocketServer.createInstance(port);
         }
     }
