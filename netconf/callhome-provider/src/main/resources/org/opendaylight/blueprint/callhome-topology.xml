@@ -47,5 +47,6 @@
         <argument ref="dataBroker"/>
         <argument ref="domMountPointService"/>
         <argument ref="encryptionService"/>
+        <property name="keepAliveDelay" value="120"/>
     </bean>
 </blueprint>

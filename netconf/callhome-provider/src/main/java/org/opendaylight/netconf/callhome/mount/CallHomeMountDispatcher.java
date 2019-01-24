@@ -58,23 +58,25 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
                                    final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
                                    final SchemaRepositoryProvider schemaRepositoryProvider, final DataBroker dataBroker,
                                    final DOMMountPointService mountService,
-                                   final AAAEncryptionService encryptionService) {
+                                   final AAAEncryptionService encryptionService,
+                                   final long keepAliveDelay) {
         this(topologyId, eventExecutor, keepaliveExecutor, processingExecutor, schemaRepositoryProvider, dataBroker,
-                mountService, encryptionService, null);
+                mountService, encryptionService, null, keepAliveDelay);
     }
 
     public CallHomeMountDispatcher(final String topologyId, final EventExecutor eventExecutor,
             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
             final SchemaRepositoryProvider schemaRepositoryProvider, final DataBroker dataBroker,
             final DOMMountPointService mountService,
-            final AAAEncryptionService encryptionService, final DeviceActionFactory deviceActionFactory) {
+            final AAAEncryptionService encryptionService, final DeviceActionFactory deviceActionFactory,
+            final long keepAliveDelay) {
         this.topologyId = topologyId;
         this.eventExecutor = eventExecutor;
         this.keepaliveExecutor = keepaliveExecutor;
         this.processingExecutor = processingExecutor;
         this.schemaRepositoryProvider = schemaRepositoryProvider;
         this.deviceActionFactory = deviceActionFactory;
-        this.sessionManager = new CallHomeMountSessionManager();
+        this.sessionManager = new CallHomeMountSessionManager(keepAliveDelay);
         this.dataBroker = dataBroker;
         this.mountService = mountService;
         this.encryptionService = encryptionService;

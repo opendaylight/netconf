@@ -38,14 +38,16 @@ class CallHomeMountSessionContext {
     private final CloseCallback onClose;
     // FIXME: Remove this
     private final ContextKey key;
+    private final long keepAliveDelay;
 
     CallHomeMountSessionContext(String nodeId, CallHomeProtocolSessionContext protocol,
-                                CallHomeChannelActivator activator, CloseCallback callback) {
+                                CallHomeChannelActivator activator, long keepAliveDelay, CloseCallback callback) {
 
         this.nodeId = new NodeId(Preconditions.checkNotNull(nodeId, "nodeId"));
         this.key = ContextKey.from(protocol.getRemoteAddress());
         this.protocol = Preconditions.checkNotNull(protocol, "protocol");
         this.activator = Preconditions.checkNotNull(activator, "activator");
+        this.keepAliveDelay = keepAliveDelay;
         this.onClose = Preconditions.checkNotNull(callback, "callback");
     }
 
@@ -69,6 +71,7 @@ class CallHomeMountSessionContext {
         node.setTcpOnly(Boolean.FALSE);
         node.setCredentials(new LoginPasswordBuilder().setUsername("ommited").setPassword("ommited").build());
         node.setSchemaless(Boolean.FALSE);
+        node.setKeepaliveDelay(keepAliveDelay);
         return node.build();
     }
 

@@ -45,8 +45,9 @@ public class CallHomeMountSessionContextTest {
         mockActivator = mock(CallHomeChannelActivator.class);
         mockCallback = mock(CallHomeMountSessionContext.CloseCallback.class);
         doReturn(someSocketAddress).when(mockProtocol).getRemoteAddress();
+        long keepAliveDelay = 120L;
 
-        instance = new CallHomeMountSessionContext("test",mockProtocol, mockActivator, mockCallback);
+        instance = new CallHomeMountSessionContext("test",mockProtocol, mockActivator, keepAliveDelay, mockCallback);
     }
 
     @Test

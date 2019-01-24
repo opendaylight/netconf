@@ -68,10 +68,11 @@ public class CallHomeMountDispatcherTest {
         mockTopology = mock(CallHomeTopology.class);
         mockProtoSess = mock(CallHomeProtocolSessionContext.class);
         mockEncryptionService = mock(AAAEncryptionService.class);
+        long keepAliveDelay = 120L;
 
         instance = new CallHomeMountDispatcher(topologyId, mockExecutor, mockKeepAlive,
                 mockProcessingExecutor, mockSchemaRepoProvider, mockDataBroker, mockMount,
-                mockEncryptionService) {
+                mockEncryptionService, keepAliveDelay) {
             @Override
             public CallHomeMountSessionManager getSessionManager() {
                 return mockSessMgr;
