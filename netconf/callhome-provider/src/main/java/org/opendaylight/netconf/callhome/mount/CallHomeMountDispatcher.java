@@ -96,6 +96,10 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
                 schemaRepositoryProvider, dataBroker, mountService, encryptionService);
     }
 
+    void setKeepAliveDelay(long keepAliveDelay) {
+        sessionManager.setKeepAliveDelay(keepAliveDelay);
+    }
+
     @Override
     public void onNetconfSubsystemOpened(final CallHomeProtocolSessionContext session,
                                          final CallHomeChannelActivator activator) {

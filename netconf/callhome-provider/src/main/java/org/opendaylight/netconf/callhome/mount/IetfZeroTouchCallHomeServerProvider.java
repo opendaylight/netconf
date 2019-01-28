@@ -67,7 +67,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
             final CallHomeMountDispatcher mountDispacher) {
         this.dataBroker = dataBroker;
         this.mountDispacher = mountDispacher;
-        this.authProvider = new CallHomeAuthProviderImpl(dataBroker);
+        this.authProvider = new CallHomeAuthProviderImpl(dataBroker, mountDispacher);
         this.statusReporter = new CallhomeStatusReporter(dataBroker);
     }
 
@@ -96,7 +96,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
     }
 
     private CallHomeAuthorizationProvider getCallHomeAuthorization() {
-        return new CallHomeAuthProviderImpl(dataBroker);
+        return new CallHomeAuthProviderImpl(dataBroker, mountDispacher);
     }
 
     private void initializeServer() throws IOException {
