@@ -33,6 +33,7 @@ maven-metadata-local.xml
 .checkstyle
 .factorypath
 .fbExcludeFilterFile
+.editorconfig
 
 # Sphinx documentation
 .tox/
