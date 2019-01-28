@@ -22,6 +22,30 @@
       "revId": "52d1b9ac5aa680adae9a0b1f8edf15fa1cafa16b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4ed345ce_b2fba894",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/api/Bierman02RestConfWiring.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2019-01-28T22:15:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e843ca95_92abbee4",
+      "range": {
+        "startLine": 57,
+        "startChar": 39,
+        "endLine": 57,
+        "endChar": 54
+      },
+      "revId": "52d1b9ac5aa680adae9a0b1f8edf15fa1cafa16b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
