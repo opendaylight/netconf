@@ -43,8 +43,8 @@ public class NetconfDispatcherImplTest {
                         .setConnectionTimeoutMillis(5000)
                         .build();
 
-        NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer =
-                new NetconfServerDispatcherImpl.ServerChannelInitializer(serverNegotiatorFactory);
+        ServerChannelInitializer serverChannelInitializer =
+                new ServerChannelInitializer(serverNegotiatorFactory);
 
         dispatch = new NetconfServerDispatcherImpl(
                 serverChannelInitializer, nettyGroup, nettyGroup);

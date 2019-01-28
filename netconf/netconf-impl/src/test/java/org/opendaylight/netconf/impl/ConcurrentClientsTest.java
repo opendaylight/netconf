@@ -171,8 +171,8 @@ public class ConcurrentClientsTest {
                 .setBaseCapabilities(serverCaps)
                 .build();
 
-        NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer =
-                new NetconfServerDispatcherImpl.ServerChannelInitializer(serverNegotiatorFactory);
+        ServerChannelInitializer serverChannelInitializer =
+                new ServerChannelInitializer(serverNegotiatorFactory);
         final NetconfServerDispatcherImpl dispatch =
                 new NetconfServerDispatcherImpl(serverChannelInitializer, nettyGroup, nettyGroup);
 

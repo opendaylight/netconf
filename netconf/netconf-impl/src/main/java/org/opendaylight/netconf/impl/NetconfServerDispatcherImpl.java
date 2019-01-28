@@ -7,16 +7,12 @@
  */
 package org.opendaylight.netconf.impl;
 
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalServerChannel;
-import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
 import org.opendaylight.netconf.api.NetconfServerDispatcher;
-import org.opendaylight.netconf.impl.util.DeserializerExceptionHandler;
-import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfDispatcher;
 
 public class NetconfServerDispatcherImpl extends AbstractNetconfDispatcher<NetconfServerSession,
@@ -38,30 +34,5 @@ public class NetconfServerDispatcherImpl extends AbstractNetconfDispatcher<Netco
     @Override
     public ChannelFuture createLocalServer(LocalAddress address) {
         return super.createServer(address, LocalServerChannel.class, initializer::initialize);
-    }
-
-    public static class ServerChannelInitializer extends AbstractChannelInitializer<NetconfServerSession> {
-
-        public static final String DESERIALIZER_EX_HANDLER_KEY = "deserializerExHandler";
-
-        private final NetconfServerSessionNegotiatorFactory negotiatorFactory;
-
-
-        public ServerChannelInitializer(NetconfServerSessionNegotiatorFactory negotiatorFactory) {
-            this.negotiatorFactory = negotiatorFactory;
-
-        }
-
-        @Override
-        protected void initializeMessageDecoder(Channel ch) {
-            super.initializeMessageDecoder(ch);
-            ch.pipeline().addLast(DESERIALIZER_EX_HANDLER_KEY, new DeserializerExceptionHandler());
-        }
-
-        @Override
-        protected void initializeSessionNegotiator(Channel ch, Promise<NetconfServerSession> promise) {
-            ch.pipeline().addAfter(DESERIALIZER_EX_HANDLER_KEY, AbstractChannelInitializer.NETCONF_SESSION_NEGOTIATOR,
-                    negotiatorFactory.getSessionNegotiator(null, ch, promise));
-        }
     }
 }
