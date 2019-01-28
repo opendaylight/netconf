@@ -70,7 +70,7 @@
     </bean>
 
     <bean id="serverChannelInitializer"
-          class="org.opendaylight.netconf.impl.NetconfServerDispatcherImpl.ServerChannelInitializer">
+          class="org.opendaylight.netconf.impl.ServerChannelInitializer">
         <argument ref="netconfServerSessionNegotiatorFactory"/>
     </bean>
 

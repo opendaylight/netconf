@@ -46,6 +46,7 @@ import org.opendaylight.netconf.api.capability.YangModuleCapability;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
 import org.opendaylight.netconf.impl.NetconfServerDispatcherImpl;
 import org.opendaylight.netconf.impl.NetconfServerSessionNegotiatorFactory;
+import org.opendaylight.netconf.impl.ServerChannelInitializer;
 import org.opendaylight.netconf.impl.SessionIdProvider;
 import org.opendaylight.netconf.impl.osgi.AggregatedNetconfOperationServiceFactory;
 import org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactory;
@@ -128,8 +129,8 @@ public class NetconfDeviceSimulator implements Closeable {
                 configuration.getGenerateConfigsTimeout(),
                 monitoringService1, serverCapabilities);
 
-        final NetconfServerDispatcherImpl.ServerChannelInitializer serverChannelInitializer =
-            new NetconfServerDispatcherImpl.ServerChannelInitializer(serverNegotiatorFactory);
+        final ServerChannelInitializer serverChannelInitializer =
+            new ServerChannelInitializer(serverNegotiatorFactory);
         return new NetconfServerDispatcherImpl(serverChannelInitializer, nettyThreadgroup, nettyThreadgroup);
     }
 
