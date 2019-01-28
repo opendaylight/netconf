@@ -27,11 +27,7 @@ public class CallHomeMountSessionManager implements CallHomeMountSessionContext.
         new ConcurrentHashMap<>();
     private final Multimap<PublicKey, CallHomeMountSessionContext> contextByPublicKey = MultimapBuilder.hashKeys()
         .hashSetValues().build();
-    private final long keepAliveDelay;
-
-    public CallHomeMountSessionManager(long keepAliveDelay) {
-        this.keepAliveDelay = keepAliveDelay;
-    }
+    private long keepAliveDelay;
 
     @Nullable
     public CallHomeMountSessionContext getByAddress(InetSocketAddress remoteAddr) {
@@ -41,6 +37,10 @@ public class CallHomeMountSessionManager implements CallHomeMountSessionContext.
     @Nullable
     public Collection<CallHomeMountSessionContext> getByPublicKey(PublicKey publicKey) {
         return contextByPublicKey.get(publicKey);
+    }
+
+    void setKeepAliveDelay(long keepAliveDelay) {
+        this.keepAliveDelay = keepAliveDelay;
     }
 
     CallHomeMountSessionContext createSession(CallHomeProtocolSessionContext session,

@@ -72,7 +72,7 @@ public class CallHomeMountDispatcherTest {
 
         instance = new CallHomeMountDispatcher(topologyId, mockExecutor, mockKeepAlive,
                 mockProcessingExecutor, mockSchemaRepoProvider, mockDataBroker, mockMount,
-                mockEncryptionService, keepAliveDelay) {
+                mockEncryptionService) {
             @Override
             public CallHomeMountSessionManager getSessionManager() {
                 return mockSessMgr;

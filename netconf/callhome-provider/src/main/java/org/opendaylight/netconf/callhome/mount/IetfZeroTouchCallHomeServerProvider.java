@@ -31,7 +31,6 @@ import org.opendaylight.mdsal.binding.api.ReadWriteTransaction;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.netconf.callhome.protocol.CallHomeAuthorizationProvider;
 import org.opendaylight.netconf.callhome.protocol.NetconfCallHomeServer;
 import org.opendaylight.netconf.callhome.protocol.NetconfCallHomeServerBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.callhome.device.status.rev170112.Device1;
@@ -69,7 +68,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
             final CallHomeMountDispatcher mountDispacher) {
         this.dataBroker = dataBroker;
         this.mountDispacher = mountDispacher;
-        this.authProvider = new CallHomeAuthProviderImpl(dataBroker);
+        this.authProvider = new CallHomeAuthProviderImpl(dataBroker, mountDispacher);
         this.statusReporter = new CallhomeStatusReporter(dataBroker);
     }
 
@@ -97,15 +96,10 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         }
     }
 
-    private CallHomeAuthorizationProvider getCallHomeAuthorization() {
-        return new CallHomeAuthProviderImpl(dataBroker);
-    }
-
     private void initializeServer() throws IOException {
         LOG.info("Initializing Call Home server instance");
-        CallHomeAuthorizationProvider provider = this.getCallHomeAuthorization();
-        NetconfCallHomeServerBuilder builder = new NetconfCallHomeServerBuilder(provider, mountDispacher,
-                                                                                statusReporter);
+        NetconfCallHomeServerBuilder builder =
+            new NetconfCallHomeServerBuilder(this.authProvider, mountDispacher, statusReporter);
         if (port > 0) {
             builder.setBindAddress(new InetSocketAddress(port));
         }

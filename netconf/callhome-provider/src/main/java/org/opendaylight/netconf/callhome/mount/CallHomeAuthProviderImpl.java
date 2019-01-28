@@ -59,13 +59,13 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
     private final ListenerRegistration<GlobalConfig> configReg;
     private final ListenerRegistration<DeviceConfig> deviceReg;
     private final ListenerRegistration<DeviceOp> deviceOpReg;
-
     private final CallhomeStatusReporter statusReporter;
 
-    CallHomeAuthProviderImpl(final DataBroker broker) {
+    CallHomeAuthProviderImpl(final DataBroker broker, CallHomeMountDispatcher mountDispatcher) {
         configReg = broker.registerDataTreeChangeListener(GLOBAL, globalConfig);
         deviceReg = broker.registerDataTreeChangeListener(ALLOWED_DEVICES, deviceConfig);
         deviceOpReg = broker.registerDataTreeChangeListener(ALLOWED_OP_DEVICES, deviceOp);
+        globalConfig.setMountDispatcher(mountDispatcher);
         statusReporter = new CallhomeStatusReporter(broker);
     }
 
@@ -245,12 +245,15 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
     private static class GlobalConfig implements DataTreeChangeListener<Global> {
 
         private volatile Global current = null;
+        private CallHomeMountDispatcher mountDispatcher = null;
 
         @Override
         public void onDataTreeChanged(@Nonnull final Collection<DataTreeModification<Global>> mods) {
             for (DataTreeModification<Global> dataTreeModification : mods) {
                 current = dataTreeModification.getRootNode().getDataAfter();
             }
+
+            this.mountDispatcher.setKeepAliveDelay(current.getKeepaliveDelay());
         }
 
         boolean allowedUnknownKeys() {
@@ -263,6 +266,18 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
         Credentials getCredentials() {
             return current != null ? current.getCredentials() : null;
+        }
+
+        long getKeepAliveDelay() {
+            return current.getKeepaliveDelay();
+        }
+
+        Global.MountPointName getMountPointName() {
+            return current.getMountPointName();
+        }
+
+        public void setMountDispatcher(CallHomeMountDispatcher mountDispatcher) {
+            this.mountDispatcher = mountDispatcher;
         }
     }
 }

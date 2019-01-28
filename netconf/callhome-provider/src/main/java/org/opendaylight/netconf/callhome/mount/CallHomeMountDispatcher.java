@@ -58,25 +58,23 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
                                    final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
                                    final SchemaRepositoryProvider schemaRepositoryProvider, final DataBroker dataBroker,
                                    final DOMMountPointService mountService,
-                                   final AAAEncryptionService encryptionService,
-                                   final long keepAliveDelay) {
+                                   final AAAEncryptionService encryptionService) {
         this(topologyId, eventExecutor, keepaliveExecutor, processingExecutor, schemaRepositoryProvider, dataBroker,
-                mountService, encryptionService, null, keepAliveDelay);
+                mountService, encryptionService, null);
     }
 
     public CallHomeMountDispatcher(final String topologyId, final EventExecutor eventExecutor,
             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
             final SchemaRepositoryProvider schemaRepositoryProvider, final DataBroker dataBroker,
             final DOMMountPointService mountService,
-            final AAAEncryptionService encryptionService, final DeviceActionFactory deviceActionFactory,
-            final long keepAliveDelay) {
+            final AAAEncryptionService encryptionService, final DeviceActionFactory deviceActionFactory) {
         this.topologyId = topologyId;
         this.eventExecutor = eventExecutor;
         this.keepaliveExecutor = keepaliveExecutor;
         this.processingExecutor = processingExecutor;
         this.schemaRepositoryProvider = schemaRepositoryProvider;
         this.deviceActionFactory = deviceActionFactory;
-        this.sessionManager = new CallHomeMountSessionManager(keepAliveDelay);
+        this.sessionManager = new CallHomeMountSessionManager();
         this.dataBroker = dataBroker;
         this.mountService = mountService;
         this.encryptionService = encryptionService;
@@ -105,6 +103,10 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     void createTopology() {
         this.topology = new CallHomeTopology(topologyId, this, eventExecutor, keepaliveExecutor, processingExecutor,
                 schemaRepositoryProvider, dataBroker, mountService, encryptionService, deviceActionFactory);
+    }
+
+    void setKeepAliveDelay(long keepAliveDelay) {
+        sessionManager.setKeepAliveDelay(keepAliveDelay);
     }
 
     @Override
