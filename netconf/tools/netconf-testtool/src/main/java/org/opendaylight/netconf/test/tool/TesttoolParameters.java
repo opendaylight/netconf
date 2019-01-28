@@ -82,7 +82,7 @@ public class TesttoolParameters {
     @Arg(dest = "ssh")
     public boolean ssh;
     @Arg(dest = "exi")
-    public boolean exi = true;
+    public boolean exi = false;
     @Arg(dest = "debug")
     public boolean debug;
     @Arg(dest = "notification-file")
