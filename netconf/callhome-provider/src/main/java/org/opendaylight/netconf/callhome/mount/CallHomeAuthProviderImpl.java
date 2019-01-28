@@ -62,10 +62,11 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
     private final CallhomeStatusReporter statusReporter;
 
-    CallHomeAuthProviderImpl(final DataBroker broker) {
+    CallHomeAuthProviderImpl(final DataBroker broker, CallHomeMountDispatcher mountDispatcher) {
         configReg = broker.registerDataTreeChangeListener(GLOBAL, globalConfig);
         deviceReg = broker.registerDataTreeChangeListener(ALLOWED_DEVICES, deviceConfig);
         deviceOpReg = broker.registerDataTreeChangeListener(ALLOWED_OP_DEVICES, deviceOp);
+        globalConfig.setMountDispatcher(mountDispatcher);
         statusReporter = new CallhomeStatusReporter(broker);
     }
 
@@ -235,11 +236,13 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
     private static class GlobalConfig implements DataTreeChangeListener<Global> {
         private volatile Global current = null;
+        private CallHomeMountDispatcher mountDispatcher = null;
 
         @Override
         public void onDataTreeChanged(final Collection<DataTreeModification<Global>> mods) {
             if (!mods.isEmpty()) {
                 current = Iterables.getLast(mods).getRootNode().getDataAfter();
+                this.mountDispatcher.setKeepAliveDelay(current.getKeepaliveDelay());
             }
         }
 
@@ -252,6 +255,14 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         Credentials getCredentials() {
             final Global local = current;
             return local != null ? local.getCredentials() : null;
+        }
+
+        long getKeepAliveDelay() {
+            return current.getKeepaliveDelay();
+        }
+
+        public void setMountDispatcher(CallHomeMountDispatcher mountDispatcher) {
+            this.mountDispatcher = mountDispatcher;
         }
     }
 }

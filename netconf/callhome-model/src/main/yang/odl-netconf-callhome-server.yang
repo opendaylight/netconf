@@ -43,6 +43,16 @@ module odl-netconf-callhome-server {
         type boolean;
         default false;
       }
+
+      // Keepalive configuration
+      leaf keepalive-delay {
+        config true;
+        type uint32;
+        default 120;
+        description "Netconf connector sends keepalive RPCs while the session is idle, this delay
+            specifies the delay between keepalive RPC in seconds.
+            If a value <1 is provided, no keepalives will be sent";
+      }
     }
 
     container allowed-devices {
