@@ -83,7 +83,7 @@ public class Bierman02WebRegistrarImpl implements Bierman02WebRegistrar {
             return;
         }
 
-        WebContextBuilder webContextBuilder = WebContext.builder().contextPath("/restconf").supportsSessions(true)
+        WebContextBuilder webContextBuilder = WebContext.builder().contextPath("/restconf").supportsSessions(false)
                 .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
                     .addUrlPattern("/*").build())
 
