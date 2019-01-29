@@ -272,10 +272,6 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
             return current.getKeepaliveDelay();
         }
 
-        Global.MountPointName getMountPointName() {
-            return current.getMountPointName();
-        }
-
         public void setMountDispatcher(CallHomeMountDispatcher mountDispatcher) {
             this.mountDispatcher = mountDispatcher;
         }
