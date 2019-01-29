@@ -16,6 +16,24 @@
       "revId": "17898de9d3cbb4e8a7a73ab7917c8556109aa741",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a14e253b_ddbe91d4",
+        "filename": "netconf/netconf-util/src/main/resources/OSGI-INF/blueprint/netconf-util-blueprint.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2019-01-29T15:12:11Z",
+      "side": 1,
+      "message": "yup - not sure how that snuck in there",
+      "parentUuid": "cd50edb6_bb2e7d62",
+      "revId": "17898de9d3cbb4e8a7a73ab7917c8556109aa741",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
