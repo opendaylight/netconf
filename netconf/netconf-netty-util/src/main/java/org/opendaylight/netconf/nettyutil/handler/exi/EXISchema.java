@@ -7,12 +7,14 @@
  */
 package org.opendaylight.netconf.nettyutil.handler.exi;
 
+import static com.google.common.base.Suppliers.memoize;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.io.ByteSource;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Supplier;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
 import org.opendaylight.netconf.shaded.exificient.core.grammars.Grammars;
 import org.opendaylight.netconf.shaded.exificient.grammars.GrammarFactory;
@@ -21,16 +23,16 @@ import org.opendaylight.netconf.shaded.exificient.grammars.GrammarFactory;
  * Enumeration of schema modes defined by the NETCONF EXI capability.
  */
 public enum EXISchema {
-    NONE("none", GrammarFactory.newInstance().createSchemaLessGrammars()),
-    BUILTIN("builtin", createBuiltinGrammar()),
-    BASE_1_1("base:1.1", createNetconfGrammar());
+    NONE("none", memoize(() -> GrammarFactory.newInstance().createSchemaLessGrammars())),
+    BUILTIN("builtin", memoize(() -> createBuiltinGrammar())),
+    BASE_1_1("base:1.1", memoize(() -> createNetconfGrammar()));
 
     private String option;
-    private Grammars grammar;
+    private Supplier<Grammars> grammarsSupplier;
 
-    EXISchema(final String option, final Grammars grammar) {
+    EXISchema(final String option, final Supplier<Grammars> grammarsSupplier) {
         this.option = requireNonNull(option);
-        this.grammar = requireNonNull(grammar);
+        this.grammarsSupplier = requireNonNull(grammarsSupplier);
     }
 
     final String getOption() {
@@ -38,7 +40,7 @@ public enum EXISchema {
     }
 
     final Grammars getGrammar() {
-        return grammar;
+        return grammarsSupplier.get();
     }
 
     static EXISchema forOption(final String id) {
