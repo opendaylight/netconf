@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
 
@@ -54,10 +53,10 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
      * which means that {@link #decode(ChannelHandlerContext, ByteBuf, List)}
      * cannot be invoked concurrently. Hence we can reuse the reader.
      */
-    private final XMLReader reader;
+    private final ThreadLocalSAXDecoder reader;
     private final DocumentBuilder documentBuilder;
 
-    private NetconfEXIToMessageDecoder(final XMLReader reader) {
+    private NetconfEXIToMessageDecoder(final ThreadLocalSAXDecoder reader) {
         this.reader = requireNonNull(reader);
         this.documentBuilder = UntrustedXML.newDocumentBuilder();
     }
