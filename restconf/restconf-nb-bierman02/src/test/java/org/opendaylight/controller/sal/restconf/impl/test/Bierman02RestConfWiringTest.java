@@ -19,10 +19,12 @@ import org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfigu
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.testutils.TestWebClient;
 import org.opendaylight.aaa.web.testutils.WebTestModule;
-import org.opendaylight.controller.sal.restconf.impl.test.incubate.InMemoryMdsalModule;
 import org.opendaylight.infrautils.inject.guice.testutils.AnnotationsModule;
 import org.opendaylight.infrautils.inject.guice.testutils.GuiceRule;
 import org.opendaylight.infrautils.testutils.LogRule;
+import org.opendaylight.mdsal.wiring.guice.DOMModule;
+import org.opendaylight.mdsal.wiring.guice.InMemoryDOMDataBrokerModule;
+import org.opendaylight.mdsal.wiring.schema.HybridSchemaWiring;
 import org.opendaylight.netconf.sal.restconf.api.RestConfConfig;
 import org.opendaylight.netconf.sal.restconf.impl.Bierman02RestConfWiring;
 
@@ -44,8 +46,9 @@ public class Bierman02RestConfWiringTest {
 
     public @Rule LogRule logRule = new LogRule();
 
-    public @Rule GuiceRule guice = new GuiceRule(TestModule.class,
-            InMemoryMdsalModule.class, WebTestModule.class, AnnotationsModule.class);
+    public @Rule GuiceRule guice = new GuiceRule(new TestModule(),
+            new InMemoryDOMDataBrokerModule(), new DOMModule(new HybridSchemaWiring()),
+            new WebTestModule(), new AnnotationsModule());
 
     @Inject WebServer webServer;
     @Inject TestWebClient webClient;
