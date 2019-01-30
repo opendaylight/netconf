@@ -20,7 +20,6 @@ import org.opendaylight.netconf.shaded.exificient.core.FidelityOptions;
 import org.opendaylight.netconf.shaded.exificient.core.SchemaIdResolver;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.UnsupportedOption;
-import org.opendaylight.netconf.shaded.exificient.core.grammars.Grammars;
 import org.opendaylight.netconf.shaded.exificient.core.helpers.DefaultEXIFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +51,8 @@ public final class EXIParameters {
         if (schemaId.isEmpty()) {
             return EXISchema.BUILTIN.getGrammar();
         }
-
-        final Grammars g = EXISchema.BASE_1_1.getGrammar();
-        if (g.getSchemaId().equals(schemaId)) {
-            return g;
+        if (schemaId.equals(EXISchema.BASE_1_1.getOption())) {
+            return EXISchema.BASE_1_1.getGrammar();
         }
 
         throw new EXIException("Cannot resolve schema " + schemaId);
