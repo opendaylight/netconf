@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler;
 
 import static java.util.Objects.requireNonNull;
@@ -17,10 +16,8 @@ import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.shaded.exificient.core.EXIFactory;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
 import org.opendaylight.netconf.shaded.exificient.main.api.sax.SAXEncoder;
-import org.opendaylight.netconf.shaded.exificient.main.api.sax.SAXFactory;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
 
 public final class NetconfEXICodec {
     /**
@@ -41,24 +38,23 @@ public final class NetconfEXICodec {
                 }
             });
 
-    private final SAXFactory exiFactory;
+    private final ThreadLocalSAXFactory exiFactory;
 
     private NetconfEXICodec(final EXIFactory exiFactory) {
-        this.exiFactory = new SAXFactory(requireNonNull(exiFactory));
+        this.exiFactory = new ThreadLocalSAXFactory(requireNonNull(exiFactory));
     }
 
     public static NetconfEXICodec forParameters(final EXIParameters parameters) {
         return CODECS.getUnchecked(parameters);
     }
 
-    XMLReader getReader() throws EXIException {
-        final XMLReader reader = exiFactory.createEXIReader();
+    ThreadLocalSAXDecoder getReader() throws EXIException {
+        final ThreadLocalSAXDecoder reader = exiFactory.createEXIReader();
         reader.setEntityResolver(ENTITY_RESOLVER);
         return reader;
     }
 
     SAXEncoder getWriter() throws EXIException {
-        final SAXEncoder writer = exiFactory.createEXIWriter();
-        return writer;
+        return exiFactory.createEXIWriter();
     }
 }
