@@ -53,6 +53,7 @@ public final class NetconfTopologyUtils {
     public static final long DEFAULT_REQUEST_TIMEOUT_MILLIS = 60000L;
     public static final int DEFAULT_KEEPALIVE_DELAY = 0;
     public static final boolean DEFAULT_RECONNECT_ON_CHANGED_SCHEMA = false;
+    public static final boolean DEFAULT_IS_TCP_ONLY = false;
     public static final int DEFAULT_CONCURRENT_RPC_LIMIT = 0;
     public static final int DEFAULT_MAX_CONNECTION_ATTEMPTS = 0;
     public static final int DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS = 2000;

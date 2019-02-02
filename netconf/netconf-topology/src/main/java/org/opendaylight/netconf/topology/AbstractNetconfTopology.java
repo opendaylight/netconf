@@ -101,6 +101,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected static final int DEFAULT_KEEPALIVE_DELAY = 0;
     protected static final boolean DEFAULT_RECONNECT_ON_CHANGED_SCHEMA = false;
     protected static final int DEFAULT_CONCURRENT_RPC_LIMIT = 0;
+    private static final boolean DEFAULT_IS_TCP_ONLY = false;
     private static final int DEFAULT_MAX_CONNECTION_ATTEMPTS = 0;
     private static final int DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS = 2000;
     private static final long DEFAULT_CONNECTION_TIMEOUT_MILLIS = 20000L;
@@ -263,7 +264,6 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         Preconditions.checkNotNull(netconfNode.getHost());
         Preconditions.checkNotNull(netconfNode.getPort());
-        Preconditions.checkNotNull(netconfNode.isTcpOnly());
 
         final NetconfConnectorDTO deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
@@ -477,6 +477,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 ? DEFAULT_MAX_CONNECTION_ATTEMPTS : node.getMaxConnectionAttempts();
         final int betweenAttemptsTimeoutMillis = node.getBetweenAttemptsTimeoutMillis() == null
                 ? DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS : node.getBetweenAttemptsTimeoutMillis();
+        final boolean useTcp = node.isTcpOnly() == null ? DEFAULT_IS_TCP_ONLY : node.isTcpOnly();
         final BigDecimal sleepFactor = node.getSleepFactor() == null ? DEFAULT_SLEEP_FACTOR : node.getSleepFactor();
 
         final InetSocketAddress socketAddress = getSocketAddress(node.getHost(), node.getPort().getValue());
@@ -486,7 +487,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
         final Protocol protocol = node.getProtocol();
-        if (node.isTcpOnly()) {
+        if (useTcp) {
             reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
                     .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
                     .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));

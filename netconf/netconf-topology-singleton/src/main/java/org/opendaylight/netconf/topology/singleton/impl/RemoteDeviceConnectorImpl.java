@@ -109,7 +109,6 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final NodeId nodeId = netconfTopologyDeviceSetup.getNode().getNodeId();
         Preconditions.checkNotNull(netconfNode.getHost());
         Preconditions.checkNotNull(netconfNode.getPort());
-        Preconditions.checkNotNull(netconfNode.isTcpOnly());
 
         this.deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, deviceHandler);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
@@ -276,6 +275,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                 ? NetconfTopologyUtils.DEFAULT_MAX_CONNECTION_ATTEMPTS : node.getMaxConnectionAttempts();
         final int betweenAttemptsTimeoutMillis = node.getBetweenAttemptsTimeoutMillis() == null
                 ? NetconfTopologyUtils.DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS : node.getBetweenAttemptsTimeoutMillis();
+        final boolean isTcpOnly = node.isTcpOnly() == null
+                ? NetconfTopologyUtils.DEFAULT_IS_TCP_ONLY : node.isTcpOnly();
         final BigDecimal sleepFactor = node.getSleepFactor() == null
                 ? NetconfTopologyUtils.DEFAULT_SLEEP_FACTOR : node.getSleepFactor();
 
@@ -288,7 +289,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
         final Protocol protocol = node.getProtocol();
-        if (node.isTcpOnly()) {
+        if (isTcpOnly) {
             reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
                     .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
                     .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));

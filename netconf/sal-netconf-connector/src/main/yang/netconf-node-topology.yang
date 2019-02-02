@@ -79,6 +79,7 @@ module netconf-node-topology {
         leaf tcp-only {
             config true;
             type boolean;
+            default false;
         }
 
         container protocol {
