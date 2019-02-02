@@ -99,7 +99,7 @@
   <service ref="jsonRestconfServiceDraft02" odl:type="default"
       interface="org.opendaylight.netconf.sal.restconf.api.JSONRestconfService" />
 
-  <!-- Bierman02WebRegistrar -->
+  <!-- Web app registration -->
 
   <reference id="customFilterAdapterConfig"
       interface="org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration"/>
@@ -110,16 +110,12 @@
 
   <reference id="servletSupport" interface="org.opendaylight.aaa.web.servlet.ServletSupport" />
 
-  <bean id="webRegistrar" class="org.opendaylight.netconf.sal.restconf.web.Bierman02WebRegistrarImpl"
-          destroy-method="close">
+  <bean class="org.opendaylight.netconf.sal.restconf.web.WebInitializer">
     <argument ref="webServer"/>
     <argument ref="webContextSecurer"/>
     <argument ref="servletSupport"/>
     <argument ref="restconfApplication"/>
     <argument ref="customFilterAdapterConfig"/>
   </bean>
-
-  <service ref="webRegistrar"
-      interface="org.opendaylight.netconf.sal.restconf.web.Bierman02WebRegistrar" />
 
 </blueprint>
