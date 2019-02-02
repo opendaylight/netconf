@@ -34,7 +34,6 @@
         <module>odl-restconf-common</module>
         <module>odl-restconf-nb-bierman02</module>
         <module>odl-restconf-nb-bierman02-base</module>
-        <module>odl-restconf-nb-bierman02-noauth</module>
         <module>odl-restconf-nb-rfc8040</module>
     </modules>
 
