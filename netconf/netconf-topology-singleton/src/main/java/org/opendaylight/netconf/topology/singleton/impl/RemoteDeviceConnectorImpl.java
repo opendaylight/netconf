@@ -8,6 +8,9 @@
 
 package org.opendaylight.netconf.topology.singleton.impl;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -21,7 +24,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
@@ -94,7 +96,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
                                      final RemoteDeviceId remoteDeviceId) {
 
-        this.netconfTopologyDeviceSetup = Preconditions.checkNotNull(netconfTopologyDeviceSetup);
+        this.netconfTopologyDeviceSetup = requireNonNull(netconfTopologyDeviceSetup);
         this.remoteDeviceId = remoteDeviceId;
         this.privateKeyPath = netconfTopologyDeviceSetup.getPrivateKeyPath();
         this.privateKeyPassphrase = netconfTopologyDeviceSetup.getPrivateKeyPassphrase();
@@ -107,8 +109,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         final NetconfNode netconfNode = netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class);
         final NodeId nodeId = netconfTopologyDeviceSetup.getNode().getNodeId();
-        Preconditions.checkNotNull(netconfNode.getHost());
-        Preconditions.checkNotNull(netconfNode.getPort());
+        requireNonNull(netconfNode.getHost());
+        requireNonNull(netconfNode.getPort());
 
         this.deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, deviceHandler);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
@@ -217,9 +219,9 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         NetconfDeviceCommunicator netconfDeviceCommunicator =
              userCapabilities.isPresent() ? new NetconfDeviceCommunicator(remoteDeviceId, device,
              new UserPreferences(userCapabilities.get(),
-                 Objects.isNull(node.getYangModuleCapabilities())
+                 isNull(node.getYangModuleCapabilities())
                          ? false : node.getYangModuleCapabilities().isOverride(),
-                 Objects.isNull(node.getNonModuleCapabilities())
+                 isNull(node.getNonModuleCapabilities())
                          ? false : node.getNonModuleCapabilities().isOverride()), rpcMessageLimit)
             : new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit);
 
