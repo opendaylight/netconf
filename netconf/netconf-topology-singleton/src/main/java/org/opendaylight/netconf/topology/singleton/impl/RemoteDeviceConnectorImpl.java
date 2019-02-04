@@ -94,7 +94,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
                                      final RemoteDeviceId remoteDeviceId) {
 
-        this.netconfTopologyDeviceSetup = Preconditions.checkNotNull(netconfTopologyDeviceSetup);
+        this.netconfTopologyDeviceSetup = Objects.requireNonNull(netconfTopologyDeviceSetup);
         this.remoteDeviceId = remoteDeviceId;
         this.privateKeyPath = netconfTopologyDeviceSetup.getPrivateKeyPath();
         this.privateKeyPassphrase = netconfTopologyDeviceSetup.getPrivateKeyPassphrase();
@@ -107,8 +107,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         final NetconfNode netconfNode = netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class);
         final NodeId nodeId = netconfTopologyDeviceSetup.getNode().getNodeId();
-        Preconditions.checkNotNull(netconfNode.getHost());
-        Preconditions.checkNotNull(netconfNode.getPort());
+        Objects.requireNonNull(netconfNode.getHost());
+        Objects.requireNonNull(netconfNode.getPort());
 
         this.deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, deviceHandler);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();

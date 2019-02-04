@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.topology;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -26,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
@@ -262,8 +263,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                                                                           final Node configNode) {
         final NetconfNode netconfNode = configNode.augmentation(NetconfNode.class);
 
-        Preconditions.checkNotNull(netconfNode.getHost());
-        Preconditions.checkNotNull(netconfNode.getPort());
+        Objects.requireNonNull(netconfNode.getHost());
+        Objects.requireNonNull(netconfNode.getPort());
 
         final NetconfConnectorDTO deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
@@ -561,7 +562,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         // if none of yang-module-capabilities or non-module-capabilities is specified
         // just return absent
         if (node.getYangModuleCapabilities() == null && node.getNonModuleCapabilities() == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         final List<String> capabilities = new ArrayList<>();
