@@ -30,7 +30,7 @@ public class WebInitializer {
 
     public WebInitializer(WebServer webServer,  WebContextSecurer webContextSecurer, ServletSupport servletSupport,
             Application webApp, CustomFilterAdapterConfiguration customFilterAdapterConfig) throws ServletException {
-        WebContextBuilder webContextBuilder = WebContext.builder().contextPath("rests").supportsSessions(true)
+        WebContextBuilder webContextBuilder = WebContext.builder().contextPath("rests").supportsSessions(false)
                 .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
                     .addUrlPattern("/*").build())
 
