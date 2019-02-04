@@ -77,9 +77,11 @@ module netconf-node-topology {
         }
 
         leaf tcp-only {
+            status deprecated;
             config true;
             type boolean;
             default false;
+            desciption "Deprecated, use protocol container instead";
         }
 
         container protocol {
@@ -88,6 +90,7 @@ module netconf-node-topology {
                 type enumeration {
                     enum SSH;
                     enum TLS;
+                    enum TCP;
                 }
                 default SSH;
             }
