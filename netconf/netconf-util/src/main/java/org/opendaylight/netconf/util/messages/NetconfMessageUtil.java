@@ -11,7 +11,6 @@ import com.google.common.collect.Collections2;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -22,10 +21,11 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 public final class NetconfMessageUtil {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageUtil.class);
 
-    private NetconfMessageUtil() {}
+    private NetconfMessageUtil() {
+
+    }
 
     public static boolean isOKMessage(final NetconfMessage message) throws NetconfDocumentedException {
         return isOKMessage(message.getDocument());
@@ -75,7 +75,7 @@ public final class NetconfMessageUtil {
         }
 
         List<XmlElement> caps = capabilitiesElement.get().getChildElements(XmlNetconfConstants.CAPABILITY);
-        return Collections2.transform(caps, (@Nonnull final XmlElement input) -> {
+        return Collections2.transform(caps, input -> {
             // Trim possible leading/tailing whitespace
             try {
                 return input.getTextContent().trim();

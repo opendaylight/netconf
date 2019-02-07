@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
+import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
 
 import akka.actor.ActorRef;
@@ -14,11 +15,9 @@ import akka.cluster.Cluster;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonService;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
@@ -29,6 +28,7 @@ import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySet
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
 import org.opendaylight.netconf.topology.singleton.messages.RefreshSetupMasterActorData;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
@@ -53,7 +53,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
     NetconfTopologyContext(final NetconfTopologySetup netconfTopologyDeviceSetup,
                            final ServiceGroupIdentifier serviceGroupIdent,
                            final Timeout actorResponseWaitTime, final DOMMountPointService mountService) {
-        this.netconfTopologyDeviceSetup = Preconditions.checkNotNull(netconfTopologyDeviceSetup);
+        this.netconfTopologyDeviceSetup = requireNonNull(netconfTopologyDeviceSetup);
         this.serviceGroupIdent = serviceGroupIdent;
         this.actorResponseWaitTime = actorResponseWaitTime;
         this.mountService = mountService;
@@ -93,7 +93,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     // called when master is down/changed to slave
     @Override
-    public ListenableFuture<Void> closeServiceInstance() {
+    public ListenableFuture<?> closeServiceInstance() {
 
         if (!closed.get()) {
             // in case that master changes role to slave, new NodeDeviceManager must be created and listener registered
@@ -101,7 +101,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         }
         stopDeviceConnectorAndActor();
 
-        return Futures.immediateFuture(null);
+        return FluentFutures.immediateNullFluentFuture();
     }
 
     @Override
@@ -135,8 +135,8 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
      * Refresh, if configuration data was changed.
      * @param setup new setup
      */
-    void refresh(@Nonnull final NetconfTopologySetup setup) {
-        netconfTopologyDeviceSetup = Preconditions.checkNotNull(setup);
+    void refresh(final @NonNull NetconfTopologySetup setup) {
+        netconfTopologyDeviceSetup = requireNonNull(setup);
         remoteDeviceId = NetconfTopologyUtils.createRemoteDeviceId(netconfTopologyDeviceSetup.getNode().getNodeId(),
                 netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class));
 

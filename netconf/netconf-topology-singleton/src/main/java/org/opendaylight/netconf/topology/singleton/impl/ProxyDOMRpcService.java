@@ -16,7 +16,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.Collection;
-import javax.annotation.Nonnull;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
@@ -98,10 +97,8 @@ public class ProxyDOMRpcService implements DOMRpcService {
         return settableFuture;
     }
 
-    @Nonnull
     @Override
-    public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
-            @Nonnull final T listener) {
+    public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(final T listener) {
         // NOOP, only proxy
         throw new UnsupportedOperationException("RegisterRpcListener: DOMRpc service not working in cluster.");
     }

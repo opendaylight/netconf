@@ -15,7 +15,6 @@ import akka.pattern.AskTimeoutException;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import java.util.Collection;
-import javax.annotation.Nonnull;
 import javax.annotation.concurrent.GuardedBy;
 import org.opendaylight.mdsal.binding.api.ClusteredDataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
@@ -83,7 +82,7 @@ class NetconfNodeManager
     }
 
     @Override
-    public void onDataTreeChanged(@Nonnull final Collection<DataTreeModification<Node>> changes) {
+    public void onDataTreeChanged(final Collection<DataTreeModification<Node>> changes) {
         for (final DataTreeModification<Node> change : changes) {
             final DataObjectModification<Node> rootNode = change.getRootNode();
             final NodeId nodeId = NetconfTopologyUtils.getNodeId(rootNode.getIdentifier());

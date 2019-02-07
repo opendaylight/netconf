@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import org.opendaylight.mdsal.binding.api.ClusteredDataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
@@ -145,7 +144,7 @@ public class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<K
     }
 
     @Override
-    public void onDataTreeChanged(@Nonnull final Collection<DataTreeModification<Keystore>> changes) {
+    public void onDataTreeChanged(final Collection<DataTreeModification<Keystore>> changes) {
         LOG.debug("Keystore updated: {}", changes);
 
         for (final DataTreeModification<Keystore> change : changes) {

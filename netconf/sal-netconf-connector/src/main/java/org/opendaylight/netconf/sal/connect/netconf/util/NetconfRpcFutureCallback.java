@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
 import com.google.common.util.concurrent.FutureCallback;
-import javax.annotation.Nonnull;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.slf4j.Logger;
@@ -29,7 +28,7 @@ public class NetconfRpcFutureCallback implements FutureCallback<DOMRpcResult> {
     }
 
     @Override
-    public void onSuccess(@Nonnull final DOMRpcResult result) {
+    public void onSuccess(final DOMRpcResult result) {
         if (result.getErrors().isEmpty()) {
             LOG.trace("{}: {} invoked successfully", id, type);
         } else {

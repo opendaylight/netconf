@@ -9,7 +9,6 @@ package org.opendaylight.netconf.topology.impl;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
-import javax.annotation.Nullable;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -84,7 +83,7 @@ public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
         transaction.put(LogicalDatastoreType.CONFIGURATION, nodePath, node);
         transaction.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
-            public void onSuccess(@Nullable final CommitInfo result) {
+            public void onSuccess(final CommitInfo result) {
                 LOG.debug("Node {} was successfully added to the topology", instanceName);
             }
 

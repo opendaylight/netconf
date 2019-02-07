@@ -14,7 +14,6 @@ import akka.actor.Status.Success;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
-import javax.annotation.Nonnull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
@@ -52,7 +51,7 @@ class WriteAdapter {
             }
 
             @Override
-            public void onFailure(@Nonnull final Throwable throwable) {
+            public void onFailure(final Throwable throwable) {
                 requester.tell(new Failure(throwable), self);
             }
         }, MoreExecutors.directExecutor());

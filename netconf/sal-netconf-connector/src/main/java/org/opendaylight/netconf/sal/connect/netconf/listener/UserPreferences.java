@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.listener;
 
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * DTO with user capabilities to override or merge with device specific capabilities.
@@ -18,7 +18,7 @@ public class UserPreferences {
     private final boolean overrideModuleCapabilities;
     private final boolean overrideNonModuleCapabilities;
 
-    public UserPreferences(@Nonnull final NetconfSessionPreferences sessionPreferences,
+    public UserPreferences(final @NonNull NetconfSessionPreferences sessionPreferences,
             boolean overrideModuleCapabilities, boolean overrideNonModuleCapabilities) {
 
         if (overrideModuleCapabilities && (sessionPreferences.getModuleBasedCaps() == null

@@ -7,13 +7,14 @@
  */
 package org.opendaylight.netconf.sal.streams.listeners;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import org.json.XML;
@@ -68,15 +69,15 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     ListenerAdapter(final YangInstanceIdentifier path, final String streamName,
             final NotificationOutputType outputType, final ControllerContext controllerContext) {
         register(this);
-        this.outputType = Preconditions.checkNotNull(outputType);
-        this.path = Preconditions.checkNotNull(path);
-        Preconditions.checkArgument(streamName != null && !streamName.isEmpty());
+        this.outputType = requireNonNull(outputType);
+        this.path = requireNonNull(path);
+        checkArgument(streamName != null && !streamName.isEmpty());
         this.streamName = streamName;
         this.controllerContext = controllerContext;
     }
 
     @Override
-    public void onDataTreeChanged(@Nonnull final Collection<DataTreeCandidate> dataTreeCandidates) {
+    public void onDataTreeChanged(final Collection<DataTreeCandidate> dataTreeCandidates) {
         final Instant now = Instant.now();
         if (!checkStartStop(now, this)) {
             return;

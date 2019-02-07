@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.notification.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -14,7 +13,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import java.util.Collection;
-import javax.annotation.Nonnull;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -22,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -45,7 +44,7 @@ public class OperationalDatastoreListenerTest {
         final OperationalDatastoreListener<DataObject> op =
                 new OperationalDatastoreListener<DataObject>(instanceIdentifier) {
             @Override
-            public void onDataTreeChanged(@Nonnull final Collection collection) {
+            public void onDataTreeChanged(final Collection<DataTreeModification<DataObject>> collection) {
             }
         };
         doReturn(null).when(dataBroker).registerDataTreeChangeListener(any(), any());
@@ -57,5 +56,4 @@ public class OperationalDatastoreListenerTest {
         assertEquals(testId, argumentId.getValue());
 
     }
-
 }

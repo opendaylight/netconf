@@ -9,13 +9,12 @@ package org.opendaylight.netconf.callhome.protocol;
 
 import java.net.SocketAddress;
 import java.security.PublicKey;
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 
 /**
  * Provider responsible for resolving CallHomeAuthorization.
  */
 public interface CallHomeAuthorizationProvider {
-
     /**
      * Provides authorization parameters for incoming call-home connection.
      *
@@ -23,7 +22,5 @@ public interface CallHomeAuthorizationProvider {
      * @param serverKey     SSH key provided by SSH server on incoming connection
      * @return {@link CallHomeAuthorization} with authorization information.
      */
-    @Nonnull
-    CallHomeAuthorization provideAuth(@Nonnull SocketAddress remoteAddress, @Nonnull PublicKey serverKey);
-
+    @NonNull CallHomeAuthorization provideAuth(@NonNull SocketAddress remoteAddress, @NonNull PublicKey serverKey);
 }

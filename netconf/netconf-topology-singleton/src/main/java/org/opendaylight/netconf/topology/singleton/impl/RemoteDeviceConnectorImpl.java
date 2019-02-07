@@ -5,14 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.impl;
 
+import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -25,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -127,7 +125,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
             }
 
             @Override
-            public void onFailure(@Nullable final Throwable throwable) {
+            public void onFailure(final Throwable throwable) {
                 LOG.error("{}: Connector failed", remoteDeviceId, throwable);
             }
         }, MoreExecutors.directExecutor());
@@ -243,7 +241,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         //non-module capabilities should not exist in yang module capabilities
         final NetconfSessionPreferences netconfSessionPreferences = NetconfSessionPreferences.fromStrings(capabilities);
-        Preconditions.checkState(netconfSessionPreferences.getNonModuleCaps().isEmpty(),
+        checkState(netconfSessionPreferences.getNonModuleCaps().isEmpty(),
                 "List yang-module-capabilities/capability should contain only module based capabilities. "
                         + "Non-module capabilities used: " + netconfSessionPreferences.getNonModuleCaps());
 

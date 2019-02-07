@@ -7,12 +7,12 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
+import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.CREATE_NOTIFICATION_STREAM;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_ACCESS_PATH_PART;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_LOCATION_PATH_PART;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH;
 
-import com.google.common.base.Preconditions;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -180,7 +180,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response putData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
-        Preconditions.checkNotNull(payload);
+        requireNonNull(payload);
 
         boolean insertUsed = false;
         boolean pointUsed = false;
@@ -252,7 +252,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public Response postData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
-        Preconditions.checkNotNull(payload);
+        requireNonNull(payload);
 
         boolean insertUsed = false;
         boolean pointUsed = false;
@@ -325,8 +325,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     @Override
     public PatchStatusContext patchData(final PatchContext context, final UriInfo uriInfo) {
-        Preconditions.checkNotNull(context);
-        final DOMMountPoint mountPoint = context.getInstanceIdentifierContext().getMountPoint();
+        final DOMMountPoint mountPoint = requireNonNull(context).getInstanceIdentifierContext().getMountPoint();
 
         final TransactionChainHandler localTransactionChainHandler;
         final SchemaContextRef ref;
@@ -350,7 +349,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      *            mount point reference
      * @return {@link TransactionChainHandler}
      */
-    private static TransactionChainHandler transactionChainOfMountPoint(@Nonnull final DOMMountPoint mountPoint) {
+    private static TransactionChainHandler transactionChainOfMountPoint(final @NonNull DOMMountPoint mountPoint) {
         final Optional<DOMDataBroker> domDataBrokerService = mountPoint.getService(DOMDataBroker.class);
         if (domDataBrokerService.isPresent()) {
             return new TransactionChainHandler(domDataBrokerService.get());

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.mount;
 
 import com.google.common.collect.Multimap;
@@ -16,7 +15,8 @@ import java.security.PublicKey;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.callhome.mount.CallHomeMountSessionContext.CloseCallback;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext;
@@ -28,13 +28,12 @@ public class CallHomeMountSessionManager implements CallHomeMountSessionContext.
     private final Multimap<PublicKey, CallHomeMountSessionContext> contextByPublicKey = MultimapBuilder.hashKeys()
         .hashSetValues().build();
 
-    @Nullable
-    public CallHomeMountSessionContext getByAddress(InetSocketAddress remoteAddr) {
+    public @Nullable CallHomeMountSessionContext getByAddress(InetSocketAddress remoteAddr) {
         return contextByAddress.get(remoteAddr);
     }
 
-    @Nullable
-    public Collection<CallHomeMountSessionContext> getByPublicKey(PublicKey publicKey) {
+
+    public @NonNull Collection<CallHomeMountSessionContext> getByPublicKey(PublicKey publicKey) {
         return contextByPublicKey.get(publicKey);
     }
 

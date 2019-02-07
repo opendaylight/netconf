@@ -21,9 +21,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.controller.cluster.common.actor.AbstractUntypedActor;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProvider;
@@ -208,7 +205,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     }
 
     private void sendYangTextSchemaSourceProxy(final SourceIdentifier sourceIdentifier, final ActorRef sender) {
-        final ListenableFuture<@NonNull YangTextSchemaSource> schemaSourceFuture =
+        final ListenableFuture<YangTextSchemaSource> schemaSourceFuture =
                 schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class);
 
         Futures.addCallback(schemaSourceFuture, new FutureCallback<YangTextSchemaSource>() {
@@ -223,7 +220,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             }
 
             @Override
-            public void onFailure(@Nonnull final Throwable throwable) {
+            public void onFailure(final Throwable throwable) {
                 LOG.debug("{}: getSchemaSource for {} failed", id, sourceIdentifier, throwable);
                 sender.tell(new Failure(throwable), getSelf());
             }
@@ -241,7 +238,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
 
         Futures.addCallback(rpcResult, new FutureCallback<DOMRpcResult>() {
             @Override
-            public void onSuccess(@Nullable final DOMRpcResult domRpcResult) {
+            public void onSuccess(final DOMRpcResult domRpcResult) {
                 LOG.debug("{}: invokeSlaveRpc for {}, domRpcResult: {}", id, schemaPath, domRpcResult);
 
                 if (domRpcResult == null) {
@@ -257,7 +254,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             }
 
             @Override
-            public void onFailure(@Nonnull final Throwable throwable) {
+            public void onFailure(final Throwable throwable) {
                 recipient.tell(new Failure(throwable), getSelf());
             }
         }, MoreExecutors.directExecutor());
@@ -296,7 +293,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                 schemaContextFactory.createSchemaContext(sourceIdentifiers);
         Futures.addCallback(schemaContextFuture, new FutureCallback<SchemaContext>() {
             @Override
-            public void onSuccess(@Nonnull final SchemaContext result) {
+            public void onSuccess(final SchemaContext result) {
                 executeInSelf(() -> {
                     // Make sure the slaveSalManager instance hasn't changed since we initiated the schema context
                     // resolution.
@@ -310,7 +307,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             }
 
             @Override
-            public void onFailure(@Nonnull final Throwable throwable) {
+            public void onFailure(final Throwable throwable) {
                 executeInSelf(() -> {
                     if (slaveSalManager == localSlaveSalManager) {
                         final Throwable cause = Throwables.getRootCause(throwable);

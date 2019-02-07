@@ -11,8 +11,7 @@ import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -67,7 +66,7 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
     }
 
     private FluentFuture<DOMRpcResult> handleRpc(
-            @Nonnull final SchemaPath type, @Nullable final NormalizedNode<?, ?> input,
+            final @NonNull SchemaPath type, final @NonNull NormalizedNode<?, ?> input,
             final MessageTransformer<NetconfMessage> transformer) {
         final FluentFuture<RpcResult<NetconfMessage>> delegateFuture = listener.sendRequest(
             transformer.toRpcRequest(type, input), type.getLastComponent());
@@ -94,9 +93,8 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
         return NetconfMessageTransformUtil.NETCONF_URI.equals(type.getLastComponent().getNamespace());
     }
 
-    @Nonnull
     @Override
-    public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(@Nonnull final T lsnr) {
+    public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(final T lsnr) {
         throw new UnsupportedOperationException("Not available for netconf 1.0");
     }
 }

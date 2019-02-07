@@ -5,11 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.protocol;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.concurrent.Promise;
@@ -19,7 +19,6 @@ import java.net.SocketAddress;
 import java.security.PublicKey;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.GuardedBy;
 import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.future.AuthFuture;
@@ -28,6 +27,7 @@ import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.client.session.ClientSessionImpl;
 import org.apache.sshd.common.future.SshFutureListener;
 import org.apache.sshd.common.session.Session;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
@@ -53,11 +53,11 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
 
     CallHomeSessionContext(final ClientSession sshSession, final CallHomeAuthorization authorization,
                            final SocketAddress remoteAddress, final Factory factory) {
-        this.authorization = Preconditions.checkNotNull(authorization, "authorization");
-        Preconditions.checkArgument(this.authorization.isServerAllowed(), "Server was not allowed.");
-        Preconditions.checkArgument(sshSession instanceof ClientSessionImpl,
+        this.authorization = requireNonNull(authorization, "authorization");
+        checkArgument(this.authorization.isServerAllowed(), "Server was not allowed.");
+        checkArgument(sshSession instanceof ClientSessionImpl,
                 "sshSession must implement ClientSessionImpl");
-        this.factory = Preconditions.checkNotNull(factory, "factory");
+        this.factory = requireNonNull(factory, "factory");
         this.sshSession = (ClientSessionImpl) sshSession;
         this.sshSession.setAttribute(SESSION_KEY, this);
         this.remoteAddress = (InetSocketAddress) this.sshSession.getIoSession().getRemoteAddress();
@@ -80,7 +80,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
             netconfChannel.setStreaming(ClientChannel.Streaming.Async);
             netconfChannel.open().addListener(newSshFutureListener(netconfChannel));
         } catch (IOException e) {
-            throw Throwables.propagate(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -159,9 +159,9 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
 
         Factory(final EventLoopGroup nettyGroup, final NetconfClientSessionNegotiatorFactory negotiatorFactory,
                 final CallHomeNetconfSubsystemListener subsystemListener) {
-            this.nettyGroup = Preconditions.checkNotNull(nettyGroup, "nettyGroup");
-            this.negotiatorFactory = Preconditions.checkNotNull(negotiatorFactory, "negotiatorFactory");
-            this.subsystemListener = Preconditions.checkNotNull(subsystemListener);
+            this.nettyGroup = requireNonNull(nettyGroup, "nettyGroup");
+            this.negotiatorFactory = requireNonNull(negotiatorFactory, "negotiatorFactory");
+            this.subsystemListener = requireNonNull(subsystemListener);
         }
 
         void remove(final CallHomeSessionContext session) {
@@ -176,8 +176,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
             return this.subsystemListener;
         }
 
-        @Nullable
-        CallHomeSessionContext createIfNotExists(final ClientSession sshSession,
+        @Nullable CallHomeSessionContext createIfNotExists(final ClientSession sshSession,
                 final CallHomeAuthorization authorization, final SocketAddress remoteAddress) {
             CallHomeSessionContext session = new CallHomeSessionContext(sshSession, authorization,
                     remoteAddress, this);

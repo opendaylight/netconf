@@ -5,15 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -42,9 +41,8 @@ public final class ParserFieldsParameter {
      * @param input input value of fields parameter
      * @return {@link List}
      */
-    @Nonnull
-    public static List<Set<QName>> parseFieldsParameter(@Nonnull final InstanceIdentifierContext<?> identifier,
-                                                        @Nonnull final String input) {
+    public static @NonNull List<Set<QName>> parseFieldsParameter(final @NonNull InstanceIdentifierContext<?> identifier,
+                                                                 final @NonNull String input) {
         final List<Set<QName>> parsed = new ArrayList<>();
         final SchemaContext context = identifier.getSchemaContext();
         final QNameModule startQNameModule = identifier.getSchemaNode().getQName().getModule();
@@ -68,11 +66,9 @@ public final class ParserFieldsParameter {
      * @param parsed list of results
      * @param context schema context
      */
-    private static void parseInput(@Nonnull final String input,
-                                   @Nonnull final QNameModule startQNameModule,
-                                   @Nonnull final DataSchemaContextNode<?> startNode,
-                                   @Nonnull final List<Set<QName>> parsed,
-                                   @Nonnull final SchemaContext context) {
+    private static void parseInput(final @NonNull String input, final @NonNull QNameModule startQNameModule,
+                                   final @NonNull DataSchemaContextNode<?> startNode,
+                                   final @NonNull List<Set<QName>> parsed, final SchemaContext context) {
         int currentPosition = 0;
         int startPosition = 0;
         DataSchemaContextNode<?> currentNode = startNode;
@@ -178,12 +174,9 @@ public final class ParserFieldsParameter {
      * @param level current nodes level
      * @return {@link DataSchemaContextNode}
      */
-    @Nonnull
-    private static DataSchemaContextNode<?> addChildToResult(
-            @Nonnull final DataSchemaContextNode<?> currentNode,
-            @Nonnull final String identifier,
-            @Nonnull final QNameModule currentQNameModule,
-            @Nonnull final Set<QName> level) {
+    private static @NonNull DataSchemaContextNode<?> addChildToResult(
+            final @NonNull DataSchemaContextNode<?> currentNode, final @NonNull String identifier,
+            final @NonNull QNameModule currentQNameModule, final @NonNull Set<QName> level) {
         final QName childQName = QName.create(currentQNameModule, identifier);
 
         // resolve parent node
@@ -218,10 +211,8 @@ public final class ParserFieldsParameter {
      * @param qualifiedName qname of initial node
      * @return {@link DataSchemaContextNode}
      */
-    @Nullable
-    private static DataSchemaContextNode<?> resolveMixinNode(@Nullable final DataSchemaContextNode<?> node,
-                                                             @Nonnull final Set<QName> level,
-                                                             @Nonnull final QName qualifiedName) {
+    private static @Nullable DataSchemaContextNode<?> resolveMixinNode(final @Nullable DataSchemaContextNode<?> node,
+            final @NonNull Set<QName> level, final @NonNull QName qualifiedName) {
         DataSchemaContextNode<?> currentNode = node;
         while (currentNode != null && currentNode.isMixin()) {
             level.add(qualifiedName);
@@ -236,7 +227,7 @@ public final class ParserFieldsParameter {
      * @param input input where to find for closing parenthesis
      * @return int position of closing parenthesis increased by one
      */
-    private static int findClosingParenthesis(@Nonnull final String input) {
+    private static int findClosingParenthesis(final @Nullable String input) {
         int position = 0;
         int count = 1;
 

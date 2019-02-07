@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -19,8 +21,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javax.annotation.Nonnull;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
@@ -65,7 +65,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     }
 
     protected void checkNotFinished() {
-        Preconditions.checkState(!isFinished(), "%s: Transaction %s already finished", id, getIdentifier());
+        checkState(!isFinished(), "%s: Transaction %s already finished", id, getIdentifier());
     }
 
     protected boolean isFinished() {
@@ -145,7 +145,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     }
 
     @Override
-    public @NonNull FluentFuture<? extends @NonNull CommitInfo> commit() {
+    public FluentFuture<? extends CommitInfo> commit() {
         final SettableFuture<CommitInfo> resultFuture = SettableFuture.create();
         Futures.addCallback(commitConfiguration(), new FutureCallback<RpcResult<Void>>() {
             @Override
@@ -178,7 +178,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         final ListenableFuture<RpcResult<Void>> result = performCommit();
         Futures.addCallback(result, new FutureCallback<RpcResult<Void>>() {
             @Override
-            public void onSuccess(@Nonnull final RpcResult<Void> rpcResult) {
+            public void onSuccess(final RpcResult<Void> rpcResult) {
                 if (rpcResult.isSuccessful()) {
                     listeners.forEach(txListener -> txListener.onTransactionSuccessful(AbstractWriteTx.this));
                 } else {
@@ -201,7 +201,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
 
     private void checkEditable(final LogicalDatastoreType store) {
         checkNotFinished();
-        Preconditions.checkArgument(store == LogicalDatastoreType.CONFIGURATION,
+        checkArgument(store == LogicalDatastoreType.CONFIGURATION,
                 "Can edit only configuration data, not %s", store);
     }
 
@@ -214,7 +214,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
 
         Futures.addCallback(Futures.allAsList(resultsFutures), new FutureCallback<List<DOMRpcResult>>() {
             @Override
-            public void onSuccess(@Nonnull final List<DOMRpcResult> domRpcResults) {
+            public void onSuccess(final List<DOMRpcResult> domRpcResults) {
                 if (!transformed.isDone()) {
                     extractResult(domRpcResults, transformed);
                 }

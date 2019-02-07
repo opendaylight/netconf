@@ -7,8 +7,9 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,7 +18,6 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
@@ -72,7 +72,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void put(final String uriPath, final String payload) throws OperationFailedException {
-        Preconditions.checkNotNull(payload, "payload can't be null");
+        requireNonNull(payload, "payload can't be null");
 
         LOG.debug("put: uriPath: {}, payload: {}", uriPath, payload);
 
@@ -92,9 +92,8 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public void post(final String uriPath, final String payload)
-            throws OperationFailedException {
-        Preconditions.checkNotNull(payload, "payload can't be null");
+    public void post(final String uriPath, final String payload) throws OperationFailedException {
+        requireNonNull(payload, "payload can't be null");
 
         LOG.debug("post: uriPath: {}, payload: {}", uriPath, payload);
 
@@ -159,7 +158,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
     @Override
     public Optional<String> invokeRpc(final String uriPath, final Optional<String> input)
             throws OperationFailedException {
-        Preconditions.checkNotNull(uriPath, "uriPath can't be null");
+        requireNonNull(uriPath, "uriPath can't be null");
 
         final String actualInput = input.isPresent() ? input.get() : null;
 
@@ -198,7 +197,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
             throws OperationFailedException {
 
         String output = null;
-        Preconditions.checkNotNull(payload, "payload can't be null");
+        requireNonNull(payload, "payload can't be null");
 
         LOG.debug("patch: uriPath: {}, payload: {}", uriPath, payload);
 
@@ -222,8 +221,8 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public Optional<String> subscribeToStream(@Nonnull final String identifier,
-                                      final MultivaluedMap<String, String> params) throws OperationFailedException {
+    public Optional<String> subscribeToStream(final String identifier, final MultivaluedMap<String, String> params)
+            throws OperationFailedException {
         //Note: We use http://127.0.0.1 because the Uri parser requires something there though it does nothing
         String uri = new StringBuilder("http://127.0.0.1:8081/restconf/streams/stream/").append(identifier).toString();
         MultivaluedMap queryParams = params != null ? params : new MultivaluedHashMap<String, String>();
@@ -240,7 +239,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
         return Optional.fromNullable(jsonRes);
     }
 
-    private  String toJson(final PatchStatusContext patchStatusContext) throws IOException {
+    private static String toJson(final PatchStatusContext patchStatusContext) throws IOException {
         final PatchJsonBodyWriter writer = new PatchJsonBodyWriter();
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writer.writeTo(patchStatusContext, PatchStatusContext.class, null, EMPTY_ANNOTATIONS,

@@ -7,7 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
@@ -21,10 +23,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.Provider;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -166,11 +168,11 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param resultCollection collection of parsed edits
      * @throws IOException if operation fails
      */
-    private void parseByName(@Nonnull final String name, @Nonnull final PatchEdit edit,
-                             @Nonnull final JsonReader in, @Nonnull final InstanceIdentifierContext<?> path,
-                             @Nonnull final StringModuleInstanceIdentifierCodec codec,
-                             @Nonnull final List<PatchEntity> resultCollection,
-                             @Nonnull final AtomicReference<String> patchId) throws IOException {
+    private void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
+                             final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext<?> path,
+                             final @NonNull StringModuleInstanceIdentifierCodec codec,
+                             final @NonNull List<PatchEntity> resultCollection,
+                             final @NonNull AtomicReference<String> patchId) throws IOException {
         switch (name) {
             case "edit":
                 if (in.peek() == JsonToken.BEGIN_ARRAY) {
@@ -207,9 +209,9 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param codec Draft11StringModuleInstanceIdentifierCodec codec
      * @throws IOException if operation fails
      */
-    private void readEditDefinition(@Nonnull final PatchEdit edit, @Nonnull final JsonReader in,
-                                    @Nonnull final InstanceIdentifierContext<?> path,
-                                    @Nonnull final StringModuleInstanceIdentifierCodec codec) throws IOException {
+    private void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
+                                    final @NonNull InstanceIdentifierContext<?> path,
+                                    final @NonNull StringModuleInstanceIdentifierCodec codec) throws IOException {
         String deferredValue = null;
         in.beginObject();
 
@@ -237,8 +239,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
 
                     break;
                 case "value":
-                    Preconditions.checkArgument(edit.getData() == null && deferredValue == null,
-                            "Multiple value entries found");
+                    checkArgument(edit.getData() == null && deferredValue == null, "Multiple value entries found");
 
                     if (edit.getTargetSchemaNode() == null) {
                         final StringBuilder sb = new StringBuilder();
@@ -273,7 +274,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private void readValueNode(@Nonnull final StringBuilder sb, @Nonnull final JsonReader in) throws IOException {
+    private void readValueNode(final @NonNull StringBuilder sb, final @NonNull JsonReader in) throws IOException {
         in.beginObject();
 
         sb.append("{\"").append(in.nextName()).append("\":");
@@ -312,7 +313,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private void readValueObject(@Nonnull final StringBuilder sb, @Nonnull final JsonReader in) throws IOException {
+    private void readValueObject(final @NonNull StringBuilder sb, final @NonNull JsonReader in) throws IOException {
         // read simple leaf value
         if (in.peek() == JsonToken.STRING) {
             sb.append('"').append(in.nextString()).append('"');
@@ -366,8 +367,8 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      */
-    private static NormalizedNode<?, ?> readEditData(@Nonnull final JsonReader in,
-            @Nonnull final SchemaNode targetSchemaNode, @Nonnull final InstanceIdentifierContext<?> path) {
+    private static NormalizedNode<?, ?> readEditData(final @NonNull JsonReader in,
+             final @NonNull SchemaNode targetSchemaNode, final @NonNull InstanceIdentifierContext<?> path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         JsonParserStream.create(writer, JSONCodecFactorySupplier.RFC7951.getShared(path.getSchemaContext()),
@@ -381,7 +382,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @param edit Instance of PatchEdit
      * @return PatchEntity Patch entity
      */
-    private static PatchEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
+    private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) {
         if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
                 && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
             if (!edit.getOperation().isWithValue()) {
@@ -409,7 +410,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
      * @return true if data is present when operation requires it or if there are no data when operation does not
      *     allow it, false otherwise
      */
-    private static boolean checkDataPresence(@Nonnull final PatchEditOperation operation, final boolean hasData) {
+    private static boolean checkDataPresence(final @NonNull PatchEditOperation operation, final boolean hasData) {
         return operation.isWithValue() == hasData;
     }
 
@@ -428,7 +429,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
         }
 
         void setId(final String id) {
-            this.id = Preconditions.checkNotNull(id);
+            this.id = requireNonNull(id);
         }
 
         PatchEditOperation getOperation() {
@@ -436,7 +437,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
         }
 
         void setOperation(final PatchEditOperation operation) {
-            this.operation = Preconditions.checkNotNull(operation);
+            this.operation = requireNonNull(operation);
         }
 
         YangInstanceIdentifier getTarget() {
@@ -444,7 +445,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
         }
 
         void setTarget(final YangInstanceIdentifier target) {
-            this.target = Preconditions.checkNotNull(target);
+            this.target = requireNonNull(target);
         }
 
         SchemaNode getTargetSchemaNode() {
@@ -452,7 +453,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
         }
 
         void setTargetSchemaNode(final SchemaNode targetSchemaNode) {
-            this.targetSchemaNode = Preconditions.checkNotNull(targetSchemaNode);
+            this.targetSchemaNode = requireNonNull(targetSchemaNode);
         }
 
         NormalizedNode<?, ?> getData() {
@@ -460,7 +461,7 @@ public class JsonToPatchBodyReader extends AbstractToPatchBodyReader {
         }
 
         void setData(final NormalizedNode<?, ?> data) {
-            this.data = Preconditions.checkNotNull(data);
+            this.data = requireNonNull(data);
         }
 
         void clear() {

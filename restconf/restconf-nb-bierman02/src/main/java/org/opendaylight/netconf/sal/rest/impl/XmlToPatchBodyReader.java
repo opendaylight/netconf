@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.rest.impl;
 
 import com.google.common.base.Splitter;
@@ -21,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -31,6 +29,7 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -206,8 +205,8 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
      * @param operation Name of current operation
      * @return List of value elements
      */
-    private static List<Element> readValueNodes(@Nonnull final Element element,
-            @Nonnull final PatchEditOperation operation) {
+    private static List<Element> readValueNodes(final @NonNull Element element,
+            final @NonNull PatchEditOperation operation) {
         final Node valueNode = element.getElementsByTagName("value").item(0);
 
         if (operation.isWithValue() && valueNode == null) {
@@ -245,8 +244,8 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
      * @param revision Module revision
      * @return Non-conditional XPath
      */
-    private static String prepareNonCondXpath(@Nonnull final DataSchemaNode schemaNode, @Nonnull final String target,
-            @Nonnull final Element value, @Nonnull final String namespace, @Nonnull final String revision) {
+    private static String prepareNonCondXpath(final @NonNull DataSchemaNode schemaNode, final @NonNull String target,
+            final @NonNull Element value, final @NonNull String namespace, final @NonNull String revision) {
         final Iterator<String> args = Splitter.on("/").split(target.substring(target.indexOf(':') + 1)).iterator();
 
         final StringBuilder nonCondXpath = new StringBuilder();
@@ -279,7 +278,7 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
      * @param keys Iterator of list keys names
      * @return Iterator of list keys values
      */
-    private static Iterator<String> readKeyValues(@Nonnull final Element value, @Nonnull final Iterator<QName> keys) {
+    private static Iterator<String> readKeyValues(final @NonNull Element value, final @NonNull Iterator<QName> keys) {
         final List<String> result = new ArrayList<>();
 
         while (keys.hasNext()) {
@@ -296,16 +295,11 @@ public class XmlToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider i
      * @param keyNames Iterator of list keys names
      * @param keyValues Iterator of list keys values
      */
-    private static void appendKeys(@Nonnull final StringBuilder nonCondXpath, @Nonnull final Iterator<QName> keyNames,
-                            @Nonnull final Iterator<String> keyValues) {
+    private static void appendKeys(final @NonNull StringBuilder nonCondXpath, final @NonNull Iterator<QName> keyNames,
+            final @NonNull Iterator<String> keyValues) {
         while (keyNames.hasNext()) {
-            nonCondXpath.append("[");
-            nonCondXpath.append(keyNames.next().getLocalName());
-            nonCondXpath.append("=");
-            nonCondXpath.append("'");
-            nonCondXpath.append(keyValues.next());
-            nonCondXpath.append("'");
-            nonCondXpath.append("]");
+            nonCondXpath.append("[").append(keyNames.next().getLocalName()).append("='").append(keyValues.next())
+                .append("']");
         }
     }
 }
