@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d8222545_d29d950d",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/test/Rfc8040RestConfWiringTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2019-02-07T19:02:22Z",
+      "side": 1,
+      "message": "\u003d\u003d\u003e https://jira.opendaylight.org/browse/YANGTOOLS-952",
+      "revId": "5f0ef08498db99f5525742507b41eb47b4795adb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
