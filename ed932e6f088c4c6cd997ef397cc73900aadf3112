@@ -73,6 +73,24 @@
     },
     {
       "key": {
+        "uuid": "f22a9d0e_c2e3a773",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-02-07T16:09:10Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "cf4961b2_b764e57c",
+      "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "02aa1f82_59e5f16e",
         "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
         "patchSetId": 10
