@@ -8,8 +8,8 @@
 package org.opendaylight.netconf.sal.restconf.api;
 
 import com.google.common.base.Optional;
-import javax.annotation.Nonnull;
 import javax.ws.rs.core.MultivaluedMap;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 
@@ -32,7 +32,7 @@ public interface JSONRestconfService {
      * @param payload the payload data in JSON format.
      * @throws OperationFailedException if the request fails.
      */
-    void put(String uriPath, @Nonnull String payload) throws OperationFailedException;
+    void put(String uriPath, @NonNull String payload) throws OperationFailedException;
 
     /**
      * Issues a restconf POST request to the configuration data store.
@@ -42,7 +42,7 @@ public interface JSONRestconfService {
      * @param payload the payload data in JSON format.
      * @throws OperationFailedException if the request fails.
      */
-    void post(String uriPath, @Nonnull String payload) throws OperationFailedException;
+    void post(String uriPath, @NonNull String payload) throws OperationFailedException;
 
     /**
      * Issues a restconf DELETE request to the configuration data store.
@@ -73,7 +73,7 @@ public interface JSONRestconfService {
      * @return an Optional containing the output in JSON format if the RPC returns output.
      * @throws OperationFailedException if the request fails.
      */
-    Optional<String> invokeRpc(@Nonnull String uriPath, Optional<String> input) throws OperationFailedException;
+    Optional<String> invokeRpc(@NonNull String uriPath, Optional<String> input) throws OperationFailedException;
 
     /**
      * Issues a restconf PATCH request to the configuration data store.
@@ -84,7 +84,7 @@ public interface JSONRestconfService {
      * @return an Optional containing the patch response data in JSON format.
      * @throws OperationFailedException if the request fails.
      */
-    Optional<String> patch(@Nonnull String uriPath, @Nonnull String payload) throws OperationFailedException;
+    Optional<String> patch(@NonNull String uriPath, @NonNull String payload) throws OperationFailedException;
 
     /**
      * Subscribe to a stream.
@@ -94,6 +94,6 @@ public interface JSONRestconfService {
      * @return On optional containing the JSON response.
      * @throws OperationFailedException if the requests fails.
      */
-    Optional<String> subscribeToStream(@Nonnull String identifier, MultivaluedMap<String, String> params)
+    Optional<String> subscribeToStream(@NonNull String identifier, MultivaluedMap<String, String> params)
                                                                                     throws OperationFailedException;
 }

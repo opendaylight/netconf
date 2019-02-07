@@ -7,25 +7,26 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
@@ -46,6 +47,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfEventSourceMountTest {
 
     public static final String STREAM_1 = "stream-1";
@@ -62,7 +64,6 @@ public class NetconfEventSourceMountTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         doReturn(Optional.of(dataBroker)).when(domMountPoint).getService(DOMDataBroker.class);
         doReturn(Optional.of(rpcService)).when(domMountPoint).getService(DOMRpcService.class);
         doReturn(Optional.of(mock(DOMNotificationService.class))).when(domMountPoint)
@@ -86,7 +87,7 @@ public class NetconfEventSourceMountTest {
                 "create-subscription"));
         ArgumentCaptor<ContainerNode> captor = ArgumentCaptor.forClass(ContainerNode.class);
         verify(rpcService).invokeRpc(eq(type), captor.capture());
-        Assert.assertEquals(STREAM_1, getStreamName(captor.getValue()));
+        assertEquals(STREAM_1, getStreamName(captor.getValue()));
     }
 
     @Test
@@ -101,12 +102,12 @@ public class NetconfEventSourceMountTest {
                 "create-subscription"));
         ArgumentCaptor<ContainerNode> captor = ArgumentCaptor.forClass(ContainerNode.class);
         verify(rpcService).invokeRpc(eq(type), captor.capture());
-        Assert.assertEquals(STREAM_1, getStreamName(captor.getValue()));
+        assertEquals(STREAM_1, getStreamName(captor.getValue()));
         final String expDate = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(date.atZone(ZoneId.systemDefault()));
         final Optional<LeafNode> actual = (Optional<LeafNode>) getDate(captor.getValue());
-        Assert.assertTrue(actual.isPresent());
+        assertTrue(actual.isPresent());
         String actualDate = (String) actual.get().getValue();
-        Assert.assertEquals(expDate, actualDate);
+        assertEquals(expDate, actualDate);
     }
 
     @Test
@@ -120,23 +121,16 @@ public class NetconfEventSourceMountTest {
                 "create-subscription"));
         ArgumentCaptor<ContainerNode> captor = ArgumentCaptor.forClass(ContainerNode.class);
         verify(rpcService).invokeRpc(eq(type), captor.capture());
-        Assert.assertEquals(STREAM_1, getStreamName(captor.getValue()));
+        assertEquals(STREAM_1, getStreamName(captor.getValue()));
         final Optional<LeafNode> date = (Optional<LeafNode>) getDate(captor.getValue());
-        Assert.assertFalse(date.isPresent());
-
+        assertFalse(date.isPresent());
     }
 
     @Test
     public void testGetAvailableStreams() throws Exception {
         final List<Stream> availableStreams = mount.getAvailableStreams();
-        Assert.assertEquals(2, availableStreams.size());
-        final List<String> streamNames = Lists.transform(availableStreams, new Function<Stream, String>() {
-            @Nullable
-            @Override
-            public String apply(@Nullable final Stream input) {
-                return input.getName().getValue();
-            }
-        });
+        assertEquals(2, availableStreams.size());
+        final List<String> streamNames = Lists.transform(availableStreams, input -> input.getName().getValue());
         streamNames.contains(STREAM_1);
         streamNames.contains(STREAM_2);
     }

@@ -7,10 +7,11 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -20,7 +21,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nonnull;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
@@ -93,18 +93,18 @@ public class NetconfTopologyManager
                                   final DOMMountPointService mountPointService,
                                   final AAAEncryptionService encryptionService) {
 
-        this.dataBroker = Preconditions.checkNotNull(dataBroker);
-        this.rpcProviderRegistry = Preconditions.checkNotNull(rpcProviderRegistry);
-        this.clusterSingletonServiceProvider = Preconditions.checkNotNull(clusterSingletonServiceProvider);
+        this.dataBroker = requireNonNull(dataBroker);
+        this.rpcProviderRegistry = requireNonNull(rpcProviderRegistry);
+        this.clusterSingletonServiceProvider = requireNonNull(clusterSingletonServiceProvider);
         this.keepaliveExecutor = keepaliveExecutor.getExecutor();
         this.processingExecutor = MoreExecutors.listeningDecorator(processingExecutor.getExecutor());
-        this.actorSystem = Preconditions.checkNotNull(actorSystemProvider).getActorSystem();
-        this.eventExecutor = Preconditions.checkNotNull(eventExecutor);
-        this.clientDispatcher = Preconditions.checkNotNull(clientDispatcher);
-        this.topologyId = Preconditions.checkNotNull(topologyId);
+        this.actorSystem = requireNonNull(actorSystemProvider).getActorSystem();
+        this.eventExecutor = requireNonNull(eventExecutor);
+        this.clientDispatcher = requireNonNull(clientDispatcher);
+        this.topologyId = requireNonNull(topologyId);
         this.writeTxIdleTimeout = Duration.apply(config.getWriteTransactionIdleTimeout(), TimeUnit.SECONDS);
         this.mountPointService = mountPointService;
-        this.encryptionService = Preconditions.checkNotNull(encryptionService);
+        this.encryptionService = requireNonNull(encryptionService);
 
     }
 
@@ -114,7 +114,7 @@ public class NetconfTopologyManager
     }
 
     @Override
-    public void onDataTreeChanged(@Nonnull final Collection<DataTreeModification<Node>> changes) {
+    public void onDataTreeChanged(final Collection<DataTreeModification<Node>> changes) {
         for (final DataTreeModification<Node> change : changes) {
             final DataObjectModification<Node> rootNode = change.getRootNode();
             final InstanceIdentifier<Node> dataModifIdent = change.getRootPath().getRootIdentifier();
@@ -155,9 +155,9 @@ public class NetconfTopologyManager
     @SuppressWarnings("checkstyle:IllegalCatch")
     private void startNetconfDeviceContext(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
         final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
-        Preconditions.checkNotNull(netconfNode);
-        Preconditions.checkNotNull(netconfNode.getHost());
-        Preconditions.checkNotNull(netconfNode.getHost().getIpAddress());
+        requireNonNull(netconfNode);
+        requireNonNull(netconfNode.getHost());
+        requireNonNull(netconfNode.getHost().getIpAddress());
 
         final Timeout actorResponseWaitTime = new Timeout(Duration.create(netconfNode.getActorResponseWaitTime(),
                 "seconds"));
@@ -251,7 +251,7 @@ public class NetconfTopologyManager
             }
 
             @Override
-            public void onFailure(@Nonnull final Throwable throwable) {
+            public void onFailure(final Throwable throwable) {
                 LOG.error("Unable to initialize netconf-topology, {}", throwable);
             }
         }, MoreExecutors.directExecutor());

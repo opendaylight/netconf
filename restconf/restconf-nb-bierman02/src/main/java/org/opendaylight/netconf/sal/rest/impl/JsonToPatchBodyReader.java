@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.rest.impl;
 
 import com.google.common.collect.ImmutableList;
@@ -23,13 +22,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.annotation.Nonnull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
@@ -188,11 +187,11 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param resultCollection collection of parsed edits
      * @throws IOException if operation fails
      */
-    private void parseByName(@Nonnull final String name, @Nonnull final PatchEdit edit,
-                             @Nonnull final JsonReader in, @Nonnull final InstanceIdentifierContext<?> path,
-                             @Nonnull final StringModuleInstanceIdentifierCodec codec,
-                             @Nonnull final List<PatchEntity> resultCollection,
-                             @Nonnull final AtomicReference<String> patchId) throws IOException {
+    private void parseByName(final @NonNull String name, final @NonNull PatchEdit edit,
+                             final @NonNull JsonReader in, final @NonNull InstanceIdentifierContext<?> path,
+                             final @NonNull StringModuleInstanceIdentifierCodec codec,
+                             final @NonNull List<PatchEntity> resultCollection,
+                             final @NonNull AtomicReference<String> patchId) throws IOException {
         switch (name) {
             case "edit" :
                 if (in.peek() == JsonToken.BEGIN_ARRAY) {
@@ -228,9 +227,9 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param codec StringModuleInstanceIdentifierCodec codec
      * @throws IOException if operation fails
      */
-    private void readEditDefinition(@Nonnull final PatchEdit edit, @Nonnull final JsonReader in,
-                                    @Nonnull final InstanceIdentifierContext<?> path,
-                                    @Nonnull final StringModuleInstanceIdentifierCodec codec) throws IOException {
+    private void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
+                                    final @NonNull InstanceIdentifierContext<?> path,
+                                    final @NonNull StringModuleInstanceIdentifierCodec codec) throws IOException {
         final StringBuffer value = new StringBuffer();
         in.beginObject();
 
@@ -280,7 +279,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private void readValueNode(@Nonnull final StringBuffer value, @Nonnull final JsonReader in) throws IOException {
+    private void readValueNode(final @NonNull StringBuffer value, final @NonNull JsonReader in) throws IOException {
         in.beginObject();
         value.append("{");
 
@@ -317,7 +316,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private void readValueObject(@Nonnull final StringBuffer value, @Nonnull final JsonReader in) throws IOException {
+    private void readValueObject(final @NonNull StringBuffer value, final @NonNull JsonReader in) throws IOException {
         // read simple leaf value
         if (in.peek() == JsonToken.STRING) {
             value.append("\"" + in.nextString() + "\"");
@@ -370,8 +369,8 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param in reader JsonReader reader
      * @return NormalizedNode representing data
      */
-    private static NormalizedNode<?, ?> readEditData(@Nonnull final JsonReader in,
-            @Nonnull final SchemaNode targetSchemaNode, @Nonnull final InstanceIdentifierContext<?> path) {
+    private static NormalizedNode<?, ?> readEditData(final @NonNull JsonReader in,
+            final @NonNull SchemaNode targetSchemaNode, final @NonNull InstanceIdentifierContext<?> path) {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         JsonParserStream.create(writer,
@@ -386,7 +385,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param edit Instance of PatchEdit
      * @return PatchEntity Patch entity
      */
-    private static PatchEntity prepareEditOperation(@Nonnull final PatchEdit edit) {
+    private static PatchEntity prepareEditOperation(final @NonNull PatchEdit edit) {
         if (edit.getOperation() != null && edit.getTargetSchemaNode() != null
                 && checkDataPresence(edit.getOperation(), edit.getData() != null)) {
             if (edit.getOperation().isWithValue()) {
@@ -414,7 +413,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @return true if data is present when operation requires it or if there are no data when operation does not
      *     allow it, false otherwise
      */
-    private static boolean checkDataPresence(@Nonnull final PatchEditOperation operation, final boolean hasData) {
+    private static boolean checkDataPresence(final @NonNull PatchEditOperation operation, final boolean hasData) {
         return operation.isWithValue() == hasData;
     }
 

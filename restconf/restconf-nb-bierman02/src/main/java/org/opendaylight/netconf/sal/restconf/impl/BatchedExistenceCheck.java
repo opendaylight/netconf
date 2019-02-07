@@ -8,8 +8,6 @@
 package org.opendaylight.netconf.sal.restconf.impl;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -18,7 +16,6 @@ import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
-import javax.annotation.Nonnull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
@@ -44,10 +41,9 @@ final class BatchedExistenceCheck {
         final BatchedExistenceCheck ret = new BatchedExistenceCheck(children.size());
         for (NormalizedNode<?, ?> child : children) {
             final YangInstanceIdentifier path = parentPath.node(child.getIdentifier());
-            final ListenableFuture<Boolean> f = readTx.exists(datastore, path);
-            Futures.addCallback(f, new FutureCallback<Boolean>() {
+            readTx.exists(datastore, path).addCallback(new FutureCallback<Boolean>() {
                 @Override
-                public void onSuccess(@Nonnull final Boolean result) {
+                public void onSuccess(final Boolean result) {
                     ret.complete(path, result);
                 }
 

@@ -14,7 +14,6 @@ import akka.pattern.Patterns;
 import akka.util.Timeout;
 import java.util.Collections;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
 import org.opendaylight.netconf.topology.singleton.messages.YangTextSchemaSourceRequest;
@@ -44,7 +43,7 @@ public class ProxyYangTextSourceProvider implements RemoteYangTextSourceProvider
 
     @Override
     public Future<YangTextSchemaSourceSerializationProxy> getYangTextSchemaSource(
-            @Nonnull final SourceIdentifier sourceIdentifier) {
+            final SourceIdentifier sourceIdentifier) {
 
         final Future<Object> scalaFuture = Patterns.ask(masterRef,
                 new YangTextSchemaSourceRequest(sourceIdentifier), actorResponseWaitTime);

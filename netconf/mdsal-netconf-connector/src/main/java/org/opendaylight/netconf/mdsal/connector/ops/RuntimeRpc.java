@@ -14,12 +14,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import javax.annotation.Nullable;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -253,9 +253,8 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
      * @return parsed rpc into normalized node, or null if input schema is null
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
-    @Nullable
-    private NormalizedNode<?, ?> rpcToNNode(final XmlElement element, @Nullable final ContainerSchemaNode input)
-            throws DocumentedException {
+    private @Nullable NormalizedNode<?, ?> rpcToNNode(final XmlElement element,
+            final @Nullable ContainerSchemaNode input) throws DocumentedException {
         if (input == null || input.getChildNodes().isEmpty()) {
             return null;
         }

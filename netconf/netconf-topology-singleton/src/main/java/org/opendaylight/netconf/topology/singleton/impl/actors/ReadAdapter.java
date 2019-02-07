@@ -12,7 +12,6 @@ import akka.actor.Status.Failure;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Optional;
-import javax.annotation.Nonnull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
@@ -60,7 +59,7 @@ class ReadAdapter {
             }
 
             @Override
-            public void onFailure(@Nonnull final Throwable throwable) {
+            public void onFailure(final Throwable throwable) {
                 sender.tell(new Failure(throwable), self);
             }
         }, MoreExecutors.directExecutor());
@@ -79,7 +78,7 @@ class ReadAdapter {
             }
 
             @Override
-            public void onFailure(@Nonnull final Throwable throwable) {
+            public void onFailure(final Throwable throwable) {
                 sender.tell(new Failure(throwable), self);
             }
         }, MoreExecutors.directExecutor());

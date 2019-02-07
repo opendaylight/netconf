@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.topology.singleton.messages.rpc;
 
 import java.io.Externalizable;
@@ -13,7 +12,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
-import javax.annotation.Nullable;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.SchemaPathMessage;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -25,7 +24,7 @@ public class InvokeRpcMessage implements Serializable {
     private final NormalizedNodeMessage normalizedNodeMessage;
 
     public InvokeRpcMessage(final SchemaPathMessage schemaPathMessage,
-                            @Nullable final NormalizedNodeMessage normalizedNodeMessage) {
+                            final @Nullable NormalizedNodeMessage normalizedNodeMessage) {
         this.schemaPathMessage = schemaPathMessage;
         this.normalizedNodeMessage = normalizedNodeMessage;
     }
@@ -38,8 +37,8 @@ public class InvokeRpcMessage implements Serializable {
         return schemaPathMessage.getSchemaPath();
     }
 
-    @Nullable
-    public NormalizedNodeMessage getNormalizedNodeMessage() {
+
+    public @Nullable NormalizedNodeMessage getNormalizedNodeMessage() {
         return normalizedNodeMessage;
     }
 

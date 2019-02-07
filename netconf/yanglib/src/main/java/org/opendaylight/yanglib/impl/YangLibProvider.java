@@ -7,7 +7,9 @@
  */
 package org.opendaylight.yanglib.impl;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
@@ -16,7 +18,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -62,9 +63,9 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
 
     public YangLibProvider(final YanglibConfig yanglibConfig, final DataBroker dataBroker,
             final SharedSchemaRepository schemaRepository) {
-        this.yanglibConfig = Preconditions.checkNotNull(yanglibConfig);
-        this.dataBroker = Preconditions.checkNotNull(dataBroker);
-        this.schemaRepository = Preconditions.checkNotNull(schemaRepository);
+        this.yanglibConfig = requireNonNull(yanglibConfig);
+        this.dataBroker = requireNonNull(dataBroker);
+        this.schemaRepository = requireNonNull(schemaRepository);
     }
 
     @Override
@@ -81,9 +82,8 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
         }
 
         final File cacheFolderFile = new File(yanglibConfig.getCacheFolder());
-        Preconditions.checkArgument(cacheFolderFile.exists(), "cache-folder %s does not exist", cacheFolderFile);
-        Preconditions.checkArgument(cacheFolderFile.isDirectory(), "cache-folder %s is not a directory",
-                cacheFolderFile);
+        checkArgument(cacheFolderFile.exists(), "cache-folder %s does not exist", cacheFolderFile);
+        checkArgument(cacheFolderFile.isDirectory(), "cache-folder %s is not a directory", cacheFolderFile);
 
         final FilesystemSchemaSourceCache<YangTextSchemaSource> cache =
                 new FilesystemSchemaSourceCache<>(schemaRepository, YangTextSchemaSource.class, cacheFolderFile);
@@ -126,7 +126,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
 
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
-            public void onSuccess(@Nullable final CommitInfo result) {
+            public void onSuccess(final CommitInfo result) {
                 LOG.debug("Modules state successfully populated with new modules");
             }
 
@@ -155,7 +155,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
 
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
-            public void onSuccess(@Nullable final CommitInfo result) {
+            public void onSuccess(final CommitInfo result) {
                 LOG.debug("Modules state successfully updated.");
             }
 

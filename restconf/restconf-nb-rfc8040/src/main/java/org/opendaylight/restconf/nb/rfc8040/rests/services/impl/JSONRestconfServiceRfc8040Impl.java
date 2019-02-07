@@ -7,7 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,10 +18,10 @@ import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
@@ -73,7 +74,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public void put(final String uriPath, final String payload) throws OperationFailedException {
-        Preconditions.checkNotNull(payload, "payload can't be null");
+        requireNonNull(payload, "payload can't be null");
 
         LOG.debug("put: uriPath: {}, payload: {}", uriPath, payload);
 
@@ -91,9 +92,8 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public void post(final String uriPath, final String payload)
-            throws OperationFailedException {
-        Preconditions.checkNotNull(payload, "payload can't be null");
+    public void post(final String uriPath, final String payload) throws OperationFailedException {
+        requireNonNull(payload, "payload can't be null");
 
         LOG.debug("post: uriPath: {}, payload: {}", uriPath, payload);
 
@@ -156,7 +156,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
     @Override
     public Optional<String> invokeRpc(final String uriPath, final Optional<String> input)
             throws OperationFailedException {
-        Preconditions.checkNotNull(uriPath, "uriPath can't be null");
+        requireNonNull(uriPath, "uriPath can't be null");
 
         final String actualInput = input.isPresent() ? input.get() : null;
 
@@ -189,7 +189,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
             throws OperationFailedException {
 
         String output = null;
-        Preconditions.checkNotNull(payload, "payload can't be null");
+        requireNonNull(payload, "payload can't be null");
 
         LOG.debug("patch: uriPath: {}, payload: {}", uriPath, payload);
 
@@ -215,7 +215,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
     public void close() {
     }
 
-    private NormalizedNodeContext toNormalizedNodeContext(final String uriPath, @Nullable final String payload,
+    private NormalizedNodeContext toNormalizedNodeContext(final String uriPath, final @Nullable String payload,
             final boolean isPost) throws OperationFailedException {
         final InstanceIdentifierContext<?> instanceIdentifierContext = ParserIdentifier.toInstanceIdentifier(
                 uriPath, schemaContextHandler.get(), Optional.of(mountPointServiceHandler.get()));

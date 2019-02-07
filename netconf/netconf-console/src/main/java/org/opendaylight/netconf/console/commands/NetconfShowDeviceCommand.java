@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.console.commands;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -13,13 +12,13 @@ import com.google.common.base.Strings;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.annotation.Nonnull;
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.table.ShellTable;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.console.api.NetconfCommands;
 import org.opendaylight.netconf.console.utils.NetconfConsoleConstants;
 
@@ -95,7 +94,7 @@ public class NetconfShowDeviceCommand implements Action {
     }
 
     @SuppressWarnings("checkstyle:RegexpSinglelineJava")
-    private static void printDeviceData(@Nonnull final Map<String, Map<String, List<String>>> devices) {
+    private static void printDeviceData(final @NonNull Map<String, Map<String, List<String>>> devices) {
         final ShellTable table = new ShellTable();
         table.column(NetconfConsoleConstants.NETCONF_ID).alignLeft();
         table.column(NetconfConsoleConstants.NETCONF_IP).alignLeft();

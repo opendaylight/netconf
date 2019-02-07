@@ -7,24 +7,20 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
+import static com.google.common.base.Preconditions.checkState;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps.getSourceNode;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_PATH;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
 
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
@@ -121,7 +117,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     }
 
     void reconnect() {
-        Preconditions.checkState(listener != null, "%s: Unable to reconnect, session listener is missing", id);
+        checkState(listener != null, "%s: Unable to reconnect, session listener is missing", id);
         stopKeepalives();
         LOG.info("{}: Reconnecting inactive netconf session", id);
         listener.disconnect();
@@ -149,7 +145,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
 
     private void scheduleKeepalives() {
         lastKeepAliveSucceeded.set(true);
-        Preconditions.checkState(currentDeviceRpc != null);
+        checkState(currentDeviceRpc != null);
         LOG.trace("{}: Scheduling keepalives every  {} {}", id, keepaliveDelaySeconds, TimeUnit.SECONDS);
         currentKeepalive = executor.scheduleWithFixedDelay(new Keepalive(),
           keepaliveDelaySeconds, keepaliveDelaySeconds, TimeUnit.SECONDS);
@@ -200,7 +196,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
                 if (!lastJobSucceeded) {
                     onFailure(new IllegalStateException("Previous keepalive timed out"));
                 } else {
-                    Futures.addCallback(currentDeviceRpc.invokeRpc(NETCONF_GET_CONFIG_PATH, KEEPALIVE_PAYLOAD), this,
+                    currentDeviceRpc.invokeRpc(NETCONF_GET_CONFIG_PATH, KEEPALIVE_PAYLOAD).addCallback(this,
                                         MoreExecutors.directExecutor());
                 }
             } catch (NullPointerException e) {
@@ -230,7 +226,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         }
 
         @Override
-        public void onFailure(@Nonnull final Throwable throwable) {
+        public void onFailure(final Throwable throwable) {
             LOG.warn("{}: Keepalive RPC failed. Reconnecting netconf session.", id, throwable);
             reconnect();
         }
@@ -241,14 +237,14 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
      */
     private class ResetKeepalive implements FutureCallback<DOMRpcResult> {
         @Override
-        public void onSuccess(@Nullable final DOMRpcResult result) {
+        public void onSuccess(final DOMRpcResult result) {
             // No matter what response we got,
             // rpc-reply or rpc-error, we got it from device so the netconf session is OK.
             resetKeepalive();
         }
 
         @Override
-        public void onFailure(@Nonnull final Throwable throwable) {
+        public void onFailure(final Throwable throwable) {
             // User/Application RPC failed (The RPC did not reach the remote device or ..
             // TODO what other reasons could cause this ?)
             // There is no point in keeping this session. Reconnect.
@@ -301,12 +297,10 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
             return deviceRpc;
         }
 
-        @Nonnull
         @Override
-        public @NonNull FluentFuture<DOMRpcResult> invokeRpc(@Nonnull final SchemaPath type,
-                                                                      final NormalizedNode<?, ?> input) {
+        public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
             final FluentFuture<DOMRpcResult> rpcResultFuture = deviceRpc.invokeRpc(type, input);
-            Futures.addCallback(rpcResultFuture, resetKeepaliveTask, MoreExecutors.directExecutor());
+            rpcResultFuture.addCallback(resetKeepaliveTask, MoreExecutors.directExecutor());
 
             final RequestTimeoutTask timeoutTask = new RequestTimeoutTask(rpcResultFuture);
             executor.schedule(timeoutTask, defaultRequestTimeoutMillis, TimeUnit.MILLISECONDS);
@@ -315,8 +309,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         }
 
         @Override
-        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(
-                @Nonnull final T listener) {
+        public <T extends DOMRpcAvailabilityListener> ListenerRegistration<T> registerRpcListener(final T listener) {
             // There is no real communication with the device (yet), no reset here
             return deviceRpc.registerRpcListener(listener);
         }

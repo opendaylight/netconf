@@ -15,8 +15,6 @@ import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.NetconfManagementSession;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
@@ -42,21 +40,15 @@ public class DummyMonitoringService implements NetconfMonitoringService {
     private static final Function<Capability, Uri> CAPABILITY_URI_FUNCTION =
         capability -> new Uri(capability.getCapabilityUri());
 
-    private static final Function<Capability, Schema> CAPABILITY_SCHEMA_FUNCTION = new Function<Capability, Schema>() {
-        @Nullable
-        @Override
-        public Schema apply(@Nonnull final Capability capability) {
-            return new SchemaBuilder()
-                    .setIdentifier(capability.getModuleName().get())
-                    .setNamespace(new Uri(capability.getModuleNamespace().get()))
-                    .setFormat(Yang.class)
-                    .setVersion(capability.getRevision().or(""))
-                    .setLocation(Collections.singletonList(new Location(Enumeration.NETCONF)))
-                    .withKey(new SchemaKey(Yang.class, capability.getModuleName().get(),
-                        capability.getRevision().or("")))
-                    .build();
-        }
-    };
+    private static final Function<Capability, Schema> CAPABILITY_SCHEMA_FUNCTION = capability -> new SchemaBuilder()
+            .setIdentifier(capability.getModuleName().get())
+            .setNamespace(new Uri(capability.getModuleNamespace().get()))
+            .setFormat(Yang.class)
+            .setVersion(capability.getRevision().or(""))
+            .setLocation(Collections.singletonList(new Location(Enumeration.NETCONF)))
+            .withKey(new SchemaKey(Yang.class, capability.getModuleName().get(),
+                capability.getRevision().or("")))
+            .build();
 
     private final Capabilities capabilities;
     private final ArrayListMultimap<String, Capability> capabilityMultiMap;

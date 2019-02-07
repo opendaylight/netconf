@@ -8,7 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.api;
 
 import java.util.Optional;
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 
@@ -31,7 +31,7 @@ public interface JSONRestconfService {
      * @param payload the payload data in JSON format.
      * @throws OperationFailedException if the request fails.
      */
-    void put(String uriPath, @Nonnull String payload) throws OperationFailedException;
+    void put(String uriPath, @NonNull String payload) throws OperationFailedException;
 
     /**
      * Issues a restconf POST request to the configuration data store.
@@ -41,7 +41,7 @@ public interface JSONRestconfService {
      * @param payload the payload data in JSON format.
      * @throws OperationFailedException if the request fails.
      */
-    void post(String uriPath, @Nonnull String payload) throws OperationFailedException;
+    void post(String uriPath, @NonNull String payload) throws OperationFailedException;
 
     /**
      * Issues a restconf DELETE request to the configuration data store.
@@ -72,7 +72,7 @@ public interface JSONRestconfService {
      * @return an Optional containing the output in JSON format if the RPC returns output.
      * @throws OperationFailedException if the request fails.
      */
-    Optional<String> invokeRpc(@Nonnull String uriPath, Optional<String> input) throws OperationFailedException;
+    Optional<String> invokeRpc(@NonNull String uriPath, Optional<String> input) throws OperationFailedException;
 
     /**
      * Issues a restconf PATCH request to the configuration data store.
@@ -83,5 +83,5 @@ public interface JSONRestconfService {
      * @return an Optional containing the patch response data in JSON format.
      * @throws OperationFailedException if the request fails.
      */
-    Optional<String> patch(@Nonnull String uriPath, @Nonnull String payload) throws OperationFailedException;
+    Optional<String> patch(@NonNull String uriPath, @NonNull String payload) throws OperationFailedException;
 }

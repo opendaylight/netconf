@@ -13,7 +13,6 @@ import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
@@ -42,7 +41,7 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
     private static final Logger LOG = LoggerFactory.getLogger(CapabilityChangeNotificationProducer.class);
 
     private final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration;
-    private final ListenerRegistration capabilityChangeListenerRegistration;
+    private final ListenerRegistration<?> capabilityChangeListenerRegistration;
 
     public CapabilityChangeNotificationProducer(final NetconfNotificationCollector netconfNotificationCollector,
                                                 final DataBroker dataBroker) {
@@ -52,7 +51,7 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
     }
 
     @Override
-    public void onDataTreeChanged(@Nonnull final Collection<DataTreeModification<Capabilities>> changes) {
+    public void onDataTreeChanged(final Collection<DataTreeModification<Capabilities>> changes) {
         for (DataTreeModification<Capabilities> change : changes) {
             final DataObjectModification<Capabilities> rootNode = change.getRootNode();
             final DataObjectModification.ModificationType modificationType = rootNode.getModificationType();

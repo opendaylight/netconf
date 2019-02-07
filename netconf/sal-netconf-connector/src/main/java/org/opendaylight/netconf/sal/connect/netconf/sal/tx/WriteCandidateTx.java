@@ -13,8 +13,6 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Optional;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfRpcFutureCallback;
@@ -65,7 +63,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
     private void lock() {
         final FutureCallback<DOMRpcResult> lockCandidateCallback = new FutureCallback<DOMRpcResult>() {
             @Override
-            public void onSuccess(@Nonnull final DOMRpcResult result) {
+            public void onSuccess(final DOMRpcResult result) {
                 if (isSuccess(result)) {
                     if (LOG.isTraceEnabled()) {
                         LOG.trace("Lock candidate successful");
@@ -105,7 +103,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
 
         Futures.addCallback(txResult, new FutureCallback<RpcResult<Void>>() {
             @Override
-            public void onSuccess(@Nullable final RpcResult<Void> result) {
+            public void onSuccess(final RpcResult<Void> result) {
                 cleanupOnSuccess();
             }
 

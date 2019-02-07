@@ -11,7 +11,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
-import javax.annotation.Nonnull;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
@@ -43,7 +42,7 @@ public class NetconfDeviceNotificationService implements DOMNotificationService 
 
     @Override
     public synchronized <T extends DOMNotificationListener> ListenerRegistration<T> registerNotificationListener(
-            @Nonnull final T listener, @Nonnull final Collection<SchemaPath> types) {
+            final T listener, final Collection<SchemaPath> types) {
         for (final SchemaPath type : types) {
             listeners.put(type, listener);
         }
@@ -60,7 +59,7 @@ public class NetconfDeviceNotificationService implements DOMNotificationService 
 
     @Override
     public synchronized <T extends DOMNotificationListener> ListenerRegistration<T> registerNotificationListener(
-            @Nonnull final T listener, final SchemaPath... types) {
+            final T listener, final SchemaPath... types) {
         return registerNotificationListener(listener, Lists.newArrayList(types));
     }
 }

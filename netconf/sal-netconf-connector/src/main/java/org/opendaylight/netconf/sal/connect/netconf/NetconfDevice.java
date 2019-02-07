@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf;
 
+import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 import javax.annotation.concurrent.GuardedBy;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -162,7 +161,7 @@ public class NetconfDevice
 
         final FutureCallback<DeviceSources> resolvedSourceCallback = new FutureCallback<DeviceSources>() {
             @Override
-            public void onSuccess(@Nonnull final DeviceSources result) {
+            public void onSuccess(final DeviceSources result) {
                 addProvidedSourcesToSchemaRegistry(result);
                 setUpSchema(result);
             }
@@ -320,10 +319,10 @@ public class NetconfDevice
                                   final SchemaRepository schemaRepository,
                                   final SchemaContextFactory schemaContextFactory,
                                   final NetconfDeviceSchemasResolver deviceSchemasResolver) {
-            this.schemaRegistry = Preconditions.checkNotNull(schemaRegistry);
-            this.schemaRepository = Preconditions.checkNotNull(schemaRepository);
-            this.schemaContextFactory = Preconditions.checkNotNull(schemaContextFactory);
-            this.stateSchemasResolver = Preconditions.checkNotNull(deviceSchemasResolver);
+            this.schemaRegistry = requireNonNull(schemaRegistry);
+            this.schemaRepository = requireNonNull(schemaRepository);
+            this.schemaContextFactory = requireNonNull(schemaContextFactory);
+            this.stateSchemasResolver = requireNonNull(deviceSchemasResolver);
         }
 
         public SchemaSourceRegistry getSchemaRegistry() {
@@ -604,9 +603,8 @@ public class NetconfDevice
         private Collection<SourceIdentifier> stripUnavailableSource(final Collection<SourceIdentifier> requiredSources,
                                                                     final SourceIdentifier sourceIdToRemove) {
             final LinkedList<SourceIdentifier> sourceIdentifiers = Lists.newLinkedList(requiredSources);
-            final boolean removed = sourceIdentifiers.remove(sourceIdToRemove);
-            Preconditions.checkState(
-                    removed, "{}: Trying to remove {} from {} failed", id, sourceIdToRemove, requiredSources);
+            checkState(sourceIdentifiers.remove(sourceIdToRemove),
+                    "%s: Trying to remove %s from %s failed", id, sourceIdToRemove, requiredSources);
             return sourceIdentifiers;
         }
 

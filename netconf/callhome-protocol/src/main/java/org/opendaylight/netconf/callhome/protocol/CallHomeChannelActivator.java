@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.callhome.protocol;
 
 import io.netty.util.concurrent.Promise;
-import javax.annotation.Nonnull;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 
@@ -26,6 +26,5 @@ public interface CallHomeChannelActivator {
      * @param listener Client Session Listener to be attached to NETCONF session.
      * @return Promise with negotiated NETCONF session
      */
-    @Nonnull
-    Promise<NetconfClientSession> activate(@Nonnull NetconfClientSessionListener listener);
+    @NonNull Promise<NetconfClientSession> activate(@NonNull NetconfClientSessionListener listener);
 }
