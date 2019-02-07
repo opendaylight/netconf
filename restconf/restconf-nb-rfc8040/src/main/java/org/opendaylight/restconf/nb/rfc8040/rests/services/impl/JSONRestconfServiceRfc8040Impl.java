@@ -18,6 +18,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.Nullable;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -53,6 +56,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Pantelis
  */
+@Singleton
 public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(JSONRestconfServiceRfc8040Impl.class);
 
@@ -62,6 +66,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
     private final DOMMountPointServiceHandler mountPointServiceHandler;
     private final SchemaContextHandler schemaContextHandler;
 
+    @Inject
     public JSONRestconfServiceRfc8040Impl(final TransactionServicesWrapper services,
             final DOMMountPointServiceHandler mountPointServiceHandler,
             final SchemaContextHandler schemaContextHandler) {
@@ -212,6 +217,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
     }
 
     @Override
+    @PreDestroy
     public void close() {
     }
 

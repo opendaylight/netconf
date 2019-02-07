@@ -10,6 +10,8 @@ package org.opendaylight.restconf.nb.rfc8040;
 import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.core.Application;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
@@ -25,11 +27,14 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.schema.SchemaExport
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.schema.SchemaExportContentYinBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
 
+@Singleton
 public class RestconfApplication extends Application {
+
     private final SchemaContextHandler schemaContextHandler;
     private final DOMMountPointServiceHandler mountPointServiceHandler;
     private final ServicesWrapper servicesWrapper;
 
+    @Inject
     public RestconfApplication(SchemaContextHandler schemaContextHandler,
             DOMMountPointServiceHandler mountPointServiceHandler, ServicesWrapper servicesWrapper) {
         this.schemaContextHandler = schemaContextHandler;
