@@ -7,8 +7,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.web;
 
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.ServletException;
-import javax.ws.rs.core.Application;
+import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration;
 import org.opendaylight.aaa.filterchain.filters.CustomFilterAdapter;
 import org.opendaylight.aaa.web.FilterDetails;
@@ -19,17 +22,22 @@ import org.opendaylight.aaa.web.WebContextRegistration;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
+import org.opendaylight.restconf.nb.rfc8040.RestconfApplication;
 
 /**
  * Initializes the rfc8040 web app endpoint.
  *
  * @author Thomas Pantelis
  */
+@Singleton
 public class WebInitializer {
+
     private final WebContextRegistration registration;
 
-    public WebInitializer(WebServer webServer,  WebContextSecurer webContextSecurer, ServletSupport servletSupport,
-            Application webApp, CustomFilterAdapterConfiguration customFilterAdapterConfig) throws ServletException {
+    @Inject
+    public WebInitializer(@Reference WebServer webServer, @Reference WebContextSecurer webContextSecurer,
+            @Reference ServletSupport servletSupport, RestconfApplication webApp,
+            @Reference CustomFilterAdapterConfiguration customFilterAdapterConfig) throws ServletException {
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath("rests").supportsSessions(false)
                 .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
                     .addUrlPattern("/*").build())
@@ -48,6 +56,7 @@ public class WebInitializer {
         registration = webServer.registerWebContext(webContextBuilder.build());
     }
 
+    @PreDestroy
     public void close() {
         if (registration != null) {
             registration.close();
