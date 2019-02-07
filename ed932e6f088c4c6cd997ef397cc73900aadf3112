@@ -283,6 +283,24 @@
       "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "68ed2342_88edd9f6",
+        "filename": "restconf/restconf-nb-bierman02/src/main/resources/OSGI-INF/blueprint/restconf-config.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-02-07T14:59:41Z",
+      "side": 1,
+      "message": "Oh ok",
+      "parentUuid": "27005a44_741bdbef",
+      "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
