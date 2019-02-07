@@ -157,6 +157,24 @@
       "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2c0416f7_3698b1f7",
+        "filename": "restconf/restconf-nb-bierman02/src/main/resources/OSGI-INF/blueprint/restconf-config.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2019-02-07T13:41:51Z",
+      "side": 1,
+      "message": "ext:filter was used to make the DOMDataBroker type configurable at runtime via  a cfg.  The motivation was to be able to inject a a custom DOMDataBroker that enforced policies.",
+      "parentUuid": "b8800b74_b59c8c82",
+      "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
