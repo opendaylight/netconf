@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6a0d4e42_8a535914",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2019-02-07T19:02:22Z",
+      "side": 1,
+      "message": "from https://git.opendaylight.org/gerrit/#/c/79388/  (Change-Id: I614a48bcc425db8faa1a79ebd6236236bcd09e73)",
+      "revId": "b0425c4ac114b3e40366261c5000130fa1a4219e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
