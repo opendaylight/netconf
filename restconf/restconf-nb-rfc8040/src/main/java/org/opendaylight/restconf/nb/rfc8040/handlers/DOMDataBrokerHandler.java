@@ -7,15 +7,19 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 
 /**
  * Implementation of {@link DOMDataBrokerHandler}.
  */
+@Singleton
 public class DOMDataBrokerHandler implements Handler<DOMDataBroker> {
 
     private final DOMDataBroker broker;
 
+    @Inject
     public DOMDataBrokerHandler(final DOMDataBroker broker) {
         this.broker = broker;
     }
@@ -24,5 +28,4 @@ public class DOMDataBrokerHandler implements Handler<DOMDataBroker> {
     public DOMDataBroker get() {
         return this.broker;
     }
-
 }

@@ -7,8 +7,12 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 
+@Singleton
 public class NotificationServiceHandler implements Handler<DOMNotificationService> {
 
     private final DOMNotificationService notificationService;
@@ -19,7 +23,8 @@ public class NotificationServiceHandler implements Handler<DOMNotificationServic
      * @param notificationService
      *             DOMNotificationService
      */
-    public NotificationServiceHandler(final DOMNotificationService notificationService) {
+    @Inject
+    public NotificationServiceHandler(final @Reference DOMNotificationService notificationService) {
         this.notificationService = notificationService;
     }
 
@@ -27,5 +32,4 @@ public class NotificationServiceHandler implements Handler<DOMNotificationServic
     public DOMNotificationService get() {
         return this.notificationService;
     }
-
 }

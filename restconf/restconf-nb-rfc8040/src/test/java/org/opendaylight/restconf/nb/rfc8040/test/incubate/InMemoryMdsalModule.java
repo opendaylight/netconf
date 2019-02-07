@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.controller.sal.restconf.impl.test.incubate;
+package org.opendaylight.restconf.nb.rfc8040.test.incubate;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -24,23 +24,10 @@ import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMNotificationRouter;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
 import org.opendaylight.mdsal.dom.spi.DOMNotificationSubscriptionListenerRegistry;
-import org.opendaylight.mdsal.dom.store.inmemory.InMemoryDOMDataStore;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextProvider;
 
 /**
- * Guice Module which binds the mdsal (not controller) {@link DataBroker} & Co.
- * in-memory implementation suitable for tests.
- *
- * <p>This class is here only temporarily and it can and should be removed and
- * replaced when the equivalent will be offered by the mdsal project itself; see
- * <a href="https://jira.opendaylight.org/browse/MDSAL-418">MDSAL-418</a>.  It is
- * also copy/pasted to org.opendaylight.restconf.nb.rfc8040.test.incubate.InMemoryMdsalModule.
- *
- * <p>BEWARE: Do *NOT* use this module in component tests or applications mixing
- * code requiring the old controller and the new mdsal {@link DataBroker} & Co.
- * APIs together - because this binds a *SEPARATE* {@link InMemoryDOMDataStore},
- * and doesn't delegate to controller's InMemoryDOMDataStore. This is just fine
- * for tests where all code under test already uses only the mdsal APIs.
+ * Copy paste from org.opendaylight.controller.sal.restconf.impl.test.incubate.InMemoryMdsalModule.
  *
  * @author Michael Vorburger.ch
  */
@@ -121,7 +108,5 @@ public class InMemoryMdsalModule extends AbstractModule {
 
     @PreDestroy
     public void close() {
-        // TODO When moving this to mdsal, must close components to shut down Threads etc.
-        // but cannot do this here (in netconf) yet, because we need to change AbstractBaseDataBrokerTest & Co..
     }
 }
