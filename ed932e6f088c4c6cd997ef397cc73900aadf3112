@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "866a3240_8079b5e4",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2019-02-07T13:31:26Z",
+      "side": 1,
+      "message": "No no, that\u0027s not it at all.. ;-) you absolutely can, it\u0027s just that I have pretty strong personal dislike against seeing \"final\" everywhere - it really hurts my eyes, and IMHO it\u0027s quite useless.  FYI the infrautils parent sets things up so that everything is assumed to be final, and you get a build failure if you assign a value - unless you use @Var.  That works really well in practice.  Anyway - I\u0027ve just put it back here!  Also in ControllerContext and WebInitializer.",
+      "parentUuid": "8d3886ce_7e1e9020",
+      "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "02aa1f82_59e5f16e",
         "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
         "patchSetId": 10
@@ -30,6 +48,24 @@
       "writtenOn": "2019-02-07T10:05:21Z",
       "side": 1,
       "message": "No need for unrelated change here",
+      "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ccdb3418_051aa467",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2019-02-07T13:31:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02aa1f82_59e5f16e",
       "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "8c7ec92a_76fb20bf",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/web/WebInitializer.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2019-02-07T13:31:26Z",
+      "side": 1,
+      "message": "Well spotted.. ;-) It\u0027s because the (new) Bierman02RestConfWiringTest fails without this.  I have now investigated why, and propose https://git.opendaylight.org/gerrit/#/c/80206/ - when that is merged and available, then this does not have to be changed here.",
+      "parentUuid": "0310e02b_4a510fe8",
+      "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "956f9dba_1a59dc16",
         "filename": "restconf/restconf-nb-bierman02/src/main/resources/OSGI-INF/blueprint/restconf-config.xml",
         "patchSetId": 10
@@ -64,6 +118,24 @@
       "writtenOn": "2019-02-07T10:05:21Z",
       "side": 1,
       "message": "Do we still need this reference?",
+      "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b8800b74_b59c8c82",
+        "filename": "restconf/restconf-nb-bierman02/src/main/resources/OSGI-INF/blueprint/restconf-config.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2019-02-07T13:31:26Z",
+      "side": 1,
+      "message": "yeah, because BrokerFacade needs a DOMDataBroker, and I didn\u0027t want to replace that one with a @Reference and yank this here - because of the funky ext:filter just below in the next line 38... whatever that is, it\u0027s something that we (easily) can get the blueprint-maven-plugin to generate from an annotation (identically), so let\u0027s not touch it, in this change.",
+      "parentUuid": "956f9dba_1a59dc16",
       "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
