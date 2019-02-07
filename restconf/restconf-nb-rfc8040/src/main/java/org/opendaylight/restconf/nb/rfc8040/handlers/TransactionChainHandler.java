@@ -8,6 +8,9 @@
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
 import java.util.Objects;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
@@ -18,8 +21,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link TransactionChainHandler}.
- *
  */
+@Singleton
 public class TransactionChainHandler implements Handler<DOMTransactionChain>, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(TransactionChainHandler.class);
 
@@ -45,6 +48,7 @@ public class TransactionChainHandler implements Handler<DOMTransactionChain>, Au
     /**
      * Prepare transaction chain service for Restconf services.
      */
+    @Inject
     public TransactionChainHandler(final DOMDataBroker dataBroker) {
         this.dataBroker = Objects.requireNonNull(dataBroker);
         transactionChain = Objects.requireNonNull(dataBroker.createTransactionChain(transactionChainListener));
@@ -62,6 +66,7 @@ public class TransactionChainHandler implements Handler<DOMTransactionChain>, Au
     }
 
     @Override
+    @PreDestroy
     public synchronized void close() {
         transactionChain.close();
     }

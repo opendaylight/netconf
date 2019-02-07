@@ -12,6 +12,11 @@ import com.google.common.base.Throwables;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -35,8 +40,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link SchemaContextHandler}.
- *
  */
+@Singleton
 @SuppressWarnings("checkstyle:FinalClass")
 public class SchemaContextHandler implements SchemaContextListenerHandler, AutoCloseable {
 
@@ -55,22 +60,26 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
      *
      * @param transactionChainHandler Transaction chain handler
      */
-    private SchemaContextHandler(final TransactionChainHandler transactionChainHandler,
-            final DOMSchemaService domSchemaService) {
+    @Inject
+    public SchemaContextHandler(final TransactionChainHandler transactionChainHandler,
+            final @Reference DOMSchemaService domSchemaService) {
         this.transactionChainHandler = transactionChainHandler;
         this.domSchemaService = domSchemaService;
     }
 
+    @Deprecated
     public static SchemaContextHandler newInstance(final TransactionChainHandler transactionChainHandler,
             final DOMSchemaService domSchemaService) {
         return new SchemaContextHandler(transactionChainHandler, domSchemaService);
     }
 
+    @PostConstruct
     public void init() {
         listenerRegistration = domSchemaService.registerSchemaContextListener(this);
     }
 
     @Override
+    @PreDestroy
     public void close() {
         if (listenerRegistration != null) {
             listenerRegistration.close();
