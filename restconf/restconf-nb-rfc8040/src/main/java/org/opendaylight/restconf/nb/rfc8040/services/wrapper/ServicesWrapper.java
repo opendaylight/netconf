@@ -43,7 +43,6 @@ import org.opendaylight.restconf.nb.rfc8040.services.simple.impl.RestconfSchemaS
  * <li>{@link BaseServicesWrapper}
  * <li>{@link TransactionServicesWrapper}
  * </ul>
- *
  */
 @Path("/")
 public final class ServicesWrapper implements BaseServicesWrapper, TransactionServicesWrapper {

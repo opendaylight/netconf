@@ -7,15 +7,20 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 
 /**
  * Implementation of {@link RpcServiceHandler}.
  */
+@Singleton
 public class RpcServiceHandler implements Handler<DOMRpcService> {
     private final DOMRpcService rpcService;
 
-    public RpcServiceHandler(final DOMRpcService rpcService) {
+    @Inject
+    public RpcServiceHandler(final @Reference DOMRpcService rpcService) {
         this.rpcService = rpcService;
     }
 
