@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "cf4961b2_b764e57c",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2019-02-07T14:50:23Z",
+      "side": 1,
+      "message": "Sure, I can see why you found this inconsistent, so I have changed it and it now uses final again for all constructor params, like it was before, and just adds @Reference.",
+      "parentUuid": "1f704fef_b973b03f",
+      "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "02aa1f82_59e5f16e",
         "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfProviderImpl.java",
         "patchSetId": 10
@@ -137,6 +155,24 @@
       "side": 1,
       "message": "It is already merged, so please leave it as it is now.",
       "parentUuid": "8c7ec92a_76fb20bf",
+      "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4498c8ac_6851d444",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/restconf/web/WebInitializer.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2019-02-07T14:50:23Z",
+      "side": 1,
+      "message": "Yup, had already done so in new Patch Set 11!",
+      "parentUuid": "85ad81a9_dc8cb32d",
       "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -226,6 +262,24 @@
       "side": 1,
       "message": "But you already touched it, you changed id attribute.",
       "parentUuid": "b8800b74_b59c8c82",
+      "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "27005a44_741bdbef",
+        "filename": "restconf/restconf-nb-bierman02/src/main/resources/OSGI-INF/blueprint/restconf-config.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2019-02-07T14:50:23Z",
+      "side": 1,
+      "message": "yes, I couldn\u0027t completely replace the reference but had to change that ID, because it\u0027s \u003cargument ref\u003d\"dOMSchemaService\"/\u003e for \u003cbean id\u003d\"controllerContext\" class\u003d\"org.opendaylight.netconf.sal.restconf.impl.ControllerContext\" destroy-method\u003d\"close\"\u003e in netconf/restconf/restconf-nb-bierman02/target/generated-sources/blueprint/OSGI-INF/blueprint/autowire.xml ... hope that makes sense.",
+      "parentUuid": "6fbce306_4c05da00",
       "revId": "ed932e6f088c4c6cd997ef397cc73900aadf3112",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
