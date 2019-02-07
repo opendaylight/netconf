@@ -49,8 +49,8 @@ public class RestconfImpl implements RestconfService {
                 QName.create(RestconfModule.IETF_RESTCONF_QNAME, RestconfModule.LIB_VER_LEAF_SCHEMA_NODE));
         final InstanceIdentifierContext<? extends SchemaNode> iid =
                 new InstanceIdentifierContext<>(yangIId, schemaNode, null, context);
-        final NormalizedNode<?, ?> data =
-                Builders.leafBuilder((LeafSchemaNode) schemaNode).withValue(IetfYangLibrary.REVISION).build();
+        final NormalizedNode<?, ?> data = Builders.leafBuilder((LeafSchemaNode) schemaNode)
+                .withValue(IetfYangLibrary.REVISION.toString()).build();
         return new NormalizedNodeContext(iid, data);
     }
 
