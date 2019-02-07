@@ -7,7 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.services.simple.impl;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
@@ -28,6 +29,6 @@ public class RestconfImplTest {
         final RestconfImpl restconfImpl = new RestconfImpl(schemaContextHandler);
         final NormalizedNodeContext libraryVersion = restconfImpl.getLibraryVersion();
         final LeafNode<?> value = (LeafNode<?>) libraryVersion.getData();
-        Assert.assertEquals(IetfYangLibrary.REVISION, value.getValue());
+        assertEquals(IetfYangLibrary.REVISION.toString(), value.getValue());
     }
 }
