@@ -9,12 +9,16 @@ package org.opendaylight.restconf.nb.rfc8040.handlers;
 
 import static java.util.Objects.requireNonNull;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 
 /**
  * Implementation of {@link DOMMountPointServiceHandler}.
  *
  */
+@Singleton
 public final class DOMMountPointServiceHandler implements Handler<DOMMountPointService> {
     private final DOMMountPointService domMountPointService;
 
@@ -24,10 +28,12 @@ public final class DOMMountPointServiceHandler implements Handler<DOMMountPointS
      * @param domMountPointService
      *             mount point service
      */
-    private DOMMountPointServiceHandler(final DOMMountPointService domMountPointService) {
+    @Inject
+    public DOMMountPointServiceHandler(final @Reference DOMMountPointService domMountPointService) {
         this.domMountPointService = requireNonNull(domMountPointService);
     }
 
+    @Deprecated
     public static DOMMountPointServiceHandler newInstance(final DOMMountPointService domMountPointService) {
         return new DOMMountPointServiceHandler(domMountPointService);
     }
