@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "707d8d51_10b08349",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/test/Rfc8040RestConfWiringTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-02-08T07:07:02Z",
+      "side": 1,
+      "message": "Please rebase, uncomment assert and remove todo",
+      "revId": "e7d4d7f7b8d34cf17a5feec534ce4d302332aba4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
