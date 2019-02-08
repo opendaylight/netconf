@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.callhome.mount;
 
-import com.google.common.net.InetAddresses;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -31,6 +30,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.AllowedDevices;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.Global;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.Global.MountPointNamingStrategy;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.netconf.callhome.server.rev161109.netconf.callhome.server.allowed.devices.Device;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
@@ -115,10 +115,20 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         deviceOpReg.close();
     }
 
-    private static String fromRemoteAddress(final SocketAddress remoteAddress) {
+    private String fromRemoteAddress(final SocketAddress remoteAddress) {
         if (remoteAddress instanceof InetSocketAddress) {
             InetSocketAddress socketAddress = (InetSocketAddress) remoteAddress;
-            return InetAddresses.toAddrString(socketAddress.getAddress()) + ":" + socketAddress.getPort();
+            String ip = socketAddress.getAddress().getHostAddress();
+
+            final MountPointNamingStrategy strat = globalConfig.getMountPointNamingStrategy();
+            switch (strat) {
+                case IPONLY:
+                    return ip;
+                case IPPORT:
+                    return ip + ":" + socketAddress.getPort();
+                default:
+                    throw new IllegalStateException("Unhandled naming strategy " + strat);
+            }
         }
         return remoteAddress.toString();
     }
@@ -253,6 +263,14 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
         Credentials getCredentials() {
             return current != null ? current.getCredentials() : null;
+        }
+
+        MountPointNamingStrategy getMountPointNamingStrategy() {
+            if (current == null) {
+                return MountPointNamingStrategy.IPPORT;
+            }
+            MountPointNamingStrategy strat = current.getMountPointNamingStrategy();
+            return strat == null ? MountPointNamingStrategy.IPPORT : strat;
         }
     }
 }
