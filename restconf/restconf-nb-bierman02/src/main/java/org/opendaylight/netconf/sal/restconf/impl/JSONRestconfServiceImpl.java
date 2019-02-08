@@ -178,7 +178,7 @@ public class JSONRestconfServiceImpl implements JSONRestconfService {
 
                 outputContext = restconfService.invokeRpc(uriPath, inputContext, null);
             } else {
-                outputContext = restconfService.invokeRpc(uriPath, "", null);
+                outputContext = restconfService.invokeRpc(uriPath, null, null);
             }
 
             if (outputContext.getData() != null) {
