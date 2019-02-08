@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fdfc9116_0b051304",
+        "filename": "netconf/messagebus-netconf/src/test/java/org/opendaylight/netconf/messagebus/eventsources/netconf/NetconfEventSourceMountTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-02-08T07:05:20Z",
+      "side": 1,
+      "message": "Why do we want/need this here?",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 46
+      },
+      "revId": "384a6f5f688f092b60639f85c3ec5c44699eb50c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
