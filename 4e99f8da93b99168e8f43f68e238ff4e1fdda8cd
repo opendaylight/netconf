@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8ab04f48_1ba29249",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/JSONRestconfServiceRfc8040Impl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1842
+      },
+      "writtenOn": "2019-02-08T12:05:21Z",
+      "side": 0,
+      "message": "Why did you change this to javax.annotation?",
+      "revId": "4e99f8da93b99168e8f43f68e238ff4e1fdda8cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
