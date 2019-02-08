@@ -204,13 +204,11 @@
     <dependency>
       <groupId>org.opendaylight.infrautils</groupId>
       <artifactId>inject.guice.testutils</artifactId>
-      <version>1.6.0-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.opendaylight.infrautils</groupId>
       <artifactId>infrautils-testutils</artifactId>
-      <version>1.6.0-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -18,6 +18,9 @@ import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.PreDestroy;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -41,6 +44,7 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.PatchJsonBody
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.JSONRestconfService;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.TransactionServicesWrapper;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
+import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -54,6 +58,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Pantelis
  */
+@Singleton
 public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(JSONRestconfServiceRfc8040Impl.class);
 
@@ -63,7 +68,8 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
     private final DOMMountPointServiceHandler mountPointServiceHandler;
     private final SchemaContextHandler schemaContextHandler;
 
-    public JSONRestconfServiceRfc8040Impl(final TransactionServicesWrapper services,
+    @Inject
+    public JSONRestconfServiceRfc8040Impl(final ServicesWrapper services,
             final DOMMountPointServiceHandler mountPointServiceHandler,
             final SchemaContextHandler schemaContextHandler) {
         this.services = services;
@@ -212,6 +218,7 @@ public class JSONRestconfServiceRfc8040Impl implements JSONRestconfService, Auto
     }
 
     @Override
+    @PreDestroy
     public void close() {
     }
 
