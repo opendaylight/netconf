@@ -16,6 +16,24 @@
       "revId": "4e99f8da93b99168e8f43f68e238ff4e1fdda8cd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6eaee72d_a1b2a4b7",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/JSONRestconfServiceRfc8040Impl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2019-02-08T12:17:39Z",
+      "side": 0,
+      "message": "Not intentionally but by accident via Ctrl-Shift-O while resolving merge conflicts in the import block after https://git.opendaylight.org/gerrit/#/c/80219 ... I\u0027ve reverted it to how it was - thanks for noticing.",
+      "parentUuid": "8ab04f48_1ba29249",
+      "revId": "4e99f8da93b99168e8f43f68e238ff4e1fdda8cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
