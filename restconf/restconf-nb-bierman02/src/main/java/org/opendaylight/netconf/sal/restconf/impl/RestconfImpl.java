@@ -529,9 +529,9 @@ public final class RestconfImpl implements RestconfService {
         }
 
         if (!rpc.getInput().getChildNodes().isEmpty()) {
-            LOG.debug("RPC {} does not need input value.", rpc);
-            throw new RestconfDocumentedException("RPC " + rpc + " does not take any input value.",
-                    ErrorType.RPC, ErrorTag.INVALID_VALUE);
+            LOG.debug("No input specified for RPC {} with an input section", rpc);
+            throw new RestconfDocumentedException("No input specified for RPC " + rpc
+                    + " with an input section defined", ErrorType.RPC, ErrorTag.MISSING_ELEMENT);
         }
 
         final ListenableFuture<DOMRpcResult> response;
