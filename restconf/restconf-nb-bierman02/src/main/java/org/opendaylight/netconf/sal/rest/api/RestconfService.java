@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.rest.api;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -168,24 +167,6 @@ public interface RestconfService {
             MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     NormalizedNodeContext invokeRpc(@Encoded @PathParam("identifier") String identifier, NormalizedNodeContext payload,
             @Context UriInfo uriInfo);
-
-    /**
-     * Invoke RPC with default empty payload.
-     *
-     * @param identifier module name and rpc identifier string for the desired operation
-     * @param noPayload the body of the operation
-     * @param uriInfo URI info
-     * @return {@link NormalizedNodeContext}
-     * @deprecated Method is not used and will be removed
-     */
-    @POST
-    @Path("/operations/{identifier:.+}")
-    @Produces({ Draft02.MediaTypes.OPERATION + JSON, Draft02.MediaTypes.OPERATION + XML,
-            Draft02.MediaTypes.DATA + JSON, Draft02.MediaTypes.DATA + XML, MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    @Deprecated // method isn't use anywhere
-    NormalizedNodeContext invokeRpc(@Encoded @PathParam("identifier") String identifier,
-            @DefaultValue("") String noPayload, @Context UriInfo uriInfo);
 
     /**
      * Get target data resource from config data store.

@@ -19,6 +19,10 @@ final class MonitoringSchema {
 
     private final Schema schema;
 
+    MonitoringSchema() {
+
+    }
+
     MonitoringSchema(final Schema schema) {
         this.schema = schema;
     }

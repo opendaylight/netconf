@@ -65,12 +65,6 @@ public class RestconfCompositeWrapper implements RestconfService, SchemaRetrieva
     }
 
     @Override
-    @Deprecated
-    public NormalizedNodeContext invokeRpc(final String identifier, final String noPayload, final UriInfo uriInfo) {
-        return this.restconf.invokeRpc(identifier, noPayload, uriInfo);
-    }
-
-    @Override
     public NormalizedNodeContext readConfigurationData(final String identifier, final UriInfo uriInfo) {
         return this.restconf.readConfigurationData(identifier, uriInfo);
     }
