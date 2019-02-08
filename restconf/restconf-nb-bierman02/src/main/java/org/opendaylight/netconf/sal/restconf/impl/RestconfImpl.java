@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.sal.restconf.impl;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
@@ -435,7 +434,7 @@ public final class RestconfImpl implements RestconfService {
             final UriInfo uriInfo) {
         if (payload == null) {
             // no payload specified, reroute this to no payload invokeRpc implementation
-            return invokeRpc(identifier, "", uriInfo);
+            return invokeRpc(identifier, uriInfo);
         }
 
         final SchemaPath type = payload.getInstanceIdentifierContext().getSchemaNode().getPath();
@@ -485,14 +484,10 @@ public final class RestconfImpl implements RestconfService {
                 resultData, QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
-    @Override
-    public NormalizedNodeContext invokeRpc(final String identifier, final String noPayload, final UriInfo uriInfo) {
-        if (noPayload != null && !CharMatcher.whitespace().matchesAllOf(noPayload)) {
-            throw new RestconfDocumentedException("Content must be empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
-        }
+    private NormalizedNodeContext invokeRpc(final String identifier, final UriInfo uriInfo) {
 
-        String identifierEncoded = null;
         DOMMountPoint mountPoint = null;
+        final String identifierEncoded;
         final SchemaContext schemaContext;
         if (identifier.contains(ControllerContext.MOUNT)) {
             // mounted RPC call - look up mount instance.
@@ -516,7 +511,7 @@ public final class RestconfImpl implements RestconfService {
 
         final String identifierDecoded = this.controllerContext.urlPathArgDecode(identifierEncoded);
 
-        RpcDefinition rpc = null;
+        RpcDefinition rpc;
         if (mountPoint == null) {
             rpc = this.controllerContext.getRpcDefinition(identifierDecoded);
         } else {
