@@ -34,6 +34,24 @@
       "revId": "e7d4d7f7b8d34cf17a5feec534ce4d302332aba4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ec97437_3c73ae71",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/test/Rfc8040RestConfWiringTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2019-02-08T11:43:21Z",
+      "side": 1,
+      "message": "Done, in Patch Set 7.  After seeing that https://jira.opendaylight.org/browse/NETCONF-606 was resolved I figured... need to improve my mind reading skills to figure what is implied! ;)  Thanks Robert for promptly fixing NETCONF-606.",
+      "parentUuid": "341cb0fe_d7090436",
+      "revId": "e7d4d7f7b8d34cf17a5feec534ce4d302332aba4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
