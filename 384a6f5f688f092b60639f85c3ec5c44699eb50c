@@ -22,6 +22,30 @@
       "revId": "384a6f5f688f092b60639f85c3ec5c44699eb50c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2378c5bf_ca44ad48",
+        "filename": "netconf/messagebus-netconf/src/test/java/org/opendaylight/netconf/messagebus/eventsources/netconf/NetconfEventSourceMountTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-02-08T09:41:41Z",
+      "side": 1,
+      "message": "Ah, this is just a drive-by -- runner runs initMocks() and strictstubs ensures that all methods called on mocks are properly stubbed: http://blog.mockito.org/2017/01/clean-tests-produce-clean-code-strict.html",
+      "parentUuid": "fdfc9116_0b051304",
+      "range": {
+        "startLine": 50,
+        "startChar": 0,
+        "endLine": 50,
+        "endChar": 46
+      },
+      "revId": "384a6f5f688f092b60639f85c3ec5c44699eb50c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
