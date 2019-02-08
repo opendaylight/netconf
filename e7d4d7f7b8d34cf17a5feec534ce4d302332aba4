@@ -16,6 +16,24 @@
       "revId": "e7d4d7f7b8d34cf17a5feec534ce4d302332aba4",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "341cb0fe_d7090436",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/test/Rfc8040RestConfWiringTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5867
+      },
+      "writtenOn": "2019-02-08T11:34:53Z",
+      "side": 1,
+      "message": "but it still fails! :( https://lists.opendaylight.org/pipermail/netconf-dev/2019-February/002038.html So no point running Jenkins builds for what we know doesn\u0027t work yet.. I don\u0027t know what URL should work here, and was hoping you/someone would locally pull this to help figure out how to get this test to pass... ;-)",
+      "parentUuid": "707d8d51_10b08349",
+      "revId": "e7d4d7f7b8d34cf17a5feec534ce4d302332aba4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
