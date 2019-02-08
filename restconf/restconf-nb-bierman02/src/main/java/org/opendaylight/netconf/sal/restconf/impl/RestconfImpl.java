@@ -423,6 +423,11 @@ public final class RestconfImpl implements RestconfService {
     @Override
     public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload,
             final UriInfo uriInfo) {
+        if (payload == null) {
+            // no payload specified, reroute this to no payload invokeRpc implementation
+            return invokeRpc(identifier, "", uriInfo);
+        }
+
         final SchemaPath type = payload.getInstanceIdentifierContext().getSchemaNode().getPath();
         final URI namespace = payload.getInstanceIdentifierContext().getSchemaNode().getQName().getNamespace();
         final ListenableFuture<DOMRpcResult> response;
