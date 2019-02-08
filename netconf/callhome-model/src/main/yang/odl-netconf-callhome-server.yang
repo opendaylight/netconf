@@ -43,6 +43,15 @@ module odl-netconf-callhome-server {
         type boolean;
         default false;
       }
+
+      leaf mount-point-name {
+        type enumeration {
+            enum IP_PORT;
+            enum IP_ONLY;
+        }
+        default IP_PORT;
+        description "Mount name will be chosen as per this strategy in the absence of per device settings. Default is IP_PORT";
+      }
     }
 
     container allowed-devices {
