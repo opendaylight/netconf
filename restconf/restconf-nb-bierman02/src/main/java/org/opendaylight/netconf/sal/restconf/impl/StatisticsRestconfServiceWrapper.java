@@ -93,12 +93,6 @@ public final class StatisticsRestconfServiceWrapper implements RestconfService {
         return this.delegate.invokeRpc(identifier, payload, uriInfo);
     }
 
-    @Override
-    public NormalizedNodeContext invokeRpc(final String identifier, final String noPayload, final UriInfo uriInfo) {
-        this.rpc.incrementAndGet();
-        return this.delegate.invokeRpc(identifier, noPayload, uriInfo);
-    }
-
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
     public NormalizedNodeContext readConfigurationData(final String identifier, final UriInfo uriInfo) {
