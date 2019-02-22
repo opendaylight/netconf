@@ -9,6 +9,7 @@
 package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -17,6 +18,8 @@ import io.netty.util.concurrent.GenericFutureListener;
 import java.io.IOException;
 import java.net.SocketAddress;
 import org.apache.sshd.client.SshClient;
+import org.apache.sshd.client.auth.password.UserAuthPasswordFactory;
+import org.apache.sshd.client.auth.pubkey.UserAuthPublicKeyFactory;
 import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
@@ -43,6 +46,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         final SshClient c = SshClient.setUpDefaultClient();
         c.getProperties().put(SshClient.AUTH_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
         c.getProperties().put(SshClient.IDLE_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
+        c.setUserAuthFactories(Lists.newArrayList(new UserAuthPublicKeyFactory(), new UserAuthPasswordFactory()));
 
         // TODO make configurable, or somehow reuse netty threadpool
         c.setNioWorkers(SSH_DEFAULT_NIO_WORKERS);
