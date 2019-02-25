@@ -22,6 +22,30 @@
       "revId": "810940e2773f52e939e77f9cce085acceea11254",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45060554_117c07d0",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-02-25T08:37:29Z",
+      "side": 1,
+      "message": "I will change it to immutable list.",
+      "parentUuid": "35e557f1_cdbe3cad",
+      "range": {
+        "startLine": 49,
+        "startChar": 31,
+        "endLine": 49,
+        "endChar": 49
+      },
+      "revId": "810940e2773f52e939e77f9cce085acceea11254",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
