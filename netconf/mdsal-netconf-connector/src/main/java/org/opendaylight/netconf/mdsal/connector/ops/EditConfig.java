@@ -96,7 +96,7 @@ public final class EditConfig extends AbstractEdit {
 
     private void executeChange(final DOMDataTreeReadWriteTransaction rwtx, final DataTreeChange change)
             throws DocumentedException {
-        final YangInstanceIdentifier path = YangInstanceIdentifier.create(change.getPath());
+        final YangInstanceIdentifier path = change.getPath();
         final NormalizedNode<?, ?> changeData = change.getChangeRoot();
         switch (change.getAction()) {
             case NONE:

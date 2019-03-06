@@ -8,7 +8,6 @@
 
 package org.opendaylight.netconf.mdsal.connector.ops;
 
-import java.util.ArrayList;
 import java.util.Map;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput;
@@ -59,8 +58,7 @@ final class EditOperationNormalizedNodeStreamWriter extends ImmutableNormalizedN
             if (!action.equals(dataTreeChangeTracker.peekAction())) {
                 final LeafNode<Object> node = ImmutableNodes.leafNode(name, value);
                 dataTreeChangeTracker.pushPath(name);
-                dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(node, action,
-                        new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
+                dataTreeChangeTracker.addDataTreeChange(action, node);
                 getCurrent().removeChild(dataTreeChangeTracker.popPath());
             }
         }
@@ -91,10 +89,9 @@ final class EditOperationNormalizedNodeStreamWriter extends ImmutableNormalizedN
                 && dataTreeChangeTracker.getRemoveOperationTracker() == 0) {
             if (!action.equals(dataTreeChangeTracker.peekAction())) {
                 final LeafSetEntryNode<?> node = Builders.leafSetEntryBuilder().withNodeIdentifier(
-                        new NodeWithValue(name, value)).withValue(value).build();
+                        new NodeWithValue<>(name, value)).withValue(value).build();
                 dataTreeChangeTracker.pushPath(node.getIdentifier());
-                dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(node, action,
-                        new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
+                dataTreeChangeTracker.addDataTreeChange(action, node);
                 getCurrent().removeChild(dataTreeChangeTracker.popPath());
             }
         }
@@ -161,20 +158,16 @@ final class EditOperationNormalizedNodeStreamWriter extends ImmutableNormalizedN
     // for augments and choices
     private void trackMixinNode(final PathArgument identifier) {
         dataTreeChangeTracker.pushPath(identifier);
-        dataTreeChangeTracker.pushAction(dataTreeChangeTracker.peekAction() != null
-                ? dataTreeChangeTracker.peekAction() : dataTreeChangeTracker.getDefaultAction());
+        dataTreeChangeTracker.pushAction(dataTreeChangeTracker.currentAction());
     }
 
     // for containers, (unkeyed) list entries and yang-modeled-anyxmls
     private void trackDataContainerNode(final PathArgument identifier, final Map<QName, String> attributes) {
         dataTreeChangeTracker.pushPath(identifier);
         final String operation = attributes.get(OPERATION_ATTRIBUTE);
-        if (operation != null) {
-            dataTreeChangeTracker.pushAction(ModifyAction.fromXmlValue(operation));
-        } else {
-            dataTreeChangeTracker.pushAction(dataTreeChangeTracker.peekAction() != null
-                    ? dataTreeChangeTracker.peekAction() : dataTreeChangeTracker.getDefaultAction());
-        }
+        final ModifyAction action = operation != null ? ModifyAction.fromXmlValue(operation)
+                : dataTreeChangeTracker.currentAction();
+        dataTreeChangeTracker.pushAction(action);
     }
 
     @Override
@@ -196,8 +189,7 @@ final class EditOperationNormalizedNodeStreamWriter extends ImmutableNormalizedN
                 //if parent and current actions don't match create a DataTreeChange and add it to the change list
                 //don't add a new child to the parent node
                 if (!currentAction.equals(dataTreeChangeTracker.peekAction())) {
-                    dataTreeChangeTracker.addDataTreeChange(new DataTreeChangeTracker.DataTreeChange(product,
-                            currentAction, new ArrayList<>(dataTreeChangeTracker.getCurrentPath())));
+                    dataTreeChangeTracker.addDataTreeChange(currentAction, product);
                     if (getCurrent() instanceof NormalizedNodeResultBuilder) {
                         dataTreeChangeTracker.popPath();
                         return;
