@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright © 2019 FRINX s.r.o. All rights reserved.
+  ~
+  ~ This program and the accompanying materials are made available under the
+  ~ terms of the Eclipse Public License v1.0 which accompanies this distribution,
+  ~ and is available at http://www.eclipse.org/legal/epl-v10.html
+  -->
+<!-- vi: set et smarttab sw=4 tabstop=4: -->
+
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
+
+    <cm:property-placeholder persistent-id="restconf" update-strategy="reload">
+        <cm:default-properties>
+            <cm:property name="web-socket-enabled" value="true"/>
+            <cm:property name="web-socket-tcp-port" value="8454"/>
+            <cm:property name="web-socket-security-type" value="disabled"/>
+        </cm:default-properties>
+    </cm:property-placeholder>
+
+    <bean id="restconfConfiguration" class="org.opendaylight.restconf.common.configuration.RestconfConfigurationImpl"
+          destroy-method="close">
+        <argument value="${web-socket-enabled}"/>
+        <argument value="${web-socket-tcp-port}"/>
+        <argument value="${web-socket-security-type}"/>
+    </bean>
+    <service ref="restconfConfiguration"
+             interface="org.opendaylight.restconf.common.configuration.RestconfConfiguration"/>
+</blueprint>
