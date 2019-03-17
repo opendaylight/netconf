@@ -17,7 +17,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
@@ -87,7 +86,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
                               final NotificationOutputTypeGrouping.NotificationOutputType outputType,
                               final boolean leafNodesOnly) {
             super(path, streamName, outputType);
-            setQueryParams(EPOCH, Optional.empty(), Optional.empty(), leafNodesOnly);
+            setQueryParams(EPOCH, null, null, leafNodesOnly);
         }
 
         @Override
