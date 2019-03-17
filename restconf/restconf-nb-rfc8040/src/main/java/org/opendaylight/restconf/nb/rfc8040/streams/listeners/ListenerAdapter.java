@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
@@ -30,6 +31,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidateNode;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -41,8 +43,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * {@link ListenerAdapter} is responsible to track events, which occurred by
- * changing data in data source.
+ * {@link ListenerAdapter} is responsible to track events, which occurred by changing data in data source.
  */
 public class ListenerAdapter extends AbstractCommonSubscriber implements ClusteredDOMDataTreeChangeListener {
 
@@ -53,18 +54,14 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     private final NotificationOutputType outputType;
 
     /**
-     * Creates new {@link ListenerAdapter} listener specified by path and stream
-     * name and register for subscribing.
+     * Creates new {@link ListenerAdapter} listener specified by path and stream name and register for subscribing.
      *
-     * @param path
-     *            Path to data in data store.
-     * @param streamName
-     *            The name of the stream.
-     * @param outputType
-     *            Type of output on notification (JSON, XML)
+     * @param path       Path to data in data store.
+     * @param streamName The name of the stream.
+     * @param outputType Type of output on notification (JSON, XML).
      */
     ListenerAdapter(final YangInstanceIdentifier path, final String streamName,
-            final NotificationOutputType outputType) {
+                    final NotificationOutputType outputType) {
         register(this);
         setLocalNameOfPath(path.getLastPathArgument().getNodeType().getLocalName());
 
@@ -114,7 +111,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     /**
      * Prepare data of notification and data to client.
      *
-     * @param xml   data
+     * @param xml XML-formatted data.
      */
     private void prepareAndPostData(final String xml) {
         final Event event = new Event(EventType.NOTIFY);
@@ -127,14 +124,9 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     }
 
     /**
-     * Tracks events of data change by customer.
-     */
-
-    /**
      * Prepare data in printable form and transform it to String.
      *
-     * @param dataTreeCandidates the DataTreeCandidates to transform
-     *
+     * @param dataTreeCandidates Data-tree candidates to be transformed.
      * @return Data in printable form.
      */
     private String prepareXml(final Collection<DataTreeCandidate> dataTreeCandidates) {
@@ -156,10 +148,12 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      * Adds values to data changed notification event element.
      */
     @SuppressWarnings("checkstyle:hiddenField")
-    private void addValuesToDataChangedNotificationEventElement(final Document doc,
+    private void addValuesToDataChangedNotificationEventElement(
+            final Document doc,
             final Element dataChangedNotificationEventElement,
             final Collection<DataTreeCandidate> dataTreeCandidates,
-            final SchemaContext schemaContext, final DataSchemaContextTree dataSchemaContextTree) {
+            final SchemaContext schemaContext,
+            final DataSchemaContextTree dataSchemaContextTree) {
 
         for (DataTreeCandidate dataTreeCandidate : dataTreeCandidates) {
             DataTreeCandidateNode candidateNode = dataTreeCandidate.getRootNode();
@@ -172,9 +166,12 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
         }
     }
 
-    private void addNodeToDataChangeNotificationEventElement(final Document doc,
-            final Element dataChangedNotificationEventElement, final DataTreeCandidateNode candidateNode,
-            final YangInstanceIdentifier parentYiid, final SchemaContext schemaContext,
+    private void addNodeToDataChangeNotificationEventElement(
+            final Document doc,
+            final Element dataChangedNotificationEventElement,
+            final DataTreeCandidateNode candidateNode,
+            final YangInstanceIdentifier parentYiid,
+            final SchemaContext schemaContext,
             final DataSchemaContextTree dataSchemaContextTree) {
 
         Optional<NormalizedNode<?,?>> optionalNormalizedNode = Optional.empty();
@@ -200,9 +197,11 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
 
         NormalizedNode<?,?> normalizedNode = optionalNormalizedNode.get();
         YangInstanceIdentifier yiid = YangInstanceIdentifier.builder(parentYiid)
-                                                            .append(normalizedNode.getIdentifier()).build();
+                .append(normalizedNode.getIdentifier()).build();
 
-        boolean isNodeMixin = dataSchemaContextTree.getChild(yiid).isMixin();
+        final Optional<DataSchemaContextNode<?>> childrenSchemaNode = dataSchemaContextTree.findChild(yiid);
+        Preconditions.checkState(childrenSchemaNode.isPresent());
+        boolean isNodeMixin = childrenSchemaNode.get().isMixin();
         boolean isSkippedNonLeaf = getLeafNodesOnly() && !(normalizedNode instanceof LeafNode);
         if (!isNodeMixin && !isSkippedNonLeaf) {
             Node node = null;
@@ -228,32 +227,30 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
         }
 
         for (DataTreeCandidateNode childNode : candidateNode.getChildNodes()) {
-            addNodeToDataChangeNotificationEventElement(doc, dataChangedNotificationEventElement, childNode,
-                                                                        yiid, schemaContext, dataSchemaContextTree);
+            addNodeToDataChangeNotificationEventElement(
+                    doc, dataChangedNotificationEventElement, childNode, yiid, schemaContext, dataSchemaContextTree);
         }
     }
 
     /**
-     * Creates changed event element from data.
+     * Creates data-changed event element from data.
      *
-     * @param doc
-     *            {@link Document}
-     * @param path
-     *            Path to data in data store.
-     * @param operation
-     *            {@link Operation}
-     * @param schemaContext
-     *            schema context
-     * @return {@link Node} node represented by changed event element.
+     * @param document      {@link Document}
+     * @param operation     {@link Operation}
+     * @param schemaContext Schema context.
+     * @return {@link Node} represented by changed event element.
      */
-    private Node createDataChangeEventElement(final Document doc, final YangInstanceIdentifier eventPath,
-            final Operation operation, final SchemaContext schemaContext) {
-        final Element dataChangeEventElement = doc.createElement("data-change-event");
-        final Element pathElement = doc.createElement("path");
+    @SuppressWarnings("SameParameterValue")
+    private Node createDataChangeEventElement(final Document document,
+                                              final YangInstanceIdentifier eventPath,
+                                              final Operation operation,
+                                              final SchemaContext schemaContext) {
+        final Element dataChangeEventElement = document.createElement("data-change-event");
+        final Element pathElement = document.createElement("path");
         addPathAsValueToElement(eventPath, pathElement, schemaContext);
         dataChangeEventElement.appendChild(pathElement);
 
-        final Element operationElement = doc.createElement("operation");
+        final Element operationElement = document.createElement("operation");
         operationElement.setTextContent(operation.value);
         dataChangeEventElement.appendChild(operationElement);
 
@@ -261,8 +258,11 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     }
 
     private Node createCreatedChangedDataChangeEventElement(final Document doc,
-            final YangInstanceIdentifier eventPath, final NormalizedNode<?, ?> normalized, final Operation operation,
-            final SchemaContext schemaContext, final DataSchemaContextTree dataSchemaContextTree) {
+                                                            final YangInstanceIdentifier eventPath,
+                                                            final NormalizedNode<?, ?> normalized,
+                                                            final Operation operation,
+                                                            final SchemaContext schemaContext,
+                                                            final DataSchemaContextTree dataSchemaContextTree) {
         final Element dataChangeEventElement = doc.createElement("data-change-event");
         final Element pathElement = doc.createElement("path");
         addPathAsValueToElement(eventPath, pathElement, schemaContext);
@@ -274,10 +274,12 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
 
         try {
             SchemaPath nodePath;
+            final Optional<DataSchemaContextNode<?>> childrenSchemaNode = dataSchemaContextTree.findChild(eventPath);
+            Preconditions.checkState(childrenSchemaNode.isPresent());
             if (normalized instanceof MapEntryNode || normalized instanceof UnkeyedListEntryNode) {
-                nodePath = dataSchemaContextTree.getChild(eventPath).getDataSchemaNode().getPath();
+                nodePath = childrenSchemaNode.get().getDataSchemaNode().getPath();
             } else {
-                nodePath = dataSchemaContextTree.getChild(eventPath).getDataSchemaNode().getPath().getParent();
+                nodePath = childrenSchemaNode.get().getDataSchemaNode().getPath().getParent();
             }
             final DOMResult domResult = writeNormalizedNode(normalized, schemaContext, nodePath);
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
@@ -296,16 +298,14 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     /**
      * Adds path as value to element.
      *
-     * @param eventPath
-     *            Path to data in data store.
-     * @param element
-     *            {@link Element}
-     * @param schemaContext
-     *            schema context
+     * @param eventPath     Path to data in data store.
+     * @param element       {@link Element}
+     * @param schemaContext Schema context.
      */
     @SuppressWarnings("rawtypes")
-    private void addPathAsValueToElement(final YangInstanceIdentifier eventPath, final Element element,
-            final SchemaContext schemaContext) {
+    private void addPathAsValueToElement(final YangInstanceIdentifier eventPath,
+                                         final Element element,
+                                         final SchemaContext schemaContext) {
         final StringBuilder textContent = new StringBuilder();
 
         for (final PathArgument pathArgument : eventPath.getPathArguments()) {
@@ -313,14 +313,14 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
                 continue;
             }
             textContent.append("/");
-            writeIdentifierWithNamespacePrefix(element, textContent, pathArgument.getNodeType(), schemaContext);
+            writeIdentifierWithNamespacePrefix(textContent, pathArgument.getNodeType(), schemaContext);
             if (pathArgument instanceof NodeIdentifierWithPredicates) {
                 final Map<QName, Object> predicates = ((NodeIdentifierWithPredicates) pathArgument).getKeyValues();
                 for (final Entry<QName, Object> entry : predicates.entrySet()) {
                     final QName keyValue = entry.getKey();
                     final String predicateValue = String.valueOf(entry.getValue());
                     textContent.append("[");
-                    writeIdentifierWithNamespacePrefix(element, textContent, keyValue, schemaContext);
+                    writeIdentifierWithNamespacePrefix(textContent, keyValue, schemaContext);
                     textContent.append("='");
                     textContent.append(predicateValue);
                     textContent.append("'");
@@ -339,35 +339,67 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
     /**
      * Writes identifier that consists of prefix and QName.
      *
-     * @param element
-     *            {@link Element}
-     * @param textContent
-     *            StringBuilder
-     * @param qualifiedName
-     *            QName
-     * @param schemaContext
-     *            schema context
+     * @param textContent   Text builder that should be supplemented by QName and its modules name.
+     * @param qualifiedName QName of the element.
+     * @param schemaContext Schema context that holds modules which should contain module specified in QName.
      */
-    private static void writeIdentifierWithNamespacePrefix(final Element element, final StringBuilder textContent,
-            final QName qualifiedName, final SchemaContext schemaContext) {
-        final Module module = schemaContext.findModule(qualifiedName.getModule()).get();
-
-        textContent.append(module.getName());
-        textContent.append(":");
-        textContent.append(qualifiedName.getLocalName());
+    private static void writeIdentifierWithNamespacePrefix(final StringBuilder textContent,
+                                                           final QName qualifiedName,
+                                                           final SchemaContext schemaContext) {
+        final Optional<Module> module = schemaContext.findModule(qualifiedName.getModule());
+        if (module.isPresent()) {
+            textContent.append(module.get().getName());
+            textContent.append(":");
+            textContent.append(qualifiedName.getLocalName());
+        } else {
+            LOG.error("Cannot write identifier with namespace prefix in data-change listener adapter: "
+                    + "Cannot find module in schema context for input QName {}.", qualifiedName);
+            throw new IllegalStateException(String.format(
+                    "Cannot find module in schema context for input QName %s.",
+                    qualifiedName));
+        }
     }
 
     /**
-     * Consists of three types {@link Operation#CREATED},
-     * {@link Operation#UPDATED} and {@link Operation#DELETED}.
+     * Consists of three types {@link Operation#CREATED}, {@link Operation#UPDATED} and {@link Operation#DELETED}.
      */
     private enum Operation {
-        CREATED("created"), UPDATED("updated"), DELETED("deleted");
+        CREATED("created"),
+        UPDATED("updated"),
+        DELETED("deleted");
 
         private final String value;
 
         Operation(final String value) {
             this.value = value;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "ListenerAdapter{"
+                + "path=" + path
+                + ", streamName='" + streamName + '\''
+                + ", outputType=" + outputType
+                + '}';
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        ListenerAdapter that = (ListenerAdapter) object;
+        return path.equals(that.path)
+                && streamName.equals(that.streamName)
+                && outputType == that.outputType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(path, streamName, outputType);
     }
 }

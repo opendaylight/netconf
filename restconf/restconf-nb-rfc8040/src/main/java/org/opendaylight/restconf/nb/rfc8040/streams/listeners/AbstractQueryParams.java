@@ -11,7 +11,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import java.io.StringReader;
 import java.time.Instant;
-import java.util.Optional;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -24,7 +23,6 @@ import org.xml.sax.InputSource;
 
 /**
  * Features of query parameters part of both notifications.
- *
  */
 abstract class AbstractQueryParams extends AbstractNotificationsData {
     // FIXME: BUG-7956: switch to using UntrustedXML
@@ -62,21 +60,17 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     /**
      * Set query parameters for listener.
      *
-     * @param start
-     *            start-time of getting notification
-     * @param stop
-     *            stop-time of getting notification
-     * @param filter
-     *            indicate which subset of all possible events are of interest
-     * @param leafNodesOnly
-     *            if true, notifications will contain changes to leaf nodes only
+     * @param start         Start-time of getting notification.
+     * @param stop          Stop-time of getting notification.
+     * @param filter        Indicates which subset of all possible events are of interest.
+     * @param leafNodesOnly If TRUE, notifications will contain changes of leaf nodes only.
      */
     @SuppressWarnings("checkstyle:hiddenField")
-    public void setQueryParams(final Instant start, final Optional<Instant> stop, final Optional<String> filter,
+    public void setQueryParams(final Instant start, final Instant stop, final String filter,
                                final boolean leafNodesOnly) {
         this.start = Preconditions.checkNotNull(start);
-        this.stop = stop.orElse(null);
-        this.filter = filter.orElse(null);
+        this.stop = stop;
+        this.filter = filter;
         this.leafNodesOnly = leafNodesOnly;
     }
 
@@ -85,11 +79,11 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      *
      * @return true if this query should only notify about leaf node changes
      */
-    public boolean getLeafNodesOnly() {
+    boolean getLeafNodesOnly() {
         return leafNodesOnly;
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
+    @SuppressWarnings({"checkstyle:IllegalCatch", "BooleanMethodIsAlwaysInverted"})
     <T extends BaseListenerInterface> boolean checkStartStop(final Instant now, final T listener) {
         if (this.stop != null) {
             if (this.start.compareTo(now) < 0 && this.stop.compareTo(now) > 0) {
@@ -116,14 +110,13 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     /**
      * Check if is filter used and then prepare and post data do client.
      *
-     * @param xml   data of notification
+     * @param xml XML data of notification.
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
     boolean checkFilter(final String xml) {
         if (this.filter == null) {
             return true;
         }
-
         try {
             return parseFilterParam(xml);
         } catch (final Exception e) {
@@ -132,11 +125,10 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     }
 
     /**
-     * Parse and evaluate filter value by xml.
+     * Parse and evaluate filter statement by XML format.
      *
-     * @return true or false - depends on filter expression and data of
-     *         notifiaction
-     * @throws Exception if operation fails
+     * @return TRUE or FALSE depending on filter expression and data of notification.
+     * @throws Exception If operation fails.
      */
     private boolean parseFilterParam(final String xml) throws Exception {
         final Document docOfXml = DBF.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));

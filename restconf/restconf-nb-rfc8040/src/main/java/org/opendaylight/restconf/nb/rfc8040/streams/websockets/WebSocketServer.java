@@ -14,92 +14,65 @@ import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.Notificator;
+import org.opendaylight.restconf.common.configuration.RestconfConfigurationHolder;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link WebSocketServer} is the singleton responsible for starting and stopping the
- * web socket server.
+ * {@link WebSocketServer} is the class that is responsible for starting and stopping of web-socket server with
+ * specified listening TCP port and security type.
  */
+@SuppressWarnings("unused")
 public final class WebSocketServer implements Runnable {
-
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketServer.class);
 
-    private static WebSocketServer instance = null;
-
-    private final int port;
+    private final Integer port;
+    private final RestconfConfigurationHolder.SecurityType securityType;
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
-
-    private WebSocketServer(final int port) {
-        this.port = port;
+    /**
+     * Creates instance of web-socket server using defined port and security features.
+     *
+     * @param port         TCP port used for this server.
+     * @param securityType Security type that should be used for protecting of web-socket server and its communication.
+     */
+    public WebSocketServer(final Integer port, final RestconfConfigurationHolder.SecurityType securityType) {
+        this.port = Preconditions.checkNotNull(port);
+        this.securityType = Preconditions.checkNotNull(securityType);
     }
 
     /**
-     * Create singleton instance of {@link WebSocketServer}.
+     * Get the TCP port of websocket server.
      *
-     * @param port TCP port used for this server
-     * @return instance of {@link WebSocketServer}
+     * @return TCP port number.
      */
-    public static WebSocketServer createInstance(final int port) {
-        Preconditions.checkState(instance == null, "createInstance() has already been called");
-        Preconditions.checkArgument(port >= 1024, "Privileged port (below 1024) is not allowed");
-
-        instance = new WebSocketServer(port);
-        return instance;
-    }
-
-    /**
-     * Get the websocket of TCP port.
-     *
-     * @return websocket TCP port
-     */
-    public int getPort() {
+    public Integer getPort() {
         return port;
     }
 
     /**
-     * Get instance of {@link WebSocketServer} created by {@link #createInstance(int)}.
+     * Get the security type that is applied to web-socket server.
      *
-     * @return instance of {@link WebSocketServer}
+     * @return Security type that web-socket server provides.
      */
-    public static WebSocketServer getInstance() {
-        Preconditions.checkNotNull(instance, "createInstance() must be called prior to getInstance()");
-        return instance;
-    }
-
-    /**
-     * Destroy the existing instance.
-     */
-    public static void destroyInstance() {
-        Preconditions.checkState(instance != null, "createInstance() must be called prior to destroyInstance()");
-
-        instance.stop();
-        instance = null;
+    public RestconfConfigurationHolder.SecurityType getSecurityType() {
+        return securityType;
     }
 
     @Override
     @SuppressWarnings("checkstyle:IllegalCatch")
     public void run() {
-        bossGroup = new NioEventLoopGroup();
-        workerGroup = new NioEventLoopGroup();
         try {
-            final ServerBootstrap serverBootstrap = new ServerBootstrap();
-            serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-                    .childHandler(new WebSocketServerInitializer());
-
-            final Channel channel = serverBootstrap.bind(port).sync().channel();
-            LOG.info("Web socket server started at port {}.", port);
-
+            final Channel channel = createWebSocketChannel();
             channel.closeFuture().sync();
-        } catch (final InterruptedException e) {
-            LOG.error("Web socket server encountered an error during startup attempt on port {}", port, e);
-        } catch (Throwable throwable) {
+        } catch (final InterruptedException exception) {
+            LOG.error("Web socket server encountered an error during startup attempt on port {}.", port, exception);
+        } catch (final Throwable throwable) {
             // sync() re-throws exceptions declared as Throwable, so the compiler doesn't see them
-            LOG.error("Error while binding to port {}", port, throwable);
+            LOG.error("Error while binding to port {}.", port, throwable);
             throw throwable;
         } finally {
             stop();
@@ -107,11 +80,42 @@ public final class WebSocketServer implements Runnable {
     }
 
     /**
+     * Creation of the web-socket channel based on configured security type.
+     *
+     * @return Created web-socket channel.
+     * @throws InterruptedException Unexpected interruption during creation of web-socket channel.
+     */
+    private synchronized Channel createWebSocketChannel() throws InterruptedException {
+        bossGroup = new NioEventLoopGroup();
+        workerGroup = new NioEventLoopGroup();
+        Channel channel;
+        switch (securityType) {
+            case DISABLED:
+                channel = configureNonSecuredServerChannel();
+                break;
+            default:
+                LOG.warn("Security type {} of web-socket server is currently not supported, "
+                        + "starting of non-secured web-socket server.", securityType);
+                channel = configureNonSecuredServerChannel();
+        }
+        return channel;
+    }
+
+    private Channel configureNonSecuredServerChannel() throws InterruptedException {
+        final ServerBootstrap serverBootstrap = new ServerBootstrap();
+        serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+                .childHandler(new WebSocketServerInitializer());
+        final Channel channel = serverBootstrap.bind(port).sync().channel();
+        LOG.info("Web socket server started at port {}.", port);
+        return channel;
+    }
+
+    /**
      * Stops the web socket server and removes all listeners.
      */
-    private void stop() {
-        LOG.debug("Stopping the web socket server instance on port {}", port);
-        Notificator.removeAllListeners();
+    public synchronized void stop() {
+        LOG.debug("Stopping the web socket server instance on port {}.", port);
+        ListenersBroker.getInstance().removeAndCloseAllListeners();
         if (bossGroup != null) {
             bossGroup.shutdownGracefully();
             bossGroup = null;
@@ -122,4 +126,11 @@ public final class WebSocketServer implements Runnable {
         }
     }
 
+    @Override
+    public String toString() {
+        return "WebSocketServer{"
+                + "port=" + port
+                + ", securityType=" + securityType
+                + '}';
+    }
 }

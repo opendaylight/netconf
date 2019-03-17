@@ -29,6 +29,9 @@
   <reference id="dOMDataBroker" interface="org.opendaylight.mdsal.dom.api.DOMDataBroker"
           ext:filter="(type=@{databroker-service-type})"/>
 
+  <reference id="restconfConfiguration"
+             interface="org.opendaylight.restconf.common.configuration.RestconfConfiguration"/>
+
   <bean id="servicesWrapper" factory-ref="rfc8040RestConfWiring" factory-method="getServicesWrapper" />
 
   <service ref="jSONRestconfServiceRfc8040Impl" odl:type="rfc8040"

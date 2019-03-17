@@ -21,23 +21,23 @@ class EventBusChangeRecorder<T extends BaseListenerInterface> {
     /**
      * Event bus change recorder of specific listener of notifications.
      *
-     * @param listener
-     *             specific listener
+     * @param listener Specific listener.
      */
     EventBusChangeRecorder(final T listener) {
         this.listener = listener;
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void recordCustomerChange(final Event event) {
         if (event.getType() == EventType.REGISTER) {
             final Channel subscriber = event.getSubscriber();
-            if (!this.listener.getSubscribers().contains(subscriber)) {
-                this.listener.getSubscribers().add(subscriber);
-            }
+            this.listener.getSubscribers().add(subscriber);
         } else if (event.getType() == EventType.DEREGISTER) {
             this.listener.getSubscribers().remove(event.getSubscriber());
-            Notificator.removeListenerIfNoSubscriberExists(this.listener);
+            if (!this.listener.hasSubscribers()) {
+                ListenersBroker.getInstance().removeAndCloseListener(this.listener);
+            }
         } else if (event.getType() == EventType.NOTIFY) {
             for (final Channel subscriber : this.listener.getSubscribers()) {
                 if (subscriber.isActive()) {

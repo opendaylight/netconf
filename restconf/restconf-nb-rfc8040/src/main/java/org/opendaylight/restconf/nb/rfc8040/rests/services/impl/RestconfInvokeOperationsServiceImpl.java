@@ -56,7 +56,8 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
     }
 
     @Override
-    public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload,
+    public NormalizedNodeContext invokeRpc(final String identifier,
+                                           final NormalizedNodeContext payload,
                                            final UriInfo uriInfo) {
         final SchemaContextRef refSchemaCtx = new SchemaContextRef(this.schemaContextHandler.get());
         final SchemaPath schemaPath = payload.getInstanceIdentifierContext().getSchemaNode().getPath();
@@ -67,8 +68,8 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         SchemaContextRef schemaContextRef;
 
         if (mountPoint == null) {
-            if (namespace.toString().equals(RestconfStreamsConstants.SAL_REMOTE_NAMESPACE)) {
-                if (identifier.contains(RestconfStreamsConstants.CREATE_DATA_SUBSCR)) {
+            if (namespace.equals(RestconfStreamsConstants.SAL_REMOTE_NAMESPACE.getNamespace())) {
+                if (identifier.contains(RestconfStreamsConstants.CREATE_DATA_SUBSCRIPTION)) {
                     response = CreateStreamUtil.createDataChangeNotifiStream(payload, refSchemaCtx);
                 } else {
                     throw new RestconfDocumentedException("Not supported operation", ErrorType.RPC,

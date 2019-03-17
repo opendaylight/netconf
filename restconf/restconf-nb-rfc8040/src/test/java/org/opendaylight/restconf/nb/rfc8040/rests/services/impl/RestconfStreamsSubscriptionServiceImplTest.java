@@ -15,15 +15,15 @@ import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import com.google.common.collect.ImmutableClassToInstanceMap;
-import java.lang.reflect.Field;
+import java.io.FileNotFoundException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -32,6 +32,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -49,17 +50,18 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.Notificator;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class RestconfStreamsSubscriptionServiceImplTest {
 
     private static final String URI = "/restconf/18/data/ietf-restconf-monitoring:restconf-state/streams/stream/"
             + "toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE";
-    private static Field listenersByStreamName;
 
     @Mock
     private DOMDataBrokerHandler dataBrokerHandler;
@@ -73,7 +75,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
 
     @SuppressWarnings("unchecked")
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws FileNotFoundException {
         MockitoAnnotations.initMocks(this);
 
         final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
@@ -124,29 +126,31 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     }
 
     @BeforeClass
-    public static void setUpBeforeTest() throws Exception {
+    public static void setUpBeforeTest() {
         final Map<String, ListenerAdapter> listenersByStreamNameSetter = new HashMap<>();
         final ListenerAdapter adapter = mock(ListenerAdapter.class);
+        final YangInstanceIdentifier yiid = mock(YangInstanceIdentifier.class);
+        final YangInstanceIdentifier.PathArgument lastPathArgument = mock(YangInstanceIdentifier.PathArgument.class);
+        final QName qname = QName.create("toaster", "2009-11-20", "toasterStatus");
+        Mockito.when(adapter.getPath()).thenReturn(yiid);
+        Mockito.when(adapter.getOutputType()).thenReturn("JSON");
+        Mockito.when(yiid.getLastPathArgument()).thenReturn(lastPathArgument);
+        Mockito.when(lastPathArgument.getNodeType()).thenReturn(qname);
         listenersByStreamNameSetter.put(
                 "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                 adapter);
-        listenersByStreamName = Notificator.class.getDeclaredField("dataChangeListener");
-
-        listenersByStreamName.setAccessible(true);
-        listenersByStreamName.set(Notificator.class, listenersByStreamNameSetter);
+        ListenersBroker.getInstance().setDataChangeListeners(listenersByStreamNameSetter);
     }
 
     @AfterClass
-    public static void setUpAfterTest() throws Exception {
-        listenersByStreamName.set(Notificator.class, null);
-        listenersByStreamName.set(Notificator.class, new ConcurrentHashMap<>());
-        listenersByStreamName.setAccessible(false);
+    public static void setUpAfterTest() {
+        ListenersBroker.getInstance().setDataChangeListeners(Collections.emptyMap());
     }
 
     @Test
-    public void testSubscribeToStream() throws Exception {
+    public void testSubscribeToStream() {
         final UriBuilder uriBuilder = UriBuilder.fromUri(URI);
-        Notificator.createListener(
+        ListenersBroker.getInstance().registerDataChangeListener(
                 IdentifierCodec.deserialize("toaster:toaster/toasterStatus", this.schemaHandler.get()),
                 "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                 NotificationOutputType.XML);

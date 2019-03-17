@@ -35,7 +35,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     /**
      * Creating {@link EventBus}.
      */
-    protected AbstractCommonSubscriber() {
+    AbstractCommonSubscriber() {
         this.eventBus = new AsyncEventBus(Executors.newSingleThreadExecutor());
     }
 
@@ -55,7 +55,6 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
             this.registration.close();
             this.registration = null;
         }
-
         deleteDataInDS();
         unregister();
     }
@@ -64,8 +63,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
      * Creates event of type {@link EventType#REGISTER}, set {@link Channel}
      * subscriber to the event and post event into event bus.
      *
-     * @param subscriber
-     *            Channel
+     * @param subscriber Web-socket channel.
      */
     public void addSubscriber(final Channel subscriber) {
         if (!subscriber.isActive()) {
@@ -92,8 +90,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     /**
      * Sets {@link ListenerRegistration} registration.
      *
-     * @param registration
-     *            DOMDataChangeListener registration
+     * @param registration DOMDataChangeListener registration.
      */
     public void setRegistration(final ListenerRegistration<?> registration) {
         this.registration = registration;
@@ -102,8 +99,9 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     /**
      * Checks if {@link ListenerRegistration} registration exist.
      *
-     * @return True if exist, false otherwise.
+     * @return TRUE if exist, FALSE otherwise.
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isListening() {
         return this.registration != null;
     }
@@ -112,11 +110,10 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
      * Creating and registering {@link EventBusChangeRecorder} of specific
      * listener on {@link EventBus}.
      *
-     * @param listener
-     *            specific listener of notifications
+     * @param listener Specific listener of notifications.
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected <T extends BaseListenerInterface> void register(final T listener) {
+    <T extends BaseListenerInterface> void register(final T listener) {
         this.eventBusChangeRecorder = new EventBusChangeRecorder(listener);
         this.eventBus.register(this.eventBusChangeRecorder);
     }
@@ -132,10 +129,9 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     }
 
     /**
-     * Removes all subscribers and unregisters event bus change recorder form
-     * event bus.
+     * Removes all subscribers and unregisters event bus change recorder form event bus.
      */
-    protected void unregister() {
+    private void unregister() {
         this.subscribers.clear();
         this.eventBus.unregister(this.eventBusChangeRecorder);
     }
