@@ -10,7 +10,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAMS_PATH;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH_PART;
 
-import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.FluentFuture;
 import java.net.URI;
@@ -273,31 +272,39 @@ public final class ReadDataTransactionUtil {
                                                 final SchemaContextRef schemaContextRef, final UriInfo uriInfo) {
         final SchemaContext schemaContext = schemaContextRef.get();
         if (identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
-            final DOMDataTreeReadWriteTransaction wTx = transactionNode.getTransactionChain().newReadWriteTransaction();
-            final boolean exist = SubscribeToStreamUtil.checkExist(schemaContext, wTx);
-
-            for (final NotificationDefinition notificationDefinition : schemaContextRef.get().getNotifications()) {
-                final List<NotificationListenerAdapter> notifiStreamXML =
-                        CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContextRef,
-                                NotificationOutputType.XML.getName());
-                final List<NotificationListenerAdapter> notifiStreamJSON =
-                        CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContextRef,
-                                NotificationOutputType.JSON.getName());
-                for (final NotificationListenerAdapter listener : Iterables.concat(notifiStreamXML, notifiStreamJSON)) {
-                    final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName());
-                    final NormalizedNode mapToStreams =
-                            RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-                                    listener.getSchemaPath().getLastComponent(), schemaContext.getNotifications(),
-                                    null, listener.getOutputType(), uri,
-                                    SubscribeToStreamUtil.getMonitoringModule(schemaContext), exist);
-                    SubscribeToStreamUtil.writeDataToDS(schemaContext,
-                            listener.getSchemaPath().getLastComponent().getLocalName(), wTx, exist,
-                            mapToStreams);
-                }
-            }
-            SubscribeToStreamUtil.submitData(wTx);
+            createAllYangNotificationStreams(transactionNode, schemaContextRef, uriInfo);
         }
         return readData(content, transactionNode, withDefa, schemaContext);
+    }
+
+    private static void createAllYangNotificationStreams(final TransactionVarsWrapper transactionNode,
+            final SchemaContextRef schemaContextRef, final UriInfo uriInfo) {
+        final DOMDataTreeReadWriteTransaction wTx = transactionNode.getTransactionChain().newReadWriteTransaction();
+        final boolean exist = SubscribeToStreamUtil.checkExist(schemaContextRef.get(), wTx);
+
+        for (final NotificationDefinition notificationDefinition : schemaContextRef.get().getNotifications()) {
+            final NotificationListenerAdapter notifiStreamXML =
+                    CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContextRef,
+                            NotificationOutputType.XML);
+            final NotificationListenerAdapter notifiStreamJSON =
+                    CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContextRef,
+                            NotificationOutputType.JSON);
+            writeNotificationStreamToDatastore(schemaContextRef, uriInfo, wTx, exist, notifiStreamXML);
+            writeNotificationStreamToDatastore(schemaContextRef, uriInfo, wTx, exist, notifiStreamJSON);
+        }
+        SubscribeToStreamUtil.submitData(wTx);
+    }
+
+    private static void writeNotificationStreamToDatastore(final SchemaContextRef schemaContextRef,
+            final UriInfo uriInfo, final DOMDataTreeReadWriteTransaction readWriteTransaction, final boolean exist,
+            final NotificationListenerAdapter listener) {
+        final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName());
+        final NormalizedNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
+                listener.getSchemaPath().getLastComponent(), schemaContextRef.get().getNotifications(), null,
+                listener.getOutputType(), uri,
+                SubscribeToStreamUtil.getMonitoringModule(schemaContextRef.get()), exist);
+        SubscribeToStreamUtil.writeDataToDS(schemaContextRef.get(),
+                listener.getSchemaPath().getLastComponent().getLocalName(), readWriteTransaction, exist, mapToStreams);
     }
 
     private static NormalizedNode<?, ?> prepareDataByParamWithDef(final NormalizedNode<?, ?> result,
