@@ -30,7 +30,6 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.SubscribeToStreamUtil;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
@@ -41,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link RestconfStreamsSubscriptionService}.
- *
  */
 @Path("/")
 public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSubscriptionService {
@@ -83,7 +81,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         final NotificationQueryParams notificationQueryParams = NotificationQueryParams.fromUriInfo(uriInfo);
 
         URI response = null;
-        if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCR)) {
+        if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
             response = SubscribeToStreamUtil.notifiDataStream(identifier, uriInfo, notificationQueryParams,
                     this.handlersHolder);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
@@ -97,8 +95,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                     SubscribeToStreamUtil.prepareIIDSubsStreamOutput(this.handlersHolder.getSchemaHandler());
             final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> builder =
                     ImmutableLeafNodeBuilder.create().withValue(response.toString());
-            builder.withNodeIdentifier(
-                    NodeIdentifier.create(QName.create("subscribe:to:notification", "2016-10-28", "location")));
+            builder.withNodeIdentifier(NodeIdentifier.create(RestconfStreamsConstants.LOCATION_QNAME));
 
             // prepare new header with location
             final Map<String, Object> headers = new HashMap<>();
@@ -170,7 +167,6 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
     /**
      * Parser and holder of query paramteres from uriInfo for notifications.
-     *
      */
     public static final class NotificationQueryParams {
 
@@ -255,5 +251,4 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
             return Optional.ofNullable(filter);
         }
     }
-
 }
