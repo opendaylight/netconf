@@ -15,17 +15,16 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 
 /**
- * {@link WebSocketServerInitializer} is used to setup the {@link ChannelPipeline} of a {@link io.netty.channel.Channel}
- * .
+ * {@link WebSocketServerInitializer} is used to setup the {@link ChannelPipeline} of
+ * a {@link io.netty.channel.Channel}.
  */
 public class WebSocketServerInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
-    protected void initChannel(final SocketChannel ch) {
-        ChannelPipeline pipeline = ch.pipeline();
+    protected void initChannel(final SocketChannel channel) {
+        ChannelPipeline pipeline = channel.pipeline();
         pipeline.addLast("codec-http", new HttpServerCodec());
         pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
         pipeline.addLast("handler", new WebSocketServerHandler());
     }
-
 }

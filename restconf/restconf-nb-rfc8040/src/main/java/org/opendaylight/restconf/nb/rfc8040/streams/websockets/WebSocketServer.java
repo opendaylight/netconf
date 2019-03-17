@@ -14,18 +14,17 @@ import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.Notificator;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link WebSocketServer} is the singleton responsible for starting and stopping the
- * web socket server.
+ * {@link WebSocketServer} is the class that is responsible for starting and stopping of web-socket server with
+ * specified listening TCP port.
  */
 public final class WebSocketServer implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketServer.class);
-
     private static WebSocketServer instance = null;
 
     private final int port;
@@ -41,8 +40,7 @@ public final class WebSocketServer implements Runnable {
     /**
      * Create singleton instance of {@link WebSocketServer}.
      *
-     * @param port TCP port used for this server
-     * @return instance of {@link WebSocketServer}
+     * @param port TCP port used for this server.
      */
     public static WebSocketServer createInstance(final int port) {
         Preconditions.checkState(instance == null, "createInstance() has already been called");
@@ -53,9 +51,9 @@ public final class WebSocketServer implements Runnable {
     }
 
     /**
-     * Get the websocket of TCP port.
+     * Get the TCP port of websocket server.
      *
-     * @return websocket TCP port
+     * @return TCP port number.
      */
     public int getPort() {
         return port;
@@ -64,7 +62,7 @@ public final class WebSocketServer implements Runnable {
     /**
      * Get instance of {@link WebSocketServer} created by {@link #createInstance(int)}.
      *
-     * @return instance of {@link WebSocketServer}
+     * @return Instance of {@link WebSocketServer}.
      */
     public static WebSocketServer getInstance() {
         Preconditions.checkNotNull(instance, "createInstance() must be called prior to getInstance()");
@@ -96,10 +94,10 @@ public final class WebSocketServer implements Runnable {
 
             channel.closeFuture().sync();
         } catch (final InterruptedException e) {
-            LOG.error("Web socket server encountered an error during startup attempt on port {}", port, e);
+            LOG.error("Web socket server encountered an error during startup attempt on port {}.", port, e);
         } catch (Throwable throwable) {
             // sync() re-throws exceptions declared as Throwable, so the compiler doesn't see them
-            LOG.error("Error while binding to port {}", port, throwable);
+            LOG.error("Error while binding to port {}.", port, throwable);
             throw throwable;
         } finally {
             stop();
@@ -110,8 +108,8 @@ public final class WebSocketServer implements Runnable {
      * Stops the web socket server and removes all listeners.
      */
     private void stop() {
-        LOG.debug("Stopping the web socket server instance on port {}", port);
-        Notificator.removeAllListeners();
+        LOG.debug("Stopping the web socket server instance on port {}.", port);
+        ListenersBroker.getInstance().removeAndCloseAllListeners();
         if (bossGroup != null) {
             bossGroup.shutdownGracefully();
             bossGroup = null;

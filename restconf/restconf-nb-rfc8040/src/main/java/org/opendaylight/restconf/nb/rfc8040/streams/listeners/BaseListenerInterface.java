@@ -9,39 +9,68 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import io.netty.channel.Channel;
 import java.util.Set;
+import org.opendaylight.yangtools.concepts.ListenerRegistration;
 
 /**
- * Base interface for both listeners({@link ListenerAdapter},
- * {@link NotificationListenerAdapter}).
+ * Base interface for both listeners({@link ListenerAdapter}, {@link NotificationListenerAdapter}).
  */
-interface BaseListenerInterface extends AutoCloseable {
+public interface BaseListenerInterface extends AutoCloseable {
 
     /**
      * Return all subscribers of listener.
      *
-     * @return set of subscribers
+     * @return Set of all subscribers.
      */
     Set<Channel> getSubscribers();
 
     /**
      * Checks if exists at least one {@link Channel} subscriber.
      *
-     * @return True if exist at least one {@link Channel} subscriber, false
-     *         otherwise.
+     * @return {@code true} if exist at least one {@link Channel} subscriber, {@code false} otherwise.
      */
     boolean hasSubscribers();
 
     /**
      * Get name of stream.
      *
-     * @return stream name
+     * @return Stream name.
      */
     String getStreamName();
 
     /**
      * Get output type.
      *
-     * @return outputType
+     * @return Output type (JSON or XML).
      */
     String getOutputType();
+
+    /**
+     * Creates event of type {@link EventType#REGISTER}, set {@link Channel}
+     * subscriber to the event and post event into event bus.
+     *
+     * @param subscriber Web-socket channel.
+     */
+    void addSubscriber(Channel subscriber);
+
+    /**
+     * Creates event of type {@link EventType#DEREGISTER}, sets {@link Channel}
+     * subscriber to the event and posts event into event bus.
+     *
+     * @param subscriber Subscriber channel.
+     */
+    void removeSubscriber(Channel subscriber);
+
+    /**
+     * Sets {@link ListenerRegistration} registration.
+     *
+     * @param registration DOMDataChangeListener registration.
+     */
+    void setRegistration(ListenerRegistration<?> registration);
+
+    /**
+     * Checks if {@link ListenerRegistration} registration exists.
+     *
+     * @return {@code true} if exists, {@code false} otherwise.
+     */
+    boolean isListening();
 }
