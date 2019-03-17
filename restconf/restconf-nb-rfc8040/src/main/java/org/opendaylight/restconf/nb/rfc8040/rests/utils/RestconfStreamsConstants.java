@@ -20,43 +20,52 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.Augmentat
 
 /**
  * Constants for streams.
- *
  */
 public final class RestconfStreamsConstants {
-    public static final String SAL_REMOTE_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote";
 
+    public static final QNameModule SAL_REMOTE_AUGMENT = QNameModule.create(
+            URI.create("urn:sal:restconf:event:subscription"),
+            Revision.of("2014-07-08"));
+    public static final QNameModule SUBSCRIBE_TO_NOTIFICATION = QNameModule.create(
+            URI.create("subscribe:to:notification"),
+            Revision.of("2016-10-28"));
+
+    public static final QName SAL_REMOTE_NAMESPACE = QName.create(
+            "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote",
+            "2014-01-14",
+            "sal-remote");
+
+    public static final String STREAM_PATH_PARAM_NAME = "path";
     public static final String DATASTORE_PARAM_NAME = "datastore";
+    public static final String SCOPE_PARAM_NAME = "scope";
+    public static final String OUTPUT_TYPE_PARAM_NAME = "notification-output-type";
+    public static final String OUTPUT_CONTAINER_NAME = "output";
+    public static final String OUTPUT_STREAM_NAME = "stream-name";
 
-    private static final URI NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT = URI.create("urn:sal:restconf:event:subscription");
 
-    public static final QNameModule SAL_REMOTE_AUGMENT = QNameModule.create(NAMESPACE_EVENT_SUBSCRIPTION_AUGMENT,
-        Revision.of("2014-07-08")).intern();
+    public static final AugmentationIdentifier SAL_REMOTE_AUG_IDENTIFIER = new AugmentationIdentifier(ImmutableSet.of(
+            QName.create(SAL_REMOTE_AUGMENT, SCOPE_PARAM_NAME),
+            QName.create(SAL_REMOTE_AUGMENT, DATASTORE_PARAM_NAME),
+            QName.create(SAL_REMOTE_AUGMENT, OUTPUT_TYPE_PARAM_NAME)));
 
-    public static final AugmentationIdentifier SAL_REMOTE_AUG_IDENTIFIER = new AugmentationIdentifier(
-        ImmutableSet.of(QName.create(SAL_REMOTE_AUGMENT, "scope"), QName.create(SAL_REMOTE_AUGMENT, "datastore"),
-            QName.create(SAL_REMOTE_AUGMENT, "notification-output-type")));
+    public static final QName LOCATION_QNAME = QName.create(SUBSCRIBE_TO_NOTIFICATION, "location");
+    public static final QName NOTIFI_QNAME = QName.create(SUBSCRIBE_TO_NOTIFICATION, "notifi");
 
     public static final DataChangeScope DEFAULT_SCOPE = DataChangeScope.BASE;
-
     public static final LogicalDatastoreType DEFAULT_DS = LogicalDatastoreType.CONFIGURATION;
 
-    public static final String SCOPE_PARAM_NAME = "scope";
-
     public static final char EQUAL = ParserBuilderConstants.Deserializer.EQUAL;
-
     public static final String DS_URI = RestconfConstants.SLASH + DATASTORE_PARAM_NAME + EQUAL;
-
     public static final String SCOPE_URI = RestconfConstants.SLASH + SCOPE_PARAM_NAME + EQUAL;
+    public static final String SCHEMA_SUBSCRIBE_URI = "ws";
+    public static final String SCHEMA_SUBSCRIBE_SECURED_URI = "wss";
+    public static final String SCHEMA_UPGRADE_URI = "http";
+    public static final String SCHEMA_UPGRADE_SECURED_URI = "https";
 
-    public static final int NOTIFICATION_PORT = 8181;
-
-    public static final String SCHEMA_SUBSCIBRE_URI = "ws";
-
-    public static final CharSequence DATA_SUBSCR = "data-change-event-subscription";
-    public static final CharSequence CREATE_DATA_SUBSCR = "create-" + DATA_SUBSCR;
-
-    public static final CharSequence NOTIFICATION_STREAM = "notification-stream";
-    public static final CharSequence CREATE_NOTIFICATION_STREAM = "create-" + NOTIFICATION_STREAM;
+    public static final String DATA_SUBSCRIPTION = "data-change-event-subscription";
+    public static final String CREATE_DATA_SUBSCRIPTION = "create-" + DATA_SUBSCRIPTION;
+    public static final String NOTIFICATION_STREAM = "notification-stream";
+    public static final String CREATE_NOTIFICATION_STREAM = "create-" + NOTIFICATION_STREAM;
 
     public static final String STREAMS_PATH = "ietf-restconf-monitoring:restconf-state/streams";
     public static final String STREAM_PATH_PART = "/stream=";
@@ -67,5 +76,4 @@ public final class RestconfStreamsConstants {
     private RestconfStreamsConstants() {
         throw new UnsupportedOperationException("Util class.");
     }
-
 }
