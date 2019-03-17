@@ -153,8 +153,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
             final String streamName = value.substring(
-                    value.indexOf(CREATE_NOTIFICATION_STREAM.toString() + RestconfConstants.SLASH),
-                    value.length());
+                    value.indexOf(CREATE_NOTIFICATION_STREAM + RestconfConstants.SLASH));
             this.delegRestconfSubscrService.subscribeToStream(streamName, uriInfo);
         }
         if (node == null) {
