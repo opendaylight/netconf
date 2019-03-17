@@ -18,7 +18,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.Before;
@@ -215,14 +214,10 @@ public class NotificationListenerTest {
         return child;
     }
 
-    private String prepareJson(final DOMNotification notificationData, final SchemaPath schemaPathNotifi)
-            throws Exception {
-        final List<SchemaPath> paths = new ArrayList<>();
-        paths.add(schemaPathNotifi);
-        final List<NotificationListenerAdapter> listNotifi =
-                Notificator.createNotificationListener(paths, "stream-name", NotificationOutputType.JSON.toString());
-        final NotificationListenerAdapter notifi = listNotifi.get(0);
-        final String result = notifi.prepareJson(schmeaCtx, notificationData);
+    private String prepareJson(final DOMNotification notificationData, final SchemaPath schemaPathNotifi) {
+        final NotificationListenerAdapter notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
+                schemaPathNotifi, "stream-name", NotificationOutputType.JSON);
+        final String result = notifiAdapter.prepareJson(schmeaCtx, notificationData);
         return Preconditions.checkNotNull(result);
     }
 }
