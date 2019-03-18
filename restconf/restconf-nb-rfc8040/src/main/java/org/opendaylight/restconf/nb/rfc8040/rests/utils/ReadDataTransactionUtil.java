@@ -27,6 +27,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.restconf.common.configuration.RestconfConfigurationHolder;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.context.WriterParameters.WriterParametersBuilder;
@@ -34,7 +35,9 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
+import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketServer;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
@@ -75,6 +78,8 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Util class for read data from data store via transaction.
@@ -86,6 +91,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  *
  */
 public final class ReadDataTransactionUtil {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ReadDataTransactionUtil.class);
 
     private ReadDataTransactionUtil() {
         throw new UnsupportedOperationException("Util class.");
@@ -266,24 +273,35 @@ public final class ReadDataTransactionUtil {
      *             schema context
      * @param uriInfo
      *             uri info
+     * @param webSocketInitializer
+     *             web-socket server manager - provides instance of web-socket server
      * @return {@link NormalizedNode}
      */
     public static NormalizedNode<?, ?> readData(final String identifier, final String content,
                                                 final TransactionVarsWrapper transactionNode, final String withDefa,
-                                                final SchemaContextRef schemaContextRef, final UriInfo uriInfo) {
+                                                final SchemaContextRef schemaContextRef, final UriInfo uriInfo,
+                                                final WebSocketInitializer webSocketInitializer) {
         final SchemaContext schemaContext = schemaContextRef.get();
         if (identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
-            createAllYangNotificationStreams(transactionNode, schemaContextRef, uriInfo);
+            final Optional<WebSocketServer> webSocketServer = webSocketInitializer.getWebSocketServer();
+            if (webSocketServer.isPresent()) {
+                final RestconfConfigurationHolder.SecurityType securityType = webSocketServer.get().getSecurityType();
+                createAllYangNotificationStreams(transactionNode, schemaContextRef, uriInfo, securityType);
+            } else {
+                LOG.warn("Web-socket server hasn't been started yet, "
+                        + "the streams are not created for YANG notifications.");
+            }
         }
         return readData(content, transactionNode, withDefa, schemaContext);
     }
 
-    private static void createAllYangNotificationStreams(final TransactionVarsWrapper transactionNode,
-                                                         final SchemaContextRef schemaContextRef,
-                                                         final UriInfo uriInfo) {
+    private static void createAllYangNotificationStreams(
+            final TransactionVarsWrapper transactionNode,
+            final SchemaContextRef schemaContextRef,
+            final UriInfo uriInfo,
+            final RestconfConfigurationHolder.SecurityType securityType) {
         final DOMDataTreeReadWriteTransaction wTx = transactionNode.getTransactionChain().newReadWriteTransaction();
         final boolean exist = SubscribeToStreamUtil.checkExist(schemaContextRef.get(), wTx);
-
         for (final NotificationDefinition notificationDefinition : schemaContextRef.get().getNotifications()) {
             final NotificationListenerAdapter notifiStreamXML =
                     CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContextRef,
@@ -292,7 +310,8 @@ public final class ReadDataTransactionUtil {
                     CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContextRef,
                             NotificationOutputType.JSON);
             for (final NotificationListenerAdapter listener : Sets.newHashSet(notifiStreamJSON, notifiStreamXML)) {
-                final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName());
+                final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(
+                        uriInfo, listener.getStreamName(), securityType);
                 final NormalizedNode mapToStreams =
                         RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                                 listener.getSchemaPath().getLastComponent(), schemaContextRef.get().getNotifications(),

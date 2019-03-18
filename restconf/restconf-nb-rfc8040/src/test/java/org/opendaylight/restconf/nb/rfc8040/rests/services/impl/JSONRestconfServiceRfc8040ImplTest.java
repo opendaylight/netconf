@@ -66,6 +66,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
+import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -143,6 +144,9 @@ public class JSONRestconfServiceRfc8040ImplTest {
     @Mock
     private DOMSchemaService domSchemaService;
 
+    @Mock
+    private WebSocketInitializer webSocketInitializer;
+
     private JSONRestconfServiceRfc8040Impl service;
 
     private final SchemaContextHandler schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
@@ -192,7 +196,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         final ServicesWrapper servicesWrapper = ServicesWrapper.newInstance(schemaContextHandler,
                 mountPointServiceHandler, txChainHandler, new DOMDataBrokerHandler(mockDOMDataBroker),
                 new RpcServiceHandler(mockRpcService), new NotificationServiceHandler(mockNotificationService),
-                domSchemaService);
+                domSchemaService, webSocketInitializer);
 
         service = new JSONRestconfServiceRfc8040Impl(servicesWrapper, mountPointServiceHandler,
                 schemaContextHandler);

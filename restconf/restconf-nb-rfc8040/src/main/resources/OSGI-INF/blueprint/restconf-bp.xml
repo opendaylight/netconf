@@ -32,6 +32,10 @@
   <reference id="restconfConfiguration"
              interface="org.opendaylight.restconf.common.configuration.RestconfConfiguration"/>
 
+  <reference id="iCertificateManager"
+             interface="org.opendaylight.aaa.cert.api.ICertificateManager"
+             odl:type="default-certificate-manager"/>
+
   <bean id="servicesWrapper" factory-ref="rfc8040RestConfWiring" factory-method="getServicesWrapper" />
 
   <service ref="jSONRestconfServiceRfc8040Impl" odl:type="rfc8040"

@@ -29,6 +29,8 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.util.CharsetUtil;
 import java.util.Optional;
+import org.opendaylight.restconf.common.configuration.RestconfConfigurationHolder;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
@@ -43,7 +45,12 @@ import org.slf4j.LoggerFactory;
 public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> {
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketServerHandler.class);
 
+    private final RestconfConfigurationHolder.SecurityType securityType;
     private WebSocketServerHandshaker handshaker;
+
+    WebSocketServerHandler(final RestconfConfigurationHolder.SecurityType securityType) {
+        this.securityType = securityType;
+    }
 
     @Override
     protected void channelRead0(final ChannelHandlerContext ctx, final Object msg) {
@@ -181,10 +188,21 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     /**
      * Get web socket location from HTTP request.
      *
-     * @param req HTTP request from which the location will be returned.
+     * @param httpRequest HTTP request from which the location will be returned.
      * @return String representation of web socket location.
      */
-    private static String getWebSocketLocation(final HttpRequest req) {
-        return "ws://" + req.headers().get(HttpHeaderNames.HOST) + req.uri();
+    private String getWebSocketLocation(final HttpRequest httpRequest) {
+        String protocolName;
+        switch (securityType) {
+            case DISABLED:
+                protocolName = RestconfStreamsConstants.SCHEMA_SUBSCRIBE_URI;
+                break;
+            case TLS_AUTH_PRIV:
+                protocolName = RestconfStreamsConstants.SCHEMA_SUBSCRIBE_SECURED_URI;
+                break;
+            default:
+                protocolName = RestconfStreamsConstants.SCHEMA_SUBSCRIBE_URI;
+        }
+        return protocolName + "://" + httpRequest.headers().get(HttpHeaderNames.HOST) + httpRequest.uri();
     }
 }

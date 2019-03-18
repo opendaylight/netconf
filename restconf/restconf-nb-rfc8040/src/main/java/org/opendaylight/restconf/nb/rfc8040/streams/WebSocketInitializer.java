@@ -18,6 +18,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import org.opendaylight.aaa.cert.api.ICertificateManager;
 import org.opendaylight.restconf.common.configuration.RestconfConfiguration;
 import org.opendaylight.restconf.common.configuration.RestconfConfigurationHolder;
 import org.opendaylight.restconf.common.configuration.RestconfConfigurationListener;
@@ -36,6 +37,7 @@ public class WebSocketInitializer implements RestconfConfigurationListener {
 
     private final ExecutorService webSocketThreadExecutor = Executors.newSingleThreadExecutor();
     private final RestconfConfiguration restconfConfiguration;
+    private final ICertificateManager aaaCertificateManager;
     private Integer listeningPort;
     private RestconfConfigurationHolder.SecurityType securityType;
     private Boolean enabledWebSocketServer;
@@ -47,10 +49,13 @@ public class WebSocketInitializer implements RestconfConfigurationListener {
      *
      * @param restconfConfiguration Restconf configuration that contains defined web-socket port, security level,
      *                              and status.
+     * @param aaaCertificateManager AAA certificate manager (required for creation of secured web-socket server).
      */
     @Inject
-    public WebSocketInitializer(@Nonnull final RestconfConfiguration restconfConfiguration) {
+    public WebSocketInitializer(@Nonnull final RestconfConfiguration restconfConfiguration,
+                                @Nonnull final ICertificateManager aaaCertificateManager) {
         this.restconfConfiguration = Preconditions.checkNotNull(restconfConfiguration);
+        this.aaaCertificateManager = Preconditions.checkNotNull(aaaCertificateManager);
     }
 
     /**
@@ -64,7 +69,7 @@ public class WebSocketInitializer implements RestconfConfigurationListener {
 
     private void startWebSocketServer() {
         if (enabledWebSocketServer) {
-            webSocketServer = new WebSocketServer(listeningPort, securityType);
+            webSocketServer = new WebSocketServer(aaaCertificateManager, listeningPort, securityType);
             webSocketServerFuture = webSocketThreadExecutor.submit(webSocketServer);
             LOG.info("Web-socket server has been successfully started on the port {} with security level {}.",
                     listeningPort, securityType);

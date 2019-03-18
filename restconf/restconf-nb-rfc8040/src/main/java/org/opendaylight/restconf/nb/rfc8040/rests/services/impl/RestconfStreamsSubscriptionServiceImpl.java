@@ -20,6 +20,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.restconf.common.configuration.RestconfConfigurationHolder;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -30,6 +31,8 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.SubscribeToStreamUtil;
+import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
+import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketServer;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
@@ -47,6 +50,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsSubscriptionServiceImpl.class);
 
     private HandlersHolder handlersHolder;
+    private final WebSocketInitializer webSocketInitializer;
 
     /**
      * Initialize holder of handlers with holders as parameters.
@@ -59,13 +63,17 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      *             handler of {@link SchemaContext}
      * @param transactionChainHandler
      *             handler of {@link DOMTransactionChain}
+     * @param webSocketInitializer
+     *             web-socket server manager - provides instance of web-socket server
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBrokerHandler domDataBrokerHandler,
                                                   final NotificationServiceHandler notificationServiceHandler,
                                                   final SchemaContextHandler schemaHandler,
-                                                  final TransactionChainHandler transactionChainHandler) {
+                                                  final TransactionChainHandler transactionChainHandler,
+                                                  final WebSocketInitializer webSocketInitializer) {
         this.handlersHolder = new HandlersHolder(domDataBrokerHandler, notificationServiceHandler,
                 transactionChainHandler, schemaHandler);
+        this.webSocketInitializer = webSocketInitializer;
     }
 
     @Override
@@ -80,14 +88,21 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
     @Override
     public NormalizedNodeContext subscribeToStream(final String identifier, final UriInfo uriInfo) {
         final NotificationQueryParams notificationQueryParams = NotificationQueryParams.fromUriInfo(uriInfo);
+        final Optional<WebSocketServer> webSocketServer = webSocketInitializer.getWebSocketServer();
+        if (!webSocketServer.isPresent()) {
+            final String message = "Web-socket server hasn't been started yet.";
+            LOG.error(message);
+            throw new RestconfDocumentedException(message);
+        }
+        final RestconfConfigurationHolder.SecurityType securityType = webSocketServer.get().getSecurityType();
 
         URI response = null;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
             response = SubscribeToStreamUtil.notifiDataStream(identifier, uriInfo, notificationQueryParams,
-                    this.handlersHolder);
+                    this.handlersHolder, securityType);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
             response = SubscribeToStreamUtil.notifYangStream(identifier, uriInfo, notificationQueryParams,
-                    this.handlersHolder);
+                    this.handlersHolder, securityType);
         }
 
         if (response != null) {

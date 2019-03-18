@@ -59,6 +59,7 @@ public final class RestconfStreamsConstants {
     public static final String DS_URI = RestconfConstants.SLASH + DATASTORE_PARAM_NAME + EQUAL;
     public static final String SCOPE_URI = RestconfConstants.SLASH + SCOPE_PARAM_NAME + EQUAL;
     public static final String SCHEMA_SUBSCRIBE_URI = "ws";
+    public static final String SCHEMA_SUBSCRIBE_SECURED_URI = "wss";
 
     public static final CharSequence DATA_SUBSCRIPTION = "data-change-event-subscription";
     public static final CharSequence CREATE_DATA_SUBSCRIPTION = "create-" + DATA_SUBSCRIPTION;

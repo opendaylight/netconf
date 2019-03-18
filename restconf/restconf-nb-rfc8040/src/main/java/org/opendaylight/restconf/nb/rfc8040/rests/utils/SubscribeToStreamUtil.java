@@ -32,6 +32,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
+import org.opendaylight.restconf.common.configuration.RestconfConfigurationHolder;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -91,13 +92,15 @@ public final class SubscribeToStreamUtil {
      * @param uriInfo                 URI information.
      * @param notificationQueryParams Query parameters of notification.
      * @param handlersHolder          Holder of handlers for notifications.
+     * @param securityType            Web-socket server security level.
      * @return Stream location for listening.
      */
     @SuppressWarnings("rawtypes")
     public static URI notifYangStream(final String identifier,
                                       final UriInfo uriInfo,
                                       final NotificationQueryParams notificationQueryParams,
-                                      final HandlersHolder handlersHolder) {
+                                      final HandlersHolder handlersHolder,
+                                      final RestconfConfigurationHolder.SecurityType securityType) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -112,7 +115,7 @@ public final class SubscribeToStreamUtil {
                     .newReadWriteTransaction();
             final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
             final boolean exist = checkExist(schemaContext, writeTransaction);
-            final URI uri = prepareUriByStreamName(uriInfo, streamName);
+            final URI uri = prepareUriByStreamName(uriInfo, streamName, securityType);
 
             registerToListenNotification(
                     notificationListenerAdapter.get(), handlersHolder.getNotificationServiceHandler());
@@ -179,13 +182,15 @@ public final class SubscribeToStreamUtil {
      * @param uriInfo                 Base URI information.
      * @param notificationQueryParams Query parameters of notification.
      * @param handlersHolder          Holder of handlers for notifications.
+     * @param securityType            Web-socket server security level.
      * @return Location for listening.
      */
     @SuppressWarnings("rawtypes")
     public static URI notifiDataStream(final String identifier,
                                        final UriInfo uriInfo,
                                        final NotificationQueryParams notificationQueryParams,
-                                       final HandlersHolder handlersHolder) {
+                                       final HandlersHolder handlersHolder,
+                                       final RestconfConfigurationHolder.SecurityType securityType) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
         final LogicalDatastoreType datastoreType = parseURIEnum(
                 LogicalDatastoreType.class,
@@ -217,7 +222,7 @@ public final class SubscribeToStreamUtil {
         listener.get().setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
         registration(datastoreType, listener.get(), handlersHolder.getDomDataBrokerHandler().get());
 
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
+        final URI uri = prepareUriByStreamName(uriInfo, streamName, securityType);
         final DOMDataTreeReadWriteTransaction writeTransaction
                 = handlersHolder.getTransactionChainHandler().get().newReadWriteTransaction();
         final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
@@ -299,9 +304,20 @@ public final class SubscribeToStreamUtil {
         return result;
     }
 
-    static URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
+    static URI prepareUriByStreamName(final UriInfo uriInfo,
+                                      final String streamName,
+                                      final RestconfConfigurationHolder.SecurityType securityType) {
         final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
-        uriBuilder.scheme(RestconfStreamsConstants.SCHEMA_SUBSCRIBE_URI);
+        switch (securityType) {
+            case DISABLED:
+                uriBuilder.scheme(RestconfStreamsConstants.SCHEMA_SUBSCRIBE_URI);
+                break;
+            case TLS_AUTH_PRIV:
+                uriBuilder.scheme(RestconfStreamsConstants.SCHEMA_SUBSCRIBE_SECURED_URI);
+                break;
+            default:
+                uriBuilder.scheme(RestconfStreamsConstants.SCHEMA_SUBSCRIBE_URI);
+        }
         return uriBuilder.replacePath(streamName).build();
     }
 

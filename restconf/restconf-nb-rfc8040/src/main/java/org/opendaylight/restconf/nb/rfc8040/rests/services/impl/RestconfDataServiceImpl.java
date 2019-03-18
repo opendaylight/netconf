@@ -46,6 +46,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
+import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -69,15 +70,18 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private DOMMountPointServiceHandler mountPointServiceHandler;
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
+    private final WebSocketInitializer webSocketInitializer;
 
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
                                    final TransactionChainHandler transactionChainHandler,
-            final DOMMountPointServiceHandler mountPointServiceHandler,
-            final RestconfStreamsSubscriptionService delegRestconfSubscrService) {
+                                   final DOMMountPointServiceHandler mountPointServiceHandler,
+                                   final RestconfStreamsSubscriptionService delegRestconfSubscrService,
+                                   final WebSocketInitializer webSocketInitializer) {
         this.schemaContextHandler = Objects.requireNonNull(schemaContextHandler);
         this.transactionChainHandler = Objects.requireNonNull(transactionChainHandler);
         this.mountPointServiceHandler = Objects.requireNonNull(mountPointServiceHandler);
         this.delegRestconfSubscrService = Objects.requireNonNull(delegRestconfSubscrService);
+        this.webSocketInitializer = Objects.requireNonNull(webSocketInitializer);
     }
 
     @Override
@@ -148,7 +152,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 instanceIdentifier, mountPoint, localTransactionChainHandler);
         final NormalizedNode<?, ?> node =
                 ReadDataTransactionUtil.readData(identifier, parameters.getContent(), transactionNode, withDefa,
-                        schemaContextRef, uriInfo);
+                        schemaContextRef, uriInfo, webSocketInitializer);
         if (identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
