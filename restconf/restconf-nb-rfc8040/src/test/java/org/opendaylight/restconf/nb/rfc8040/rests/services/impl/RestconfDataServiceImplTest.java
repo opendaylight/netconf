@@ -61,6 +61,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
+import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -113,6 +114,8 @@ public class RestconfDataServiceImplTest {
     private DOMTransactionChain mountTransactionChain;
     @Mock
     private RestconfStreamsSubscriptionService delegRestconfSubscrService;
+    @Mock
+    private WebSocketInitializer webSocketInitializer;
 
     @Before
     public void setUp() throws Exception {
@@ -191,7 +194,8 @@ public class RestconfDataServiceImplTest {
 
         schemaContextHandler.onGlobalContextUpdated(this.contextRef.get());
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,
-                DOMMountPointServiceHandler.newInstance(mountPointService), this.delegRestconfSubscrService);
+                DOMMountPointServiceHandler.newInstance(mountPointService), this.delegRestconfSubscrService,
+                this.webSocketInitializer);
         doReturn(Optional.of(this.mountPoint)).when(this.mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doReturn(this.contextRef.get()).when(this.mountPoint).getSchemaContext();

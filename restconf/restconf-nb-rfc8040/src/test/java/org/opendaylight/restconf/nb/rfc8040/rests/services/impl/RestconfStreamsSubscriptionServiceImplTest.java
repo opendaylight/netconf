@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
@@ -34,6 +35,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.opendaylight.aaa.cert.api.ICertificateManager;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
@@ -41,6 +43,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
+import org.opendaylight.restconf.common.configuration.RestconfConfigurationHolder;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
@@ -49,8 +52,10 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
+import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketServer;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
@@ -69,6 +74,10 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     private UriInfo uriInfo;
     @Mock
     private NotificationServiceHandler notificationServiceHandler;
+    @Mock
+    private WebSocketInitializer webSocketInitializer;
+    @Mock
+    private ICertificateManager certificateManager;
 
     private TransactionChainHandler transactionHandler;
     private SchemaContextHandler schemaHandler;
@@ -148,7 +157,10 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     }
 
     @Test
-    public void testSubscribeToStream() {
+    public void testSubscribeToNonSecuredXmlStream() {
+        Mockito.when(webSocketInitializer.getWebSocketServer()).thenReturn(Optional.of(new WebSocketServer(
+                certificateManager, 8484, RestconfConfigurationHolder.SecurityType.DISABLED)));
+
         final UriBuilder uriBuilder = UriBuilder.fromUri(URI);
         ListenersBroker.getInstance().registerDataChangeListener(
                 IdentifierCodec.deserialize("toaster:toaster/toasterStatus", this.schemaHandler.get()),
@@ -157,7 +169,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler, this.transactionHandler);
+                        this.schemaHandler, this.transactionHandler, webSocketInitializer);
         final NormalizedNodeContext response = streamsSubscriptionService
                 .subscribeToStream(
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
@@ -168,13 +180,37 @@ public class RestconfStreamsSubscriptionServiceImplTest {
             response.getNewHeaders().get("Location").toString());
     }
 
+    @Test
+    public void testSubscribeToSecuredJsonStream() {
+        Mockito.when(webSocketInitializer.getWebSocketServer()).thenReturn(Optional.of(new WebSocketServer(
+                certificateManager, 8484, RestconfConfigurationHolder.SecurityType.TLS_AUTH_PRIV)));
+
+        final UriBuilder uriBuilder = UriBuilder.fromUri(URI);
+        ListenersBroker.getInstance().registerDataChangeListener(
+                IdentifierCodec.deserialize("toaster:toaster/toasterStatus", this.schemaHandler.get()),
+                "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE/JSON",
+                NotificationOutputType.JSON);
+        doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
+        final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
+                new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
+                        this.schemaHandler, this.transactionHandler, webSocketInitializer);
+        final NormalizedNodeContext response = streamsSubscriptionService
+                .subscribeToStream("data-change-event-subscription/toaster:toaster/toasterStatus"
+                                + "/datastore=OPERATIONAL/scope=ONE/JSON",
+                        this.uriInfo);
+        assertEquals(
+                "wss://localhost:8181/data-change-event-subscription"
+                        + "/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE/JSON",
+                response.getNewHeaders().get("Location").toString());
+    }
+
     @Test(expected = RestconfDocumentedException.class)
     public void testSubscribeToStreamMissingDatastoreInPath() {
         final UriBuilder uriBuilder = UriBuilder.fromUri(URI);
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler, this.transactionHandler);
+                        this.schemaHandler, this.transactionHandler, webSocketInitializer);
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/scope=ONE", this.uriInfo);
     }
 
@@ -184,7 +220,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler, this.transactionHandler);
+                        this.schemaHandler, this.transactionHandler, webSocketInitializer);
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL",
                 this.uriInfo);
     }

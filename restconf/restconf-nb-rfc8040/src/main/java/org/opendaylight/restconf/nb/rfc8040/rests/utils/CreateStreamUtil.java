@@ -60,7 +60,7 @@ public final class CreateStreamUtil {
      *                                 "path": "/toaster:toaster/toaster:toasterStatus",
      *                                 "sal-remote-augment:datastore": "OPERATIONAL",
      *                                 "sal-remote-augment:scope": "ONE",
-     *                                 "sal-remote-augment:enabled-tls": false
+     *                                 "sal-remote-augment:notification-output-type": JSON
      *                             }
      *                         }
      *                     }

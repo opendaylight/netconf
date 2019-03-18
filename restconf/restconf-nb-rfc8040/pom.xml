@@ -17,7 +17,6 @@
     <relativePath>../restconf-parent</relativePath>
   </parent>
 
-  <groupId>org.opendaylight.netconf</groupId>
   <artifactId>restconf-nb-rfc8040</artifactId>
   <version>1.10.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
@@ -111,6 +110,11 @@
     </dependency>
 
     <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-handler</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>net.java.dev.stax-utils</groupId>
       <artifactId>stax-utils</artifactId>
     </dependency>
@@ -138,6 +142,11 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlets</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.opendaylight.aaa</groupId>
+      <artifactId>aaa-cert</artifactId>
     </dependency>
 
     <!-- Testing Dependencies -->

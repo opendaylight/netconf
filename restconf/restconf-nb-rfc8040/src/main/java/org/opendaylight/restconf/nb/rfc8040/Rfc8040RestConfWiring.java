@@ -19,6 +19,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.JSONRestconfServiceRfc8040Impl;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
+import org.opendaylight.restconf.nb.rfc8040.streams.WebSocketInitializer;
 import org.opendaylight.restconf.nb.rfc8040.web.WebInitializer;
 
 /**
@@ -42,10 +43,11 @@ public class Rfc8040RestConfWiring {
             SchemaContextHandler schemaCtxHandler,
             DOMMountPointServiceHandler domMountPointServiceHandler, TransactionChainHandler transactionChainHandler,
             DOMDataBrokerHandler domDataBrokerHandler, RpcServiceHandler rpcServiceHandler,
-            NotificationServiceHandler notificationServiceHandler, @Reference DOMSchemaService domSchemaService) {
+            NotificationServiceHandler notificationServiceHandler, @Reference DOMSchemaService domSchemaService,
+            WebSocketInitializer webSocketInitializer) {
         servicesWrapper = ServicesWrapper.newInstance(schemaCtxHandler, domMountPointServiceHandler,
                 transactionChainHandler, domDataBrokerHandler, rpcServiceHandler, notificationServiceHandler,
-                domSchemaService);
+                domSchemaService, webSocketInitializer);
     }
 
     public ServicesWrapper getServicesWrapper() {

@@ -9,11 +9,23 @@
 package org.opendaylight.restconf.nb.rfc8040.streams.websockets;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.ssl.ApplicationProtocolConfig;
+import io.netty.handler.ssl.CipherSuiteFilter;
+import io.netty.handler.ssl.ClientAuth;
+import io.netty.handler.ssl.JdkSslContext;
+import io.netty.handler.ssl.SslContext;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.net.ssl.SSLContext;
+import org.opendaylight.aaa.cert.api.ICertificateManager;
 import org.opendaylight.restconf.common.configuration.RestconfConfigurationHolder;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.slf4j.Logger;
@@ -27,6 +39,7 @@ import org.slf4j.LoggerFactory;
 public final class WebSocketServer implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(WebSocketServer.class);
 
+    private final ICertificateManager caManager;
     private final Integer port;
     private final RestconfConfigurationHolder.SecurityType securityType;
 
@@ -36,10 +49,14 @@ public final class WebSocketServer implements Runnable {
     /**
      * Creates instance of web-socket server using defined port and security features.
      *
+     * @param caManager    AAA certificate manager.
      * @param port         TCP port used for this server.
      * @param securityType Security type that should be used for protecting of web-socket server and its communication.
      */
-    public WebSocketServer(final Integer port, final RestconfConfigurationHolder.SecurityType securityType) {
+    public WebSocketServer(@Nonnull final ICertificateManager caManager,
+                           @Nonnull final Integer port,
+                           @Nonnull final RestconfConfigurationHolder.SecurityType securityType) {
+        this.caManager = Preconditions.checkNotNull(caManager);
         this.port = Preconditions.checkNotNull(port);
         this.securityType = Preconditions.checkNotNull(securityType);
     }
@@ -49,6 +66,7 @@ public final class WebSocketServer implements Runnable {
      *
      * @return TCP port number.
      */
+    @Nonnull
     public Integer getPort() {
         return port;
     }
@@ -58,6 +76,7 @@ public final class WebSocketServer implements Runnable {
      *
      * @return Security type that web-socket server provides.
      */
+    @Nonnull
     public RestconfConfigurationHolder.SecurityType getSecurityType() {
         return securityType;
     }
@@ -93,6 +112,9 @@ public final class WebSocketServer implements Runnable {
             case DISABLED:
                 channel = configureNonSecuredServerChannel();
                 break;
+            case TLS_AUTH_PRIV:
+                channel = configureTlsSecuredServerChannel();
+                break;
             default:
                 LOG.warn("Security type {} of web-socket server is currently not supported, "
                         + "starting of non-secured web-socket server.", securityType);
@@ -103,11 +125,38 @@ public final class WebSocketServer implements Runnable {
 
     private Channel configureNonSecuredServerChannel() throws InterruptedException {
         final ServerBootstrap serverBootstrap = new ServerBootstrap();
-        serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-                .childHandler(new WebSocketServerInitializer());
+        serverBootstrap.group(bossGroup, workerGroup)
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new WebSocketServerInitializer(securityType));
         final Channel channel = serverBootstrap.bind(port).sync().channel();
         LOG.info("Web socket server started at port {}.", port);
         return channel;
+    }
+
+    private Channel configureTlsSecuredServerChannel() throws InterruptedException {
+        final SslContext sslContext = createSslContext();
+        final ServerBootstrap serverBootstrap = new ServerBootstrap();
+        serverBootstrap.group(bossGroup, workerGroup)
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new WebSocketServerInitializer(securityType, sslContext));
+        final Channel channel = serverBootstrap.bind(port).sync().channel();
+        LOG.info("Web socket server with TLS authentication started at port {}.", port);
+        return channel;
+    }
+
+    private SslContext createSslContext() {
+        final SSLContext odlSslContext = caManager.getServerContext();
+        final List<String> odlCipherSuites = Arrays.asList(caManager.getCipherSuites());
+        final String[] tlsProtocols = caManager.getTlsProtocols();
+        final CipherSuiteFilter cipherSuiteFilter = (ciphers, defaultCiphers, supportedCiphers) -> {
+            final Set<String> filteredCipherSuites = Sets.intersection(
+                    Sets.newHashSet(odlCipherSuites),
+                    Sets.newHashSet(ciphers)
+            );
+            return filteredCipherSuites.toArray(new String[0]);
+        };
+        return new JdkSslContext(odlSslContext, false, odlCipherSuites, cipherSuiteFilter,
+                ApplicationProtocolConfig.DISABLED, ClientAuth.REQUIRE, tlsProtocols, false);
     }
 
     /**
