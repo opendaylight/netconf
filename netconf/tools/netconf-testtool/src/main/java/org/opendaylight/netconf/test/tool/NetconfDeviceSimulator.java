@@ -29,8 +29,6 @@ import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.channels.AsynchronousChannelGroup;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -38,7 +36,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import org.apache.sshd.common.keyprovider.KeyPairProvider;
-import org.apache.sshd.common.util.security.SecurityUtils;
 import org.apache.sshd.common.util.threads.ThreadUtils;
 import org.opendaylight.netconf.api.capability.BasicCapability;
 import org.opendaylight.netconf.api.capability.Capability;
@@ -191,7 +188,7 @@ public class NetconfDeviceSimulator implements Closeable {
         final List<Integer> openDevices = Lists.newArrayList();
 
         // Generate key to temp folder
-        final KeyPairProvider keyPairProvider = getPemGeneratorHostKeyProvider();
+        final KeyPairProvider keyPairProvider = new VirtualKeyPairProvider();
 
         final AsynchronousChannelGroup group;
         try {
@@ -286,16 +283,6 @@ public class NetconfDeviceSimulator implements Closeable {
                 .setKeyPairProvider(keyPairProvider)
                 .setIdleTimeout(Integer.MAX_VALUE)
                 .createSshProxyServerConfiguration();
-    }
-
-    private static KeyPairProvider getPemGeneratorHostKeyProvider() {
-        try {
-            final Path tempFile = Files.createTempFile("tempKeyNetconfTest", "suffix");
-            return SecurityUtils.createGeneratorHostKeyProvider(tempFile.toAbsolutePath());
-        } catch (final IOException e) {
-            LOG.error("Unable to generate PEM key", e);
-            throw new RuntimeException(e);
-        }
     }
 
     private Set<Capability> parseSchemasToModuleCapabilities(final SharedSchemaRepository consumer) {
