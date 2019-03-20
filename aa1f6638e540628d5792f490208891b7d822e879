@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "dcdcfdcd_40a2ed78",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-03-20T14:10:27Z",
+      "side": 1,
+      "message": "Ugh, why do we need this to be a Set?\n\nAlso since you are factoring things out, note how NotificationOutput type is the only loop invariant, so how about splitting the loop body into a separate method taking needed arguments including NotificationOutputType and let it instantiate the stream?\n\nThat way there is no need to iterate and readData() becomes more than an empty husk.",
+      "range": {
+        "startLine": 294,
+        "startChar": 62,
+        "endLine": 294,
+        "endChar": 77
+      },
+      "revId": "aa1f6638e540628d5792f490208891b7d822e879",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "057de8fd_4c087e6b",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/SubscribeToStreamUtil.java",
         "patchSetId": 1
