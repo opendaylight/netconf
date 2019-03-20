@@ -14,6 +14,7 @@ import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.test.tool.TesttoolParameters;
 import org.opendaylight.netconf.test.tool.operations.OperationsCreator;
 import org.opendaylight.netconf.test.tool.rpchandler.RpcHandler;
+import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 
 public class ConfigurationBuilder {
 
@@ -48,7 +49,7 @@ public class ConfigurationBuilder {
         return this;
     }
 
-    public ConfigurationBuilder setModels(final Set<String> models) {
+    public ConfigurationBuilder setModels(final Set<YangModuleInfo> models) {
         this.configuration.setModels(models);
         return this;
     }
