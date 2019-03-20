@@ -2,6 +2,98 @@
   "comments": [
     {
       "key": {
+        "uuid": "057de8fd_4c087e6b",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/SubscribeToStreamUtil.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-03-20T14:04:34Z",
+      "side": 1,
+      "message": "this is wasting vertical space. what was wrong with original formatting?",
+      "range": {
+        "startLine": 260,
+        "startChar": 30,
+        "endLine": 264,
+        "endChar": 63
+      },
+      "revId": "aa1f6638e540628d5792f490208891b7d822e879",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "938dcd84_6f247be7",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/SubscribeToStreamUtil.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-03-20T14:04:34Z",
+      "side": 1,
+      "message": "what was wrong with the original structure of the code?\n\nit was making clear when processing bails without incurring unnecessary nesting.",
+      "range": {
+        "startLine": 318,
+        "startChar": 0,
+        "endLine": 318,
+        "endChar": 38
+      },
+      "revId": "aa1f6638e540628d5792f490208891b7d822e879",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e031b8cf_0bf719e0",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/SubscribeToStreamUtil.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-03-20T14:04:34Z",
+      "side": 1,
+      "message": "we use \u0027e\u0027 pretty much everywhere, please do not invent new standards.",
+      "range": {
+        "startLine": 338,
+        "startChar": 65,
+        "endLine": 338,
+        "endChar": 74
+      },
+      "revId": "aa1f6638e540628d5792f490208891b7d822e879",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f66a6fe_768190a7",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/SubscribeToStreamUtil.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-03-20T14:04:34Z",
+      "side": 1,
+      "message": "this part is an unrelated clean up and should be submitted in a separate patch",
+      "range": {
+        "startLine": 334,
+        "startChar": 0,
+        "endLine": 339,
+        "endChar": 102
+      },
+      "revId": "aa1f6638e540628d5792f490208891b7d822e879",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9e703f1e_bc985eac",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/AbstractQueryParams.java",
         "patchSetId": 1
