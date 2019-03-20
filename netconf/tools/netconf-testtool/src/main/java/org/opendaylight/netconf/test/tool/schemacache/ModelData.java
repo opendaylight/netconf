@@ -7,23 +7,24 @@
  */
 package org.opendaylight.netconf.test.tool.schemacache;
 
+import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 
 public class ModelData {
 
-    private SourceIdentifier id;
-    private String path;
+    private final SourceIdentifier sourceIdentifier;
+    private final YangModuleInfo yangModuleInfo;
 
-    public ModelData(SourceIdentifier id, String path) {
-        this.id = id;
-        this.path = path;
+    ModelData(final SourceIdentifier sourceIdentifier, final YangModuleInfo yangModuleInfo) {
+        this.sourceIdentifier = sourceIdentifier;
+        this.yangModuleInfo = yangModuleInfo;
     }
 
-    public SourceIdentifier getId() {
-        return id;
+    public SourceIdentifier getSourceIdentifier() {
+        return sourceIdentifier;
     }
 
-    public String getPath() {
-        return path;
+    public YangModuleInfo getYangModuleInfo() {
+        return yangModuleInfo;
     }
 }
