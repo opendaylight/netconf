@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6660ba73_5d69ebcb",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/Rfc8040RestConfWiring.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-03-20T13:51:13Z",
+      "side": 1,
+      "message": "I think this is moving in the wrong direction.\n\nThis feature is copy\u0026pasted from bierman02 and was not enabled on purpose, so that it can be implemented correctly, i.e. letting Jetty handle endpoints and security (certificates as well as authentication).\n\nThe reason for bierman02 opening a separate socket was that we did not have servlet-3.1, which allows for proper websocket/http2 integration.",
+      "range": {
+        "startLine": 47,
+        "startChar": 12,
+        "endLine": 47,
+        "endChar": 53
+      },
+      "revId": "e7822576261c1764452e6e1970a508b90ddadfa4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "137c5dbf_2a098b9e",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/websockets/WebSocketServer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-03-20T13:51:13Z",
+      "side": 1,
+      "message": "do not proliferate JSR305, please",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 32
+      },
+      "revId": "e7822576261c1764452e6e1970a508b90ddadfa4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
