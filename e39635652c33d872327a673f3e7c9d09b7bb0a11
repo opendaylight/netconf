@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "60b931de_7b75d0ce",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/schemacache/ModelData.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-03-20T13:35:54Z",
+      "side": 1,
+      "message": "This is mixing apples and oranges. SourceIdentifier can readily be constructed from YangModuleInfo, so why do we need this class?",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 71
+      },
+      "revId": "e39635652c33d872327a673f3e7c9d09b7bb0a11",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d126c11a_4f90de2d",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/schemacache/SchemaSourceCache.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-03-20T13:35:54Z",
+      "side": 1,
+      "message": "What is moduleList good here? Given that the input is YangModuleInfo, why do we need this indirection?",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 49
+      },
+      "revId": "e39635652c33d872327a673f3e7c9d09b7bb0a11",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d8f07eae_2e1abd22",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/schemacache/SchemaSourceCache.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-03-20T13:35:54Z",
+      "side": 1,
+      "message": "This ignores YangModulesInfo\u0027s dependencies.",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 65,
+        "endChar": 111
+      },
+      "revId": "e39635652c33d872327a673f3e7c9d09b7bb0a11",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "09980f77_82585a0e",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/schemacache/SchemaSourceCache.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-03-20T13:35:54Z",
+      "side": 1,
+      "message": "so in initializeCachedSchemas() we have a perfectly valid SourceIdentifier, which we are turning into a string to use as a key in map.\n\nhere we are again getting a SourceIdentifier and turning it into a String for sake of lookup. Why?",
+      "range": {
+        "startLine": 71,
+        "startChar": 8,
+        "endLine": 71,
+        "endChar": 66
+      },
+      "revId": "e39635652c33d872327a673f3e7c9d09b7bb0a11",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7e231612_c4512bc4",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/schemacache/SchemaSourceCache.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-03-20T13:35:54Z",
+      "side": 1,
+      "message": "This is completely superfluous, see:\n\nYangTextSchemaSource.delegateForByteSource()\nYangModuleInfo.getYangTextByteSource()",
+      "range": {
+        "startLine": 90,
+        "startChar": 15,
+        "endLine": 107,
+        "endChar": 13
+      },
+      "revId": "e39635652c33d872327a673f3e7c9d09b7bb0a11",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
