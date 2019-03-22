@@ -30,6 +30,8 @@
                odl:type="default"/>
     <reference id="encryptionService"
                interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
+    <reference id="deviceActionFactory"
+               interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
 
     <bean id="schemaRepository" class="org.opendaylight.netconf.topology.impl.SchemaRepositoryProviderImpl">
         <argument value="shared-schema-repository-impl"/>
@@ -58,6 +60,7 @@
         <property name="privateKeyPath" value="${private-key-path}"/>
         <property name="privateKeyPassphrase" value="${private-key-passphrase}"/>
         <argument ref="encryptionService" />
+        <argument ref="deviceActionFactory"/>
     </bean>
 
     <bean id="netconfConnectorFactory" class="org.opendaylight.netconf.topology.impl.NetconfConnectorFactoryImpl"/>
