@@ -562,6 +562,12 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         }
 
         final String head = strings.iterator().next();
+
+        if (head.isEmpty()) {
+            final List<String> remaining = strings.subList(1, strings.size());
+            return collectPathArguments(builder, remaining, parentNode, mountPoint, returnJustMountPoint);
+        }
+
         final String nodeName = toNodeName(head);
         final String moduleName = toModuleName(head);
 

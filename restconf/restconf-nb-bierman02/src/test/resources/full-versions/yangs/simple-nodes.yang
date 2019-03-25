@@ -43,6 +43,11 @@ module simple-nodes {
         leaf full-name {
             type string;
         }
+        container inner-container {
+            leaf inner-list {
+                type uint16;
+            }
+        }
     }
     
      container food {
