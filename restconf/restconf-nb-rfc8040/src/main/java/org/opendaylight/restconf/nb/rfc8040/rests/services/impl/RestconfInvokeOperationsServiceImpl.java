@@ -9,6 +9,8 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import java.net.URI;
 import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -24,6 +26,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOpe
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.CreateStreamUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -92,7 +95,12 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
             resultData = result.getResult();
             resultNodeSchema = (RpcDefinition) payload.getInstanceIdentifierContext().getSchemaNode();
         }
-        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, resultNodeSchema,
-                mountPoint, schemaContextRef.get()), resultData);
+
+        if (resultData != null && ((ContainerNode) resultData).getValue().isEmpty()) {
+            throw new WebApplicationException(Response.Status.NO_CONTENT);
+        } else {
+            return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, resultNodeSchema,
+                    mountPoint, schemaContextRef.get()), resultData);
+        }
     }
 }
