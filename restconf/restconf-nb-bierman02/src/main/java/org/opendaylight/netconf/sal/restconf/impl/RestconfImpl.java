@@ -43,6 +43,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -479,9 +480,13 @@ public final class RestconfImpl implements RestconfService {
             resultData = null;
         }
 
-        return new NormalizedNodeContext(
-                new InstanceIdentifierContext<>(null, resultNodeSchema, mountPoint, schemaContext),
-                resultData, QueryParametersParser.parseWriterParameters(uriInfo));
+        if (resultData != null && ((ContainerNode) resultData).getValue().isEmpty()) {
+            throw new WebApplicationException(Response.Status.NO_CONTENT);
+        } else {
+            return new NormalizedNodeContext(
+                    new InstanceIdentifierContext<>(null, resultNodeSchema, mountPoint, schemaContext),
+                    resultData, QueryParametersParser.parseWriterParameters(uriInfo));
+        }
     }
 
     private NormalizedNodeContext invokeRpc(final String identifier, final UriInfo uriInfo) {
@@ -542,8 +547,12 @@ public final class RestconfImpl implements RestconfService {
 
         final DOMRpcResult result = checkRpcResponse(response);
 
-        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpc, mountPoint, schemaContext),
-                result.getResult(), QueryParametersParser.parseWriterParameters(uriInfo));
+        if (result.getResult() != null && ((ContainerNode) result.getResult()).getValue().isEmpty()) {
+            throw new WebApplicationException(Response.Status.NO_CONTENT);
+        } else {
+            return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpc, mountPoint, schemaContext),
+                    result.getResult(), QueryParametersParser.parseWriterParameters(uriInfo));
+        }
     }
 
     @SuppressWarnings("checkstyle:avoidHidingCauseException")
