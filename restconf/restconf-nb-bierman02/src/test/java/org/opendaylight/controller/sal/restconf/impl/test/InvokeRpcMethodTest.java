@@ -29,12 +29,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -234,6 +238,27 @@ public class InvokeRpcMethodTest {
         assertEquals(null, output.getData());
         // additional validation in the fact that the restconfImpl does not
         // throw an exception.
+    }
+
+    @Test
+    public void testInvokeRpcWithEmptyOutput() {
+        final ContainerNode resultObj = Mockito.mock(ContainerNode.class);
+        Mockito.when(resultObj.getValue()).thenReturn(Collections.emptySet());
+        final DOMRpcResult expResult = new DefaultDOMRpcResult(resultObj);
+
+        final QName qname = QName.create("(http://netconfcentral.org/ns/toaster?revision=2009-11-20)cancel-toast");
+        final SchemaPath path = SchemaPath.create(true, qname);
+        doReturn(immediateFluentFuture(expResult)).when(brokerFacade).invokeRpc(eq(path), isNull());
+
+        WebApplicationException exceptionToBeThrown = null;
+        try {
+            this.restconfImpl.invokeRpc("toaster:cancel-toast", null, uriInfo);
+        } catch (final WebApplicationException exception) {
+            exceptionToBeThrown = exception;
+
+        }
+        Assert.assertNotNull("WebApplicationException with status code 204 is expected.", exceptionToBeThrown);
+        Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), exceptionToBeThrown.getResponse().getStatus());
     }
 
     @Test
