@@ -13,7 +13,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
+import java.util.Collections;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -32,6 +36,8 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -69,14 +75,36 @@ public class RestconfInvokeOperationsServiceImplTest {
     }
 
     @Test
-    public void testInvokeRpc() throws Exception {
+    public void testInvokeRpcWithNonEmptyOutput() {
         final String identifier = "invoke-rpc-module:rpcTest";
-        final NormalizedNode<?, ?> result = mock(NormalizedNode.class);
+        final ContainerNode result = mock(ContainerNode.class);
+        final LeafNode outputChild = mock(LeafNode.class);
+        when(result.getValue()).thenReturn(Collections.singleton(outputChild));
+
         final NormalizedNodeContext payload = prepNNC(result);
         final UriInfo uriInfo = mock(UriInfo.class);
 
         final NormalizedNodeContext rpc = this.invokeOperationsService.invokeRpc(identifier, payload, uriInfo);
         assertEquals(result, rpc.getData());
+    }
+
+    @Test
+    public void testInvokeRpcWithEmptyOutput() {
+        final String identifier = "invoke-rpc-module:rpcTest";
+        final ContainerNode result = mock(ContainerNode.class);
+
+        final NormalizedNodeContext payload = prepNNC(result);
+        final UriInfo uriInfo = mock(UriInfo.class);
+
+        WebApplicationException exceptionToBeThrown = null;
+        try {
+            this.invokeOperationsService.invokeRpc(identifier, payload, uriInfo);
+        } catch (final WebApplicationException exception) {
+            exceptionToBeThrown = exception;
+
+        }
+        Assert.assertNotNull("WebApplicationException with status code 204 is expected.", exceptionToBeThrown);
+        Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), exceptionToBeThrown.getResponse().getStatus());
     }
 
     private NormalizedNodeContext prepNNC(final NormalizedNode<?, ?> result) {
