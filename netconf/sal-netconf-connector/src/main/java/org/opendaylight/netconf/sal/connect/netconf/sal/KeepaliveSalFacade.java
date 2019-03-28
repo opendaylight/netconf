@@ -13,8 +13,9 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_PATH;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME;
 
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.ScheduledExecutorService;
@@ -197,8 +198,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
                 if (!lastJobSucceeded) {
                     onFailure(new IllegalStateException("Previous keepalive timed out"));
                 } else {
-                    currentDeviceRpc.invokeRpc(NETCONF_GET_CONFIG_PATH, KEEPALIVE_PAYLOAD).addCallback(this,
-                                        MoreExecutors.directExecutor());
+                    Futures.addCallback(currentDeviceRpc.invokeRpc(NETCONF_GET_CONFIG_PATH, KEEPALIVE_PAYLOAD), this,
+                        MoreExecutors.directExecutor());
                 }
             } catch (final NullPointerException e) {
                 LOG.debug("{}: Skipping keepalive while reconnecting", id);
@@ -272,7 +273,7 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
             }
             scheduleKeepalives();
             //Listening on the result should be done before the keepalive rpc will be send
-            final long delay = (keepaliveDelaySeconds * 1000) - 500;
+            final long delay = keepaliveDelaySeconds * 1000 - 500;
             schedule = executor.schedule(runnable, delay, TimeUnit.MILLISECONDS);
         }
 
@@ -287,11 +288,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
 
     private static final class ResponseWaiting implements Runnable {
 
-        private final FluentFuture<DOMRpcResult> rpcResultFuture;
+        private final ListenableFuture<DOMRpcResult> rpcResultFuture;
         private final ResponseWaitingScheduler responseWaitingScheduler;
 
         ResponseWaiting(final ResponseWaitingScheduler responseWaitingScheduler,
-                final FluentFuture<DOMRpcResult> rpcResultFuture) {
+                final ListenableFuture<DOMRpcResult> rpcResultFuture) {
             this.responseWaitingScheduler = responseWaitingScheduler;
             this.rpcResultFuture = rpcResultFuture;
         }
@@ -323,11 +324,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
      * it.
      */
     private static final class RequestTimeoutTask implements Runnable {
-
-        private final FluentFuture<DOMRpcResult> rpcResultFuture;
+        private final ListenableFuture<DOMRpcResult> rpcResultFuture;
         private final ResponseWaiting responseWaiting;
 
-        RequestTimeoutTask(final FluentFuture<DOMRpcResult> rpcResultFuture, final ResponseWaiting responseWaiting) {
+        RequestTimeoutTask(final ListenableFuture<DOMRpcResult> rpcResultFuture,
+            final ResponseWaiting responseWaiting) {
             this.rpcResultFuture = rpcResultFuture;
             this.responseWaiting = responseWaiting;
         }
@@ -370,11 +371,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         }
 
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
-            final FluentFuture<DOMRpcResult> rpcResultFuture = deviceRpc.invokeRpc(type, input);
+        public ListenableFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+            final ListenableFuture<DOMRpcResult> rpcResultFuture = deviceRpc.invokeRpc(type, input);
             final ResponseWaiting responseWaiting = new ResponseWaiting(responseWaitingScheduler, rpcResultFuture);
             responseWaiting.start();
-            rpcResultFuture.addCallback(resetKeepaliveTask, MoreExecutors.directExecutor());
+            Futures.addCallback(rpcResultFuture, resetKeepaliveTask, MoreExecutors.directExecutor());
 
             final RequestTimeoutTask timeoutTask = new RequestTimeoutTask(rpcResultFuture, responseWaiting);
             executor.schedule(timeoutTask, defaultRequestTimeoutMillis, TimeUnit.MILLISECONDS);

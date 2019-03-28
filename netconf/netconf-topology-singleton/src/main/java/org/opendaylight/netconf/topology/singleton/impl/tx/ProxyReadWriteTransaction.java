@@ -81,11 +81,6 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
     }
 
     @Override
-    public void close() {
-        cancel();
-    }
-
-    @Override
     public FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         LOG.debug("{}: Read {} {}", id, store, path);
