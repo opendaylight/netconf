@@ -15,7 +15,8 @@ import akka.pattern.AskTimeoutException;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import java.util.Collection;
-import javax.annotation.concurrent.GuardedBy;
+import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.checkerframework.checker.lock.qual.Holding;
 import org.opendaylight.mdsal.binding.api.ClusteredDataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
@@ -126,7 +127,7 @@ class NetconfNodeManager
         }
     }
 
-    @GuardedBy("this")
+    @Holding("this")
     private void closeActor() {
         if (slaveActorRef != null) {
             LOG.debug("{}: Sending poison pill to {}", id, slaveActorRef);
@@ -178,7 +179,7 @@ class NetconfNodeManager
         }
     }
 
-    @GuardedBy("this")
+    @Holding("this")
     private void sendAskForMasterMountPointWithRetries(final AskForMasterMountPoint askForMasterMountPoint,
             final ActorSelection masterActor, final int tries, final int updateCount) {
         final Future<Object> future = Patterns.ask(masterActor, askForMasterMountPoint, actorResponseWaitTime);
@@ -208,7 +209,7 @@ class NetconfNodeManager
         }, setup.getActorSystem().dispatcher());
     }
 
-    @GuardedBy("this")
+    @Holding("this")
     private void createOrUpdateActorRef() {
         if (slaveActorRef == null) {
             slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.props(setup, id, schemaRegistry,
