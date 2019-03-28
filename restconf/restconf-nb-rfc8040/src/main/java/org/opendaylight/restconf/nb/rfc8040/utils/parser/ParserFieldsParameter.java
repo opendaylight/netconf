@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -77,6 +78,10 @@ public final class ParserFieldsParameter {
         Set<QName> currentLevel = new HashSet<>();
         parsed.add(currentLevel);
 
+        DataSchemaContextNode<?> parenthesisNode = currentNode;
+        Set<QName> parenthesisLevel = currentLevel;
+        QNameModule parenthesisQNameModule = currentQNameModule;
+
         while (currentPosition < input.length()) {
             final char currentChar = input.charAt(currentPosition);
 
@@ -87,8 +92,7 @@ public final class ParserFieldsParameter {
                             currentNode,
                             input.substring(startPosition, currentPosition), currentQNameModule, currentLevel);
                     // go one level down
-                    currentLevel = new HashSet<>();
-                    parsed.add(currentLevel);
+                    currentLevel = prepareQNameLevel(parsed, currentLevel);
 
                     currentPosition++;
                     startPosition = currentPosition;
@@ -150,6 +154,11 @@ public final class ParserFieldsParameter {
                             currentNode,
                             input.substring(startPosition, currentPosition), currentQNameModule, currentLevel);
                     currentPosition++;
+
+                    // next nodes can be placed on already utilized level-s
+                    currentNode = parenthesisNode;
+                    currentQNameModule = parenthesisQNameModule;
+                    currentLevel = parenthesisLevel;
                     break;
                 default:
                     throw new RestconfDocumentedException(
@@ -163,6 +172,35 @@ public final class ParserFieldsParameter {
         // parse input to end
         if (startPosition < input.length()) {
             addChildToResult(currentNode, input.substring(startPosition), currentQNameModule, currentLevel);
+        }
+    }
+
+    /**
+     * Preparation of the QName level that is used as storage for parsed QNames. If the current level exist at the
+     * index that doesn't equal to the last index of already parsed QNames, a new level of QNames is allocated and
+     * pushed to input parsed QNames.
+     *
+     * @param parsedQNames Already parsed list of QNames grouped to multiple levels.
+     * @param currentLevel Current level of QNames (set).
+     * @return Existing or new level of QNames.
+     */
+    private static Set<QName> prepareQNameLevel(final List<Set<QName>> parsedQNames, final Set<QName> currentLevel) {
+        final Optional<Set<QName>> existingLevel = parsedQNames.stream()
+                .filter(qNameSet -> qNameSet.equals(currentLevel))
+                .findAny();
+        if (existingLevel.isPresent()) {
+            final int index = parsedQNames.indexOf(existingLevel.get());
+            if (index == parsedQNames.size() - 1) {
+                final Set<QName> nextLevel = new HashSet<>();
+                parsedQNames.add(nextLevel);
+                return nextLevel;
+            } else {
+                return parsedQNames.get(index + 1);
+            }
+        } else {
+            final Set<QName> nextLevel = new HashSet<>();
+            parsedQNames.add(nextLevel);
+            return nextLevel;
         }
     }
 
