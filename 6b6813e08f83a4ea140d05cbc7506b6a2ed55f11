@@ -16,6 +16,24 @@
       "revId": "6b6813e08f83a4ea140d05cbc7506b6a2ed55f11",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "344eaa2c_24b77b03",
+        "filename": "restconf/restconf-nb-bierman02/src/test/java/org/opendaylight/controller/sal/restconf/impl/test/URITest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2019-03-28T07:40:06Z",
+      "side": 1,
+      "message": "according to the testing YANG, there should be key after userWithoutClass (it\u0027s list) - so the key should be \"\" and the last slash is ignored (it was ignored before this patch too)\n\nI added this to test so we are sure that this fix doesn\u0027t influence parsing of empty keys",
+      "parentUuid": "dcf5157f_3aac42d9",
+      "revId": "6b6813e08f83a4ea140d05cbc7506b6a2ed55f11",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
