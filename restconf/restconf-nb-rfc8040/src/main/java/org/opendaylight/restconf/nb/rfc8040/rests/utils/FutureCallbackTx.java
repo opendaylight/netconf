@@ -9,7 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
@@ -47,7 +47,7 @@ final class FutureCallbackTx {
      *             if the Future throws an exception
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
-    static <T> void addCallback(final FluentFuture<T> listenableFuture, final String txType,
+    static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
             final FutureDataFactory<? super T> dataFactory) throws RestconfDocumentedException {
 
         try {

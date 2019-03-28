@@ -12,13 +12,13 @@ import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableClassToInstanceMap;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBrokerExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
+import org.opendaylight.mdsal.dom.spi.PingPongMergingDOMDataBroker;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.tx.ProxyReadTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.tx.ProxyReadWriteTransaction;
@@ -28,7 +28,7 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWrit
 import scala.concurrent.ExecutionContext;
 import scala.concurrent.Future;
 
-public class ProxyDOMDataBroker implements DOMDataBroker {
+public class ProxyDOMDataBroker implements PingPongMergingDOMDataBroker {
 
     private final Timeout askTimeout;
     private final RemoteDeviceId id;

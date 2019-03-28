@@ -40,6 +40,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.Empty;
 
 public class CapabilityChangeNotificationProducerTest {
 
@@ -125,7 +126,7 @@ public class CapabilityChangeNotificationProducerTest {
     private static NetconfCapabilityChange changedCapabilitesFrom(final List<Uri> added, final List<Uri> deleted) {
         NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
         netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(
-                new ServerBuilder().setServer(true).build()).build());
+                new ServerBuilder().setServer(Empty.getInstance()).build()).build());
 
         netconfCapabilityChangeBuilder.setModifiedCapability(Collections.emptyList());
         netconfCapabilityChangeBuilder.setAddedCapability(added);

@@ -36,11 +36,6 @@ public class ReadWriteTx implements DOMDataTreeReadWriteTransaction {
     }
 
     @Override
-    public void close() {
-        cancel();
-    }
-
-    @Override
     public void put(final LogicalDatastoreType store, final YangInstanceIdentifier path,
                     final NormalizedNode<?, ?> data) {
         delegateWriteTx.put(store, path, data);

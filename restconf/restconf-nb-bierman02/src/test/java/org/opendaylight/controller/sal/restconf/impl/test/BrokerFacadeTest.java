@@ -30,6 +30,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.junit.Before;
@@ -186,7 +187,7 @@ public class BrokerFacadeTest {
         final DOMRpcResult expResult = mock(DOMRpcResult.class);
         doReturn(immediateFluentFuture(expResult)).when(this.mockRpcService).invokeRpc(this.type, this.dummyNode);
 
-        final FluentFuture<DOMRpcResult> actualFuture = this.brokerFacade.invokeRpc(this.type, this.dummyNode);
+        final ListenableFuture<DOMRpcResult> actualFuture = this.brokerFacade.invokeRpc(this.type, this.dummyNode);
         assertNotNull("Future is null", actualFuture);
         final DOMRpcResult actualResult = actualFuture.get();
         assertSame("invokeRpc", expResult, actualResult);

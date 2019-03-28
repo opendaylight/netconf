@@ -15,6 +15,7 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.Closeable;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import org.opendaylight.mdsal.common.api.ReadFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -488,7 +490,7 @@ public class BrokerFacade implements Closeable {
     }
 
     // RPC
-    public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+    public ListenableFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
         if (this.rpcService == null) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
@@ -515,12 +517,12 @@ public class BrokerFacade implements Closeable {
         listener.setRegistration(registration);
     }
 
-    private NormalizedNode<?, ?> readDataViaTransaction(final DOMDataTreeReadTransaction transaction,
+    private NormalizedNode<?, ?> readDataViaTransaction(final DOMDataTreeReadOperations transaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path) {
         return readDataViaTransaction(transaction, datastore, path, null);
     }
 
-    private NormalizedNode<?, ?> readDataViaTransaction(final DOMDataTreeReadTransaction transaction,
+    private NormalizedNode<?, ?> readDataViaTransaction(final DOMDataTreeReadOperations transaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final String withDefa) {
         LOG.trace("Read {} via Restconf: {}", datastore.name(), path);
 

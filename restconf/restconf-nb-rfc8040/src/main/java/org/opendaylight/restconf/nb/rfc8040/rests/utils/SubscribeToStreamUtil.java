@@ -28,7 +28,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -358,7 +358,7 @@ public final class SubscribeToStreamUtil {
     }
 
     static boolean checkExist(final SchemaContext schemaContext,
-                              final DOMDataTreeReadTransaction readWriteTransaction) {
+                              final DOMDataTreeReadOperations readWriteTransaction) {
         boolean exist;
         try {
             exist = readWriteTransaction.exists(LogicalDatastoreType.OPERATIONAL,
