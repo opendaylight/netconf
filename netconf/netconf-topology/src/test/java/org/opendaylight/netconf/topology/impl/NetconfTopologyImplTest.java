@@ -45,6 +45,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
+import org.opendaylight.netconf.topology.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -297,5 +298,31 @@ public class NetconfTopologyImplTest {
         public ListenableFuture<Void> disconnectNode(final NodeId nodeId) {
             return Futures.immediateFuture(null);
         }
+    }
+
+    @Test
+    public void hideCredentialsTest() {
+        final String userName = "admin";
+        final String password = "pa$$word";
+        final NetconfNode netconfNode = new NetconfNodeBuilder()
+                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                .setPort(new PortNumber(9999))
+                .setReconnectOnChangedSchema(true)
+                .setDefaultRequestTimeoutMillis(1000L)
+                .setBetweenAttemptsTimeoutMillis(100)
+                .setKeepaliveDelay(1000L)
+                .setTcpOnly(false)
+                .setProtocol(new ProtocolBuilder().setName(Name.TLS).build())
+                .setCredentials(new LoginPasswordBuilder()
+                        .setUsername(userName).setPassword(password).build())
+                .build();
+        final Node node = new NodeBuilder()
+                .addAugmentation(NetconfNode.class, netconfNode)
+                .setNodeId(NodeId.getDefaultInstance("junos"))
+                .build();
+        final String transformedNetconfNode = AbstractNetconfTopology.hideCredentials(node);
+        Assert.assertTrue(transformedNetconfNode.contains("credentials=***"));
+        Assert.assertFalse(transformedNetconfNode.contains(userName));
+        Assert.assertFalse(transformedNetconfNode.contains(password));
     }
 }

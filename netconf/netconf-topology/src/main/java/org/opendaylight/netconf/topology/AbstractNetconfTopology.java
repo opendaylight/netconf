@@ -9,6 +9,7 @@ package org.opendaylight.netconf.topology;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -241,8 +242,22 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
     @Override
     public ListenableFuture<NetconfDeviceCapabilities> connectNode(final NodeId nodeId, final Node configNode) {
-        LOG.info("Connecting RemoteDevice{{}} , with config {}", nodeId, configNode);
+        LOG.info("Connecting RemoteDevice{{}} , with config {}", nodeId, hideCredentials(configNode));
         return setupConnection(nodeId, configNode);
+    }
+
+    /**
+     * Hiding of private credentials from node configuration (credentials data is replaced by asterisks).
+     *
+     * @param nodeConfiguration Node configuration container.
+     * @return String representation of node configuration with credentials replaced by asterisks.
+     */
+    @VisibleForTesting
+    public static String hideCredentials(final Node nodeConfiguration) {
+        final NetconfNode netconfNodeAugmentation = nodeConfiguration.augmentation(NetconfNode.class);
+        final String nodeCredentials = netconfNodeAugmentation.getCredentials().toString();
+        final String nodeConfigurationString = nodeConfiguration.toString();
+        return nodeConfigurationString.replace(nodeCredentials, "***");
     }
 
     @Override
