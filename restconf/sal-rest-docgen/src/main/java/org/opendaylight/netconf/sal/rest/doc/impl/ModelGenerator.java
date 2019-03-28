@@ -37,7 +37,7 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.MandatoryAware;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.RevisionAwareXPath;
+import org.opendaylight.yangtools.yang.model.api.PathExpression;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -58,7 +58,7 @@ import org.opendaylight.yangtools.yang.model.api.type.RangeConstraint;
 import org.opendaylight.yangtools.yang.model.api.type.RangeRestrictedTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.StringTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.UnionTypeDefinition;
-import org.opendaylight.yangtools.yang.model.util.RevisionAwareXPathImpl;
+import org.opendaylight.yangtools.yang.model.util.PathExpressionImpl;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -515,11 +515,11 @@ public class ModelGenerator {
 
     private String processLeafRef(final DataSchemaNode node, final ObjectNode property,
                                   final SchemaContext schemaContext, final TypeDefinition<?> leafTypeDef) {
-        RevisionAwareXPath xpath = ((LeafrefTypeDefinition) leafTypeDef).getPathStatement();
+        PathExpression xpath = ((LeafrefTypeDefinition) leafTypeDef).getPathStatement();
         final SchemaNode schemaNode;
 
-        final String xPathString = STRIP_PATTERN.matcher(xpath.toString()).replaceAll("");
-        xpath = new RevisionAwareXPathImpl(xPathString, xpath.isAbsolute());
+        final String xPathString = STRIP_PATTERN.matcher(xpath.getOriginalString()).replaceAll("");
+        xpath = new PathExpressionImpl(xPathString, xpath.isAbsolute());
 
         final Module module;
         if (xpath.isAbsolute()) {

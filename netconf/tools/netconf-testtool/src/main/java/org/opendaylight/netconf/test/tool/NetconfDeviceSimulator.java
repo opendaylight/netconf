@@ -62,7 +62,6 @@ import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -325,8 +324,8 @@ public class NetconfDeviceSimulator implements Closeable {
 
         try {
             //necessary for creating mdsal data stores and operations
-            this.schemaContext = consumer.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT)
-                .createSchemaContext(loadedSources).get();
+            this.schemaContext = consumer.createEffectiveModelContextFactory()
+                    .createEffectiveModelContext(loadedSources).get();
         } catch (final InterruptedException | ExecutionException e) {
             throw new RuntimeException("Cannot parse schema context", e);
         }

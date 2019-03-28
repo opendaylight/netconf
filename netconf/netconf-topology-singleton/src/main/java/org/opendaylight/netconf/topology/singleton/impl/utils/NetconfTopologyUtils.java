@@ -32,9 +32,8 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
+import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
@@ -80,8 +79,8 @@ public final class NetconfTopologyUtils {
             InMemorySchemaSourceCache.createSoftCache(DEFAULT_SCHEMA_REPOSITORY, ASTSchemaSource.class);
 
     // The default factory for creating <code>SchemaContext</code> instances.
-    public static final SchemaContextFactory DEFAULT_SCHEMA_CONTEXT_FACTORY =
-            DEFAULT_SCHEMA_REPOSITORY.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
+    public static final EffectiveModelContextFactory DEFAULT_SCHEMA_CONTEXT_FACTORY =
+            DEFAULT_SCHEMA_REPOSITORY.createEffectiveModelContextFactory();
 
     /**
      * Keeps track of initialized Schema resources.  A Map is maintained in which the key represents the name
@@ -184,8 +183,8 @@ public final class NetconfTopologyUtils {
      */
     private static NetconfDevice.SchemaResourcesDTO createSchemaResourcesDTO(final String moduleSchemaCacheDirectory) {
         final SharedSchemaRepository repository = new SharedSchemaRepository(moduleSchemaCacheDirectory);
-        final SchemaContextFactory schemaContextFactory
-                = repository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
+        final EffectiveModelContextFactory schemaContextFactory
+                = repository.createEffectiveModelContextFactory();
 
         final FilesystemSchemaSourceCache<YangTextSchemaSource> deviceCache =
                 createDeviceFilesystemCache(moduleSchemaCacheDirectory, repository);

@@ -243,7 +243,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         @Override
         void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
                 final Iterator<PathArgument> others) throws IOException {
-            writer.anyxmlNode(getIdentifier(), null);
+            writer.startAnyxmlNode(getIdentifier());
+            // FIXME: why are we not emitting a value?
+            writer.endNode();
         }
     }
 
@@ -287,7 +289,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
         @Override
         void streamToWriter(final NormalizedNodeStreamWriter writer, final PathArgument first,
                 final Iterator<PathArgument> others) throws IOException {
-            writer.leafNode(getIdentifier(), null);
+            writer.startLeafNode(getIdentifier());
+            // FIXME: why are we not emitting a value?
+            writer.endNode();
         }
     }
 
@@ -301,7 +305,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
                 final Iterator<PathArgument> others) throws IOException {
             checkArgument(first instanceof NodeWithValue);
             final NodeWithValue<?> identifier = (NodeWithValue<?>) first;
-            writer.leafSetEntryNode(identifier.getNodeType(), identifier.getValue());
+            writer.startLeafSetEntryNode(identifier);
+            writer.scalarValue(identifier.getValue());
+            writer.endNode();
         }
     }
 
@@ -321,7 +327,9 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
             writer.startMapEntryNode(identifier, UNKNOWN_SIZE);
 
             for (Entry<QName, Object> entry : identifier.getKeyValues().entrySet()) {
-                writer.leafNode(new NodeIdentifier(entry.getKey()), entry.getValue());
+                writer.startLeafNode(new NodeIdentifier(entry.getKey()));
+                writer.scalarValue(entry.getValue());
+                writer.endNode();
             }
         }
     }
