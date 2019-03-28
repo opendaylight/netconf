@@ -47,7 +47,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStre
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
-import org.opendaylight.yangtools.yang.data.impl.schema.SchemaUtils;
+import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AugmentationTarget;
 import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
@@ -72,7 +72,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
 
     private static final Logger LOG = LoggerFactory.getLogger(XmlNormalizedNodeBodyReader.class);
 
-    public XmlNormalizedNodeBodyReader(ControllerContext controllerContext) {
+    public XmlNormalizedNodeBodyReader(final ControllerContext controllerContext) {
         super(controllerContext);
     }
 
@@ -141,7 +141,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
                 final Object child = foundSchemaNodes.pop();
                 if (child instanceof AugmentationSchemaNode) {
                     final AugmentationSchemaNode augmentSchemaNode = (AugmentationSchemaNode) child;
-                    iiToDataList.add(SchemaUtils.getNodeIdentifierForAugmentation(augmentSchemaNode));
+                    iiToDataList.add(DataSchemaContextNode.augmentationIdentifierFrom(augmentSchemaNode));
                 } else if (child instanceof DataSchemaNode) {
                     schemaNode = (DataSchemaNode) child;
                     iiToDataList.add(new YangInstanceIdentifier.NodeIdentifier(schemaNode.getQName()));

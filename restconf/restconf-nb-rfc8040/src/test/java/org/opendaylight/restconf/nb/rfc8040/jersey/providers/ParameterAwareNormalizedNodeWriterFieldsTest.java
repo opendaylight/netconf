@@ -160,9 +160,9 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
         final InOrder inOrder = Mockito.inOrder(writer);
         inOrder.verify(writer, Mockito.times(1)).startContainerNode(containerNodeIdentifier, containerNodeValue.size());
         inOrder.verify(writer, Mockito.times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
-        inOrder.verify(writer, Mockito.times(1)).leafSetEntryNode(
-                leafSetEntryNodeIdentifier.getNodeType(), leafSetEntryNodeValue);
-        inOrder.verify(writer, Mockito.times(2)).endNode();
+        inOrder.verify(writer, Mockito.times(1)).startLeafSetEntryNode(leafSetEntryNodeIdentifier);
+        inOrder.verify(writer, Mockito.times(1)).scalarValue(leafSetEntryNodeValue);
+        inOrder.verify(writer, Mockito.times(3)).endNode();
         Mockito.verifyNoMoreInteractions(writer);
     }
 
@@ -204,8 +204,9 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
         final InOrder inOrder = Mockito.inOrder(writer);
         inOrder.verify(writer, Mockito.times(1)).startMapNode(mapNodeIdentifier, mapNodeValue.size());
         inOrder.verify(writer, Mockito.times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
-        inOrder.verify(writer, Mockito.times(1)).leafNode(keyLeafNodeIdentifier, keyLeafNodeValue);
-        inOrder.verify(writer, Mockito.times(2)).endNode();
+        inOrder.verify(writer, Mockito.times(1)).startLeafNode(keyLeafNodeIdentifier);
+        inOrder.verify(writer, Mockito.times(1)).scalarValue(keyLeafNodeValue);
+        inOrder.verify(writer, Mockito.times(3)).endNode();
         Mockito.verifyNoMoreInteractions(writer);
     }
 }
