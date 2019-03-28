@@ -65,6 +65,21 @@ public class URITest {
     }
 
     @Test
+    public void testToInstanceIdentifierWithDoubleSlash() {
+        InstanceIdentifierContext<?> instanceIdentifier = controllerContext
+                .toInstanceIdentifier("simple-nodes:food//nonalcoholic");
+        assertEquals(instanceIdentifier.getSchemaNode().getQName().getLocalName(), "nonalcoholic");
+
+        instanceIdentifier = controllerContext
+                .toInstanceIdentifier("simple-nodes:userWithoutClass//");
+        assertEquals(instanceIdentifier.getSchemaNode().getQName().getLocalName(), "userWithoutClass");
+
+        instanceIdentifier = controllerContext
+                .toInstanceIdentifier("simple-nodes:userWithoutClass///inner-container");
+        assertEquals(instanceIdentifier.getSchemaNode().getQName().getLocalName(), "inner-container");
+    }
+
+    @Test
     public void testToInstanceIdentifierListWithNullKey() {
         this.exception.expect(RestconfDocumentedException.class);
         controllerContext.toInstanceIdentifier("simple-nodes:user/null/boo");
