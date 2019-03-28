@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.ReadFailedException;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ExistsRequest;
@@ -46,11 +46,11 @@ public abstract class ReadTransactionActorTestAdapter {
     static final NormalizedNode<?, ?> NODE = Builders.containerBuilder()
             .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("", "cont"))).build();
 
-    private DOMDataTreeReadTransaction mockReadTx;
+    private DOMDataTreeReadOperations mockReadTx;
     private TestProbe probe;
     private ActorRef actorRef;
 
-    public void init(final DOMDataTreeReadTransaction inMockReadTx, final ActorSystem system,
+    public void init(final DOMDataTreeReadOperations inMockReadTx, final ActorSystem system,
             final ActorRef inActorRef) {
         this.mockReadTx = inMockReadTx;
         this.probe = TestProbe.apply(system);
