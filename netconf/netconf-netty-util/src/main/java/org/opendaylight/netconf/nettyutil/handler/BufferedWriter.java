@@ -5,13 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler;
 
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.io.Writer;
-import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Custom BufferedWriter optimized for netconf pipeline implemented instead of default BufferedWriter provided by jdk.
@@ -26,7 +24,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  * such as netconf message to XML encoders.
  * Methods in this implementation are not synchronized.
  */
-@NotThreadSafe
 public final class BufferedWriter extends Writer {
 
     private static final int DEFAULT_CHAR_BUFFER_SIZE = 8192;
@@ -68,8 +65,8 @@ public final class BufferedWriter extends Writer {
     @Override
     @SuppressWarnings("checkstyle:hiddenField")
     public void write(final char[] buffer, final int offset, final int length) throws IOException {
-        if ((offset < 0) || (offset > buffer.length)
-                || (length < 0) || ((offset + length) > buffer.length) || ((offset + length) < 0)) {
+        if (offset < 0 || offset > buffer.length
+                || length < 0 || offset + length > buffer.length || offset + length < 0) {
             throw new IndexOutOfBoundsException(
                     String.format("Buffer size: %d, Offset: %d, Length: %d", buffer.length, offset, length));
         } else if (length == 0) {
