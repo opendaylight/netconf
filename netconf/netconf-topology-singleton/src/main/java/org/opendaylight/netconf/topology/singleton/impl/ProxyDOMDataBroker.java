@@ -19,6 +19,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
+import org.opendaylight.mdsal.dom.spi.PingPongTransactionChain;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.tx.ProxyReadTransaction;
 import org.opendaylight.netconf.topology.singleton.impl.tx.ProxyReadWriteTransaction;
@@ -75,6 +76,11 @@ public class ProxyDOMDataBroker implements DOMDataBroker {
     @Override
     public DOMTransactionChain createTransactionChain(final DOMTransactionChainListener listener) {
         throw new UnsupportedOperationException(id + ": Transaction chains not supported for netconf mount point");
+    }
+
+    @Override
+    public DOMTransactionChain createMergingTransactionChain(final DOMTransactionChainListener listener) {
+        return new PingPongTransactionChain(this::createTransactionChain, listener);
     }
 
     @Override
