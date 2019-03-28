@@ -9,6 +9,7 @@ package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -109,7 +110,8 @@ class NetconfEventSourceMount {
      * @param lastEventTime last event time
      * @return rpc result
      */
-    FluentFuture<DOMRpcResult> invokeCreateSubscription(final Stream stream, final Optional<Instant> lastEventTime) {
+    ListenableFuture<DOMRpcResult> invokeCreateSubscription(final Stream stream,
+            final Optional<Instant> lastEventTime) {
         final CreateSubscriptionInputBuilder inputBuilder = new CreateSubscriptionInputBuilder()
                 .setStream(stream.getName());
         if (lastEventTime.isPresent() && stream.isReplaySupport()) {
@@ -128,7 +130,7 @@ class NetconfEventSourceMount {
      * @param stream stream
      * @return rpc result
      */
-    FluentFuture<DOMRpcResult> invokeCreateSubscription(final Stream stream) {
+    ListenableFuture<DOMRpcResult> invokeCreateSubscription(final Stream stream) {
         return invokeCreateSubscription(stream, Optional.empty());
     }
 
