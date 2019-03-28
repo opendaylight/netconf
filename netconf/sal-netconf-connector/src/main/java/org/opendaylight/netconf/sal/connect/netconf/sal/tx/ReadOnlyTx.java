@@ -9,6 +9,8 @@ package org.opendaylight.netconf.sal.connect.netconf.sal.tx;
 
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.Optional;
@@ -47,22 +49,22 @@ public final class ReadOnlyTx implements DOMDataTreeReadTransaction {
             new NetconfRpcFutureCallback("Data read", id), Optional.ofNullable(path)));
     }
 
-    private static <T> FluentFuture<T> remapException(FluentFuture<T> input) {
+    private static <T> FluentFuture<T> remapException(final ListenableFuture<T> input) {
         final SettableFuture<T> ret = SettableFuture.create();
-        input.addCallback(new FutureCallback<T>() {
+        Futures.addCallback(input, new FutureCallback<T>() {
 
             @Override
-            public void onSuccess(T result) {
+            public void onSuccess(final T result) {
                 ret.set(result);
             }
 
             @Override
-            public void onFailure(Throwable cause) {
+            public void onFailure(final Throwable cause) {
                 ret.setException(cause instanceof ReadFailedException ? cause
                         : new ReadFailedException("NETCONF operation failed", cause));
             }
         }, MoreExecutors.directExecutor());
-        return ret;
+        return FluentFuture.from(ret);
     }
 
     @Override

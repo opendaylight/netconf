@@ -87,7 +87,6 @@ public class NetconfCallHomeServerTest {
 
         Map<String, String> props = new HashMap<>();
         props.put("nio-workers", "1");
-        doReturn(props).when(mockSshClient).getProperties();
         doReturn(EVENT_LOOP_GROUP).when(mockFactory).getNettyGroup();
         instance = new NetconfCallHomeServer(
             mockSshClient, mockCallHomeAuthProv, mockFactory, MOCK_ADDRESS, mockStatusRecorder);
