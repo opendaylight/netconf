@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "67e941da_530b79c5",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/DeviceActionFactoryImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-03-28T08:28:08Z",
+      "side": 1,
+      "message": "actionResultFuture",
+      "revId": "e60851370f22868682142778777d08ed814e0920",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5c6f102_1a7cafc1",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/DeviceActionFactoryImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-03-28T08:28:08Z",
+      "side": 1,
+      "message": "This is somehow misleading message. You can try to reword this into something like this.\n\nMissing action result of action \" + schemaPath.",
+      "revId": "e60851370f22868682142778777d08ed814e0920",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "23c1fd18_10b66de3",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/DeviceActionFactoryImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-03-28T08:28:08Z",
+      "side": 1,
+      "message": "This will be logger of enclosing class, not sure if that is appropriate",
+      "revId": "e60851370f22868682142778777d08ed814e0920",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
