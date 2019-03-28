@@ -27,6 +27,7 @@ import org.apache.sshd.common.cipher.Cipher;
 import org.apache.sshd.common.io.IoAcceptor;
 import org.apache.sshd.common.io.IoConnector;
 import org.apache.sshd.common.io.IoHandler;
+import org.apache.sshd.common.io.IoServiceEventListener;
 import org.apache.sshd.common.io.IoServiceFactory;
 import org.apache.sshd.common.io.IoServiceFactoryFactory;
 import org.apache.sshd.common.io.nio2.Nio2Acceptor;
@@ -113,6 +114,8 @@ public class SshProxyServer implements AutoCloseable {
         private final FactoryManager manager;
         private final AsynchronousChannelGroup group;
 
+        private IoServiceEventListener eventListener;
+
         AbstractNioServiceFactory(final FactoryManager manager, final AsynchronousChannelGroup group) {
             this.manager = requireNonNull(manager);
             this.group = requireNonNull(group);
@@ -130,6 +133,16 @@ public class SshProxyServer implements AutoCloseable {
         @Override
         public final IoAcceptor createAcceptor(final IoHandler handler) {
             return new Nio2Acceptor(manager, handler, group);
+        }
+
+        @Override
+        public final IoServiceEventListener getIoServiceEventListener() {
+            return eventListener;
+        }
+
+        @Override
+        public final void setIoServiceEventListener(final IoServiceEventListener listener) {
+            eventListener = listener;
         }
     }
 

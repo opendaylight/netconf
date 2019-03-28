@@ -12,13 +12,12 @@ import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import javax.annotation.concurrent.GuardedBy;
-import javax.annotation.concurrent.ThreadSafe;
+import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Swiss army knife equivalent for reconnect strategies.
+ * Swiss army knife equivalent for reconnect strategies. This class is thread-safe.
  *
  * <p>
  * This strategy continues to schedule reconnect attempts, each having to complete in a fixed time (connectTime).
@@ -44,7 +43,6 @@ import org.slf4j.LoggerFactory;
  * Both these caps can be combined, with the strategy giving up as soon as the first one is reached.
  */
 @Deprecated
-@ThreadSafe
 public final class TimedReconnectStrategy implements ReconnectStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(TimedReconnectStrategy.class);
     private final EventExecutor executor;
