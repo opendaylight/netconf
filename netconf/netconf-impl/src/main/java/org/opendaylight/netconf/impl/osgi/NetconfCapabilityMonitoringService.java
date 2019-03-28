@@ -45,6 +45,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.ChangedByBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.changed.by.server.or.user.ServerBuilder;
+import org.opendaylight.yangtools.yang.common.Empty;
 
 class NetconfCapabilityMonitoringService implements CapabilityListener, AutoCloseable {
 
@@ -238,7 +239,7 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
         final NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
         netconfCapabilityChangeBuilder
                 .setChangedBy(new ChangedByBuilder().setServerOrUser(
-                    new ServerBuilder().setServer(Boolean.TRUE).build()).build());
+                    new ServerBuilder().setServer(Empty.getInstance()).build()).build());
         netconfCapabilityChangeBuilder.setDeletedCapability(Lists.newArrayList(Collections2
                 .transform(removed, CAPABILITY_TO_URI)));
         netconfCapabilityChangeBuilder.setAddedCapability(Lists.newArrayList(Collections2
