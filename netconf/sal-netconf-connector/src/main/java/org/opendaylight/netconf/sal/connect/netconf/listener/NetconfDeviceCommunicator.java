@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.connect.netconf.listener;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import io.netty.util.concurrent.Future;
@@ -344,7 +343,7 @@ public class NetconfDeviceCommunicator
     }
 
     @Override
-    public FluentFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message, final QName rpc) {
+    public ListenableFuture<RpcResult<NetconfMessage>> sendRequest(final NetconfMessage message, final QName rpc) {
         sessionLock.lock();
         try {
             if (semaphore != null && !semaphore.tryAcquire()) {
@@ -361,7 +360,7 @@ public class NetconfDeviceCommunicator
         }
     }
 
-    private FluentFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message,
+    private ListenableFuture<RpcResult<NetconfMessage>> sendRequestWithLock(final NetconfMessage message,
                                                                             final QName rpc) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("{}: Sending message {}", id, msgToS(message));

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.client;
 
 import com.google.common.base.Preconditions;
@@ -14,7 +13,8 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.concurrent.Promise;
 import java.util.ArrayDeque;
 import java.util.Queue;
-import javax.annotation.concurrent.GuardedBy;
+import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.checkerframework.checker.lock.qual.Holding;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
         private final Promise<NetconfMessage> promise;
         private final NetconfMessage request;
 
-        RequestEntry(Promise<NetconfMessage> future, NetconfMessage request) {
+        RequestEntry(final Promise<NetconfMessage> future, final NetconfMessage request) {
             this.promise = Preconditions.checkNotNull(future);
             this.request = Preconditions.checkNotNull(request);
         }
@@ -39,7 +39,7 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
     @GuardedBy("this")
     private NetconfClientSession clientSession;
 
-    @GuardedBy("this")
+    @Holding("this")
     private void dispatchRequest() {
         while (!requests.isEmpty()) {
             final RequestEntry e = requests.peek();
@@ -56,7 +56,7 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
 
     @Override
     @SuppressWarnings("checkstyle:hiddenField")
-    public final synchronized void onSessionUp(NetconfClientSession clientSession) {
+    public final synchronized void onSessionUp(final NetconfClientSession clientSession) {
         this.clientSession = Preconditions.checkNotNull(clientSession);
         LOG.debug("Client session {} went up", clientSession);
         dispatchRequest();
@@ -73,22 +73,22 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
 
     @Override
     @SuppressWarnings("checkstyle:hiddenField")
-    public final void onSessionDown(NetconfClientSession clientSession, Exception exception) {
+    public final void onSessionDown(final NetconfClientSession clientSession, final Exception exception) {
         LOG.debug("Client Session {} went down unexpectedly", clientSession, exception);
         tearDown(exception);
     }
 
     @Override
     @SuppressWarnings("checkstyle:hiddenField")
-    public final void onSessionTerminated(NetconfClientSession clientSession,
-                                          NetconfTerminationReason netconfTerminationReason) {
+    public final void onSessionTerminated(final NetconfClientSession clientSession,
+                                          final NetconfTerminationReason netconfTerminationReason) {
         LOG.debug("Client Session {} terminated, reason: {}", clientSession,
                 netconfTerminationReason.getErrorMessage());
         tearDown(new RuntimeException(netconfTerminationReason.getErrorMessage()));
     }
 
     @Override
-    public synchronized void onMessage(NetconfClientSession session, NetconfMessage message) {
+    public synchronized void onMessage(final NetconfClientSession session, final NetconfMessage message) {
         LOG.debug("New message arrived: {}", message);
 
         final RequestEntry e = requests.poll();
@@ -100,7 +100,7 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
         }
     }
 
-    public final synchronized Future<NetconfMessage> sendRequest(NetconfMessage message) {
+    public final synchronized Future<NetconfMessage> sendRequest(final NetconfMessage message) {
         final RequestEntry req = new RequestEntry(GlobalEventExecutor.INSTANCE.newPromise(), message);
 
         requests.add(req);

@@ -17,8 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.concurrent.GuardedBy;
-import javax.annotation.concurrent.ThreadSafe;
+import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.opendaylight.netconf.mdsal.notification.impl.ops.NotificationsTransformUtil;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotification;
@@ -42,7 +41,9 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ThreadSafe
+/**
+ *  A thread-safe implementation NetconfNotificationRegistry.
+ */
 public class NetconfNotificationManager implements NetconfNotificationCollector, NetconfNotificationRegistry,
         NetconfNotificationListener, AutoCloseable {
 
