@@ -54,11 +54,11 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.NewRead
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewReadWriteTransactionRequest;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionRequest;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
+import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
@@ -67,7 +67,6 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import scala.concurrent.duration.Duration;
 
 public class NetconfNodeActor extends AbstractUntypedActor {
-
     private final Duration writeTxIdleTimeout;
     private final DOMMountPointService mountPointService;
 
@@ -272,7 +271,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         return new ProxyDOMRpcService(setup.getActorSystem(), masterReference, id, actorResponseWaitTime);
     }
 
-    private SchemaContextFactory createSchemaContextFactory(final ActorRef masterReference) {
+    private EffectiveModelContextFactory createSchemaContextFactory(final ActorRef masterReference) {
         final RemoteYangTextSourceProvider remoteYangTextSourceProvider =
                 new ProxyYangTextSourceProvider(masterReference, getContext().dispatcher(), actorResponseWaitTime);
         final RemoteSchemaProvider remoteProvider = new RemoteSchemaProvider(remoteYangTextSourceProvider,
@@ -284,13 +283,13 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                                 YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())))
                 .collect(Collectors.toList());
 
-        return schemaRepository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
+        return schemaRepository.createEffectiveModelContextFactory();
     }
 
-    private void resolveSchemaContext(final SchemaContextFactory schemaContextFactory,
+    private void resolveSchemaContext(final EffectiveModelContextFactory schemaContextFactory,
             final SlaveSalFacade localSlaveSalManager, final ActorRef masterReference, final int tries) {
-        final ListenableFuture<SchemaContext> schemaContextFuture =
-                schemaContextFactory.createSchemaContext(sourceIdentifiers);
+        final ListenableFuture<EffectiveModelContext> schemaContextFuture =
+                schemaContextFactory.createEffectiveModelContext(sourceIdentifiers);
         Futures.addCallback(schemaContextFuture, new FutureCallback<SchemaContext>() {
             @Override
             public void onSuccess(final SchemaContext result) {
@@ -335,5 +334,4 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             registeredSchemas = null;
         }
     }
-
 }
