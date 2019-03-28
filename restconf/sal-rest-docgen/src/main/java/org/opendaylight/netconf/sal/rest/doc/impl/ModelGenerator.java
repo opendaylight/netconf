@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
-import javax.annotation.concurrent.NotThreadSafe;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Post;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -65,9 +64,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Generates JSON Schema for data defined in YANG.
+ * Generates JSON Schema for data defined in YANG. This class is not thread-safe.
  */
-@NotThreadSafe
 public class ModelGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(ModelGenerator.class);
