@@ -244,19 +244,36 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         // the schema has a ContainerSchemaNode so, to avoid an error, we override the leafNode behavior
         // for error-info.
         final NormalizedNodeStreamWriter streamWriter = new ForwardingNormalizedNodeStreamWriter() {
+            private boolean inOurLeaf;
+
             @Override
             protected NormalizedNodeStreamWriter delegate() {
                 return jsonStreamWriter;
             }
 
             @Override
-            public void leafNode(final NodeIdentifier name, final Object value) throws IOException {
+            public void startLeafNode(final NodeIdentifier name) throws IOException {
                 if (name.getNodeType().equals(Draft02.RestConfModule.ERROR_INFO_QNAME)) {
+                    inOurLeaf = true;
                     jsonWriter.name(Draft02.RestConfModule.ERROR_INFO_QNAME.getLocalName());
+                } else {
+                    super.startLeafNode(name);
+                }
+            }
+
+            @Override
+            public void scalarValue(final Object value) throws IOException {
+                if (inOurLeaf) {
                     jsonWriter.value(value.toString());
                 } else {
-                    super.leafNode(name, value);
+                    super.scalarValue(value);
                 }
+            }
+
+            @Override
+            public void endNode() throws IOException {
+                inOurLeaf = false;
+                super.endNode();
             }
         };
 
@@ -314,25 +331,53 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         // the schema has a ContainerSchemaNode so, to avoid an error, we override the leafNode behavior
         // for error-info.
         final NormalizedNodeStreamWriter streamWriter = new ForwardingNormalizedNodeStreamWriter() {
+            private boolean inOurLeaf;
+
             @Override
             protected NormalizedNodeStreamWriter delegate() {
                 return xmlStreamWriter;
             }
 
             @Override
-            public void leafNode(final NodeIdentifier name, final Object value) throws IOException {
+            public void startLeafNode(final NodeIdentifier name) throws IOException {
                 if (name.getNodeType().equals(Draft02.RestConfModule.ERROR_INFO_QNAME)) {
                     String ns = Draft02.RestConfModule.ERROR_INFO_QNAME.getNamespace().toString();
                     try {
                         xmlWriter.writeStartElement(XMLConstants.DEFAULT_NS_PREFIX,
                                 Draft02.RestConfModule.ERROR_INFO_QNAME.getLocalName(), ns);
+                    } catch (XMLStreamException e) {
+                        throw new IOException("Error writing error-info", e);
+                    }
+                    inOurLeaf = true;
+                } else {
+                    super.startLeafNode(name);
+                }
+            }
+
+            @Override
+            public void scalarValue(final Object value) throws IOException {
+                if (inOurLeaf) {
+                    try {
                         xmlWriter.writeCharacters(value.toString());
-                        xmlWriter.writeEndElement();
                     } catch (XMLStreamException e) {
                         throw new IOException("Error writing error-info", e);
                     }
                 } else {
-                    super.leafNode(name, value);
+                    super.scalarValue(value);
+                }
+            }
+
+            @Override
+            public void endNode() throws IOException {
+                if (inOurLeaf) {
+                    try {
+                        xmlWriter.writeEndElement();
+                    } catch (XMLStreamException e) {
+                        throw new IOException("Error writing error-info", e);
+                    }
+                    inOurLeaf = false;
+                } else {
+                    super.endNode();
                 }
             }
         };

@@ -5,8 +5,13 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.rest.impl;
+
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
 import java.util.Collection;
@@ -15,10 +20,10 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -33,6 +38,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class DepthAwareNormalizedNodeWriterTest {
 
     @Mock
@@ -70,23 +76,21 @@ public class DepthAwareNormalizedNodeWriterTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
         // identifiers
         containerNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "container"));
-        Mockito.when(containerNodeData.getIdentifier()).thenReturn(containerNodeIdentifier);
+        when(containerNodeData.getIdentifier()).thenReturn(containerNodeIdentifier);
 
         mapNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "list"));
-        Mockito.when(mapNodeData.getIdentifier()).thenReturn(mapNodeIdentifier);
+        when(mapNodeData.getIdentifier()).thenReturn(mapNodeIdentifier);
 
         final QName leafSetEntryNodeQName = QName.create("namespace", "leaf-set-entry");
         leafSetEntryNodeValue = "leaf-set-value";
         leafSetEntryNodeIdentifier = new NodeWithValue<>(leafSetEntryNodeQName, leafSetEntryNodeValue);
-        Mockito.when(leafSetEntryNodeData.getIdentifier()).thenReturn(leafSetEntryNodeIdentifier);
-        Mockito.when(leafSetEntryNodeData.getNodeType()).thenReturn(leafSetEntryNodeQName);
+        when(leafSetEntryNodeData.getIdentifier()).thenReturn(leafSetEntryNodeIdentifier);
+        when(leafSetEntryNodeData.getNodeType()).thenReturn(leafSetEntryNodeQName);
 
         leafSetNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "leaf-set"));
-        Mockito.when(leafSetNodeData.getIdentifier()).thenReturn(leafSetNodeIdentifier);
+        when(leafSetNodeData.getIdentifier()).thenReturn(leafSetNodeIdentifier);
 
         final QName mapEntryNodeKey = QName.create("namespace", "key-field");
         keyLeafNodeIdentifier = NodeIdentifier.create(mapEntryNodeKey);
@@ -94,32 +98,32 @@ public class DepthAwareNormalizedNodeWriterTest {
 
         mapEntryNodeIdentifier = new YangInstanceIdentifier.NodeIdentifierWithPredicates(
                 QName.create("namespace", "list-entry"), Collections.singletonMap(mapEntryNodeKey, keyLeafNodeValue));
-        Mockito.when(mapEntryNodeData.getIdentifier()).thenReturn(mapEntryNodeIdentifier);
-        Mockito.when(mapEntryNodeData.getChild(keyLeafNodeIdentifier)).thenReturn(Optional.of(keyLeafNodeData));
+        when(mapEntryNodeData.getIdentifier()).thenReturn(mapEntryNodeIdentifier);
+        when(mapEntryNodeData.getChild(keyLeafNodeIdentifier)).thenReturn(Optional.of(keyLeafNodeData));
 
-        Mockito.when(keyLeafNodeData.getValue()).thenReturn(keyLeafNodeValue);
-        Mockito.when(keyLeafNodeData.getIdentifier()).thenReturn(keyLeafNodeIdentifier);
+        when(keyLeafNodeData.getValue()).thenReturn(keyLeafNodeValue);
+        when(keyLeafNodeData.getIdentifier()).thenReturn(keyLeafNodeIdentifier);
 
         anotherLeafNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "another-field"));
         anotherLeafNodeValue = "another-value";
 
-        Mockito.when(anotherLeafNodeData.getValue()).thenReturn(anotherLeafNodeValue);
-        Mockito.when(anotherLeafNodeData.getIdentifier()).thenReturn(anotherLeafNodeIdentifier);
+        when(anotherLeafNodeData.getValue()).thenReturn(anotherLeafNodeValue);
+        when(anotherLeafNodeData.getIdentifier()).thenReturn(anotherLeafNodeIdentifier);
 
         // values
-        Mockito.when(leafSetEntryNodeData.getValue()).thenReturn(leafSetEntryNodeValue);
+        when(leafSetEntryNodeData.getValue()).thenReturn(leafSetEntryNodeValue);
 
         leafSetNodeValue = Collections.singletonList(leafSetEntryNodeData);
-        Mockito.when(leafSetNodeData.getValue()).thenReturn(leafSetNodeValue);
+        when(leafSetNodeData.getValue()).thenReturn(leafSetNodeValue);
 
         containerNodeValue = Collections.singleton(leafSetNodeData);
-        Mockito.when(containerNodeData.getValue()).thenReturn(containerNodeValue);
+        when(containerNodeData.getValue()).thenReturn(containerNodeValue);
 
         mapEntryNodeValue = Sets.newHashSet(keyLeafNodeData, anotherLeafNodeData);
-        Mockito.when(mapEntryNodeData.getValue()).thenReturn(mapEntryNodeValue);
+        when(mapEntryNodeData.getValue()).thenReturn(mapEntryNodeValue);
 
         mapNodeValue = Collections.singleton(mapEntryNodeData);
-        Mockito.when(mapNodeData.getValue()).thenReturn(mapNodeValue);
+        when(mapNodeData.getValue()).thenReturn(mapNodeValue);
     }
 
     /**
@@ -131,10 +135,10 @@ public class DepthAwareNormalizedNodeWriterTest {
 
         depthWriter.write(containerNodeData);
 
-        final InOrder inOrder = Mockito.inOrder(writer);
-        inOrder.verify(writer, Mockito.times(1)).startContainerNode(containerNodeIdentifier, containerNodeValue.size());
-        inOrder.verify(writer, Mockito.times(1)).endNode();
-        Mockito.verifyNoMoreInteractions(writer);
+        final InOrder inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startContainerNode(containerNodeIdentifier, containerNodeValue.size());
+        inOrder.verify(writer, times(1)).endNode();
+        verifyNoMoreInteractions(writer);
     }
 
     /**
@@ -147,13 +151,13 @@ public class DepthAwareNormalizedNodeWriterTest {
 
         depthWriter.write(containerNodeData);
 
-        final InOrder inOrder = Mockito.inOrder(writer);
-        inOrder.verify(writer, Mockito.times(1)).startContainerNode(containerNodeIdentifier, containerNodeValue.size());
-        inOrder.verify(writer, Mockito.times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
-        inOrder.verify(writer, Mockito.times(1)).leafSetEntryNode(
-                leafSetEntryNodeIdentifier.getNodeType(), leafSetEntryNodeValue);
-        inOrder.verify(writer, Mockito.times(2)).endNode();
-        Mockito.verifyNoMoreInteractions(writer);
+        final InOrder inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startContainerNode(containerNodeIdentifier, containerNodeValue.size());
+        inOrder.verify(writer, times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
+        inOrder.verify(writer, times(1)).startLeafSetEntryNode(leafSetEntryNodeIdentifier);
+        inOrder.verify(writer, times(1)).scalarValue(leafSetEntryNodeValue);
+        inOrder.verify(writer, times(3)).endNode();
+        verifyNoMoreInteractions(writer);
     }
 
     /**
@@ -165,12 +169,13 @@ public class DepthAwareNormalizedNodeWriterTest {
 
         depthWriter.write(mapNodeData);
 
-        final InOrder inOrder = Mockito.inOrder(writer);
-        inOrder.verify(writer, Mockito.times(1)).startMapNode(mapNodeIdentifier, mapNodeValue.size());
-        inOrder.verify(writer, Mockito.times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
-        inOrder.verify(writer, Mockito.times(1)).leafNode(keyLeafNodeIdentifier, keyLeafNodeValue);
-        inOrder.verify(writer, Mockito.times(2)).endNode();
-        Mockito.verifyNoMoreInteractions(writer);
+        final InOrder inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startMapNode(mapNodeIdentifier, mapNodeValue.size());
+        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
+        inOrder.verify(writer, times(1)).startLeafNode(keyLeafNodeIdentifier);
+        inOrder.verify(writer, times(1)).scalarValue(keyLeafNodeValue);
+        inOrder.verify(writer, times(2)).endNode();
+        verifyNoMoreInteractions(writer);
     }
 
     /**
@@ -187,14 +192,21 @@ public class DepthAwareNormalizedNodeWriterTest {
 
         depthWriter.write(mapNodeData);
 
-        final InOrder inOrder = Mockito.inOrder(writer);
-        inOrder.verify(writer, Mockito.times(1)).startMapNode(mapNodeIdentifier, mapNodeValue.size());
-        inOrder.verify(writer, Mockito.times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
-        inOrder.verify(writer, Mockito.times(2)).leafNode(keyLeafNodeIdentifier, keyLeafNodeValue);
+        final InOrder inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startMapNode(mapNodeIdentifier, mapNodeValue.size());
+        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
+        inOrder.verify(writer, times(1)).startLeafNode(keyLeafNodeIdentifier);
+        inOrder.verify(writer, times(1)).scalarValue(keyLeafNodeValue);
+        inOrder.verify(writer, times(1)).endNode();
+        inOrder.verify(writer, times(1)).startLeafNode(keyLeafNodeIdentifier);
+        inOrder.verify(writer, times(1)).scalarValue(keyLeafNodeValue);
+        inOrder.verify(writer, times(1)).endNode();
+
         // FIXME this assertion is not working because leaves are not written in expected order
-        inOrder.verify(writer, Mockito.times(1)).leafNode(anotherLeafNodeIdentifier, anotherLeafNodeValue);
-        inOrder.verify(writer, Mockito.times(2)).endNode();
-        Mockito.verifyNoMoreInteractions(writer);
+        inOrder.verify(writer, times(1)).startLeafNode(anotherLeafNodeIdentifier);
+        inOrder.verify(writer, times(1)).scalarValue(anotherLeafNodeValue);
+        inOrder.verify(writer, times(3)).endNode();
+        verifyNoMoreInteractions(writer);
     }
 
     /**
@@ -207,10 +219,10 @@ public class DepthAwareNormalizedNodeWriterTest {
 
         depthWriter.write(leafSetNodeData);
 
-        final InOrder inOrder = Mockito.inOrder(writer);
-        inOrder.verify(writer, Mockito.times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
-        inOrder.verify(writer, Mockito.times(1)).endNode();
-        Mockito.verifyNoMoreInteractions(writer);
+        final InOrder inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
+        inOrder.verify(writer, times(1)).endNode();
+        verifyNoMoreInteractions(writer);
     }
 
     /**
@@ -223,12 +235,12 @@ public class DepthAwareNormalizedNodeWriterTest {
 
         depthWriter.write(leafSetNodeData);
 
-        final InOrder inOrder = Mockito.inOrder(writer);
-        inOrder.verify(writer, Mockito.times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
-        inOrder.verify(writer, Mockito.times(1)).leafSetEntryNode(
-                leafSetEntryNodeIdentifier.getNodeType(), leafSetEntryNodeValue);
-        inOrder.verify(writer, Mockito.times(1)).endNode();
-        Mockito.verifyNoMoreInteractions(writer);
+        final InOrder inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
+        inOrder.verify(writer, times(1)).startLeafSetEntryNode(leafSetEntryNodeIdentifier);
+        inOrder.verify(writer, times(1)).scalarValue(leafSetEntryNodeValue);
+        inOrder.verify(writer, times(2)).endNode();
+        verifyNoMoreInteractions(writer);
     }
 
     /**
@@ -241,10 +253,11 @@ public class DepthAwareNormalizedNodeWriterTest {
 
         depthWriter.write(leafSetEntryNodeData);
 
-        final InOrder inOrder = Mockito.inOrder(writer);
-        inOrder.verify(writer, Mockito.times(1)).leafSetEntryNode(
-                leafSetEntryNodeIdentifier.getNodeType(), leafSetEntryNodeValue);
-        Mockito.verifyNoMoreInteractions(writer);
+        final InOrder inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startLeafSetEntryNode(leafSetEntryNodeIdentifier);
+        inOrder.verify(writer, times(1)).scalarValue(leafSetEntryNodeValue);
+        inOrder.verify(writer, times(1)).endNode();
+        verifyNoMoreInteractions(writer);
     }
 
     /**
@@ -257,12 +270,13 @@ public class DepthAwareNormalizedNodeWriterTest {
 
         depthWriter.write(mapEntryNodeData);
 
-        final InOrder inOrder = Mockito.inOrder(writer);
-        inOrder.verify(writer, Mockito.times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
+        final InOrder inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
         // write only the key
-        inOrder.verify(writer, Mockito.times(1)).leafNode(keyLeafNodeIdentifier, keyLeafNodeValue);
-        inOrder.verify(writer, Mockito.times(1)).endNode();
-        Mockito.verifyNoMoreInteractions(writer);
+        inOrder.verify(writer, times(1)).startLeafNode(keyLeafNodeIdentifier);
+        inOrder.verify(writer, times(2)).scalarValue(keyLeafNodeValue);
+        inOrder.verify(writer, times(2)).endNode();
+        verifyNoMoreInteractions(writer);
     }
 
     /**
@@ -276,11 +290,14 @@ public class DepthAwareNormalizedNodeWriterTest {
         depthWriter.write(mapEntryNodeData);
 
         // unordered
-        Mockito.verify(writer, Mockito.times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
-        Mockito.verify(writer, Mockito.times(1)).leafNode(keyLeafNodeIdentifier, keyLeafNodeValue);
-        Mockito.verify(writer, Mockito.times(1)).leafNode(anotherLeafNodeIdentifier, anotherLeafNodeValue);
-        Mockito.verify(writer, Mockito.times(1)).endNode();
-        Mockito.verifyNoMoreInteractions(writer);
+        verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
+        verify(writer, times(1)).startLeafNode(keyLeafNodeIdentifier);
+        verify(writer, times(1)).scalarValue(keyLeafNodeValue);
+        verify(writer, times(1)).endNode();
+        verify(writer, times(1)).startLeafNode(anotherLeafNodeIdentifier);
+        verify(writer, times(1)).scalarValue(anotherLeafNodeValue);
+        verify(writer, times(2)).endNode();
+        verifyNoMoreInteractions(writer);
     }
 
     /**
@@ -293,11 +310,12 @@ public class DepthAwareNormalizedNodeWriterTest {
 
         depthWriter.write(mapEntryNodeData);
 
-        final InOrder inOrder = Mockito.inOrder(writer);
-        inOrder.verify(writer, Mockito.times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
-        inOrder.verify(writer, Mockito.times(1)).leafNode(keyLeafNodeIdentifier, keyLeafNodeValue);
-        inOrder.verify(writer, Mockito.times(1)).endNode();
-        Mockito.verifyNoMoreInteractions(writer);
+        final InOrder inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
+        inOrder.verify(writer, times(1)).startLeafNode(keyLeafNodeIdentifier);
+        inOrder.verify(writer, times(2)).scalarValue(keyLeafNodeValue);
+        inOrder.verify(writer, times(2)).endNode();
+        verifyNoMoreInteractions(writer);
     }
 
     /**
@@ -314,12 +332,15 @@ public class DepthAwareNormalizedNodeWriterTest {
 
         depthWriter.write(mapEntryNodeData);
 
-        final InOrder inOrder = Mockito.inOrder(writer);
-        inOrder.verify(writer, Mockito.times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
-        inOrder.verify(writer, Mockito.times(2)).leafNode(keyLeafNodeIdentifier, keyLeafNodeValue);
+        final InOrder inOrder = inOrder(writer);
+        inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
+        inOrder.verify(writer, times(2)).startLeafNode(keyLeafNodeIdentifier);
+        inOrder.verify(writer, times(2)).scalarValue(keyLeafNodeValue);
+        inOrder.verify(writer, times(1)).endNode();
         // FIXME this assertion is not working because leaves are not written in expected order
-        inOrder.verify(writer, Mockito.times(1)).leafNode(anotherLeafNodeIdentifier, anotherLeafNodeValue);
-        inOrder.verify(writer, Mockito.times(1)).endNode();
-        Mockito.verifyNoMoreInteractions(writer);
+        inOrder.verify(writer, times(1)).startLeafNode(anotherLeafNodeIdentifier);
+        inOrder.verify(writer, times(2)).scalarValue(anotherLeafNodeValue);
+        inOrder.verify(writer, times(2)).endNode();
+        verifyNoMoreInteractions(writer);
     }
 }

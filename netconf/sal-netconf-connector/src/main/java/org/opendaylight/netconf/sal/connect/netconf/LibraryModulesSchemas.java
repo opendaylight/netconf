@@ -38,7 +38,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
@@ -60,6 +59,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
+import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -91,6 +92,9 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
                 .library.rev160621.$YangModuleInfoImpl.getInstance());
         LIBRARY_CONTEXT = moduleInfoBackedContext.tryToCreateSchemaContext().get();
     }
+
+    private static final JSONCodecFactory JSON_CODECS = JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02
+            .getShared(LIBRARY_CONTEXT);
 
     private final Map<QName, URL> availableModels;
 
@@ -303,7 +307,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
 
-        final JsonParserStream jsonParser = JsonParserStream.create(writer, LIBRARY_CONTEXT);
+        final JsonParserStream jsonParser = JsonParserStream.create(writer, JSON_CODECS);
         final JsonReader reader = new JsonReader(new InputStreamReader(in, Charset.defaultCharset()));
 
         jsonParser.parse(reader);
@@ -339,8 +343,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             xmlParser.traverse(new DOMSource(doc.getDocumentElement()));
             final NormalizedNode<?, ?> parsed = resultHolder.getResult();
             return Optional.of(parsed);
-        } catch (XMLStreamException | URISyntaxException | IOException | ParserConfigurationException
-                | SAXException e) {
+        } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
             LOG.warn("Unable to parse yang library xml content", e);
         }
 
