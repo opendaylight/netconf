@@ -10,8 +10,9 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Collections2;
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
@@ -48,20 +49,20 @@ public final class NetconfDeviceRpc implements DOMRpcService {
     }
 
     @Override
-    public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
-        final FluentFuture<RpcResult<NetconfMessage>> delegateFuture = communicator.sendRequest(
+    public ListenableFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+        final ListenableFuture<RpcResult<NetconfMessage>> delegateFuture = communicator.sendRequest(
             transformer.toRpcRequest(type, input), type.getLastComponent());
 
         final SettableFuture<DOMRpcResult> ret = SettableFuture.create();
-        delegateFuture.addCallback(new FutureCallback<RpcResult<NetconfMessage>>() {
+        Futures.addCallback(delegateFuture, new FutureCallback<RpcResult<NetconfMessage>>() {
             @Override
-            public void onSuccess(RpcResult<NetconfMessage> result) {
+            public void onSuccess(final RpcResult<NetconfMessage> result) {
                 ret.set(result.isSuccessful() ? transformer.toRpcResult(result.getResult(), type)
                         : new DefaultDOMRpcResult(result.getErrors()));
             }
 
             @Override
-            public void onFailure(Throwable cause) {
+            public void onFailure(final Throwable cause) {
                 ret.setException(new DOMRpcImplementationNotAvailableException(cause, "Unable to invoke rpc %s", type));
             }
 

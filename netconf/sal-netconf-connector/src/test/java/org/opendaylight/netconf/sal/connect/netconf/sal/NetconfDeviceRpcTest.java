@@ -11,7 +11,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import java.util.Collection;
 import java.util.Collections;
@@ -78,8 +77,7 @@ public class NetconfDeviceRpcTest {
     @Test
     public void testInvokeRpc() throws Exception {
         NormalizedNode<?, ?> input = createNode("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "filter");
-        final FluentFuture<DOMRpcResult> future = rpc.invokeRpc(path, input);
-        final DOMRpcResult result = future.get();
+        final DOMRpcResult result = rpc.invokeRpc(path, input).get();
         Assert.assertEquals(expectedReply, result);
     }
 
