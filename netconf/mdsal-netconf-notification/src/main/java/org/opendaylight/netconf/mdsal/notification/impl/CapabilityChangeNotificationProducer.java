@@ -26,6 +26,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.changed.by.parms.changed.by.server.or.user.ServerBuilder;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +87,7 @@ public final class CapabilityChangeNotificationProducer extends OperationalDatas
     private void publishNotification(final Set<Uri> added, final Set<Uri> removed) {
         final NetconfCapabilityChangeBuilder netconfCapabilityChangeBuilder = new NetconfCapabilityChangeBuilder();
         netconfCapabilityChangeBuilder.setChangedBy(new ChangedByBuilder().setServerOrUser(new ServerBuilder()
-                .setServer(true).build()).build());
+                .setServer(Empty.getInstance()).build()).build());
         netconfCapabilityChangeBuilder.setAddedCapability(ImmutableList.copyOf(added));
         netconfCapabilityChangeBuilder.setDeletedCapability(ImmutableList.copyOf(removed));
         // TODO modified should be computed ... but why ?

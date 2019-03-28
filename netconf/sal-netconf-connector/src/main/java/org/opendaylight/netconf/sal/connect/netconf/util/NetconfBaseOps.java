@@ -34,6 +34,8 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Locale;
 import java.util.Optional;
@@ -80,110 +82,109 @@ public final class NetconfBaseOps {
         }
     }
 
-    public FluentFuture<DOMRpcResult> lock(final FutureCallback<DOMRpcResult> callback, final QName datastore) {
+    public ListenableFuture<DOMRpcResult> lock(final FutureCallback<DOMRpcResult> callback, final QName datastore) {
         Preconditions.checkNotNull(callback);
         Preconditions.checkNotNull(datastore);
 
-        final FluentFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_LOCK_PATH, getLockContent(datastore));
-        future.addCallback(callback, MoreExecutors.directExecutor());
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_LOCK_PATH, getLockContent(datastore));
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
-    public FluentFuture<DOMRpcResult> lockCandidate(final FutureCallback<DOMRpcResult> callback) {
-        final FluentFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_LOCK_PATH,
+    public ListenableFuture<DOMRpcResult> lockCandidate(final FutureCallback<DOMRpcResult> callback) {
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_LOCK_PATH,
             getLockContent(NETCONF_CANDIDATE_QNAME));
-        future.addCallback(callback, MoreExecutors.directExecutor());
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
-
-    public FluentFuture<DOMRpcResult> lockRunning(final FutureCallback<DOMRpcResult> callback) {
-        final FluentFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_LOCK_PATH,
+    public ListenableFuture<DOMRpcResult> lockRunning(final FutureCallback<DOMRpcResult> callback) {
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_LOCK_PATH,
             getLockContent(NETCONF_RUNNING_QNAME));
-        future.addCallback(callback, MoreExecutors.directExecutor());
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
-    public FluentFuture<DOMRpcResult> unlock(final FutureCallback<DOMRpcResult> callback, final QName datastore) {
+    public ListenableFuture<DOMRpcResult> unlock(final FutureCallback<DOMRpcResult> callback, final QName datastore) {
         Preconditions.checkNotNull(callback);
         Preconditions.checkNotNull(datastore);
 
-        final FluentFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_UNLOCK_PATH, getUnLockContent(datastore));
-        future.addCallback(callback, MoreExecutors.directExecutor());
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_UNLOCK_PATH, getUnLockContent(datastore));
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
-    public FluentFuture<DOMRpcResult> unlockRunning(final FutureCallback<DOMRpcResult> callback) {
-        final FluentFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_UNLOCK_PATH,
+    public ListenableFuture<DOMRpcResult> unlockRunning(final FutureCallback<DOMRpcResult> callback) {
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_UNLOCK_PATH,
             getUnLockContent(NETCONF_RUNNING_QNAME));
-        future.addCallback(callback, MoreExecutors.directExecutor());
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
-    public FluentFuture<DOMRpcResult> unlockCandidate(final FutureCallback<DOMRpcResult> callback) {
-        final FluentFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_UNLOCK_PATH,
+    public ListenableFuture<DOMRpcResult> unlockCandidate(final FutureCallback<DOMRpcResult> callback) {
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_UNLOCK_PATH,
             getUnLockContent(NETCONF_CANDIDATE_QNAME));
-        future.addCallback(callback, MoreExecutors.directExecutor());
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
-    public FluentFuture<DOMRpcResult> discardChanges(final FutureCallback<DOMRpcResult> callback) {
+    public ListenableFuture<DOMRpcResult> discardChanges(final FutureCallback<DOMRpcResult> callback) {
         Preconditions.checkNotNull(callback);
 
-        final FluentFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_DISCARD_CHANGES_PATH, null);
-        future.addCallback(callback, MoreExecutors.directExecutor());
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_DISCARD_CHANGES_PATH, null);
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
-    public FluentFuture<DOMRpcResult> commit(final FutureCallback<DOMRpcResult> callback) {
+    public ListenableFuture<DOMRpcResult> commit(final FutureCallback<DOMRpcResult> callback) {
         Preconditions.checkNotNull(callback);
 
-        final FluentFuture<DOMRpcResult> future = rpc.invokeRpc(NetconfMessageTransformUtil.NETCONF_COMMIT_PATH,
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(NetconfMessageTransformUtil.NETCONF_COMMIT_PATH,
             NetconfMessageTransformUtil.COMMIT_RPC_CONTENT);
-        future.addCallback(callback, MoreExecutors.directExecutor());
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
-    public FluentFuture<DOMRpcResult> validate(final FutureCallback<DOMRpcResult> callback, final QName datastore) {
+    public ListenableFuture<DOMRpcResult> validate(final FutureCallback<DOMRpcResult> callback, final QName datastore) {
         Preconditions.checkNotNull(callback);
         Preconditions.checkNotNull(datastore);
 
-        final FluentFuture<DOMRpcResult> future = rpc.invokeRpc(NetconfMessageTransformUtil.NETCONF_VALIDATE_PATH,
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(NetconfMessageTransformUtil.NETCONF_VALIDATE_PATH,
             getValidateContent(datastore));
-        future.addCallback(callback, MoreExecutors.directExecutor());
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
-    public FluentFuture<DOMRpcResult> validateCandidate(final FutureCallback<DOMRpcResult> callback) {
+    public ListenableFuture<DOMRpcResult> validateCandidate(final FutureCallback<DOMRpcResult> callback) {
         return validate(callback, NETCONF_CANDIDATE_QNAME);
     }
 
-    public FluentFuture<DOMRpcResult> validateRunning(final FutureCallback<DOMRpcResult> callback) {
+    public ListenableFuture<DOMRpcResult> validateRunning(final FutureCallback<DOMRpcResult> callback) {
         return validate(callback, NETCONF_RUNNING_QNAME);
     }
 
-    public FluentFuture<DOMRpcResult> copyConfig(final FutureCallback<DOMRpcResult> callback,
+    public ListenableFuture<DOMRpcResult> copyConfig(final FutureCallback<DOMRpcResult> callback,
                                                      final QName source, final QName target) {
         Preconditions.checkNotNull(callback);
         Preconditions.checkNotNull(source);
         Preconditions.checkNotNull(target);
 
-        final FluentFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_COPY_CONFIG_PATH,
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_COPY_CONFIG_PATH,
             getCopyConfigContent(source, target));
-        future.addCallback(callback, MoreExecutors.directExecutor());
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
-    public FluentFuture<DOMRpcResult> copyRunningToCandidate(final FutureCallback<DOMRpcResult> callback) {
+    public ListenableFuture<DOMRpcResult> copyRunningToCandidate(final FutureCallback<DOMRpcResult> callback) {
         return copyConfig(callback, NETCONF_RUNNING_QNAME, NETCONF_CANDIDATE_QNAME);
     }
 
-    public FluentFuture<DOMRpcResult> getConfig(final FutureCallback<DOMRpcResult> callback, final QName datastore,
+    public ListenableFuture<DOMRpcResult> getConfig(final FutureCallback<DOMRpcResult> callback, final QName datastore,
                                                     final Optional<YangInstanceIdentifier> filterPath) {
         Preconditions.checkNotNull(callback);
         Preconditions.checkNotNull(datastore);
 
-        final FluentFuture<DOMRpcResult> future;
+        final ListenableFuture<DOMRpcResult> future;
         if (isFilterPresent(filterPath)) {
             final DataContainerChild<?, ?> node = transformer.toFilterStructure(filterPath.get());
             future = rpc.invokeRpc(NETCONF_GET_CONFIG_PATH,
@@ -193,25 +194,25 @@ public final class NetconfBaseOps {
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_CONFIG_NODEID, getSourceNode(datastore)));
         }
 
-        future.addCallback(callback, MoreExecutors.directExecutor());
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
-    public FluentFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(
             final FutureCallback<DOMRpcResult> callback, final Optional<YangInstanceIdentifier> filterPath) {
-        final FluentFuture<DOMRpcResult> configRunning = getConfigRunning(callback, filterPath);
+        final ListenableFuture<DOMRpcResult> configRunning = getConfigRunning(callback, filterPath);
         return extractData(filterPath, configRunning);
     }
 
-    public FluentFuture<Optional<NormalizedNode<?, ?>>> getData(final FutureCallback<DOMRpcResult> callback,
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(final FutureCallback<DOMRpcResult> callback,
                                                                     final Optional<YangInstanceIdentifier> filterPath) {
-        final FluentFuture<DOMRpcResult> configRunning = get(callback, filterPath);
+        final ListenableFuture<DOMRpcResult> configRunning = get(callback, filterPath);
         return extractData(filterPath, configRunning);
     }
 
-    private FluentFuture<Optional<NormalizedNode<?, ?>>> extractData(
-            final Optional<YangInstanceIdentifier> path, final FluentFuture<DOMRpcResult> configRunning) {
-        return configRunning.transform(result -> {
+    private ListenableFuture<Optional<NormalizedNode<?, ?>>> extractData(
+            final Optional<YangInstanceIdentifier> path, final ListenableFuture<DOMRpcResult> configRunning) {
+        return Futures.transform(configRunning, result -> {
             Preconditions.checkArgument(result.getErrors().isEmpty(), "Unable to read data: %s, errors: %s", path,
                 result.getErrors());
             final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> dataNode =
@@ -221,24 +222,24 @@ public final class NetconfBaseOps {
         }, MoreExecutors.directExecutor());
     }
 
-    public FluentFuture<DOMRpcResult> getConfigRunning(final FutureCallback<DOMRpcResult> callback,
+    public ListenableFuture<DOMRpcResult> getConfigRunning(final FutureCallback<DOMRpcResult> callback,
                                                            final Optional<YangInstanceIdentifier> filterPath) {
         return getConfig(callback, NETCONF_RUNNING_QNAME, filterPath);
     }
 
-    public FluentFuture<DOMRpcResult> getConfigCandidate(final FutureCallback<DOMRpcResult> callback,
+    public ListenableFuture<DOMRpcResult> getConfigCandidate(final FutureCallback<DOMRpcResult> callback,
                                                              final Optional<YangInstanceIdentifier> filterPath) {
         return getConfig(callback, NETCONF_CANDIDATE_QNAME, filterPath);
     }
 
-    public FluentFuture<DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback,
+    public ListenableFuture<DOMRpcResult> get(final FutureCallback<DOMRpcResult> callback,
                                               final Optional<YangInstanceIdentifier> filterPath) {
         Preconditions.checkNotNull(callback);
 
-        final FluentFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_GET_PATH, isFilterPresent(filterPath)
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_GET_PATH, isFilterPresent(filterPath)
             ? NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, toFilterStructure(filterPath.get(), schemaContext))
                     : NetconfMessageTransformUtil.GET_RPC_CONTENT);
-        future.addCallback(callback, MoreExecutors.directExecutor());
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
