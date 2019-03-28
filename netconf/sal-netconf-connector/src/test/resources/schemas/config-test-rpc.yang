@@ -40,6 +40,11 @@ module config-test-rpc {
                        if this attribute is present.";
     }
 
+    feature candidate;
+    feature startup;
+    feature writable-running;
+    feature url;
+
     rpc edit-config {
         description "The <edit-config> operation loads all or part of a specified
              configuration to the specified target configuration.";
