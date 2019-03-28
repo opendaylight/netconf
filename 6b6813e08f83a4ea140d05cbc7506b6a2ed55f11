@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dcf5157f_3aac42d9",
+        "filename": "restconf/restconf-nb-bierman02/src/test/java/org/opendaylight/controller/sal/restconf/impl/test/URITest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-03-28T07:32:20Z",
+      "side": 1,
+      "message": "Not sure if we want to/should support trailing slashes.\n\nWas this supported before this patch?",
+      "revId": "6b6813e08f83a4ea140d05cbc7506b6a2ed55f11",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
