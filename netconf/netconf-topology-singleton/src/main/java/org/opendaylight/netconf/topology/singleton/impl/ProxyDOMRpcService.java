@@ -94,7 +94,7 @@ public class ProxyDOMRpcService implements DOMRpcService {
             }
         }, actorSystem.dispatcher());
 
-        return settableFuture;
+        return FluentFuture.from(settableFuture);
     }
 
     @Override

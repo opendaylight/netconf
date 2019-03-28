@@ -128,7 +128,7 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
             }
         }, executionContext);
 
-        return settableFuture;
+        return FluentFuture.from(settableFuture);
     }
 
     @Override
@@ -160,7 +160,7 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
             }
         }, executionContext);
 
-        return settableFuture;
+        return FluentFuture.from(settableFuture);
     }
 
     @Override
@@ -205,7 +205,7 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
             }
         }, executionContext);
 
-        return settableFuture;
+        return FluentFuture.from(settableFuture);
     }
 
     private TransactionCommitFailedException newTransactionCommitFailedException(final Throwable failure) {

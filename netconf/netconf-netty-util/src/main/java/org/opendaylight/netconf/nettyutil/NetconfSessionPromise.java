@@ -18,14 +18,12 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
-import javax.annotation.concurrent.GuardedBy;
-import javax.annotation.concurrent.ThreadSafe;
+import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.opendaylight.netconf.api.NetconfSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Deprecated
-@ThreadSafe
 final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromise<S> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfSessionPromise.class);
     private final ReconnectStrategy strategy;

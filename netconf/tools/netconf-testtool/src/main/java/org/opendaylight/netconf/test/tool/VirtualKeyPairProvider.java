@@ -17,6 +17,7 @@ import java.util.Objects;
 import org.apache.sshd.common.cipher.ECCurves;
 import org.apache.sshd.common.config.keys.KeyUtils;
 import org.apache.sshd.common.keyprovider.KeyPairProvider;
+import org.apache.sshd.common.session.SessionContext;
 import org.apache.sshd.common.util.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,7 @@ public class VirtualKeyPairProvider implements KeyPairProvider {
     }
 
     @Override
-    public synchronized Iterable<KeyPair> loadKeys() {
+    public synchronized Iterable<KeyPair> loadKeys(final SessionContext session) {
         if (Objects.isNull(generatedKeyPair)) {
             try {
                 generatedKeyPair = generateKeyPair();

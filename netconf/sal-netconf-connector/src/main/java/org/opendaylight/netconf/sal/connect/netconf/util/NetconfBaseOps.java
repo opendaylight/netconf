@@ -33,7 +33,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 
 import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Locale;
@@ -247,31 +246,31 @@ public final class NetconfBaseOps {
         return filterPath.isPresent() && !filterPath.get().isEmpty();
     }
 
-    public FluentFuture<DOMRpcResult> editConfigCandidate(final FutureCallback<? super DOMRpcResult> callback,
+    public ListenableFuture<DOMRpcResult> editConfigCandidate(final FutureCallback<? super DOMRpcResult> callback,
                                                               final DataContainerChild<?, ?> editStructure,
                                                               final ModifyAction modifyAction, final boolean rollback) {
         return editConfig(callback, NETCONF_CANDIDATE_QNAME, editStructure, Optional.of(modifyAction), rollback);
     }
 
-    public FluentFuture<DOMRpcResult> editConfigCandidate(final FutureCallback<? super DOMRpcResult> callback,
+    public ListenableFuture<DOMRpcResult> editConfigCandidate(final FutureCallback<? super DOMRpcResult> callback,
                                                               final DataContainerChild<?, ?> editStructure,
                                                               final boolean rollback) {
         return editConfig(callback, NETCONF_CANDIDATE_QNAME, editStructure, Optional.empty(), rollback);
     }
 
-    public FluentFuture<DOMRpcResult> editConfigRunning(final FutureCallback<? super DOMRpcResult> callback,
+    public ListenableFuture<DOMRpcResult> editConfigRunning(final FutureCallback<? super DOMRpcResult> callback,
                                                             final DataContainerChild<?, ?> editStructure,
                                                             final ModifyAction modifyAction, final boolean rollback) {
         return editConfig(callback, NETCONF_RUNNING_QNAME, editStructure, Optional.of(modifyAction), rollback);
     }
 
-    public FluentFuture<DOMRpcResult> editConfigRunning(final FutureCallback<? super DOMRpcResult> callback,
+    public ListenableFuture<DOMRpcResult> editConfigRunning(final FutureCallback<? super DOMRpcResult> callback,
                                                             final DataContainerChild<?, ?> editStructure,
                                                             final boolean rollback) {
         return editConfig(callback, NETCONF_RUNNING_QNAME, editStructure, Optional.empty(), rollback);
     }
 
-    public FluentFuture<DOMRpcResult> editConfig(
+    public ListenableFuture<DOMRpcResult> editConfig(
             final FutureCallback<? super DOMRpcResult> callback, final QName datastore,
             final DataContainerChild<?, ?> editStructure, final Optional<ModifyAction> modifyAction,
             final boolean rollback) {
@@ -279,10 +278,10 @@ public final class NetconfBaseOps {
         Preconditions.checkNotNull(callback);
         Preconditions.checkNotNull(datastore);
 
-        final FluentFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_EDIT_CONFIG_PATH,
+        final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_EDIT_CONFIG_PATH,
                 getEditConfigContent(datastore, editStructure, modifyAction, rollback));
 
-        future.addCallback(callback, MoreExecutors.directExecutor());
+        Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
     }
 
