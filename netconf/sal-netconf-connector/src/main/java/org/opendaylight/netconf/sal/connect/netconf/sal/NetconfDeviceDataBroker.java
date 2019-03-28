@@ -18,6 +18,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChainListener;
+import org.opendaylight.mdsal.dom.spi.PingPongTransactionChain;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadOnlyTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.ReadWriteTx;
@@ -77,6 +78,11 @@ public final class NetconfDeviceDataBroker implements DOMDataBroker {
     @Override
     public DOMTransactionChain createTransactionChain(final DOMTransactionChainListener listener) {
         return new TxChain(this, listener);
+    }
+
+    @Override
+    public DOMTransactionChain createMergingTransactionChain(final DOMTransactionChainListener listener) {
+        return new PingPongTransactionChain(this::createTransactionChain, listener);
     }
 
     @Override

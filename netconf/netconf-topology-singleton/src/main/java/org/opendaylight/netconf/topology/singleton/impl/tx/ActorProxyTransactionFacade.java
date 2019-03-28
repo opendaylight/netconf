@@ -86,11 +86,6 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
     }
 
     @Override
-    public void close() {
-        cancel();
-    }
-
-    @Override
     public FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         LOG.debug("{}: Read {} {} via actor {}", id, store, path, masterTxActor);

@@ -7,8 +7,9 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 import org.eclipse.jdt.annotation.NonNull;
@@ -25,7 +26,6 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMes
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -52,35 +52,35 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
     }
 
     @Override
-    public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+    public ListenableFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
         final MessageTransformer<NetconfMessage> transformer;
         if (input instanceof AnyXmlNode) {
             transformer = schemalessTransformer;
         } else if (isBaseRpc(type)) {
             transformer = baseRpcTransformer;
         } else {
-            return FluentFutures.immediateFailedFluentFuture(new DOMRpcImplementationNotAvailableException(
+            return Futures.immediateFailedFuture(new DOMRpcImplementationNotAvailableException(
                 "Unable to invoke rpc %s", type));
         }
         return handleRpc(type, input, transformer);
     }
 
-    private FluentFuture<DOMRpcResult> handleRpc(
+    private ListenableFuture<DOMRpcResult> handleRpc(
             final @NonNull SchemaPath type, final @NonNull NormalizedNode<?, ?> input,
             final MessageTransformer<NetconfMessage> transformer) {
-        final FluentFuture<RpcResult<NetconfMessage>> delegateFuture = listener.sendRequest(
+        final ListenableFuture<RpcResult<NetconfMessage>> delegateFuture = listener.sendRequest(
             transformer.toRpcRequest(type, input), type.getLastComponent());
 
         final SettableFuture<DOMRpcResult> ret = SettableFuture.create();
-        delegateFuture.addCallback(new FutureCallback<RpcResult<NetconfMessage>>() {
+        Futures.addCallback(delegateFuture, new FutureCallback<RpcResult<NetconfMessage>>() {
             @Override
-            public void onSuccess(RpcResult<NetconfMessage> result) {
+            public void onSuccess(final RpcResult<NetconfMessage> result) {
                 ret.set(result.isSuccessful() ? transformer.toRpcResult(result.getResult(), type)
                         : new DefaultDOMRpcResult(result.getErrors()));
             }
 
             @Override
-            public void onFailure(Throwable cause) {
+            public void onFailure(final Throwable cause) {
                 ret.setException(new DOMRpcImplementationNotAvailableException(cause,
                     "Unable to invoke rpc %s on device %s", type, deviceId));
             }
