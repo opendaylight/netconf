@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
@@ -155,8 +154,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                     notificationAsContainerSchemaNode, strictParsing);
             xmlParser.traverse(new DOMSource(element));
             content = (ContainerNode) resultHolder.getResult();
-        } catch (XMLStreamException | URISyntaxException | IOException | ParserConfigurationException
-                | SAXException | UnsupportedOperationException e) {
+        } catch (XMLStreamException | URISyntaxException | IOException | SAXException
+                | UnsupportedOperationException e) {
             throw new IllegalArgumentException(String.format("Failed to parse notification %s", element), e);
         }
         return new NetconfDeviceNotification(content, stripped.getKey());
@@ -280,8 +279,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                         strictParsing);
                 xmlParser.traverse(new DOMSource(xmlData));
                 dataNode = (ContainerNode) resultHolder.getResult();
-            } catch (XMLStreamException | URISyntaxException | IOException | ParserConfigurationException
-                    | SAXException e) {
+            } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
                 throw new IllegalArgumentException(String.format("Failed to parse data response %s", xmlData), e);
             }
 
@@ -345,8 +343,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                         operationDefinition.getOutput(), strictParsing);
                 xmlParser.traverse(new DOMSource(element));
                 return resultHolder.getResult();
-            } catch (XMLStreamException | URISyntaxException | IOException | ParserConfigurationException
-                    | SAXException e) {
+            } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
                 throw new IllegalArgumentException(String.format("Failed to parse RPC response %s", element), e);
             }
         }

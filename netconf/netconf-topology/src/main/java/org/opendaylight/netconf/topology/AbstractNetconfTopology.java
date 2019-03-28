@@ -80,9 +80,10 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencrypted;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
+import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactoryConfiguration;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
@@ -144,8 +145,9 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     /**
      * The default factory for creating <code>SchemaContext</code> instances.
      */
-    private static final SchemaContextFactory DEFAULT_SCHEMA_CONTEXT_FACTORY =
-            DEFAULT_SCHEMA_REPOSITORY.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
+    private static final EffectiveModelContextFactory DEFAULT_SCHEMA_CONTEXT_FACTORY =
+            DEFAULT_SCHEMA_REPOSITORY.createEffectiveModelContextFactory(
+                SchemaContextFactoryConfiguration.getDefault());
 
     /**
      * Keeps track of initialized Schema resources.  A Map is maintained in which the key represents the name
@@ -444,8 +446,8 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
      */
     private NetconfDevice.SchemaResourcesDTO createSchemaResourcesDTO(final String moduleSchemaCacheDirectory) {
         final SharedSchemaRepository repository = new SharedSchemaRepository(moduleSchemaCacheDirectory);
-        final SchemaContextFactory contextFactory
-                = repository.createSchemaContextFactory(SchemaSourceFilter.ALWAYS_ACCEPT);
+        final EffectiveModelContextFactory contextFactory
+                = repository.createEffectiveModelContextFactory(SchemaContextFactoryConfiguration.getDefault());
         setSchemaRegistry(repository);
         setSchemaContextFactory(contextFactory);
         final FilesystemSchemaSourceCache<YangTextSchemaSource> deviceCache =
