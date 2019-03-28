@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import javax.ws.rs.core.Response.Status;
@@ -50,7 +50,7 @@ public final class RestconfInvokeOperationsUtil {
             final SchemaPath schemaPath) {
         final Optional<DOMRpcService> mountPointService = mountPoint.getService(DOMRpcService.class);
         if (mountPointService.isPresent()) {
-            final FluentFuture<DOMRpcResult> rpc = mountPointService.get().invokeRpc(schemaPath, data);
+            final ListenableFuture<DOMRpcResult> rpc = mountPointService.get().invokeRpc(schemaPath, data);
             return prepareResult(rpc);
         }
         final String errmsg = "RPC service is missing.";
@@ -76,7 +76,7 @@ public final class RestconfInvokeOperationsUtil {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
 
-        final FluentFuture<DOMRpcResult> rpc = rpcService.invokeRpc(schemaPath, data);
+        final ListenableFuture<DOMRpcResult> rpc = rpcService.invokeRpc(schemaPath, data);
         return prepareResult(rpc);
     }
 
@@ -104,7 +104,7 @@ public final class RestconfInvokeOperationsUtil {
         }
     }
 
-    private static DOMRpcResult prepareResult(final FluentFuture<DOMRpcResult> rpc) {
+    private static DOMRpcResult prepareResult(final ListenableFuture<DOMRpcResult> rpc) {
         final RpcResultFactory dataFactory = new RpcResultFactory();
         FutureCallbackTx.addCallback(rpc, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory);
         return dataFactory.build();
