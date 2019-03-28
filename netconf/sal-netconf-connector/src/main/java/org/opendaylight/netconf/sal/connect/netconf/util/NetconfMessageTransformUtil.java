@@ -61,7 +61,6 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStr
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -199,42 +198,34 @@ public final class NetconfMessageTransformUtil {
             .withNodeIdentifier(NodeIdentifier.create(CREATE_SUBSCRIPTION_RPC_QNAME)).build();
 
     private static final NodeIdentifier NETCONF_FILTER_NODEID = NodeIdentifier.create(NETCONF_FILTER_QNAME);
-    private static final Map<QName, String> SUBTREE_FILTER_ATTRIBUTES = ImmutableMap.of(NETCONF_TYPE_QNAME, SUBTREE);
 
     public static final DataContainerChild<?, ?> EMPTY_FILTER;
 
     static {
-        final NormalizedNodeAttrBuilder<NodeIdentifier, DOMSource, AnyXmlNode> anyXmlBuilder =
-                Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID)
-                .withAttributes(SUBTREE_FILTER_ATTRIBUTES);
-
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
                 Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
         element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(),
-                NETCONF_TYPE_QNAME.getLocalName(), "subtree");
+                NETCONF_TYPE_QNAME.getLocalName(), SUBTREE);
 
-        anyXmlBuilder.withValue(new DOMSource(element));
-
-        EMPTY_FILTER = anyXmlBuilder.build();
+        EMPTY_FILTER = Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID)
+                .withValue(new DOMSource(element)).build();
     }
 
     public static DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier identifier,
                                                              final SchemaContext ctx) {
-        final NormalizedNodeAttrBuilder<NodeIdentifier, DOMSource, AnyXmlNode> anyXmlBuilder = Builders.anyXmlBuilder()
-                .withNodeIdentifier(NETCONF_FILTER_NODEID).withAttributes(SUBTREE_FILTER_ATTRIBUTES);
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
                 Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
         element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
-                "subtree");
+                SUBTREE);
 
         try {
             NetconfUtil.writeFilter(identifier, new DOMResult(element), SchemaPath.ROOT, ctx);
         } catch (IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize filter element for path " + identifier, e);
         }
-        anyXmlBuilder.withValue(new DOMSource(element));
 
-        return anyXmlBuilder.build();
+        return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_FILTER_NODEID).withValue(new DOMSource(element))
+                .build();
     }
 
     public static void checkValidReply(final NetconfMessage input, final NetconfMessage output)

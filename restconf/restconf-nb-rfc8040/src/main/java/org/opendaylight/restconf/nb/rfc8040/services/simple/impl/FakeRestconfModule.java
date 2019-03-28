@@ -34,7 +34,6 @@ import org.opendaylight.yangtools.yang.model.api.ModuleImport;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.UnknownSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
 
 /**
@@ -183,11 +182,6 @@ final class FakeRestconfModule implements Module {
 
     @Override
     public List<ExtensionDefinition> getExtensionSchemaNodes() {
-        throw new UnsupportedOperationException("Operation not implemented.");
-    }
-
-    @Override
-    public List<UnknownSchemaNode> getUnknownSchemaNodes() {
         throw new UnsupportedOperationException("Operation not implemented.");
     }
 

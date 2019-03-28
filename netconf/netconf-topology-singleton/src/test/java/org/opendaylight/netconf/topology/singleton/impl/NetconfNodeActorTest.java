@@ -12,6 +12,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.after;
@@ -90,14 +91,14 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceFilter;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
@@ -150,13 +151,13 @@ public class NetconfNodeActorTest {
     private SchemaSourceRegistry mockRegistry;
 
     @Mock
-    private SchemaContextFactory mockSchemaContextFactory;
+    private EffectiveModelContextFactory mockSchemaContextFactory;
 
     @Mock
     private SchemaRepository mockSchemaRepository;
 
     @Mock
-    private SchemaContext mockSchemaContext;
+    private EffectiveModelContext mockSchemaContext;
 
     @Before
     public void setup() {
@@ -184,7 +185,7 @@ public class NetconfNodeActorTest {
         doReturn(mockSchemaSourceReg2).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER2));
 
         doReturn(mockSchemaContextFactory).when(mockSchemaRepository)
-                .createSchemaContextFactory(any(SchemaSourceFilter.class));
+                .createEffectiveModelContextFactory();
     }
 
     @After
@@ -258,13 +259,13 @@ public class NetconfNodeActorTest {
         doReturn(mockSchemaSourceReg1).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER1));
 
         doReturn(mockSchemaContextFactory).when(mockSchemaRepository)
-                .createSchemaContextFactory(any(SchemaSourceFilter.class));
+                .createEffectiveModelContextFactory();
 
         final SchemaSourceRegistration<?> newMockSchemaSourceReg = mock(SchemaSourceRegistration.class);
 
-        final SchemaContextFactory newMockSchemaContextFactory = mock(SchemaContextFactory.class);
+        final EffectiveModelContextFactory newMockSchemaContextFactory = mock(EffectiveModelContextFactory.class);
         doReturn(Futures.immediateFuture(mockSchemaContext))
-                .when(newMockSchemaContextFactory).createSchemaContext(any());
+                .when(newMockSchemaContextFactory).createEffectiveModelContext(anyCollection());
 
         doAnswer(unused -> {
             SettableFuture<SchemaContext> future = SettableFuture.create();
@@ -273,7 +274,7 @@ public class NetconfNodeActorTest {
                         withSourceId(SOURCE_IDENTIFIER1));
 
                 doReturn(newMockSchemaContextFactory).when(mockSchemaRepository)
-                        .createSchemaContextFactory(any(SchemaSourceFilter.class));
+                        .createEffectiveModelContextFactory();
 
                 slaveRef.tell(new RegisterMountPoint(ImmutableList.of(SOURCE_IDENTIFIER1), masterRef),
                         testKit.getRef());
@@ -281,10 +282,10 @@ public class NetconfNodeActorTest {
                 future.set(mockSchemaContext);
             }).start();
             return future;
-        }).when(mockSchemaContextFactory).createSchemaContext(any());
+        }).when(mockSchemaContextFactory).createEffectiveModelContext(anyCollection());
 
         doReturn(mockSchemaContextFactory).when(mockSchemaRepository)
-                .createSchemaContextFactory(any(SchemaSourceFilter.class));
+                .createEffectiveModelContextFactory();
 
         slaveRef.tell(new RegisterMountPoint(ImmutableList.of(SOURCE_IDENTIFIER1), masterRef), testKit.getRef());
 
@@ -295,7 +296,7 @@ public class NetconfNodeActorTest {
         verify(mockMountPointBuilder).addService(eq(DOMNotificationService.class), any());
         verify(mockSchemaSourceReg1).close();
         verify(mockRegistry, times(2)).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER1));
-        verify(mockSchemaRepository, times(2)).createSchemaContextFactory(any(SchemaSourceFilter.class));
+        verify(mockSchemaRepository, times(2)).createEffectiveModelContextFactory();
         verifyNoMoreInteractions(mockMountPointBuilder, newMockSchemaSourceReg);
 
         // Stop the slave actor and verify schema source registrations are closed.
@@ -318,7 +319,7 @@ public class NetconfNodeActorTest {
         // Test unrecoverable failure.
 
         doReturn(Futures.immediateFailedFuture(new SchemaResolutionException("mock")))
-                .when(mockSchemaContextFactory).createSchemaContext(any());
+                .when(mockSchemaContextFactory).createEffectiveModelContext(anyCollection());
 
         slaveRef.tell(new RegisterMountPoint(ImmutableList.of(SOURCE_IDENTIFIER1, SOURCE_IDENTIFIER2),
                 masterRef), testKit.getRef());
@@ -339,7 +340,7 @@ public class NetconfNodeActorTest {
         doReturn(Futures.immediateFailedFuture(new SchemaResolutionException("mock",
                 new AskTimeoutException("timeout"))))
             .doReturn(Futures.immediateFuture(mockSchemaContext))
-            .when(mockSchemaContextFactory).createSchemaContext(any());
+            .when(mockSchemaContextFactory).createEffectiveModelContext(anyCollection());
 
         slaveRef.tell(new RegisterMountPoint(ImmutableList.of(SOURCE_IDENTIFIER1, SOURCE_IDENTIFIER2),
                 masterRef), testKit.getRef());
@@ -355,15 +356,15 @@ public class NetconfNodeActorTest {
         reset(mockSchemaSourceReg1, mockSchemaSourceReg2, mockSchemaRepository, mockSchemaContextFactory);
         resetMountPointMocks();
 
-        final SchemaContextFactory mockSchemaContextFactorySuccess = mock(SchemaContextFactory.class);
+        final EffectiveModelContextFactory mockSchemaContextFactorySuccess = mock(EffectiveModelContextFactory.class);
         doReturn(Futures.immediateFuture(mockSchemaContext))
-                .when(mockSchemaContextFactorySuccess).createSchemaContext(any());
+                .when(mockSchemaContextFactorySuccess).createEffectiveModelContext(anyCollection());
 
         doAnswer(unused -> {
             SettableFuture<SchemaContext> future = SettableFuture.create();
             new Thread(() -> {
                 doReturn(mockSchemaContextFactorySuccess).when(mockSchemaRepository)
-                        .createSchemaContextFactory(any(SchemaSourceFilter.class));
+                    .createEffectiveModelContextFactory();
 
                 slaveRef.tell(new RegisterMountPoint(ImmutableList.of(SOURCE_IDENTIFIER1, SOURCE_IDENTIFIER2),
                         masterRef), testKit.getRef());
@@ -371,16 +372,15 @@ public class NetconfNodeActorTest {
                 future.setException(new SchemaResolutionException("mock", new AskTimeoutException("timeout")));
             }).start();
             return future;
-        }).when(mockSchemaContextFactory).createSchemaContext(any());
+        }).when(mockSchemaContextFactory).createEffectiveModelContext(anyCollection());
 
-        doReturn(mockSchemaContextFactory).when(mockSchemaRepository)
-                .createSchemaContextFactory(any(SchemaSourceFilter.class));
+        doReturn(mockSchemaContextFactory).when(mockSchemaRepository).createEffectiveModelContextFactory();
 
         slaveRef.tell(new RegisterMountPoint(ImmutableList.of(SOURCE_IDENTIFIER1, SOURCE_IDENTIFIER2),
                 masterRef), testKit.getRef());
 
         verify(mockMountPointBuilder, timeout(5000)).register();
-        verify(mockSchemaRepository, times(2)).createSchemaContextFactory(any(SchemaSourceFilter.class));
+        verify(mockSchemaRepository, times(2)).createEffectiveModelContextFactory();
     }
 
     @Test
@@ -527,7 +527,7 @@ public class NetconfNodeActorTest {
                 mockSchemaRepository, TIMEOUT, mockMountPointService));
 
         doReturn(Futures.immediateFuture(mockSchemaContext))
-                .when(mockSchemaContextFactory).createSchemaContext(any());
+                .when(mockSchemaContextFactory).createEffectiveModelContext(anyCollection());
 
         slaveRef.tell(new RegisterMountPoint(ImmutableList.of(SOURCE_IDENTIFIER1, SOURCE_IDENTIFIER2),
                 masterRef), testKit.getRef());
