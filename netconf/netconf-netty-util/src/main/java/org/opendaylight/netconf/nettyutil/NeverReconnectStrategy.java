@@ -10,14 +10,11 @@ package org.opendaylight.netconf.nettyutil;
 import com.google.common.base.Preconditions;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Utility ReconnectStrategy singleton, which will cause the reconnect process
- * to always fail.
+ * Utility ReconnectStrategy singleton, which will cause the reconnect process to always fail. This class is thred-safe.
  */
 @Deprecated
-@ThreadSafe
 public final class NeverReconnectStrategy implements ReconnectStrategy {
     private final EventExecutor executor;
     private final int timeout;
