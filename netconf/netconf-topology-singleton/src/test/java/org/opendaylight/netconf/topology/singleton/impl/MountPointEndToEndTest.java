@@ -72,7 +72,7 @@ import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.binding.spec.reflect.BindingReflections;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -599,7 +599,7 @@ public class MountPointEndToEndTest {
         writeTx.commit().get(5, TimeUnit.SECONDS);
     }
 
-    private static void verifyDataInStore(final DOMDataTreeReadTransaction readTx, final YangInstanceIdentifier path,
+    private static void verifyDataInStore(final DOMDataTreeReadOperations readTx, final YangInstanceIdentifier path,
             final NormalizedNode<?, ?> expNode) throws InterruptedException, ExecutionException, TimeoutException {
         final Optional<NormalizedNode<?, ?>> read = readTx.read(LogicalDatastoreType.CONFIGURATION, path)
                 .get(5, TimeUnit.SECONDS);

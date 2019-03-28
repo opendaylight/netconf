@@ -49,11 +49,6 @@ class FailedProxyTransactionFacade implements ProxyTransactionFacade {
     }
 
     @Override
-    public void close() {
-        // No-op
-    }
-
-    @Override
     public FluentFuture<Optional<NormalizedNode<?, ?>>> read(final LogicalDatastoreType store,
             final YangInstanceIdentifier path) {
         LOG.debug("{}: Read {} {} - failure", id, store, path, failure);
