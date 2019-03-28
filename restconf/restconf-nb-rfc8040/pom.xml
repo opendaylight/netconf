@@ -119,6 +119,7 @@
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
+      <version>20131018</version>
     </dependency>
 
     <dependency>
@@ -195,6 +196,12 @@
       <plugin>
         <groupId>org.apache.aries.blueprint</groupId>
         <artifactId>blueprint-maven-plugin</artifactId>
+        <configuration>
+          <scanPaths>
+            <!-- FIXME: we *really* should be in org.opendaylight.netconf ! -->
+            <scanPath>org.opendaylight.restconf</scanPath>
+          </scanPaths>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>

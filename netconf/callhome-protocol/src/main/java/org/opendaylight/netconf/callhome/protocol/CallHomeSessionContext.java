@@ -19,7 +19,6 @@ import java.net.SocketAddress;
 import java.security.PublicKey;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import javax.annotation.concurrent.GuardedBy;
 import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.OpenFuture;
@@ -27,6 +26,7 @@ import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.client.session.ClientSessionImpl;
 import org.apache.sshd.common.future.SshFutureListener;
 import org.apache.sshd.common.session.Session;
+import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -105,7 +105,8 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
             CallHomeSessionContext.this, this::doActivate);
     }
 
-    @GuardedBy("this")
+    // FIXME: this does not look right
+    @Holding("this")
     private synchronized Promise<NetconfClientSession> doActivate(final NetconfClientSessionListener listener) {
         if (activated) {
             return newSessionPromise().setFailure(new IllegalStateException("Session already activated."));

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import javax.annotation.concurrent.GuardedBy;
+import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -92,7 +92,7 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
 
         final SettableFuture<Optional<NormalizedNode<?, ?>>> returnFuture = SettableFuture.create();
         processTransactionOperation(facade -> returnFuture.setFuture(facade.read(store, path)));
-        return returnFuture;
+        return FluentFuture.from(returnFuture);
     }
 
     @Override
@@ -102,7 +102,7 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
 
         final SettableFuture<Boolean> returnFuture = SettableFuture.create();
         processTransactionOperation(facade -> returnFuture.setFuture(facade.exists(store, path)));
-        return returnFuture;
+        return FluentFuture.from(returnFuture);
     }
 
     @Override
@@ -135,7 +135,7 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
 
         final SettableFuture<CommitInfo> returnFuture = SettableFuture.create();
         processTransactionOperation(facade -> returnFuture.setFuture(facade.commit()));
-        return returnFuture;
+        return FluentFuture.from(returnFuture);
     }
 
     @Override

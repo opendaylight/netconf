@@ -215,9 +215,15 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         public void onSuccess(final DOMRpcResult result) {
             // No matter what response we got, rpc-reply or rpc-error,
             // we got it from device so the netconf session is OK
-            if (result != null && result.getResult() != null) {
+            if (result == null) {
+                LOG.warn("{} Keepalive RPC returned null with response. Reconnecting netconf session", id);
+                reconnect();
+                return;
+            }
+
+            if (result.getResult() != null) {
                 lastKeepAliveSucceeded.set(true);
-            }  else if (result != null && result.getErrors() != null) {
+            }  else if (result.getErrors() != null) {
                 LOG.warn("{}: Keepalive RPC failed with error: {}", id, result.getErrors());
                 lastKeepAliveSucceeded.set(true);
             } else {
