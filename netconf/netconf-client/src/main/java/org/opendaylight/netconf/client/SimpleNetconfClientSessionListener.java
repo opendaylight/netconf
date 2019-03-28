@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.client;
 
 import com.google.common.base.Preconditions;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.concurrent.Promise;
@@ -41,7 +40,6 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
     private NetconfClientSession clientSession;
 
     @GuardedBy("this")
-    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED")
     private void dispatchRequest() {
         while (!requests.isEmpty()) {
             final RequestEntry e = requests.peek();
@@ -52,7 +50,7 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
             }
 
             LOG.debug("Message {} has been cancelled, skipping it", e.request);
-            requests.poll();
+            requests.remove();
         }
     }
 
