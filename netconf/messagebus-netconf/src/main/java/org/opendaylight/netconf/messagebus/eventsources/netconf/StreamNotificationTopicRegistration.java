@@ -7,7 +7,7 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
-import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -62,7 +62,7 @@ class StreamNotificationTopicRegistration extends NotificationTopicRegistration 
     void activateNotificationSource() {
         if (!isActive()) {
             LOG.info("Stream {} is not active on node {}. Will subscribe.", this.getStreamName(), this.nodeId);
-            final FluentFuture<DOMRpcResult> result = mountPoint.invokeCreateSubscription(stream);
+            final ListenableFuture<DOMRpcResult> result = mountPoint.invokeCreateSubscription(stream);
             try {
                 result.get();
                 setActive(true);
@@ -84,7 +84,8 @@ class StreamNotificationTopicRegistration extends NotificationTopicRegistration 
     void reActivateNotificationSource() {
         if (isActive()) {
             LOG.info("Stream {} is reactivating on node {}.", this.getStreamName(), this.nodeId);
-            final FluentFuture<DOMRpcResult> result = mountPoint.invokeCreateSubscription(stream, getLastEventTime());
+            final ListenableFuture<DOMRpcResult> result = mountPoint.invokeCreateSubscription(stream,
+                getLastEventTime());
             try {
                 result.get();
                 setActive(true);

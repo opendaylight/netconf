@@ -15,7 +15,7 @@ import java.util.List;
 import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -273,7 +273,7 @@ public final class PatchDataTransactionUtil {
      * @param store Datastore
      * @param path Path to be checked
      */
-    public static void checkItemExistsWithinTransaction(final DOMDataTreeReadTransaction rwTransaction,
+    public static void checkItemExistsWithinTransaction(final DOMDataTreeReadOperations rwTransaction,
                                                 final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         final FluentFuture<Boolean> future = rwTransaction.exists(store, path);
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();
@@ -294,7 +294,7 @@ public final class PatchDataTransactionUtil {
      * @param store Datastore
      * @param path Path to be checked
      */
-    public static void checkItemDoesNotExistsWithinTransaction(final DOMDataTreeReadTransaction rwTransaction,
+    public static void checkItemDoesNotExistsWithinTransaction(final DOMDataTreeReadOperations rwTransaction,
                                                final LogicalDatastoreType store, final YangInstanceIdentifier path) {
         final FluentFuture<Boolean> future = rwTransaction.exists(store, path);
         final FutureDataFactory<Boolean> response = new FutureDataFactory<>();

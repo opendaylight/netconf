@@ -11,9 +11,9 @@ package org.opendaylight.netconf.sal.connect.netconf;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableClassToInstanceMap;
-import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMActionServiceExtension;
@@ -45,16 +45,16 @@ public class DeviceActionFactoryImpl implements DeviceActionFactory {
 
         return new DOMActionService() {
             @Override
-            public FluentFuture<? extends DOMActionResult> invokeAction(final SchemaPath schemaPath,
+            public ListenableFuture<? extends DOMActionResult> invokeAction(final SchemaPath schemaPath,
                     final DOMDataTreeIdentifier dataTreeIdentifier, final ContainerNode input) {
                 Preconditions.checkNotNull(schemaPath);
                 Preconditions.checkNotNull(dataTreeIdentifier);
                 Preconditions.checkNotNull(input);
 
-                final FluentFuture<RpcResult<NetconfMessage>> actionResultFuture = listener.sendRequest(
+                final ListenableFuture<RpcResult<NetconfMessage>> actionResultFuture = listener.sendRequest(
                         messageTransformer.toActionRequest(schemaPath, dataTreeIdentifier, input), input.getNodeType());
 
-                return actionResultFuture.transform(netconfMessageRpcResult -> {
+                return Futures.transform(actionResultFuture, netconfMessageRpcResult -> {
                     if (netconfMessageRpcResult != null) {
                         return messageTransformer.toActionResult(schemaPath, netconfMessageRpcResult.getResult());
                     } else {
@@ -66,7 +66,7 @@ public class DeviceActionFactoryImpl implements DeviceActionFactory {
             }
 
             @Override
-            public @NonNull ClassToInstanceMap<DOMActionServiceExtension> getExtensions() {
+            public ClassToInstanceMap<DOMActionServiceExtension> getExtensions() {
                 return ImmutableClassToInstanceMap.of();
             }
         };

@@ -13,7 +13,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Optional;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyReadResponse;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.ExistsRequest;
@@ -23,9 +23,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 class ReadAdapter {
 
-    private final DOMDataTreeReadTransaction tx;
+    private final DOMDataTreeReadOperations tx;
 
-    ReadAdapter(final DOMDataTreeReadTransaction tx) {
+    ReadAdapter(final DOMDataTreeReadOperations tx) {
         this.tx = tx;
     }
 
