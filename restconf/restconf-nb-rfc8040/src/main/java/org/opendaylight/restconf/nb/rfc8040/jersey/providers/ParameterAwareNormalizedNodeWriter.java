@@ -36,7 +36,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.OrderedLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
-import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamAttributeWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,26 +152,22 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
         if (node instanceof LeafSetEntryNode) {
             if (selectedByParameters(node, false)) {
                 final LeafSetEntryNode<?> nodeAsLeafList = (LeafSetEntryNode<?>) node;
-                if (writer instanceof NormalizedNodeStreamAttributeWriter) {
-                    ((NormalizedNodeStreamAttributeWriter) writer).leafSetEntryNode(nodeAsLeafList.getNodeType(),
-                            nodeAsLeafList.getValue(), nodeAsLeafList.getAttributes());
-                } else {
-                    writer.leafSetEntryNode(nodeAsLeafList.getNodeType(), nodeAsLeafList.getValue());
-                }
+                writer.startLeafSetEntryNode(nodeAsLeafList.getIdentifier());
+                writer.scalarValue(nodeAsLeafList.getValue());
+                writer.endNode();
             }
             return true;
         } else if (node instanceof LeafNode) {
             final LeafNode<?> nodeAsLeaf = (LeafNode<?>)node;
-            if (writer instanceof NormalizedNodeStreamAttributeWriter) {
-                ((NormalizedNodeStreamAttributeWriter) writer).leafNode(
-                        nodeAsLeaf.getIdentifier(), nodeAsLeaf.getValue(), nodeAsLeaf.getAttributes());
-            } else {
-                writer.leafNode(nodeAsLeaf.getIdentifier(), nodeAsLeaf.getValue());
-            }
+            writer.startLeafNode(nodeAsLeaf.getIdentifier());
+            writer.scalarValue(nodeAsLeaf.getValue());
+            writer.endNode();
             return true;
         } else if (node instanceof AnyXmlNode) {
             final AnyXmlNode anyXmlNode = (AnyXmlNode)node;
-            writer.anyxmlNode(anyXmlNode.getIdentifier(), anyXmlNode.getValue());
+            writer.startAnyxmlNode(anyXmlNode.getIdentifier());
+            writer.domSourceValue(anyXmlNode.getValue());
+            writer.endNode();
             return true;
         }
 
@@ -241,18 +236,15 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
 
     private void writeOnlyKeys(final Map<QName, Object> keyValues) throws IllegalArgumentException, IOException {
         for (final Map.Entry<QName, Object> entry : keyValues.entrySet()) {
-            writer.leafNode(new NodeIdentifier(entry.getKey()), entry.getValue());
+            writer.startLeafNode(new NodeIdentifier(entry.getKey()));
+            writer.scalarValue(entry.getValue());
+            writer.endNode();
         }
         writer.endNode();
     }
 
     protected boolean writeMapEntryNode(final MapEntryNode node) throws IOException {
-        if (writer instanceof NormalizedNodeStreamAttributeWriter) {
-            ((NormalizedNodeStreamAttributeWriter) writer)
-                    .startMapEntryNode(node.getIdentifier(), childSizeHint(node.getValue()), node.getAttributes());
-        } else {
-            writer.startMapEntryNode(node.getIdentifier(), childSizeHint(node.getValue()));
-        }
+        writer.startMapEntryNode(node.getIdentifier(), childSizeHint(node.getValue()));
         currentDepth++;
         writeMapEntryChildren(node);
         currentDepth--;
@@ -264,12 +256,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
         if (node instanceof ContainerNode) {
             final ContainerNode n = (ContainerNode) node;
             if (!n.getNodeType().withoutRevision().equals(ROOT_DATA_QNAME)) {
-                if (writer instanceof NormalizedNodeStreamAttributeWriter) {
-                    ((NormalizedNodeStreamAttributeWriter) writer).startContainerNode(
-                            n.getIdentifier(), childSizeHint(n.getValue()), n.getAttributes());
-                } else {
-                    writer.startContainerNode(n.getIdentifier(), childSizeHint(n.getValue()));
-                }
+                writer.startContainerNode(n.getIdentifier(), childSizeHint(n.getValue()));
                 currentDepth++;
                 processedAsCompositeNode = writeChildren(n.getValue(), false);
                 currentDepth--;
@@ -338,12 +325,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
         @Override
         protected boolean writeMapEntryNode(final MapEntryNode node) throws IOException {
             final NormalizedNodeStreamWriter writer = getWriter();
-            if (writer instanceof NormalizedNodeStreamAttributeWriter) {
-                ((NormalizedNodeStreamAttributeWriter) writer).startMapEntryNode(
-                        node.getIdentifier(), childSizeHint(node.getValue()), node.getAttributes());
-            } else {
-                writer.startMapEntryNode(node.getIdentifier(), childSizeHint(node.getValue()));
-            }
+            writer.startMapEntryNode(node.getIdentifier(), childSizeHint(node.getValue()));
 
             final Set<QName> qnames = node.getIdentifier().getKeyValues().keySet();
             // Write out all the key children
