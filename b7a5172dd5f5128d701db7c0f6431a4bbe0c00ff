@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "83322092_8adde2ca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2019-03-28T07:05:06Z",
+      "side": 1,
+      "message": "\"old restconf\" is implementation of https://tools.ietf.org/html/draft-bierman-netconf-restconf-02. We should do what is specified there not in the RFC. I believe that also there we should return 204 but please change the commit message accordingly.",
+      "revId": "b7a5172dd5f5128d701db7c0f6431a4bbe0c00ff",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
