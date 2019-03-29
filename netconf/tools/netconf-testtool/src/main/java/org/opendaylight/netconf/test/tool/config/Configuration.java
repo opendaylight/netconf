@@ -17,6 +17,7 @@ import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.test.tool.operations.OperationsCreator;
 import org.opendaylight.netconf.test.tool.rpchandler.RpcHandler;
 import org.opendaylight.netconf.test.tool.rpchandler.RpcHandlerDefault;
+import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +65,7 @@ public class Configuration {
     private String ip = "0.0.0.0";
     private Set<YangResource> defaultYangResources = DEFAULT_YANG_RESOURCES;
 
-    private Set<String> models;
+    private Set<YangModuleInfo> models;
     private Set<String> capabilities = DEFAULT_BASE_CAPABILITIES_EXI;
     private RpcHandler rpcHandler = new RpcHandlerDefault();
     private OperationsCreator operationsCreator;
@@ -161,11 +162,11 @@ public class Configuration {
         this.ip = ip;
     }
 
-    public Set<String> getModels() {
+    public Set<YangModuleInfo> getModels() {
         return models;
     }
 
-    public void setModels(final Set<String> models) {
+    public void setModels(final Set<YangModuleInfo> models) {
         this.models = models;
     }
 

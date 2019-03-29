@@ -7,19 +7,14 @@
  */
 package org.opendaylight.netconf.test.tool.schemacache;
 
-import com.google.common.base.MoreObjects.ToStringHelper;
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
-import java.io.InputStream;
-import java.util.HashMap;
+import java.util.AbstractMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.opendaylight.netconf.test.tool.TestToolUtils;
-import org.opendaylight.yangtools.yang.common.Revision;
+import java.util.stream.Collectors;
+import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
@@ -34,87 +29,85 @@ import org.slf4j.LoggerFactory;
 /**
  * Cache implementation that stores schemas in form of files under provided folder.
  */
-public final class SchemaSourceCache<T extends SchemaSourceRepresentation>
-        extends AbstractSchemaSourceCache<T> {
+public final class SchemaSourceCache<T extends SchemaSourceRepresentation> extends AbstractSchemaSourceCache<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(SchemaSourceCache.class);
 
-    public static final Pattern CACHED_FILE_PATTERN = Pattern.compile(
-                    ".*/(?<moduleName>[^@]+)" + "(@(?<revision>" + Revision.STRING_FORMAT_PATTERN + "))?.yang");
-
     private final Class<T> representation;
-    private final Set<String> modelList;
-    private Map<String, ModelData> cachedSchemas;
+    private Map<SourceIdentifier, YangModuleInfo> cachedSchemas;
 
-    public SchemaSourceCache(
-            final SchemaSourceRegistry consumer, final Class<T> representation, final Set<String> modelList) {
+    public SchemaSourceCache(final SchemaSourceRegistry consumer,
+                             final Class<T> representation,
+                             final Set<YangModuleInfo> moduleList) {
         super(consumer, representation, Costs.LOCAL_IO);
         this.representation = representation;
-        this.modelList = Preconditions.checkNotNull(modelList);
-        init();
+        initializeCachedSchemas(moduleList);
     }
 
     /**
-     * Restore cache state.
+     * Restore cache state using input set of modules. Cached schemas are filled with dependencies of input modules too.
+     *
+     * @param moduleList Set of modules information.
      */
-    private void init() {
-        cachedSchemas = new HashMap<>();
-        for (String modelPath: modelList) {
-            Optional<SourceIdentifier> sourceIdentifierOptional = getSourceIdentifier(modelPath);
-            if (sourceIdentifierOptional.isPresent()) {
-                SourceIdentifier sourceIdentifier = sourceIdentifierOptional.get();
-                cachedSchemas.put(sourceIdentifier.toYangFilename(), new ModelData(sourceIdentifier, modelPath));
-            } else {
-                LOG.debug("Skipping caching model {}, cannot restore source identifier from model path,"
-                        + " does not match {}", modelPath, CACHED_FILE_PATTERN);
-            }
-        }
-        for (final ModelData cachedSchema : cachedSchemas.values()) {
-            register(cachedSchema.getId());
-        }
+    private void initializeCachedSchemas(final Set<YangModuleInfo> moduleList) {
+        // searching for all dependencies
+        final Set<YangModuleInfo> allModulesInfo = new HashSet<>(moduleList);
+        allModulesInfo.addAll(moduleList.stream()
+                .flatMap(yangModuleInfo -> collectYangModuleInfoDependencies(yangModuleInfo, moduleList).stream())
+                .collect(Collectors.toSet()));
+
+        // creation of source identifiers for all yang module info
+        cachedSchemas = allModulesInfo.stream()
+                .map(yangModuleInfo -> {
+                    final RevisionSourceIdentifier revisionSourceIdentifier = RevisionSourceIdentifier.create(
+                            yangModuleInfo.getName().getLocalName(),
+                            yangModuleInfo.getName().getRevision());
+                    return new AbstractMap.SimpleEntry<>(revisionSourceIdentifier, yangModuleInfo);
+                })
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
+        cachedSchemas.keySet().forEach(this::register);
+    }
+
+    /**
+     * Collection of all direct and indirect dependencies of input YANG module info.
+     *
+     * @param yangModuleInfo       Input YANG module info for which this method collects dependencies.
+     * @param collectedModulesInfo Already collected module information.
+     * @return Already collected module information union found direct and indirect dependencies.
+     */
+    private static Set<YangModuleInfo> collectYangModuleInfoDependencies(
+            final YangModuleInfo yangModuleInfo, final Set<YangModuleInfo> collectedModulesInfo) {
+        // resolution of direct dependencies that haven't already been collected
+        final Set<YangModuleInfo> allDependencies = new HashSet<>(collectedModulesInfo);
+        final Set<YangModuleInfo> directDependencies = yangModuleInfo.getImportedModules().stream()
+                .filter(importedYangModuleInfo -> !collectedModulesInfo.contains(importedYangModuleInfo))
+                .collect(Collectors.toSet());
+        allDependencies.addAll(directDependencies);
+
+        // resolution of indirect dependencies through recursion
+        final Set<YangModuleInfo> indirectDependencies = directDependencies.stream()
+                .flatMap(importedYangModuleInfo ->
+                        collectYangModuleInfoDependencies(importedYangModuleInfo, allDependencies).stream())
+                .collect(Collectors.toSet());
+        allDependencies.addAll(indirectDependencies);
+        return allDependencies;
     }
 
     @Override
     public synchronized ListenableFuture<? extends T> getSource(final SourceIdentifier sourceIdentifier) {
-        final String fileName = sourceIdentifier.toYangFilename();
-        ModelData modelData = cachedSchemas.get(fileName);
-        if (modelData != null) {
-            final SchemaSourceRepresentation restored = restoreAsType(modelData.getId(), modelData.getPath());
-            return Futures.immediateFuture(representation.cast(restored));
+        final YangModuleInfo yangModuleInfo = cachedSchemas.get(sourceIdentifier);
+        if (yangModuleInfo != null) {
+            final YangTextSchemaSource yangTextSchemaSource = YangTextSchemaSource.delegateForByteSource(
+                    sourceIdentifier, yangModuleInfo.getYangTextByteSource());
+            return Futures.immediateFuture(representation.cast(yangTextSchemaSource));
         }
 
-        LOG.debug("Source {} not found in cache as {}", sourceIdentifier, fileName);
+        LOG.debug("Source {} not found in cache", sourceIdentifier);
         return Futures.immediateFailedFuture(new MissingSchemaSourceException("Source not found", sourceIdentifier));
     }
 
     @Override
     protected synchronized void offer(final T source) {
         LOG.trace("Source {} offered to cache", source.getIdentifier());
-    }
-
-    private static YangTextSchemaSource restoreAsType(final SourceIdentifier sourceIdentifier,
-            final String cachedSource) {
-        return new YangTextSchemaSource(sourceIdentifier) {
-
-            @Override
-            protected ToStringHelper addToStringAttributes(final ToStringHelper toStringHelper) {
-                return toStringHelper;
-            }
-
-            @Override
-            public InputStream openStream() {
-                return TestToolUtils.getDataAsStream(cachedSource);
-            }
-        };
-    }
-
-    private static Optional<SourceIdentifier> getSourceIdentifier(final String fileName) {
-        final Matcher matcher = CACHED_FILE_PATTERN.matcher(fileName);
-        if (matcher.matches()) {
-            final String moduleName = matcher.group("moduleName");
-            final Optional<Revision> revision = Revision.ofNullable(matcher.group("revision"));
-            return Optional.of(RevisionSourceIdentifier.create(moduleName, revision));
-        }
-        return Optional.empty();
     }
 }
