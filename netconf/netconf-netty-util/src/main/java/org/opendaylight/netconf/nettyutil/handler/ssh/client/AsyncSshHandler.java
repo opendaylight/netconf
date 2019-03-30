@@ -16,6 +16,7 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.future.AuthFuture;
@@ -61,6 +62,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private ClientSession session;
     private ChannelPromise connectPromise;
     private GenericFutureListener negotiationFutureListener;
+    private final AtomicBoolean isDisconnected = new AtomicBoolean();
 
     public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient,
             final Future<?> negotiationFuture) {
@@ -215,62 +217,68 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public synchronized void disconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) {
-        LOG.trace("Closing SSH session on channel: {} with connect promise in state: {}",
-                ctx.channel(),connectPromise);
-
-        // If we have already succeeded and the session was dropped after,
-        // we need to fire inactive to notify reconnect logic
-        if (connectPromise.isSuccess()) {
-            ctx.fireChannelInactive();
+    public void disconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) {
+        if (isDisconnected.getAndSet(true)) {
+            return;
         }
 
-        if (sshWriteAsyncHandler != null) {
-            sshWriteAsyncHandler.close();
-        }
+        synchronized (this) {
+            LOG.trace("Closing SSH session on channel: {} with connect promise in state: {}",
+                    ctx.channel(), connectPromise);
 
-        if (sshReadAsyncListener != null) {
-            sshReadAsyncListener.close();
-        }
+            // If we have already succeeded and the session was dropped after,
+            // we need to fire inactive to notify reconnect logic
+            if (connectPromise.isSuccess()) {
+                ctx.fireChannelInactive();
+            }
 
-        //If connection promise is not already set, it means negotiation failed
-        //we must set connection promise to failure
-        if (!connectPromise.isDone()) {
-            connectPromise.setFailure(new IllegalStateException("Negotiation failed"));
-        }
+            if (sshWriteAsyncHandler != null) {
+                sshWriteAsyncHandler.close();
+            }
 
-        //Remove listener from negotiation future, we don't want notifications
-        //from negotiation anymore
-        if (negotiationFuture != null) {
-            negotiationFuture.removeListener(negotiationFutureListener);
-        }
+            if (sshReadAsyncListener != null) {
+                sshReadAsyncListener.close();
+            }
 
-        if (session != null && !session.isClosed() && !session.isClosing()) {
-            session.close(false).addListener(future -> {
-                synchronized (this) {
-                    if (!future.isClosed()) {
-                        session.close(true);
+            //If connection promise is not already set, it means negotiation failed
+            //we must set connection promise to failure
+            if (!connectPromise.isDone()) {
+                connectPromise.setFailure(new IllegalStateException("Negotiation failed"));
+            }
+
+            //Remove listener from negotiation future, we don't want notifications
+            //from negotiation anymore
+            if (negotiationFuture != null) {
+                negotiationFuture.removeListener(negotiationFutureListener);
+            }
+
+            if (session != null && !session.isClosed() && !session.isClosing()) {
+                session.close(false).addListener(future -> {
+                    synchronized (this) {
+                        if (!future.isClosed()) {
+                            session.close(true);
+                        }
+                        session = null;
                     }
-                    session = null;
-                }
-            });
-        }
+                });
+            }
 
-        // Super disconnect is necessary in this case since we are using NioSocketChannel and it needs
-        // to cleanup its resources e.g. Socket that it tries to open in its constructor
-        // (https://bugs.opendaylight.org/show_bug.cgi?id=2430)
-        // TODO better solution would be to implement custom ChannelFactory + Channel
-        // that will use mina SSH lib internally: port this to custom channel implementation
-        try {
-            // Disconnect has to be closed after inactive channel event was fired, because it interferes with it
-            super.disconnect(ctx, ctx.newPromise());
-        } catch (final Exception e) {
-            LOG.warn("Unable to cleanup all resources for channel: {}. Ignoring.", ctx.channel(), e);
-        }
+            // Super disconnect is necessary in this case since we are using NioSocketChannel and it needs
+            // to cleanup its resources e.g. Socket that it tries to open in its constructor
+            // (https://bugs.opendaylight.org/show_bug.cgi?id=2430)
+            // TODO better solution would be to implement custom ChannelFactory + Channel
+            // that will use mina SSH lib internally: port this to custom channel implementation
+            try {
+                // Disconnect has to be closed after inactive channel event was fired, because it interferes with it
+                super.disconnect(ctx, ctx.newPromise());
+            } catch (final Exception e) {
+                LOG.warn("Unable to cleanup all resources for channel: {}. Ignoring.", ctx.channel(), e);
+            }
 
-        channel = null;
-        promise.setSuccess();
-        LOG.debug("SSH session closed on channel: {}", ctx.channel());
+            channel = null;
+            promise.setSuccess();
+            LOG.debug("SSH session closed on channel: {}", ctx.channel());
+        }
     }
 
 }

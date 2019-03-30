@@ -10,6 +10,7 @@ package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.sshd.common.future.SshFutureListener;
 import org.apache.sshd.common.io.IoInputStream;
 import org.apache.sshd.common.io.IoReadFuture;
@@ -47,36 +48,39 @@ public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFutu
     }
 
     @Override
-    public synchronized void operationComplete(final IoReadFuture future) {
-        if (future.getException() != null) {
+    public void operationComplete(final IoReadFuture future) {
+        AtomicBoolean disconnect = new AtomicBoolean(false);
+        synchronized (this) {
+            if (future.getException() != null) {
 
-            //if asyncout is already set to null by close method, do nothing
-            if (asyncOut == null) {
-                return;
-            }
+                //if asyncout is already set to null by close method, do nothing
+                if (asyncOut == null) {
+                    return;
+                }
 
-            if (asyncOut.isClosed() || asyncOut.isClosing()) {
-                // Ssh dropped
-                LOG.debug("Ssh session dropped on channel: {}", channelId, future.getException());
-            } else {
-                LOG.warn("Exception while reading from SSH remote on channel {}", channelId, future.getException());
+                if (asyncOut.isClosed() || asyncOut.isClosing()) {
+                    // Ssh dropped
+                    LOG.debug("Ssh session dropped on channel: {}", channelId, future.getException());
+                } else {
+                    LOG.warn("Exception while reading from SSH remote on channel {}", channelId, future.getException());
+                }
+                disconnect.set(true);
+            } else if (future.getRead() > 0) {
+                final ByteBuf msg = Unpooled.wrappedBuffer(buf.array(), 0, future.getRead());
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("Reading message on channel: {}, message: {}",
+                            channelId, AsyncSshHandlerWriter.byteBufToString(msg));
+                }
+                readHandler.onMessageRead(msg);
+
+                // Schedule next read
+                buf = new ByteArrayBuffer(BUFFER_SIZE);
+                currentReadFuture = asyncOut.read(buf);
+                currentReadFuture.addListener(this);
             }
-            invokeDisconnect();
-            return;
         }
-
-        if (future.getRead() > 0) {
-            final ByteBuf msg = Unpooled.wrappedBuffer(buf.array(), 0, future.getRead());
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Reading message on channel: {}, message: {}",
-                        channelId, AsyncSshHandlerWriter.byteBufToString(msg));
-            }
-            readHandler.onMessageRead(msg);
-
-            // Schedule next read
-            buf = new ByteArrayBuffer(BUFFER_SIZE);
-            currentReadFuture = asyncOut.read(buf);
-            currentReadFuture.addListener(this);
+        if (disconnect.get()) {
+            invokeDisconnect();
         }
     }
 
