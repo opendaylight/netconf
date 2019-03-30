@@ -16,6 +16,7 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.future.AuthFuture;
@@ -52,6 +53,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     private final AuthenticationHandler authenticationHandler;
     private final SshClient sshClient;
+    private final AtomicBoolean isDisconnected = new AtomicBoolean();
     private Future<?> negotiationFuture;
 
     private AsyncSshHandlerReader sshReadAsyncListener;
@@ -213,11 +215,19 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         disconnect(ctx, promise);
     }
 
-    @SuppressWarnings("checkstyle:IllegalCatch")
     @Override
-    public synchronized void disconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) {
+    public void disconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) {
+        if (!isDisconnected.weakCompareAndSet(false, true)) {
+            return;
+        }
+
+        safelyDisconnect(ctx, promise);
+    }
+
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    private synchronized void safelyDisconnect(final ChannelHandlerContext ctx, final ChannelPromise promise) {
         LOG.trace("Closing SSH session on channel: {} with connect promise in state: {}",
-                ctx.channel(),connectPromise);
+                ctx.channel(), connectPromise);
 
         // If we have already succeeded and the session was dropped after,
         // we need to fire inactive to notify reconnect logic
@@ -272,5 +282,4 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         promise.setSuccess();
         LOG.debug("SSH session closed on channel: {}", ctx.channel());
     }
-
 }
