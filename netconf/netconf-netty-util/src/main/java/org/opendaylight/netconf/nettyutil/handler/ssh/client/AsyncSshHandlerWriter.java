@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Queue;
+import javax.annotation.concurrent.GuardedBy;
 import org.apache.sshd.common.io.IoOutputStream;
 import org.apache.sshd.common.io.WritePendingException;
 import org.apache.sshd.common.util.buffer.Buffer;
@@ -50,6 +51,9 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
         this.asyncIn = asyncIn;
     }
 
+    @GuardedBy("asyncInLock")
+    private boolean isWriteExecuted = false;
+
     public void write(final ChannelHandlerContext ctx,
             final Object msg, final ChannelPromise promise) {
         if (asyncIn == null) {
@@ -67,7 +71,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
                 promise.setFailure(new IllegalStateException("Channel closed"));
             } else {
                 final ByteBuf byteBufMsg = (ByteBuf) msg;
-                if (!pending.isEmpty()) {
+                if (isWriteExecuted) {
                     queueRequest(ctx, byteBufMsg, promise);
                     return;
                 }
@@ -86,6 +90,9 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Writing request on channel: {}, message: {}", ctx.channel(), byteBufToString(byteBufMsg));
             }
+
+            isWriteExecuted = true;
+
             asyncIn.writePacket(toBuffer(byteBufMsg)).addListener(future -> {
                 // synchronized block due to deadlock that happens on ssh window resize
                 // writes and pending writes would lock the underlyinch channel session
@@ -134,6 +141,7 @@ public final class AsyncSshHandlerWriter implements AutoCloseable {
     private void writePendingIfAny() {
         synchronized (asyncInLock) {
             if (pending.peek() == null) {
+                isWriteExecuted = false;
                 return;
             }
 
