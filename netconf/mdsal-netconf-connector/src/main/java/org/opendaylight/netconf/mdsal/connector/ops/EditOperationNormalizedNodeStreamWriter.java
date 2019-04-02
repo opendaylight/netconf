@@ -8,6 +8,10 @@
 
 package org.opendaylight.netconf.mdsal.connector.ops;
 
+import static com.google.common.base.Preconditions.checkState;
+
+import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
 import java.util.Map;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput;
@@ -23,25 +27,42 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamAttributeWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableMetadataNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeMetadataResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeContainerBuilder;
 
-final class EditOperationNormalizedNodeStreamWriter extends ImmutableNormalizedNodeStreamWriter
+final class EditOperationNormalizedNodeStreamWriter extends ImmutableMetadataNormalizedNodeStreamWriter
         implements NormalizedNodeStreamAttributeWriter {
     private static final QName OPERATION_ATTRIBUTE = QName.create(EditConfigInput.QNAME.getNamespace(),
             XmlNetconfConstants.OPERATION_ATTR_KEY);
 
     private final DataTreeChangeTracker dataTreeChangeTracker;
 
-    EditOperationNormalizedNodeStreamWriter(final NormalizedNodeResult result,
-            final DataTreeChangeTracker dataTreeChangeTracker) {
-        super(result);
+    EditOperationNormalizedNodeStreamWriter(final DataTreeChangeTracker dataTreeChangeTracker) {
+        super(new NormalizedNodeMetadataResult());
         this.dataTreeChangeTracker = dataTreeChangeTracker;
     }
+
+    @Override
+    public void metadata(final ImmutableMap<QName, Object> metadata) throws IOException {
+        final Object operation = metadata.get(OPERATION_ATTRIBUTE);
+        if (operation != null) {
+            checkState(operation instanceof String, "Unexpected operation attribute value %s", operation);
+
+            // FIXME: check current stack
+
+            final State state = popState();
+
+            // FIXME:
+
+
+
+        }
+    }
+
 
     @Override
     public void leafNode(final NodeIdentifier name, final Object value, final Map<QName, String> attributes) {

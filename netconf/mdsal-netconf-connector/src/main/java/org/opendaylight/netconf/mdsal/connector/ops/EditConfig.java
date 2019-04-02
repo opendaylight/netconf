@@ -30,7 +30,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -75,8 +74,7 @@ public final class EditConfig extends AbstractEdit {
             final String ns = element.getNamespace();
             final DataSchemaNode schemaNode = getSchemaNodeFromNamespace(ns, element);
             final DataTreeChangeTracker changeTracker = new DataTreeChangeTracker(defaultAction);
-            parseIntoNormalizedNode(schemaNode, element,
-                new EditOperationNormalizedNodeStreamWriter(new NormalizedNodeResult(), changeTracker));
+            parseIntoNormalizedNode(schemaNode, element, new EditOperationNormalizedNodeStreamWriter(changeTracker));
             executeOperations(changeTracker);
         }
 
