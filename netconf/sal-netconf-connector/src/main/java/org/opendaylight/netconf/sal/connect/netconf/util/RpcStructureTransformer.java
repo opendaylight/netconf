@@ -8,7 +8,7 @@
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
 import java.util.Optional;
-import org.opendaylight.yangtools.yang.data.api.ModifyAction;
+import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
