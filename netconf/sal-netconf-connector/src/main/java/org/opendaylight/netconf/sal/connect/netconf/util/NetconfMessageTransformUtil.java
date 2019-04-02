@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
-import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.Iterator;
@@ -29,6 +28,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.FailedNetconfMessage;
+import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -46,7 +46,6 @@ import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcError.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
-import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -343,14 +342,17 @@ public final class NetconfMessageTransformUtil {
                             + "but was: %s", lastChildOverride.get());
             configContent = lastChildOverride.get();
         } else {
-            final Entry<QName, ModifyAction> modifyOperation = operation.isPresent()
-                    ? new AbstractMap.SimpleEntry<>(NETCONF_OPERATION_QNAME, operation.get()) : null;
-            configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride,
-                Optional.ofNullable(modifyOperation));
+            configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride);
         }
 
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME.getLocalName(),
                 Optional.of(NETCONF_CONFIG_QNAME.getNamespace().toString()));
+
+        // FIXME: create the MetadataStructure if operation is applicable
+        // if (operation.isPresent()) ...
+        //    final Entry<QName, ModifyAction> modifyOperation = operation.isPresent()
+        //         ? new AbstractMap.SimpleEntry<>(NETCONF_OPERATION_QNAME, operation.get()) : null;
+
         try {
             NetconfUtil.writeNormalizedNode(configContent, new DOMResult(element), SchemaPath.ROOT, ctx);
         } catch (IOException | XMLStreamException e) {
