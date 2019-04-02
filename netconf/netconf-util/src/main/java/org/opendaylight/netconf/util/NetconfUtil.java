@@ -14,10 +14,13 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
+import org.opendaylight.yangtools.rfc7952.data.util.NormalizedMetadataWriter;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -66,6 +69,36 @@ public final class NetconfUtil {
                      NormalizedNodeWriter.forStreamWriter(normalizedNodeStreamWriter)
         ) {
             normalizedNodeWriter.write(normalized);
+            normalizedNodeWriter.flush();
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (final Exception e) {
+                LOG.warn("Unable to close resource properly", e);
+            }
+        }
+    }
+
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    public static void writeNormalizedNode(final NormalizedNode<?, ?> normalized,
+                                           final @Nullable NormalizedMetadata metadata,
+                                           final DOMResult result, final SchemaPath schemaPath,
+                                           final SchemaContext context) throws IOException, XMLStreamException {
+        if (metadata == null) {
+            writeNormalizedNode(normalized, result, schemaPath, context);
+            return;
+        }
+
+        final XMLStreamWriter writer = XML_FACTORY.createXMLStreamWriter(result);
+        try (
+             NormalizedNodeStreamWriter normalizedNodeStreamWriter =
+                     XMLStreamNormalizedNodeStreamWriter.create(writer, context, schemaPath);
+                NormalizedMetadataWriter normalizedNodeWriter =
+                     NormalizedMetadataWriter.forStreamWriter(normalizedNodeStreamWriter)
+        ) {
+            normalizedNodeWriter.write(normalized, metadata);
             normalizedNodeWriter.flush();
         } finally {
             try {
