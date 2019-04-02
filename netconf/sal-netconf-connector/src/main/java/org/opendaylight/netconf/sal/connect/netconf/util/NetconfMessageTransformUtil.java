@@ -10,15 +10,18 @@ package org.opendaylight.netconf.sal.connect.netconf.util;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
-import java.util.AbstractMap;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -29,6 +32,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.FailedNetconfMessage;
+import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -41,12 +45,14 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
+import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
+import org.opendaylight.yangtools.rfc7952.data.util.ImmutableNormalizedMetadata;
+import org.opendaylight.yangtools.rfc7952.data.util.ImmutableNormalizedMetadata.Builder;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcError.ErrorSeverity;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
-import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -56,6 +62,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -137,6 +144,7 @@ public final class NetconfMessageTransformUtil {
     public static final SchemaPath NETCONF_COPY_CONFIG_PATH = toPath(NETCONF_COPY_CONFIG_QNAME);
 
     public static final QName NETCONF_OPERATION_QNAME = QName.create(NETCONF_QNAME, "operation").intern();
+    private static final QName NETCONF_OPERATION_QNAME_LEGACY = NETCONF_OPERATION_QNAME.withoutRevision().intern();
     public static final QName NETCONF_DEFAULT_OPERATION_QNAME =
             QName.create(NETCONF_OPERATION_QNAME, "default-operation").intern();
     public static final NodeIdentifier NETCONF_DEFAULT_OPERATION_NODEID =
@@ -343,22 +351,61 @@ public final class NetconfMessageTransformUtil {
                             + "but was: %s", lastChildOverride.get());
             configContent = lastChildOverride.get();
         } else {
-            final Entry<QName, ModifyAction> modifyOperation = operation.isPresent()
-                    ? new AbstractMap.SimpleEntry<>(NETCONF_OPERATION_QNAME, operation.get()) : null;
-            configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride,
-                Optional.ofNullable(modifyOperation));
+            configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride);
         }
 
+        final NormalizedMetadata metadata = operation.map(oper -> leafMetadata(configContent, oper)).orElse(null);
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME.getLocalName(),
                 Optional.of(NETCONF_CONFIG_QNAME.getNamespace().toString()));
+
         try {
-            NetconfUtil.writeNormalizedNode(configContent, new DOMResult(element), SchemaPath.ROOT, ctx);
+            NetconfUtil.writeNormalizedNode(configContent, metadata, new DOMResult(element), SchemaPath.ROOT, ctx);
         } catch (IOException | XMLStreamException e) {
             throw new IllegalStateException("Unable to serialize edit config content element for path " + dataPath, e);
         }
 
         return Builders.anyXmlBuilder().withNodeIdentifier(NETCONF_CONFIG_NODEID).withValue(new DOMSource(element))
                 .build();
+    }
+
+    private static NormalizedMetadata leafMetadata(final NormalizedNode<?, ?> node, final ModifyAction oper) {
+        final Deque<Builder> builders = new ArrayDeque<>();
+
+        // Step one: open builders
+        NormalizedNode<?, ?> currentNode = node;
+        do {
+            builders.push(ImmutableNormalizedMetadata.builder().withIdentifier(currentNode.getIdentifier()));
+            if (currentNode instanceof NormalizedNodeContainer) {
+                final Collection<NormalizedNode<?, ?>> children =
+                        ((NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>>) currentNode).getValue();
+                switch (children.size()) {
+                    case 0:
+                        currentNode = null;
+                        break;
+                    case 1:
+                        currentNode = Iterables.getOnlyElement(children);
+                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected container " + currentNode);
+                }
+            } else {
+                currentNode = null;
+            }
+        } while (currentNode != null);
+
+        // Step two: set the top builder's metadata
+        builders.peek().withAnnotation(NETCONF_OPERATION_QNAME_LEGACY, oper.toString().toLowerCase(Locale.US));
+
+        // Step three: build the tree
+        while (true) {
+            final ImmutableNormalizedMetadata currentMeta = builders.pop().build();
+            final Builder parent = builders.peek();
+            if (parent != null) {
+                parent.withChild(currentMeta);
+            } else {
+                return currentMeta;
+            }
+        }
     }
 
     public static DataContainerChild<?, ?> createEditConfigStructure(final SchemaContext ctx,
