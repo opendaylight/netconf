@@ -23,14 +23,12 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.mdsal.connector.CurrentSchemaContext;
 import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.netconf.mdsal.connector.ops.DataTreeChangeTracker.DataTreeChange;
-import org.opendaylight.yangtools.yang.data.api.ModifyAction;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -74,19 +72,19 @@ public final class EditConfig extends AbstractEdit {
         for (final XmlElement element : configElement.getChildElements()) {
             final String ns = element.getNamespace();
             final DataSchemaNode schemaNode = getSchemaNodeFromNamespace(ns, element);
-            final DataTreeChangeTracker changeTracker = new DataTreeChangeTracker(defaultAction);
-            parseIntoNormalizedNode(schemaNode, element,
-                new EditOperationNormalizedNodeStreamWriter(new NormalizedNodeResult(), changeTracker));
-            executeOperations(changeTracker);
+
+            final SplittingNormalizedNodeMetadataStreamWriter writer = new SplittingNormalizedNodeMetadataStreamWriter(
+                defaultAction);
+            parseIntoNormalizedNode(schemaNode, element, writer);
+            executeOperations(writer.getDataTreeChanges());
         }
 
         return document.createElement(XmlNetconfConstants.OK);
     }
 
-    private void executeOperations(final DataTreeChangeTracker changeTracker) throws DocumentedException {
+    private void executeOperations(final List<DataTreeChange> changes) throws DocumentedException {
         final DOMDataTreeReadWriteTransaction rwTx = transactionProvider.getOrCreateTransaction();
-        final List<DataTreeChange> aa = changeTracker.getDataTreeChanges();
-        final ListIterator<DataTreeChange> iterator = aa.listIterator(aa.size());
+        final ListIterator<DataTreeChange> iterator = changes.listIterator(changes.size());
 
         while (iterator.hasPrevious()) {
             final DataTreeChange dtc = iterator.previous();
