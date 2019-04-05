@@ -104,7 +104,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
         writeTransaction.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                LOG.debug("remove-key-pair success. Input: {}");
+                LOG.debug("remove-key-pair success. Input: {}", input);
                 rpcResult.set(RpcResultBuilder.success(new RemoveKeystoreEntryOutputBuilder().build()).build());
             }
 
@@ -139,7 +139,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
         writeTransaction.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
             public void onSuccess(final CommitInfo result) {
-                LOG.debug("add-key-pair success. Input: {}");
+                LOG.debug("add-key-pair success. Input: {}", input);
                 rpcResult.set(RpcResultBuilder.success(new AddKeystoreEntryOutputBuilder().build()).build());
             }
 
