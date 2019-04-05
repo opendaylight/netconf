@@ -43,7 +43,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -129,7 +128,7 @@ public class URIParametersParsing {
         }
         assertNotNull("RPC ContainerSchemaNode was not found!", rpcInputSchemaNode);
 
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> container =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> container =
                 Builders.containerBuilder(rpcInputSchemaNode);
 
         final QName pathQName =

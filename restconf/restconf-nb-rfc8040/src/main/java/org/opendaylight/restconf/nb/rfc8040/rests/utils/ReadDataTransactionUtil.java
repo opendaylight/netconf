@@ -62,10 +62,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeContainerBuilder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -317,12 +316,12 @@ public final class ReadDataTransactionUtil {
         final DataSchemaContextTree baseSchemaCtxTree = DataSchemaContextTree.from(ctx);
         final DataSchemaNode baseSchemaNode = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
         if (result instanceof ContainerNode) {
-            final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder =
+            final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder =
                     Builders.containerBuilder((ContainerSchemaNode) baseSchemaNode);
             buildCont(builder, (ContainerNode) result, baseSchemaCtxTree, path, trim);
             return builder.build();
         } else {
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder =
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder =
                     Builders.mapEntryBuilder((ListSchemaNode) baseSchemaNode);
             buildMapEntryBuilder(builder, (MapEntryNode) result, baseSchemaCtxTree, path, trim,
                     ((ListSchemaNode) baseSchemaNode).getKeyDefinition());
@@ -331,14 +330,14 @@ public final class ReadDataTransactionUtil {
     }
 
     private static void buildMapEntryBuilder(
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder,
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder,
             final MapEntryNode result, final DataSchemaContextTree baseSchemaCtxTree,
             final YangInstanceIdentifier actualPath, final boolean trim, final List<QName> keys) {
         for (final DataContainerChild<? extends PathArgument, ?> child : result.getValue()) {
             final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
             final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
             if (child instanceof ContainerNode) {
-                final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> childBuilder =
+                final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> childBuilder =
                         Builders.containerBuilder((ContainerSchemaNode) childSchema);
                 buildCont(childBuilder, (ContainerNode) child, baseSchemaCtxTree, path, trim);
                 builder.withChild(childBuilder.build());
@@ -351,7 +350,7 @@ public final class ReadDataTransactionUtil {
             } else if (child instanceof LeafNode) {
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
                 final Object nodeVal = child.getValue();
-                final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
+                final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (keys.contains(child.getNodeType())) {
                     leafBuilder.withValue(((LeafNode) child).getValue());
@@ -379,21 +378,21 @@ public final class ReadDataTransactionUtil {
         for (final MapEntryNode mapEntryNode : result.getValue()) {
             final YangInstanceIdentifier actualNode = path.node(mapEntryNode.getIdentifier());
             final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(actualNode).getDataSchemaNode();
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
                     Builders.mapEntryBuilder((ListSchemaNode) childSchema);
             buildMapEntryBuilder(mapEntryBuilder, mapEntryNode, baseSchemaCtxTree, actualNode, trim, keys);
             builder.withChild(mapEntryBuilder.build());
         }
     }
 
-    private static void buildCont(final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder,
+    private static void buildCont(final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder,
             final ContainerNode result, final DataSchemaContextTree baseSchemaCtxTree,
             final YangInstanceIdentifier actualPath, final boolean trim) {
         for (final DataContainerChild<? extends PathArgument, ?> child : result.getValue()) {
             final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
             final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
             if (child instanceof ContainerNode) {
-                final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builderChild =
+                final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builderChild =
                         Builders.containerBuilder((ContainerSchemaNode) childSchema);
                 buildCont(builderChild, result, baseSchemaCtxTree, actualPath, trim);
                 builder.withChild(builderChild.build());
@@ -406,7 +405,7 @@ public final class ReadDataTransactionUtil {
             } else if (child instanceof LeafNode) {
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
                 final Object nodeVal = child.getValue();
-                final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
+                final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (trim) {
                     if (defaultVal == null || !defaultVal.equals(nodeVal)) {
@@ -600,7 +599,7 @@ public final class ReadDataTransactionUtil {
 
             return builder.build();
         } else if (configDataNode instanceof ContainerNode) {
-            final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder = Builders
+            final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder = Builders
                     .containerBuilder().withNodeIdentifier(((ContainerNode) configDataNode).getIdentifier());
 
             mapValueToBuilder(
@@ -647,7 +646,7 @@ public final class ReadDataTransactionUtil {
                     ((UnkeyedListNode) stateDataNode).getValue(), builder);
             return builder.build();
         } else if (configDataNode instanceof UnkeyedListEntryNode) {
-            final DataContainerNodeAttrBuilder<NodeIdentifier, UnkeyedListEntryNode> builder = Builders
+            final DataContainerNodeBuilder<NodeIdentifier, UnkeyedListEntryNode> builder = Builders
                 .unkeyedListEntryBuilder().withNodeIdentifier(((UnkeyedListEntryNode) configDataNode).getIdentifier());
 
             mapValueToBuilder(((UnkeyedListEntryNode) configDataNode).getValue(),

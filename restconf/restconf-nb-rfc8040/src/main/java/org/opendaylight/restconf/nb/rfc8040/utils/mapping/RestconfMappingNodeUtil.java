@@ -36,7 +36,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -79,7 +79,7 @@ public final class RestconfMappingNodeUtil {
                     final SchemaContext context, final String moduleSetId) {
         final DataSchemaNode modulesStateSch =
                 ietfYangLibraryModule.getDataChildByName(IetfYangLibrary.MODUELS_STATE_CONT_QNAME);
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> modulesStateBuilder =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> modulesStateBuilder =
                 Builders.containerBuilder((ContainerSchemaNode) modulesStateSch);
 
         final DataSchemaNode moduleSetIdSch =
@@ -115,7 +115,7 @@ public final class RestconfMappingNodeUtil {
     private static void fillMapByModules(final CollectionNodeBuilder<MapEntryNode, OrderedMapNode> mapBuilder,
             final DataSchemaNode moduleSch, final boolean isSubmodule, final Module module,
             final Module ietfYangLibraryModule, final SchemaContext context) {
-        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
                 Builders.mapEntryBuilder((ListSchemaNode) moduleSch);
         addCommonLeafs(module, mapEntryBuilder, ietfYangLibraryModule);
         addChildOfModuleBySpecificModuleInternal(
@@ -162,7 +162,7 @@ public final class RestconfMappingNodeUtil {
      *             schema context
      */
     private static void addSubmodules(final Module module,
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final Module ietfYangLibraryModule, final SchemaContext context) {
         final DataSchemaNode listSubm = findSchemaInListOfModulesSchema(
                 IetfYangLibrary.SPECIFIC_MODULE_SUBMODULE_LIST_QNAME, ietfYangLibraryModule);
@@ -187,14 +187,14 @@ public final class RestconfMappingNodeUtil {
      *             schema context
      */
     private static void addDeviationList(final Module module,
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final Module ietfYangLibraryModule, final SchemaContext context) {
         final DataSchemaNode deviationsSchema = findSchemaInListOfModulesSchema(
                 IetfYangLibrary.SPECIFIC_MODULE_DEVIATION_LIST_QNAME, ietfYangLibraryModule);
         final CollectionNodeBuilder<MapEntryNode, MapNode> deviations =
                 Builders.mapBuilder((ListSchemaNode) deviationsSchema);
         for (final Deviation deviation : module.getDeviations()) {
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> deviationEntryNode =
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> deviationEntryNode =
                     Builders.mapEntryBuilder((ListSchemaNode) deviationsSchema);
             final QName lastComponent = deviation.getTargetPath().getLastComponent();
             addChildOfModuleBySpecificModule(IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF_QNAME, deviationEntryNode,
@@ -220,7 +220,7 @@ public final class RestconfMappingNodeUtil {
      *             ieat-yang-library module
      */
     private static void addFeatureLeafList(final QName qnameOfFeaturesLeafList,
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final Set<FeatureDefinition> features, final Module ietfYangLibraryModule) {
         final DataSchemaNode schemaNode =
                 findSchemaInListOfModulesSchema(qnameOfFeaturesLeafList, ietfYangLibraryModule);
@@ -245,7 +245,7 @@ public final class RestconfMappingNodeUtil {
      *             ietf-yang-library module
      */
     private static void addCommonLeafs(final Module module,
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final Module ietfYangLibraryModule) {
         addChildOfModuleBySpecificModuleInternal(IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF_QNAME, mapEntryBuilder,
                 module.getName(), ietfYangLibraryModule);
@@ -266,7 +266,7 @@ public final class RestconfMappingNodeUtil {
      *             ietf-yang-library module
      */
     private static void addChildOfModuleBySpecificModuleOfListChild(final QName specificQName,
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final Object value, final Module ietfYangLibraryModule) {
         final DataSchemaNode leafSch = findSchemaInListOfModulesSchema(specificQName, ietfYangLibraryModule);
         mapEntryBuilder.withChild(Builders.leafBuilder((LeafSchemaNode) leafSch).withValue(value).build());
@@ -306,7 +306,7 @@ public final class RestconfMappingNodeUtil {
      *             ietf-yang-library module
      */
     private static void addChildOfModuleBySpecificModuleInternal(final QName specifiLeafQName,
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final Object value, final Module ietfYangLibraryModule) {
         final DataSchemaNode nameLeaf = findNodeInInternGroupings(specifiLeafQName, ietfYangLibraryModule);
         mapEntryBuilder.withChild(Builders.leafBuilder((LeafSchemaNode) nameLeaf).withValue(value).build());
@@ -349,7 +349,7 @@ public final class RestconfMappingNodeUtil {
      *             ietf-yang-library module
      */
     private static void addChildOfModuleBySpecificModule(final QName specifiLeafQName,
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
             final Object value, final Module ietfYangLibraryModule) {
         final DataSchemaNode nameLeaf = findNodeInGroupings(specifiLeafQName, ietfYangLibraryModule);
         mapEntryBuilder.withChild(Builders.leafBuilder((LeafSchemaNode) nameLeaf).withValue(value).build());
@@ -384,11 +384,11 @@ public final class RestconfMappingNodeUtil {
             mapCapabilites(final Module monitoringModule) {
         final DataSchemaNode restconfState =
                 monitoringModule.getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME);
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> restStateContBuilder =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> restStateContBuilder =
                 Builders.containerBuilder((ContainerSchemaNode) restconfState);
         final DataSchemaNode capabilitesContSchema =
                 getChildOfCont((ContainerSchemaNode) restconfState, MonitoringModule.CONT_CAPABILITES_QNAME);
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> capabilitesContBuilder =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> capabilitesContBuilder =
                 Builders.containerBuilder((ContainerSchemaNode) capabilitesContSchema);
         final DataSchemaNode leafListCapa = getChildOfCont((ContainerSchemaNode) capabilitesContSchema,
                 MonitoringModule.LEAF_LIST_CAPABILITY_QNAME);
@@ -484,7 +484,7 @@ public final class RestconfMappingNodeUtil {
                         .getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME))
                                 .getDataChildByName(MonitoringModule.CONT_STREAMS_QNAME))
                                         .getDataChildByName(MonitoringModule.LIST_STREAM_QNAME);
-                final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
+                final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
                         Builders.mapEntryBuilder((ListSchemaNode) streamListSchema);
 
                 final ListSchemaNode listSchema = (ListSchemaNode) streamListSchema;
@@ -525,10 +525,10 @@ public final class RestconfMappingNodeUtil {
     }
 
     private static void prepareListAndFillEntryBuilder(
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry,
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry,
             final ListSchemaNode listSchemaNode, final String outputType, final URI uriToWebsocketServer) {
         final CollectionNodeBuilder<MapEntryNode, MapNode> accessListBuilder = Builders.mapBuilder(listSchemaNode);
-        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> entryAccessList =
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> entryAccessList =
                 Builders.mapEntryBuilder(listSchemaNode);
         prepareLeafAndFillEntryBuilder(entryAccessList,
                 listSchemaNode.getDataChildByName(MonitoringModule.LEAF_ENCODING_ACCESS_QNAME), outputType);
@@ -546,7 +546,7 @@ public final class RestconfMappingNodeUtil {
      * @param value         Value
      */
     private static void prepareLeafAndFillEntryBuilder(
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry,
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry,
             final DataSchemaNode leafSchema, final Object value) {
         streamEntry.withChild(Builders.leafBuilder((LeafSchemaNode) leafSchema).withValue(value).build());
     }
@@ -587,7 +587,7 @@ public final class RestconfMappingNodeUtil {
                 .getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME))
                         .getDataChildByName(MonitoringModule.CONT_STREAMS_QNAME))
                                 .getDataChildByName(MonitoringModule.LIST_STREAM_QNAME);
-        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
                 Builders.mapEntryBuilder((ListSchemaNode) streamListSchema);
 
         final ListSchemaNode listSchema = (ListSchemaNode) streamListSchema;
