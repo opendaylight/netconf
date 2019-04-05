@@ -275,7 +275,7 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
         try {
             return devicesFuture.get().orNull();
         } catch (ExecutionException | InterruptedException e) {
-            LOG.error("Error trying to read the whitelist devices: {}", e);
+            LOG.error("Error trying to read the whitelist devices", e);
             return null;
         }
     }
