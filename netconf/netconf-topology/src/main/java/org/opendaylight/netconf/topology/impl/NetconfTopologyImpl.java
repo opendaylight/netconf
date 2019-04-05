@@ -105,7 +105,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
 
             @Override
             public void onFailure(final Throwable throwable) {
-                LOG.error("Unable to initialize netconf-topology, {}", throwable);
+                LOG.error("Unable to initialize netconf-topology", throwable);
             }
         }, MoreExecutors.directExecutor());
 
