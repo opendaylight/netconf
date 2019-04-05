@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.rest.impl;
 
 import com.google.common.base.Preconditions;
@@ -57,7 +56,7 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStr
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -131,7 +130,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
 
         Preconditions.checkState(errorsSchemaNode instanceof ContainerSchemaNode,
                 "Found Errors SchemaNode isn't ContainerNode");
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> errContBuild =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> errContBuild =
                 Builders.containerBuilder((ContainerSchemaNode) errorsSchemaNode);
 
         final List<DataSchemaNode> schemaList = ControllerContext.findInstanceDataChildrenByName(errorsSchemaNode,
@@ -165,7 +164,7 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         Preconditions.checkArgument(errListSchemaNode instanceof ListSchemaNode,
                 "errListSchemaNode has to be of type ListSchemaNode");
         final ListSchemaNode listStreamSchemaNode = (ListSchemaNode) errListSchemaNode;
-        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> errNodeValues = Builders
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> errNodeValues = Builders
                 .mapEntryBuilder(listStreamSchemaNode);
 
         List<DataSchemaNode> lsChildDataSchemaNode = ControllerContext.findInstanceDataChildrenByName(

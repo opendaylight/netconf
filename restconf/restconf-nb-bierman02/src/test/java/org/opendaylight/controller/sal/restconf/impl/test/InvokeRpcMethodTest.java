@@ -56,8 +56,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
@@ -135,13 +135,13 @@ public class InvokeRpcMethodTest {
         }
         assertNotNull(rpcInputSchemaNode);
 
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> container =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> container =
                 Builders.containerBuilder(rpcInputSchemaNode);
 
         final QName contQName = QName.create(rpcModule.getQNameModule(), "cont");
         final DataSchemaNode contSchemaNode = rpcInputSchemaNode.getDataChildByName(contQName);
         assertTrue(contSchemaNode instanceof ContainerSchemaNode);
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> contNode =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> contNode =
                 Builders.containerBuilder((ContainerSchemaNode) contSchemaNode);
 
         final QName lfQName = QName.create(rpcModule.getQNameModule(), "lf");
@@ -291,7 +291,7 @@ public class InvokeRpcMethodTest {
 
         assertNotNull(rpcDef);
         assertNotNull(rpcInputSchemaNode);
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> containerBuilder =
                 Builders.containerBuilder(rpcInputSchemaNode);
 
         final NormalizedNodeContext payload =
@@ -338,12 +338,12 @@ public class InvokeRpcMethodTest {
         }
         assertNotNull(rpcDef);
         assertNotNull(rpcOutputSchemaNode);
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> containerBuilder =
                 Builders.containerBuilder(rpcOutputSchemaNode);
         final DataSchemaNode leafSchema = rpcOutputSchemaNode
                 .getDataChildByName(QName.create(rpcModule.getQNameModule(), "textOut"));
         assertTrue(leafSchema instanceof LeafSchemaNode);
-        final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
+        final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                 Builders.leafBuilder((LeafSchemaNode) leafSchema);
         leafBuilder.withValue("brm");
         containerBuilder.withChild(leafBuilder.build());

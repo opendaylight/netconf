@@ -95,9 +95,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.tree.ModifiedNodeDoesNotE
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -196,7 +196,7 @@ public final class RestconfImpl implements RestconfService {
                 restconfModule, Draft02.RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
         Preconditions.checkState(modulesSchemaNode instanceof ContainerSchemaNode);
 
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> moduleContainerBuilder =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> moduleContainerBuilder =
                 Builders.containerBuilder((ContainerSchemaNode) modulesSchemaNode);
         moduleContainerBuilder.withChild(allModuleMap);
 
@@ -228,7 +228,7 @@ public final class RestconfImpl implements RestconfService {
                 restconfModule, Draft02.RestConfModule.MODULES_CONTAINER_SCHEMA_NODE);
         Preconditions.checkState(modulesSchemaNode instanceof ContainerSchemaNode);
 
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> moduleContainerBuilder =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> moduleContainerBuilder =
                 Builders.containerBuilder((ContainerSchemaNode) modulesSchemaNode);
         moduleContainerBuilder.withChild(mountPointModulesMap);
 
@@ -297,7 +297,7 @@ public final class RestconfImpl implements RestconfService {
                 restconfModule, Draft02.RestConfModule.STREAMS_CONTAINER_SCHEMA_NODE);
         Preconditions.checkState(streamsContainerSchemaNode instanceof ContainerSchemaNode);
 
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> streamsContainerBuilder =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> streamsContainerBuilder =
                 Builders.containerBuilder((ContainerSchemaNode) streamsContainerSchemaNode);
         streamsContainerBuilder.withChild(listStreamsBuilder.build());
 
@@ -362,7 +362,7 @@ public final class RestconfImpl implements RestconfService {
         }
 
         final ContainerSchemaNode fakeCont = new FakeContainerSchemaNode(fakeRpcSchema);
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> containerBuilder =
                 Builders.containerBuilder(fakeCont);
 
         for (final LeafSchemaNode leaf : fakeRpcSchema) {
@@ -1119,7 +1119,7 @@ public final class RestconfImpl implements RestconfService {
         if (response != null) {
             // prepare node with value of location
             final InstanceIdentifierContext<?> iid = prepareIIDSubsStreamOutput();
-            final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> builder =
+            final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> builder =
                     ImmutableLeafNodeBuilder.create().withValue(response.toString());
             builder.withNodeIdentifier(
                     NodeIdentifier.create(QName.create("subscribe:to:notification", "2016-10-28", "location")));
@@ -1398,7 +1398,7 @@ public final class RestconfImpl implements RestconfService {
         Preconditions.checkArgument(moduleSchemaNode instanceof ListSchemaNode,
                 "moduleSchemaNode has to be of type ListSchemaNode");
         final ListSchemaNode listModuleSchemaNode = (ListSchemaNode) moduleSchemaNode;
-        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> moduleNodeValues =
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> moduleNodeValues =
                 Builders.mapEntryBuilder(listModuleSchemaNode);
 
         List<DataSchemaNode> instanceDataChildrenByName =
@@ -1444,7 +1444,7 @@ public final class RestconfImpl implements RestconfService {
         Preconditions.checkArgument(streamSchemaNode instanceof ListSchemaNode,
                 "streamSchemaNode has to be of type ListSchemaNode");
         final ListSchemaNode listStreamSchemaNode = (ListSchemaNode) streamSchemaNode;
-        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamNodeValues =
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamNodeValues =
                 Builders.mapEntryBuilder(listStreamSchemaNode);
 
         List<DataSchemaNode> instanceDataChildrenByName =
