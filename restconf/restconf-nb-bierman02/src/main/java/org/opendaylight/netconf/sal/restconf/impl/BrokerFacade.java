@@ -77,8 +77,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -556,13 +556,13 @@ public class BrokerFacade implements Closeable {
         final DataSchemaContextTree baseSchemaCtxTree = DataSchemaContextTree.from(ctx);
         final DataSchemaNode baseSchemaNode = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
         if (result instanceof ContainerNode) {
-            final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder =
+            final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder =
                     Builders.containerBuilder((ContainerSchemaNode) baseSchemaNode);
             buildCont(builder, (ContainerNode) result, baseSchemaCtxTree, path, trim);
             return builder.build();
         }
 
-        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder =
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder =
                 Builders.mapEntryBuilder((ListSchemaNode) baseSchemaNode);
         buildMapEntryBuilder(builder, (MapEntryNode) result, baseSchemaCtxTree, path, trim,
             ((ListSchemaNode) baseSchemaNode).getKeyDefinition());
@@ -570,14 +570,14 @@ public class BrokerFacade implements Closeable {
     }
 
     private void buildMapEntryBuilder(
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder,
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder,
             final MapEntryNode result, final DataSchemaContextTree baseSchemaCtxTree,
             final YangInstanceIdentifier actualPath, final boolean trim, final List<QName> keys) {
         for (final DataContainerChild<? extends PathArgument, ?> child : result.getValue()) {
             final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
             final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
             if (child instanceof ContainerNode) {
-                final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> childBuilder =
+                final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> childBuilder =
                         Builders.containerBuilder((ContainerSchemaNode) childSchema);
                 buildCont(childBuilder, (ContainerNode) child, baseSchemaCtxTree, path, trim);
                 builder.withChild(childBuilder.build());
@@ -590,7 +590,7 @@ public class BrokerFacade implements Closeable {
             } else if (child instanceof LeafNode) {
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
                 final Object nodeVal = child.getValue();
-                final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
+                final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (keys.contains(child.getNodeType())) {
                     leafBuilder.withValue(child.getValue());
@@ -618,21 +618,21 @@ public class BrokerFacade implements Closeable {
         for (final MapEntryNode mapEntryNode : result.getValue()) {
             final YangInstanceIdentifier actualNode = path.node(mapEntryNode.getIdentifier());
             final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(actualNode).getDataSchemaNode();
-            final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
+            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder =
                     Builders.mapEntryBuilder((ListSchemaNode) childSchema);
             buildMapEntryBuilder(mapEntryBuilder, mapEntryNode, baseSchemaCtxTree, actualNode, trim, keys);
             builder.withChild(mapEntryBuilder.build());
         }
     }
 
-    private void buildCont(final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder,
+    private void buildCont(final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder,
             final ContainerNode result, final DataSchemaContextTree baseSchemaCtxTree,
             final YangInstanceIdentifier actualPath, final boolean trim) {
         for (final DataContainerChild<? extends PathArgument, ?> child : result.getValue()) {
             final YangInstanceIdentifier path = actualPath.node(child.getIdentifier());
             final DataSchemaNode childSchema = baseSchemaCtxTree.getChild(path).getDataSchemaNode();
             if (child instanceof ContainerNode) {
-                final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builderChild =
+                final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builderChild =
                         Builders.containerBuilder((ContainerSchemaNode) childSchema);
                 buildCont(builderChild, result, baseSchemaCtxTree, actualPath, trim);
                 builder.withChild(builderChild.build());
@@ -645,7 +645,7 @@ public class BrokerFacade implements Closeable {
             } else if (child instanceof LeafNode) {
                 final Object defaultVal = ((LeafSchemaNode) childSchema).getType().getDefaultValue().orElse(null);
                 final Object nodeVal = child.getValue();
-                final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
+                final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafBuilder =
                         Builders.leafBuilder((LeafSchemaNode) childSchema);
                 if (trim) {
                     if (defaultVal == null || !defaultVal.equals(nodeVal)) {

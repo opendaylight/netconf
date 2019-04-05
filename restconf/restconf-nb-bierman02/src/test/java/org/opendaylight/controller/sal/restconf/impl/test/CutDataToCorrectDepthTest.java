@@ -57,7 +57,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -237,7 +237,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
     }
 
     private static ContainerNode container(final String localName, final DataContainerChild<?, ?>... children) {
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> containerBuilder =
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> containerBuilder =
                 Builders.containerBuilder();
         for (final DataContainerChild<?, ?> child : children) {
             containerBuilder.withChild(child);
@@ -260,7 +260,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
 
     private static UnkeyedListEntryNode unkeyedEntry(final String localName,
                                                      final DataContainerChild<?, ?>... children) {
-        final DataContainerNodeAttrBuilder<NodeIdentifier, UnkeyedListEntryNode> builder =
+        final DataContainerNodeBuilder<NodeIdentifier, UnkeyedListEntryNode> builder =
                 Builders.unkeyedListEntryBuilder();
         builder.withNodeIdentifier(toIdentifier(localName));
         for (final DataContainerChild<?, ?> child : children) {
@@ -280,7 +280,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
 
     private static MapEntryNode mapEntryNode(final String localName, final int keysNumber,
                                              final DataContainerChild<?, ?>... children) {
-        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder =
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder =
                 Builders.mapEntryBuilder();
         final Map<QName, Object> keys = new HashMap<>();
         for (int i = 0; i < keysNumber; i++) {
