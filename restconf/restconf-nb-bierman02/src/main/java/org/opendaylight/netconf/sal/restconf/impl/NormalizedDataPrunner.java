@@ -30,7 +30,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 
 class NormalizedDataPrunner {
@@ -68,7 +67,7 @@ class NormalizedDataPrunner {
 
     private DataContainerChild<?, ?> processContainerNode(final NormalizedNode<?, ?> node, final Integer depth) {
         final ContainerNode containerNode = (ContainerNode) node;
-        DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> newContainerBuilder = Builders.containerBuilder()
+        DataContainerNodeBuilder<NodeIdentifier, ContainerNode> newContainerBuilder = Builders.containerBuilder()
                 .withNodeIdentifier(containerNode.getIdentifier());
         if (depth > 1) {
             processDataContainerChild((DataContainerNode<?>) node, depth, newContainerBuilder);
@@ -113,7 +112,7 @@ class NormalizedDataPrunner {
                 .unkeyedListBuilder();
         if (depth > 1) {
             for (UnkeyedListEntryNode oldUnkeyedListEntry : ((UnkeyedListNode) node).getValue()) {
-                DataContainerNodeAttrBuilder<NodeIdentifier, UnkeyedListEntryNode> newUnkeyedListEntry = Builders
+                DataContainerNodeBuilder<NodeIdentifier, UnkeyedListEntryNode> newUnkeyedListEntry = Builders
                         .unkeyedListEntryBuilder().withNodeIdentifier(oldUnkeyedListEntry.getIdentifier());
                 for (DataContainerChild<? extends PathArgument, ?> oldUnkeyedListEntryValue : oldUnkeyedListEntry
                         .getValue()) {
@@ -138,10 +137,10 @@ class NormalizedDataPrunner {
     }
 
     private void processMapEntries(final NormalizedNode<?, ?> node, final Integer depth,
-            CollectionNodeBuilder<MapEntryNode, ? extends MapNode> newOrderedMapNodeBuilder) {
+            final CollectionNodeBuilder<MapEntryNode, ? extends MapNode> newOrderedMapNodeBuilder) {
         if (depth > 1) {
             for (MapEntryNode oldMapEntryNode : ((MapNode) node).getValue()) {
-                DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> newMapEntryNodeBuilder =
+                DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> newMapEntryNodeBuilder =
                         Builders.mapEntryBuilder().withNodeIdentifier(oldMapEntryNode.getIdentifier());
                 for (DataContainerChild<? extends PathArgument, ?> mapEntryNodeValue : oldMapEntryNode.getValue()) {
                     newMapEntryNodeBuilder.withChild(pruneDataAtDepth(mapEntryNodeValue, depth - 1));
@@ -150,6 +149,4 @@ class NormalizedDataPrunner {
             }
         }
     }
-
-
 }

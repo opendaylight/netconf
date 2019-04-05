@@ -33,7 +33,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.SubscribeToStreamUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
@@ -95,7 +95,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
             // prepare node with value of location
             final InstanceIdentifierContext<?> iid =
                     SubscribeToStreamUtil.prepareIIDSubsStreamOutput(this.handlersHolder.getSchemaHandler());
-            final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> builder =
+            final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> builder =
                     ImmutableLeafNodeBuilder.create().withValue(response.toString());
             builder.withNodeIdentifier(
                     NodeIdentifier.create(QName.create("subscribe:to:notification", "2016-10-28", "location")));

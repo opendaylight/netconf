@@ -45,8 +45,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.valid.DataValidationException;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
@@ -174,7 +174,7 @@ public class RestPutListDataTest {
         final DataSchemaNode testNodeSchemaNode = schemaContextTestModule.getDataChildByName(lstWithCompositeKey);
         assertTrue(testNodeSchemaNode != null);
         assertTrue(testNodeSchemaNode instanceof ListSchemaNode);
-        final DataContainerNodeAttrBuilder<NodeIdentifierWithPredicates, MapEntryNode> testNodeContainer =
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> testNodeContainer =
                 Builders.mapEntryBuilder((ListSchemaNode) testNodeSchemaNode);
 
         List<DataSchemaNode> testChildren = ControllerContext.findInstanceDataChildrenByName(
@@ -183,7 +183,7 @@ public class RestPutListDataTest {
         final DataSchemaNode testLeafKey1SchemaNode = Iterables.getFirst(testChildren, null);
         assertTrue(testLeafKey1SchemaNode != null);
         assertTrue(testLeafKey1SchemaNode instanceof LeafSchemaNode);
-        final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafKey1 =
+        final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafKey1 =
                 Builders.leafBuilder((LeafSchemaNode) testLeafKey1SchemaNode);
         leafKey1.withValue(payloadKey1);
         testNodeContainer.withChild(leafKey1.build());
@@ -195,7 +195,7 @@ public class RestPutListDataTest {
             final DataSchemaNode testLeafKey2SchemaNode = Iterables.getFirst(testChildren, null);
             assertTrue(testLeafKey2SchemaNode != null);
             assertTrue(testLeafKey2SchemaNode instanceof LeafSchemaNode);
-            final NormalizedNodeAttrBuilder<NodeIdentifier, Object, LeafNode<Object>> leafKey2 =
+            final NormalizedNodeBuilder<NodeIdentifier, Object, LeafNode<Object>> leafKey2 =
                     Builders.leafBuilder((LeafSchemaNode) testLeafKey2SchemaNode);
             leafKey2.withValue(payloadKey2);
             testNodeContainer.withChild(leafKey2.build());
@@ -222,5 +222,4 @@ public class RestPutListDataTest {
         }
         return uriBuilder.toString();
     }
-
 }

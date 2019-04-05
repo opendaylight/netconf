@@ -29,7 +29,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -98,15 +98,15 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
 
         assertTrue(schemaContNode instanceof ContainerSchemaNode);
 
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> dataContSchemaContNode = Builders
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataContSchemaContNode = Builders
                 .containerBuilder((ContainerSchemaNode) schemaContNode);
 
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> modul1 = buildContBuilderMod1(
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> modul1 = buildContBuilderMod1(
                 "module:one", rev, "cont_m1", "contB_m1", "lf1_m1",
                 "lf1 m1 value");
         dataContSchemaContNode.withChild(modul1.build());
 
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> modul2 = buildContBuilderMod1(
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> modul2 = buildContBuilderMod1(
                 "module:two", rev, "cont_m2", "contB_m2", "lf1_m2",
                 "lf1 m2 value");
         dataContSchemaContNode.withChild(modul2.build());
@@ -119,7 +119,7 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
         return testNormalizedNodeContext;
     }
 
-    private static DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> buildContBuilderMod1(
+    private static DataContainerNodeBuilder<NodeIdentifier, ContainerNode> buildContBuilderMod1(
             final String uri, final String rev, final String cont, final String contB, final String lf1,
             final String lf1Value) {
         final QName contQname = QName.create(uri, rev, cont);
@@ -128,7 +128,7 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
 
         final DataSchemaNode contSchemaNode = schemaContext
                 .getDataChildByName(contQname);
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> dataContainerNodeAttrBuilder = Builders
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataContainerNodeAttrBuilder = Builders
                 .containerBuilder((ContainerSchemaNode) contSchemaNode);
 
         Preconditions.checkState(contSchemaNode instanceof ContainerSchemaNode);
@@ -145,7 +145,7 @@ public class NnToXmlWithDataFromSeveralModulesTest extends
         final DataSchemaNode contBSchemaNode = ((ContainerSchemaNode) contSchemaNode)
                 .getDataChildByName(contBQname);
 
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> dataContainerB = Builders
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> dataContainerB = Builders
                 .containerBuilder((ContainerSchemaNode) contBSchemaNode);
 
         return dataContainerNodeAttrBuilder.withChild(dataContainerB.build());
