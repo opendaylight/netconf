@@ -77,7 +77,7 @@ public class WriteCandidateTx extends AbstractWriteTx {
 
             @Override
             public void onFailure(final Throwable throwable) {
-                LOG.warn("Lock candidate operation failed. {}", throwable);
+                LOG.warn("Lock candidate operation failed", throwable);
                 discardChanges();
             }
         };
