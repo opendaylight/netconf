@@ -73,7 +73,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
         // We do not support actions in clustered topology yet
         if (domActionService != null) {
             LOG.warn("{}: YANG 1.1 actions are not supported in clustered netconf topology, "
-                    + "DOMActionService will not be exposed for the device");
+                    + "DOMActionService will not be exposed for the device", id);
         }
 
         onDeviceConnected(remoteSchemaContext, sessionPreferences, domRpcService);

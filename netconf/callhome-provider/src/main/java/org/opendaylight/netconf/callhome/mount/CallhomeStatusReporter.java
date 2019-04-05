@@ -266,15 +266,15 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
         commit(tx, device.key());
     }
 
-    private static void commit(WriteTransaction tx, DeviceKey device) {
+    private static void commit(final WriteTransaction tx, final DeviceKey device) {
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
-            public void onSuccess(CommitInfo result) {
+            public void onSuccess(final CommitInfo result) {
                 LOG.debug("Device {} committed", device);
             }
 
             @Override
-            public void onFailure(Throwable cause) {
+            public void onFailure(final Throwable cause) {
                 LOG.warn("Failed to commit device {}", device, cause);
             }
         }, MoreExecutors.directExecutor());
@@ -287,7 +287,7 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
         try {
             return devicesFuture.get().orElse(null);
         } catch (ExecutionException | InterruptedException e) {
-            LOG.error("Error trying to read the whitelist devices: {}", e);
+            LOG.error("Error trying to read the whitelist devices", e);
             return null;
         }
     }

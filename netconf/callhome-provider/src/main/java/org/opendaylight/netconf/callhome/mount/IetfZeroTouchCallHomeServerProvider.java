@@ -170,7 +170,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
                 readAndUpdateStatus(confDevice);
             }
         } catch (ExecutionException | InterruptedException e) {
-            LOG.error("Error trying to read the whitelist devices: {}", e);
+            LOG.error("Error trying to read the whitelist devices", e);
         }
     }
 
@@ -188,12 +188,12 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
 
         opTx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
-            public void onSuccess(CommitInfo result) {
+            public void onSuccess(final CommitInfo result) {
                 LOG.debug("Device deletions committed");
             }
 
             @Override
-            public void onFailure(Throwable cause) {
+            public void onFailure(final Throwable cause) {
                 LOG.warn("Failed to commit device deletions", cause);
             }
         }, MoreExecutors.directExecutor());
@@ -204,7 +204,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         return devicesFuture.get().map(AllowedDevices::getDevice).orElse(Collections.emptyList());
     }
 
-    private void readAndUpdateStatus(Device cfgDevice) throws InterruptedException, ExecutionException {
+    private void readAndUpdateStatus(final Device cfgDevice) throws InterruptedException, ExecutionException {
         InstanceIdentifier<Device> deviceIID = InstanceIdentifier.create(NetconfCallhomeServer.class)
                 .child(AllowedDevices.class).child(Device.class, new DeviceKey(cfgDevice.getUniqueId()));
 
@@ -224,12 +224,12 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
             .setUniqueId(cfgDevice.getUniqueId()).build());
         tx.commit().addCallback(new FutureCallback<CommitInfo>() {
             @Override
-            public void onSuccess(CommitInfo result) {
+            public void onSuccess(final CommitInfo result) {
                 LOG.debug("Device {} status update committed", cfgDevice.key());
             }
 
             @Override
-            public void onFailure(Throwable cause) {
+            public void onFailure(final Throwable cause) {
                 LOG.warn("Failed to commit device {} status update", cfgDevice.key(), cause);
             }
         }, MoreExecutors.directExecutor());
