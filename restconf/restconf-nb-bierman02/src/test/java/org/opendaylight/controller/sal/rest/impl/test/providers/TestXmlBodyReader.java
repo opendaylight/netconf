@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.sal.rest.impl.test.providers;
 
 import static org.junit.Assert.assertEquals;
@@ -18,6 +17,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Optional;
 import javax.ws.rs.core.MediaType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -205,13 +205,13 @@ public class TestXmlBodyReader extends AbstractBodyReaderTest {
         checkNormalizedNodeContext(returnValue);
         final ContainerNode contNode = (ContainerNode) returnValue.getData();
         final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(QName.create(contNode.getNodeType(), "cont"));
-        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> contDataNodePotential = contNode
+        final Optional<DataContainerChild<? extends PathArgument, ?>> contDataNodePotential = contNode
                 .getChild(yangCont.getLastPathArgument());
         assertTrue(contDataNodePotential.isPresent());
         final ContainerNode contDataNode = (ContainerNode) contDataNodePotential.get();
         final YangInstanceIdentifier yangLeaf =
                 YangInstanceIdentifier.of(QName.create(contDataNode.getNodeType(), "lf"));
-        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = contDataNode.getChild(
+        final Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode = contDataNode.getChild(
             yangLeaf.getLastPathArgument());
         assertTrue(leafDataNode.isPresent());
         assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue().toString()));

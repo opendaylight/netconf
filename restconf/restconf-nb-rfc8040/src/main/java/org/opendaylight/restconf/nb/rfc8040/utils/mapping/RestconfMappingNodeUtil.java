@@ -492,7 +492,7 @@ public final class RestconfMappingNodeUtil {
                         listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME),
                         notificationDefinition.getQName().getLocalName());
 
-                final java.util.Optional<String> optDesc = notificationDefinition.getDescription();
+                final Optional<String> optDesc = notificationDefinition.getDescription();
                 if (optDesc.isPresent()) {
                     prepareLeafAndFillEntryBuilder(streamEntry,
                             listSchema.getDataChildByName(MonitoringModule.LEAF_DESCR_STREAM_QNAME), optDesc.get());
@@ -595,7 +595,7 @@ public final class RestconfMappingNodeUtil {
                 listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME),
                 schemaNode.getQName().getLocalName());
 
-        final java.util.Optional<String> optDesc = schemaNode.getDescription();
+        final Optional<String> optDesc = schemaNode.getDescription();
         if (optDesc.isPresent()) {
             prepareLeafAndFillEntryBuilder(streamEntry,
                     listSchema.getDataChildByName(MonitoringModule.LEAF_DESCR_STREAM_QNAME), optDesc.get());

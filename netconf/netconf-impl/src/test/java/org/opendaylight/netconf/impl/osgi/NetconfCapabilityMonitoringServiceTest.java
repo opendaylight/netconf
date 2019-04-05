@@ -90,14 +90,14 @@ public class NetconfCapabilityMonitoringServiceTest {
 
         doReturn(new URI(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock).getNamespace();
         doReturn(TEST_MODULE_NAME).when(moduleMock).getName();
-        doReturn(java.util.Optional.of(TEST_MODULE_DATE)).when(moduleMock).getRevision();
+        doReturn(Optional.of(TEST_MODULE_DATE)).when(moduleMock).getRevision();
         moduleCapability1 = new YangModuleCapability(moduleMock, TEST_MODULE_CONTENT);
 
         capabilities.add(moduleCapability1);
 
         doReturn(new URI(TEST_MODULE_NAMESPACE.getValue())).when(moduleMock2).getNamespace();
         doReturn(TEST_MODULE_NAME).when(moduleMock2).getName();
-        doReturn(java.util.Optional.of(TEST_MODULE_DATE2)).when(moduleMock2).getRevision();
+        doReturn(Optional.of(TEST_MODULE_DATE2)).when(moduleMock2).getRevision();
         moduleCapability2 = new YangModuleCapability(moduleMock2, TEST_MODULE_CONTENT2);
 
         capabilities.add(new BasicCapability("urn:ietf:params:netconf:base:1.0"));

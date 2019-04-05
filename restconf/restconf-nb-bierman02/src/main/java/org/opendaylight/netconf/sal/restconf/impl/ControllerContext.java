@@ -852,7 +852,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
     }
 
     private QName toQName(final SchemaContext schemaContext, final String name,
-            final java.util.Optional<Revision> revisionDate) {
+            final Optional<Revision> revisionDate) {
         checkPreconditions();
         final String module = toModuleName(name);
         final String node = toNodeName(name);
@@ -872,7 +872,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         return node instanceof ListSchemaNode || node instanceof ContainerSchemaNode;
     }
 
-    public RpcDefinition getRpcDefinition(final String name, final java.util.Optional<Revision> revisionDate) {
+    public RpcDefinition getRpcDefinition(final String name, final Optional<Revision> revisionDate) {
         final QName validName = toQName(this.globalSchema, name, revisionDate);
         return validName == null ? null : this.qnameToRpc.get().get(validName);
     }

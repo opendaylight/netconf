@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import org.json.XML;
@@ -183,7 +184,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
             final YangInstanceIdentifier parentYiid, final SchemaContext schemaContext,
             final DataSchemaContextTree dataSchemaContextTree) {
 
-        java.util.Optional<NormalizedNode<?,?>> optionalNormalizedNode = java.util.Optional.empty();
+        Optional<NormalizedNode<?,?>> optionalNormalizedNode = Optional.empty();
         switch (candidateNode.getModificationType()) {
             case APPEARED:
             case SUBTREE_MODIFIED:

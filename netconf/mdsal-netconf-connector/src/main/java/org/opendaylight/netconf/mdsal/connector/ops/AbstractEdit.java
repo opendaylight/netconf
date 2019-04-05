@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import com.google.common.collect.ImmutableMap;
@@ -13,6 +12,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.DocumentedException.ErrorSeverity;
@@ -83,8 +83,8 @@ abstract class AbstractEdit extends AbstractConfigOperation {
 
         final Module module = it.next();
         final String elementName = element.getName();
-        final java.util.Optional<DataSchemaNode> schemaNode =
-            module.findDataChildByName(QName.create(module.getQNameModule(), element.getName()));
+        final Optional<DataSchemaNode> schemaNode = module.findDataChildByName(QName.create(module.getQNameModule(),
+                    element.getName()));
         if (!schemaNode.isPresent()) {
             throw new DocumentedException(
                 "Unable to find node " + elementName + " with namespace: " + namespace + "in module: "

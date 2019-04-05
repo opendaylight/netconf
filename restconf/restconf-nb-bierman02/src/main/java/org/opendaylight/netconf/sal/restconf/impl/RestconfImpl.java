@@ -612,7 +612,7 @@ public final class RestconfImpl implements RestconfService {
     private ListenableFuture<DOMRpcResult> invokeSalRemoteRpcSubscribeRPC(final NormalizedNodeContext payload) {
         final ContainerNode value = (ContainerNode) payload.getData();
         final QName rpcQName = payload.getInstanceIdentifierContext().getSchemaNode().getQName();
-        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> path = value.getChild(
+        final Optional<DataContainerChild<? extends PathArgument, ?>> path = value.getChild(
             new NodeIdentifier(QName.create(payload.getInstanceIdentifierContext().getSchemaNode().getQName(),
                 "path")));
         final Object pathValue = path.isPresent() ? path.get().getValue() : null;
@@ -1216,8 +1216,7 @@ public final class RestconfImpl implements RestconfService {
 
         for (final NotificationListenerAdapter listener : listeners) {
             this.broker.registerToListenNotification(listener);
-            listener.setQueryParams(start,
-                    java.util.Optional.ofNullable(stop), java.util.Optional.ofNullable(filter), false);
+            listener.setQueryParams(start, Optional.ofNullable(stop), Optional.ofNullable(filter), false);
         }
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
@@ -1267,8 +1266,7 @@ public final class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("Stream was not found.", ErrorType.PROTOCOL,
                     ErrorTag.UNKNOWN_ELEMENT);
         }
-        listener.setQueryParams(start, java.util.Optional.ofNullable(stop),
-                java.util.Optional.ofNullable(filter), leafNodesOnly);
+        listener.setQueryParams(start, Optional.ofNullable(stop), Optional.ofNullable(filter), leafNodesOnly);
 
         final Map<String, String> paramToValues = resolveValuesFromUri(identifier);
         final LogicalDatastoreType datastore =
@@ -1337,7 +1335,7 @@ public final class RestconfImpl implements RestconfService {
      */
     private static <T> T parseEnumTypeParameter(final ContainerNode value, final Class<T> classDescriptor,
             final String paramName) {
-        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> optAugNode = value.getChild(
+        final Optional<DataContainerChild<? extends PathArgument, ?>> optAugNode = value.getChild(
             SAL_REMOTE_AUG_IDENTIFIER);
         if (!optAugNode.isPresent()) {
             return null;
@@ -1346,8 +1344,8 @@ public final class RestconfImpl implements RestconfService {
         if (!(augNode instanceof AugmentationNode)) {
             return null;
         }
-        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> enumNode = ((AugmentationNode) augNode)
-            .getChild(new NodeIdentifier(QName.create(SAL_REMOTE_AUGMENT, paramName)));
+        final Optional<DataContainerChild<? extends PathArgument, ?>> enumNode = ((AugmentationNode) augNode).getChild(
+                new NodeIdentifier(QName.create(SAL_REMOTE_AUGMENT, paramName)));
         if (!enumNode.isPresent()) {
             return null;
         }
@@ -1433,7 +1431,7 @@ public final class RestconfImpl implements RestconfService {
                 ControllerContext.findInstanceDataChildrenByName(listModuleSchemaNode, "revision");
         final DataSchemaNode revisionSchemaNode = Iterables.getFirst(instanceDataChildrenByName, null);
         Preconditions.checkState(revisionSchemaNode instanceof LeafSchemaNode);
-        final java.util.Optional<Revision> revision = qNameModule.getRevision();
+        final Optional<Revision> revision = qNameModule.getRevision();
         moduleNodeValues.withChild(Builders.leafBuilder((LeafSchemaNode) revisionSchemaNode)
                 .withValue(revision.map(Revision::toString).orElse("")).build());
 

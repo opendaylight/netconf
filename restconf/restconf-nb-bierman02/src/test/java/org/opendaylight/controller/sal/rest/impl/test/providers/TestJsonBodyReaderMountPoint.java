@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Optional;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -115,13 +116,13 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
         final ContainerNode inputNode = (ContainerNode) returnValue.getData();
         final YangInstanceIdentifier yangCont = YangInstanceIdentifier.of(QName
                 .create(inputNode.getNodeType(), "cont"));
-        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> contDataNode = inputNode
+        final Optional<DataContainerChild<? extends PathArgument, ?>> contDataNode = inputNode
                 .getChild(yangCont.getLastPathArgument());
         assertTrue(contDataNode.isPresent());
         assertTrue(contDataNode.get() instanceof ContainerNode);
         final YangInstanceIdentifier yangleaf = YangInstanceIdentifier.of(QName
                 .create(inputNode.getNodeType(), "lf"));
-        final java.util.Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode =
+        final Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode =
                 ((ContainerNode) contDataNode.get()).getChild(yangleaf.getLastPathArgument());
         assertTrue(leafDataNode.isPresent());
         assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue()

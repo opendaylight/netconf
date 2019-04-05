@@ -171,7 +171,7 @@ public final class CopyConfig extends AbstractEdit {
         final DOMDataTreeReadWriteTransaction rwTx = getTransaction(sourceDatastore);
         final YangInstanceIdentifier dataRoot = YangInstanceIdentifier.EMPTY;
         try {
-            final java.util.Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(
+            final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(
                 LogicalDatastoreType.CONFIGURATION, dataRoot).get();
             if (sourceDatastore == Datastore.running) {
                 transactionProvider.abortRunningTransaction(rwTx);

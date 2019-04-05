@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,7 +54,7 @@ public class ApiDocServiceImplTest {
         when(mountPoint.getSchemaContext()).thenReturn(context);
 
         final DOMMountPointService service = mock(DOMMountPointService.class);
-        when(service.getMountPoint(INSTANCE_ID)).thenReturn(java.util.Optional.of(mountPoint));
+        when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
         MountPointSwaggerGeneratorDraft02 swagger =
                 new MountPointSwaggerGeneratorDraft02(schemaService, service);
         swagger.getMountPointSwagger().onMountPointCreated(INSTANCE_ID);
