@@ -9,20 +9,21 @@
 package org.opendaylight.netconf.topology.singleton.messages;
 
 import com.google.common.collect.Iterables;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.Serializable;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
-public class SchemaPathMessage implements Serializable {
+public class SchemaPathMessage implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    @SuppressFBWarnings("SE_BAD_FIELD")
-    private final SchemaPath schemaPath;
+    private SchemaPath schemaPath;
+
+    public SchemaPathMessage(){
+
+    }
 
     public SchemaPathMessage(final SchemaPath schemaPath) {
         this.schemaPath = schemaPath;
@@ -32,54 +33,26 @@ public class SchemaPathMessage implements Serializable {
         return schemaPath;
     }
 
-    private Object writeReplace() {
-        return new Proxy(this);
+    @Override
+    public void writeExternal(final ObjectOutput out) throws IOException {
+        out.writeInt(Iterables.size(schemaPath.getPathTowardsRoot()));
+
+        for (final QName qualifiedName : schemaPath.getPathTowardsRoot()) {
+            out.writeObject(qualifiedName);
+        }
+
+        out.writeBoolean(schemaPath.isAbsolute());
     }
 
     @Override
-    public String toString() {
-        return "SchemaPathMessage [schemaPath=" + schemaPath + "]";
-    }
-
-    private static class Proxy implements Externalizable {
-        private static final long serialVersionUID = 2L;
-
-        private SchemaPathMessage schemaPathMessage;
-
-        @SuppressWarnings("checkstyle:RedundantModifier")
-        public Proxy() {
-            //due to Externalizable
+    public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
+        final int sizePath = in.readInt();
+        final QName[] paths = new QName[sizePath];
+        for (int i = 0; i < sizePath; i++) {
+            paths[i] = (QName) in.readObject();
         }
-
-        Proxy(final SchemaPathMessage schemaPathMessage) {
-            this.schemaPathMessage = schemaPathMessage;
-        }
-
-        @Override
-        public void writeExternal(final ObjectOutput out) throws IOException {
-            out.writeInt(Iterables.size(schemaPathMessage.getSchemaPath().getPathTowardsRoot()));
-
-            for (final QName qualifiedName : schemaPathMessage.getSchemaPath().getPathTowardsRoot()) {
-                out.writeObject(qualifiedName);
-            }
-
-            out.writeBoolean(schemaPathMessage.getSchemaPath().isAbsolute());
-        }
-
-        @Override
-        public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
-            final int sizePath = in.readInt();
-            final QName[] paths = new QName[sizePath];
-            for (int i = 0; i < sizePath; i++) {
-                paths[i] = (QName) in.readObject();
-            }
-            final boolean absolute = in.readBoolean();
-            schemaPathMessage = new SchemaPathMessage(SchemaPath.create(absolute, paths));
-        }
-
-        private Object readResolve() {
-            return schemaPathMessage;
-        }
+        final boolean absolute = in.readBoolean();
+        this.schemaPath = SchemaPath.create(absolute, paths);
     }
 
 }
