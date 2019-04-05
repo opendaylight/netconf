@@ -38,7 +38,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -78,7 +78,7 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
     public static ContainerNode createGetSchemaRequest(final String moduleName, final Optional<String> revision) {
         final LeafNode<?> identifier =
                 Builders.leafBuilder().withNodeIdentifier(IDENTIFIER_PATHARG).withValue(moduleName).build();
-        final DataContainerNodeAttrBuilder<NodeIdentifier, ContainerNode> builder = Builders.containerBuilder()
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> builder = Builders.containerBuilder()
                 .withNodeIdentifier(GET_SCHEMA_PATHARG).withChild(identifier).withChild(FORMAT_LEAF);
 
         if (revision.isPresent()) {

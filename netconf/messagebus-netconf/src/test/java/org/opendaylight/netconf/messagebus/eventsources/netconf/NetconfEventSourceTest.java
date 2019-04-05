@@ -46,7 +46,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeAttrBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -76,7 +76,7 @@ public class NetconfEventSourceTest {
         //init notification mocks
         doReturn(NOTIFICATION_1_PATH).when(matchnigNotification).getType();
         doReturn(NOTIFICATION_2_PATH).when(nonMachtingNotification).getType();
-        DataContainerNodeAttrBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> body = Builders
+        DataContainerNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> body = Builders
                 .containerBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create("ns1",
                         "1970-01-15", "not1data")));
         doReturn(body.build()).when(matchnigNotification).getBody();
