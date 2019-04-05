@@ -5,85 +5,61 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
+
 package org.opendaylight.netconf.topology.singleton.messages.rpc;
 
-import static java.util.Objects.requireNonNull;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
 import org.opendaylight.yangtools.yang.common.RpcError;
 
-public class InvokeRpcMessageReply implements Serializable {
+public class InvokeRpcMessageReply implements Externalizable {
     private static final long serialVersionUID = 1L;
 
-    @SuppressFBWarnings("SE_BAD_FIELD")
-    private final Collection<? extends RpcError> rpcErrors;
-    private final NormalizedNodeMessage normalizedNodeMessage;
+    private Collection<RpcError> rpcErrors;
+    private NormalizedNodeMessage normalizedNodeMessage;
 
-    public InvokeRpcMessageReply(final @Nullable NormalizedNodeMessage normalizedNodeMessage,
-                                 final @NonNull Collection<? extends RpcError> rpcErrors) {
-        this.normalizedNodeMessage = normalizedNodeMessage;
-        this.rpcErrors = requireNonNull(rpcErrors);
+    // Default constructor for deserialization
+    public InvokeRpcMessageReply(){
+
     }
 
-    public @Nullable NormalizedNodeMessage getNormalizedNodeMessage() {
+    public InvokeRpcMessageReply(final NormalizedNodeMessage normalizedNodeMessage,
+                                 final Collection<RpcError> rpcErrors) {
+        this.normalizedNodeMessage = normalizedNodeMessage;
+        this.rpcErrors = rpcErrors;
+    }
+
+    public NormalizedNodeMessage getNormalizedNodeMessage() {
         return normalizedNodeMessage;
     }
 
-    public @NonNull Collection<? extends RpcError> getRpcErrors() {
+    public Collection<RpcError> getRpcErrors() {
         return rpcErrors;
     }
 
-    private Object writeReplace() {
-        return new Proxy(this);
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeInt(rpcErrors.size());
+        for (final RpcError rpcError : rpcErrors) {
+            out.writeObject(rpcError);
+        }
+        out.writeObject(normalizedNodeMessage);
     }
 
-    private static class Proxy implements Externalizable {
-        private static final long serialVersionUID = 2L;
-
-        private InvokeRpcMessageReply invokeRpcMessageReply;
-
-        @SuppressWarnings("checkstyle:RedundantModifier")
-        public Proxy() {
-            //due to Externalizable
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        final int size = in.readInt();
+        final Collection<RpcError> rpcErrors = new LinkedList<>();
+        for (int i = 0; i < size; i++) {
+            rpcErrors.add((RpcError) in.readObject());
         }
-
-        Proxy(final InvokeRpcMessageReply invokeRpcMessageReply) {
-            this.invokeRpcMessageReply = invokeRpcMessageReply;
-        }
-
-        @Override
-        public void writeExternal(final ObjectOutput out) throws IOException {
-            out.writeInt(invokeRpcMessageReply.getRpcErrors().size());
-            for (final RpcError rpcError : invokeRpcMessageReply.getRpcErrors()) {
-                out.writeObject(rpcError);
-            }
-            out.writeObject(invokeRpcMessageReply.getNormalizedNodeMessage());
-        }
-
-        @Override
-        public void readExternal(final ObjectInput in) throws IOException, ClassNotFoundException {
-            final int size = in.readInt();
-            final Collection<RpcError> rpcErrors = new LinkedList<>();
-            for (int i = 0; i < size; i++) {
-                rpcErrors.add((RpcError) in.readObject());
-            }
-            final NormalizedNodeMessage normalizedNodeMessage = (NormalizedNodeMessage) in.readObject();
-            invokeRpcMessageReply = new InvokeRpcMessageReply(normalizedNodeMessage, rpcErrors);
-        }
-
-        private Object readResolve() {
-            return invokeRpcMessageReply;
-        }
+        final NormalizedNodeMessage normalizedNodeMessage = (NormalizedNodeMessage) in.readObject();
+        this.rpcErrors = rpcErrors;
+        this.normalizedNodeMessage = normalizedNodeMessage;
     }
-
 }
