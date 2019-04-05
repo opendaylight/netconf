@@ -168,7 +168,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
                 readAndUpdateStatus(confDevice);
             }
         } catch (ExecutionException | InterruptedException e) {
-            LOG.error("Error trying to read the whitelist devices: {}", e);
+            LOG.error("Error trying to read the whitelist devices", e);
         }
     }
 
@@ -193,7 +193,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         return opt.isPresent() ? opt.get().getDevice() : Collections.emptyList();
     }
 
-    private void readAndUpdateStatus(Device cfgDevice) throws InterruptedException, ExecutionException {
+    private void readAndUpdateStatus(final Device cfgDevice) throws InterruptedException, ExecutionException {
         InstanceIdentifier<Device> deviceIID = InstanceIdentifier.create(NetconfCallhomeServer.class)
                 .child(AllowedDevices.class).child(Device.class, new DeviceKey(cfgDevice.getUniqueId()));
 
