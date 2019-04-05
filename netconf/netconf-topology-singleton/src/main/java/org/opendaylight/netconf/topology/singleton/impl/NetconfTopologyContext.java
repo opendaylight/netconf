@@ -156,7 +156,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
                 @Override
                 public void onComplete(final Throwable failure, final Object success) {
                     if (failure != null) {
-                        LOG.error("Failed to refresh master actor data: {}", failure);
+                        LOG.error("Failed to refresh master actor data", failure);
                         return;
                     }
                     remoteDeviceConnector.startRemoteDeviceConnection(newMasterSalFacade());
