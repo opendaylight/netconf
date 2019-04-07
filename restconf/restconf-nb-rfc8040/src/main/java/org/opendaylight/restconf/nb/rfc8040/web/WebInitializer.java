@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.web;
 
+import com.google.common.collect.Lists;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -23,6 +24,9 @@ import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.nb.rfc8040.RestconfApplication;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
+import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketInitializer;
+import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 
 /**
  * Initializes the rfc8040 web app endpoint.
@@ -37,10 +41,15 @@ public class WebInitializer {
     @Inject
     public WebInitializer(@Reference WebServer webServer, @Reference WebContextSecurer webContextSecurer,
             @Reference ServletSupport servletSupport, RestconfApplication webApp,
-            @Reference CustomFilterAdapterConfiguration customFilterAdapterConfig) throws ServletException {
-        WebContextBuilder webContextBuilder = WebContext.builder().contextPath("rests").supportsSessions(false)
+            @Reference CustomFilterAdapterConfiguration customFilterAdapterConfig,
+            WebSocketInitializer webSocketServlet) throws ServletException {
+        WebContextBuilder webContextBuilder = WebContext.builder().contextPath(RestconfConstants.BASE_URI_PATTERN)
+                .supportsSessions(false)
                 .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
-                    .addUrlPattern("/*").build())
+                        .addUrlPattern("/*").build())
+                .addServlet(ServletDetails.builder().servlet(webSocketServlet).addAllUrlPatterns(Lists.newArrayList(
+                        RestconfStreamsConstants.DATA_CHANGE_EVENT_STREAM_PATTERN,
+                        RestconfStreamsConstants.YANG_NOTIFICATION_STREAM_PATTERN)).build())
 
                 // Allows user to add javax.servlet.Filter(s) in front of REST services
                 .addFilter(FilterDetails.builder().filter(new CustomFilterAdapter(customFilterAdapterConfig))
