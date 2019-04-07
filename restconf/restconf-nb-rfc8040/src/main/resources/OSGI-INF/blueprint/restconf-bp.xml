@@ -26,8 +26,36 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
+  <cm:property-placeholder persistent-id="websockets">
+    <cm:default-properties>
+      <cm:property name="maximum-fragment-length" value="8192"/>
+      <cm:property name="idle-timeout" value="30000"/>
+      <cm:property name="heartbeat-interval" value="5000"/>
+      <cm:property name="ping-executor-name-prefix" value="web-socket-ping-executor"/>
+      <cm:property name="max-thread-count" value="1"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+
   <reference id="dOMDataBroker" interface="org.opendaylight.mdsal.dom.api.DOMDataBroker"
           ext:filter="(type=@{databroker-service-type})"/>
+
+  <bean id="threadPoolFactory"
+        class="org.opendaylight.controller.config.threadpool.util.NamingThreadPoolFactory">
+    <argument value="${ping-executor-name-prefix}"/>
+  </bean>
+
+  <bean id="scheduledThreadPool"
+        class="org.opendaylight.controller.config.threadpool.util.ScheduledThreadPoolWrapper">
+    <argument value="${max-thread-count}"/>
+    <argument ref="threadPoolFactory"/>
+  </bean>
+
+  <bean id="webSocketConfiguration"
+        class="org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketConfiguration">
+    <argument value="${maximum-fragment-length}"/>
+    <argument value="${idle-timeout}"/>
+    <argument value="${heartbeat-interval}"/>
+  </bean>
 
   <bean id="servicesWrapper" factory-ref="rfc8040RestConfWiring" factory-method="getServicesWrapper" />
 
