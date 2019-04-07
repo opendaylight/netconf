@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.Function;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
+import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
@@ -331,15 +332,22 @@ public final class ListenersBroker {
     }
 
     /**
-     * Creates string representation of stream name from URI. Removes slash from URI in start and end positions.
+     * Creates string representation of stream name from URI. Removes slash from URI in start and end positions,
+     * and optionally {@link RestconfConstants#BASE_URI_PATTERN} prefix.
      *
      * @param uri URI for creation of stream name.
      * @return String representation of stream name.
      */
     public static String createStreamNameFromUri(final String uri) {
         String result = requireNonNull(uri);
-        if (result.startsWith("/")) {
-            result = result.substring(1);
+        while (true) {
+            if (result.startsWith(RestconfConstants.BASE_URI_PATTERN)) {
+                result = result.substring(RestconfConstants.BASE_URI_PATTERN.length());
+            } else if (result.startsWith("/")) {
+                result = result.substring(1);
+            } else {
+                break;
+            }
         }
         if (result.endsWith("/")) {
             result = result.substring(0, result.length() - 1);
