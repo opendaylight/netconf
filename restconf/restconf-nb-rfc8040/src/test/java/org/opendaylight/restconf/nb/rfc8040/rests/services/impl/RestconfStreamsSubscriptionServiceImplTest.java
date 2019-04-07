@@ -52,6 +52,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
+import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
@@ -165,10 +166,9 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                 .subscribeToStream(
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                         this.uriInfo);
-        assertEquals(
-                "ws://localhost:8181/data-change-event-subscription"
-                        + "/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
-            response.getNewHeaders().get("Location").toString());
+        assertEquals("ws://localhost:8181/" + RestconfConstants.BASE_URI_PATTERN
+                + "/data-change-event-subscription/toaster:toaster/toasterStatus/"
+                + "datastore=OPERATIONAL/scope=ONE", response.getNewHeaders().get("Location").toString());
     }
 
     @Test(expected = RestconfDocumentedException.class)
