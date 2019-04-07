@@ -7,26 +7,26 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
-import io.netty.channel.Channel;
 import java.util.Set;
+import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketSessionHandler;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 
 /**
  * Base interface for both listeners({@link ListenerAdapter}, {@link NotificationListenerAdapter}).
  */
-interface BaseListenerInterface extends AutoCloseable {
+public interface BaseListenerInterface extends AutoCloseable {
 
     /**
      * Return all subscribers of listener.
      *
      * @return Set of all subscribers.
      */
-    Set<Channel> getSubscribers();
+    Set<WebSocketSessionHandler> getSubscribers();
 
     /**
-     * Checks if exists at least one {@link Channel} subscriber.
+     * Checks if exists at least one {@link WebSocketSessionHandler} subscriber.
      *
-     * @return {@code true} if exist at least one {@link Channel} subscriber, {@code false} otherwise.
+     * @return {@code true} if exist at least one {@link WebSocketSessionHandler} subscriber, {@code false} otherwise.
      */
     boolean hasSubscribers();
 
@@ -45,20 +45,20 @@ interface BaseListenerInterface extends AutoCloseable {
     String getOutputType();
 
     /**
-     * Creates event of type {@link EventType#REGISTER}, set {@link Channel}
+     * Creates event of type {@link EventType#REGISTER}, set {@link WebSocketSessionHandler}
      * subscriber to the event and post event into event bus.
      *
      * @param subscriber Web-socket channel.
      */
-    void addSubscriber(Channel subscriber);
+    void addSubscriber(final WebSocketSessionHandler subscriber);
 
     /**
-     * Creates event of type {@link EventType#DEREGISTER}, sets {@link Channel}
+     * Creates event of type {@link EventType#DEREGISTER}, sets {@link WebSocketSessionHandler}
      * subscriber to the event and posts event into event bus.
      *
      * @param subscriber Subscriber channel.
      */
-    void removeSubscriber(Channel subscriber);
+    void removeSubscriber(final WebSocketSessionHandler subscriber);
 
     /**
      * Sets {@link ListenerRegistration} registration.

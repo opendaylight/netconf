@@ -9,10 +9,10 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
-import io.netty.channel.Channel;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketSessionHandler;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCommonSubscriber.class);
 
-    private final Set<Channel> subscribers = ConcurrentHashMap.newKeySet();
+    private final Set<WebSocketSessionHandler> subscribers = ConcurrentHashMap.newKeySet();
     private final EventBus eventBus;
 
     private EventBusChangeRecorder eventBusChangeRecorder;
@@ -44,7 +44,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     }
 
     @Override
-    public final Set<Channel> getSubscribers() {
+    public final Set<WebSocketSessionHandler> getSubscribers() {
         return this.subscribers;
     }
 
@@ -59,18 +59,14 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
     }
 
     @Override
-    public void addSubscriber(final Channel subscriber) {
-        if (!subscriber.isActive()) {
-            LOG.debug("Channel is not active between websocket server and subscriber {}", subscriber.remoteAddress());
-        }
+    public void addSubscriber(final WebSocketSessionHandler subscriber) {
         final Event event = new Event(EventType.REGISTER);
         event.setSubscriber(subscriber);
         this.eventBus.post(event);
     }
 
     @Override
-    public void removeSubscriber(final Channel subscriber) {
-        LOG.debug("Subscriber {} is removed.", subscriber.remoteAddress());
+    public void removeSubscriber(final WebSocketSessionHandler subscriber) {
         final Event event = new Event(EventType.DEREGISTER);
         event.setSubscriber(subscriber);
         this.eventBus.post(event);

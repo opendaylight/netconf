@@ -7,43 +7,40 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
-import io.netty.channel.Channel;
+import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketSessionHandler;
 
 /**
- * Represents event of specific {@link EventType} type, holds data and
- * {@link Channel} subscriber.
+ * Represents event of specific {@link EventType} type, holds data and {@link WebSocketSessionHandler} subscriber.
  */
 class Event {
     private final EventType type;
-    private Channel subscriber;
+    private WebSocketSessionHandler subscriber;
     private String data;
 
     /**
      * Creates new event specified by {@link EventType} type.
      *
-     * @param type
-     *            EventType
+     * @param type Event type.
      */
     Event(final EventType type) {
         this.type = type;
     }
 
     /**
-     * Gets the {@link Channel} subscriber.
+     * Gets the {@link WebSocketSessionHandler} subscriber.
      *
-     * @return Channel
+     * @return Web-socket session handler.
      */
-    public Channel getSubscriber() {
+    public WebSocketSessionHandler getSubscriber() {
         return this.subscriber;
     }
 
     /**
      * Sets subscriber for event.
      *
-     * @param subscriber
-     *            Channel
+     * @param subscriber Web-socket session handler.
      */
-    public void setSubscriber(final Channel subscriber) {
+    public void setSubscriber(final WebSocketSessionHandler subscriber) {
         this.subscriber = subscriber;
     }
 
@@ -59,8 +56,7 @@ class Event {
     /**
      * Sets event data.
      *
-     * @param data
-     *            String.
+     * @param data String representation of event data.
      */
     public void setData(final String data) {
         this.data = data;

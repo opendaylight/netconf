@@ -8,8 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import com.google.common.eventbus.Subscribe;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketSessionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ class EventBusChangeRecorder<T extends BaseListenerInterface> {
     @Subscribe
     public void recordCustomerChange(final Event event) {
         if (event.getType() == EventType.REGISTER) {
-            final Channel subscriber = event.getSubscriber();
+            final WebSocketSessionHandler subscriber = event.getSubscriber();
             this.listener.getSubscribers().add(subscriber);
         } else if (event.getType() == EventType.DEREGISTER) {
             this.listener.getSubscribers().remove(event.getSubscriber());
@@ -38,15 +37,8 @@ class EventBusChangeRecorder<T extends BaseListenerInterface> {
                 ListenersBroker.getInstance().removeAndCloseListener(this.listener);
             }
         } else if (event.getType() == EventType.NOTIFY) {
-            for (final Channel subscriber : this.listener.getSubscribers()) {
-                if (subscriber.isActive()) {
-                    LOG.debug("Data are sent to subscriber {}:", subscriber.remoteAddress());
-                    subscriber.writeAndFlush(new TextWebSocketFrame(event.getData()));
-                } else {
-                    LOG.debug("Subscriber {} is removed - channel is not active yet.", subscriber.remoteAddress());
-                    this.listener.getSubscribers().remove(subscriber);
-                }
-            }
+            this.listener.getSubscribers().forEach(
+                    webSocketSessionHandler -> webSocketSessionHandler.sendDataMessage(event.getData()));
         }
     }
 }
