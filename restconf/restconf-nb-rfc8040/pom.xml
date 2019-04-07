@@ -107,8 +107,8 @@
     </dependency>
 
     <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-codec-http</artifactId>
+      <groupId>org.opendaylight.controller</groupId>
+      <artifactId>threadpool-config-api</artifactId>
     </dependency>
 
     <dependency>
@@ -140,6 +140,11 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlets</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.websocket</groupId>
+      <artifactId>websocket-server</artifactId>
+      <version>9.4.12.v20180830</version>
     </dependency>
 
     <!-- Testing Dependencies -->
@@ -187,6 +192,11 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>ietf-restconf</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.controller</groupId>
+      <artifactId>threadpool-config-impl</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
