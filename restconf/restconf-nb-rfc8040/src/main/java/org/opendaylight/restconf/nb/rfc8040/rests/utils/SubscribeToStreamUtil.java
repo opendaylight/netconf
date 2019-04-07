@@ -296,7 +296,8 @@ public final class SubscribeToStreamUtil {
             default:
                 uriBuilder.scheme(RestconfStreamsConstants.SCHEMA_SUBSCRIBE_URI);
         }
-        return uriBuilder.replacePath(streamName).build();
+        return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + RestconfConstants.SLASH + streamName)
+                .build();
     }
 
     /**
