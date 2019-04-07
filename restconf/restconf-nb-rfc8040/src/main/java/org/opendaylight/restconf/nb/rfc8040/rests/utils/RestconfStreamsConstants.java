@@ -73,6 +73,9 @@ public final class RestconfStreamsConstants {
     public static final String STREAM_ACCESS_PATH_PART = "/access=";
     public static final String STREAM_LOCATION_PATH_PART = "/location";
 
+    public static final String DATA_CHANGE_EVENT_STREAM_PATTERN = '/' + DATA_SUBSCRIPTION + "/*";
+    public static final String YANG_NOTIFICATION_STREAM_PATTERN = '/' + NOTIFICATION_STREAM + "/*";
+
     private RestconfStreamsConstants() {
         throw new UnsupportedOperationException("Util class.");
     }
