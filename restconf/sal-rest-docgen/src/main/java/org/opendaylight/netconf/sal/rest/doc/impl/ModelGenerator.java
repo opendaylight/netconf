@@ -113,7 +113,7 @@ public class ModelGenerator {
                                           final SchemaContext schemaContext) throws IOException {
         final ObjectNode models = JsonNodeFactory.instance.objectNode();
         final ObjectNode emptyIdentifier = JsonNodeFactory.instance.objectNode();
-        models.put(UNIQUE_EMPTY_IDENTIFIER, emptyIdentifier);
+        models.set(UNIQUE_EMPTY_IDENTIFIER, emptyIdentifier);
         topLevelModule = module;
         processModules(module, models, schemaContext);
         processContainersAndLists(module, models, schemaContext);
@@ -162,9 +162,9 @@ public class ModelGenerator {
                 final String filename = "(" + rpc.getQName().getLocalName() + ")input";
                 final ObjectNode childSchema = getSchemaTemplate();
                 childSchema.put(TYPE_KEY, OBJECT_TYPE);
-                childSchema.put(PROPERTIES_KEY, properties);
+                childSchema.set(PROPERTIES_KEY, properties);
                 childSchema.put(ID_KEY, filename);
-                models.put(filename, childSchema);
+                models.set(filename, childSchema);
 
                 processTopData(filename, models, input);
             }
@@ -176,9 +176,9 @@ public class ModelGenerator {
                 final String filename = "(" + rpc.getQName().getLocalName() + ")output";
                 final ObjectNode childSchema = getSchemaTemplate();
                 childSchema.put(TYPE_KEY, OBJECT_TYPE);
-                childSchema.put(PROPERTIES_KEY, properties);
+                childSchema.set(PROPERTIES_KEY, properties);
                 childSchema.put(ID_KEY, filename);
-                models.put(filename, childSchema);
+                models.set(filename, childSchema);
 
                 processTopData(filename, models, output);
             }
@@ -191,16 +191,16 @@ public class ModelGenerator {
         items.put(REF_KEY, filename);
         final ObjectNode dataNodeProperties = JsonNodeFactory.instance.objectNode();
         dataNodeProperties.put(TYPE_KEY, schemaNode instanceof ListSchemaNode ? ARRAY_TYPE : OBJECT_TYPE);
-        dataNodeProperties.put(ITEMS_KEY, items);
+        dataNodeProperties.set(ITEMS_KEY, items);
 
         putIfNonNull(dataNodeProperties, DESCRIPTION_KEY, schemaNode.getDescription().orElse(null));
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
-        properties.put(topLevelModule.getName() + ":" + schemaNode.getQName().getLocalName(), dataNodeProperties);
+        properties.set(topLevelModule.getName() + ":" + schemaNode.getQName().getLocalName(), dataNodeProperties);
         final ObjectNode finalChildSchema = getSchemaTemplate();
         finalChildSchema.put(TYPE_KEY, OBJECT_TYPE);
-        finalChildSchema.put(PROPERTIES_KEY, properties);
+        finalChildSchema.set(PROPERTIES_KEY, properties);
         finalChildSchema.put(ID_KEY, filename + OperationBuilder.TOP);
-        models.put(filename + OperationBuilder.TOP, finalChildSchema);
+        models.set(filename + OperationBuilder.TOP, finalChildSchema);
 
         return dataNodeProperties;
     }
@@ -239,7 +239,7 @@ public class ModelGenerator {
                     for (final IdentitySchemaNode derivedId : derivedIds) {
                         subTypes.add(derivedId.getQName().getLocalName());
                     }
-                    identityObj.put(SUB_TYPES_KEY, subTypes);
+                    identityObj.set(SUB_TYPES_KEY, subTypes);
 
                 }
             } else {
@@ -250,8 +250,8 @@ public class ModelGenerator {
             }
 
             // Add the properties. For a base type, this will be an empty object as required by the Swagger spec.
-            identityObj.put(PROPERTIES_KEY, props);
-            models.put(identityName, identityObj);
+            identityObj.set(PROPERTIES_KEY, props);
+            models.set(identityName, identityObj);
         }
     }
 
@@ -268,10 +268,10 @@ public class ModelGenerator {
 
             final ObjectNode childSchema = getSchemaTemplate();
             childSchema.put(TYPE_KEY, OBJECT_TYPE);
-            childSchema.put(PROPERTIES_KEY, properties);
+            childSchema.set(PROPERTIES_KEY, properties);
 
             childSchema.put(ID_KEY, nodeName);
-            models.put(nodeName, childSchema);
+            models.set(nodeName, childSchema);
 
             if (isConfig) {
                 createConcreteModelForPost(models, localName,
@@ -289,8 +289,8 @@ public class ModelGenerator {
         final ObjectNode postSchema = getSchemaTemplate();
         postSchema.put(TYPE_KEY, OBJECT_TYPE);
         postSchema.put(ID_KEY, nodePostName);
-        postSchema.put(PROPERTIES_KEY, properties);
-        models.put(nodePostName, postSchema);
+        postSchema.set(PROPERTIES_KEY, properties);
+        models.set(nodePostName, postSchema);
     }
 
     private JsonNode createPropertiesForPost(final DataNodeContainer dataNodeContainer,
@@ -302,11 +302,11 @@ public class ModelGenerator {
                 items.put(REF_KEY, parentName + "(config)" + childNode.getQName().getLocalName());
                 final ObjectNode property = JsonNodeFactory.instance.objectNode();
                 property.put(TYPE_KEY, childNode instanceof ListSchemaNode ? ARRAY_TYPE : OBJECT_TYPE);
-                property.put(ITEMS_KEY, items);
-                properties.put(childNode.getQName().getLocalName(), property);
+                property.set(ITEMS_KEY, items);
+                properties.set(childNode.getQName().getLocalName(), property);
             } else if (childNode instanceof LeafSchemaNode) {
                 final ObjectNode property = processLeafNode((LeafSchemaNode) childNode, schemaContext);
-                properties.put(childNode.getQName().getLocalName(), property);
+                properties.set(childNode.getQName().getLocalName(), property);
             }
         }
         return properties;
@@ -351,7 +351,7 @@ public class ModelGenerator {
                     throw new IllegalArgumentException("Unknown DataSchemaNode type: " + node.getClass());
                 }
                 putIfNonNull(property, DESCRIPTION_KEY, node.getDescription().orElse(null));
-                properties.put(topLevelModule.getName() + ":" + name, property);
+                properties.set(topLevelModule.getName() + ":" + name, property);
             }
         }
         return properties;
@@ -379,7 +379,7 @@ public class ModelGenerator {
         } else {
             processTypeDef(listNode.getType(), listNode, itemsVal, schemaContext);
         }
-        props.put(ITEMS_KEY, itemsVal);
+        props.set(ITEMS_KEY, itemsVal);
 
         return props;
     }
@@ -421,7 +421,7 @@ public class ModelGenerator {
             }
 
             putIfNonNull(property, DESCRIPTION_KEY, node.getDescription().orElse(null));
-            properties.put(name, property);
+            properties.set(name, property);
         }
     }
 
@@ -543,7 +543,7 @@ public class ModelGenerator {
     private static String processBinaryType(final ObjectNode property) {
         final ObjectNode media = JsonNodeFactory.instance.objectNode();
         media.put(BINARY_ENCODING_KEY, BASE_64);
-        property.put(MEDIA_KEY, media);
+        property.set(MEDIA_KEY, media);
         return "bin1 bin2";
     }
 
@@ -555,7 +555,7 @@ public class ModelGenerator {
             enumNames.add(new TextNode(enumPair.getName()));
         }
 
-        property.put(ENUM, enumNames);
+        property.set(ENUM, enumNames);
         return enumLeafType.getValues().iterator().next().getName();
     }
 
@@ -568,7 +568,7 @@ public class ModelGenerator {
         for (final Bit bit : bits) {
             enumNames.add(new TextNode(bit.getName()));
         }
-        property.put(ENUM, enumNames);
+        property.set(ENUM, enumNames);
 
         return enumNames.iterator().next() + " " + enumNames.get(enumNames.size() - 1);
     }
@@ -605,7 +605,7 @@ public class ModelGenerator {
         for (final TypeDefinition<?> typeDef : unionType.getTypes()) {
             unionNames.add(processTypeDef(typeDef, node, property, schemaContext));
         }
-        property.put(ENUM, unionNames);
+        property.set(ENUM, unionNames);
         return unionNames.iterator().next().asText();
     }
 
