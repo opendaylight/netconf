@@ -362,14 +362,17 @@ public abstract class BaseYangSwaggerGenerator {
             final List<QName> listKeys = ((ListSchemaNode) schemaNode).getKeyDefinition();
             for (final QName listKey : listKeys) {
                 final ListPathBuilder keyBuilder = newListPathBuilder();
-                final DataSchemaNode dataChildByName = ((DataNodeContainer) schemaNode).getDataChildByName(listKey);
                 final String pathParamIdentifier = keyBuilder.nextParamIdentifier(listKey.getLocalName());
 
                 path.append(pathParamIdentifier);
 
                 final Parameter pathParam = new Parameter();
                 pathParam.setName(listKey.getLocalName());
-                pathParam.setDescription(dataChildByName.getDescription().orElse(null));
+
+                ((DataNodeContainer) schemaNode).findDataChildByName(listKey).ifPresent(listKeyNode -> {
+                    listKeyNode.getDescription().ifPresent(pathParam::setDescription);
+                });
+
                 pathParam.setType("string");
                 pathParam.setParamType("path");
 
