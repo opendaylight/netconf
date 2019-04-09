@@ -85,10 +85,10 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         return urlToId;
     }
 
-    private String findModuleName(final YangInstanceIdentifier id, final SchemaContext context) {
+    private static String findModuleName(final YangInstanceIdentifier id, final SchemaContext context) {
         final PathArgument rootQName = id.getPathArguments().iterator().next();
         for (final Module mod : context.getModules()) {
-            if (mod.getDataChildByName(rootQName.getNodeType()) != null) {
+            if (mod.findDataChildByName(rootQName.getNodeType()).isPresent()) {
                 return mod.getName();
             }
         }
