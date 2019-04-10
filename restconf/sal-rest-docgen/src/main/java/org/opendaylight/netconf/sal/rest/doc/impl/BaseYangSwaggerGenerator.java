@@ -369,9 +369,8 @@ public abstract class BaseYangSwaggerGenerator {
                 final Parameter pathParam = new Parameter();
                 pathParam.setName(listKey.getLocalName());
 
-                ((DataNodeContainer) schemaNode).findDataChildByName(listKey).ifPresent(listKeyNode -> {
-                    listKeyNode.getDescription().ifPresent(pathParam::setDescription);
-                });
+                ((DataNodeContainer) schemaNode).findDataChildByName(listKey).flatMap(DataSchemaNode::getDescription)
+                    .ifPresent(pathParam::setDescription);
 
                 pathParam.setType("string");
                 pathParam.setParamType("path");
