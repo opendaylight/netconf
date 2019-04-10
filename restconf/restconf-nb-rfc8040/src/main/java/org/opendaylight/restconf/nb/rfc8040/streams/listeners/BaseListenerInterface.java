@@ -45,16 +45,14 @@ public interface BaseListenerInterface extends AutoCloseable {
     String getOutputType();
 
     /**
-     * Creates event of type {@link EventType#REGISTER}, set {@link Channel}
-     * subscriber to the event and post event into event bus.
+     * Registers {@link Channel} subscriber.
      *
      * @param subscriber Web-socket channel.
      */
     void addSubscriber(Channel subscriber);
 
     /**
-     * Creates event of type {@link EventType#DEREGISTER}, sets {@link Channel}
-     * subscriber to the event and posts event into event bus.
+     * Removes {@link Channel} subscriber.
      *
      * @param subscriber Subscriber channel.
      */

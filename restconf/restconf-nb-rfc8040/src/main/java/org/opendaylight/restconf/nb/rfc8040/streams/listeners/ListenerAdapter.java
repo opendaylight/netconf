@@ -62,7 +62,6 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      */
     ListenerAdapter(final YangInstanceIdentifier path, final String streamName,
             final NotificationOutputType outputType) {
-        register(this);
         setLocalNameOfPath(path.getLastPathArgument().getNodeType().getLocalName());
 
         this.outputType = Preconditions.checkNotNull(outputType);
@@ -114,13 +113,11 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      * @param xml XML-formatted data.
      */
     private void prepareAndPostData(final String xml) {
-        final Event event = new Event(EventType.NOTIFY);
         if (this.outputType.equals(NotificationOutputType.JSON)) {
-            event.setData(XML.toJSONObject(xml).toString());
+            post(XML.toJSONObject(xml).toString());
         } else {
-            event.setData(xml);
+            post(xml);
         }
-        post(event);
     }
 
     /**
