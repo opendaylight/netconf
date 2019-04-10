@@ -46,14 +46,13 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     private final String outputType;
 
     /**
-     * Set path of listener and stream name, register event bus.
+     * Set path of listener and stream name.
      *
      * @param path       Schema path of YANG notification.
      * @param streamName Name of the stream.
      * @param outputType Type of output on notification (JSON or XML).
      */
     NotificationListenerAdapter(final SchemaPath path, final String streamName, final String outputType) {
-        register(this);
         setLocalNameOfPath(path.getLastComponent().getLocalName());
 
         this.outputType = Preconditions.checkNotNull(outputType);
@@ -82,7 +81,7 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
         final SchemaContext schemaContext = schemaHandler.get();
         final String xml = prepareXml(schemaContext, notification);
         if (checkFilter(xml)) {
-            prepareAndPostData(outputType.equals("JSON") ? prepareJson(schemaContext, notification) : xml);
+            post(outputType.equals("JSON") ? prepareJson(schemaContext, notification) : xml);
         }
     }
 
@@ -103,17 +102,6 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
      */
     public SchemaPath getSchemaPath() {
         return this.path;
-    }
-
-    /**
-     * Prepare data of notification and data to client.
-     *
-     * @param data JSON or XML data that holds notification data.
-     */
-    private void prepareAndPostData(final String data) {
-        final Event event = new Event(EventType.NOTIFY);
-        event.setData(data);
-        post(event);
     }
 
     /**
