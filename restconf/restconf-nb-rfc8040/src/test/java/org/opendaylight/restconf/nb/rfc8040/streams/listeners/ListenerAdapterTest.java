@@ -90,8 +90,8 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         }
 
         @Override
-        protected void post(final Event event) {
-            this.lastNotification = event.getData();
+        protected void post(final String data) {
+            this.lastNotification = data;
             notificationLatch.countDown();
         }
 
