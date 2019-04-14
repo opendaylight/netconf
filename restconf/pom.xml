@@ -38,6 +38,7 @@
         <module>sal-rest-connector-config</module>
         <module>sal-rest-docgen</module>
         <module>sal-rest-docgen-maven</module>
+        <module>tools</module>
         <!--
         FIXME: Needs to be reimplemented to not use YANGTools restconf impl
         <module>sal-restconf-broker</module>
