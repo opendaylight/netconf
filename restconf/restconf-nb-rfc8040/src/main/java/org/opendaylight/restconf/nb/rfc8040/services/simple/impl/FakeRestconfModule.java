@@ -188,7 +188,7 @@ final class FakeRestconfModule implements Module {
 
     @Override
     public List<UnknownSchemaNode> getUnknownSchemaNodes() {
-        throw new UnsupportedOperationException("Operation not implemented.");
+        return ImmutableList.of();
     }
 
     @Override
