@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6a0f649a_01827cb8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:21:30Z",
+      "side": 1,
+      "message": "I think we need a tracker with a stack trace and a better explanation of what the deadlock is (I can figure it out, but people experiencing it have no way to find this fix)",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 53
+      },
+      "revId": "70f357bd6a283ecce350f7e474057d0cd173960e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d37bb562_52340a30",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:21:30Z",
+      "side": 1,
+      "message": "keep final fields together",
+      "range": {
+        "startLine": 65,
+        "startChar": 4,
+        "endLine": 65,
+        "endChar": 69
+      },
+      "revId": "70f357bd6a283ecce350f7e474057d0cd173960e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60f6d8c0_ee33b777",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:21:30Z",
+      "side": 1,
+      "message": "this invokes two volatile operations -- get and compareAndSet(). Instead this should read:\n\n  if (!isDisconnected.compareAndSwap(false, true)) {\n\ni.e. we expect to flip the boolean from false to true and if we do not succeed, we have already done so...",
+      "range": {
+        "startLine": 221,
+        "startChar": 8,
+        "endLine": 221,
+        "endChar": 45
+      },
+      "revId": "70f357bd6a283ecce350f7e474057d0cd173960e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fda50465_80b72697",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:21:30Z",
+      "side": 1,
+      "message": "this synchronized block is huge. Split it out into a private  synchronized method -- which is easier to maintain.",
+      "range": {
+        "startLine": 225,
+        "startChar": 0,
+        "endLine": 225,
+        "endChar": 29
+      },
+      "revId": "70f357bd6a283ecce350f7e474057d0cd173960e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "76dfd8b5_dbb8eeac",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:21:30Z",
+      "side": 1,
+      "message": "This is completely unnecessary, as the boolean is set only in current thread.",
+      "range": {
+        "startLine": 52,
+        "startChar": 8,
+        "endLine": 52,
+        "endChar": 60
+      },
+      "revId": "70f357bd6a283ecce350f7e474057d0cd173960e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "684ab6dc_100bc4ab",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:21:30Z",
+      "side": 1,
+      "message": "rather than doing this inline, factor this block into a private synchronized method returning a boolean -- for example checkDisconnect(future) and then ...",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 9
+      },
+      "revId": "70f357bd6a283ecce350f7e474057d0cd173960e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8a06fc06_1403aac0",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:21:30Z",
+      "side": 1,
+      "message": "...  this becomes\n\n if (checkDisconnect(future)) {",
+      "range": {
+        "startLine": 82,
+        "startChar": 8,
+        "endLine": 82,
+        "endChar": 31
+      },
+      "revId": "70f357bd6a283ecce350f7e474057d0cd173960e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b036421f_06e31ec9",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/AsyncSshHandlerReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:21:30Z",
+      "side": 1,
+      "message": "... and this method needs to get an explicit comment that it should never be called with any locks held (since that is the source of ABBA deadlock).",
+      "range": {
+        "startLine": 88,
+        "startChar": 4,
+        "endLine": 88,
+        "endChar": 37
+      },
+      "revId": "70f357bd6a283ecce350f7e474057d0cd173960e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
