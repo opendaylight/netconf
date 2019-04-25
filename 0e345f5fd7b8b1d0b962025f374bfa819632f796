@@ -1,0 +1,211 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ef82a820_034223bb",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/CreateStreamUtil.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:51:56Z",
+      "side": 1,
+      "message": "what is this suppressing exactly?",
+      "range": {
+        "startLine": 212,
+        "startChar": 23,
+        "endLine": 212,
+        "endChar": 35
+      },
+      "revId": "0e345f5fd7b8b1d0b962025f374bfa819632f796",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f04e339a_5dc977ca",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/CreateStreamUtil.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:51:56Z",
+      "side": 1,
+      "message": "static import of java.util.Objects.requireNonNull() makes these simple uses a lot more readable",
+      "range": {
+        "startLine": 217,
+        "startChar": 16,
+        "endLine": 217,
+        "endChar": 42
+      },
+      "revId": "0e345f5fd7b8b1d0b962025f374bfa819632f796",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d5589440_eb8fefcc",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/CreateStreamUtil.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:51:56Z",
+      "side": 1,
+      "message": "while we\u0027re here: this should have a proper format string instead of concatenation",
+      "range": {
+        "startLine": 232,
+        "startChar": 43,
+        "endLine": 234,
+        "endChar": 36
+      },
+      "revId": "0e345f5fd7b8b1d0b962025f374bfa819632f796",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5406a82c_97e15819",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/SubscribeToStreamUtil.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:51:56Z",
+      "side": 1,
+      "message": "\"accessor\" sufficies -- name and type are the same after all",
+      "range": {
+        "startLine": 240,
+        "startChar": 31,
+        "endLine": 240,
+        "endChar": 47
+      },
+      "revId": "0e345f5fd7b8b1d0b962025f374bfa819632f796",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ce71b598_f0c8aa1c",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/ListenersBroker.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:51:56Z",
+      "side": 1,
+      "message": "Ugh... what is this actually guarding? the map is not concurrent and we are leaking its contents to a caller -- if the caller iterates over it, it can easily race with modification, invoking a ConcurrentModificationException.\n\nIs the intent capture all subscribed streams? In that case ImmutableSet.copyOf() and return that.",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 9
+      },
+      "revId": "0e345f5fd7b8b1d0b962025f374bfa819632f796",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "152e46d6_215a6a77",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/ListenersBroker.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:51:56Z",
+      "side": 1,
+      "message": "Optional.ofNullable(listenerAdapter);\n\nand can be collapsed to a simple return statement",
+      "range": {
+        "startLine": 108,
+        "startChar": 19,
+        "endLine": 108,
+        "endChar": 93
+      },
+      "revId": "0e345f5fd7b8b1d0b962025f374bfa819632f796",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d9c4ecc4_d5bf62a1",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/ListenersBroker.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:51:56Z",
+      "side": 1,
+      "message": "Aside the other comments, this API contract seems to be quite dicey -- what happens if a stream is registered twice and then unregistered once?\n\nI am not saying its worse than it used to be, just food for lifecycle thought.",
+      "range": {
+        "startLine": 140,
+        "startChar": 4,
+        "endLine": 141,
+        "endChar": 54
+      },
+      "revId": "0e345f5fd7b8b1d0b962025f374bfa819632f796",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5af63fdd_0233cb7c",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/ListenersBroker.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:51:56Z",
+      "side": 1,
+      "message": "dataChangeListeners.computeIfAbsent()",
+      "range": {
+        "startLine": 148,
+        "startChar": 0,
+        "endLine": 154,
+        "endChar": 13
+      },
+      "revId": "0e345f5fd7b8b1d0b962025f374bfa819632f796",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8dea95f2_a21e6314",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/streams/listeners/ListenersBroker.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-04-25T13:51:56Z",
+      "side": 1,
+      "message": "Hmm... is it possible for a listener to be present multiple times? If not, notificationListeners should be a BiMap (and hence direct lookups on listener are possible)",
+      "range": {
+        "startLine": 330,
+        "startChar": 0,
+        "endLine": 338,
+        "endChar": 13
+      },
+      "revId": "0e345f5fd7b8b1d0b962025f374bfa819632f796",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
