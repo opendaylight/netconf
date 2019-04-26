@@ -236,7 +236,6 @@ public class NetconfDevice
                         ? BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS : BaseSchema.BASE_NETCONF_CTX;
             this.messageTransformer = new NetconfMessageTransformer(result, true, baseSchema);
 
-            updateTransformer(this.messageTransformer);
             // salFacade.onDeviceConnected has to be called before the notification handler is initialized
             this.salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc,
                     this.deviceActionFactory == null ? null : this.deviceActionFactory.createDeviceAction(
