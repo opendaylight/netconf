@@ -15,14 +15,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
-import javassist.ClassPool;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
-import org.opendaylight.mdsal.binding.dom.codec.gen.impl.StreamWriterGenerator;
 import org.opendaylight.mdsal.binding.dom.codec.impl.BindingNormalizedNodeCodecRegistry;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.binding.generator.util.BindingRuntimeContext;
-import org.opendaylight.mdsal.binding.generator.util.JavassistUtils;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.util.NetconfUtil;
@@ -52,9 +49,7 @@ public final class NotificationsTransformUtil {
 
         Preconditions.checkNotNull(CREATE_SUBSCRIPTION_RPC);
 
-        final JavassistUtils javassist = JavassistUtils.forClassPool(ClassPool.getDefault());
-        CODEC_REGISTRY = new BindingNormalizedNodeCodecRegistry(StreamWriterGenerator.create(javassist));
-        CODEC_REGISTRY.onBindingRuntimeContextUpdated(BindingRuntimeContext.create(moduleInfoBackedContext,
+        CODEC_REGISTRY = new BindingNormalizedNodeCodecRegistry(BindingRuntimeContext.create(moduleInfoBackedContext,
                 NOTIFICATIONS_SCHEMA_CTX));
     }
 
