@@ -10,7 +10,6 @@ package org.opendaylight.netconf.sal.connect.netconf.util;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
@@ -63,7 +62,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -345,7 +343,7 @@ public final class NetconfMessageTransformUtil {
             final Optional<ModifyAction> operation,
             final Optional<NormalizedNode<?, ?>> lastChildOverride) {
         final NormalizedNode<?, ?> configContent;
-
+        final NormalizedMetadata metadata;
         if (dataPath.isEmpty()) {
             Preconditions.checkArgument(lastChildOverride.isPresent(),
                     "Data has to be present when creating structure for top level element");
@@ -353,11 +351,12 @@ public final class NetconfMessageTransformUtil {
                     "Data has to be either container or a list node when creating structure for top level element, "
                             + "but was: %s", lastChildOverride.get());
             configContent = lastChildOverride.get();
+            metadata = null;
         } else {
             configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride);
+            metadata = operation.map(oper -> leafMetadata(dataPath, oper)).orElse(null);
         }
 
-        final NormalizedMetadata metadata = operation.map(oper -> leafMetadata(configContent, oper)).orElse(null);
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME.getLocalName(),
                 Optional.of(NETCONF_CONFIG_QNAME.getNamespace().toString()));
 
@@ -371,30 +370,14 @@ public final class NetconfMessageTransformUtil {
                 .build();
     }
 
-    private static NormalizedMetadata leafMetadata(final NormalizedNode<?, ?> node, final ModifyAction oper) {
-        final Deque<Builder> builders = new ArrayDeque<>();
+    private static NormalizedMetadata leafMetadata(YangInstanceIdentifier path, final ModifyAction oper) {
+        final List<PathArgument> args = path.getPathArguments();
+        final Deque<Builder> builders = new ArrayDeque<>(args.size());
 
         // Step one: open builders
-        NormalizedNode<?, ?> currentNode = node;
-        do {
-            builders.push(ImmutableNormalizedMetadata.builder().withIdentifier(currentNode.getIdentifier()));
-            if (currentNode instanceof NormalizedNodeContainer) {
-                final Collection<NormalizedNode<?, ?>> children =
-                        ((NormalizedNodeContainer<?, ?, NormalizedNode<?, ?>>) currentNode).getValue();
-                switch (children.size()) {
-                    case 0:
-                        currentNode = null;
-                        break;
-                    case 1:
-                        currentNode = Iterables.getOnlyElement(children);
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected container " + currentNode);
-                }
-            } else {
-                currentNode = null;
-            }
-        } while (currentNode != null);
+        for (PathArgument arg : args) {
+            builders.push(ImmutableNormalizedMetadata.builder().withIdentifier(arg));
+        }
 
         // Step two: set the top builder's metadata
         builders.peek().withAnnotation(NETCONF_OPERATION_QNAME_LEGACY, oper.toString().toLowerCase(Locale.US));
