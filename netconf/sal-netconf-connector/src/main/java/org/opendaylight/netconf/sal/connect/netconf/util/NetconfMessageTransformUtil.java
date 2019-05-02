@@ -342,7 +342,7 @@ public final class NetconfMessageTransformUtil {
             final Optional<ModifyAction> operation,
             final Optional<NormalizedNode<?, ?>> lastChildOverride) {
         final NormalizedNode<?, ?> configContent;
-
+        final NormalizedMetadata metadata;
         if (dataPath.isEmpty()) {
             Preconditions.checkArgument(lastChildOverride.isPresent(),
                     "Data has to be present when creating structure for top level element");
@@ -350,11 +350,12 @@ public final class NetconfMessageTransformUtil {
                     "Data has to be either container or a list node when creating structure for top level element, "
                             + "but was: %s", lastChildOverride.get());
             configContent = lastChildOverride.get();
+            metadata = null;
         } else {
             configContent = ImmutableNodes.fromInstanceId(ctx, dataPath, lastChildOverride);
+            metadata = operation.map(oper -> leafMetadata(configContent, oper)).orElse(null);
         }
 
-        final NormalizedMetadata metadata = operation.map(oper -> leafMetadata(configContent, oper)).orElse(null);
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_CONFIG_QNAME.getLocalName(),
                 Optional.of(NETCONF_CONFIG_QNAME.getNamespace().toString()));
 
