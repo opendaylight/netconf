@@ -141,8 +141,12 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
                 LOG.error("Authorize failed for session {}", session, throwable);
 
                 KeyExchange kex = impl.getKex();
-                PublicKey key = kex.getServerKey();
-                recorder.reportFailedAuth(key);
+                if (kex != null) {
+                    PublicKey key = kex.getServerKey();
+                    recorder.reportFailedAuth(key);
+                } else {
+                    LOG.warn("Null kex in session {}, skipping update", session);
+                }
 
                 session.close(true);
             }
