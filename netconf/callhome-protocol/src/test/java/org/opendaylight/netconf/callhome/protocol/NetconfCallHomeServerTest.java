@@ -33,6 +33,7 @@ import org.apache.sshd.common.future.SshFutureListener;
 import org.apache.sshd.common.io.IoAcceptor;
 import org.apache.sshd.common.io.IoHandler;
 import org.apache.sshd.common.io.IoServiceFactory;
+import org.apache.sshd.common.kex.KeyExchange;
 import org.apache.sshd.common.session.Session;
 import org.apache.sshd.common.session.SessionListener;
 import org.junit.AfterClass;
@@ -114,6 +115,12 @@ public class NetconfCallHomeServerTest {
             CallHomeSessionContext mockContext = mock(CallHomeSessionContext.class);
             doNothing().when(mockContext).openNetconfChannel();
             doReturn(mockContext).when(mockSession).getAttribute(any(Session.AttributeKey.class));
+
+            final KeyExchange kex = mock(KeyExchange.class);
+            doReturn(kex).when(mockSession).getKex();
+            final PublicKey serverKey = mock(PublicKey.class);
+            doReturn(serverKey).when(kex).getServerKey();
+
             SessionListener listener = instance.createSessionListener();
             doReturn(mockAuthFuture).when(mockContext).authorize();
             // when
