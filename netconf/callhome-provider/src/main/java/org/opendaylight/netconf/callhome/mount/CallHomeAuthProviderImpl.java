@@ -176,6 +176,11 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
         private PublicKey publicKey(final Device device) {
             String hostKey = device.getSshHostKey();
+            if (hostKey == null) {
+                LOG.warn("Device {} does not have host key, ignoring update for this device", device.getUniqueId());
+                return null;
+            }
+
             try {
                 return keyDecoder.decodePublicKey(hostKey);
             } catch (GeneralSecurityException e) {
