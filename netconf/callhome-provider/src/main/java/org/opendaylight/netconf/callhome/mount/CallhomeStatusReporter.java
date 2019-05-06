@@ -303,6 +303,10 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
 
         for (Device device : getDevicesAsList()) {
             String keyString = device.getSshHostKey();
+            if (keyString == null) {
+                LOG.info("Whitelist device {} does not have a host key, skipping it", device.getUniqueId());
+                continue;
+            }
 
             try {
                 PublicKey pubKey = decoder.decodePublicKey(keyString);

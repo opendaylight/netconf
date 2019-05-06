@@ -18,12 +18,10 @@ import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.keyverifier.ServerKeyVerifier;
 import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.client.session.ClientSessionImpl;
 import org.apache.sshd.client.session.SessionFactory;
 import org.apache.sshd.common.future.SshFutureListener;
 import org.apache.sshd.common.io.IoAcceptor;
 import org.apache.sshd.common.io.IoServiceFactory;
-import org.apache.sshd.common.kex.KeyExchange;
 import org.apache.sshd.common.session.Session;
 import org.apache.sshd.common.session.SessionListener;
 import org.apache.sshd.netty.NettyIoServiceFactory;
@@ -119,6 +117,8 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
     }
 
     private SshFutureListener<AuthFuture> newAuthSshFutureListener(final ClientSession session) {
+        final PublicKey serverKey = session.getKex().getServerKey();
+
         return new SshFutureListener<AuthFuture>() {
             @Override
             public void operationComplete(final AuthFuture authFuture) {
@@ -137,13 +137,8 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
             }
 
             private void onFailure(final Throwable throwable) {
-                ClientSessionImpl impl = (ClientSessionImpl) session;
                 LOG.error("Authorize failed for session {}", session, throwable);
-
-                KeyExchange kex = impl.getKex();
-                PublicKey key = kex.getServerKey();
-                recorder.reportFailedAuth(key);
-
+                recorder.reportFailedAuth(serverKey);
                 session.close(true);
             }
 
