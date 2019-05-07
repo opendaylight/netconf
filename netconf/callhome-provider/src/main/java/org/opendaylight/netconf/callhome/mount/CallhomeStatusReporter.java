@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.callhome.mount;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -209,12 +208,9 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
     }
 
     private Optional<Device> readDevice(final NodeId nodeId) {
-        ReadTransaction opTx = dataBroker.newReadOnlyTransaction();
-
-        InstanceIdentifier<Device> deviceIID = buildDeviceInstanceIdentifier(nodeId);
-        ListenableFuture<Optional<Device>> devFuture = opTx.read(LogicalDatastoreType.OPERATIONAL, deviceIID);
-        try {
-            return devFuture.get();
+        try (ReadTransaction opTx = dataBroker.newReadOnlyTransaction()) {
+            InstanceIdentifier<Device> deviceIID = buildDeviceInstanceIdentifier(nodeId);
+            return opTx.read(LogicalDatastoreType.OPERATIONAL, deviceIID).get();
         } catch (InterruptedException | ExecutionException e) {
             return Optional.empty();
         }
@@ -281,11 +277,9 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
     }
 
     private AllowedDevices getDevices() {
-        ReadTransaction rxTransaction = dataBroker.newReadOnlyTransaction();
-        ListenableFuture<Optional<AllowedDevices>> devicesFuture =
-                rxTransaction.read(LogicalDatastoreType.OPERATIONAL, IetfZeroTouchCallHomeServerProvider.ALL_DEVICES);
-        try {
-            return devicesFuture.get().orElse(null);
+        try (ReadTransaction rxTransaction = dataBroker.newReadOnlyTransaction()) {
+            return rxTransaction.read(LogicalDatastoreType.OPERATIONAL, IetfZeroTouchCallHomeServerProvider.ALL_DEVICES)
+                    .get().orElse(null);
         } catch (ExecutionException | InterruptedException e) {
             LOG.error("Error trying to read the whitelist devices", e);
             return null;

@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
 import com.google.common.base.Preconditions;
-import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -142,10 +141,10 @@ class NetconfEventSourceMount {
      * @throws InterruptedException if data read fails
      */
     List<Stream> getAvailableStreams() throws InterruptedException, ExecutionException {
-        DOMDataTreeReadTransaction tx = dataBroker.newReadOnlyTransaction();
-        FluentFuture<Optional<NormalizedNode<?, ?>>> checkFeature = tx.read(LogicalDatastoreType.OPERATIONAL,
-            STREAMS_PATH);
-        Optional<NormalizedNode<?, ?>> streams = checkFeature.get();
+        final Optional<NormalizedNode<?, ?>> streams;
+        try (DOMDataTreeReadTransaction tx = dataBroker.newReadOnlyTransaction()) {
+            streams = tx.read(LogicalDatastoreType.OPERATIONAL, STREAMS_PATH).get();
+        }
         if (streams.isPresent()) {
             Streams streams1 = (Streams) CODEC_REGISTRY.fromNormalizedNode(STREAMS_PATH, streams.get()).getValue();
             return streams1.getStream();
