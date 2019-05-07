@@ -7,12 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
-import com.google.common.eventbus.AsyncEventBus;
-import com.google.common.eventbus.EventBus;
 import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,119 +22,70 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCommonSubscriber.class);
 
-    private final Set<Channel> subscribers = ConcurrentHashMap.newKeySet();
-    private final EventBus eventBus;
-
-    @SuppressWarnings("rawtypes")
-    private EventBusChangeRecorder eventBusChangeRecorder;
-
+    private final Set<Channel> subscribers = new HashSet<>();
     private volatile ListenerRegistration<?> registration;
 
-    /**
-     * Creating {@link EventBus}.
-     */
-    protected AbstractCommonSubscriber() {
-        this.eventBus = new AsyncEventBus(Executors.newSingleThreadExecutor());
-    }
-
     @Override
-    public final boolean hasSubscribers() {
+    public final synchronized boolean hasSubscribers() {
         return !this.subscribers.isEmpty();
     }
 
     @Override
-    public final Set<Channel> getSubscribers() {
-        return this.subscribers;
+    public final synchronized Set<Channel> getSubscribers() {
+        return new HashSet<>(this.subscribers);
     }
 
     @Override
-    public final void close() throws Exception {
+    public final synchronized void close() throws Exception {
         if (this.registration != null) {
             this.registration.close();
             this.registration = null;
         }
-
         deleteDataInDS();
-        unregister();
+        this.subscribers.clear();
     }
 
-    /**
-     * Creates event of type {@link EventType#REGISTER}, set {@link Channel}
-     * subscriber to the event and post event into event bus.
-     *
-     * @param subscriber
-     *            Channel
-     */
-    public void addSubscriber(final Channel subscriber) {
+    @Override
+    public synchronized void addSubscriber(final Channel subscriber) {
         if (!subscriber.isActive()) {
             LOG.debug("Channel is not active between websocket server and subscriber {}", subscriber.remoteAddress());
         }
-        final Event event = new Event(EventType.REGISTER);
-        event.setSubscriber(subscriber);
-        this.eventBus.post(event);
+        subscribers.add(subscriber);
     }
 
-    /**
-     * Creates event of type {@link EventType#DEREGISTER}, sets {@link Channel}
-     * subscriber to the event and posts event into event bus.
-     *
-     * @param subscriber subscriber channel
-     */
-    public void removeSubscriber(final Channel subscriber) {
+    @Override
+    public synchronized void removeSubscriber(final Channel subscriber) {
         LOG.debug("Subscriber {} is removed.", subscriber.remoteAddress());
-        final Event event = new Event(EventType.DEREGISTER);
-        event.setSubscriber(subscriber);
-        this.eventBus.post(event);
+        subscribers.remove(subscriber);
+        if (!hasSubscribers()) {
+            ListenersBroker.getInstance().removeAndCloseListener(this);
+        }
     }
 
-    /**
-     * Sets {@link ListenerRegistration} registration.
-     *
-     * @param registration
-     *            DOMDataChangeListener registration
-     */
+    @Override
     public void setRegistration(final ListenerRegistration<?> registration) {
         this.registration = registration;
     }
 
-    /**
-     * Checks if {@link ListenerRegistration} registration exist.
-     *
-     * @return True if exist, false otherwise.
-     */
+    @Override
     public boolean isListening() {
         return this.registration != null;
     }
 
     /**
-     * Creating and registering {@link EventBusChangeRecorder} of specific
-     * listener on {@link EventBus}.
+     * Post data to subscribed channels.
      *
-     * @param listener
-     *            specific listener of notifications
+     * @param data Data of incoming notifications.
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected <T extends BaseListenerInterface> void register(final T listener) {
-        this.eventBusChangeRecorder = new EventBusChangeRecorder(listener);
-        this.eventBus.register(this.eventBusChangeRecorder);
-    }
-
-    /**
-     * Post event to event bus.
-     *
-     * @param event
-     *            data of incoming notifications
-     */
-    protected void post(final Event event) {
-        this.eventBus.post(event);
-    }
-
-    /**
-     * Removes all subscribers and unregisters event bus change recorder form
-     * event bus.
-     */
-    protected void unregister() {
-        this.subscribers.clear();
-        this.eventBus.unregister(this.eventBusChangeRecorder);
+    synchronized void post(final String data) {
+        for (final Channel subscriber : subscribers) {
+            if (subscriber.isActive()) {
+                LOG.debug("Data are sent to subscriber {}:", subscriber.remoteAddress());
+                subscriber.writeAndFlush(new TextWebSocketFrame(data));
+            } else {
+                LOG.debug("Subscriber {} is removed - channel is not active yet.", subscriber.remoteAddress());
+                subscribers.remove(subscriber);
+            }
+        }
     }
 }

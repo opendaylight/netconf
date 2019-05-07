@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -34,9 +35,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- * {@link NotificationListenerAdapter} is responsible to track events on
- * notifications.
- *
+ * {@link NotificationListenerAdapter} is responsible to track events on notifications.
  */
 public class NotificationListenerAdapter extends AbstractCommonSubscriber implements DOMNotificationListener {
 
@@ -47,17 +46,13 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     private final String outputType;
 
     /**
-     * Set path of listener and stream name, register event bus.
+     * Set path of listener and stream name.
      *
-     * @param path
-     *             path of notification
-     * @param streamName
-     *             stream name of listener
-     * @param outputType
-     *             type of output on notification (JSON, XML)
+     * @param path       Schema path of YANG notification.
+     * @param streamName Name of the stream.
+     * @param outputType Type of output on notification (JSON or XML).
      */
     NotificationListenerAdapter(final SchemaPath path, final String streamName, final String outputType) {
-        register(this);
         setLocalNameOfPath(path.getLastComponent().getLocalName());
 
         this.outputType = Preconditions.checkNotNull(outputType);
@@ -67,9 +62,9 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     }
 
     /**
-     * Get outputType of listener.
+     * Get output type of this listener.
      *
-     * @return the outputType
+     * @return The configured output type (JSON or XML).
      */
     @Override
     public String getOutputType() {
@@ -86,14 +81,14 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
         final SchemaContext schemaContext = schemaHandler.get();
         final String xml = prepareXml(schemaContext, notification);
         if (checkFilter(xml)) {
-            prepareAndPostData(outputType.equals("JSON") ? prepareJson(schemaContext, notification) : xml);
+            post(outputType.equals("JSON") ? prepareJson(schemaContext, notification) : xml);
         }
     }
 
     /**
      * Get stream name of this listener.
      *
-     * @return {@link String}
+     * @return The configured stream name.
      */
     @Override
     public String getStreamName() {
@@ -103,27 +98,16 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     /**
      * Get schema path of notification.
      *
-     * @return {@link SchemaPath}
+     * @return The configured schema path that points to observing YANG notification schema node.
      */
     public SchemaPath getSchemaPath() {
         return this.path;
     }
 
     /**
-     * Prepare data of notification and data to client.
+     * Creation of JSON from notification data.
      *
-     * @param data   data
-     */
-    private void prepareAndPostData(final String data) {
-        final Event event = new Event(EventType.NOTIFY);
-        event.setData(data);
-        post(event);
-    }
-
-    /**
-     * Prepare json from notification data.
-     *
-     * @return json as {@link String}
+     * @return Transformed notification data in JSON format.
      */
     @VisibleForTesting
     String prepareJson(final SchemaContext schemaContext, final DOMNotification notification) {
@@ -137,8 +121,8 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     private static String writeBodyToString(final SchemaContext schemaContext, final DOMNotification notification) {
         final Writer writer = new StringWriter();
         final NormalizedNodeStreamWriter jsonStream = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
-            JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(schemaContext), notification.getType(),
-            null, JsonWriterFactory.createJsonWriter(writer));
+                JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(schemaContext),
+                notification.getType(), null, JsonWriterFactory.createJsonWriter(writer));
         final NormalizedNodeWriter nodeWriter = NormalizedNodeWriter.forStreamWriter(jsonStream);
         try {
             nodeWriter.write(notification.getBody());
@@ -149,6 +133,11 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
         return writer.toString();
     }
 
+    /**
+     * Creation of XML from notification data.
+     *
+     * @return Transformed notification data in XML format.
+     */
     private String prepareXml(final SchemaContext schemaContext, final DOMNotification notification) {
         final Document doc = createDocument();
         final Element notificationElement = basePartDoc(doc);
@@ -164,7 +153,6 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     private void addValuesToNotificationEventElement(final Document doc, final Element element,
             final SchemaContext schemaContext, final DOMNotification notification) {
         try {
-
             final DOMResult domResult = writeNormalizedNode(notification.getBody(), schemaContext, this.path);
             final Node result = doc.importNode(domResult.getNode().getFirstChild(), true);
             final Element dataElement = doc.createElement("notification");
@@ -175,5 +163,14 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
         } catch (final XMLStreamException e) {
             LOG.error("Error processing stream", e);
         }
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("path", path)
+                .add("stream-name", streamName)
+                .add("output-type", outputType)
+                .toString();
     }
 }
