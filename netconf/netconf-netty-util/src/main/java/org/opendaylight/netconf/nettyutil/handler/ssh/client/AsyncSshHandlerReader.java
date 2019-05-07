@@ -47,12 +47,17 @@ public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFutu
     }
 
     @Override
-    public synchronized void operationComplete(final IoReadFuture future) {
-        if (future.getException() != null) {
+    public void operationComplete(final IoReadFuture future) {
+        if (checkDisconnect(future)) {
+            invokeDisconnect();
+        }
+    }
 
+    private synchronized boolean checkDisconnect(final IoReadFuture future) {
+        if (future.getException() != null) {
             //if asyncout is already set to null by close method, do nothing
             if (asyncOut == null) {
-                return;
+                return false;
             }
 
             if (asyncOut.isClosed() || asyncOut.isClosing()) {
@@ -61,11 +66,8 @@ public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFutu
             } else {
                 LOG.warn("Exception while reading from SSH remote on channel {}", channelId, future.getException());
             }
-            invokeDisconnect();
-            return;
-        }
-
-        if (future.getRead() > 0) {
+            return true;
+        } else if (future.getRead() > 0) {
             final ByteBuf msg = Unpooled.wrappedBuffer(buf.array(), 0, future.getRead());
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Reading message on channel: {}, message: {}",
@@ -78,8 +80,13 @@ public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFutu
             currentReadFuture = asyncOut.read(buf);
             currentReadFuture.addListener(this);
         }
+        return false;
     }
 
+    /**
+     * Closing of the {@link AsyncSshHandlerReader}. This method should never be called with any locks held since
+     * call to {@link AutoCloseable#close()} can be a source of ABBA deadlock.
+     */
     @SuppressWarnings("checkstyle:IllegalCatch")
     private void invokeDisconnect() {
         try {
