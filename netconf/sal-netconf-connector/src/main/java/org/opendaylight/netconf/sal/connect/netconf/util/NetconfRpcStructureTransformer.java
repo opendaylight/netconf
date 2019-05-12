@@ -7,20 +7,29 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Optional;
+import javax.xml.stream.XMLStreamException;
 import org.opendaylight.netconf.api.ModifyAction;
+import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 /**
  * Transforms rpc structures to normalized nodes and vice versa.
  */
 class NetconfRpcStructureTransformer implements RpcStructureTransformer {
 
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfRpcStructureTransformer.class);
     private final SchemaContext schemaContext;
 
     NetconfRpcStructureTransformer(final SchemaContext schemaContext) {
@@ -31,7 +40,18 @@ class NetconfRpcStructureTransformer implements RpcStructureTransformer {
     public Optional<NormalizedNode<?, ?>> selectFromDataStructure(
             final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> data,
             final YangInstanceIdentifier path) {
-        return NormalizedNodes.findNode(data, path.getPathArguments());
+        if (data instanceof AnyXmlNode) {
+            final NormalizedNodeResult node;
+            try {
+                node = NetconfUtil.transformDOMSourceToNormalizedNode(schemaContext, ((AnyXmlNode)data).getValue());
+                return NormalizedNodes.findNode(node.getResult(), path.getPathArguments());
+            } catch (final XMLStreamException | URISyntaxException | IOException | SAXException e) {
+                LOG.error("Cannot parse anyxml: {}", e.getMessage());
+                return Optional.empty();
+            }
+        } else {
+            return NormalizedNodes.findNode(data, path.getPathArguments());
+        }
     }
 
     @Override
