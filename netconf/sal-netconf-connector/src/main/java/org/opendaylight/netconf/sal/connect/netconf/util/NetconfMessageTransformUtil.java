@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.AbstractMap.SimpleEntry;
@@ -65,11 +66,16 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.AnyXmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -78,6 +84,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 public final class NetconfMessageTransformUtil {
 
@@ -479,7 +486,7 @@ public final class NetconfMessageTransformUtil {
         final Element actionData = prepareActionData(rootSchemaContextNode, actionNS,
                 domDataTreeIdentifier.getRootIdentifier().getPathArguments().iterator(), document);
 
-        Element specificActionElement = document.createElement(action);
+        final Element specificActionElement = document.createElement(action);
         actionData.appendChild(specificActionElement);
         rpcNS.appendChild(actionNS);
         document.appendChild(rpcNS);
@@ -491,7 +498,7 @@ public final class NetconfMessageTransformUtil {
         if (iterator.hasNext()) {
             final PathArgument next = iterator.next();
 
-            DataSchemaContextNode<?> current = currentParentSchemaNode.getChild(next);
+            final DataSchemaContextNode<?> current = currentParentSchemaNode.getChild(next);
             Preconditions.checkArgument(current != null, "Invalid input: schema for argument %s not found", next);
 
             if (current.isMixin()) {
@@ -553,5 +560,23 @@ public final class NetconfMessageTransformUtil {
                                         DocumentedException.ErrorTag.MALFORMED_MESSAGE,
                                         DocumentedException.ErrorSeverity.ERROR)))
                 .build();
+    }
+
+    public static AnyXmlSchemaNode createSchemaForAnyXmlDataRead() {
+        return new NodeAnyXmlProxy(NETCONF_DATA_QNAME);
+    }
+
+    public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final SchemaContext schemaContext,
+            final DOMSource value) throws XMLStreamException, URISyntaxException, IOException, SAXException {
+        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+        final XmlCodecFactory codecs = XmlCodecFactory.create(schemaContext);
+        final ContainerSchemaNode dataRead = NetconfMessageTransformUtil.createSchemaForDataRead(schemaContext);
+
+        try (XmlParserStream xmlParserStream = XmlParserStream.create(writer, codecs, dataRead)) {
+            xmlParserStream.traverse(value);
+        }
+
+        return resultHolder;
     }
 }

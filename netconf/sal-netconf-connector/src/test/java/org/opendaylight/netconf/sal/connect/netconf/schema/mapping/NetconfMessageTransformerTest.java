@@ -76,6 +76,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
@@ -227,9 +228,13 @@ public class NetconfMessageTransformerTest {
         final MapEntryNode schemaNode =
                 Builders.mapEntryBuilder().withNodeIdentifier(identifierWithPredicates).withValue(values).build();
 
-        final ContainerNode data = (ContainerNode) ((ContainerNode) compositeNodeRpcResult
+        final AnyXmlNode data = (AnyXmlNode) ((ContainerNode) compositeNodeRpcResult
                 .getResult()).getChild(toId(NETCONF_DATA_QNAME)).get();
-        final ContainerNode state = (ContainerNode) data.getChild(toId(NetconfState.QNAME)).get();
+
+        NormalizedNodeResult nodeResult =
+                NetconfMessageTransformUtil.transformDOMSourceToNormalizedNode(schema, data.getValue());
+        ContainerNode result = (ContainerNode) nodeResult.getResult();
+        final ContainerNode state = (ContainerNode) result.getChild(toId(NetconfState.QNAME)).get();
         final ContainerNode schemas = (ContainerNode) state.getChild(toId(Schemas.QNAME)).get();
         final MapNode schemaParent = (MapNode) schemas.getChild(toId(Schema.QNAME)).get();
         assertEquals(1, Iterables.size(schemaParent.getValue()));
