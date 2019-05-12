@@ -76,6 +76,7 @@ import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.restconf.common.validation.RestconfValidationUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -374,7 +375,7 @@ public final class RestconfImpl implements RestconfService {
                 Builders.containerBuilder(fakeCont);
 
         for (final LeafSchemaNode leaf : fakeRpcSchema) {
-            containerBuilder.withChild(Builders.leafBuilder(leaf).build());
+            containerBuilder.withChild(Builders.leafBuilder(leaf).withValue(Empty.getInstance()).build());
         }
 
         final Collection<Module> fakeModules = new ArrayList<>(neededModules.size() + 1);
@@ -472,7 +473,7 @@ public final class RestconfImpl implements RestconfService {
         final DOMRpcResult result = checkRpcResponse(response);
 
         RpcDefinition resultNodeSchema = null;
-        final NormalizedNode<?, ?> resultData;
+        NormalizedNode<?, ?> resultData;
         if (result != null && result.getResult() != null) {
             resultData = result.getResult();
             resultNodeSchema = (RpcDefinition) payload.getInstanceIdentifierContext().getSchemaNode();
