@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
 import javanet.staxutils.IndentingXMLStreamWriter;
@@ -29,9 +30,11 @@ import javax.xml.stream.XMLStreamWriter;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
+import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -41,6 +44,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.xml.sax.SAXException;
 
 /**
  * Normalized node writer for XML.
@@ -108,7 +112,17 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         final SchemaContext schemaCtx = pathContext.getSchemaContext();
         if (SchemaPath.ROOT.equals(schemaPath)) {
             nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, schemaPath, depth);
-            writeElements(xmlWriter, nnWriter, (ContainerNode) data);
+            if (data instanceof AnyXmlNode) {
+                try {
+                    writeElements(xmlWriter, nnWriter,
+                            (ContainerNode) NetconfUtil.transformDOMSourceToNormalizedNode(schemaCtx,
+                                    ((AnyXmlNode)data).getValue()).getResult());
+                } catch (XMLStreamException | URISyntaxException | SAXException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                writeElements(xmlWriter, nnWriter, (ContainerNode) data);
+            }
         }  else if (pathContext.getSchemaNode() instanceof RpcDefinition) {
             nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx,
                     ((RpcDefinition) pathContext.getSchemaNode()).getOutput().getPath(), depth);
