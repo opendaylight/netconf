@@ -23,12 +23,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -79,7 +81,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
                 httpHeaders.add(entry.getKey(), entry.getValue());
             }
         }
-        final NormalizedNode<?, ?> data = context.getData();
+        NormalizedNode<?, ?> data = context.getData();
         if (data == null) {
             return;
         }
@@ -89,6 +91,10 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
                 (InstanceIdentifierContext<SchemaNode>) context.getInstanceIdentifierContext();
 
         final SchemaPath path = identifierCtx.getSchemaNode().getPath();
+        if (data instanceof AnyXmlNode) {
+            data = NetconfMessageTransformUtil.transformDOMSourceToNormalizedNode(identifierCtx.getSchemaContext(),
+                    ((AnyXmlNode)data).getValue()).getResult();
+        }
         try (JsonWriter jsonWriter = createJsonWriter(entityStream, context.getWriterParameters().isPrettyPrint())) {
             jsonWriter.beginObject();
             writeNormalizedNode(

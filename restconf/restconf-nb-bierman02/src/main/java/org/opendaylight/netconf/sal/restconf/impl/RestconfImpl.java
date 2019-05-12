@@ -50,6 +50,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.OptimisticLockFailedException;
@@ -59,6 +60,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.netconf.sal.streams.listeners.ListenerAdapter;
@@ -76,6 +78,7 @@ import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.restconf.common.validation.RestconfValidationUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
+import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -84,6 +87,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.Augmentat
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -96,6 +100,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.ModifiedNodeDoesNotExistException;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
@@ -374,7 +379,7 @@ public final class RestconfImpl implements RestconfService {
                 Builders.containerBuilder(fakeCont);
 
         for (final LeafSchemaNode leaf : fakeRpcSchema) {
-            containerBuilder.withChild(Builders.leafBuilder(leaf).build());
+            containerBuilder.withChild(Builders.leafBuilder(leaf).withValue(Empty.getInstance()).build());
         }
 
         final Collection<Module> fakeModules = new ArrayList<>(neededModules.size() + 1);
@@ -472,9 +477,15 @@ public final class RestconfImpl implements RestconfService {
         final DOMRpcResult result = checkRpcResponse(response);
 
         RpcDefinition resultNodeSchema = null;
-        final NormalizedNode<?, ?> resultData;
+        NormalizedNode<?, ?> resultData;
         if (result != null && result.getResult() != null) {
             resultData = result.getResult();
+            if (resultData instanceof AnyXmlNode) {
+                final DOMSource value = ((AnyXmlNode) resultData).getValue();
+                NormalizedNodeResult resultHolder =
+                        NetconfMessageTransformUtil.transformDOMSourceToNormalizedNode(schemaContext, value);
+                resultData = resultHolder.getResult();
+            }
             resultNodeSchema = (RpcDefinition) payload.getInstanceIdentifierContext().getSchemaNode();
         } else {
             resultData = null;
