@@ -15,6 +15,7 @@ import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
 import javax.ws.rs.Produces;
@@ -23,12 +24,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -38,12 +42,18 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
+import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.xml.sax.SAXException;
 
 /**
  * Normalized node writer for JSON.
@@ -79,7 +89,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
                 httpHeaders.add(entry.getKey(), entry.getValue());
             }
         }
-        final NormalizedNode<?, ?> data = context.getData();
+        NormalizedNode<?, ?> data = context.getData();
         if (data == null) {
             return;
         }
@@ -109,7 +119,16 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
              *  which is not visible in restconf
              */
             nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth);
-            writeChildren(nnWriter,(ContainerNode) data);
+            if (data instanceof ContainerNode) {
+                writeChildren(nnWriter,(ContainerNode) data);
+            } else if (data instanceof AnyXmlNode) {
+                try {
+                    writeChildren(nnWriter,
+                            transformDOMSource(context.getSchemaContext(), ((AnyXmlNode)data).getValue()));
+                } catch (XMLStreamException | URISyntaxException | SAXException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         } else if (context.getSchemaNode() instanceof RpcDefinition) {
             /*
              *  RpcDefinition is not supported as initial codec in JSONStreamWriter,
@@ -178,4 +197,23 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         // TODO: Performance: Cache JSON Codec factory and schema context
         return JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(context.getSchemaContext());
     }
+
+    private static ContainerNode transformDOMSource(final SchemaContext schemaContext,
+            final DOMSource value) throws XMLStreamException, URISyntaxException, IOException, SAXException {
+        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+        final XmlCodecFactory codecs = XmlCodecFactory.create(schemaContext);
+        final ContainerSchemaNode dataRead = createSchemaForDataRead(schemaContext);
+
+        try (XmlParserStream xmlParserStream = XmlParserStream.create(writer, codecs, dataRead)) {
+            xmlParserStream.traverse(value);
+        }
+
+        return (ContainerNode)resultHolder.getResult();
+    }
+
+    private static ContainerSchemaNode createSchemaForDataRead(final SchemaContext schemaContext) {
+        return new NodeContainerProxy(schemaContext.getChildNodes());
+    }
+
 }
