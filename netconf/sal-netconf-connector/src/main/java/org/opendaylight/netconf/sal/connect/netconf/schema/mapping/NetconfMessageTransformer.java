@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_URI;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
@@ -48,6 +47,8 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.YangConstants;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -108,7 +109,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     @VisibleForTesting
     Set<ActionDefinition> getActions() {
-        Builder<ActionDefinition> builder = ImmutableSet.builder();
+        final Builder<ActionDefinition> builder = ImmutableSet.builder();
         for (DataSchemaNode dataSchemaNode : schemaContext.getChildNodes()) {
             if (dataSchemaNode instanceof ActionNodeContainer) {
                 findAction(dataSchemaNode, builder);
@@ -209,7 +210,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             // If the schema context for netconf device does not contain model for base netconf operations,
             // use default pre build context with just the base model
             // This way operations like lock/unlock are supported even if the source for base model was not provided
-            SchemaContext ctx = needToUseBaseCtx ? baseSchema.getSchemaContext() : schemaContext;
+            final SchemaContext ctx = needToUseBaseCtx ? baseSchema.getSchemaContext() : schemaContext;
             NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result, rpcInput, ctx);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize " + rpcInput, e);
@@ -273,24 +274,12 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         final QName rpcQName = rpc.getLastComponent();
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpcQName)) {
             final Element xmlData = NetconfMessageTransformUtil.getDataSubtree(message.getDocument());
-            final ContainerSchemaNode schemaForDataRead =
-                    NetconfMessageTransformUtil.createSchemaForDataRead(schemaContext);
-            final ContainerNode dataNode;
-
-            try {
-                final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
-                final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext, schemaForDataRead,
-                        strictParsing);
-                xmlParser.traverse(new DOMSource(xmlData));
-                dataNode = (ContainerNode) resultHolder.getResult();
-            } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
-                throw new IllegalArgumentException(String.format("Failed to parse data response %s", xmlData), e);
-            }
-
-            normalizedNode = Builders.containerBuilder()
-                    .withNodeIdentifier(NETCONF_RPC_REPLY_NODEID)
-                    .withChild(dataNode).build();
+            final AnyXmlNode anyXmlNode = Builders.anyXmlBuilder()
+                    .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
+                    .withValue(new DOMSource(xmlData)).build();
+            normalizedNode = Builders.containerBuilder().withNodeIdentifier(
+                    new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
+                    .withChild(anyXmlNode).build();
         } else {
 
             Map<QName, RpcDefinition> currentMappedRpcs = mappedRpcs;
@@ -322,7 +311,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             }
         }
         Preconditions.checkNotNull(actionDefinition, "Action does not exist: %s", action);
-        ContainerNode normalizedNode = (ContainerNode) parseResult(message, actionDefinition);
+        final ContainerNode normalizedNode = (ContainerNode) parseResult(message, actionDefinition);
 
         if (normalizedNode == null) {
             return new SimpleDOMActionResult(Collections.<RpcError>emptyList());
