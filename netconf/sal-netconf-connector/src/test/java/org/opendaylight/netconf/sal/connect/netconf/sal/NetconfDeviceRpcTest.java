@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -29,17 +30,23 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
+import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.w3c.dom.Node;
 
 public class NetconfDeviceRpcTest {
 
@@ -78,7 +85,16 @@ public class NetconfDeviceRpcTest {
     public void testInvokeRpc() throws Exception {
         NormalizedNode<?, ?> input = createNode("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "filter");
         final DOMRpcResult result = rpc.invokeRpc(path, input).get();
-        Assert.assertEquals(expectedReply, result);
+        Assert.assertEquals(expectedReply.getResult().getIdentifier(), result.getResult().getIdentifier());
+        Assert.assertEquals(resolveNode(expectedReply), resolveNode(result));
+    }
+
+    private Node resolveNode(final DOMRpcResult result) {
+        DataContainerChild<? extends PathArgument, ?> value = ((ContainerNode) result.getResult())
+                .getChild(NodeIdentifier.create(NetconfMessageTransformUtil.NETCONF_DATA_QNAME)).get();
+        Node node = ((AnyXmlNode)value).getValue().getNode();
+        assertNotNull(node);
+        return node;
     }
 
     @Test

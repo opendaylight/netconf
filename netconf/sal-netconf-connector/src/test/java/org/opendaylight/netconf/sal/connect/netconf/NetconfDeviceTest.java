@@ -116,7 +116,7 @@ public class NetconfDeviceTest {
             TEST_NAMESPACE + "?module=" + TEST_MODULE + "2" + "&amp;revision=" + TEST_REVISION;
 
     private static final NetconfDeviceSchemasResolver STATE_SCHEMAS_RESOLVER =
-        (deviceRpc, remoteSessionCapabilities, id) -> NetconfStateSchemas.EMPTY;
+        (deviceRpc, remoteSessionCapabilities, id, schemaContext) -> NetconfStateSchemas.EMPTY;
 
     @Test
     public void testNetconfDeviceFlawedModelFailedResolution() throws Exception {
@@ -137,7 +137,8 @@ public class NetconfDeviceTest {
             }
         }).when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
 
-        final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id) -> {
+        final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id,
+                schemaContext) -> {
             final Module first = Iterables.getFirst(schema.getModules(), null);
             final QName qName = QName.create(first.getQNameModule(), first.getName());
             final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
@@ -178,10 +179,9 @@ public class NetconfDeviceTest {
 
         // Make fallback attempt to fail due to empty resolved sources
         final SchemaResolutionException schemaResolutionException
-                = new SchemaResolutionException("fail first",
-                Collections.emptyList(), HashMultimap.create());
-        doReturn(Futures.immediateFailedFuture(schemaResolutionException))
-                .when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
+            = new SchemaResolutionException("fail first", Collections.emptyList(), HashMultimap.create());
+        doReturn(Futures.immediateFailedFuture(schemaResolutionException)).when(schemaFactory)
+            .createSchemaContext(anyCollectionOf(SourceIdentifier.class));
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice
                 .SchemaResourcesDTO(getSchemaRegistry(), schemaRepository, schemaFactory, STATE_SCHEMAS_RESOLVER);
@@ -215,7 +215,7 @@ public class NetconfDeviceTest {
         final MissingSchemaSourceException schemaResolutionException =
                 new MissingSchemaSourceException("fail first", TEST_SID);
         doReturn(Futures.immediateFailedFuture(schemaResolutionException))
-                .when(schemaRepository).getSchemaSource(eq(TEST_SID), eq(YangTextSchemaSource.class));
+        .when(schemaRepository).getSchemaSource(eq(TEST_SID), eq(YangTextSchemaSource.class));
         doAnswer(invocation -> {
             if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
                 return Futures.immediateFailedFuture(schemaResolutionException);
@@ -224,7 +224,8 @@ public class NetconfDeviceTest {
             }
         }).when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
 
-        final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id) -> {
+        final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id,
+            schemaContext) -> {
             final Module first = Iterables.getFirst(schema.getModules(), null);
             final QName qName = QName.create(first.getQNameModule(), first.getName());
             final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
@@ -267,7 +268,7 @@ public class NetconfDeviceTest {
         final SchemaRepository mock = mock(SchemaRepository.class);
         final SchemaSourceRepresentation mockRep = mock(SchemaSourceRepresentation.class);
         doReturn(Futures.immediateFuture(mockRep))
-                .when(mock).getSchemaSource(any(SourceIdentifier.class), eq(YangTextSchemaSource.class));
+        .when(mock).getSchemaSource(any(SourceIdentifier.class), eq(YangTextSchemaSource.class));
         return mock;
     }
 
@@ -349,7 +350,7 @@ public class NetconfDeviceTest {
         final SettableFuture<SchemaContext> schemaFuture = SettableFuture.create();
         doReturn(schemaFuture).when(schemaContextProviderFactory).createSchemaContext(any(Collection.class));
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO
-                = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(),
+            = new NetconfDevice.SchemaResourcesDTO(getSchemaRegistry(), getSchemaRepository(),
                 schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
         final NetconfDevice device = new NetconfDeviceBuilder()
                 .setReconnectOnSchemasChange(true)
@@ -394,26 +395,26 @@ public class NetconfDeviceTest {
         final Map<QName, AvailableCapability.CapabilityOrigin> moduleBasedCaps = new HashMap<>();
         moduleBasedCaps.putAll(sessionCaps.getModuleBasedCapsOrigin());
         moduleBasedCaps
-                .put(QName.create("(test:qname:side:loading)test"), AvailableCapability.CapabilityOrigin.UserDefined);
+            .put(QName.create("(test:qname:side:loading)test"), AvailableCapability.CapabilityOrigin.UserDefined);
 
         netconfSpy.onRemoteSessionUp(sessionCaps.replaceModuleCaps(moduleBasedCaps), listener);
 
         final ArgumentCaptor<NetconfSessionPreferences> argument =
                 ArgumentCaptor.forClass(NetconfSessionPreferences.class);
         verify(facade, timeout(5000))
-                .onDeviceConnected(any(SchemaContext.class), argument.capture(), any(DOMRpcService.class), isNull());
+            .onDeviceConnected(any(SchemaContext.class), argument.capture(), any(DOMRpcService.class), isNull());
         final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().getNetconfDeviceCapabilities();
 
         netconfDeviceCaps.getResolvedCapabilities()
-                .forEach(entry -> assertEquals("Builded 'AvailableCapability' schemas should match input capabilities.",
-                        moduleBasedCaps.get(
-                                QName.create(entry.getCapability())).getName(), entry.getCapabilityOrigin().getName()));
+            .forEach(entry -> assertEquals("Builded 'AvailableCapability' schemas should match input capabilities.",
+                moduleBasedCaps.get(
+                        QName.create(entry.getCapability())).getName(), entry.getCapabilityOrigin().getName()));
     }
 
     private static SchemaContextFactory getSchemaFactory() throws Exception {
         final SchemaContextFactory schemaFactory = mockClass(SchemaContextFactory.class);
         doReturn(Futures.immediateFuture(getSchema()))
-                .when(schemaFactory).createSchemaContext(any(Collection.class));
+        .when(schemaFactory).createSchemaContext(any(Collection.class));
         return schemaFactory;
     }
 
@@ -462,7 +463,7 @@ public class NetconfDeviceTest {
     }
 
     public NetconfSessionPreferences getSessionCaps(final boolean addMonitor,
-                                                    final Collection<String> additionalCapabilities) {
+            final Collection<String> additionalCapabilities) {
         final ArrayList<String> capabilities = Lists.newArrayList(
                 XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_0,
                 XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_BASE_1_1);
@@ -479,8 +480,8 @@ public class NetconfDeviceTest {
 
     public NetconfDeviceCommunicator getListener() throws Exception {
         final NetconfDeviceCommunicator remoteDeviceCommunicator = mockCloseableClass(NetconfDeviceCommunicator.class);
-//        doReturn(Futures.immediateFuture(rpcResult))
-//                .when(remoteDeviceCommunicator).sendRequest(any(NetconfMessage.class), any(QName.class));
+        //        doReturn(Futures.immediateFuture(rpcResult))
+        //                .when(remoteDeviceCommunicator).sendRequest(any(NetconfMessage.class), any(QName.class));
         return remoteDeviceCommunicator;
     }
 }

@@ -11,8 +11,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.AbstractMap.SimpleEntry;
@@ -25,10 +27,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.FailedNetconfMessage;
@@ -65,11 +69,16 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodeContainer;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
+import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
+import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.SchemaOrderedNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.AnyXmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -78,6 +87,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 public final class NetconfMessageTransformUtil {
 
@@ -220,7 +230,7 @@ public final class NetconfMessageTransformUtil {
     }
 
     public static DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier identifier,
-                                                             final SchemaContext ctx) {
+            final SchemaContext ctx) {
         final Element element = XmlUtil.createElement(BLANK_DOCUMENT, NETCONF_FILTER_QNAME.getLocalName(),
                 Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
         element.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
@@ -266,7 +276,7 @@ public final class NetconfMessageTransformUtil {
         if (errorInfo != null) {
             for (final Entry<String, String> e : errorInfo.entrySet()) {
                 infoBuilder.append('<').append(e.getKey()).append('>').append(e.getValue())
-                        .append("</").append(e.getKey()).append('>');
+                .append("</").append(e.getKey()).append('>');
 
             }
         }
@@ -275,9 +285,9 @@ public final class NetconfMessageTransformUtil {
         return severity == ErrorSeverity.ERROR
                 ? RpcResultBuilder.newError(toRpcErrorType(ex.getErrorType()), ex.getErrorTag().getTagValue(),
                         ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause())
-                : RpcResultBuilder.newWarning(
-                        toRpcErrorType(ex.getErrorType()), ex.getErrorTag().getTagValue(),
-                        ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause());
+                        : RpcResultBuilder.newWarning(
+                                toRpcErrorType(ex.getErrorType()), ex.getErrorTag().getTagValue(),
+                                ex.getLocalizedMessage(), null, infoBuilder.toString(), ex.getCause());
     }
 
     private static ErrorSeverity toRpcErrorSeverity(final NetconfDocumentedException.ErrorSeverity severity) {
@@ -317,7 +327,7 @@ public final class NetconfMessageTransformUtil {
     public static boolean isDataRetrievalOperation(final QName rpc) {
         return NETCONF_URI.equals(rpc.getNamespace())
                 && (NETCONF_GET_CONFIG_QNAME.getLocalName().equals(rpc.getLocalName())
-                || NETCONF_GET_QNAME.getLocalName().equals(rpc.getLocalName()));
+                        || NETCONF_GET_QNAME.getLocalName().equals(rpc.getLocalName()));
     }
 
     public static ContainerSchemaNode createSchemaForDataRead(final SchemaContext schemaContext) {
@@ -479,7 +489,7 @@ public final class NetconfMessageTransformUtil {
         final Element actionData = prepareActionData(rootSchemaContextNode, actionNS,
                 domDataTreeIdentifier.getRootIdentifier().getPathArguments().iterator(), document);
 
-        Element specificActionElement = document.createElement(action);
+        final Element specificActionElement = document.createElement(action);
         actionData.appendChild(specificActionElement);
         rpcNS.appendChild(actionNS);
         document.appendChild(rpcNS);
@@ -492,7 +502,7 @@ public final class NetconfMessageTransformUtil {
             final PathArgument next = iterator.next();
             final QName actualNS = next.getNodeType();
 
-            DataSchemaContextNode<?> current = currentParentSchemaNode.getChild(next);
+            final DataSchemaContextNode<?> current = currentParentSchemaNode.getChild(next);
             Preconditions.checkArgument(current != null, "Invalid input: schema for argument %s not found", next);
 
             if (current.isMixin()) {
@@ -504,7 +514,8 @@ public final class NetconfMessageTransformUtil {
             if (next instanceof NodeWithValue) {
                 actualElement.setNodeValue(((NodeWithValue) next).getValue().toString());
             } else if (next instanceof NodeIdentifierWithPredicates) {
-                for (Entry<QName, Object> entry : ((NodeIdentifierWithPredicates) next).getKeyValues().entrySet()) {
+                for (final Entry<QName, Object> entry :
+                    ((NodeIdentifierWithPredicates) next).getKeyValues().entrySet()) {
                     final Element entryElement = document.createElementNS(entry.getKey().getNamespace().toString(),
                             entry.getKey().getLocalName());
                     entryElement.setTextContent(entry.getValue().toString());
@@ -521,8 +532,8 @@ public final class NetconfMessageTransformUtil {
 
     @SuppressWarnings("checkstyle:IllegalCatch")
     public static void writeNormalizedRpc(final ContainerNode normalized, final DOMResult result,
-                                          final SchemaPath schemaPath,
-                                          final SchemaContext baseNetconfCtx) throws IOException, XMLStreamException {
+            final SchemaPath schemaPath,
+            final SchemaContext baseNetconfCtx) throws IOException, XMLStreamException {
         final XMLStreamWriter writer = NetconfUtil.XML_FACTORY.createXMLStreamWriter(result);
         try {
             try (NormalizedNodeStreamWriter normalizedNodeStreamWriter =
@@ -553,5 +564,24 @@ public final class NetconfMessageTransformUtil {
                                         DocumentedException.ErrorTag.MALFORMED_MESSAGE,
                                         DocumentedException.ErrorSeverity.ERROR)))
                 .build();
+    }
+
+    public static AnyXmlSchemaNode createSchemaForAnyXmlDataRead() {
+        return new NodeAnyXmlProxy(NETCONF_DATA_QNAME);
+    }
+
+    public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final SchemaContext schemaContext,
+            final DOMSource value) {
+        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
+        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
+        final XmlCodecFactory codecs = XmlCodecFactory.create(schemaContext);
+        final ContainerSchemaNode dataRead = NetconfMessageTransformUtil.createSchemaForDataRead(schemaContext);
+        final XmlParserStream xmlParserStream = XmlParserStream.create(writer, codecs, dataRead);
+        try {
+            xmlParserStream.traverse(value);
+        } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
+            throw new RuntimeException(e);
+        }
+        return resultHolder;
     }
 }
