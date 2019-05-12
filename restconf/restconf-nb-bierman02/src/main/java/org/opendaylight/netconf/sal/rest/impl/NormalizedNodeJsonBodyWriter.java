@@ -15,6 +15,7 @@ import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
 import javax.ws.rs.Produces;
@@ -23,12 +24,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import javax.xml.stream.XMLStreamException;
 import org.opendaylight.netconf.sal.rest.api.Draft02;
 import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.netconf.sal.rest.api.RestconfService;
+import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -44,6 +48,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
+import org.xml.sax.SAXException;
 
 /**
  * Normalized node writer for JSON.
@@ -79,7 +84,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
                 httpHeaders.add(entry.getKey(), entry.getValue());
             }
         }
-        final NormalizedNode<?, ?> data = context.getData();
+        NormalizedNode<?, ?> data = context.getData();
         if (data == null) {
             return;
         }
@@ -109,7 +114,17 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
              *  which is not visible in restconf
              */
             nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth);
-            writeChildren(nnWriter,(ContainerNode) data);
+            if (data instanceof ContainerNode) {
+                writeChildren(nnWriter,(ContainerNode) data);
+            } else if (data instanceof AnyXmlNode) {
+                try {
+                    writeChildren(nnWriter,
+                            (ContainerNode) NetconfUtil.transformDOMSourceToNormalizedNode(
+                                    context.getSchemaContext(), ((AnyXmlNode)data).getValue()).getResult());
+                } catch (XMLStreamException | URISyntaxException | SAXException e) {
+                    throw new IOException("Cannot write anyxml.", e);
+                }
+            }
         } else if (context.getSchemaNode() instanceof RpcDefinition) {
             /*
              *  RpcDefinition is not supported as initial codec in JSONStreamWriter,

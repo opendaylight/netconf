@@ -127,7 +127,7 @@ class FakeContainerSchemaNode implements ContainerSchemaNode {
 
     @Override
     public boolean isPresenceContainer() {
-        throw new UnsupportedOperationException("Not supported.");
+        return false;
     }
 
     @Override
