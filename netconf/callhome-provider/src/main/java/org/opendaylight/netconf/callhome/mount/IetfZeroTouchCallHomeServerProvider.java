@@ -147,9 +147,11 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         // its created under CallHomeAuthorizationProvider.
         // Will have to redesign a bit here.
         // CallHomeAuthorization.
-        ReadTransaction roConfigTx = dataBroker.newReadOnlyTransaction();
-        ListenableFuture<Optional<AllowedDevices>> devicesFuture = roConfigTx
-                .read(LogicalDatastoreType.CONFIGURATION, IetfZeroTouchCallHomeServerProvider.ALL_DEVICES);
+        final ListenableFuture<Optional<AllowedDevices>> devicesFuture;
+        try (ReadTransaction roConfigTx = dataBroker.newReadOnlyTransaction()) {
+            devicesFuture = roConfigTx.read(LogicalDatastoreType.CONFIGURATION,
+                IetfZeroTouchCallHomeServerProvider.ALL_DEVICES);
+        }
 
         Set<InstanceIdentifier<?>> deletedDevices = new HashSet<>();
         for (DataTreeModification<AllowedDevices> change : changes) {
