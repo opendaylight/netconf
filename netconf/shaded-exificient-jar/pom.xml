@@ -22,6 +22,11 @@
     <version>1.6.2-SNAPSHOT</version>
     <name>${project.artifactId}</name>
 
+    <properties>
+        <!-- We do not want to leak this artifact -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.siemens.ct.exi</groupId>
