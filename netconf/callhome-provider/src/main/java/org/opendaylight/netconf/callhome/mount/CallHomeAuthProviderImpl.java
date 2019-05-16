@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.callhome.mount;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.net.InetAddresses;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -15,6 +16,8 @@ import java.net.SocketAddress;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -188,7 +191,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
     }
 
     private static class DeviceOp implements DataTreeChangeListener<Device> {
-        private final ConcurrentMap<String, Device> byPublicKey = new ConcurrentHashMap<>();
+        private volatile ImmutableMap<String, Device> byPublicKey = ImmutableMap.of();
 
         Device get(final PublicKey serverKey) {
             final String skey;
@@ -204,46 +207,64 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
         @Override
         public void onDataTreeChanged(final Collection<DataTreeModification<Device>> mods) {
+            final ImmutableMap<String, Device> before = byPublicKey;
+            Map<String, Device> after = before;
+
             for (DataTreeModification<Device> dataTreeModification : mods) {
                 final DataObjectModification<Device> deviceMod = dataTreeModification.getRootNode();
                 final ModificationType modType = deviceMod.getModificationType();
                 switch (modType) {
                     case DELETE:
-                        deleteDevice(deviceMod.getDataBefore());
+                        after = deleteDevice(after, deviceMod.getDataBefore());
                         break;
                     case SUBTREE_MODIFIED:
                     case WRITE:
-                        deleteDevice(deviceMod.getDataBefore());
-                        writeDevice(deviceMod.getDataAfter());
+                        after = writeDevice(deleteDevice(after, deviceMod.getDataBefore()),
+                            deviceMod.getDataAfter()) ;
                         break;
                     default:
                         throw new IllegalStateException("Unhandled modification type " + modType);
                 }
             }
+
+            if (after != before) {
+                // Push updates out
+                byPublicKey = ImmutableMap.copyOf(after);
+            }
         }
 
-        private void deleteDevice(final Device dataBefore) {
+        private static Map<String, Device> deleteDevice(final Map<String, Device> map, final Device dataBefore) {
             if (dataBefore == null) {
-                return;
+                return map;
             }
 
             final String publicKey = dataBefore.getSshHostKey();
-            if (publicKey != null) {
-                LOG.debug("Removing device {}", dataBefore.getUniqueId());
-                byPublicKey.remove(publicKey);
-            } else {
+            if (publicKey == null) {
                 LOG.debug("Ignoring removal of device {}, no host key present", dataBefore.getUniqueId());
+                return map;
             }
+
+            LOG.debug("Removing device {}", dataBefore.getUniqueId());
+            final Map<String, Device> mutable = ensureMutable(map);
+            mutable.remove(publicKey);
+            return mutable;
         }
 
-        private void writeDevice(final Device dataAfter) {
+        private static Map<String, Device> writeDevice(final Map<String, Device> map, final Device dataAfter) {
             final String publicKey = dataAfter.getSshHostKey();
-            if (publicKey != null) {
-                LOG.debug("Adding device {}", dataAfter.getUniqueId());
-                byPublicKey.put(publicKey, dataAfter);
-            } else {
+            if (publicKey == null) {
                 LOG.debug("Ignoring addition of device {}, no host key present", dataAfter.getUniqueId());
+                return map;
             }
+
+            final Map<String, Device> mutable = ensureMutable(map);
+            LOG.debug("Adding device {}", dataAfter.getUniqueId());
+            mutable.put(publicKey, dataAfter);
+            return mutable;
+        }
+
+        private static Map<String, Device> ensureMutable(final Map<String, Device> map) {
+            return map instanceof ImmutableMap ? new HashMap<>(map) : map;
         }
     }
 
