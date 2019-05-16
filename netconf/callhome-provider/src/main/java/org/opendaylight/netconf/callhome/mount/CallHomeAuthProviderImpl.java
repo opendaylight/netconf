@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.callhome.mount;
 
-import com.google.common.base.Objects;
 import com.google.common.net.InetAddresses;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -20,6 +19,7 @@ import java.util.concurrent.ConcurrentMap;
 import javax.annotation.Nonnull;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.DataObjectModification;
+import org.opendaylight.controller.md.sal.binding.api.DataObjectModification.ModificationType;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeChangeListener;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeIdentifier;
 import org.opendaylight.controller.md.sal.binding.api.DataTreeModification;
@@ -126,56 +126,80 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         return remoteAddress.toString();
     }
 
-    private static class DeviceConfig implements DataTreeChangeListener<Device> {
-
-        private final AuthorizedKeysDecoder keyDecoder = new AuthorizedKeysDecoder();
-
-        private final ConcurrentMap<PublicKey, Device> byPublicKey = new ConcurrentHashMap<>();
+    private abstract static class AbstractDeviceListener implements DataTreeChangeListener<Device> {
 
         @Override
-        public void onDataTreeChanged(@Nonnull final Collection<DataTreeModification<Device>> mods) {
+        public final void onDataTreeChanged(final Collection<DataTreeModification<Device>> mods) {
             for (DataTreeModification<Device> dataTreeModification : mods) {
-                DataObjectModification<Device> rootNode = dataTreeModification.getRootNode();
-                process(rootNode);
-            }
-        }
-
-        private void process(final DataObjectModification<Device> deviceMod) {
-            Device before = deviceMod.getDataBefore();
-            Device after = deviceMod.getDataAfter();
-
-            if (before == null) {
-                putDevice(after);
-            } else if (after == null) {
-                // Delete
-                removeDevice(before);
-            } else {
-                if (!Objects.equal(before.getSshHostKey(), after.getSshHostKey())) {
-                    // key changed // we should remove previous key.
-                    removeDevice(before);
+                final DataObjectModification<Device> deviceMod = dataTreeModification.getRootNode();
+                final ModificationType modType = deviceMod.getModificationType();
+                switch (modType) {
+                    case DELETE:
+                        deleteDevice(deviceMod.getDataBefore());
+                        break;
+                    case SUBTREE_MODIFIED:
+                    case WRITE:
+                        deleteDevice(deviceMod.getDataBefore());
+                        writeDevice(deviceMod.getDataAfter());
+                        break;
+                    default:
+                        throw new IllegalStateException("Unhandled modification type " + modType);
                 }
-                putDevice(after);
             }
         }
 
-        private void putDevice(final Device device) {
-            PublicKey key = publicKey(device);
-            if (key == null) {
-                return;
+        private void deleteDevice(final Device dataBefore) {
+            if (dataBefore != null) {
+                final String publicKey = dataBefore.getSshHostKey();
+                if (publicKey != null) {
+                    LOG.debug("Removing device {}", dataBefore.getUniqueId());
+                    removeDevice(publicKey, dataBefore);
+                } else {
+                    LOG.debug("Ignoring removal of device {}, no host key present", dataBefore.getUniqueId());
+                }
             }
-            byPublicKey.put(key, device);
         }
 
-        private void removeDevice(final Device device) {
-            PublicKey key = publicKey(device);
-            if (key == null) {
-                return;
+        private void writeDevice(final Device dataAfter) {
+            final String publicKey = dataAfter.getSshHostKey();
+            if (publicKey != null) {
+                LOG.debug("Adding device {}", dataAfter.getUniqueId());
+                addDevice(publicKey, dataAfter);
+            } else {
+                LOG.debug("Ignoring addition of device {}, no host key present", dataAfter.getUniqueId());
             }
-            byPublicKey.remove(key);
         }
 
-        private PublicKey publicKey(final Device device) {
-            String hostKey = device.getSshHostKey();
+        abstract void addDevice(String publicKey, Device device);
+
+        abstract void removeDevice(String publicKey, Device device);
+    }
+
+    private static class DeviceConfig extends AbstractDeviceListener {
+        private final ConcurrentMap<PublicKey, Device> byPublicKey = new ConcurrentHashMap<>();
+        private final AuthorizedKeysDecoder keyDecoder = new AuthorizedKeysDecoder();
+
+        Device get(final PublicKey key) {
+            return byPublicKey.get(key);
+        }
+
+        @Override
+        void addDevice(final String publicKey, final Device device) {
+            final PublicKey key = publicKey(publicKey, device);
+            if (key != null) {
+                byPublicKey.put(key, device);
+            }
+        }
+
+        @Override
+        void removeDevice(final String publicKey, final Device device) {
+            final PublicKey key = publicKey(publicKey, device);
+            if (key != null) {
+                byPublicKey.remove(key);
+            }
+        }
+
+        private PublicKey publicKey(final String hostKey, final Device device) {
             try {
                 return keyDecoder.decodePublicKey(hostKey);
             } catch (GeneralSecurityException e) {
@@ -183,62 +207,31 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
                 return null;
             }
         }
-
-        private Device get(final PublicKey key) {
-            return byPublicKey.get(key);
-        }
     }
 
-    private static class DeviceOp implements DataTreeChangeListener<Device> {
-
+    private static class DeviceOp extends AbstractDeviceListener {
         private final ConcurrentMap<String, Device> byPublicKey = new ConcurrentHashMap<>();
 
-        @Override
-        public void onDataTreeChanged(@Nonnull final Collection<DataTreeModification<Device>> mods) {
-            for (DataTreeModification<Device> dataTreeModification : mods) {
-                DataObjectModification<Device> rootNode = dataTreeModification.getRootNode();
-                process(rootNode);
-            }
-        }
-
-        private void process(final DataObjectModification<Device> deviceMod) {
-            Device before = deviceMod.getDataBefore();
-            Device after = deviceMod.getDataAfter();
-
-            if (before == null) {
-                putDevice(after);
-            } else if (after == null) {
-                // Delete
-                removeDevice(before);
-            } else {
-                if (!Objects.equal(before.getSshHostKey(), after.getSshHostKey())) {
-                    // key changed // we should remove previous key.
-                    removeDevice(before);
-                }
-                putDevice(after);
-            }
-        }
-
-        private void putDevice(final Device device) {
-            String key = device.getSshHostKey();
-            byPublicKey.put(key, device);
-        }
-
-        private void removeDevice(final Device device) {
-            String key = device.getSshHostKey();
-            byPublicKey.remove(key);
-        }
-
         Device get(final PublicKey serverKey) {
-            String skey = "";
-
+            final String skey;
             try {
                 skey = AuthorizedKeysDecoder.encodePublicKey(serverKey);
-                return byPublicKey.get(skey);
             } catch (IOException | IllegalArgumentException e) {
-                LOG.error("Unable to encode server key: {}", skey, e);
+                LOG.error("Unable to encode server key: {}", serverKey, e);
                 return null;
             }
+
+            return byPublicKey.get(skey);
+        }
+
+        @Override
+        void removeDevice(final String publicKey, final Device device) {
+            byPublicKey.remove(publicKey);
+        }
+
+        @Override
+        void addDevice(final String publicKey, final Device device) {
+            byPublicKey.put(publicKey, device);
         }
     }
 
