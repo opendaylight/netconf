@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
+import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
@@ -187,54 +188,61 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
     }
 
     private static class DeviceOp implements DataTreeChangeListener<Device> {
-
         private final ConcurrentMap<String, Device> byPublicKey = new ConcurrentHashMap<>();
+
+        Device get(final PublicKey serverKey) {
+            final String skey;
+            try {
+                skey = AuthorizedKeysDecoder.encodePublicKey(serverKey);
+            } catch (IOException | IllegalArgumentException e) {
+                LOG.error("Unable to encode server key: {}", serverKey, e);
+                return null;
+            }
+
+            return byPublicKey.get(skey);
+        }
 
         @Override
         public void onDataTreeChanged(final Collection<DataTreeModification<Device>> mods) {
             for (DataTreeModification<Device> dataTreeModification : mods) {
-                DataObjectModification<Device> rootNode = dataTreeModification.getRootNode();
-                process(rootNode);
-            }
-        }
-
-        private void process(final DataObjectModification<Device> deviceMod) {
-            Device before = deviceMod.getDataBefore();
-            Device after = deviceMod.getDataAfter();
-
-            if (before == null) {
-                putDevice(after);
-            } else if (after == null) {
-                // Delete
-                removeDevice(before);
-            } else {
-                if (!Objects.equal(before.getSshHostKey(), after.getSshHostKey())) {
-                    // key changed // we should remove previous key.
-                    removeDevice(before);
+                final DataObjectModification<Device> deviceMod = dataTreeModification.getRootNode();
+                final ModificationType modType = deviceMod.getModificationType();
+                switch (modType) {
+                    case DELETE:
+                        deleteDevice(deviceMod.getDataBefore());
+                        break;
+                    case SUBTREE_MODIFIED:
+                    case WRITE:
+                        deleteDevice(deviceMod.getDataBefore());
+                        writeDevice(deviceMod.getDataAfter());
+                        break;
+                    default:
+                        throw new IllegalStateException("Unhandled modification type " + modType);
                 }
-                putDevice(after);
             }
         }
 
-        private void putDevice(final Device device) {
-            String key = device.getSshHostKey();
-            byPublicKey.put(key, device);
+        private void deleteDevice(final Device dataBefore) {
+            if (dataBefore == null) {
+                return;
+            }
+
+            final String publicKey = dataBefore.getSshHostKey();
+            if (publicKey != null) {
+                LOG.debug("Removing device {}", dataBefore.getUniqueId());
+                byPublicKey.remove(publicKey);
+            } else {
+                LOG.debug("Ignoring removal of device {}, no host key present", dataBefore.getUniqueId());
+            }
         }
 
-        private void removeDevice(final Device device) {
-            String key = device.getSshHostKey();
-            byPublicKey.remove(key);
-        }
-
-        Device get(final PublicKey serverKey) {
-            String skey = "";
-
-            try {
-                skey = AuthorizedKeysDecoder.encodePublicKey(serverKey);
-                return byPublicKey.get(skey);
-            } catch (IOException | IllegalArgumentException e) {
-                LOG.error("Unable to encode server key: {}", skey, e);
-                return null;
+        private void writeDevice(final Device dataAfter) {
+            final String publicKey = dataAfter.getSshHostKey();
+            if (publicKey != null) {
+                LOG.debug("Adding device {}", dataAfter.getUniqueId());
+                byPublicKey.put(publicKey, dataAfter);
+            } else {
+                LOG.debug("Ignoring addition of device {}, no host key present", dataAfter.getUniqueId());
             }
         }
     }
