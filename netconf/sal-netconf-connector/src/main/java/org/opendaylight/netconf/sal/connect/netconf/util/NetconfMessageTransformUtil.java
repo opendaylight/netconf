@@ -452,7 +452,6 @@ public final class NetconfMessageTransformUtil {
             final Element actionNS, final Iterator<PathArgument> iterator, final Document document) {
         if (iterator.hasNext()) {
             final PathArgument next = iterator.next();
-            final QName actualNS = next.getNodeType();
 
             DataSchemaContextNode<?> current = currentParentSchemaNode.getChild(next);
             Preconditions.checkArgument(current != null, "Invalid input: schema for argument %s not found", next);
@@ -461,6 +460,7 @@ public final class NetconfMessageTransformUtil {
                 return prepareActionData(current, actionNS, iterator, document);
             }
 
+            final QName actualNS = next.getNodeType();
             final Element actualElement = document.createElementNS(actualNS.getNamespace().toString(),
                     actualNS.getLocalName());
             if (next instanceof NodeWithValue) {

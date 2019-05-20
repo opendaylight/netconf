@@ -90,6 +90,9 @@ public class NetconfMessageTransformerTest {
     private static final String REVISION_EXAMPLE_SERVER_FARM = "2018-08-07";
     private static final String URN_EXAMPLE_SERVER_FARM = "urn:example:server-farm";
 
+    private static final String REVISION_EXAMPLE_SERVER_FARM_2 = "2019-05-20";
+    private static final String URN_EXAMPLE_SERVER_FARM_2 = "urn:example:server-farm-2";
+
     private NetconfMessageTransformer actionNetconfMessageTransformer;
     private NetconfMessageTransformer netconfMessageTransformer;
     private SchemaContext schema;
@@ -401,7 +404,8 @@ public class NetconfMessageTransformerTest {
         QName start = QName.create(reset, "start");
         QName open = QName.create(start, "open");
         QName enable = QName.create(open, "enable");
-        Set<QName> qnames = new HashSet<>(Arrays.asList(reset, start, open, enable));
+        QName kill = QName.create(URN_EXAMPLE_SERVER_FARM_2, REVISION_EXAMPLE_SERVER_FARM_2, "kill");
+        Set<QName> qnames = new HashSet<>(Arrays.asList(reset, start, open, enable, kill));
         Set<ActionDefinition> actions = actionNetconfMessageTransformer.getActions();
         assertTrue(!actions.isEmpty());
         for (ActionDefinition actionDefinition : actions) {
@@ -524,6 +528,61 @@ public class NetconfMessageTransformerTest {
         checkNode(action, null, actionEnableQName.getLocalName(), null);
     }
 
+    @Test
+    public void toActionRequestListInContainerAugmentedIntoListTest() {
+        QName qnameServer = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "server");
+        QName serverNameQname = QName.create(qnameServer, "name");
+        QName qnameAppliactions = QName.create(URN_EXAMPLE_SERVER_FARM_2,
+                REVISION_EXAMPLE_SERVER_FARM_2, "applications");
+        QName qnameAppliaction = QName.create(URN_EXAMPLE_SERVER_FARM_2,
+                REVISION_EXAMPLE_SERVER_FARM_2, "application");
+        QName applicationNameQname = QName.create(qnameAppliaction, "name");
+        QName actionKillQName = QName.create(qnameAppliaction, "kill");
+
+        List<PathArgument> nodeIdentifiers = new ArrayList<>();
+        nodeIdentifiers.add(NodeIdentifier.create(qnameServer));
+        nodeIdentifiers.add(new NodeIdentifierWithPredicates(qnameServer, serverNameQname, "testServer"));
+        nodeIdentifiers.add(new YangInstanceIdentifier
+                .AugmentationIdentifier(Collections.singleton(qnameAppliactions)));
+        nodeIdentifiers.add(NodeIdentifier.create(qnameAppliactions));
+        nodeIdentifiers.add(NodeIdentifier.create(qnameAppliaction));
+        nodeIdentifiers.add(new NodeIdentifierWithPredicates(qnameAppliaction,
+                applicationNameQname, "testApplication"));
+
+        DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
+
+        NormalizedNode<?, ?> payload = initEmptyInputAction(qnameAppliaction);
+        NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
+                SchemaPath.create(true, actionKillQName), domDataTreeIdentifier, payload);
+
+        Node childAction = checkBasePartOfActionRequest(actionRequest);
+
+        Node childServer = childAction.getFirstChild();
+        checkNode(childServer, "server", "server", qnameServer.getNamespace().toString());
+
+        Node childServerName = childServer.getFirstChild();
+        checkNode(childServerName, "name", "name", serverNameQname.getNamespace().toString());
+
+        Node childServerNameTest = childServerName.getFirstChild();
+        assertEquals(childServerNameTest.getNodeValue(), "testServer");
+
+        Node childApplications = childServer.getLastChild();
+        checkNode(childApplications, "applications", "applications", qnameAppliactions.getNamespace().toString());
+
+        Node childApplication = childApplications.getFirstChild();
+        checkNode(childApplication, "application", "application", qnameAppliaction.getNamespace().toString());
+
+        Node childApplicationName = childApplication.getFirstChild();
+        checkNode(childApplicationName, "name", "name", applicationNameQname.getNamespace().toString());
+
+        Node childApplicationNameTest = childApplicationName.getFirstChild();
+        assertEquals(childApplicationNameTest.getNodeValue(), "testApplication");
+
+        Node childKillAction = childApplication.getLastChild();
+        checkNode(childApplication, "application", "application", qnameAppliaction.getNamespace().toString());
+        checkNode(childKillAction, null, actionKillQName.getLocalName(), null);
+    }
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void toActionResultTest() throws Exception {
@@ -602,7 +661,8 @@ public class NetconfMessageTransformerTest {
     }
 
     private static SchemaContext getActionSchema() {
-        return YangParserTestUtils.parseYangResource("/schemas/example-server-farm.yang");
+        return YangParserTestUtils.parseYangResources(NetconfMessageTransformerTest.class,
+                "/schemas/example-server-farm.yang","/schemas/example-server-farm-2.yang");
     }
 
     private static NetconfMessageTransformer getActionMessageTransformer() {
