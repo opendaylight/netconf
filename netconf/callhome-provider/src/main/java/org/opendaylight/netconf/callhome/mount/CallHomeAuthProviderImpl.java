@@ -233,7 +233,6 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
     }
 
     private static class GlobalConfig implements DataTreeChangeListener<Global> {
-
         private volatile Global current = null;
 
         @Override
@@ -244,15 +243,14 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
         }
 
         boolean allowedUnknownKeys() {
-            if (current == null) {
-                return false;
-            }
+            final Global local = current;
             // Deal with null values.
-            return Boolean.TRUE.equals(current.isAcceptAllSshKeys());
+            return local != null && Boolean.TRUE.equals(local.isAcceptAllSshKeys());
         }
 
         Credentials getCredentials() {
-            return current != null ? current.getCredentials() : null;
+            final Global local = current;
+            return local != null ? local.getCredentials() : null;
         }
     }
 }
