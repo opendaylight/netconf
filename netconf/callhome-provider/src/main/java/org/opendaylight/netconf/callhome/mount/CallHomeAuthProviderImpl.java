@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.callhome.mount;
 
+import com.google.common.collect.Iterables;
 import com.google.common.net.InetAddresses;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -237,8 +238,8 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
         @Override
         public void onDataTreeChanged(final Collection<DataTreeModification<Global>> mods) {
-            for (DataTreeModification<Global> dataTreeModification : mods) {
-                current = dataTreeModification.getRootNode().getDataAfter();
+            if (!mods.isEmpty()) {
+                current = Iterables.getLast(mods).getRootNode().getDataAfter();
             }
         }
 
