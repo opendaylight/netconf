@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "904db77c_506ce76c",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NodeAnyXmlProxy.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-05-21T11:13:23Z",
+      "side": 1,
+      "message": "why is this public?",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 6
+      },
+      "revId": "bc3fbe739f0c02a94b41fee30263678876982ec5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "76fddb01_f02e2773",
+        "filename": "restconf/restconf-nb-bierman02/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-05-21T11:13:23Z",
+      "side": 1,
+      "message": "This is a very bad dependency",
+      "range": {
+        "startLine": 162,
+        "startChar": 0,
+        "endLine": 166,
+        "endChar": 17
+      },
+      "revId": "bc3fbe739f0c02a94b41fee30263678876982ec5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c2fc1801_c85a68b3",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/NormalizedNodeJsonBodyWriter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-05-21T11:13:23Z",
+      "side": 1,
+      "message": "cross-plugin dependency for a single utility method. That method should be factored out to a common api/util component.",
+      "range": {
+        "startLine": 95,
+        "startChar": 19,
+        "endLine": 95,
+        "endChar": 81
+      },
+      "revId": "bc3fbe739f0c02a94b41fee30263678876982ec5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
