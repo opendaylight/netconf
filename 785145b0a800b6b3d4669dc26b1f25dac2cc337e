@@ -22,6 +22,30 @@
       "revId": "785145b0a800b6b3d4669dc26b1f25dac2cc337e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "590ebcb2_17243f85",
+        "filename": "netconf/callhome-model/src/main/yang/odl-netconf-callhome-server.yang",
+        "patchSetId": 5
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 6995
+      },
+      "writtenOn": "2019-05-24T21:18:30Z",
+      "side": 1,
+      "message": "Can you expand on this comment please .",
+      "parentUuid": "10060f21_c68304de",
+      "range": {
+        "startLine": 53,
+        "startChar": 57,
+        "endLine": 53,
+        "endChar": 64
+      },
+      "revId": "785145b0a800b6b3d4669dc26b1f25dac2cc337e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
