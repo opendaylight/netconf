@@ -79,11 +79,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>ietf-netconf-monitoring</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>ietf-netconf</artifactId>
+            <artifactId>ietf-netconf-monitoring-extension</artifactId>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
@@ -91,7 +87,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>ietf-netconf-monitoring-extension</artifactId>
+            <artifactId>ietf-netconf-with-defaults</artifactId>
         </dependency>
     </dependencies>
 </project>
