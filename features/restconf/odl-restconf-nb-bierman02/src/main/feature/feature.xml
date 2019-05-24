@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright © 2018 Pantheon Technologies, s.r.o. and others.
+  ~ Copyright © 2019 PANTHEON.tech, s.r.o. and others.
   ~
   ~ This program and the accompanying materials are made available under the
   ~ terms of the Eclipse Public License v1.0 which accompanies this distribution,
   ~ and is available at http://www.eclipse.org/legal/epl-v10.html
   -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" name="odl-netconf-${project.version}">
-    <feature name="odl-netconf-api" version="${project.version}">
-        <feature version="[5,6)">odl-netty-4</feature>
-        <feature version="[3,4)">odl-yangtools-parser-api</feature>
-        <feature version="[2,3)">odl-mdsal-model-rfc7895</feature>
+    <feature name="odl-restconf-nb-bierman02" version="${project.version}">
+        <feature version="[2,3)">odl-mdsal-model-draft-bierman-netconf-restconf-02</feature>
     </feature>
 </features>
