@@ -68,6 +68,12 @@
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.opendaylight.mdsal.model</groupId>
+            <artifactId>odl-mdsal-model-rfc8342</artifactId>
+            <type>xml</type>
+            <classifier>features</classifier>
+        </dependency>
 
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
@@ -87,7 +93,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>ietf-netconf-with-defaults</artifactId>
+            <artifactId>ietf-netconf-nmda</artifactId>
         </dependency>
     </dependencies>
 </project>
