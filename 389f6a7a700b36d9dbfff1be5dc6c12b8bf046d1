@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "238c337e_af58358e",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeAuthProviderImpl.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-05-24T10:25:43Z",
+      "side": 1,
+      "message": "That is handled below.",
+      "parentUuid": "2c4060c0_e96de16b",
+      "revId": "389f6a7a700b36d9dbfff1be5dc6c12b8bf046d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "435fc043_a2587948",
         "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeAuthProviderImpl.java",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2019-05-22T05:28:50Z",
       "side": 1,
       "message": "This can be removed once default is IPPORT",
+      "revId": "389f6a7a700b36d9dbfff1be5dc6c12b8bf046d1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d574a2c6_2aeb7780",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeAuthProviderImpl.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-05-24T10:25:43Z",
+      "side": 1,
+      "message": "No, it cannot. This case is when the YANG model defines a new strategy, it is explicitly configured and the code here does not cover it. ISE is very much appropriate.",
+      "parentUuid": "435fc043_a2587948",
       "revId": "389f6a7a700b36d9dbfff1be5dc6c12b8bf046d1",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
