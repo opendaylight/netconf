@@ -865,7 +865,7 @@ Testtool help
       --device-count DEVICES-COUNT
                              Number of simulated netconf devices to spin. This is the number of actual ports open for the devices.
       --devices-per-port DEVICES-PER-PORT
-                             Amount of config files generated per port to spoof more devices then are actually running
+                             Amount of config files generated per port to spoof more devices than are actually running
       --schemas-dir SCHEMAS-DIR
                              Directory containing yang schemas to describe simulated devices. Some schemas e.g. netconf monitoring and inet types are included by default
       --notification-file NOTIFICATION-FILE
