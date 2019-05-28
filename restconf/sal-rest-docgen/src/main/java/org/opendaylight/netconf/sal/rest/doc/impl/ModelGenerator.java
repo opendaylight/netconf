@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Post;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.model.api.AnyDataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AnyXmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -341,6 +342,9 @@ public class ModelGenerator {
                 } else if (node instanceof AnyXmlSchemaNode) {
                     property = processAnyXMLNode((AnyXmlSchemaNode) node);
 
+                } else if (node instanceof AnyDataSchemaNode) {
+                    property = processAnydataNode((AnyDataSchemaNode) node);
+
                 } else if (node instanceof ContainerSchemaNode) {
                     property = processDataNodeContainer((ContainerSchemaNode) node, parentName, models, isConfig,
                             schemaContext);
@@ -410,6 +414,9 @@ public class ModelGenerator {
             } else if (node instanceof AnyXmlSchemaNode) {
                 property = processAnyXMLNode((AnyXmlSchemaNode) node);
 
+            } else if (node instanceof AnyDataSchemaNode) {
+                property = processAnydataNode((AnyDataSchemaNode) node);
+
             } else if (node instanceof ContainerSchemaNode) {
                 property = processDataNodeContainer((ContainerSchemaNode) node, moduleName, models, isConfig,
                         schemaContext);
@@ -446,6 +453,19 @@ public class ModelGenerator {
         putIfNonNull(property, DESCRIPTION_KEY, leafDescription);
         processMandatory(leafNode, property);
         processTypeDef(leafNode.getType(), leafNode, property, schemaContext);
+
+        return property;
+    }
+
+    private static ObjectNode processAnydataNode(final AnyDataSchemaNode leafNode) {
+        final ObjectNode property = JsonNodeFactory.instance.objectNode();
+
+        final String leafDescription = leafNode.getDescription().orElse(null);
+        putIfNonNull(property, DESCRIPTION_KEY, leafDescription);
+
+        processMandatory(leafNode, property);
+        final String localName = leafNode.getQName().getLocalName();
+        property.put(TYPE_KEY, "example of anydata " + localName);
 
         return property;
     }
