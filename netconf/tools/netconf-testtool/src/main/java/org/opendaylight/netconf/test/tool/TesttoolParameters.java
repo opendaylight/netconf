@@ -151,7 +151,7 @@ public class TesttoolParameters {
         parser.addArgument("--devices-per-port")
                 .type(Integer.class)
                 .setDefault(1)
-                .help("Amount of config files generated per port to spoof more devices then are actually running")
+                .help("Amount of config files generated per port to spoof more devices than are actually running")
                 .dest("devices-per-port");
 
         parser.addArgument("--schemas-dir")
