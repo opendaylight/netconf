@@ -122,6 +122,8 @@ public final class NetconfMessageTransformUtil {
     public static final NodeIdentifier NETCONF_DATA_NODEID = NodeIdentifier.create(NETCONF_DATA_QNAME);
 
     public static final QName NETCONF_RPC_REPLY_QNAME = QName.create(NETCONF_QNAME, "rpc-reply").intern();
+    public static final NodeIdentifier NETCONF_RPC_REPLY_NODEID = NodeIdentifier.create(NETCONF_RPC_REPLY_QNAME);
+
     public static final QName NETCONF_OK_QNAME = QName.create(NETCONF_QNAME, "ok").intern();
     public static final QName NETCONF_ERROR_OPTION_QNAME = QName.create(NETCONF_QNAME, "error-option").intern();
     public static final NodeIdentifier NETCONF_ERROR_OPTION_NODEID = NodeIdentifier.create(NETCONF_ERROR_OPTION_QNAME);
@@ -205,7 +207,7 @@ public final class NetconfMessageTransformUtil {
     public static final ContainerNode CREATE_SUBSCRIPTION_RPC_CONTENT = Builders.containerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(CREATE_SUBSCRIPTION_RPC_QNAME)).build();
 
-    private static final NodeIdentifier NETCONF_FILTER_NODEID = NodeIdentifier.create(NETCONF_FILTER_QNAME);
+    public static final NodeIdentifier NETCONF_FILTER_NODEID = NodeIdentifier.create(NETCONF_FILTER_QNAME);
 
     public static final DataContainerChild<?, ?> EMPTY_FILTER;
 
