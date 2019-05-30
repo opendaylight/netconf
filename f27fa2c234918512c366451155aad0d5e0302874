@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ef78a9dd_d9b9fadf",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/NetconfMessageTransformer.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-05-30T13:41:31Z",
+      "side": 1,
+      "message": "The only function here is to pass the NodeIdentifier to the builder hence this call is not necessary and should be replaced by:",
+      "range": {
+        "startLine": 273,
+        "startChar": 12,
+        "endLine": 273,
+        "endChar": 106
+      },
+      "revId": "f27fa2c234918512c366451155aad0d5e0302874",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4fc5cda2_26fdda77",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/NetconfMessageTransformer.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-05-30T13:41:31Z",
+      "side": 1,
+      "message": "().withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)",
+      "range": {
+        "startLine": 274,
+        "startChar": 64,
+        "endLine": 274,
+        "endChar": 74
+      },
+      "revId": "f27fa2c234918512c366451155aad0d5e0302874",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a2bff0da_6d2cd189",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-05-30T13:41:31Z",
+      "side": 1,
+      "message": "The only caller is NetconfMessageTransformer.toRpcResult(), hence the functionality should be located there. See comments there.",
+      "range": {
+        "startLine": 565,
+        "startChar": 0,
+        "endLine": 567,
+        "endChar": 5
+      },
+      "revId": "f27fa2c234918512c366451155aad0d5e0302874",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b39c41e_98974114",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NodeAnyXmlProxy.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-05-30T13:41:31Z",
+      "side": 1,
+      "message": "This should not be public and is unnecessary anyway, see other comments.",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 56
+      },
+      "revId": "f27fa2c234918512c366451155aad0d5e0302874",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aa17433a_8b128fca",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/NodeContainerProxy.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-05-30T13:41:31Z",
+      "side": 1,
+      "message": "Is this actually a complete copy of what is in org.opendaylight.netconf.sal.connect.netconf.util ?! If so, this should live in a common place, like netconf-util",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 63
+      },
+      "revId": "f27fa2c234918512c366451155aad0d5e0302874",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
