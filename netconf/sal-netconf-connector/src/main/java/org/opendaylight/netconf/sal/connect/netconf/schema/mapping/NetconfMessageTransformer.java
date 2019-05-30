@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.Collection;
@@ -75,6 +76,11 @@ import org.xml.sax.SAXException;
 public class NetconfMessageTransformer implements MessageTransformer<NetconfMessage> {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformer.class);
+
+    private static final ImmutableSet<URI> BASE_OR_NOTIFICATION_NS = ImmutableSet.of(
+        NETCONF_URI,
+        IETF_NETCONF_NOTIFICATIONS.getNamespace(),
+        CREATE_SUBSCRIPTION_RPC_QNAME.getNamespace());
 
     private final SchemaContext schemaContext;
     private final BaseSchema baseSchema;
@@ -258,9 +264,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     private static boolean isBaseOrNotificationRpc(final QName rpc) {
-        return rpc.getNamespace().equals(NETCONF_URI)
-                || rpc.getNamespace().equals(IETF_NETCONF_NOTIFICATIONS.getNamespace())
-                || rpc.getNamespace().equals(CREATE_SUBSCRIPTION_RPC_QNAME.getNamespace());
+        return BASE_OR_NOTIFICATION_NS.contains(rpc.getNamespace());
     }
 
     @Override
