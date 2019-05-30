@@ -92,7 +92,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         document.appendChild(configElement);
 
         final Element parentXmlStructure;
-        if (dataPath.equals(YangInstanceIdentifier.EMPTY)) {
+        if (dataPath.isEmpty()) {
             parentXmlStructure = dataNode;
             configElement.appendChild(parentXmlStructure);
         } else {
@@ -137,7 +137,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
 
     private static void checkDataValidForPath(final YangInstanceIdentifier dataPath, final Element dataNode) {
         //if datapath is empty, consider dataNode to be a root node
-        if (dataPath.equals(YangInstanceIdentifier.EMPTY)) {
+        if (dataPath.isEmpty()) {
             return;
         }
         final XmlElement dataElement = XmlElement.fromDomElement(dataNode);
