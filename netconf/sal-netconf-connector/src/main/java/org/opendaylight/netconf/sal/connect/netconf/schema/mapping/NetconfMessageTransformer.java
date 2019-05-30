@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_URI;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
@@ -45,7 +47,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.YangConstants;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -259,7 +260,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     private static boolean isBaseOrNotificationRpc(final QName rpc) {
         return rpc.getNamespace().equals(NETCONF_URI)
                 || rpc.getNamespace().equals(IETF_NETCONF_NOTIFICATIONS.getNamespace())
-                || rpc.getNamespace().equals(NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME.getNamespace());
+                || rpc.getNamespace().equals(CREATE_SUBSCRIPTION_RPC_QNAME.getNamespace());
     }
 
     @Override
@@ -284,8 +285,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             }
 
             normalizedNode = Builders.containerBuilder()
-                    .withNodeIdentifier(new YangInstanceIdentifier
-                            .NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
+                    .withNodeIdentifier(NETCONF_RPC_REPLY_NODEID)
                     .withChild(dataNode).build();
         } else {
 

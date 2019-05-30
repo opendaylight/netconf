@@ -20,7 +20,7 @@ import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -33,14 +33,11 @@ import org.w3c.dom.Element;
  * Transforms anyxml rpcs for schemaless netconf devices.
  */
 public class SchemalessMessageTransformer implements MessageTransformer<NetconfMessage> {
-
-    private static final YangInstanceIdentifier.NodeIdentifier REPLY_ID =
-            new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME);
     // TODO maybe we should move this somewhere else as this
     // might be used in applications using schemaless mountpoints
-    public static final YangInstanceIdentifier.NodeIdentifier SCHEMALESS_NOTIFICATION_PAYLOAD =
+    public static final NodeIdentifier SCHEMALESS_NOTIFICATION_PAYLOAD =
             // FIXME: assign proper namespace
-            new YangInstanceIdentifier.NodeIdentifier(QName.create("", "schemaless-notification-payload"));
+            new NodeIdentifier(QName.create("", "schemaless-notification-payload"));
 
     private final MessageCounter counter;
 
@@ -61,7 +58,7 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
         }
 
         final AnyXmlNode notificationPayload = Builders.anyXmlBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(notificationNoRev))
+                .withNodeIdentifier(new NodeIdentifier(notificationNoRev))
                 .withValue(new DOMSource(stripped.getValue().getDomElement()))
                 .build();
 
@@ -94,7 +91,7 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
             result =  null;
         } else {
             result = Builders.anyXmlBuilder()
-                    .withNodeIdentifier(REPLY_ID)
+                    .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
                     .withValue(new DOMSource(rpcReply.getDocument()))
                     .build();
         }

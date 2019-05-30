@@ -11,6 +11,9 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CONFIG_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_OPERATION_QNAME;
 
 import com.google.common.base.Preconditions;
 import java.util.Collections;
@@ -121,16 +124,15 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
     @Override
     public DataContainerChild<?, ?> toFilterStructure(final YangInstanceIdentifier path) {
         final Document document = XmlUtil.newDocument();
-        final QName filterQname = NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
-        final Element filter =
-                document.createElementNS(filterQname.getNamespace().toString(), filterQname.getLocalName());
-        final Attr a = document.createAttributeNS(filterQname.getNamespace().toString(), "type");
+        final String filterNs = NETCONF_FILTER_QNAME.getNamespace().toString();
+        final Element filter = document.createElementNS(filterNs, NETCONF_FILTER_QNAME.getLocalName());
+        final Attr a = document.createAttributeNS(filterNs, "type");
         a.setTextContent("subtree");
         filter.setAttributeNode(a);
         document.appendChild(filter);
         instanceIdToXmlStructure(path.getPathArguments(), filter);
         return Builders.anyXmlBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(filterQname))
+                .withNodeIdentifier(NETCONF_FILTER_NODEID)
                 .withValue(new DOMSource(document.getDocumentElement()))
                 .build();
     }
@@ -184,9 +186,8 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
 
     private static void setOperationAttribute(final Optional<ModifyAction> operation, final Document document,
                                        final Element dataNode) {
-        final QName operationQname = NetconfMessageTransformUtil.NETCONF_OPERATION_QNAME;
-        final Attr operationAttribute =
-                document.createAttributeNS(operationQname.getNamespace().toString(), operationQname.getLocalName());
+        final Attr operationAttribute = document.createAttributeNS(NETCONF_OPERATION_QNAME.getNamespace().toString(),
+            NETCONF_OPERATION_QNAME.getLocalName());
         operationAttribute.setTextContent(toOperationString(operation.get()));
         dataNode.setAttributeNode(operationAttribute);
     }
