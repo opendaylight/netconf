@@ -28,10 +28,6 @@
       <artifactId>sal-common-util</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.controller</groupId>
-      <artifactId>sal-connector-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>ietf-netconf-monitoring</artifactId>
     </dependency>
