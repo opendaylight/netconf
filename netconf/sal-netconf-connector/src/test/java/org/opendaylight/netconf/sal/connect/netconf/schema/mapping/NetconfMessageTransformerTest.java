@@ -58,7 +58,6 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
@@ -77,7 +76,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
@@ -229,13 +227,9 @@ public class NetconfMessageTransformerTest {
         final MapEntryNode schemaNode =
                 Builders.mapEntryBuilder().withNodeIdentifier(identifierWithPredicates).withValue(values).build();
 
-        final AnyXmlNode data = (AnyXmlNode) ((ContainerNode) compositeNodeRpcResult
+        final ContainerNode data = (ContainerNode) ((ContainerNode) compositeNodeRpcResult
                 .getResult()).getChild(toId(NETCONF_DATA_QNAME)).get();
-
-        NormalizedNodeResult nodeResult =
-                NetconfUtil.transformDOMSourceToNormalizedNode(schema, data.getValue());
-        ContainerNode result = (ContainerNode) nodeResult.getResult();
-        final ContainerNode state = (ContainerNode) result.getChild(toId(NetconfState.QNAME)).get();
+        final ContainerNode state = (ContainerNode) data.getChild(toId(NetconfState.QNAME)).get();
         final ContainerNode schemas = (ContainerNode) state.getChild(toId(Schemas.QNAME)).get();
         final MapNode schemaParent = (MapNode) schemas.getChild(toId(Schema.QNAME)).get();
         assertEquals(1, Iterables.size(schemaParent.getValue()));

@@ -40,7 +40,6 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.netconf.util.NetconfUtil;
-import org.opendaylight.netconf.util.NodeContainerProxy;
 import org.opendaylight.netconf.util.messages.NetconfMessageUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.EditContent;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.CreateSubscriptionInput;
@@ -482,7 +481,7 @@ public final class NetconfMessageTransformUtil {
         final Element actionData = prepareActionData(rootSchemaContextNode, actionNS,
                 domDataTreeIdentifier.getRootIdentifier().getPathArguments().iterator(), document);
 
-        final Element specificActionElement = document.createElement(action);
+        Element specificActionElement = document.createElement(action);
         actionData.appendChild(specificActionElement);
         rpcNS.appendChild(actionNS);
         document.appendChild(rpcNS);
@@ -494,7 +493,7 @@ public final class NetconfMessageTransformUtil {
         if (iterator.hasNext()) {
             final PathArgument next = iterator.next();
 
-            final DataSchemaContextNode<?> current = currentParentSchemaNode.getChild(next);
+            DataSchemaContextNode<?> current = currentParentSchemaNode.getChild(next);
             Preconditions.checkArgument(current != null, "Invalid input: schema for argument %s not found", next);
 
             if (current.isMixin()) {

@@ -14,7 +14,6 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Default implementation resolving schemas QNames from netconf-state or from modules-state.
@@ -24,10 +23,10 @@ public final class NetconfStateSchemasResolverImpl implements NetconfDeviceSchem
 
     @Override
     public NetconfDeviceSchemas resolve(final NetconfDeviceRpc deviceRpc,
-            final NetconfSessionPreferences remoteSessionCapabilities,
-            final RemoteDeviceId id, final SchemaContext schemaContext) {
+                                        final NetconfSessionPreferences remoteSessionCapabilities,
+                                        final RemoteDeviceId id) {
         if (remoteSessionCapabilities.isMonitoringSupported()) {
-            return NetconfStateSchemas.create(deviceRpc, remoteSessionCapabilities, id, schemaContext);
+            return NetconfStateSchemas.create(deviceRpc, remoteSessionCapabilities, id);
         }
 
         // FIXME: I think we should prefer YANG library here

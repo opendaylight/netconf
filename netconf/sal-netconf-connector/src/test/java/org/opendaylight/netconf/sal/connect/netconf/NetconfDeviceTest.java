@@ -116,7 +116,7 @@ public class NetconfDeviceTest {
             TEST_NAMESPACE + "?module=" + TEST_MODULE + "2" + "&amp;revision=" + TEST_REVISION;
 
     private static final NetconfDeviceSchemasResolver STATE_SCHEMAS_RESOLVER =
-        (deviceRpc, remoteSessionCapabilities, id, schemaContext) -> NetconfStateSchemas.EMPTY;
+        (deviceRpc, remoteSessionCapabilities, id) -> NetconfStateSchemas.EMPTY;
 
     @Test
     public void testNetconfDeviceFlawedModelFailedResolution() throws Exception {
@@ -137,8 +137,7 @@ public class NetconfDeviceTest {
             }
         }).when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
 
-        final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id,
-                schemaContext) -> {
+        final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id) -> {
             final Module first = Iterables.getFirst(schema.getModules(), null);
             final QName qName = QName.create(first.getQNameModule(), first.getName());
             final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
@@ -225,8 +224,7 @@ public class NetconfDeviceTest {
             }
         }).when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
 
-        final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id,
-            schemaContext) -> {
+        final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id) -> {
             final Module first = Iterables.getFirst(schema.getModules(), null);
             final QName qName = QName.create(first.getQNameModule(), first.getName());
             final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);

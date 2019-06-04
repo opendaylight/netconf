@@ -11,13 +11,11 @@ package org.opendaylight.netconf.sal.connect.api;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Factory for netconf device schemas.
  */
 public interface NetconfDeviceSchemasResolver {
     NetconfDeviceSchemas resolve(
-            NetconfDeviceRpc deviceRpc, NetconfSessionPreferences remoteSessionCapabilities, RemoteDeviceId id,
-            SchemaContext schemaContext);
+            NetconfDeviceRpc deviceRpc, NetconfSessionPreferences remoteSessionCapabilities, RemoteDeviceId id);
 }

@@ -9,13 +9,11 @@ package org.opendaylight.netconf.util;
 
 import com.google.common.base.Preconditions;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Iterator;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -23,33 +21,22 @@ import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.util.NormalizedMetadataWriter;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.xml.XmlCodecFactory;
-import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
-import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
-import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 public final class NetconfUtil {
 
-    public static final QName NETCONF_QNAME =
-            QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "netconf").intern();
-    public static final QName NETCONF_DATA_QNAME = QName.create(NETCONF_QNAME, "data").intern();
-    public static final XMLOutputFactory XML_FACTORY;
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfUtil.class);
+    public static final XMLOutputFactory XML_FACTORY;
 
     static {
         XML_FACTORY = XMLOutputFactory.newFactory();
@@ -143,17 +130,5 @@ public final class NetconfUtil {
         } finally {
             xmlWriter.close();
         }
-    }
-
-    public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final SchemaContext schemaContext,
-            final DOMSource value) throws XMLStreamException, URISyntaxException, IOException, SAXException {
-        final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
-        final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-        final XmlCodecFactory codecs = XmlCodecFactory.create(schemaContext);
-        final ContainerSchemaNode dataRead = new NodeContainerProxy(NETCONF_DATA_QNAME, schemaContext.getChildNodes());
-        try (XmlParserStream xmlParserStream = XmlParserStream.create(writer, codecs, dataRead)) {
-            xmlParserStream.traverse(value);
-        }
-        return resultHolder;
     }
 }

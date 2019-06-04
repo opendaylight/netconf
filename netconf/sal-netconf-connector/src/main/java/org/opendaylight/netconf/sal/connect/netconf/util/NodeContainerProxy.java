@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.util;
+package org.opendaylight.netconf.sal.connect.netconf.util;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
