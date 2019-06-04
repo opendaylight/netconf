@@ -30,7 +30,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -75,12 +74,10 @@ public class NetconfStateSchemasTest {
     @Mock
     private DOMRpcService rpc;
 
-    private SchemaContext schemaContext;
-
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        schemaContext = BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext();
+        final SchemaContext schemaContext = BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext();
         final DataSchemaNode schemasNode =
                 ((ContainerSchemaNode) schemaContext
                         .getDataChildByName(NetconfState.QNAME)).getDataChildByName(Schemas.QNAME);
@@ -106,7 +103,6 @@ public class NetconfStateSchemasTest {
                 hasItem(QName.create("urn:TBD:params:xml:ns:yang:network-topology", "2013-07-12", "network-topology")));
     }
 
-    @Ignore
     @Test
     public void testCreate2() throws Exception {
         final ContainerNode netconfState = Builders.containerBuilder()
@@ -124,8 +120,8 @@ public class NetconfStateSchemasTest {
                 .withChild(data)
                 .build();
         when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any()))
-            .thenReturn(immediateFluentFuture(new DefaultDOMRpcResult(rpcReply)));
-        final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
+                .thenReturn(immediateFluentFuture(new DefaultDOMRpcResult(rpcReply)));
+        final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         assertEquals(numberOfLegalSchemas, availableYangSchemasQNames.size());
 
@@ -136,7 +132,7 @@ public class NetconfStateSchemasTest {
     @Test
     public void testCreateMonitoringNotSupported() throws Exception {
         final NetconfSessionPreferences caps = NetconfSessionPreferences.fromStrings(Collections.emptySet());
-        final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, caps, deviceId, schemaContext);
+        final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, caps, deviceId);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         Assert.assertTrue(availableYangSchemasQNames.isEmpty());
     }
@@ -144,8 +140,8 @@ public class NetconfStateSchemasTest {
     @Test
     public void testCreateFail() throws Exception {
         when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any())).thenReturn(
-                immediateFailedFluentFuture(new DOMRpcImplementationNotAvailableException("not available")));
-        final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
+            immediateFailedFluentFuture(new DOMRpcImplementationNotAvailableException("not available")));
+        final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         Assert.assertTrue(availableYangSchemasQNames.isEmpty());
     }
@@ -154,8 +150,8 @@ public class NetconfStateSchemasTest {
     public void testCreateRpcError() throws Exception {
         final RpcError rpcError = RpcResultBuilder.newError(RpcError.ErrorType.RPC, "fail", "fail");
         when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any()))
-            .thenReturn(immediateFluentFuture(new DefaultDOMRpcResult(rpcError)));
-        final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
+                .thenReturn(immediateFluentFuture(new DefaultDOMRpcResult(rpcError)));
+        final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         Assert.assertTrue(availableYangSchemasQNames.isEmpty());
     }
@@ -169,8 +165,8 @@ public class NetconfStateSchemasTest {
             try {
                 when(interruptedFuture.get()).thenThrow(new InterruptedException("interrupted"));
                 when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any())).thenReturn(
-                        FluentFuture.from(interruptedFuture));
-                NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
+                    FluentFuture.from(interruptedFuture));
+                NetconfStateSchemas.create(rpc, CAPS, deviceId);
             } catch (final InterruptedException | ExecutionException e) {
                 LOG.info("Operation failed.", e);
             }

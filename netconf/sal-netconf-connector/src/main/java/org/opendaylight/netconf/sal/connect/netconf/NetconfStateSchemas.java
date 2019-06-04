@@ -9,7 +9,6 @@ package org.opendaylight.netconf.sal.connect.netconf;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.base.Verify.verify;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_PATH;
@@ -18,14 +17,11 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import javax.xml.stream.XMLStreamException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
@@ -33,14 +29,12 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Yang;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
@@ -50,10 +44,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 /**
  * Holds QNames for all yang modules reported by ietf-netconf-monitoring/state/schemas.
@@ -96,8 +88,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
      * Issue get request to remote device and parse response to find all schemas under netconf-state/schemas.
      */
     static NetconfStateSchemas create(final DOMRpcService deviceRpc,
-            final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id,
-            final SchemaContext schemaContext) {
+                                  final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id) {
         if (!remoteSessionCapabilities.isMonitoringSupported()) {
             // TODO - need to search for get-schema support, not just ietf-netconf-monitoring support
             // issue might be a deviation to ietf-netconf-monitoring where get-schema is unsupported...
@@ -123,8 +114,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
             return EMPTY;
         }
 
-        final Optional<? extends NormalizedNode<?, ?>> optSchemasNode = findSchemasNode(schemasNodeResult.getResult(),
-                schemaContext);
+        final Optional<? extends NormalizedNode<?, ?>> optSchemasNode = findSchemasNode(schemasNodeResult.getResult());
         if (!optSchemasNode.isPresent()) {
             LOG.warn("{}: Unable to detect available schemas, get to {} was empty", id, STATE_SCHEMAS_IDENTIFIER);
             return EMPTY;
@@ -162,30 +152,18 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         return new NetconfStateSchemas(availableYangSchemas);
     }
 
-    private static Optional<? extends NormalizedNode<?, ?>> findSchemasNode(final NormalizedNode<?, ?> result,
-            final SchemaContext schemaContext) {
+    private static Optional<? extends NormalizedNode<?, ?>> findSchemasNode(final NormalizedNode<?, ?> result) {
         if (result == null) {
             return Optional.empty();
         }
-        final Optional<DataContainerChild<?, ?>> rpcResultOpt = ((ContainerNode)result).getChild(NETCONF_DATA_NODEID);
-        if (!rpcResultOpt.isPresent()) {
+        final Optional<DataContainerChild<?, ?>> dataNode = ((DataContainerNode<?>) result)
+                .getChild(NETCONF_DATA_NODEID);
+        if (!dataNode.isPresent()) {
             return Optional.empty();
         }
 
-        final DataContainerChild<?, ?> rpcResult = rpcResultOpt.get();
-        verify(rpcResult instanceof AnyXmlNode, "Unexpected result %s", rpcResult);
-        final NormalizedNode<?, ?> dataNode;
-
-        try {
-            dataNode = NetconfUtil.transformDOMSourceToNormalizedNode(schemaContext,
-                    ((AnyXmlNode) rpcResult).getValue()).getResult();
-        } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
-            LOG.warn("Failed to transform {}", rpcResult, e);
-            return Optional.empty();
-        }
-
-        final Optional<DataContainerChild<?, ?>> nStateNode = ((DataContainerNode<?>) dataNode).getChild(
-            toId(NetconfState.QNAME));
+        final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> nStateNode =
+                ((DataContainerNode<?>) dataNode.get()).getChild(toId(NetconfState.QNAME));
         if (!nStateNode.isPresent()) {
             return Optional.empty();
         }

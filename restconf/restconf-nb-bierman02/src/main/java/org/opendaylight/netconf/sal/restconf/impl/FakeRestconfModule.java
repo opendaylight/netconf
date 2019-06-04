@@ -118,7 +118,7 @@ final class FakeRestconfModule implements Module {
 
     @Override
     public YangVersion getYangVersion() {
-        return YangVersion.VERSION_1_1;
+        throw new UnsupportedOperationException("Not supported operations.");
     }
 
     @Override
@@ -153,42 +153,42 @@ final class FakeRestconfModule implements Module {
 
     @Override
     public Set<FeatureDefinition> getFeatures() {
-        return ImmutableSet.of();
+        throw new UnsupportedOperationException("Not supported operations.");
     }
 
     @Override
     public Set<NotificationDefinition> getNotifications() {
-        return ImmutableSet.of();
+        throw new UnsupportedOperationException("Not supported operations.");
     }
 
     @Override
     public Set<AugmentationSchemaNode> getAugmentations() {
-        return ImmutableSet.of();
+        throw new UnsupportedOperationException("Not supported operations.");
     }
 
     @Override
     public Set<RpcDefinition> getRpcs() {
-        return ImmutableSet.of();
+        throw new UnsupportedOperationException("Not supported operations.");
     }
 
     @Override
     public Set<Deviation> getDeviations() {
-        return ImmutableSet.of();
+        throw new UnsupportedOperationException("Not supported operations.");
     }
 
     @Override
     public Set<IdentitySchemaNode> getIdentities() {
-        return ImmutableSet.of();
+        throw new UnsupportedOperationException("Not supported operations.");
     }
 
     @Override
     public List<ExtensionDefinition> getExtensionSchemaNodes() {
-        return ImmutableList.of();
+        throw new UnsupportedOperationException("Not supported operations.");
     }
 
     @Override
     public List<UnknownSchemaNode> getUnknownSchemaNodes() {
-        return ImmutableList.of();
+        throw new UnsupportedOperationException("Not supported operations.");
     }
 
     @Override

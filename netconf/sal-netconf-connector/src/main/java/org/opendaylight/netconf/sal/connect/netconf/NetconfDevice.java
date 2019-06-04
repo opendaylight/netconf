@@ -106,14 +106,12 @@ public class NetconfDevice
      */
     static NetconfDeviceRpc getRpcForInitialization(final NetconfDeviceCommunicator listener,
                                                     final boolean notificationSupport) {
-        final BaseSchema baseSchema = resolveBaseSchema(notificationSupport);
+        final BaseSchema baseSchema = notificationSupport
+                ? BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS
+                : BaseSchema.BASE_NETCONF_CTX;
 
         return new NetconfDeviceRpc(baseSchema.getSchemaContext(), listener,
                 new NetconfMessageTransformer(baseSchema.getSchemaContext(), false, baseSchema));
-    }
-
-    private static BaseSchema resolveBaseSchema(final boolean notificationSupport) {
-        return notificationSupport ? BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS : BaseSchema.BASE_NETCONF_CTX;
     }
 
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id,
@@ -153,8 +151,7 @@ public class NetconfDevice
         final NetconfDeviceRpc initRpc =
                 getRpcForInitialization(listener, remoteSessionCapabilities.isNotificationsSupported());
         final DeviceSourcesResolver task =
-                new DeviceSourcesResolver(remoteSessionCapabilities, id, stateSchemasResolver, initRpc,
-                        resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()).getSchemaContext());
+                new DeviceSourcesResolver(remoteSessionCapabilities, id, stateSchemasResolver, initRpc);
         final ListenableFuture<DeviceSources> sourceResolverFuture = processingExecutor.submit(task);
 
         if (shouldListenOnSchemaChange(remoteSessionCapabilities)) {
@@ -352,29 +349,26 @@ public class NetconfDevice
         private final NetconfSessionPreferences remoteSessionCapabilities;
         private final RemoteDeviceId id;
         private final NetconfDeviceSchemasResolver stateSchemasResolver;
-        private final SchemaContext schemaContext;
 
         DeviceSourcesResolver(final NetconfDeviceRpc deviceRpc,
                               final NetconfSessionPreferences remoteSessionCapabilities,
-                              final RemoteDeviceId id, final NetconfDeviceSchemasResolver stateSchemasResolver,
-                              final SchemaContext schemaContext) {
+                              final RemoteDeviceId id, final NetconfDeviceSchemasResolver stateSchemasResolver) {
             this.deviceRpc = deviceRpc;
             this.remoteSessionCapabilities = remoteSessionCapabilities;
             this.id = id;
             this.stateSchemasResolver = stateSchemasResolver;
-            this.schemaContext = schemaContext;
         }
 
         DeviceSourcesResolver(final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id,
                                      final NetconfDeviceSchemasResolver stateSchemasResolver,
-                                     final NetconfDeviceRpc rpcForMonitoring, final SchemaContext schemaCtx) {
-            this(rpcForMonitoring, remoteSessionCapabilities, id, stateSchemasResolver, schemaCtx);
+                                     final NetconfDeviceRpc rpcForMonitoring) {
+            this(rpcForMonitoring, remoteSessionCapabilities, id, stateSchemasResolver);
         }
 
         @Override
         public DeviceSources call() {
             final NetconfDeviceSchemas availableSchemas =
-                    stateSchemasResolver.resolve(deviceRpc, remoteSessionCapabilities, id, schemaContext);
+                    stateSchemasResolver.resolve(deviceRpc, remoteSessionCapabilities, id);
             LOG.debug("{}: Schemas exposed by ietf-netconf-monitoring: {}", id,
                     availableSchemas.getAvailableYangSchemasQNames());
 
