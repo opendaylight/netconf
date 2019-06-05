@@ -48,8 +48,8 @@ public class NormalizedNodeMessage implements Externalizable {
     }
 
     @Override
-    public void readExternal(final ObjectInput in) {
-        SerializationUtils.deserializePathAndNode(in, this, APPLIER);
+    public void readExternal(final ObjectInput in) throws IOException {
+        SerializationUtils.readNodeAndPath(in, this, APPLIER);
     }
 
     @Override
