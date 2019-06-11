@@ -116,6 +116,8 @@ public class RestconfMappingNodeUtilTest {
 
         // verify loaded modules
         verifyLoadedModules((ContainerNode) mods);
+        // verify deviations
+        verifyDeviations((ContainerNode) mods);
     }
 
     @Test
@@ -202,6 +204,30 @@ public class RestconfMappingNodeUtilTest {
                 Assert.assertEquals(map.get(leaf.getNodeType()), leaf.getValue());
             }
         }
+    }
+
+    /**
+     * Verify whether the loaded modules contain any deviations
+     *
+     * @param containerNode
+     *             modules
+     */
+    private static void verifyDeviations(final ContainerNode containerNode) {
+        int deviationsFound = 0;
+        for (final DataContainerChild<? extends PathArgument, ?> child : containerNode.getValue()) {
+            if (child instanceof MapNode) {
+                for (final MapEntryNode mapEntryNode : ((MapNode) child).getValue()) {
+                    for (final DataContainerChild<? extends PathArgument, ?> dataContainerChild : mapEntryNode
+                            .getValue()) {
+                        if (dataContainerChild.getNodeType()
+                                .equals(IetfYangLibrary.SPECIFIC_MODULE_DEVIATION_LIST_QNAME)) {
+                            deviationsFound++;
+                        }
+                    }
+                }
+            }
+        }
+        Assert.assertTrue(deviationsFound > 0);
     }
 
     /**
