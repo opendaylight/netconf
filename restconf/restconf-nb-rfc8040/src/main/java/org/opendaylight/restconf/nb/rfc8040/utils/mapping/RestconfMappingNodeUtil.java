@@ -197,11 +197,12 @@ public final class RestconfMappingNodeUtil {
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> deviationEntryNode =
                     Builders.mapEntryBuilder((ListSchemaNode) deviationsSchema);
             final QName lastComponent = deviation.getTargetPath().getLastComponent();
-            addChildOfModuleBySpecificModule(IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF_QNAME, deviationEntryNode,
-                    context.findModule(lastComponent.getModule()).get().getName(),
+            addChildOfModuleBySpecificModuleInternal(IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF_QNAME,
+                    deviationEntryNode, context.findModule(lastComponent.getModule()).get().getName(),
                     ietfYangLibraryModule);
-            addChildOfModuleBySpecificModule(IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF_QNAME, deviationEntryNode,
-                    lastComponent.getRevision(), ietfYangLibraryModule);
+            addChildOfModuleBySpecificModuleInternal(IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF_QNAME,
+                    deviationEntryNode, lastComponent.getRevision().map(Revision::toString).orElse(""),
+                    ietfYangLibraryModule);
             deviations.withChild(deviationEntryNode.build());
         }
         mapEntryBuilder.withChild(deviations.build());
@@ -334,25 +335,6 @@ public final class RestconfMappingNodeUtil {
             }
         }
         throw new RestconfDocumentedException(qnameOfSchema.getLocalName() + " doesn't exist.");
-    }
-
-    /**
-     * Mapping childrens of list-module.
-     *
-     * @param specifiLeafQName
-     *             qname of leaf
-     * @param mapEntryBuilder
-     *             maptEntryBuilder of parent for mapping children
-     * @param value
-     *             valeu of leaf
-     * @param ietfYangLibraryModule
-     *             ietf-yang-library module
-     */
-    private static void addChildOfModuleBySpecificModule(final QName specifiLeafQName,
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
-            final Object value, final Module ietfYangLibraryModule) {
-        final DataSchemaNode nameLeaf = findNodeInGroupings(specifiLeafQName, ietfYangLibraryModule);
-        mapEntryBuilder.withChild(Builders.leafBuilder((LeafSchemaNode) nameLeaf).withValue(value).build());
     }
 
     /**
