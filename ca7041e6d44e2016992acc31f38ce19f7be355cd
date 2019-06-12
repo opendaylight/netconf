@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e14773d6_ea4aee9c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 6731
+      },
+      "writtenOn": "2019-06-12T12:25:36Z",
+      "side": 1,
+      "message": "Following Robert\u0027s remark,\nChange-Id should be Idc5c1cfb1ee7ba7df31680f2f9e0acfb66707f62\nso that Gerrit detects it was cherry-picked from 82481.\nAlthough, amending the commit message this way remotely would  result in creating another change and loosing the history. Therefore, it\u0027s worth a try to modify it from Gerrit built-in editor...",
+      "range": {
+        "startLine": 15,
+        "startChar": 11,
+        "endLine": 15,
+        "endChar": 52
+      },
+      "revId": "ca7041e6d44e2016992acc31f38ce19f7be355cd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
