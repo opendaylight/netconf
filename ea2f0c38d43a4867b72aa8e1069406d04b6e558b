@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "076ab5bd_783aac06",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/utils/mapping/RestconfMappingNodeUtilTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-06-12T08:11:38Z",
+      "side": 1,
+      "message": "unnecessary",
+      "range": {
+        "startLine": 217,
+        "startChar": 40,
+        "endLine": 217,
+        "endChar": 60
+      },
+      "revId": "ea2f0c38d43a4867b72aa8e1069406d04b6e558b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "16489e3f_deb27c3b",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/utils/mapping/RestconfMappingNodeUtilTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-06-12T08:11:38Z",
+      "side": 1,
+      "message": "this is unnecessary",
+      "range": {
+        "startLine": 220,
+        "startChar": 51,
+        "endLine": 220,
+        "endChar": 72
+      },
+      "revId": "ea2f0c38d43a4867b72aa8e1069406d04b6e558b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
