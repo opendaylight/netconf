@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6dd6c0ac_a2ed6498",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/mapping/RestconfMappingNodeUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-06-13T08:49:34Z",
+      "side": 1,
+      "message": "this is incorrect: revision \"\" is invalid and distinct from no revision. This code should not a revision leaf when there is no revision present.",
+      "range": {
+        "startLine": 204,
+        "startChar": 39,
+        "endLine": 204,
+        "endChar": 102
+      },
+      "revId": "029a9d8f78b79604e252a61ab215816b3325b6a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
