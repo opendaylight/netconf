@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-ssh</artifactId>
-    <version>1.5.3-SNAPSHOT</version>
+    <version>1.5.3</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Netconf Connector :: SSH</name>

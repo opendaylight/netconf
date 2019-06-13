@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-restconf-noauth</artifactId>
-    <version>1.8.3-SNAPSHOT</version>
+    <version>1.8.3</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Restconf</name>
@@ -28,7 +28,7 @@
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
                 <artifactId>restconf-artifacts</artifactId>
-                <version>1.8.3-SNAPSHOT</version>
+                <version>1.8.3</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

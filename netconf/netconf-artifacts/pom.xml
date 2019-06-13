@@ -20,11 +20,11 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-artifacts</artifactId>
-    <version>1.5.3-SNAPSHOT</version>
+    <version>1.5.3</version>
     <packaging>pom</packaging>
 
     <properties>
-        <mdsal.version>1.8.3-SNAPSHOT</mdsal.version>
+        <mdsal.version>1.8.3</mdsal.version>
     </properties>
 
     <dependencyManagement>
@@ -255,7 +255,7 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>protocol-framework</artifactId>
-                <version>1.2.3-SNAPSHOT</version>
+                <version>1.2.3</version>
             </dependency>
 
             <dependency>
@@ -268,14 +268,14 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>features-protocol-framework</artifactId>
-                <version>1.2.3-SNAPSHOT</version>
+                <version>1.2.3</version>
                 <type>xml</type>
                 <classifier>features</classifier>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-protocol-framework</artifactId>
-                <version>1.2.3-SNAPSHOT</version>
+                <version>1.2.3</version>
                 <type>xml</type>
                 <classifier>features</classifier>
             </dependency>
@@ -338,7 +338,7 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-netconf-mdsal</artifactId>
-                <version>1.8.3-SNAPSHOT</version>
+                <version>1.8.3</version>
                 <type>xml</type>
                 <classifier>features</classifier>
             </dependency>

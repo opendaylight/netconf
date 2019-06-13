@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-aaa-netconf-plugin-no-cluster</artifactId>
-    <version>1.5.3-SNAPSHOT</version>
+    <version>1.5.3</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: AAA :: ODL NETCONF Plugin - NO CLUSTER</name>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>org.opendaylight.aaa</groupId>
             <artifactId>odl-aaa-shiro</artifactId>
-            <version>0.8.3-SNAPSHOT</version>
+            <version>0.8.3</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
