@@ -1,0 +1,34 @@
+module netconf-node-locking {
+    namespace "urn:opendaylight:netconf-node-locking";
+    prefix "netnl";
+
+    import network-topology { prefix nt; revision-date 2013-10-21; }
+
+    revision "2019-06-14" {
+        description "Initial revision of Node Locking model";
+    }
+
+    container netconf-node-lock {
+        list topology {
+            key topology-id;
+            leaf topology-id {
+                type nt:topology-id;
+                description "The name of node's topology";
+            }
+            list node {
+                key node-id;
+                leaf node-id {
+                    type nt:node-id;
+                    description "The identifier of a node in the topology";
+                }
+                container node-lock {
+                    leaf node-lock-allowed {
+                        type boolean;
+                        default true;
+                        description "The operation allows the client to lock the entire configuration datastore system of a device";
+                    }
+                }
+            }
+        }
+    }
+}
