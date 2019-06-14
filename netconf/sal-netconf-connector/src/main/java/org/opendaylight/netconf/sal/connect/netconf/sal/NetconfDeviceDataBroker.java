@@ -29,13 +29,19 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
+<<<<<<< HEAD   (4e5846 Do not use toString() in looging messages)
 public final class NetconfDeviceDataBroker implements DOMDataBroker {
+=======
+public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBroker {
+
+>>>>>>> CHANGE (65cf34 Netconf stack by default locks the data store before issuing)
     private final RemoteDeviceId id;
     private final NetconfBaseOps netconfOps;
-
     private final boolean rollbackSupport;
     private final boolean candidateSupported;
     private final boolean runningWritable;
+
+    private boolean isLockAllowed = true;
 
     public NetconfDeviceDataBroker(final RemoteDeviceId id, final SchemaContext schemaContext,
                                    final DOMRpcService rpc, final NetconfSessionPreferences netconfSessionPreferences) {
@@ -65,12 +71,12 @@ public final class NetconfDeviceDataBroker implements DOMDataBroker {
     public DOMDataTreeWriteTransaction newWriteOnlyTransaction() {
         if (candidateSupported) {
             if (runningWritable) {
-                return new WriteCandidateRunningTx(id, netconfOps, rollbackSupport);
+                return new WriteCandidateRunningTx(id, netconfOps, rollbackSupport, isLockAllowed);
             } else {
-                return new WriteCandidateTx(id, netconfOps, rollbackSupport);
+                return new WriteCandidateTx(id, netconfOps, rollbackSupport, isLockAllowed);
             }
         } else {
-            return new WriteRunningTx(id, netconfOps, rollbackSupport);
+            return new WriteRunningTx(id, netconfOps, rollbackSupport, isLockAllowed);
         }
     }
 
@@ -83,4 +89,9 @@ public final class NetconfDeviceDataBroker implements DOMDataBroker {
     public ClassToInstanceMap<DOMDataBrokerExtension> getExtensions() {
         return ImmutableClassToInstanceMap.of();
     }
+
+    void setLockAllowed(boolean isLockAllowedOrig) {
+        this.isLockAllowed = isLockAllowedOrig;
+    }
+
 }
