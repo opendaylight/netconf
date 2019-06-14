@@ -11,9 +11,11 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
-import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
@@ -21,6 +23,15 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.locking.rev190614.NetconfNodeLock;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.locking.rev190614.netconf.node.lock.Topology;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.locking.rev190614.netconf.node.lock.TopologyKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.locking.rev190614.netconf.node.lock.topology.Node;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.locking.rev190614.netconf.node.lock.topology.NodeKey;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.locking.rev190614.netconf.node.lock.topology.node.NodeLock;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,17 +43,21 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
     private final RemoteDeviceId id;
     private final NetconfDeviceSalProvider salProvider;
     private final List<AutoCloseable> salRegistrations = new ArrayList<>();
+    private final DataBroker dataBroker;
+    private final String topologyId;
 
     public NetconfDeviceSalFacade(final RemoteDeviceId id, final DOMMountPointService mountPointService,
-            final DataBroker dataBroker) {
-        this.id = id;
-        this.salProvider = new NetconfDeviceSalProvider(id, mountPointService, dataBroker);
+            final DataBroker dataBroker, final String topologyId) {
+        this(id, new NetconfDeviceSalProvider(id, mountPointService, dataBroker), dataBroker, topologyId);
     }
 
     @VisibleForTesting
-    NetconfDeviceSalFacade(final RemoteDeviceId id, final NetconfDeviceSalProvider salProvider) {
+    NetconfDeviceSalFacade(final RemoteDeviceId id, final NetconfDeviceSalProvider salProvider,
+            final DataBroker dataBroker, final String topologyId) {
         this.id = id;
         this.salProvider = salProvider;
+        this.dataBroker = dataBroker;
+        this.topologyId = topologyId;
     }
 
     @Override
@@ -55,13 +70,14 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
                                                final NetconfSessionPreferences netconfSessionPreferences,
                                                final DOMRpcService deviceRpc, final DOMActionService deviceAction) {
 
-        final DOMDataBroker domBroker =
+        final NetconfDeviceDataBroker netconfDeviceDataBroker =
                 new NetconfDeviceDataBroker(id, schemaContext, deviceRpc, netconfSessionPreferences);
-
+        registerLockListener(netconfDeviceDataBroker);
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
 
         salProvider.getMountInstance()
-                .onTopologyDeviceConnected(schemaContext, domBroker, deviceRpc, notificationService, deviceAction);
+                .onTopologyDeviceConnected(schemaContext, netconfDeviceDataBroker, deviceRpc, notificationService,
+                        deviceAction);
         salProvider.getTopologyDatastoreAdapter()
                 .updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
     }
@@ -97,4 +113,17 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
         }
     }
 
+    private void registerLockListener(final NetconfDeviceDataBroker netconfDeviceDataBroker) {
+        dataBroker.registerDataTreeChangeListener(
+                DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, createTopologyListPath()),
+                new LockChangeListener(netconfDeviceDataBroker));
+    }
+
+    private @NonNull InstanceIdentifier<NodeLock> createTopologyListPath() {
+        return InstanceIdentifier.create(NetconfNodeLock.class)
+                .child(Topology.class, new TopologyKey(new TopologyId(topologyId)))
+                .child(Node.class, new NodeKey(new NodeId(id.getName())))
+                .child(NodeLock.class);
+
+    }
 }
