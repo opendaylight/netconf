@@ -24,6 +24,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
@@ -41,9 +42,10 @@ public class NetconfDeviceSalFacadeTest {
     private NetconfDeviceTopologyAdapter netconfDeviceTopologyAdapter;
     @Mock
     private NetconfDeviceSalProvider.MountInstance mountInstance;
-
     @Mock
     private NetconfDeviceSalProvider salProvider;
+    @Mock
+    private DataBroker dataBroker;
 
     @Before
     public void setUp() throws Exception {
@@ -51,7 +53,7 @@ public class NetconfDeviceSalFacadeTest {
         final InetSocketAddress address = new InetSocketAddress("127.0.0.1", 8000);
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId("test", address);
 
-        deviceFacade = new NetconfDeviceSalFacade(remoteDeviceId, salProvider);
+        deviceFacade = new NetconfDeviceSalFacade(remoteDeviceId, salProvider, dataBroker, "mockTopo");
 
         doReturn(netconfDeviceTopologyAdapter).when(salProvider).getTopologyDatastoreAdapter();
         doNothing().when(netconfDeviceTopologyAdapter)

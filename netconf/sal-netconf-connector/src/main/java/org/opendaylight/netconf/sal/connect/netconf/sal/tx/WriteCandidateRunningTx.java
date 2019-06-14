@@ -27,7 +27,12 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
 
     public WriteCandidateRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps,
                                    final boolean rollbackSupport) {
-        super(id, netOps, rollbackSupport);
+        this(id, netOps, rollbackSupport, true);
+    }
+
+    public WriteCandidateRunningTx(RemoteDeviceId id, NetconfBaseOps netconfOps, boolean rollbackSupport,
+            boolean isLockAllowed) {
+        super(id, netconfOps, rollbackSupport, isLockAllowed);
     }
 
     @Override
@@ -43,7 +48,11 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
     }
 
     private void lockRunning() {
-        resultsFutures.add(netOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id)));
+        if (isLockAllowed) {
+            resultsFutures.add(netOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id)));
+        } else {
+            LOG.trace("Lock is not allowed: {}", id);
+        }
     }
 
     /**
@@ -51,6 +60,10 @@ public class WriteCandidateRunningTx extends WriteCandidateTx {
      * and its netty threadpool that is really sensitive to blocking calls.
      */
     private void unlockRunning() {
-        netOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+        if (isLockAllowed) {
+            netOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+        } else {
+            LOG.trace("Unlock is not allowed: {}", id);
+        }
     }
 }

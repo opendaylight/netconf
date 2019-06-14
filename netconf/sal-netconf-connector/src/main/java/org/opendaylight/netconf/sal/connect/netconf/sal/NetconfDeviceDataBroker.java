@@ -32,10 +32,11 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 public final class NetconfDeviceDataBroker implements DOMDataBroker {
     private final RemoteDeviceId id;
     private final NetconfBaseOps netconfOps;
-
     private final boolean rollbackSupport;
     private final boolean candidateSupported;
     private final boolean runningWritable;
+
+    private boolean isLockAllowed = true;
 
     public NetconfDeviceDataBroker(final RemoteDeviceId id, final SchemaContext schemaContext,
                                    final DOMRpcService rpc, final NetconfSessionPreferences netconfSessionPreferences) {
@@ -65,12 +66,12 @@ public final class NetconfDeviceDataBroker implements DOMDataBroker {
     public DOMDataTreeWriteTransaction newWriteOnlyTransaction() {
         if (candidateSupported) {
             if (runningWritable) {
-                return new WriteCandidateRunningTx(id, netconfOps, rollbackSupport);
+                return new WriteCandidateRunningTx(id, netconfOps, rollbackSupport, isLockAllowed);
             } else {
-                return new WriteCandidateTx(id, netconfOps, rollbackSupport);
+                return new WriteCandidateTx(id, netconfOps, rollbackSupport, isLockAllowed);
             }
         } else {
-            return new WriteRunningTx(id, netconfOps, rollbackSupport);
+            return new WriteRunningTx(id, netconfOps, rollbackSupport, isLockAllowed);
         }
     }
 
@@ -83,4 +84,9 @@ public final class NetconfDeviceDataBroker implements DOMDataBroker {
     public ClassToInstanceMap<DOMDataBrokerExtension> getExtensions() {
         return ImmutableClassToInstanceMap.of();
     }
+
+    void setLockAllowed(boolean isLockAllowedOrig) {
+        this.isLockAllowed = isLockAllowedOrig;
+    }
+
 }
