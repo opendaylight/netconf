@@ -217,7 +217,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         final Document node = result.getNode().getOwnerDocument();
 
-        return new NetconfMessage(node);
+        NetconfMessage netconfMessage = new NetconfMessage(node);
+        LOG.info("REQUEST: {}", netconfMessage.toString());
+        return netconfMessage;
     }
 
     @Override
@@ -269,6 +271,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     @Override
     public synchronized DOMRpcResult toRpcResult(final NetconfMessage message, final SchemaPath rpc) {
+        LOG.info("RESULT: {}", message.toString());
         final NormalizedNode<?, ?> normalizedNode;
         final QName rpcQName = rpc.getLastComponent();
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpcQName)) {
