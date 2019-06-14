@@ -47,7 +47,12 @@ public class WriteRunningTx extends AbstractWriteTx {
 
     public WriteRunningTx(final RemoteDeviceId id, final NetconfBaseOps netOps,
                           final boolean rollbackSupport) {
-        super(netOps, id, rollbackSupport);
+        this(id, netOps, rollbackSupport, true);
+    }
+
+    public WriteRunningTx(RemoteDeviceId id, NetconfBaseOps netconfOps, boolean rollbackSupport,
+            boolean isLockAllowed) {
+        super(id, netconfOps, rollbackSupport, isLockAllowed);
     }
 
     @Override
@@ -56,7 +61,11 @@ public class WriteRunningTx extends AbstractWriteTx {
     }
 
     private void lock() {
-        resultsFutures.add(netOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id)));
+        if (isLockAllowed) {
+            resultsFutures.add(netOps.lockRunning(new NetconfRpcFutureCallback("Lock running", id)));
+        } else {
+            LOG.trace("Lock is not allowed: {}", id);
+        }
     }
 
     @Override
@@ -83,7 +92,11 @@ public class WriteRunningTx extends AbstractWriteTx {
     }
 
     private void unlock() {
-        netOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+        if (isLockAllowed) {
+            netOps.unlockRunning(new NetconfRpcFutureCallback("Unlock running", id));
+        } else {
+            LOG.trace("Unlock is not allowed: {}", id);
+        }
     }
 
     private static final class Change {
