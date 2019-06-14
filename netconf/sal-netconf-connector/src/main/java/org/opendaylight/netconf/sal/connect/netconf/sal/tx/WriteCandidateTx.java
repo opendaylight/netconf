@@ -49,8 +49,13 @@ public class WriteCandidateTx extends AbstractWriteTx {
 
     private static final Logger LOG  = LoggerFactory.getLogger(WriteCandidateTx.class);
 
-    public WriteCandidateTx(final RemoteDeviceId id, final NetconfBaseOps rpc, final boolean rollbackSupport) {
-        super(rpc, id, rollbackSupport);
+    public WriteCandidateTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport) {
+        this(id, netconfOps, rollbackSupport, true);
+    }
+
+    public WriteCandidateTx(RemoteDeviceId id, NetconfBaseOps netconfOps, boolean rollbackSupport,
+            boolean isLockAllowed) {
+        super(id, netconfOps, rollbackSupport, isLockAllowed);
     }
 
     @Override
@@ -60,6 +65,10 @@ public class WriteCandidateTx extends AbstractWriteTx {
     }
 
     private void lock() {
+        if (!isLockAllowed) {
+            LOG.trace("Lock is not allowed.");
+            return;
+        }
         final FutureCallback<DOMRpcResult> lockCandidateCallback = new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult result) {
@@ -143,7 +152,11 @@ public class WriteCandidateTx extends AbstractWriteTx {
      * and its netty threadpool that is really sensitive to blocking calls.
      */
     private void unlock() {
-        netOps.unlockCandidate(new NetconfRpcFutureCallback("Unlock candidate", id));
+        if (isLockAllowed) {
+            netOps.unlockCandidate(new NetconfRpcFutureCallback("Unlock candidate", id));
+        } else {
+            LOG.trace("Unlock is not allowed: {}", id);
+        }
     }
 
 }
