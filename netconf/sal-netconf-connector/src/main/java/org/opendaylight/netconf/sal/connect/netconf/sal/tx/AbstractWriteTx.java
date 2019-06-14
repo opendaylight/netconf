@@ -52,11 +52,14 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     private final List<TxListener> listeners = new CopyOnWriteArrayList<>();
     // Allow commit to be called only once
     protected volatile boolean finished = false;
+    protected final boolean isLockAllowed;
 
-    public AbstractWriteTx(final NetconfBaseOps netOps, final RemoteDeviceId id, final boolean rollbackSupport) {
-        this.netOps = netOps;
+    public AbstractWriteTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
+            final boolean isLockAllowed) {
+        this.netOps = netconfOps;
         this.id = id;
         this.rollbackSupport = rollbackSupport;
+        this.isLockAllowed = isLockAllowed;
         init();
     }
 

@@ -48,6 +48,6 @@ public class CallHomeTopology extends BaseCallHomeTopology {
 
     @Override
     protected RemoteDeviceHandler<NetconfSessionPreferences> createSalFacade(final RemoteDeviceId id) {
-        return new NetconfDeviceSalFacade(id, mountPointService, dataBroker);
+        return new NetconfDeviceSalFacade(id, mountPointService, dataBroker, topologyId);
     }
 }
