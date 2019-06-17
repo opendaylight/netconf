@@ -271,7 +271,6 @@ public final class ListenersBroker {
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
     private void removeAndCloseDataChangeListenerTemplate(final ListenerAdapter listener) {
-        final long stamp = dataChangeListenersLock.writeLock();
         try {
             requireNonNull(listener).close();
             if (dataChangeListeners.inverse().remove(listener) == null) {
@@ -282,8 +281,6 @@ public final class ListenersBroker {
             throw new IllegalStateException(String.format(
                     "Data-change listener %s cannot be closed.",
                     listener), exception);
-        } finally {
-            dataChangeListenersLock.unlockWrite(stamp);
         }
     }
 
