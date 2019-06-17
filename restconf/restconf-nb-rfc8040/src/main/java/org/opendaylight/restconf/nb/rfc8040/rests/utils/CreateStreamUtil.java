@@ -231,13 +231,13 @@ public final class CreateStreamUtil {
                 notificationDefinitionQName.getModule().getNamespace()));
 
         final StringBuilder streamNameBuilder = new StringBuilder();
-        streamNameBuilder.append(RestconfStreamsConstants.CREATE_NOTIFICATION_STREAM)
+        streamNameBuilder.append(RestconfStreamsConstants.NOTIFICATION_STREAM)
                 .append('/')
                 .append(module.getName())
                 .append(':')
                 .append(notificationDefinitionQName.getLocalName());
         if (outputType.equals(NotificationOutputType.JSON.getName())) {
-            streamNameBuilder.append(NotificationOutputType.JSON.getName());
+            streamNameBuilder.append('/').append(NotificationOutputType.JSON.getName());
         }
         return streamNameBuilder.toString();
     }
