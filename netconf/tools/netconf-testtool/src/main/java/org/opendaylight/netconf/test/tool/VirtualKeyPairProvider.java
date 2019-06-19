@@ -41,6 +41,7 @@ public class VirtualKeyPairProvider implements KeyPairProvider {
      * @see VirtualKeyPairProvider#VirtualKeyPairProvider(String, AlgorithmParameterSpec, Integer)
      */
     VirtualKeyPairProvider() {
+        initGeneratedKeyPair();
     }
 
     /**
@@ -59,22 +60,30 @@ public class VirtualKeyPairProvider implements KeyPairProvider {
         this.algorithm = algorithm;
         this.keySpecification = keySpecification;
         this.keySize = keySize;
+        initGeneratedKeyPair();
     }
 
     @Override
     public synchronized Iterable<KeyPair> loadKeys(final SessionContext session) {
         if (Objects.isNull(generatedKeyPair)) {
-            try {
-                generatedKeyPair = generateKeyPair();
-            } catch (GeneralSecurityException exception) {
-                LOG.error("Cannot generate key with algorithm '{}', key specification '{}', and key size '{}'.",
-                        algorithm, keySpecification, keySize, exception);
-                throw new IllegalArgumentException("An error occurred during generation of a new ke pair.", exception);
-            }
+            initGeneratedKeyPair();
         } else {
             return Collections.singleton(generatedKeyPair);
         }
         return Collections.emptyList();
+    }
+
+    /**
+     * Initialize key-pair attribute as new generated key-pair.
+     */
+    private void initGeneratedKeyPair() {
+        try {
+            generatedKeyPair = generateKeyPair();
+        } catch (GeneralSecurityException exception) {
+            LOG.error("Cannot generate key with algorithm '{}', key specification '{}', and key size '{}'.",
+                    algorithm, keySpecification, keySize, exception);
+            throw new IllegalArgumentException("An error occurred during generation of a new ke pair.", exception);
+        }
     }
 
     /**
