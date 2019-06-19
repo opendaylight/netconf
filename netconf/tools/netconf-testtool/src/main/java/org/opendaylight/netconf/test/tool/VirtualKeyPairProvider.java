@@ -71,10 +71,8 @@ public class VirtualKeyPairProvider implements KeyPairProvider {
                         algorithm, keySpecification, keySize, exception);
                 throw new IllegalArgumentException("An error occurred during generation of a new ke pair.", exception);
             }
-        } else {
-            return Collections.singleton(generatedKeyPair);
         }
-        return Collections.emptyList();
+        return Collections.singleton(generatedKeyPair);
     }
 
     /**
