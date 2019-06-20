@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool;
 
 import java.security.GeneralSecurityException;
@@ -13,7 +12,6 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Collections;
-import java.util.Objects;
 import org.apache.sshd.common.cipher.ECCurves;
 import org.apache.sshd.common.config.keys.KeyUtils;
 import org.apache.sshd.common.keyprovider.KeyPairProvider;
@@ -27,7 +25,6 @@ import org.slf4j.LoggerFactory;
  * If the key-pair has already been generated, the existing one is used.
  */
 public class VirtualKeyPairProvider implements KeyPairProvider {
-
     private static final Logger LOG = LoggerFactory.getLogger(VirtualKeyPairProvider.class);
 
     private KeyPair generatedKeyPair;
@@ -52,7 +49,7 @@ public class VirtualKeyPairProvider implements KeyPairProvider {
      * @param keySpecification Algorithm-specific settings.
      * @param keySize          To be generated key length (must be adjusted against selected algorithm).
      */
-    @SuppressWarnings({"unused", "WeakerAccess"})
+    @SuppressWarnings("WeakerAccess")
     VirtualKeyPairProvider(final String algorithm,
                            final AlgorithmParameterSpec keySpecification,
                            final Integer keySize) {
@@ -63,13 +60,13 @@ public class VirtualKeyPairProvider implements KeyPairProvider {
 
     @Override
     public synchronized Iterable<KeyPair> loadKeys(final SessionContext session) {
-        if (Objects.isNull(generatedKeyPair)) {
+        if (generatedKeyPair == null) {
             try {
                 generatedKeyPair = generateKeyPair();
-            } catch (GeneralSecurityException exception) {
+            } catch (GeneralSecurityException e) {
                 LOG.error("Cannot generate key with algorithm '{}', key specification '{}', and key size '{}'.",
-                        algorithm, keySpecification, keySize, exception);
-                throw new IllegalArgumentException("An error occurred during generation of a new ke pair.", exception);
+                        algorithm, keySpecification, keySize, e);
+                throw new IllegalArgumentException("An error occurred during generation of a new ke pair.", e);
             }
         }
         return Collections.singleton(generatedKeyPair);
@@ -83,9 +80,9 @@ public class VirtualKeyPairProvider implements KeyPairProvider {
      */
     private KeyPair generateKeyPair() throws GeneralSecurityException {
         final KeyPairGenerator generator = SecurityUtils.getKeyPairGenerator(algorithm);
-        if (Objects.nonNull(keySpecification)) {
+        if (keySpecification != null) {
             generator.initialize(keySpecification);
-        } else if (Objects.nonNull(keySize)) {
+        } else if (keySize != null) {
             generator.initialize(keySize);
         } else if (KeyUtils.EC_ALGORITHM.equals(algorithm)) {
             int numCurves = ECCurves.SORTED_KEY_SIZE.size();
