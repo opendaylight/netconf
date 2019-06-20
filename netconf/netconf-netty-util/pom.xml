@@ -12,14 +12,14 @@
   <parent>
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>netconf-parent</artifactId>
-    <version>1.5.3-SNAPSHOT</version>
+    <version>1.5.4-SNAPSHOT</version>
     <relativePath>../netconf-parent</relativePath>
   </parent>
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>netconf-netty-util</artifactId>
   <packaging>bundle</packaging>
-  <version>1.5.3-SNAPSHOT</version>
+  <version>1.5.4-SNAPSHOT</version>
   <name>${project.artifactId}</name>
 
   <dependencies>
@@ -72,7 +72,7 @@
     <dependency>
       <groupId>org.opendaylight.aaa</groupId>
       <artifactId>aaa-encrypt-service</artifactId>
-      <version>0.8.3-SNAPSHOT</version>
+      <version>0.8.4-SNAPSHOT</version>
     </dependency>
 
     <!-- test dependencies -->

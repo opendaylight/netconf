@@ -17,7 +17,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>features-protocol-framework-aggregator</artifactId>
-    <version>1.2.3-SNAPSHOT</version>
+    <version>1.2.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
