@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -27,7 +26,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -314,10 +312,10 @@ public class TesttoolParameters {
                 if (!matcher.matches()) {
                     try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                         String line = reader.readLine();
-                        while (Objects.nonNull(line) && !REVISION_DATE_PATTERN.matcher(line).find()) {
+                        while (line != null && !REVISION_DATE_PATTERN.matcher(line).find()) {
                             line = reader.readLine();
                         }
-                        if (Objects.nonNull(line)) {
+                        if (line != null) {
                             final Matcher m = REVISION_DATE_PATTERN.matcher(line);
                             Preconditions.checkState(m.find());
                             String moduleName = file.getAbsolutePath();

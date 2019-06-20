@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import static com.google.common.base.Preconditions.checkState;
-import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -217,10 +216,9 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         NetconfDeviceCommunicator netconfDeviceCommunicator =
              userCapabilities.isPresent() ? new NetconfDeviceCommunicator(remoteDeviceId, device,
              new UserPreferences(userCapabilities.get(),
-                 isNull(node.getYangModuleCapabilities())
-                         ? false : node.getYangModuleCapabilities().isOverride(),
-                 isNull(node.getNonModuleCapabilities())
-                         ? false : node.getNonModuleCapabilities().isOverride()), rpcMessageLimit)
+                 node.getYangModuleCapabilities() == null ? false : node.getYangModuleCapabilities().isOverride(),
+                 node.getNonModuleCapabilities() == null ? false : node.getNonModuleCapabilities().isOverride()),
+             rpcMessageLimit)
             : new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit);
 
         if (salFacade instanceof KeepaliveSalFacade) {
