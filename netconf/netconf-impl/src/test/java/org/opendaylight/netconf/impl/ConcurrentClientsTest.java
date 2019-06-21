@@ -330,8 +330,8 @@ public class ConcurrentClientsTest {
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
             InputStreamReader inFromServer = new InputStreamReader(clientSocket.getInputStream());
 
-            StringBuffer sb = new StringBuffer();
-            while (sb.toString().endsWith("]]>]]>") == false) {
+            StringBuilder sb = new StringBuilder();
+            while (!sb.toString().endsWith("]]>]]>")) {
                 sb.append((char) inFromServer.read());
             }
             LOG.info(sb.toString());
@@ -344,8 +344,8 @@ public class ConcurrentClientsTest {
             outToServer.write("]]>]]>".getBytes());
             outToServer.flush();
             Thread.sleep(100);
-            sb = new StringBuffer();
-            while (sb.toString().endsWith("]]>]]>") == false) {
+            sb = new StringBuilder();
+            while (!sb.toString().endsWith("]]>]]>")) {
                 sb.append((char) inFromServer.read());
             }
             LOG.info(sb.toString());

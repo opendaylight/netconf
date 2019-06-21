@@ -230,7 +230,7 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
     private void readEditDefinition(final @NonNull PatchEdit edit, final @NonNull JsonReader in,
                                     final @NonNull InstanceIdentifierContext<?> path,
                                     final @NonNull StringModuleInstanceIdentifierCodec codec) throws IOException {
-        final StringBuffer value = new StringBuffer();
+        final StringBuilder value = new StringBuilder();
         in.beginObject();
 
         while (in.hasNext()) {
@@ -279,35 +279,35 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private void readValueNode(final @NonNull StringBuffer value, final @NonNull JsonReader in) throws IOException {
+    private void readValueNode(final @NonNull StringBuilder value, final @NonNull JsonReader in) throws IOException {
         in.beginObject();
-        value.append("{");
+        value.append('{');
 
-        value.append("\"" + in.nextName() + "\"" + ":");
+        value.append('"').append(in.nextName()).append("\":");
 
         if (in.peek() == JsonToken.BEGIN_ARRAY) {
             in.beginArray();
-            value.append("[");
+            value.append('[');
 
             while (in.hasNext()) {
                 if (in.peek() == JsonToken.STRING) {
-                    value.append("\"" + in.nextString() + "\"");
+                    value.append('"').append(in.nextString()).append('"');
                 } else {
                     readValueObject(value, in);
                 }
                 if (in.peek() != JsonToken.END_ARRAY) {
-                    value.append(",");
+                    value.append(',');
                 }
             }
 
             in.endArray();
-            value.append("]");
+            value.append(']');
         } else {
             readValueObject(value, in);
         }
 
         in.endObject();
-        value.append("}");
+        value.append('}');
     }
 
     /**
@@ -316,52 +316,51 @@ public class JsonToPatchBodyReader extends AbstractIdentifierAwareJaxRsProvider
      * @param in JsonReader reader
      * @throws IOException if operation fails
      */
-    private void readValueObject(final @NonNull StringBuffer value, final @NonNull JsonReader in) throws IOException {
+    private void readValueObject(final @NonNull StringBuilder value, final @NonNull JsonReader in) throws IOException {
         // read simple leaf value
         if (in.peek() == JsonToken.STRING) {
-            value.append("\"" + in.nextString() + "\"");
+            value.append('"').append(in.nextString()).append('"');
             return;
         }
 
         in.beginObject();
-        value.append("{");
+        value.append('{');
 
         while (in.hasNext()) {
-            value.append("\"" + in.nextName() + "\"");
-            value.append(":");
+            value.append('"').append(in.nextName()).append("\":");
 
             if (in.peek() == JsonToken.STRING) {
-                value.append("\"" + in.nextString() + "\"");
+                value.append('"').append(in.nextString()).append('"');
             } else {
                 if (in.peek() == JsonToken.BEGIN_ARRAY) {
                     in.beginArray();
-                    value.append("[");
+                    value.append('[');
 
                     while (in.hasNext()) {
                         if (in.peek() == JsonToken.STRING) {
-                            value.append("\"" + in.nextString() + "\"");
+                            value.append('"').append(in.nextString()).append('"');
                         } else {
                             readValueObject(value, in);
                         }
                         if (in.peek() != JsonToken.END_ARRAY) {
-                            value.append(",");
+                            value.append(',');
                         }
                     }
 
                     in.endArray();
-                    value.append("]");
+                    value.append(']');
                 } else {
                     readValueObject(value, in);
                 }
             }
 
             if (in.peek() != JsonToken.END_OBJECT) {
-                value.append(",");
+                value.append(',');
             }
         }
 
         in.endObject();
-        value.append("}");
+        value.append('}');
     }
 
     /**
