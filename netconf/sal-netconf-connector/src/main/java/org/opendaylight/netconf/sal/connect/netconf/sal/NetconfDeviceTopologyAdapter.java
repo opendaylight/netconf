@@ -96,18 +96,28 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "init");
     }
 
-    public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities) {
-        final NetconfNode data = buildDataForNetconfNode(up, capabilities);
+    public void updateDeviceData(final ConnectionStatus connectionStatus,
+            final NetconfDeviceCapabilities capabilities, final LogicalDatastoreType dsType, final NetconfNode node) {
+        NetconfNode data;
+        if (node != null && dsType == LogicalDatastoreType.CONFIGURATION) {
+            data = node;
+        } else {
+            data = buildDataForNetconfNode(connectionStatus, capabilities, dsType, node);
+        }
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath().augmentation(NetconfNode.class),
-            data, true);
+        writeTx.put(dsType, id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
         LOG.trace("{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
 
         commitTransaction(writeTx, "update");
+    }
+
+    public void updateDeviceData(final boolean up, final NetconfDeviceCapabilities capabilities) {
+        updateDeviceData(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting, capabilities,
+                LogicalDatastoreType.OPERATIONAL, null);
     }
 
     public void updateClusteredDeviceData(final boolean up, final String masterAddress,
@@ -146,7 +156,8 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         commitTransaction(writeTx, "update-failed-device");
     }
 
-    private NetconfNode buildDataForNetconfNode(final boolean up, final NetconfDeviceCapabilities capabilities) {
+    private NetconfNode buildDataForNetconfNode(final ConnectionStatus connectionStatus,
+            final NetconfDeviceCapabilities capabilities, final LogicalDatastoreType dsType, final NetconfNode node) {
         List<AvailableCapability> capabilityList = new ArrayList<>();
         capabilityList.addAll(capabilities.getNonModuleBasedCapabilities());
         capabilityList.addAll(capabilities.getResolvedCapabilities());
@@ -154,14 +165,13 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         final AvailableCapabilitiesBuilder avCapabalitiesBuilder = new AvailableCapabilitiesBuilder();
         avCapabalitiesBuilder.setAvailableCapability(capabilityList);
 
-        final NetconfNodeBuilder netconfNodeBuilder = new NetconfNodeBuilder()
-                .setHost(id.getHost())
-                .setPort(new PortNumber(id.getAddress().getPort()))
-                .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
-                .setAvailableCapabilities(avCapabalitiesBuilder.build())
-                .setUnavailableCapabilities(unavailableCapabilities(capabilities.getUnresolvedCapabilites()));
-
-        return netconfNodeBuilder.build();
+        return new NetconfNodeBuilder()
+            .setHost(id.getHost())
+            .setPort(new PortNumber(id.getAddress().getPort()))
+            .setConnectionStatus(connectionStatus)
+            .setAvailableCapabilities(avCapabalitiesBuilder.build())
+            .setUnavailableCapabilities(unavailableCapabilities(capabilities.getUnresolvedCapabilites()))
+            .build();
     }
 
     private NetconfNode buildDataForNetconfClusteredNode(final boolean up, final String masterNodeAddress,
