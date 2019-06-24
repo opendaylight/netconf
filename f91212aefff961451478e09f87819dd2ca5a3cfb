@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "273c135d_45c69720",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfRpcStructureTransformer.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-06-24T14:43:54Z",
+      "side": 1,
+      "message": "This loses the exception",
+      "range": {
+        "startLine": 49,
+        "startChar": 16,
+        "endLine": 49,
+        "endChar": 69
+      },
+      "revId": "f91212aefff961451478e09f87819dd2ca5a3cfb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ba91e4a_b1fa8b16",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/netconf/sal/rest/impl/NormalizedNodeXmlBodyWriter.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-06-24T14:43:54Z",
+      "side": 1,
+      "message": "Missing message, also this method throws a checked exception -- hence throw that to have users correctly recover",
+      "range": {
+        "startLine": 121,
+        "startChar": 30,
+        "endLine": 121,
+        "endChar": 46
+      },
+      "revId": "f91212aefff961451478e09f87819dd2ca5a3cfb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
