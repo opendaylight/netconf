@@ -1,0 +1,69 @@
+module netconf-node-optional {
+    namespace "urn:opendaylight:netconf-node-optional";
+    prefix "netnopt";
+
+    import network-topology { prefix nt; revision-date 2013-10-21; }
+    import yang-ext { prefix ext; revision-date "2013-07-09";}
+
+    revision "2019-06-14" {
+        description "Initial revision of Node Optional model";
+    }
+
+    grouping netconf-node-augmented-optional-fields {
+        container ignore-missing-schema-sources {
+            description "Allows mount point to reconnect on the 'missing schema sources' error.
+                WARNING - enabling the reconnection on the 'missing schema sources' error can lead
+                to unexpected errors at runtime.";
+            leaf allowed {
+                type boolean;
+                default false;
+                description "Allows reconnection of the mount point. Default false.";
+            }
+            leaf reconnect-time {
+                type uint32;
+                default 5000;
+                description "Time for reconnection - in units milliseconds. Default 5000 ms.";
+            }
+        }
+    }
+
+    container netconf-node-fields-optional {
+        description "Allows to create node's optional value with the path mapping according to
+            the network-topology -> topology -> node";
+        list topology {
+            key topology-id;
+            leaf topology-id {
+                type nt:topology-id;
+                description "The name of node's topology";
+            }
+            list node {
+                key node-id;
+                leaf node-id {
+                    type nt:node-id;
+                    description "The identifier of a node in the topology";
+                }
+                // Containers allow to create specific data-change-listener directly on a node's optional value.
+                // In the future, it'll be easy to extend the node by optional node fields in this way. Do not create
+                // direct leafs here, please.
+                container datastore-lock {
+                    description "Allows to ignore lock/unlock node's datastare.";
+                    leaf datastore-lock-allowed {
+                        type boolean;
+                        default true;
+                        description "The operation allows the client to lock the entire configuration datastore
+                            system of a device.
+                            WARNING - With blocking the lock/unlock operations, the user is coming to operate
+                            in a manner which is not supported. It must not exist any concurrent access to
+                            the data store - it may interfere with data consistency.";
+                    }
+                }
+            }
+        }
+    }
+
+    augment "/nt:network-topology/nt:topology/nt:node/" {
+        when "../../nt:topology-types/topology-netconf";
+        ext:augment-identifier "netconf-node-augmented-optional";
+        uses netconf-node-augmented-optional-fields;
+    }
+}

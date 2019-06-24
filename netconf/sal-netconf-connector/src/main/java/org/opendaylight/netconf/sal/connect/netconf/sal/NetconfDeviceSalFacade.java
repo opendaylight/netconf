@@ -12,6 +12,7 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -21,6 +22,8 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +67,13 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
                 .onTopologyDeviceConnected(schemaContext, domBroker, deviceRpc, notificationService, deviceAction);
         salProvider.getTopologyDatastoreAdapter()
                 .updateDeviceData(true, netconfSessionPreferences.getNetconfDeviceCapabilities());
+    }
+
+    @Override
+    public synchronized void onDeviceReconnected(final NetconfSessionPreferences netconfSessionPreferences,
+            final NetconfNode node) {
+        this.salProvider.getTopologyDatastoreAdapter().updateDeviceData(ConnectionStatus.Connecting,
+                netconfSessionPreferences.getNetconfDeviceCapabilities(), LogicalDatastoreType.CONFIGURATION, node);
     }
 
     @Override
