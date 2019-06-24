@@ -67,6 +67,7 @@ import org.opendaylight.netconf.topology.api.NetconfTopology;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190621.NetconfNodeOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.Protocol.Name;
@@ -280,11 +281,12 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected ListenableFuture<NetconfDeviceCapabilities> setupConnection(final NodeId nodeId,
                                                                           final Node configNode) {
         final NetconfNode netconfNode = configNode.augmentation(NetconfNode.class);
+        final NetconfNodeOptional nodeOptional = configNode.augmentation(NetconfNodeOptional.class);
 
         requireNonNull(netconfNode.getHost());
         requireNonNull(netconfNode.getPort());
 
-        final NetconfConnectorDTO deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode);
+        final NetconfConnectorDTO deviceCommunicatorDTO = createDeviceCommunicator(nodeId, netconfNode, nodeOptional);
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
         final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
         final NetconfReconnectingClientConfiguration clientConfig =
@@ -311,6 +313,11 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     }
 
     protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node) {
+        return createDeviceCommunicator(nodeId, node, null);
+    }
+
+    protected NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
+            final NetconfNodeOptional nodeOptional) {
         //setup default values since default value is not supported in mdsal
         final long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
                 ? DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
@@ -371,7 +378,10 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                     .setSchemaResourcesDTO(schemaResourcesDTO)
                     .setGlobalProcessingExecutor(this.processingExecutor)
                     .setId(remoteDeviceId)
-                    .setSalFacade(salFacade);
+                    .setSalFacade(salFacade)
+                    .setNode(node)
+                    .setEventExecutor(eventExecutor)
+                    .setNodeOptional(nodeOptional);
             if (this.deviceActionFactory != null) {
                 netconfDeviceBuilder.setDeviceActionFactory(this.deviceActionFactory);
             }

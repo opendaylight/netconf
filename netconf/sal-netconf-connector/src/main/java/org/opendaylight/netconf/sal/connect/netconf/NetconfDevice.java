@@ -19,6 +19,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import io.netty.util.concurrent.EventExecutor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
@@ -52,6 +54,8 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessag
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190621.NetconfNodeOptional;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -93,12 +97,17 @@ public class NetconfDevice
     private final NetconfDeviceSchemasResolver stateSchemasResolver;
     private final NotificationHandler notificationHandler;
     private final boolean reconnectOnSchemasChange;
+    private final NetconfNode node;
 
     @GuardedBy("this")
     private boolean connected = false;
 
     // Message transformer is constructed once the schemas are available
     private MessageTransformer<NetconfMessage> messageTransformer;
+
+    private final EventExecutor eventExecutor;
+
+    private final NetconfNodeOptional nodeOptional;
 
     /**
      * Create rpc implementation capable of handling RPC for monitoring and notifications
@@ -118,16 +127,21 @@ public class NetconfDevice
                          final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
                          final ListeningExecutorService globalProcessingExecutor,
                          final boolean reconnectOnSchemasChange) {
-        this(schemaResourcesDTO, id, salFacade, globalProcessingExecutor, reconnectOnSchemasChange, null);
+        this(schemaResourcesDTO, id, salFacade, globalProcessingExecutor, reconnectOnSchemasChange, null, null, null,
+                null);
     }
 
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id,
             final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
             final ListeningExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange,
-            final DeviceActionFactory deviceActionFactory) {
+            final DeviceActionFactory deviceActionFactory, final NetconfNode node, final EventExecutor eventExecutor,
+            final NetconfNodeOptional nodeOptional) {
         this.id = id;
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
         this.deviceActionFactory = deviceActionFactory;
+        this.node = node;
+        this.eventExecutor = eventExecutor;
+        this.nodeOptional = nodeOptional;
         this.schemaRegistry = schemaResourcesDTO.getSchemaRegistry();
         this.schemaRepository = schemaResourcesDTO.getSchemaRepository();
         this.schemaContextFactory = schemaResourcesDTO.getSchemaContextFactory();
@@ -543,10 +557,20 @@ public class NetconfDevice
                     return;
                 }
             }
-            // No more sources, fail
-            final IllegalStateException cause = new IllegalStateException(id + ": No more sources for schema context");
-            handleSalInitializationFailure(cause, listener);
-            salFacade.onDeviceFailed(cause);
+            // No more sources, fail or try to reconnect
+            if (nodeOptional.getIgnoreMissingSchemaSources().isAllowed()) {
+                eventExecutor.schedule(() -> {
+                    LOG.warn("{} : No more sources for schema context.", id);
+                    LOG.info("{} : Try to remount device.", id);
+                    onRemoteSessionDown();
+                    salFacade.onDeviceReconnected(remoteSessionCapabilities, node);
+                }, nodeOptional.getIgnoreMissingSchemaSources().getRecconectTime(), TimeUnit.MILLISECONDS);
+            } else {
+                final IllegalStateException cause =
+                        new IllegalStateException(id + ": No more sources for schema context");
+                handleSalInitializationFailure(cause, listener);
+                salFacade.onDeviceFailed(cause);
+            }
         }
 
         private Collection<SourceIdentifier> handleMissingSchemaSourceException(
