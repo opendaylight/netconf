@@ -10,6 +10,7 @@ package org.opendaylight.netconf.sal.connect.api;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public interface RemoteDeviceHandler<PREF> extends AutoCloseable {
@@ -36,6 +37,10 @@ public interface RemoteDeviceHandler<PREF> extends AutoCloseable {
      */
     default void onDeviceConnected(final SchemaContext remoteSchemaContext, final PREF netconfSessionPreferences,
             final DOMRpcService deviceRpc, final DOMActionService deviceAction) {
+        // DO NOTHING
+    }
+
+    default void onDeviceReconnected(final PREF netconfSessionPreferences, final NetconfNode node) {
         // DO NOTHING
     }
 
