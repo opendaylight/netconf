@@ -10,10 +10,13 @@ package org.opendaylight.netconf.sal.connect.netconf;
 
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ListeningExecutorService;
+import io.netty.util.concurrent.EventExecutor;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.NetconfNodeAugmentedOptional;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 
 public class NetconfDeviceBuilder {
 
@@ -23,6 +26,9 @@ public class NetconfDeviceBuilder {
     private RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
     private ListeningExecutorService globalProcessingExecutor;
     private DeviceActionFactory deviceActionFactory;
+    private NetconfNode node;
+    private EventExecutor eventExecutor;
+    private NetconfNodeAugmentedOptional nodeOptional;
 
     public NetconfDeviceBuilder() {
     }
@@ -57,10 +63,26 @@ public class NetconfDeviceBuilder {
         return this;
     }
 
+    public NetconfDeviceBuilder setNode(final NetconfNode node) {
+        this.node = node;
+        return this;
+    }
+
+    public NetconfDeviceBuilder setEventExecutor(final EventExecutor eventExecutor) {
+        this.eventExecutor = eventExecutor;
+        return this;
+    }
+
+    public NetconfDeviceBuilder setNodeOptional(final NetconfNodeAugmentedOptional nodeOptional) {
+        this.nodeOptional = nodeOptional;
+        return this;
+    }
+
     public NetconfDevice build() {
         validation();
         return new NetconfDevice(this.schemaResourcesDTO, this.id, this.salFacade, this.globalProcessingExecutor,
-                this.reconnectOnSchemasChange, this.deviceActionFactory);
+                this.reconnectOnSchemasChange, this.deviceActionFactory, this.node, this.eventExecutor,
+                this.nodeOptional);
     }
 
     private void validation() {
