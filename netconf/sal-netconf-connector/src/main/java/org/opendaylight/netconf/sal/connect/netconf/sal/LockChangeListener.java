@@ -12,7 +12,7 @@ import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.netconf.node.fields.optional.topology.node.DatastoreLock;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190621.netconf.node.fields.optional.topology.node.DatastoreLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

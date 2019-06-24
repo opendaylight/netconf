@@ -3,9 +3,28 @@ module netconf-node-optional {
     prefix "netnopt";
 
     import network-topology { prefix nt; revision-date 2013-10-21; }
+    import yang-ext { prefix ext; revision-date "2013-07-09";}
+
+    revision "2019-06-21" {
+        description "Initial revision of Node optional values model";
+    }
 
     revision "2019-06-14" {
         description "Initial revision of Node Locking model";
+    }
+
+    grouping netconf-node-optional-fields {
+        container ignore-missing-schema-sources {
+            leaf allowed {
+                type boolean;
+                default false;
+            }
+            leaf recconect-time {
+                type uint32;
+                description "Time for recconection - in milliseconds. Default 5000 ms.";
+                default 5000;
+            }
+        }
     }
 
     container netconf-node-fields-optional {
@@ -37,5 +56,11 @@ module netconf-node-optional {
                 }
             }
         }
+    }
+
+    augment "/nt:network-topology/nt:topology/nt:node/" {
+        when "../../nt:topology-types/topology-netconf";
+        ext:augment-identifier "netconf-node-optional";
+        uses netconf-node-optional-fields;
     }
 }
