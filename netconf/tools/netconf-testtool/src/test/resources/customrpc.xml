@@ -1,0 +1,88 @@
+<rpcs>
+
+  <!-- First example from https://tools.ietf.org/html/rfc7950#section-4.2.9 -->
+  <rpc>
+    <input>
+      <activate-software-image xmlns="http://example.com/system">
+        <image-name>example-fw-2.3</image-name>
+      </activate-software-image>
+    </input>
+    <output>
+      <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <status xmlns="http://example.com/system">
+          The image example-fw-2.3 is being installed.
+        </status>
+      </rpc-reply>
+    </output>
+  </rpc>
+
+  <!-- Second example from https://tools.ietf.org/html/rfc7950#section-4.2.9 -->
+  <rpc>
+    <input>
+      <action xmlns="urn:ietf:params:xml:ns:yang:1">
+        <interface xmlns="http://example.com/system">
+          <name>eth1</name>
+          <ping>
+            <destination>192.0.2.1</destination>
+          </ping>
+        </interface>
+      </action>
+    </input>
+    <output>
+      <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
+                 xmlns:sys="http://example.com/system">
+        <sys:packet-loss>60</sys:packet-loss>
+      </rpc-reply>
+    </output>
+  </rpc>
+
+  <!-- Example from https://tools.ietf.org/html/rfc7950#section-7.14.5 -->
+  <rpc>
+    <input>
+      <rock-the-house xmlns="urn:example:rock">
+        <zip-code>27606-0100</zip-code>
+      </rock-the-house>
+    </input>
+    <output>
+      <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <ok/>
+      </rpc-reply>
+    </output>
+  </rpc>
+
+  <!-- Example from https://tools.ietf.org/html/rfc7950#section-7.15.3 -->
+  <rpc>
+    <input>
+      <action xmlns="urn:ietf:params:xml:ns:yang:1">
+        <server xmlns="urn:example:server-farm">
+          <name>apache-1</name>
+          <reset>
+            <reset-at>2014-07-29T13:42:00Z</reset-at>
+          </reset>
+        </server>
+      </action>
+    </input>
+    <output>
+      <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <reset-finished-at xmlns="urn:example:server-farm">
+          2014-07-29T13:42:12Z
+        </reset-finished-at>
+      </rpc-reply>
+    </output>
+  </rpc>
+
+  <rpc>
+    <input>
+      <play xmlns="urn:mynetconf:test">
+        <playlist>Foo-One</playlist>
+        <song-number>2</song-number>
+      </play>
+    </input>
+    <output>
+      <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+        <ok/>
+      </rpc-reply>
+    </output>
+  </rpc>
+
+</rpcs>

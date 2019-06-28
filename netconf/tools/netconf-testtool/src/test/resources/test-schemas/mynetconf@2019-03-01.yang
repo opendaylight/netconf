@@ -1,0 +1,44 @@
+module mynetconf {
+  yang-version 1.1;
+  namespace "urn:mynetconf:test";
+
+  prefix nft;
+  organization "mynetconf";
+  contact "my netconf address";
+  description "yang model for mynetconf";
+
+  revision "2019-03-01"{
+    description "initial version";
+  }
+
+  container netconflist{
+    list netconf{
+      key netconf-id;
+      leaf netconf-id{
+        type uint16;
+      }
+      leaf netconf-param {
+        type uint32;
+      }
+    }
+  }
+
+  rpc play {
+	description
+	  "Control function for the jukebox player.";
+	input {
+	  leaf playlist {
+	    type string;
+	    mandatory true;
+	    description
+	      "The playlist name.";
+	  }
+	  leaf song-number {
+	    type uint32;
+	    mandatory true;
+	    description
+	      "Song number in playlist to play.";
+	  }
+	}
+  }
+}

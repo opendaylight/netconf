@@ -253,7 +253,7 @@ public class NetconfDeviceSimulator implements Closeable {
                     continue;
                 }
 
-                LOG.debug("Simulated TCP device started on {}", address);
+                LOG.debug("Simulated TCP device started on {}", server.channel().localAddress());
             }
 
             devicesChannels.add(server.channel());
