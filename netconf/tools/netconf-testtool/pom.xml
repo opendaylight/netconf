@@ -26,6 +26,7 @@
 
     <properties>
         <sonar.skip>true</sonar.skip>
+        <xmlunit.version>2.6.3</xmlunit.version>
     </properties>
 
     <dependencies>
@@ -133,6 +134,18 @@
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>org.apache.karaf.features.core</artifactId>
             <version>${karaf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xmlunit</groupId>
+            <artifactId>xmlunit-core</artifactId>
+            <version>${xmlunit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.xmlunit</groupId>
+            <artifactId>xmlunit-assertj</artifactId>
+            <version>${xmlunit.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -339,6 +352,12 @@
                           </goals>
                       </execution>
                   </executions>
+              </plugin>
+              <plugin>
+                  <artifactId>maven-surefire-plugin</artifactId>
+                  <configuration>
+                      <reportFormat>plain</reportFormat>
+                  </configuration>
               </plugin>
           </plugins>
       </build>
