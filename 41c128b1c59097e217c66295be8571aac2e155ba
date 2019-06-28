@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ab2a6775_30c7152e",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-optional.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-06-28T06:50:23Z",
+      "side": 1,
+      "message": "\"exception\" is a programming term, it should not be exposed in models. This also needs to come with a big fat warning, that enabling this can lead to unexpected errors at run time, for which we do not provide support.",
+      "range": {
+        "startLine": 14,
+        "startChar": 87,
+        "endLine": 14,
+        "endChar": 96
+      },
+      "revId": "41c128b1c59097e217c66295be8571aac2e155ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "db893f07_23317444",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-optional.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-06-28T06:50:23Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 20,
+        "startChar": 17,
+        "endLine": 20,
+        "endChar": 26
+      },
+      "revId": "41c128b1c59097e217c66295be8571aac2e155ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aec0fda0_b5bbb5fe",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-optional.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-06-28T06:50:23Z",
+      "side": 1,
+      "message": "this is missing \u0027units milliseconds\u0027",
+      "range": {
+        "startLine": 23,
+        "startChar": 56,
+        "endLine": 23,
+        "endChar": 68
+      },
+      "revId": "41c128b1c59097e217c66295be8571aac2e155ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
