@@ -11,11 +11,13 @@ package org.opendaylight.netconf.test.tool;
 import static org.junit.Assert.assertNotNull;
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
+import com.google.common.collect.ImmutableMap;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.net.InetSocketAddress;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -95,6 +97,10 @@ public class TestToolTest {
         + "    2014-07-29T13:42:12Z\n"
         + "  </reset-finished-at>\n"
         + "</rpc-reply>";
+    private static final Map<String, String> PREFIX_2_URI = ImmutableMap.of(
+        "base10", "urn:ietf:params:xml:ns:netconf:base:1.0",
+        "ncmon", "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring"
+    );
 
     @BeforeClass
     public static void setUpClass() {
@@ -129,8 +135,28 @@ public class TestToolTest {
             .areIdentical();
     }
 
+    @Test
+    public void shouldSupportGetSchema()
+        throws Exception {
+        String getSchema = "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"m-0\">\n"
+            + "  <get>\n"
+            + "    <filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+            + "      <netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+            + "        <schemas/>\n"
+            + "      </netconf-state>\n"
+            + "    </filter>\n"
+            + "  </get>\n"
+            + "</rpc>";
+        Document docResponse = invokeRpc(TCP_SIMULATOR_CONFIG, getSchema);
+        assertThat(docResponse)
+            .withNamespaceContext(PREFIX_2_URI)
+            .valueByXPath("count(//base10:rpc-reply/base10:data/ncmon:netconf-state/ncmon:schemas/ncmon:schema)")
+            .isEqualTo(5);
+    }
+
     private Document invokeRpc(Configuration simulatorConfig, String xmlRequest)
         throws Exception {
+        // GIVEN
         int localPort = launchSimulator(simulatorConfig);
         SimpleNetconfClientSessionListener sessionListener = new SimpleNetconfClientSessionListener();
         NetconfClientConfiguration clientConfig = getClientConfig("localhost", localPort,
