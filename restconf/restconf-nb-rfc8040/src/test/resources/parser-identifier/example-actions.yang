@@ -1,0 +1,41 @@
+module example-actions {
+     yang-version 1.1;
+     namespace "https://example.com/ns/example-actions";
+     prefix "act";
+
+     organization "Example, Inc.";
+     contact "support at example.com";
+     description "Example Actions Data Model Module.";
+
+     revision "2016-07-07" {
+       description "Initial version.";
+       reference "example.com document 2-9973.";
+     }
+
+     container interfaces {
+       description "System interfaces.";
+
+       list interface {
+         key name;
+         description "One interface entry.";
+         leaf name {
+           type string;
+           description "Interface name.";
+         }
+
+         action reset {
+           description "Reset an interface.";
+           input {
+             leaf delay {
+               type uint32;
+               units "seconds";
+               default 0;
+               description
+                 "Number of seconds to wait before starting the
+                  interface reset.";
+             }
+           }
+         }
+       }
+     }
+   }

@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -31,7 +33,10 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
+import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.IdentitySchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
@@ -40,6 +45,7 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
@@ -324,8 +330,12 @@ public final class YangInstanceIdentifierDeserializer {
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH") // code does check for null 'current' but FB doesn't recognize it
     private static DataSchemaContextNode<?> nextContextNode(final QName qname, final List<PathArgument> path,
             final MainVarsWrapper variables) {
-        variables.setCurrent(variables.getCurrent().getChild(qname));
-        DataSchemaContextNode<?> current = variables.getCurrent();
+        final DataSchemaContextNode<?> initialContext = variables.getCurrent();
+        final DataSchemaNode initialDataSchema = initialContext.getDataSchemaNode();
+
+        DataSchemaContextNode<?> current = initialContext.getChild(qname);
+        variables.setCurrent(current);
+
         if (current == null) {
             final Optional<Module> module = variables.getSchemaContext().findModule(qname.getModule());
             if (module.isPresent()) {
@@ -334,6 +344,9 @@ public final class YangInstanceIdentifierDeserializer {
                         return null;
                     }
                 }
+            }
+            if (findActionDefinition(initialDataSchema, qname.getLocalName()).isPresent()) {
+                return null;
             }
         }
         checkValid(current != null, qname + " is not correct schema node identifier.", variables.getData(),
@@ -371,17 +384,23 @@ public final class YangInstanceIdentifierDeserializer {
     private static QName getQNameOfDataSchemaNode(final String nodeName, final MainVarsWrapper variables) {
         final DataSchemaNode dataSchemaNode = variables.getCurrent().getDataSchemaNode();
         if (dataSchemaNode instanceof ContainerSchemaNode) {
-            final ContainerSchemaNode contSchemaNode = (ContainerSchemaNode) dataSchemaNode;
-            final DataSchemaNode node = RestconfSchemaUtil.findSchemaNodeInCollection(contSchemaNode.getChildNodes(),
-                    nodeName);
-            return node.getQName();
+            getQNameOfDataSchemaNode((ContainerSchemaNode) dataSchemaNode, nodeName);
         } else if (dataSchemaNode instanceof ListSchemaNode) {
-            final ListSchemaNode listSchemaNode = (ListSchemaNode) dataSchemaNode;
-            final DataSchemaNode node = RestconfSchemaUtil.findSchemaNodeInCollection(listSchemaNode.getChildNodes(),
-                    nodeName);
-            return node.getQName();
+            getQNameOfDataSchemaNode((ListSchemaNode) dataSchemaNode, nodeName);
         }
         throw new UnsupportedOperationException();
+    }
+
+    private static <T extends DataNodeContainer & ActionNodeContainer> QName getQNameOfDataSchemaNode(final T parent,
+            String nodeName) {
+        final Optional<ActionDefinition> actionDef = findActionDefinition(parent, nodeName);
+        final SchemaNode node;
+        if (actionDef.isPresent()) {
+            node = actionDef.get();
+        } else {
+            node = RestconfSchemaUtil.findSchemaNodeInCollection(parent.getChildNodes(), nodeName);
+        }
+        return node.getQName();
     }
 
     private static Module moduleForPrefix(final String prefix, final SchemaContext schemaContext) {
@@ -423,6 +442,16 @@ public final class YangInstanceIdentifierDeserializer {
 
     private static boolean allCharsConsumed(final MainVarsWrapper variables) {
         return variables.getOffset() == variables.getData().length();
+    }
+
+    private static Optional<ActionDefinition> findActionDefinition(final DataSchemaNode dataSchemaNode,
+            final String nodeName) {
+        requireNonNull(dataSchemaNode, "DataSchema Node must not be null.");
+        if (dataSchemaNode instanceof ActionNodeContainer) {
+            return ((ActionNodeContainer) dataSchemaNode).getActions().stream()
+                    .filter(actionDef -> actionDef.getQName().getLocalName().equals(nodeName)).findFirst();
+        }
+        return Optional.empty();
     }
 
     private static final class MainVarsWrapper {
