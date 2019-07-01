@@ -20,9 +20,11 @@ import static org.opendaylight.netconf.nettyutil.AbstractChannelInitializer.NETC
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOutboundHandler;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.HashedWheelTimer;
@@ -107,7 +109,7 @@ public class AbstractNetconfSessionNegotiatorTest {
 
     @Test
     public void testStartNegotiationNotEstablished() throws Exception {
-        final ChannelOutboundHandler closedDetector = Mockito.spy(new ChannelOutboundHandlerAdapter());
+        final ChannelOutboundHandler closedDetector = Mockito.spy(new CloseDetector());
         channel.pipeline().addLast("closedDetector", closedDetector);
         doReturn(false).when(promise).isDone();
         doReturn(false).when(promise).isCancelled();
@@ -160,5 +162,12 @@ public class AbstractNetconfSessionNegotiatorTest {
         final RuntimeException cause = new RuntimeException("failure cause");
         channel.pipeline().fireExceptionCaught(cause);
         verify(promise).setFailure(cause);
+    }
+
+    private class CloseDetector extends ChannelOutboundHandlerAdapter {
+        @Override
+        public void close(ChannelHandlerContext ctx, ChannelPromise promise) {
+            // Override needed so @Skip from superclass is not effective
+        }
     }
 }
