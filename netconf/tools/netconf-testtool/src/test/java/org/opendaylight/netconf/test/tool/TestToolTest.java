@@ -11,12 +11,15 @@ package org.opendaylight.netconf.test.tool;
 import static org.junit.Assert.assertNotNull;
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
+import com.google.common.collect.ImmutableMap;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import java.io.File;
 import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -39,6 +42,7 @@ import org.opendaylight.netconf.nettyutil.NeverReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
 import org.opendaylight.netconf.test.tool.config.Configuration;
 import org.opendaylight.netconf.test.tool.config.ConfigurationBuilder;
+import org.opendaylight.netconf.test.tool.config.YangResource;
 import org.w3c.dom.Document;
 
 @SuppressWarnings("SameParameterValue")
@@ -92,6 +96,10 @@ public class TestToolTest {
         + "    2014-07-29T13:42:12Z\n"
         + "  </reset-finished-at>\n"
         + "</rpc-reply>";
+    private static final Map<String, String> PREFIX_2_URI = ImmutableMap.of(
+        "base10", "urn:ietf:params:xml:ns:netconf:base:1.0",
+        "ncmon", "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring"
+    );
 
     @BeforeClass
     public static void setUpClass() {
@@ -124,6 +132,27 @@ public class TestToolTest {
             .and(EXPECTED_XML_RESPONSE_RFC7950_SECTION_4_2_9)
             .ignoreWhitespace()
             .areIdentical();
+    }
+
+    @Test
+    public void shouldSupportGetSchema()
+        throws Exception {
+        String getSchema = "<rpc xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"m-0\">\n"
+            + "  <get>\n"
+            + "    <filter xmlns:ns0=\"urn:ietf:params:xml:ns:netconf:base:1.0\" ns0:type=\"subtree\">\n"
+            + "      <netconf-state xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring\">\n"
+            + "        <schemas/>\n"
+            + "      </netconf-state>\n"
+            + "    </filter>\n"
+            + "  </get>\n"
+            + "</rpc>";
+        Document docResponse = invokeRpc(TCP_SIMULATOR_CONFIG, getSchema);
+        Set<YangResource> expectedYangResources = Configuration.DEFAULT_YANG_RESOURCES;
+        assert expectedYangResources.size() > 0;
+        assertThat(docResponse)
+            .withNamespaceContext(PREFIX_2_URI)
+            .valueByXPath("count(//base10:rpc-reply/base10:data/ncmon:netconf-state/ncmon:schemas/ncmon:schema)")
+            .isEqualTo(expectedYangResources.size());
     }
 
     private Document invokeRpc(Configuration simulatorConfig, String xmlRequest)
