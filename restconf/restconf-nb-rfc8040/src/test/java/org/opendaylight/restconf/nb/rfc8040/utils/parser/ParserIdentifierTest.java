@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
@@ -86,6 +87,7 @@ public class ParserIdentifierTest {
     private static final String TEST_MODULE_NAMESPACE = "test:module";
 
     private static final String INVOKE_RPC = "invoke-rpc-module:rpc-test";
+    private static final String INVOKE_ACTION = "example-actions:interfaces/interface=eth0/reset";
 
     // mount point and mount point service
     private DOMMountPoint mountPoint;
@@ -691,6 +693,47 @@ public class ParserIdentifierTest {
 
         // other fields
         assertEquals(IdentifierCodec.deserialize(INVOKE_RPC, schemaContext), result.getInstanceIdentifier());
+        assertEquals(this.mountPoint, result.getMountPoint());
+        assertEquals(this.schemaContextOnMountPoint, result.getSchemaContext());
+    }
+
+    /**
+     * Test Action.
+     * Verify if Action schema node was found.
+     */
+    @Test
+    public void invokeActionTest() {
+        final InstanceIdentifierContext<?> result = ParserIdentifier
+            .toInstanceIdentifier(INVOKE_ACTION, this.schemaContext, Optional.empty());
+
+        // Action schema node
+        final QName actionQName = result.getSchemaNode().getQName();
+        assertEquals("https://example.com/ns/example-actions", actionQName.getModule().getNamespace().toString());
+        assertEquals("reset", actionQName.getLocalName());
+
+        // other fields
+        assertEquals(IdentifierCodec.deserialize(INVOKE_ACTION, schemaContext), result.getInstanceIdentifier());
+        assertNull(result.getMountPoint());
+        assertSame(this.schemaContext, result.getSchemaContext());
+    }
+
+    /**
+     * Test invoke Action on mount point.
+     * Verify if Action schema node was found.
+     */
+    @Test
+    public void invokeActionOnMountPointTest() {
+        final InstanceIdentifierContext<?> result = ParserIdentifier
+            .toInstanceIdentifier(MOUNT_POINT_IDENT + "/" + INVOKE_ACTION, this.schemaContext,
+                Optional.of(this.mountPointService));
+
+        // Action schema node
+        final QName actionQName = result.getSchemaNode().getQName();
+        assertEquals("https://example.com/ns/example-actions", actionQName.getModule().getNamespace().toString());
+        assertEquals("reset", actionQName.getLocalName());
+
+        // other fields
+        assertEquals(IdentifierCodec.deserialize(INVOKE_ACTION, schemaContext), result.getInstanceIdentifier());
         assertEquals(this.mountPoint, result.getMountPoint());
         assertEquals(this.schemaContextOnMountPoint, result.getSchemaContext());
     }
