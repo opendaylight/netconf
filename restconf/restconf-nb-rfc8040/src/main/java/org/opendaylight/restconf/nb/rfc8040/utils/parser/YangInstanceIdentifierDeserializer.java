@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -31,6 +33,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
+import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.IdentitySchemaNode;
@@ -324,6 +328,7 @@ public final class YangInstanceIdentifierDeserializer {
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH") // code does check for null 'current' but FB doesn't recognize it
     private static DataSchemaContextNode<?> nextContextNode(final QName qname, final List<PathArgument> path,
             final MainVarsWrapper variables) {
+        final DataSchemaNode dataSchemaNode = variables.getCurrent().getDataSchemaNode();
         variables.setCurrent(variables.getCurrent().getChild(qname));
         DataSchemaContextNode<?> current = variables.getCurrent();
         if (current == null) {
@@ -335,9 +340,12 @@ public final class YangInstanceIdentifierDeserializer {
                     }
                 }
             }
+            if (findActionDefinition(dataSchemaNode, qname.getLocalName()).isPresent()) {
+                return null;
+            }
         }
         checkValid(current != null, qname + " is not correct schema node identifier.", variables.getData(),
-                variables.getOffset());
+            variables.getOffset());
         while (current.isMixin()) {
             path.add(current.getIdentifier());
             current = current.getChild(qname);
@@ -371,14 +379,22 @@ public final class YangInstanceIdentifierDeserializer {
     private static QName getQNameOfDataSchemaNode(final String nodeName, final MainVarsWrapper variables) {
         final DataSchemaNode dataSchemaNode = variables.getCurrent().getDataSchemaNode();
         if (dataSchemaNode instanceof ContainerSchemaNode) {
+            final Optional<ActionDefinition> actionDef = findActionDefinition(dataSchemaNode, nodeName);
+            if (actionDef.isPresent()) {
+                return actionDef.get().getQName();
+            }
             final ContainerSchemaNode contSchemaNode = (ContainerSchemaNode) dataSchemaNode;
-            final DataSchemaNode node = RestconfSchemaUtil.findSchemaNodeInCollection(contSchemaNode.getChildNodes(),
-                    nodeName);
+            final DataSchemaNode node = RestconfSchemaUtil
+                .findSchemaNodeInCollection(contSchemaNode.getChildNodes(), nodeName);
             return node.getQName();
         } else if (dataSchemaNode instanceof ListSchemaNode) {
+            final Optional<ActionDefinition> actionDef = findActionDefinition(dataSchemaNode, nodeName);
+            if (actionDef.isPresent()) {
+                return actionDef.get().getQName();
+            }
             final ListSchemaNode listSchemaNode = (ListSchemaNode) dataSchemaNode;
-            final DataSchemaNode node = RestconfSchemaUtil.findSchemaNodeInCollection(listSchemaNode.getChildNodes(),
-                    nodeName);
+            final DataSchemaNode node = RestconfSchemaUtil
+                .findSchemaNodeInCollection(listSchemaNode.getChildNodes(), nodeName);
             return node.getQName();
         }
         throw new UnsupportedOperationException();
@@ -423,6 +439,13 @@ public final class YangInstanceIdentifierDeserializer {
 
     private static boolean allCharsConsumed(final MainVarsWrapper variables) {
         return variables.getOffset() == variables.getData().length();
+    }
+
+    private static Optional<ActionDefinition> findActionDefinition(final DataSchemaNode dataSchemaNode,
+        final String nodeName) {
+        requireNonNull(dataSchemaNode, "DataSchema Node must not be null.");
+        return ((ActionNodeContainer) dataSchemaNode).getActions().stream()
+            .filter(actionDef -> actionDef.getQName().getLocalName().equals(nodeName)).findFirst();
     }
 
     private static final class MainVarsWrapper {
