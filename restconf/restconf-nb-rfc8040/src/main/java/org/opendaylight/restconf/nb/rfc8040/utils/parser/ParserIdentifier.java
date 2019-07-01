@@ -16,6 +16,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
@@ -29,12 +31,16 @@ import org.opendaylight.restconf.nb.rfc8040.utils.validations.RestconfValidation
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +50,7 @@ import org.slf4j.LoggerFactory;
 public final class ParserIdentifier {
 
     private static final Logger LOG = LoggerFactory.getLogger(ParserIdentifier.class);
+    private static final Splitter MP_SPLITTER = Splitter.on("/" + RestconfConstants.MOUNT);
 
     private ParserIdentifier() {
         throw new UnsupportedOperationException("Util class.");
@@ -72,64 +79,75 @@ public final class ParserIdentifier {
             final String identifier,
             final SchemaContext schemaContext,
             final Optional<DOMMountPointService> mountPointService) {
+        final YangInstanceIdentifier pathYIId;
+        final DOMMountPoint domMountPoint;
+
         if (identifier != null && identifier.contains(RestconfConstants.MOUNT)) {
             if (!mountPointService.isPresent()) {
                 throw new RestconfDocumentedException("Mount point service is not available");
             }
 
-            final Iterator<String> pathsIt = Splitter.on("/" + RestconfConstants.MOUNT).split(identifier).iterator();
-
+            final Iterator<String> pathsIt = MP_SPLITTER.split(identifier).iterator();
             final String mountPointId = pathsIt.next();
-            final YangInstanceIdentifier mountYangInstanceIdentifier = IdentifierCodec.deserialize(
-                    mountPointId, schemaContext);
-            final Optional<DOMMountPoint> mountPoint =
-                    mountPointService.get().getMountPoint(mountYangInstanceIdentifier);
+            final YangInstanceIdentifier mountYangInstanceIdentifier = IdentifierCodec.deserialize(mountPointId,
+                schemaContext);
+            final Optional<DOMMountPoint> mountPoint = mountPointService.get().getMountPoint(
+                mountYangInstanceIdentifier);
 
             if (!mountPoint.isPresent()) {
-                throw new RestconfDocumentedException(
-                        "Mount point does not exist.", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+                throw new RestconfDocumentedException("Mount point does not exist.", ErrorType.PROTOCOL,
+                    ErrorTag.DATA_MISSING);
             }
-
-            final DOMMountPoint domMountPoint = mountPoint.get();
+            domMountPoint = mountPoint.get();
             final SchemaContext mountSchemaContext = domMountPoint.getSchemaContext();
 
             final String pathId = pathsIt.next().replaceFirst("/", "");
-            final YangInstanceIdentifier pathYangInstanceIdentifier = IdentifierCodec.deserialize(
-                    pathId, mountSchemaContext);
-
-            final DataSchemaContextNode<?> child = DataSchemaContextTree.from(mountSchemaContext)
-                .getChild(pathYangInstanceIdentifier);
-            if (child != null) {
-                return new InstanceIdentifierContext<SchemaNode>(pathYangInstanceIdentifier, child.getDataSchemaNode(),
-                        domMountPoint, mountSchemaContext);
-            }
-            final QName rpcQName = pathYangInstanceIdentifier.getLastPathArgument().getNodeType();
-            RpcDefinition def = null;
-            for (final RpcDefinition rpcDefinition : mountSchemaContext
-                    .findModule(rpcQName.getModule()).get().getRpcs()) {
-                if (rpcDefinition.getQName().getLocalName().equals(rpcQName.getLocalName())) {
-                    def = rpcDefinition;
-                    break;
-                }
-            }
-            return new InstanceIdentifierContext<>(pathYangInstanceIdentifier, def, domMountPoint, mountSchemaContext);
+            pathYIId = IdentifierCodec.deserialize(pathId, mountSchemaContext);
         } else {
-            final YangInstanceIdentifier deserialize = IdentifierCodec.deserialize(identifier, schemaContext);
-            final DataSchemaContextNode<?> child = DataSchemaContextTree.from(schemaContext).getChild(deserialize);
+            pathYIId = IdentifierCodec.deserialize(identifier, schemaContext);
+            domMountPoint = null;
+        }
 
-            if (child != null) {
-                return new InstanceIdentifierContext<SchemaNode>(
-                            deserialize, child.getDataSchemaNode(), null, schemaContext);
-            }
-            final QName rpcQName = deserialize.getLastPathArgument().getNodeType();
-            RpcDefinition def = null;
-            for (final RpcDefinition rpcDefinition : schemaContext.findModule(rpcQName.getModule()).get().getRpcs()) {
-                if (rpcDefinition.getQName().getLocalName().equals(rpcQName.getLocalName())) {
-                    def = rpcDefinition;
-                    break;
-                }
-            }
-            return new InstanceIdentifierContext<>(deserialize, def, null, schemaContext);
+        return createIIdContext(pathYIId, schemaContext, domMountPoint);
+    }
+
+    /**
+     * Method to create {@link InstanceIdentifierContext} from {@link YangInstanceIdentifier}
+     * and {@link SchemaContext}, {@link DOMMountPoint}.
+     *
+     * @param yangIId
+     *               - instance identifier
+     * @param schemaContext
+     *               - schema context
+     * @param domMountPoint
+     *               - optional mount point context
+     * @return {@link InstanceIdentifierContext}
+     */
+    private static InstanceIdentifierContext<?> createIIdContext(final YangInstanceIdentifier yangIId,
+            final SchemaContext schemaContext, final @Nullable DOMMountPoint domMountPoint) {
+
+        // Deal with data nodes first
+        final DataSchemaContextTree contextTree = DataSchemaContextTree.from(schemaContext);
+        final Optional<DataSchemaContextNode<?>> child = contextTree.findChild(yangIId);
+        if (child.isPresent()) {
+            return new InstanceIdentifierContext<SchemaNode>(yangIId, child.get().getDataSchemaNode(), domMountPoint,
+                schemaContext);
+        }
+
+        // That failed, now try to recover by searching through the schema context
+        final List<QName> qnames = yangIId.getPathArguments().stream()
+            .filter(pathArgument -> pathArgument instanceof NodeIdentifier).map(PathArgument::getNodeType)
+            .collect(Collectors.toList());
+        final SchemaNode schemaNode = SchemaContextUtil.findNodeInSchemaContext(schemaContext, qnames);
+        if (schemaNode instanceof RpcDefinition) {
+            return new InstanceIdentifierContext<>(yangIId, (RpcDefinition) schemaNode, domMountPoint, schemaContext);
+        } else if (schemaNode instanceof ActionDefinition) {
+            return new InstanceIdentifierContext<>(yangIId, (ActionDefinition) schemaNode, domMountPoint,
+                    schemaContext);
+        } else if (schemaNode == null) {
+            throw new IllegalArgumentException("Failed to find schema for " + qnames);
+        } else {
+            throw new IllegalStateException("Unhandled schema " + schemaNode);
         }
     }
 
