@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -106,6 +107,7 @@ public class AbstractNetconfSessionNegotiatorTest {
     }
 
     @Test
+    @Ignore
     public void testStartNegotiationNotEstablished() throws Exception {
         final ChannelOutboundHandler closedDetector = Mockito.spy(new ChannelOutboundHandlerAdapter());
         channel.pipeline().addLast("closedDetector", closedDetector);
