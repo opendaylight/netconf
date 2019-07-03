@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "57b68c10_7a91a4a7",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifier.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-07-03T22:26:27Z",
+      "side": 1,
+      "message": "I also suspect that the action QName can only ever appear as the last component of the path.",
+      "parentUuid": "22fbb887_215d06ef",
+      "range": {
+        "startLine": 113,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 46
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8198cd51_749c09aa",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierDeserializer.java",
         "patchSetId": 3
