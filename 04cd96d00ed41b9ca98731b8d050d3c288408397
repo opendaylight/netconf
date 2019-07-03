@@ -1,0 +1,211 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "22fbb887_215d06ef",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifier.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-07-03T21:49:10Z",
+      "side": 1,
+      "message": "I don\u0027t think this will quite work and will definitely be quite slow. Note DataSchemaContextTree walks data nodes only, but it does expose lookups by PathArgument, so we have all the tooling needed.\n\nThis needs to be refactored so that we walk pathYangInstanceIdentifier by hand, first trying to DataSchemaContextNode.getChild(PathArgument), if successful proceed. If unsuccessful, try to look through current Node\u0027s DataSchemaNode to find RPCs/Actions and match the QName.\n\nAlso this block is repeated almost verbatim below, so it would probably make sense to split this part out into a helper method.",
+      "range": {
+        "startLine": 113,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 46
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8198cd51_749c09aa",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-07-03T21:49:10Z",
+      "side": 1,
+      "message": "ActionNodeContainer covers all nodes capable of holding actions",
+      "range": {
+        "startLine": 340,
+        "startChar": 42,
+        "endLine": 340,
+        "endChar": 61
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "44afa919_eb40ed0b",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-07-03T21:49:10Z",
+      "side": 1,
+      "message": "this is the same thing as above -- refactor it to a common helper?",
+      "range": {
+        "startLine": 388,
+        "startChar": 54,
+        "endLine": 389,
+        "endChar": 103
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "42ec7f55_4f8e19ed",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 715,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-07-03T21:49:10Z",
+      "side": 1,
+      "message": "assertNull() is cleaner",
+      "range": {
+        "startLine": 715,
+        "startChar": 8,
+        "endLine": 715,
+        "endChar": 20
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8cbfa19c_5418fb7e",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 716,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-07-03T21:49:10Z",
+      "side": 1,
+      "message": "I think we want to do assertSame() here",
+      "range": {
+        "startLine": 716,
+        "startChar": 8,
+        "endLine": 716,
+        "endChar": 20
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7edf4ea6_3a882acd",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/resources/parser-identifier/example-actions.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-07-03T21:49:10Z",
+      "side": 1,
+      "message": "tab",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 1
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63b41b6b_6c9de8dd",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/resources/parser-identifier/example-actions.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-07-03T21:49:10Z",
+      "side": 1,
+      "message": "tab",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 1
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ecff312c_8e83bb67",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/resources/restconf/parser/deserializer/example-actions.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-07-03T21:49:10Z",
+      "side": 1,
+      "message": "tab",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 1
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37b72f72_3bad5282",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/resources/restconf/parser/deserializer/example-actions.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-07-03T21:49:10Z",
+      "side": 1,
+      "message": "tab",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 1
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
