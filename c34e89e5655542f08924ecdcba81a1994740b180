@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6c5e146e_1ea1004e",
+        "filename": "netconf/tools/netconf-testtool/src/test/resources/test-schemas/ietf-inet-types@2013-07-15.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-07-04T09:59:51Z",
+      "side": 1,
+      "message": "Hmm, these are duplicates of modules which are packaged in mdsal or netconf. Can we pick those up with a scope\u003dtest dependency instead?",
+      "range": {
+        "startLine": 1,
+        "startChar": 1,
+        "endLine": 1,
+        "endChar": 22
+      },
+      "revId": "c34e89e5655542f08924ecdcba81a1994740b180",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
