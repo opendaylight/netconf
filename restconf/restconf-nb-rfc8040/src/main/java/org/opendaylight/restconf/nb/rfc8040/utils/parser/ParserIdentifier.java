@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import java.time.format.DateTimeParseException;
@@ -16,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMYangTextSourceProvider;
@@ -29,12 +32,16 @@ import org.opendaylight.restconf.nb.rfc8040.utils.validations.RestconfValidation
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,58 +87,65 @@ public final class ParserIdentifier {
             final Iterator<String> pathsIt = Splitter.on("/" + RestconfConstants.MOUNT).split(identifier).iterator();
 
             final String mountPointId = pathsIt.next();
-            final YangInstanceIdentifier mountYangInstanceIdentifier = IdentifierCodec.deserialize(
-                    mountPointId, schemaContext);
-            final Optional<DOMMountPoint> mountPoint =
-                    mountPointService.get().getMountPoint(mountYangInstanceIdentifier);
+            final YangInstanceIdentifier mountYangInstanceIdentifier = IdentifierCodec
+                .deserialize(mountPointId, schemaContext);
+            final Optional<DOMMountPoint> mountPoint = mountPointService.get()
+                .getMountPoint(mountYangInstanceIdentifier);
 
             if (!mountPoint.isPresent()) {
-                throw new RestconfDocumentedException(
-                        "Mount point does not exist.", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
+                throw new RestconfDocumentedException("Mount point does not exist.", ErrorType.PROTOCOL,
+                    ErrorTag.DATA_MISSING);
             }
 
             final DOMMountPoint domMountPoint = mountPoint.get();
             final SchemaContext mountSchemaContext = domMountPoint.getSchemaContext();
 
             final String pathId = pathsIt.next().replaceFirst("/", "");
-            final YangInstanceIdentifier pathYangInstanceIdentifier = IdentifierCodec.deserialize(
-                    pathId, mountSchemaContext);
-
-            final DataSchemaContextNode<?> child = DataSchemaContextTree.from(mountSchemaContext)
-                .getChild(pathYangInstanceIdentifier);
-            if (child != null) {
-                return new InstanceIdentifierContext<SchemaNode>(pathYangInstanceIdentifier, child.getDataSchemaNode(),
-                        domMountPoint, mountSchemaContext);
-            }
-            final QName rpcQName = pathYangInstanceIdentifier.getLastPathArgument().getNodeType();
-            RpcDefinition def = null;
-            for (final RpcDefinition rpcDefinition : mountSchemaContext
-                    .findModule(rpcQName.getModule()).get().getRpcs()) {
-                if (rpcDefinition.getQName().getLocalName().equals(rpcQName.getLocalName())) {
-                    def = rpcDefinition;
-                    break;
-                }
-            }
-            return new InstanceIdentifierContext<>(pathYangInstanceIdentifier, def, domMountPoint, mountSchemaContext);
+            YangInstanceIdentifier pathYangInstanceIdentifier = IdentifierCodec
+                .deserialize(pathId, mountSchemaContext);
+            return createInstanceIdentifierContext(pathYangInstanceIdentifier, mountSchemaContext, domMountPoint);
         } else {
-            final YangInstanceIdentifier deserialize = IdentifierCodec.deserialize(identifier, schemaContext);
-            final DataSchemaContextNode<?> child = DataSchemaContextTree.from(schemaContext).getChild(deserialize);
-
-            if (child != null) {
-                return new InstanceIdentifierContext<SchemaNode>(
-                            deserialize, child.getDataSchemaNode(), null, schemaContext);
-            }
-            final QName rpcQName = deserialize.getLastPathArgument().getNodeType();
-            RpcDefinition def = null;
-            for (final RpcDefinition rpcDefinition : schemaContext.findModule(rpcQName.getModule()).get().getRpcs()) {
-                if (rpcDefinition.getQName().getLocalName().equals(rpcQName.getLocalName())) {
-                    def = rpcDefinition;
-                    break;
-                }
-            }
-            return new InstanceIdentifierContext<>(deserialize, def, null, schemaContext);
+            YangInstanceIdentifier pathYangInstanceIdentifier = IdentifierCodec.deserialize(identifier, schemaContext);
+            return createInstanceIdentifierContext(pathYangInstanceIdentifier, schemaContext, null);
         }
     }
+
+    /**
+     * Method to create {@link InstanceIdentifierContext} from {@link YangInstanceIdentifier}
+     * and {@link SchemaContext}, {@link DOMMountPoint}.
+     *
+     * @param instanceIdentifier
+     *               - instance identifier
+     * @param schemaContext
+     *               - schema context
+     * @param domMountPoint
+     *               - dOMMountPoint
+     * @return {@link InstanceIdentifierContext}
+     */
+    public static InstanceIdentifierContext<?> createInstanceIdentifierContext(final YangInstanceIdentifier instanceIdentifier,
+        final SchemaContext schemaContext, final DOMMountPoint domMountPoint) {
+        final Optional<DataSchemaContextNode<?>> child = DataSchemaContextTree.from(schemaContext)
+            .findChild(instanceIdentifier);
+
+        if (child.isPresent()) {
+            return new InstanceIdentifierContext<SchemaNode>(instanceIdentifier, child.get().getDataSchemaNode(),
+                domMountPoint != null ? domMountPoint : null, schemaContext);
+        }
+        List<QName> qnames = instanceIdentifier.getPathArguments().stream()
+            .filter(pathArgument -> pathArgument instanceof NodeIdentifier).map(PathArgument::getNodeType)
+            .collect(Collectors.toList());
+
+        final SchemaNode schemaNode = SchemaContextUtil.findNodeInSchemaContext(schemaContext, qnames);
+        requireNonNull(schemaNode, "SchemaNode must not be null.");
+
+        if (schemaNode instanceof ActionDefinition) {
+            return new InstanceIdentifierContext<>(instanceIdentifier, (ActionDefinition) schemaNode,
+                domMountPoint != null ? domMountPoint : null, schemaContext);
+        }
+        return new InstanceIdentifierContext<>(instanceIdentifier, (RpcDefinition) schemaNode,
+            domMountPoint != null ? domMountPoint : null, schemaContext);
+    }
+
 
     /**
      * Make {@link String} from {@link YangInstanceIdentifier}.
