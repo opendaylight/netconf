@@ -7,10 +7,15 @@
  */
 package org.opendaylight.restconf.common.util;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collection;
+import java.util.Optional;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
+import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
@@ -47,4 +52,21 @@ public final class RestconfSchemaUtil {
                 ErrorType.PROTOCOL, ErrorTag.DATA_MISSING);
     }
 
+    /**
+     * Find ActionDefinition in {@link DataSchemaNode} by {@link String}
+     * local name.
+     *
+     * @param dataSchemaNode
+     *             data schema node
+     * @param nodeName
+     *             node name
+     * @return {@link ActionDefinition}
+     */
+    public static Optional<ActionDefinition> findActionDefinition(final DataSchemaNode dataSchemaNode,
+        final String nodeName) {
+        requireNonNull(dataSchemaNode, "DataSchema Node must not be null.");
+        final ActionNodeContainer actionNodeCont = (ActionNodeContainer) dataSchemaNode;
+        return actionNodeCont.getActions().stream()
+            .filter(actionDef -> actionDef.getQName().getLocalName().equals(nodeName)).findFirst();
+    }
 }
