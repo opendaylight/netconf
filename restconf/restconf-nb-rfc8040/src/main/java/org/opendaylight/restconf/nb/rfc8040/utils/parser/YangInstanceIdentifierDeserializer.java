@@ -31,6 +31,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.IdentitySchemaNode;
@@ -324,6 +325,7 @@ public final class YangInstanceIdentifierDeserializer {
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH") // code does check for null 'current' but FB doesn't recognize it
     private static DataSchemaContextNode<?> nextContextNode(final QName qname, final List<PathArgument> path,
             final MainVarsWrapper variables) {
+        final DataSchemaNode dataSchemaNode = variables.getCurrent().getDataSchemaNode();
         variables.setCurrent(variables.getCurrent().getChild(qname));
         DataSchemaContextNode<?> current = variables.getCurrent();
         if (current == null) {
@@ -334,6 +336,11 @@ public final class YangInstanceIdentifierDeserializer {
                         return null;
                     }
                 }
+            }
+            final Optional<ActionDefinition> actionDef = RestconfSchemaUtil
+                .findActionDefinition(dataSchemaNode, qname.getLocalName());
+            if (actionDef.isPresent()) {
+                return null;
             }
         }
         checkValid(current != null, qname + " is not correct schema node identifier.", variables.getData(),
@@ -371,14 +378,24 @@ public final class YangInstanceIdentifierDeserializer {
     private static QName getQNameOfDataSchemaNode(final String nodeName, final MainVarsWrapper variables) {
         final DataSchemaNode dataSchemaNode = variables.getCurrent().getDataSchemaNode();
         if (dataSchemaNode instanceof ContainerSchemaNode) {
+            final Optional<ActionDefinition> actionDef = RestconfSchemaUtil
+                .findActionDefinition(dataSchemaNode, nodeName);
+            if (actionDef.isPresent()) {
+                return actionDef.get().getQName();
+            }
             final ContainerSchemaNode contSchemaNode = (ContainerSchemaNode) dataSchemaNode;
-            final DataSchemaNode node = RestconfSchemaUtil.findSchemaNodeInCollection(contSchemaNode.getChildNodes(),
-                    nodeName);
+            final DataSchemaNode node = RestconfSchemaUtil
+                .findSchemaNodeInCollection(contSchemaNode.getChildNodes(), nodeName);
             return node.getQName();
         } else if (dataSchemaNode instanceof ListSchemaNode) {
+            final Optional<ActionDefinition> actionDef = RestconfSchemaUtil
+                .findActionDefinition(dataSchemaNode, nodeName);
+            if (actionDef.isPresent()) {
+                return actionDef.get().getQName();
+            }
             final ListSchemaNode listSchemaNode = (ListSchemaNode) dataSchemaNode;
-            final DataSchemaNode node = RestconfSchemaUtil.findSchemaNodeInCollection(listSchemaNode.getChildNodes(),
-                    nodeName);
+            final DataSchemaNode node = RestconfSchemaUtil
+                .findSchemaNodeInCollection(listSchemaNode.getChildNodes(), nodeName);
             return node.getQName();
         }
         throw new UnsupportedOperationException();
