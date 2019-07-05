@@ -49,6 +49,54 @@
     },
     {
       "key": {
+        "uuid": "e3ddfbdd_a63f8c72",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifier.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-07-05T13:17:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "57b68c10_7a91a4a7",
+      "range": {
+        "startLine": 113,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 46
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d89069c0_bb6a1ea1",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifier.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-07-05T13:17:22Z",
+      "side": 1,
+      "message": "Discussed there is existing issue for Choice(Mix) Node type,\nShould be raising Bug to handle Choice Node usecase.\nCode duplication is refactored.",
+      "parentUuid": "22fbb887_215d06ef",
+      "range": {
+        "startLine": 113,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 46
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8198cd51_749c09aa",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierDeserializer.java",
         "patchSetId": 3
@@ -60,6 +108,30 @@
       "writtenOn": "2019-07-03T21:49:10Z",
       "side": 1,
       "message": "ActionNodeContainer covers all nodes capable of holding actions",
+      "range": {
+        "startLine": 340,
+        "startChar": 42,
+        "endLine": 340,
+        "endChar": 61
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ecd4c412_97448d2a",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-07-05T13:17:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8198cd51_749c09aa",
       "range": {
         "startLine": 340,
         "startChar": 42,
@@ -95,6 +167,30 @@
     },
     {
       "key": {
+        "uuid": "4261824a_bd3b142d",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-07-05T13:17:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44afa919_eb40ed0b",
+      "range": {
+        "startLine": 388,
+        "startChar": 54,
+        "endLine": 389,
+        "endChar": 103
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "42ec7f55_4f8e19ed",
         "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifierTest.java",
         "patchSetId": 3
@@ -106,6 +202,30 @@
       "writtenOn": "2019-07-03T21:49:10Z",
       "side": 1,
       "message": "assertNull() is cleaner",
+      "range": {
+        "startLine": 715,
+        "startChar": 8,
+        "endLine": 715,
+        "endChar": 20
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "44212dce_0b185cf7",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 715,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-07-05T13:17:22Z",
+      "side": 1,
+      "message": "Updated",
+      "parentUuid": "42ec7f55_4f8e19ed",
       "range": {
         "startLine": 715,
         "startChar": 8,
@@ -141,6 +261,30 @@
     },
     {
       "key": {
+        "uuid": "e77eb450_67d3cb0a",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 716,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-07-05T13:17:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8cbfa19c_5418fb7e",
+      "range": {
+        "startLine": 716,
+        "startChar": 8,
+        "endLine": 716,
+        "endChar": 20
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7edf4ea6_3a882acd",
         "filename": "restconf/restconf-nb-rfc8040/src/test/resources/parser-identifier/example-actions.yang",
         "patchSetId": 3
@@ -152,6 +296,30 @@
       "writtenOn": "2019-07-03T21:49:10Z",
       "side": 1,
       "message": "tab",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 1
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e387d39d_63ea42b2",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/resources/parser-identifier/example-actions.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-07-05T13:17:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7edf4ea6_3a882acd",
       "range": {
         "startLine": 15,
         "startChar": 0,
@@ -187,6 +355,30 @@
     },
     {
       "key": {
+        "uuid": "351c1f3e_24dd0369",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/resources/parser-identifier/example-actions.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-07-05T13:17:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "63b41b6b_6c9de8dd",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 1
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ecff312c_8e83bb67",
         "filename": "restconf/restconf-nb-rfc8040/src/test/resources/restconf/parser/deserializer/example-actions.yang",
         "patchSetId": 3
@@ -210,6 +402,30 @@
     },
     {
       "key": {
+        "uuid": "45301539_f9707dce",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/resources/restconf/parser/deserializer/example-actions.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-07-05T13:17:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ecff312c_8e83bb67",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 1
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "37b72f72_3bad5282",
         "filename": "restconf/restconf-nb-rfc8040/src/test/resources/restconf/parser/deserializer/example-actions.yang",
         "patchSetId": 3
@@ -221,6 +437,30 @@
       "writtenOn": "2019-07-03T21:49:10Z",
       "side": 1,
       "message": "tab",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 1
+      },
+      "revId": "04cd96d00ed41b9ca98731b8d050d3c288408397",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "72c6a2c6_7a9f0c92",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/resources/restconf/parser/deserializer/example-actions.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-07-05T13:17:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "37b72f72_3bad5282",
       "range": {
         "startLine": 18,
         "startChar": 0,
