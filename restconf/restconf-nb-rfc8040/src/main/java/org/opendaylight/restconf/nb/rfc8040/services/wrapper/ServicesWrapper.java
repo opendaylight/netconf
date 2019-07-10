@@ -16,6 +16,7 @@ import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.schema.SchemaExportContext;
+import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
@@ -68,28 +69,25 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
     }
 
     public static ServicesWrapper newInstance(final SchemaContextHandler schemaCtxHandler,
-            final DOMMountPointServiceHandler domMountPointServiceHandler,
-            final TransactionChainHandler transactionChainHandler, final DOMDataBrokerHandler domDataBrokerHandler,
-            final RpcServiceHandler rpcServiceHandler, final NotificationServiceHandler notificationServiceHandler,
-            final DOMSchemaService domSchemaService) {
-        RestconfOperationsService restconfOpsService =
-                new RestconfOperationsServiceImpl(schemaCtxHandler, domMountPointServiceHandler);
+        final DOMMountPointServiceHandler domMountPointServiceHandler,
+        final TransactionChainHandler transactionChainHandler, final DOMDataBrokerHandler domDataBrokerHandler,
+        final RpcServiceHandler rpcServiceHandler, final ActionServiceHandler actionServiceHandler,
+        final NotificationServiceHandler notificationServiceHandler, final DOMSchemaService domSchemaService) {
+        RestconfOperationsService restconfOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler,
+            domMountPointServiceHandler);
         final DOMYangTextSourceProvider yangTextSourceProvider = domSchemaService.getExtensions()
-                .getInstance(DOMYangTextSourceProvider.class);
-        RestconfSchemaService restconfSchemaService =
-                new RestconfSchemaServiceImpl(schemaCtxHandler, domMountPointServiceHandler,
-                yangTextSourceProvider);
-        RestconfStreamsSubscriptionService restconfSubscrService =
-                new RestconfStreamsSubscriptionServiceImpl(domDataBrokerHandler,
-                notificationServiceHandler, schemaCtxHandler, transactionChainHandler);
-        RestconfDataService restconfDataService =
-                new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler, domMountPointServiceHandler,
-                        restconfSubscrService);
-        RestconfInvokeOperationsService restconfInvokeOpsService =
-                new RestconfInvokeOperationsServiceImpl(rpcServiceHandler, schemaCtxHandler);
+            .getInstance(DOMYangTextSourceProvider.class);
+        RestconfSchemaService restconfSchemaService = new RestconfSchemaServiceImpl(schemaCtxHandler,
+            domMountPointServiceHandler, yangTextSourceProvider);
+        RestconfStreamsSubscriptionService restconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(
+            domDataBrokerHandler, notificationServiceHandler, schemaCtxHandler, transactionChainHandler);
+        RestconfDataService restconfDataService = new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler,
+            domMountPointServiceHandler, restconfSubscrService, actionServiceHandler);
+        RestconfInvokeOperationsService restconfInvokeOpsService = new RestconfInvokeOperationsServiceImpl(
+            rpcServiceHandler, schemaCtxHandler);
         RestconfService restconfService = new RestconfImpl(schemaCtxHandler);
-        return new ServicesWrapper(restconfDataService, restconfInvokeOpsService,
-                restconfSubscrService, restconfOpsService, restconfSchemaService, restconfService);
+        return new ServicesWrapper(restconfDataService, restconfInvokeOpsService, restconfSubscrService,
+            restconfOpsService, restconfSchemaService, restconfService);
     }
 
     @Override
