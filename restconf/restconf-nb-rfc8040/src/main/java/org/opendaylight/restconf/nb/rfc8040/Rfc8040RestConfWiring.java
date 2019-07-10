@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
@@ -38,14 +39,14 @@ public class Rfc8040RestConfWiring {
     private final ServicesWrapper servicesWrapper;
 
     @Inject
-    public Rfc8040RestConfWiring(
-            SchemaContextHandler schemaCtxHandler,
-            DOMMountPointServiceHandler domMountPointServiceHandler, TransactionChainHandler transactionChainHandler,
-            DOMDataBrokerHandler domDataBrokerHandler, RpcServiceHandler rpcServiceHandler,
-            NotificationServiceHandler notificationServiceHandler, @Reference DOMSchemaService domSchemaService) {
-        servicesWrapper = ServicesWrapper.newInstance(schemaCtxHandler, domMountPointServiceHandler,
-                transactionChainHandler, domDataBrokerHandler, rpcServiceHandler, notificationServiceHandler,
-                domSchemaService);
+    public Rfc8040RestConfWiring(SchemaContextHandler schemaCtxHandler,
+        DOMMountPointServiceHandler domMountPointServiceHandler, TransactionChainHandler transactionChainHandler,
+        DOMDataBrokerHandler domDataBrokerHandler, RpcServiceHandler rpcServiceHandler,
+        ActionServiceHandler actionServiceHandler, NotificationServiceHandler notificationServiceHandler,
+        @Reference DOMSchemaService domSchemaService) {
+        servicesWrapper = ServicesWrapper
+            .newInstance(schemaCtxHandler, domMountPointServiceHandler, transactionChainHandler, domDataBrokerHandler,
+                rpcServiceHandler, actionServiceHandler, notificationServiceHandler, domSchemaService);
     }
 
     public ServicesWrapper getServicesWrapper() {
