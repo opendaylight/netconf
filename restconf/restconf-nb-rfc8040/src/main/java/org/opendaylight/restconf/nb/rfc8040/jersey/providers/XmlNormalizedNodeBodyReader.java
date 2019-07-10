@@ -7,7 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,7 +54,7 @@ import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
+import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,21 +92,22 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
             throws XMLStreamException, IOException, ParserConfigurationException, SAXException, URISyntaxException {
         final SchemaNode schemaNodeContext = pathContext.getSchemaNode();
         DataSchemaNode schemaNode;
-        boolean isRpc = false;
-        if (schemaNodeContext instanceof RpcDefinition) {
-            schemaNode = ((RpcDefinition) schemaNodeContext).getInput();
-            isRpc = true;
+        final boolean isOperation;
+        if (schemaNodeContext instanceof OperationDefinition) {
+            schemaNode = ((OperationDefinition) schemaNodeContext).getInput();
+            isOperation = true;
         } else if (schemaNodeContext instanceof DataSchemaNode) {
             schemaNode = (DataSchemaNode) schemaNodeContext;
+            isOperation = false;
         } else {
-            throw new IllegalStateException("Unknown SchemaNode");
+            throw new IllegalStateException("Unknown SchemaNode " + schemaNodeContext);
         }
 
         final String docRootElm = doc.getDocumentElement().getLocalName();
         final String docRootNamespace = doc.getDocumentElement().getNamespaceURI();
         final List<YangInstanceIdentifier.PathArgument> iiToDataList = new ArrayList<>();
 
-        if (isPost() && !isRpc) {
+        if (isPost() && !isOperation) {
             final Deque<Object> foundSchemaNodes = findPathToSchemaNodeByName(schemaNode, docRootElm, docRootNamespace);
             if (foundSchemaNodes.isEmpty()) {
                 throw new IllegalStateException(String.format("Child \"%s\" was not found in parent schema node \"%s\"",
@@ -122,13 +124,11 @@ public class XmlNormalizedNodeBodyReader extends AbstractNormalizedNodeBodyReade
                 }
             }
         // PUT
-        } else if (!isRpc) {
+        } else if (!isOperation) {
             final QName scQName = schemaNode.getQName();
-            Preconditions.checkState(
-                    docRootElm.equals(scQName.getLocalName())
-                            && docRootNamespace.equals(scQName.getNamespace().toASCIIString()),
-                    String.format("Not correct message root element \"%s\", should be \"%s\"",
-                            docRootElm, scQName));
+            checkState(docRootElm.equals(scQName.getLocalName())
+                && docRootNamespace.equals(scQName.getNamespace().toASCIIString()),
+                "Not correct message root element \"%s\", should be \"%s\"", docRootElm, scQName);
         }
 
         NormalizedNode<?, ?> parsed;
