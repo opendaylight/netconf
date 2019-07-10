@@ -8,16 +8,26 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import javax.ws.rs.core.Response.Status;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMActionResult;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
+import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -108,5 +118,105 @@ public final class RestconfInvokeOperationsUtil {
         final RpcResultFactory dataFactory = new RpcResultFactory();
         FutureCallbackTx.addCallback(rpc, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory);
         return dataFactory.build();
+    }
+
+    /**
+     * Invoking Action via mount point.
+     *
+     * @param mountPoint
+     *             mount point
+     * @param data
+     *             input data
+     * @param schemaPath
+     *             schema path of data
+     * @return {@link DOMActionResult}
+     */
+    public static DOMActionResult invokeActionViaMountPoint(final DOMMountPoint mountPoint, final ContainerNode data,
+            final SchemaPath schemaPath, final YangInstanceIdentifier yangIId) {
+        final Optional<DOMActionService> mountPointService = mountPoint.getService(DOMActionService.class);
+        if (!mountPointService.isPresent()) {
+            throw new RestconfDocumentedException("DomAction service is missing.");
+        }
+
+        return prepareActionResult(mountPointService.get().invokeAction(schemaPath,
+            prepareDataTreeId(yangIId, schemaPath), data));
+    }
+
+    /**
+     * Invoke Action via ActionServiceHandler.
+     *
+     * @param data
+     *             input data
+     * @param schemaPath
+     *             schema path of data
+     * @param actionServiceHandler
+     *             action service handler to invoke action
+     * @return {@link DOMActionResult}
+     */
+    public static DOMActionResult invokeAction(final ContainerNode data, final SchemaPath schemaPath,
+            final ActionServiceHandler actionServiceHandler, final YangInstanceIdentifier yangIId) {
+        return prepareActionResult(actionServiceHandler.get().invokeAction(schemaPath,
+            prepareDataTreeId(yangIId, schemaPath), data));
+    }
+
+    /**
+     * Check the validity of the result.
+     *
+     * @param response
+     *             response of Action
+     * @return {@link DOMActionResult} result
+     */
+    public static DOMActionResult checkActionResponse(final DOMActionResult response) {
+        if (response != null) {
+            try {
+                if (response.getErrors().isEmpty()) {
+                    return response;
+                }
+                LOG.debug("InvokeAction Error Message {}", response.getErrors());
+                throw new RestconfDocumentedException("InvokeAction Error Message ", null, response.getErrors());
+            } catch (final CancellationException e) {
+                final String errMsg = "The Action Operation was cancelled while executing.";
+                LOG.debug("Cancel Execution: {}", errMsg, e);
+                throw new RestconfDocumentedException(errMsg, ErrorType.RPC, ErrorTag.PARTIAL_OPERATION, e);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Prepare Action Result.
+     *
+     * @param actionResult
+     *            {@link DOMActionResult} - action result
+     * @return {@link DOMActionResult} result
+     */
+    private static DOMActionResult prepareActionResult(final ListenableFuture<? extends DOMActionResult> actionResult) {
+        final ActionResultFactory dataFactory = new ActionResultFactory();
+        FutureCallbackTx.addCallback(actionResult, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory);
+        return dataFactory.build();
+    }
+
+    /**
+     * Prepare DOMDataTree Identifier.
+     *
+     * @param yangIId
+     *             {@link YangInstanceIdentifier}
+     * @param schemaPath
+     *              {@link SchemaPath}
+     * @return {@link DOMDataTreeIdentifier} domDataTreeIdentifier
+     */
+    private static DOMDataTreeIdentifier prepareDataTreeId(final YangInstanceIdentifier yangIId,
+            final SchemaPath schemaPath) {
+        final List<PathArgument> pathArg = new ArrayList<>();
+        for (PathArgument path : yangIId.getPathArguments()) {
+            if (path.getNodeType().getLocalName().equals(schemaPath.getLastComponent().getLocalName())) {
+                break;
+            }
+            pathArg.add(path);
+        }
+        YangInstanceIdentifier yangInstanceIdentifier = YangInstanceIdentifier.builder().append(pathArg).build();
+        DOMDataTreeIdentifier domDataTreeIdentifier = new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL,
+            yangInstanceIdentifier);
+        return domDataTreeIdentifier;
     }
 }
