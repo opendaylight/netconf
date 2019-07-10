@@ -41,6 +41,7 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -114,6 +115,18 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
                     jsonWriter,
                     depth,
                     fields);
+            final Module module = context.getSchemaContext().findModule(data.getNodeType().getModule()).get();
+            jsonWriter.name(module.getName() + ":output");
+            jsonWriter.beginObject();
+            writeChildren(nnWriter, (ContainerNode) data);
+            jsonWriter.endObject();
+        } else if (context.getSchemaNode() instanceof ActionDefinition) {
+            /*
+             *  ActionDefinition is not supported as initial codec in JSONStreamWriter,
+             *  so we need to emit initial output declaration..
+             */
+            nnWriter = createNormalizedNodeWriter(context,
+                ((ActionDefinition) context.getSchemaNode()).getOutput().getPath(), jsonWriter, depth, fields);
             final Module module = context.getSchemaContext().findModule(data.getNodeType().getModule()).get();
             jsonWriter.name(module.getName() + ":output");
             jsonWriter.beginObject();
