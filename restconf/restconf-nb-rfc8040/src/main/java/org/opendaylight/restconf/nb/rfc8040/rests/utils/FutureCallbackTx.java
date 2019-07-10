@@ -13,8 +13,10 @@ import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMActionException;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
@@ -65,6 +67,9 @@ final class FutureCallbackTx {
             final Throwable cause = e.getCause();
             if (cause instanceof DOMRpcException) {
                 dataFactory.setResult((T) new DefaultDOMRpcResult(ImmutableList.of(
+                    RpcResultBuilder.newError(RpcError.ErrorType.RPC, "operation-failed", cause.getMessage()))));
+            } else if (cause instanceof DOMActionException) {
+                dataFactory.setResult((T) new SimpleDOMActionResult(ImmutableList.of(
                     RpcResultBuilder.newError(RpcError.ErrorType.RPC, "operation-failed", cause.getMessage()))));
             } else if (cause instanceof TransactionCommitFailedException) {
                 /* If device send some error message we want this message to get to client
