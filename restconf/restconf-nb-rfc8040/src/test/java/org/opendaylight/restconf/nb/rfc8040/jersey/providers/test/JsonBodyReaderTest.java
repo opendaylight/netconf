@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Sets;
 import java.io.File;
@@ -17,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Optional;
 import javax.ws.rs.core.MediaType;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,6 +30,7 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -108,6 +111,24 @@ public class JsonBodyReaderTest extends AbstractBodyReaderTest {
                 inputStream);
         checkNormalizedNodeContext(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue, dataII);
+    }
+
+    @Test
+    public void moduleSubContainerDataPostActionTest() throws Exception {
+        final Optional<DataSchemaNode> dataSchemaNode = schemaContext
+            .findDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
+        final QName cont1QName = QName.create(dataSchemaNode.get().getQName(), "cont1");
+        final QName actionQName = QName.create(dataSchemaNode.get().getQName(), "reset");
+        final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.get().getQName())
+            .node(cont1QName).node(actionQName);
+        final String uri = "instance-identifier-module:cont/cont1/reset";
+        mockBodyReader(uri, this.jsonBodyReader, true);
+        final InputStream inputStream = JsonBodyReaderTest.class
+            .getResourceAsStream("/instanceidentifier/json/json_cont_action.json");
+        final NormalizedNodeContext returnValue = this.jsonBodyReader
+            .readFrom(null, null, null, this.mediaType, null, inputStream);
+        checkNormalizedNodeContext(returnValue);
+        assertTrue(returnValue.getInstanceIdentifierContext().getSchemaNode() instanceof ActionDefinition);
     }
 
     @Test
