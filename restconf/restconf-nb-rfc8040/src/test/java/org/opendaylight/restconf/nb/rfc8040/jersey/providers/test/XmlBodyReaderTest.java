@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Optional;
 import javax.ws.rs.core.MediaType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -35,6 +36,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -146,6 +148,24 @@ public class XmlBodyReaderTest extends AbstractBodyReaderTest {
                 inputStream);
         checkNormalizedNodeContext(returnValue);
         checkExpectValueNormalizeNodeContext(dataSchemaNode, returnValue, dataII);
+    }
+
+    @Test
+    public void moduleSubContainerDataPostActionTest() throws Exception {
+        final Optional<DataSchemaNode> dataSchemaNode = schemaContext
+            .findDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
+        final QName cont1QName = QName.create(dataSchemaNode.get().getQName(), "cont1");
+        final QName actionQName = QName.create(dataSchemaNode.get().getQName(), "reset");
+        final YangInstanceIdentifier dataII = YangInstanceIdentifier.of(dataSchemaNode.get().getQName())
+            .node(cont1QName).node(actionQName);
+        final String uri = "instance-identifier-module:cont/cont1/reset";
+        mockBodyReader(uri, this.xmlBodyReader, true);
+        final InputStream inputStream = XmlBodyReaderTest.class
+            .getResourceAsStream("/instanceidentifier/xml/xml_cont_action.xml");
+        final NormalizedNodeContext returnValue = this.xmlBodyReader.readFrom(null, null, null, this.mediaType, null,
+            inputStream);
+        checkNormalizedNodeContext(returnValue);
+        assertTrue(returnValue.getInstanceIdentifierContext().getSchemaNode() instanceof ActionDefinition);
     }
 
     @Test

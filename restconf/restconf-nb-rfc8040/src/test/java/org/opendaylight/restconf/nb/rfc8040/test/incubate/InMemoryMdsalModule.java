@@ -14,6 +14,7 @@ import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractBaseDataBrokerTest;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
@@ -104,6 +105,12 @@ public class InMemoryMdsalModule extends AbstractModule {
     @Provides
     @Singleton DOMRpcService getDOMRpcService(DOMSchemaService schemaService) {
         return DOMRpcRouter.newInstance(schemaService).getRpcService();
+    }
+
+    @Provides
+    @Singleton
+    DOMActionService getDOMActionService(DOMSchemaService schemaService) {
+        return DOMRpcRouter.newInstance(schemaService).getActionService();
     }
 
     @PreDestroy
