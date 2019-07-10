@@ -21,9 +21,11 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -33,6 +35,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
@@ -46,12 +49,16 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,13 +74,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private SchemaContextHandler schemaContextHandler;
     private TransactionChainHandler transactionChainHandler;
     private DOMMountPointServiceHandler mountPointServiceHandler;
+    private volatile ActionServiceHandler actionServiceHandler;
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
 
     public RestconfDataServiceImpl(final SchemaContextHandler schemaContextHandler,
-                                   final TransactionChainHandler transactionChainHandler,
-            final DOMMountPointServiceHandler mountPointServiceHandler,
-            final RestconfStreamsSubscriptionService delegRestconfSubscrService) {
+        final TransactionChainHandler transactionChainHandler,
+        final DOMMountPointServiceHandler mountPointServiceHandler,
+        final RestconfStreamsSubscriptionService delegRestconfSubscrService,
+        final ActionServiceHandler actionServiceHandler) {
+        this.actionServiceHandler = Objects.requireNonNull(actionServiceHandler);
         this.schemaContextHandler = Objects.requireNonNull(schemaContextHandler);
         this.transactionChainHandler = Objects.requireNonNull(transactionChainHandler);
         this.mountPointServiceHandler = Objects.requireNonNull(mountPointServiceHandler);
@@ -85,6 +95,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         for (final Object object : handlers) {
             if (object instanceof SchemaContextHandler) {
                 schemaContextHandler = (SchemaContextHandler) object;
+            } else if (object instanceof ActionServiceHandler) {
+                actionServiceHandler = (ActionServiceHandler) object;
             } else if (object instanceof DOMMountPointServiceHandler) {
                 mountPointServiceHandler = (DOMMountPointServiceHandler) object;
             } else if (object instanceof TransactionChainHandler) {
@@ -252,7 +264,9 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @Override
     public Response postData(final NormalizedNodeContext payload, final UriInfo uriInfo) {
         requireNonNull(payload);
-
+        if (payload.getInstanceIdentifierContext().getSchemaNode() instanceof ActionDefinition) {
+            return invokeAction(payload, uriInfo);
+        }
         boolean insertUsed = false;
         boolean pointUsed = false;
         String insert = null;
@@ -357,5 +371,47 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final String errMsg = "DOM data broker service isn't available for mount point " + mountPoint.getIdentifier();
         LOG.warn(errMsg);
         throw new RestconfDocumentedException(errMsg);
+    }
+
+    /**
+     * Invoke Action operation.
+     *
+     * @param payload
+     *             {@link NormalizedNodeContext} - the body of the operation
+     * @param uriInfo
+     *             URI info
+     * @return {@link NormalizedNodeContext} wrapped in {@link Response}
+     */
+    public Response invokeAction(final NormalizedNodeContext payload, final UriInfo uriInfo) {
+        final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
+        final SchemaPath schemaPath = payload.getInstanceIdentifierContext().getSchemaNode().getPath();
+        DOMActionResult response;
+        SchemaContextRef schemaContextRef;
+
+        if (mountPoint != null) {
+            response = RestconfInvokeOperationsUtil
+                .invokeActionViaMountPoint(mountPoint, (ContainerNode) payload.getData(), schemaPath);
+            schemaContextRef = new SchemaContextRef(mountPoint.getSchemaContext());
+        } else {
+            response = RestconfInvokeOperationsUtil
+                .invokeAction((ContainerNode) payload.getData(), schemaPath, this.actionServiceHandler);
+            schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
+        }
+        final DOMActionResult result = RestconfInvokeOperationsUtil.checkActionResponse(response);
+
+        ActionDefinition resultNodeSchema = null;
+        ContainerNode resultData = null;
+        if (result != null && result.getOutput().isPresent()) {
+            resultData = result.getOutput().get();
+            resultNodeSchema = (ActionDefinition) payload.getInstanceIdentifierContext().getSchemaNode();
+        }
+
+        if (resultData != null && resultData.getValue().isEmpty()) {
+            throw new WebApplicationException(Response.Status.NO_CONTENT);
+        } else {
+            return Response.status(200).entity(new NormalizedNodeContext(
+                new InstanceIdentifierContext<>(null, resultNodeSchema, mountPoint, schemaContextRef.get()),
+                resultData)).build();
+        }
     }
 }
