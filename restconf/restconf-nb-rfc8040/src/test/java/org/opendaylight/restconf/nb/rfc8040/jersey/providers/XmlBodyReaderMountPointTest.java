@@ -108,6 +108,20 @@ public class XmlBodyReaderMountPointTest extends AbstractBodyReaderTest {
     }
 
     @Test
+    public void moduleSubContainerDataPostActionTest() throws Exception {
+        final Optional<DataSchemaNode> dataSchemaNode = schemaContext
+            .findDataChildByName(QName.create(INSTANCE_IDENTIFIER_MODULE_QNAME, "cont"));
+        final String uri = "instance-identifier-module:cont/yang-ext:mount/instance-identifier-module:cont/cont1/reset";
+        mockBodyReader(uri, this.xmlBodyReader, true);
+        final InputStream inputStream = XmlBodyReaderMountPointTest.class
+            .getResourceAsStream("/instanceidentifier/xml/xml_cont_action.xml");
+        final NormalizedNodeContext returnValue = this.xmlBodyReader.readFrom(null,
+            null, null, this.mediaType, null, inputStream);
+        checkMountPointNormalizedNodeContext(returnValue);
+        checkExpectValueNormalizeNodeContext(dataSchemaNode.get(), returnValue);
+    }
+
+    @Test
     public void rpcModuleInputTest() throws Exception {
         final String uri = "instance-identifier-module:cont/yang-ext:mount/invoke-rpc-module:rpc-test";
         mockBodyReader(uri, this.xmlBodyReader, true);

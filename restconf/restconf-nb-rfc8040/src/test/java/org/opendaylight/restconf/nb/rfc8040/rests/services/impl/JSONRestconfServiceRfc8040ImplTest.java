@@ -44,6 +44,7 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -59,6 +60,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
+import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
@@ -141,6 +143,9 @@ public class JSONRestconfServiceRfc8040ImplTest {
     private DOMRpcService mockRpcService;
 
     @Mock
+    private DOMActionService mockActionService;
+
+    @Mock
     private DOMSchemaService domSchemaService;
 
     private JSONRestconfServiceRfc8040Impl service;
@@ -189,9 +194,10 @@ public class JSONRestconfServiceRfc8040ImplTest {
                 DOMMountPointServiceHandler.newInstance(mockMountPointService);
 
         final DOMNotificationService mockNotificationService = mock(DOMNotificationService.class);
-        final ServicesWrapper servicesWrapper = ServicesWrapper.newInstance(schemaContextHandler,
-                mountPointServiceHandler, txChainHandler, new DOMDataBrokerHandler(mockDOMDataBroker),
-                new RpcServiceHandler(mockRpcService), new NotificationServiceHandler(mockNotificationService),
+        final ServicesWrapper servicesWrapper = ServicesWrapper
+            .newInstance(schemaContextHandler, mountPointServiceHandler, txChainHandler,
+                new DOMDataBrokerHandler(mockDOMDataBroker), new RpcServiceHandler(mockRpcService),
+                new ActionServiceHandler(mockActionService), new NotificationServiceHandler(mockNotificationService),
                 domSchemaService);
 
         service = new JSONRestconfServiceRfc8040Impl(servicesWrapper, mountPointServiceHandler,
