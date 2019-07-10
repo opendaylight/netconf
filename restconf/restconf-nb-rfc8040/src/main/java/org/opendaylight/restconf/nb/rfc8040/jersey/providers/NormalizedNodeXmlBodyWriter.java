@@ -39,6 +39,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -117,6 +118,14 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
                     ((RpcDefinition) pathContext.getSchemaNode()).getOutput().getPath(),
                     depth,
                     fields);
+            writeElements(xmlWriter, nnWriter, (ContainerNode) data);
+        } else if (pathContext.getSchemaNode() instanceof ActionDefinition) {
+            /*
+             *  ActionDefinition is not supported as initial codec in XMLStreamWriter,
+             *  so we need to emit initial output declaration..
+             */
+            nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx,
+                ((ActionDefinition) pathContext.getSchemaNode()).getOutput().getPath(), depth, fields);
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
         } else {
             if (SchemaPath.ROOT.equals(path)) {
