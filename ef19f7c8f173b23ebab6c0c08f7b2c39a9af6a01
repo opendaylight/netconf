@@ -22,6 +22,29 @@
       "revId": "ef19f7c8f173b23ebab6c0c08f7b2c39a9af6a01",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f592359a_e54a8bc5",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/ActionServiceHandler.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-07-11T20:18:17Z",
+      "side": 1,
+      "message": "Yeah got that it needs to be updated to org.apache.aries.blueprint.annotation",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 53
+      },
+      "revId": "ef19f7c8f173b23ebab6c0c08f7b2c39a9af6a01",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
