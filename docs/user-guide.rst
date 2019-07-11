@@ -853,21 +853,37 @@ Testtool help
 
 ::
 
-    usage: netconf testool [-h] [--device-count DEVICES-COUNT] [--devices-per-port DEVICES-PER-PORT] [--schemas-dir SCHEMAS-DIR] [--notification-file NOTIFICATION-FILE]
-                           [--initial-config-xml-file INITIAL-CONFIG-XML-FILE] [--starting-port STARTING-PORT] [--generate-config-connection-timeout GENERATE-CONFIG-CONNECTION-TIMEOUT]
-                           [--generate-config-address GENERATE-CONFIG-ADDRESS] [--generate-configs-batch-size GENERATE-CONFIGS-BATCH-SIZE] [--distribution-folder DISTRO-FOLDER] [--ssh SSH] [--exi EXI]
-                           [--debug DEBUG] [--md-sal MD-SAL]
+    usage: netconf testtool [-h] [--edit-content EDIT-CONTENT] [--async-requests {true,false}] [--thread-amount THREAD-AMOUNT] [--throttle THROTTLE]
+                            [--auth AUTH AUTH] [--controller-destination CONTROLLER-DESTINATION] [--device-count DEVICES-COUNT]
+                            [--devices-per-port DEVICES-PER-PORT] [--schemas-dir SCHEMAS-DIR] [--notification-file NOTIFICATION-FILE]
+                            [--initial-config-xml-file INITIAL-CONFIG-XML-FILE] [--starting-port STARTING-PORT]
+                            [--generate-config-connection-timeout GENERATE-CONFIG-CONNECTION-TIMEOUT]
+                            [--generate-config-address GENERATE-CONFIG-ADDRESS] [--generate-configs-batch-size GENERATE-CONFIGS-BATCH-SIZE]
+                            [--distribution-folder DISTRO-FOLDER] [--ssh {true,false}] [--exi {true,false}] [--debug {true,false}]
+                            [--md-sal {true,false}] [--time-out TIME-OUT] [-ip IP] [--thread-pool-size THREAD-POOL-SIZE] [--rpc-config RPC-CONFIG]
 
-    NETCONF device simulator. Detailed info can be found at https://wiki.opendaylight.org/view/OpenDaylight_Controller:Netconf:Testtool#Building_testtool
+    netconf testtool
 
-    optional arguments:
+    named arguments:
       -h, --help             show this help message and exit
+      --edit-content EDIT-CONTENT
+      --async-requests {true,false}
+      --thread-amount THREAD-AMOUNT
+                             The number of threads to use for configuring devices.
+      --throttle THROTTLE    Maximum amount of async requests that can be open at a time, with mutltiple threads this gets divided among all threads
+      --auth AUTH AUTH       Username and password for HTTP basic authentication in order username password.
+      --controller-destination CONTROLLER-DESTINATION
+                             Ip address and port of controller. Must  be  in  following  format  <ip>:<port>  if  available it will be used for spawning
+                             netconf   connectors    via    topology    configuration    as    a    part    of    URI.    Example    (http://<controller
+                             destination>/restconf/config/network-topology:network-topology/topology/topology-netconf/node/<node-id>)otherwise  it  will
+                             just start simulated devices and skip the execution of PUT requests
       --device-count DEVICES-COUNT
                              Number of simulated netconf devices to spin. This is the number of actual ports open for the devices.
       --devices-per-port DEVICES-PER-PORT
                              Amount of config files generated per port to spoof more devices than are actually running
       --schemas-dir SCHEMAS-DIR
-                             Directory containing yang schemas to describe simulated devices. Some schemas e.g. netconf monitoring and inet types are included by default
+                             Directory containing yang schemas to describe simulated devices.  Some  schemas  e.g. netconf monitoring and inet types are
+                             included by default
       --notification-file NOTIFICATION-FILE
                              Xml file containing notifications that should be sent to clients after create subscription is called
       --initial-config-xml-file INITIAL-CONFIG-XML-FILE
@@ -882,10 +898,19 @@ Testtool help
                              Number of connector configs per generated file
       --distribution-folder DISTRO-FOLDER
                              Directory where the karaf distribution for controller is located
-      --ssh SSH              Whether to use ssh for transport or just pure tcp
-      --exi EXI              Whether to use exi to transport xml content
-      --debug DEBUG          Whether to use debug log level instead of INFO
-      --md-sal MD-SAL        Whether to use md-sal datastore instead of default simulated datastore.
+      --ssh {true,false}     Whether to use ssh for transport or just pure tcp
+      --exi {true,false}     Whether to use exi to transport xml content
+      --debug {true,false}   Whether to use debug log level instead of INFO
+      --md-sal {true,false}  Whether to use md-sal datastore instead of default simulated datastore.
+      --time-out TIME-OUT    the maximum time in seconds for executing each PUT request
+      -ip IP                 Ip address which will be used for creating a socket  address.It  can  either  be a machine name, such as java.sun.com, or a
+                             textual representation of its IP address.
+      --thread-pool-size THREAD-POOL-SIZE
+                             The number of threads to keep in the pool, when creating a device simulator. Even if they are idle.
+      --rpc-config RPC-CONFIG
+                             Rpc config file. It can be used to define custom rpc  behavior, or override the default one.Usable for testing buggy device
+                             behavior.
+
 
 Supported operations
 ^^^^^^^^^^^^^^^^^^^^
@@ -1112,6 +1137,98 @@ Editing data for simulated device
 
     Data will be mirrored in operational datastore only when using the
     default simple datastore.
+
+
+Testing User defined RPC
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The NETCONF test-tool allows using custom RPC. Custom RPC needs to be defined in yang model provide to test-tool along
+with parameter ``--schemas-dir``.
+
+The input and output of the custom RPC should be provided with ``--rpc-config`` parameter as a path to the file containing
+definition of input and output. The format of the custom RPC file is xml as shown below.
+
+Start the device with following command:
+
+::
+
+    java -jar netconf/tools/netconf-testtool/target/netconf-testtool-1.7.0-SNAPSHOT-executable.jar --schemas-dir ~/test-schemas/ --rpc-config ~/tmp/customrpc.xml --debug=true
+
+Example YANG model file:
+
+::
+
+    module example-ops {
+         namespace "urn:example-ops:reboot";
+         prefix "ops";
+
+        import ietf-yang-types {
+        prefix "yang";
+         }
+
+
+         revision "2016-07-07" {
+           description "Initial version.";
+           reference "example document.";
+         }
+
+
+         rpc reboot {
+           description "Reboot operation.";
+           input {
+             leaf delay {
+               type uint32;
+               units "seconds";
+               default 0;
+               description
+                 "Delay in seconds.";
+             }
+             leaf message {
+               type string;
+               description
+                 "Log message.";
+             }
+           }
+         }
+       }
+
+
+Example payload (RPC config file customrpc.xml):
+
+::
+
+    <rpcs>
+      <rpc>
+        <input>
+          <reboot xmlns="urn:example-ops:reboot">
+            <delay>300</delay>
+            <message>message</message>
+          </reboot>
+        </input>
+        <output>
+          <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
+            <ok/>
+          </rpc-reply>
+        </output>
+      </rpc>
+    </rpcs>
+
+
+
+Example of use:
+
+::
+
+    POST http://localhost:8181/restconf/operations/network-topology:network-topology/topology/topology-netconf/node/new-netconf-device/yang-ext:mount/example-ops:get-reboot-info
+
+If successful the command will return code 200.
+
+
+
+.. note::
+
+    A working example of user defined RPC can be found in TestToolTest.java class of the tools[netconf-testtool] project.
+
 
 Known problems
 ^^^^^^^^^^^^^^
