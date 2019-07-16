@@ -9,7 +9,10 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -48,6 +51,7 @@ import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListen
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.SchemaPathCodec;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -127,14 +131,14 @@ public final class SubscribeToStreamUtil {
                 false);
         notificationListenerAdapter.get().setCloseVars(
                 handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
+        final String serializedPath = SchemaPathCodec.serialize(notificationListenerAdapter.get().getSchemaPath(),
+                schemaContext);
         final NormalizedNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                 notificationListenerAdapter.get().getSchemaPath().getLastComponent(),
                 schemaContext.getNotifications(), notificationQueryParams.getStart(),
                 notificationListenerAdapter.get().getOutputType(), uri, getMonitoringModule(schemaContext),
-                exist);
-        writeDataToDS(schemaContext,
-                notificationListenerAdapter.get().getSchemaPath().getLastComponent().getLocalName(), writeTransaction,
-                exist, mapToStreams);
+                exist, serializedPath);
+        writeDataToDS(schemaContext, serializedPath, writeTransaction, exist, mapToStreams);
         submitData(writeTransaction);
         return uri;
     }
@@ -212,13 +216,12 @@ public final class SubscribeToStreamUtil {
                 = handlersHolder.getTransactionChainHandler().get().newReadWriteTransaction();
         final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
         final boolean exist = checkExist(schemaContext, writeTransaction);
-
+        final String serializedPath = IdentifierCodec.serialize(listener.get().getPath(), schemaContext);
         final NormalizedNode mapToStreams = RestconfMappingNodeUtil
                 .mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.get().getPath(),
                         notificationQueryParams.getStart(), listener.get().getOutputType(), uri,
-                        getMonitoringModule(schemaContext), exist, schemaContext);
-        writeDataToDS(schemaContext, listener.get().getPath().getLastPathArgument().getNodeType().getLocalName(),
-                writeTransaction, exist, mapToStreams);
+                        getMonitoringModule(schemaContext), exist, schemaContext, serializedPath);
+        writeDataToDS(schemaContext, serializedPath, writeTransaction, exist, mapToStreams);
         submitData(writeTransaction);
         return uri;
     }
@@ -252,7 +255,12 @@ public final class SubscribeToStreamUtil {
             final NormalizedNode mapToStreams) {
         String pathId;
         if (exist) {
-            pathId = MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;
+            try {
+                pathId = MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY
+                        + URLEncoder.encode(name, StandardCharsets.UTF_8.name());
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalStateException(e);
+            }
         } else {
             pathId = MonitoringModule.PATH_TO_STREAMS;
         }
@@ -327,7 +335,6 @@ public final class SubscribeToStreamUtil {
 
     static boolean checkExist(final SchemaContext schemaContext,
                               final DOMDataTreeReadOperations readWriteTransaction) {
-        boolean exist;
         try {
             return readWriteTransaction.exists(LogicalDatastoreType.OPERATIONAL,
                     IdentifierCodec.deserialize(MonitoringModule.PATH_TO_STREAMS, schemaContext)).get();
