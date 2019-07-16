@@ -21,7 +21,9 @@ import org.opendaylight.restconf.common.util.DataChangeScope;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
+import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.SchemaPathCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -32,7 +34,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
@@ -215,27 +216,24 @@ public final class CreateStreamUtil {
             final NotificationOutputType outputType) {
         final String streamName = parseNotificationStreamName(requireNonNull(notificationDefinition),
                 requireNonNull(refSchemaCtx), requireNonNull(outputType.getName()));
-        final Optional<NotificationListenerAdapter> listenerForStreamName = ListenersBroker.getInstance()
-                .getNotificationListenerFor(streamName);
-        return listenerForStreamName.orElseGet(() -> ListenersBroker.getInstance().registerNotificationListener(
-                notificationDefinition.getPath(), streamName, outputType));
+        return ListenersBroker.getInstance().registerNotificationListener(notificationDefinition.getPath(),
+                streamName, outputType);
     }
 
     private static String parseNotificationStreamName(final NotificationDefinition notificationDefinition,
             final SchemaContextRef refSchemaCtx, final String outputType) {
-        final QName notificationDefinitionQName = notificationDefinition.getQName();
-        final Module module = refSchemaCtx.findModuleByNamespaceAndRevision(
-                notificationDefinitionQName.getModule().getNamespace(),
-                notificationDefinitionQName.getModule().getRevision());
-        requireNonNull(module, String.format("Module for namespace %s does not exist.",
-                notificationDefinitionQName.getModule().getNamespace()));
+        String serializedSchemaPath = SchemaPathCodec.serialize(
+                notificationDefinition.getPath(), refSchemaCtx.get());
+        if (serializedSchemaPath.startsWith(String.valueOf(RestconfConstants.DOT))) {
+            serializedSchemaPath = serializedSchemaPath.substring(1);
+        }
 
         final StringBuilder streamNameBuilder = new StringBuilder();
-        streamNameBuilder.append(RestconfStreamsConstants.NOTIFICATION_STREAM)
-                .append('/')
-                .append(module.getName())
-                .append(':')
-                .append(notificationDefinitionQName.getLocalName());
+        streamNameBuilder.append(RestconfStreamsConstants.NOTIFICATION_STREAM);
+        if (!serializedSchemaPath.equals(String.valueOf(RestconfConstants.SLASH))) {
+            streamNameBuilder.append(serializedSchemaPath);
+        }
+
         if (outputType.equals(NotificationOutputType.JSON.getName())) {
             streamNameBuilder.append('/').append(NotificationOutputType.JSON.getName());
         }

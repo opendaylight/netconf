@@ -154,13 +154,14 @@ public class RestconfMappingNodeUtilTest {
         final URI uri = new URI("uri");
         final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
         final boolean exist = true;
+        final String streamName = "/nested-module:depth1-cont/depth2-leaf1";
 
         final Map<QName, Object> map =
-                prepareMap(path.getLastPathArgument().getNodeType().getLocalName(), uri, start, outputType);
+                prepareMap(streamName, uri, start, outputType);
 
         final NormalizedNode<?, ?> mappedData =
                 RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(
-                        path, start, outputType, uri, monitoringModule, exist, schemaContextMonitoring);
+                        path, start, outputType, uri, monitoringModule, exist, schemaContextMonitoring, streamName);
         assertNotNull(mappedData);
         testData(map, mappedData);
     }
@@ -172,14 +173,16 @@ public class RestconfMappingNodeUtilTest {
         final URI uri = new URI("uri");
         final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
         final boolean exist = true;
+        final String streamName = "/module:notif";
 
-        final Map<QName, Object> map = prepareMap("notifi", uri, start, outputType);
+        final Map<QName, Object> map = prepareMap(streamName, uri, start, outputType);
         map.put(MonitoringModule.LEAF_DESCR_STREAM_QNAME, "Notifi");
 
         final QName notifiQName = QName.create("urn:nested:module", "2014-06-03", "notifi");
         final NormalizedNode<?, ?> mappedData =
                 RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(notifiQName,
-                    schemaContextMonitoring.getNotifications(), start, outputType, uri, monitoringModule, exist);
+                    schemaContextMonitoring.getNotifications(), start, outputType, uri, monitoringModule, exist,
+                        streamName);
         assertNotNull(mappedData);
         testData(map, mappedData);
     }

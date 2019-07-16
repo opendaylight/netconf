@@ -36,6 +36,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWr
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserFieldsParameter;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.SchemaPathCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -291,12 +292,13 @@ public final class ReadDataTransactionUtil {
             final UriInfo uriInfo, final DOMDataTreeReadWriteTransaction readWriteTransaction, final boolean exist,
             final NotificationListenerAdapter listener) {
         final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName());
+        final String serializedPath = SchemaPathCodec.serialize(listener.getSchemaPath(), schemaContextRef.get());
         final NormalizedNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                 listener.getSchemaPath().getLastComponent(), schemaContextRef.get().getNotifications(), null,
-                listener.getOutputType(), uri,
-                SubscribeToStreamUtil.getMonitoringModule(schemaContextRef.get()), exist);
-        SubscribeToStreamUtil.writeDataToDS(schemaContextRef.get(),
-                listener.getSchemaPath().getLastComponent().getLocalName(), readWriteTransaction, exist, mapToStreams);
+                listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContextRef.get()),
+                exist, serializedPath);
+        SubscribeToStreamUtil.writeDataToDS(schemaContextRef.get(), serializedPath, readWriteTransaction,
+                exist, mapToStreams);
     }
 
     private static NormalizedNode<?, ?> prepareDataByParamWithDef(final NormalizedNode<?, ?> result,
