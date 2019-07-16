@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  */
 abstract class SubscribeToStreamUtil {
     /**
-     * Implementation of {@link UrlResolver} for Server-sent events.
+     * Implementation of SubscribeToStreamUtil for Server-sent events.
      */
     private static final class ServerSentEvents extends SubscribeToStreamUtil {
         static final ServerSentEvents INSTANCE = new ServerSentEvents();
@@ -67,7 +67,7 @@ abstract class SubscribeToStreamUtil {
     }
 
     /**
-     * Implementation of {@link UrlResolver} for Web sockets.
+     * Implementation of SubscribeToStreamUtil for Web sockets.
      */
     private static final class WebSockets extends SubscribeToStreamUtil {
         static final WebSockets INSTANCE = new WebSockets();
@@ -122,7 +122,6 @@ abstract class SubscribeToStreamUtil {
      * @param uriInfo                 URI information.
      * @param notificationQueryParams Query parameters of notification.
      * @param handlersHolder          Holder of handlers for notifications.
-     * @param urlResolver             Resolver for proper implementation. Possibilities is WS or SSE.
      * @return Stream location for listening.
      */
     final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
@@ -134,7 +133,7 @@ abstract class SubscribeToStreamUtil {
         final Optional<NotificationListenerAdapter> notificationListenerAdapter =
                 ListenersBroker.getInstance().getNotificationListenerFor(streamName);
 
-        if (!notificationListenerAdapter.isPresent()) {
+        if (notificationListenerAdapter.isEmpty()) {
             throw new RestconfDocumentedException(String.format(
                     "Stream with name %s was not found.", streamName),
                     ErrorType.PROTOCOL,
@@ -214,13 +213,13 @@ abstract class SubscribeToStreamUtil {
         final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
         final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
+        final String serializedPath = IdentifierCodec.serialize(listener.get().getPath(), schemaContext);
 
         final MapEntryNode mapToStreams =
             RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.get().getPath(),
                 notificationQueryParams.getStart(), listener.get().getOutputType(), uri,
-                getMonitoringModule(schemaContext), schemaContext);
-        writeDataToDS(schemaContext, listener.get().getPath().getLastPathArgument().getNodeType().getLocalName(),
-                writeTransaction, mapToStreams);
+                getMonitoringModule(schemaContext), schemaContext, serializedPath);
+        writeDataToDS(schemaContext, serializedPath, writeTransaction, mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
         return uri;
