@@ -184,7 +184,7 @@ final class CreateStreamUtil {
     private static <T> T parseEnum(final ContainerNode data, final Class<T> clazz, final String paramName) {
         final Optional<DataContainerChild<? extends PathArgument, ?>> optAugNode = data.getChild(
                 RestconfStreamsConstants.SAL_REMOTE_AUG_IDENTIFIER);
-        if (!optAugNode.isPresent()) {
+        if (optAugNode.isEmpty()) {
             return null;
         }
         final DataContainerChild<? extends PathArgument, ?> augNode = optAugNode.get();
@@ -193,7 +193,7 @@ final class CreateStreamUtil {
         }
         final Optional<DataContainerChild<? extends PathArgument, ?>> enumNode = ((AugmentationNode) augNode).getChild(
                 new NodeIdentifier(QName.create(RestconfStreamsConstants.SAL_REMOTE_AUGMENT, paramName)));
-        if (!enumNode.isPresent()) {
+        if (enumNode.isEmpty()) {
             return null;
         }
         final Object value = enumNode.get().getValue();
