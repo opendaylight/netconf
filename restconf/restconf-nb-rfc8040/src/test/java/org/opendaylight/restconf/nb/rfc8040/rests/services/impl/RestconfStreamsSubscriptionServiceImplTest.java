@@ -58,7 +58,6 @@ import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -139,12 +138,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         final Map<String, ListenerAdapter> listenersByStreamNameSetter = new HashMap<>();
         final ListenerAdapter adapter = mock(ListenerAdapter.class);
         final YangInstanceIdentifier yiid = mock(YangInstanceIdentifier.class);
-        final YangInstanceIdentifier.PathArgument lastPathArgument = mock(YangInstanceIdentifier.PathArgument.class);
-        final QName qname = QName.create("toaster", "2009-11-20", "toasterStatus");
         Mockito.when(adapter.getPath()).thenReturn(yiid);
         Mockito.when(adapter.getOutputType()).thenReturn("JSON");
-        Mockito.when(yiid.getLastPathArgument()).thenReturn(lastPathArgument);
-        Mockito.when(lastPathArgument.getNodeType()).thenReturn(qname);
         listenersByStreamNameSetter.put(
                 "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                 adapter);
