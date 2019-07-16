@@ -1,0 +1,8 @@
+Code-Review+1: Mariusz Sobucki <mariusz.sobucki@est.tech>
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Robert Varga <nite@hq.sk>
+Submitted-by: Robert Varga <nite@hq.sk>
+Submitted-at: Tue, 16 Jul 2019 11:49:43 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/83060
+Project: netconf
+Branch: refs/heads/stable/neon
