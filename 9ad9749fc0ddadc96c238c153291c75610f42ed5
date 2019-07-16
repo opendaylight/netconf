@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a3e74bd_4044556a",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 1230,
+      "author": {
+        "id": 8432
+      },
+      "writtenOn": "2019-07-16T11:15:12Z",
+      "side": 1,
+      "message": "Please remove this part. This class is not present in neon branch.",
+      "range": {
+        "startLine": 1228,
+        "startChar": 0,
+        "endLine": 1230,
+        "endChar": 121
+      },
+      "revId": "9ad9749fc0ddadc96c238c153291c75610f42ed5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
