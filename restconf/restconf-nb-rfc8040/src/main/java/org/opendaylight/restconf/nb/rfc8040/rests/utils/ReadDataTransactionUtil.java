@@ -291,12 +291,14 @@ public final class ReadDataTransactionUtil {
             final UriInfo uriInfo, final DOMDataTreeReadWriteTransaction readWriteTransaction, final boolean exist,
             final NotificationListenerAdapter listener) {
         final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName());
+        final String serializedPath = CreateStreamUtil.serializeAndNormalizeSchemaPath(
+                listener.getSchemaPath(), schemaContextRef.get());
         final NormalizedNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                 listener.getSchemaPath().getLastComponent(), schemaContextRef.get().getNotifications(), null,
-                listener.getOutputType(), uri,
-                SubscribeToStreamUtil.getMonitoringModule(schemaContextRef.get()), exist);
-        SubscribeToStreamUtil.writeDataToDS(schemaContextRef.get(),
-                listener.getSchemaPath().getLastComponent().getLocalName(), readWriteTransaction, exist, mapToStreams);
+                listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContextRef.get()),
+                exist, serializedPath);
+        SubscribeToStreamUtil.writeDataToDS(schemaContextRef.get(), serializedPath, readWriteTransaction,
+                exist, mapToStreams);
     }
 
     private static NormalizedNode<?, ?> prepareDataByParamWithDef(final NormalizedNode<?, ?> result,
