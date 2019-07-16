@@ -121,13 +121,14 @@ public class RestconfMappingNodeUtilTest {
         final URI uri = new URI("uri");
         final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
         final boolean exist = true;
+        final String streamName = "/nested-module:depth1-cont/depth2-leaf1";
 
         final Map<QName, Object> map =
-                prepareMap(path.getLastPathArgument().getNodeType().getLocalName(), uri, start, outputType);
+                prepareMap(streamName, uri, start, outputType);
 
         final NormalizedNode<?, ?> mappedData =
                 RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(
-                        path, start, outputType, uri, monitoringModule, exist, schemaContextMonitoring);
+                        path, start, outputType, uri, monitoringModule, exist, schemaContextMonitoring, streamName);
         assertNotNull(mappedData);
         testData(map, mappedData);
     }
