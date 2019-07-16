@@ -455,7 +455,7 @@ public final class RestconfMappingNodeUtil {
     @SuppressWarnings("rawtypes")
     public static NormalizedNode mapYangNotificationStreamByIetfRestconfMonitoring(final QName notifiQName,
             final Set<NotificationDefinition> notifications, final Instant start, final String outputType,
-            final URI uri, final Module monitoringModule, final boolean existParent) {
+            final URI uri, final Module monitoringModule, final boolean existParent, final String streamName) {
         for (final NotificationDefinition notificationDefinition : notifications) {
             if (notificationDefinition.getQName().equals(notifiQName)) {
                 final DataSchemaNode streamListSchema = ((ContainerSchemaNode) ((ContainerSchemaNode) monitoringModule
@@ -467,8 +467,7 @@ public final class RestconfMappingNodeUtil {
 
                 final ListSchemaNode listSchema = (ListSchemaNode) streamListSchema;
                 prepareLeafAndFillEntryBuilder(streamEntry,
-                        listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME),
-                        notificationDefinition.getQName().getLocalName());
+                        listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME), streamName);
 
                 final Optional<String> optDesc = notificationDefinition.getDescription();
                 if (optDesc.isPresent()) {
@@ -556,7 +555,8 @@ public final class RestconfMappingNodeUtil {
     @SuppressWarnings("rawtypes")
     public static NormalizedNode mapDataChangeNotificationStreamByIetfRestconfMonitoring(
             final YangInstanceIdentifier path, final Instant start, final String outputType, final URI uri,
-            final Module monitoringModule, final boolean existParent, final SchemaContext schemaContext) {
+            final Module monitoringModule, final boolean existParent, final SchemaContext schemaContext,
+            final String streamName) {
         final SchemaNode schemaNode = ParserIdentifier
                 .toInstanceIdentifier(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext),
                         schemaContext, Optional.empty())
@@ -570,8 +570,7 @@ public final class RestconfMappingNodeUtil {
 
         final ListSchemaNode listSchema = (ListSchemaNode) streamListSchema;
         prepareLeafAndFillEntryBuilder(streamEntry,
-                listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME),
-                schemaNode.getQName().getLocalName());
+                listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME), streamName);
 
         final Optional<String> optDesc = schemaNode.getDescription();
         if (optDesc.isPresent()) {

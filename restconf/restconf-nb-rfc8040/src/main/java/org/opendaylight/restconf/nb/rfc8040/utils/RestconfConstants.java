@@ -20,6 +20,7 @@ public final class RestconfConstants {
     public static final String MOUNT = "yang-ext:mount";
     public static final String IDENTIFIER = "identifier";
     public static final char SLASH = '/';
+    public static final char DOT = '.';
     public static final Splitter SLASH_SPLITTER = Splitter.on(SLASH);
     public static final String BASE_URI_PATTERN = "rests";
 
