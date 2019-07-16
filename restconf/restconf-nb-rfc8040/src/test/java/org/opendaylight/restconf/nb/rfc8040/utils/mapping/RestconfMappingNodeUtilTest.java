@@ -115,12 +115,11 @@ public class RestconfMappingNodeUtilTest {
         final String outputType = "XML";
         final URI uri = new URI("uri");
         final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
+        final String streamName = "/nested-module:depth1-cont/depth2-leaf1";
 
-        final Map<QName, Object> map = prepareMap(path.getLastPathArgument().getNodeType().getLocalName(), uri, start,
-            outputType);
-
+        final Map<QName, Object> map = prepareMap(streamName, uri, start, outputType);
         final MapEntryNode mappedData = RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(
-            path, start, outputType, uri, monitoringModule, schemaContextMonitoring);
+            path, start, outputType, uri, monitoringModule, schemaContextMonitoring, streamName);
         assertMappedData(map, mappedData);
     }
 
