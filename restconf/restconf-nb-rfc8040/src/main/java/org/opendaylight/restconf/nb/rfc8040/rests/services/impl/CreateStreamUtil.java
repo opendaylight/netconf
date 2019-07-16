@@ -23,6 +23,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.SchemaPathCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -34,9 +35,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -183,7 +184,7 @@ final class CreateStreamUtil {
     private static <T> T parseEnum(final ContainerNode data, final Class<T> clazz, final String paramName) {
         final Optional<DataContainerChild<? extends PathArgument, ?>> optAugNode = data.getChild(
                 RestconfStreamsConstants.SAL_REMOTE_AUG_IDENTIFIER);
-        if (!optAugNode.isPresent()) {
+        if (optAugNode.isEmpty()) {
             return null;
         }
         final DataContainerChild<? extends PathArgument, ?> augNode = optAugNode.get();
@@ -192,7 +193,7 @@ final class CreateStreamUtil {
         }
         final Optional<DataContainerChild<? extends PathArgument, ?>> enumNode = ((AugmentationNode) augNode).getChild(
                 new NodeIdentifier(QName.create(RestconfStreamsConstants.SAL_REMOTE_AUGMENT, paramName)));
-        if (!enumNode.isPresent()) {
+        if (enumNode.isEmpty()) {
             return null;
         }
         final Object value = enumNode.get().getValue();
@@ -215,30 +216,41 @@ final class CreateStreamUtil {
             final EffectiveModelContext refSchemaCtx, final NotificationOutputType outputType) {
         final String streamName = parseNotificationStreamName(requireNonNull(notificationDefinition),
                 requireNonNull(refSchemaCtx), requireNonNull(outputType.getName()));
-        final Optional<NotificationListenerAdapter> listenerForStreamName = ListenersBroker.getInstance()
-                .getNotificationListenerFor(streamName);
-        return listenerForStreamName.orElseGet(() -> ListenersBroker.getInstance().registerNotificationListener(
-                notificationDefinition.getPath(), streamName, outputType));
+        return ListenersBroker.getInstance().registerNotificationListener(notificationDefinition.getPath(),
+                streamName, outputType);
     }
 
     private static String parseNotificationStreamName(final NotificationDefinition notificationDefinition,
             final EffectiveModelContext refSchemaCtx, final String outputType) {
-        final QName notificationDefinitionQName = notificationDefinition.getQName();
-        final Module module = refSchemaCtx.findModule(
-                notificationDefinitionQName.getModule().getNamespace(),
-                notificationDefinitionQName.getModule().getRevision()).orElse(null);
-        requireNonNull(module, String.format("Module for namespace %s does not exist.",
-                notificationDefinitionQName.getModule().getNamespace()));
-
+        final String serializedSchemaPath = serializeAndNormalizeSchemaPath(
+                notificationDefinition.getPath(), refSchemaCtx);
         final StringBuilder streamNameBuilder = new StringBuilder();
-        streamNameBuilder.append(RestconfStreamsConstants.NOTIFICATION_STREAM)
-                .append('/')
-                .append(module.getName())
-                .append(':')
-                .append(notificationDefinitionQName.getLocalName());
+        streamNameBuilder.append(RestconfStreamsConstants.NOTIFICATION_STREAM);
+        if (!serializedSchemaPath.isEmpty()) {
+            streamNameBuilder.append('/')
+                    .append(serializedSchemaPath);
+        }
+
         if (outputType.equals(NotificationOutputType.JSON.getName())) {
-            streamNameBuilder.append('/').append(NotificationOutputType.JSON.getName());
+            streamNameBuilder.append('/')
+                    .append(NotificationOutputType.JSON.getName());
         }
         return streamNameBuilder.toString();
+    }
+
+    /**
+     * Serialization of the input schema path and removal of leading dot and slash characters from the input path
+     * (these characters are used for differentiation between absolute and relative schema paths, but in this case
+     * only absolute schema paths have a sense).
+     *
+     * @param schemaPath    Schema path used as input for serialization.
+     * @param schemaContext Schema context used for serialization.
+     * @return Normalized path.
+     */
+    static String serializeAndNormalizeSchemaPath(final SchemaPath schemaPath,
+                                                  final EffectiveModelContext schemaContext) {
+        String serializePath = SchemaPathCodec.serialize(schemaPath, schemaContext);
+        serializePath = serializePath.substring(1);
+        return serializePath;
     }
 }

@@ -23,17 +23,17 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -45,7 +45,6 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
-import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.handlers.ActionServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
@@ -66,7 +65,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperations
 import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Immutable;
@@ -206,58 +204,35 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     private void createAllYangNotificationStreams(final RestconfStrategy strategy,
             final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
-        strategy.prepareReadWriteExecution();
-        final boolean exist = checkExist(schemaContext, strategy);
+        final DOMDataTreeReadWriteTransaction wTx = Objects.requireNonNull(strategy.getTransactionChain())
+                .newReadWriteTransaction();
+        final boolean exist = SubscribeToStreamUtil.checkExist(schemaContext, wTx);
 
         for (final NotificationDefinition notificationDefinition : schemaContext.getNotifications()) {
             final NotificationListenerAdapter notifiStreamXML =
-                CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
-                    NotificationOutputType.XML);
+                    CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
+                            NotificationOutputType.XML);
             final NotificationListenerAdapter notifiStreamJSON =
-                CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
-                    NotificationOutputType.JSON);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamXML);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, strategy, exist, notifiStreamJSON);
+                    CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
+                            NotificationOutputType.JSON);
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, wTx, exist, notifiStreamXML);
+            writeNotificationStreamToDatastore(schemaContext, uriInfo, wTx, exist, notifiStreamJSON);
         }
-        try {
-            strategy.commit().get();
-        } catch (final InterruptedException | ExecutionException e) {
-            throw new RestconfDocumentedException("Problem while putting data to DS.", e);
-        }
+        SubscribeToStreamUtil.submitData(wTx);
     }
 
     private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
-            final UriInfo uriInfo, final RestconfStrategy strategy, final boolean exist,
+            final UriInfo uriInfo, final DOMDataTreeReadWriteTransaction readWriteTransaction, final boolean exist,
             final NotificationListenerAdapter listener) {
         final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
-        final NormalizedNode<?, ?> mapToStreams =
-            RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-                listener.getSchemaPath().getLastComponent(), schemaContext.getNotifications(), null,
-                listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext), exist);
-        writeDataToDS(schemaContext,
-            listener.getSchemaPath().getLastComponent().getLocalName(), strategy, exist, mapToStreams);
-    }
-
-    private static boolean checkExist(final EffectiveModelContext schemaContext, final RestconfStrategy strategy) {
-        try {
-            return strategy.exists(LogicalDatastoreType.OPERATIONAL,
-                IdentifierCodec.deserialize(Rfc8040.MonitoringModule.PATH_TO_STREAMS, schemaContext)).get();
-        } catch (final InterruptedException | ExecutionException exception) {
-            throw new RestconfDocumentedException("Problem while checking data if exists", exception);
-        }
-    }
-
-    private static void writeDataToDS(final EffectiveModelContext schemaContext, final String name,
-                                      final RestconfStrategy strategy, final boolean exist,
-                                      final NormalizedNode<?, ?> mapToStreams) {
-        final String pathId;
-        if (exist) {
-            pathId = Rfc8040.MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;
-        } else {
-            pathId = Rfc8040.MonitoringModule.PATH_TO_STREAMS;
-        }
-        strategy.merge(LogicalDatastoreType.OPERATIONAL, IdentifierCodec.deserialize(pathId, schemaContext),
-            mapToStreams);
+        final String serializedPath = CreateStreamUtil.serializeAndNormalizeSchemaPath(
+                listener.getSchemaPath(), schemaContext);
+        final NormalizedNode<?, ?> mapToStreams
+                = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
+                    listener.getSchemaPath().getLastComponent(), schemaContext.getNotifications(), null,
+                    listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext),
+                    exist, serializedPath);
+        SubscribeToStreamUtil.writeDataToDS(schemaContext, serializedPath, readWriteTransaction, exist, mapToStreams);
     }
 
     @Override
