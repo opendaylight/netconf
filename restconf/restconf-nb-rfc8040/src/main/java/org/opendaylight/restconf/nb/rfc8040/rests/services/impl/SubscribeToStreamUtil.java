@@ -9,7 +9,10 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -54,12 +57,13 @@ import org.slf4j.LoggerFactory;
  */
 abstract class SubscribeToStreamUtil {
     /**
-     * Implementation of {@link UrlResolver} for Server-sent events.
+     * Implementation of UrlResolver for Server-sent events.
      */
     private static final class ServerSentEvents extends SubscribeToStreamUtil {
         static final ServerSentEvents INSTANCE = new ServerSentEvents();
 
         @Override
+        @NonNull
         public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
             final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
             return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + '/'
@@ -68,12 +72,13 @@ abstract class SubscribeToStreamUtil {
     }
 
     /**
-     * Implementation of {@link UrlResolver} for Web sockets.
+     * Implementation of UrlResolver for Web sockets.
      */
     private static final class WebSockets extends SubscribeToStreamUtil {
         static final WebSockets INSTANCE = new WebSockets();
 
         @Override
+        @NonNull
         public URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
             final String scheme = uriInfo.getAbsolutePath().getScheme();
             final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
@@ -123,7 +128,6 @@ abstract class SubscribeToStreamUtil {
      * @param uriInfo                 URI information.
      * @param notificationQueryParams Query parameters of notification.
      * @param handlersHolder          Holder of handlers for notifications.
-     * @param urlResolver             Resolver for proper implementation. Possibilities is WS or SSE.
      * @return Stream location for listening.
      */
     final @NonNull URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
@@ -135,7 +139,7 @@ abstract class SubscribeToStreamUtil {
         final Optional<NotificationListenerAdapter> notificationListenerAdapter =
                 ListenersBroker.getInstance().getNotificationListenerFor(streamName);
 
-        if (!notificationListenerAdapter.isPresent()) {
+        if (notificationListenerAdapter.isEmpty()) {
             throw new RestconfDocumentedException(String.format(
                     "Stream with name %s was not found.", streamName),
                     ErrorType.PROTOCOL,
@@ -218,13 +222,13 @@ abstract class SubscribeToStreamUtil {
         final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final EffectiveModelContext schemaContext = handlersHolder.getSchemaHandler().get();
         final boolean exist = checkExist(schemaContext, writeTransaction);
+        final String serializedPath = IdentifierCodec.serialize(listener.get().getPath(), schemaContext);
 
         final NormalizedNode<?, ?> mapToStreams = RestconfMappingNodeUtil
                 .mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.get().getPath(),
                         notificationQueryParams.getStart(), listener.get().getOutputType(), uri,
-                        getMonitoringModule(schemaContext), exist, schemaContext);
-        writeDataToDS(schemaContext, listener.get().getPath().getLastPathArgument().getNodeType().getLocalName(),
-                writeTransaction, exist, mapToStreams);
+                        getMonitoringModule(schemaContext), exist, schemaContext, serializedPath);
+        writeDataToDS(schemaContext, serializedPath, writeTransaction, exist, mapToStreams);
         submitData(writeTransaction);
         transactionChain.close();
         return uri;
@@ -239,7 +243,12 @@ abstract class SubscribeToStreamUtil {
             final NormalizedNode<?, ?> mapToStreams) {
         String pathId;
         if (exist) {
-            pathId = MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + name;
+            try {
+                pathId = MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY
+                        + URLEncoder.encode(name, StandardCharsets.UTF_8.name());
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalStateException(e);
+            }
         } else {
             pathId = MonitoringModule.PATH_TO_STREAMS;
         }
@@ -247,7 +256,7 @@ abstract class SubscribeToStreamUtil {
                 IdentifierCodec.deserialize(pathId, schemaContext), mapToStreams);
     }
 
-    private static void submitData(final DOMDataTreeReadWriteTransaction readWriteTransaction) {
+    static void submitData(final DOMDataTreeReadWriteTransaction readWriteTransaction) {
         try {
             readWriteTransaction.commit().get();
         } catch (final InterruptedException | ExecutionException e) {

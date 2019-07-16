@@ -560,7 +560,8 @@ public final class RestconfMappingNodeUtil {
      */
     public static NormalizedNode<?, ?> mapDataChangeNotificationStreamByIetfRestconfMonitoring(
             final YangInstanceIdentifier path, final Instant start, final String outputType, final URI uri,
-            final Module monitoringModule, final boolean existParent, final EffectiveModelContext schemaContext) {
+            final Module monitoringModule, final boolean existParent, final EffectiveModelContext schemaContext,
+            final String streamName) {
         final SchemaNode schemaNode = ParserIdentifier
                 .toInstanceIdentifier(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext),
                         schemaContext, Optional.empty())
@@ -574,8 +575,7 @@ public final class RestconfMappingNodeUtil {
 
         final ListSchemaNode listSchema = (ListSchemaNode) streamListSchema;
         prepareLeafAndFillEntryBuilder(streamEntry,
-                listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME),
-                schemaNode.getQName().getLocalName());
+                listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME), streamName);
 
         final Optional<String> optDesc = schemaNode.getDescription();
         if (optDesc.isPresent()) {
