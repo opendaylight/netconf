@@ -26,8 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
@@ -92,13 +90,12 @@ public final class SubscribeToStreamUtil {
      * about listener to DS according to ietf-restconf-monitoring.
      *
      * @param identifier              Name of the stream.
-     * @param uriInfo                 URI information.
      * @param notificationQueryParams Query parameters of notification.
      * @param handlersHolder          Holder of handlers for notifications.
      * @return Stream location for listening.
      */
     @SuppressWarnings("rawtypes")
-    public static URI subscribeToYangStream(final String identifier, final UriInfo uriInfo,
+    public static URI subscribeToYangStream(final String identifier,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final String streamName = ListenersBroker.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
@@ -120,7 +117,7 @@ public final class SubscribeToStreamUtil {
                 .newReadWriteTransaction();
         final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
         final boolean exist = checkExist(schemaContext, writeTransaction);
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
+        final URI uri = prepareUriByStreamName(streamName);
 
         registerToListenNotification(
                 notificationListenerAdapter.get(), handlersHolder.getNotificationServiceHandler());
@@ -172,13 +169,12 @@ public final class SubscribeToStreamUtil {
      * information about listener to DS according to ietf-restconf-monitoring.
      *
      * @param identifier              Identifier as stream name.
-     * @param uriInfo                 Base URI information.
      * @param notificationQueryParams Query parameters of notification.
      * @param handlersHolder          Holder of handlers for notifications.
      * @return Location for listening.
      */
     @SuppressWarnings("rawtypes")
-    public static URI subscribeToDataStream(final String identifier, final UriInfo uriInfo,
+    public static URI subscribeToDataStream(final String identifier,
             final NotificationQueryParams notificationQueryParams, final HandlersHolder handlersHolder) {
         final Map<String, String> mapOfValues = mapValuesFromUri(identifier);
         final LogicalDatastoreType datastoreType = parseURIEnum(
@@ -211,7 +207,7 @@ public final class SubscribeToStreamUtil {
         listener.get().setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
         registration(datastoreType, listener.get(), handlersHolder.getDomDataBrokerHandler().get());
 
-        final URI uri = prepareUriByStreamName(uriInfo, streamName);
+        final URI uri = prepareUriByStreamName(streamName);
         final DOMDataTreeReadWriteTransaction writeTransaction
                 = handlersHolder.getTransactionChainHandler().get().newReadWriteTransaction();
         final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
@@ -293,19 +289,8 @@ public final class SubscribeToStreamUtil {
         return result;
     }
 
-    static URI prepareUriByStreamName(final UriInfo uriInfo, final String streamName) {
-        final String scheme = uriInfo.getAbsolutePath().getScheme();
-        final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
-        switch (scheme) {
-            case RestconfStreamsConstants.SCHEMA_UPGRADE_SECURED_URI:
-                uriBuilder.scheme(RestconfStreamsConstants.SCHEMA_SUBSCRIBE_SECURED_URI);
-                break;
-            case RestconfStreamsConstants.SCHEMA_UPGRADE_URI:
-            default:
-                uriBuilder.scheme(RestconfStreamsConstants.SCHEMA_SUBSCRIBE_URI);
-        }
-        return uriBuilder.replacePath(RestconfConstants.BASE_URI_PATTERN + RestconfConstants.SLASH + streamName)
-                .build();
+    static URI prepareUriByStreamName(final String streamName) {
+        return URI.create(RestconfConstants.BASE_URI_PATTERN + RestconfConstants.SLASH + streamName);
     }
 
     /**

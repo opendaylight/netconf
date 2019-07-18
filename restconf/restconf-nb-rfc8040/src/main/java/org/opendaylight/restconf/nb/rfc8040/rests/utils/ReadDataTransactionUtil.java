@@ -289,16 +289,16 @@ public final class ReadDataTransactionUtil {
             final NotificationListenerAdapter notifiStreamJSON =
                     CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContextRef,
                             NotificationOutputType.JSON);
-            writeNotificationStreamToDatastore(schemaContextRef, uriInfo, wTx, exist, notifiStreamXML);
-            writeNotificationStreamToDatastore(schemaContextRef, uriInfo, wTx, exist, notifiStreamJSON);
+            writeNotificationStreamToDatastore(schemaContextRef, wTx, exist, notifiStreamXML);
+            writeNotificationStreamToDatastore(schemaContextRef, wTx, exist, notifiStreamJSON);
         }
         SubscribeToStreamUtil.submitData(wTx);
     }
 
     private static void writeNotificationStreamToDatastore(final SchemaContextRef schemaContextRef,
-            final UriInfo uriInfo, final DOMDataTreeReadWriteTransaction readWriteTransaction, final boolean exist,
+            final DOMDataTreeReadWriteTransaction readWriteTransaction, final boolean exist,
             final NotificationListenerAdapter listener) {
-        final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(uriInfo, listener.getStreamName());
+        final URI uri = SubscribeToStreamUtil.prepareUriByStreamName(listener.getStreamName());
         final String serializedPath = SchemaPathCodec.serialize(listener.getSchemaPath(), schemaContextRef.get());
         final NormalizedNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
                 listener.getSchemaPath().getLastComponent(), schemaContextRef.get().getNotifications(), null,

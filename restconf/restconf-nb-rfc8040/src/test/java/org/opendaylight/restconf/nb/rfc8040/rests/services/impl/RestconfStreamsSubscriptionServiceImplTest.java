@@ -166,7 +166,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
                 .subscribeToStream(
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                         this.uriInfo);
-        assertEquals("ws://localhost:8181/" + RestconfConstants.BASE_URI_PATTERN
+        assertEquals(RestconfConstants.BASE_URI_PATTERN
                 + "/data-change-event-subscription/toaster:toaster/toasterStatus/"
                 + "datastore=OPERATIONAL/scope=ONE", response.getNewHeaders().get("Location").toString());
     }
