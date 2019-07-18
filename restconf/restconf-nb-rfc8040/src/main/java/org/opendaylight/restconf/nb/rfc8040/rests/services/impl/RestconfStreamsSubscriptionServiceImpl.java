@@ -82,10 +82,10 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
         URI response = null;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
-            response = SubscribeToStreamUtil.subscribeToDataStream(identifier, uriInfo, notificationQueryParams,
+            response = SubscribeToStreamUtil.subscribeToDataStream(identifier, notificationQueryParams,
                     this.handlersHolder);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
-            response = SubscribeToStreamUtil.subscribeToYangStream(identifier, uriInfo, notificationQueryParams,
+            response = SubscribeToStreamUtil.subscribeToYangStream(identifier, notificationQueryParams,
                     this.handlersHolder);
         }
 
