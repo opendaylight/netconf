@@ -38,7 +38,7 @@
         <dependency>
             <groupId>org.opendaylight.yangtools</groupId>
             <artifactId>odl-yangtools-codec</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.4</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
