@@ -50,7 +50,6 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
-import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
@@ -72,9 +71,6 @@ public class RestconfStreamsSubscriptionServiceImplTest {
     private UriInfo uriInfo;
     @Mock
     private NotificationServiceHandler notificationServiceHandler;
-
-    private Configuration configurationWs;
-    private Configuration configurationSse;
 
     private TransactionChainHandler transactionHandler;
     private SchemaContextHandler schemaHandler;
@@ -115,12 +111,10 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         final UriBuilder baseUriBuilder = new LocalUriInfo().getBaseUriBuilder();
         when(uriInfo.getBaseUri()).thenReturn(baseUriBuilder.build());
         when(uriInfo.getBaseUriBuilder()).thenReturn(baseUriBuilder);
-        final URI uri = new URI("http://127.0.0.1/" + URI);
+        final URI uri = new URI("http://127.0.0.1:8181/" + URI);
         when(uriInfo.getAbsolutePath()).thenReturn(uri);
         this.schemaHandler.onModelContextUpdated(
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications")));
-        configurationWs = new Configuration(0, 100, 10, false);
-        configurationSse = new Configuration(0, 100, 10, true);
     }
 
     private static class LocalUriInfo extends SimpleUriInfo {
@@ -167,12 +161,12 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler, this.transactionHandler, configurationSse);
+                        this.schemaHandler, this.transactionHandler, StreamUrlResolver.serverSentEvents());
         final NormalizedNodeContext response = streamsSubscriptionService
                 .subscribeToStream(
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                         this.uriInfo);
-        assertEquals("http://localhost:8181/" + RestconfConstants.BASE_URI_PATTERN
+        assertEquals("http://127.0.0.1:8181/" + RestconfConstants.BASE_URI_PATTERN
                 + "/" + RestconfConstants.NOTIF
                 + "/data-change-event-subscription/toaster:toaster/toasterStatus/"
                 + "datastore=OPERATIONAL/scope=ONE", response.getNewHeaders().get("Location").toString());
@@ -188,12 +182,12 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler, this.transactionHandler, configurationWs);
+                        this.schemaHandler, this.transactionHandler, StreamUrlResolver.webSockets());
         final NormalizedNodeContext response = streamsSubscriptionService
                 .subscribeToStream(
                         "data-change-event-subscription/toaster:toaster/toasterStatus/datastore=OPERATIONAL/scope=ONE",
                         this.uriInfo);
-        assertEquals("ws://localhost:8181/" + RestconfConstants.BASE_URI_PATTERN
+        assertEquals("ws://127.0.0.1:8181/" + RestconfConstants.BASE_URI_PATTERN
                 + "/data-change-event-subscription/toaster:toaster/toasterStatus/"
                 + "datastore=OPERATIONAL/scope=ONE", response.getNewHeaders().get("Location").toString());
     }
@@ -204,7 +198,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler, this.transactionHandler, configurationWs);
+                        this.schemaHandler, this.transactionHandler, StreamUrlResolver.webSockets());
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/scope=ONE", this.uriInfo);
     }
 
@@ -214,9 +208,8 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(uriBuilder).when(this.uriInfo).getAbsolutePathBuilder();
         final RestconfStreamsSubscriptionServiceImpl streamsSubscriptionService =
                 new RestconfStreamsSubscriptionServiceImpl(this.dataBrokerHandler, this.notificationServiceHandler,
-                        this.schemaHandler, this.transactionHandler, configurationWs);
+                        this.schemaHandler, this.transactionHandler, StreamUrlResolver.webSockets());
         streamsSubscriptionService.subscribeToStream("toaster:toaster/toasterStatus/datastore=OPERATIONAL",
                 this.uriInfo);
     }
-
 }

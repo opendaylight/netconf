@@ -1,0 +1,40 @@
+module example-notifications {
+    yang-version 1.1;
+    namespace urn:ietf:paras:xml:ns:yang:example-notifications;
+    prefix example-notifications;
+
+    revision 2019-07-27 {
+        description
+          "Initial revision";
+    }
+
+    container example-container {
+        notification notification-under-container {
+            leaf container-status {
+                type uint16;
+            }
+            description
+              "Test description";
+        }
+
+        list sub-list {
+            key "sub-list-key";
+
+            leaf sub-list-key {
+                type string;
+            }
+
+            notification sub-notification {
+                leaf list-status {
+                    type string;
+                }
+            }
+        }
+    }
+
+    notification root-notify {
+        leaf module-status {
+            type int32;
+        }
+    }
+}

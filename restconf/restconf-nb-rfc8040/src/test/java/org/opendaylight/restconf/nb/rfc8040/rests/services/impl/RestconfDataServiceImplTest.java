@@ -67,7 +67,6 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSu
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
-import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -131,8 +130,6 @@ public class RestconfDataServiceImplTest {
     private DOMTransactionChain mountTransactionChain;
     @Mock
     private RestconfStreamsSubscriptionService delegRestconfSubscrService;
-    @Mock
-    private Configuration configuration;
 
     @Before
     public void setUp() throws Exception {
@@ -212,7 +209,7 @@ public class RestconfDataServiceImplTest {
         schemaContextHandler.onModelContextUpdated(this.contextRef);
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,
                 new DOMMountPointServiceHandler(mountPointService), this.delegRestconfSubscrService,
-                this.actionServiceHandler, configuration);
+                this.actionServiceHandler, StreamUrlResolver.webSockets());
         doReturn(Optional.of(this.mountPoint)).when(this.mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
         doCallRealMethod().when(this.mountPoint).getSchemaContext();

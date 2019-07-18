@@ -17,7 +17,6 @@ import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsCo
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH_PART;
 
-import java.net.URI;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -62,11 +61,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
-import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
-import org.opendaylight.restconf.nb.rfc8040.streams.listeners.NotificationListenerAdapter;
-import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
-import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -75,7 +70,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -100,7 +94,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
 
     private final RestconfStreamsSubscriptionService delegRestconfSubscrService;
-    private final SubscribeToStreamUtil streamUtils;
+    private final StreamUrlResolver streamUrlResolver;
 
     // FIXME: evaluate thread-safety of updates (synchronized) vs. access (mostly unsynchronized) here
     private SchemaContextHandler schemaContextHandler;
@@ -113,14 +107,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             final DOMMountPointServiceHandler mountPointServiceHandler,
             final RestconfStreamsSubscriptionService delegRestconfSubscrService,
             final ActionServiceHandler actionServiceHandler,
-            final Configuration configuration) {
+            final StreamUrlResolver streamUrlResolver) {
         this.actionServiceHandler = requireNonNull(actionServiceHandler);
         this.schemaContextHandler = requireNonNull(schemaContextHandler);
         this.transactionChainHandler = requireNonNull(transactionChainHandler);
         this.mountPointServiceHandler = requireNonNull(mountPointServiceHandler);
         this.delegRestconfSubscrService = requireNonNull(delegRestconfSubscrService);
-        streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
-                : SubscribeToStreamUtil.webSockets();
+        this.streamUrlResolver = requireNonNull(streamUrlResolver);
     }
 
     @Override
@@ -153,7 +146,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(instanceIdentifier, mountPoint);
         final NormalizedNode<?, ?> node = readData(identifier, parameters.getContent(),
-                strategy, parameters.getWithDefault(), schemaContextRef, uriInfo);
+                strategy, parameters.getWithDefault(), schemaContextRef);
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
@@ -190,49 +183,16 @@ public class RestconfDataServiceImpl implements RestconfDataService {
      * @param strategy      {@link RestconfStrategy} - object that perform the actual DS operations
      * @param withDefa      value of with-defaults parameter
      * @param schemaContext schema context
-     * @param uriInfo       uri info
      * @return {@link NormalizedNode}
      */
     private NormalizedNode<?, ?> readData(final String identifier, final String content,
-            final RestconfStrategy strategy, final String withDefa, final EffectiveModelContext schemaContext,
-            final UriInfo uriInfo) {
+            final RestconfStrategy strategy, final String withDefa, final EffectiveModelContext schemaContext) {
         if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
-            createAllYangNotificationStreams(strategy, schemaContext, uriInfo);
+            final DOMDataTreeReadWriteTransaction rwTx = Objects.requireNonNull(
+                    strategy.getTransactionChain()).newReadWriteTransaction();
+            CreateStreamUtil.createNotificationStreams(schemaContext, rwTx, streamUrlResolver);
         }
         return ReadDataTransactionUtil.readData(content, strategy, withDefa, schemaContext);
-    }
-
-    private void createAllYangNotificationStreams(final RestconfStrategy strategy,
-            final EffectiveModelContext schemaContext, final UriInfo uriInfo) {
-        final DOMDataTreeReadWriteTransaction wTx = Objects.requireNonNull(strategy.getTransactionChain())
-                .newReadWriteTransaction();
-        final boolean exist = SubscribeToStreamUtil.checkExist(schemaContext, wTx);
-
-        for (final NotificationDefinition notificationDefinition : schemaContext.getNotifications()) {
-            final NotificationListenerAdapter notifiStreamXML =
-                    CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
-                            NotificationOutputType.XML);
-            final NotificationListenerAdapter notifiStreamJSON =
-                    CreateStreamUtil.createYangNotifiStream(notificationDefinition, schemaContext,
-                            NotificationOutputType.JSON);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, wTx, exist, notifiStreamXML);
-            writeNotificationStreamToDatastore(schemaContext, uriInfo, wTx, exist, notifiStreamJSON);
-        }
-        SubscribeToStreamUtil.submitData(wTx);
-    }
-
-    private void writeNotificationStreamToDatastore(final EffectiveModelContext schemaContext,
-            final UriInfo uriInfo, final DOMDataTreeReadWriteTransaction readWriteTransaction, final boolean exist,
-            final NotificationListenerAdapter listener) {
-        final URI uri = streamUtils.prepareUriByStreamName(uriInfo, listener.getStreamName());
-        final String serializedPath = CreateStreamUtil.serializeAndNormalizeSchemaPath(
-                listener.getSchemaPath(), schemaContext);
-        final NormalizedNode<?, ?> mapToStreams
-                = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-                    listener.getSchemaPath().getLastComponent(), schemaContext.getNotifications(), null,
-                    listener.getOutputType(), uri, SubscribeToStreamUtil.getMonitoringModule(schemaContext),
-                    exist, serializedPath);
-        SubscribeToStreamUtil.writeDataToDS(schemaContext, serializedPath, readWriteTransaction, exist, mapToStreams);
     }
 
     @Override

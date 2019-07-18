@@ -30,6 +30,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.TransactionServic
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfDataServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfInvokeOperationsServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.RestconfStreamsSubscriptionServiceImpl;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.StreamUrlResolver;
 import org.opendaylight.restconf.nb.rfc8040.services.simple.api.BaseServicesWrapper;
 import org.opendaylight.restconf.nb.rfc8040.services.simple.api.RestconfOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.services.simple.api.RestconfSchemaService;
@@ -81,13 +82,15 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
             .getInstance(DOMYangTextSourceProvider.class);
         RestconfSchemaService restconfSchemaService = new RestconfSchemaServiceImpl(schemaCtxHandler,
             domMountPointServiceHandler, yangTextSourceProvider);
+        StreamUrlResolver streamUrlResolver = configuration.isUseSSE() ? StreamUrlResolver.serverSentEvents()
+                : StreamUrlResolver.webSockets();
         RestconfStreamsSubscriptionService restconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(
             domDataBrokerHandler, notificationServiceHandler, schemaCtxHandler, transactionChainHandler,
-            configuration);
+            streamUrlResolver);
         RestconfDataService restconfDataService = new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler,
-            domMountPointServiceHandler, restconfSubscrService, actionServiceHandler, configuration);
+            domMountPointServiceHandler, restconfSubscrService, actionServiceHandler, streamUrlResolver);
         RestconfInvokeOperationsService restconfInvokeOpsService = new RestconfInvokeOperationsServiceImpl(
-            rpcServiceHandler, schemaCtxHandler);
+            rpcServiceHandler, schemaCtxHandler, transactionChainHandler, streamUrlResolver);
         RestconfService restconfService = new RestconfImpl(schemaCtxHandler);
         return new ServicesWrapper(restconfDataService, restconfInvokeOpsService, restconfSubscrService,
             restconfOpsService, restconfSchemaService, restconfService);

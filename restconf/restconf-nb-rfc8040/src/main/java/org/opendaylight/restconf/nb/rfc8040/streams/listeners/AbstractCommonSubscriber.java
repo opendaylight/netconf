@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Features of subscribing part of both notifications.
  */
-abstract class AbstractCommonSubscriber extends AbstractQueryParams implements BaseListenerInterface {
+public abstract class AbstractCommonSubscriber extends AbstractQueryParams implements BaseListenerInterface {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCommonSubscriber.class);
 
