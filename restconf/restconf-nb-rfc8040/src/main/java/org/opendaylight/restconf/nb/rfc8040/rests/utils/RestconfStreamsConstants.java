@@ -25,11 +25,9 @@ public final class RestconfStreamsConstants {
     public static final QNameModule SUBSCRIBE_TO_NOTIFICATION = QNameModule.create(
             URI.create("subscribe:to:notification"),
             Revision.of("2016-10-28"));
-
-    public static final QName SAL_REMOTE_NAMESPACE = QName.create(
-            "urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote",
-            "2014-01-14",
-            "sal-remote");
+    public static final QNameModule SAL_REMOTE_MODULE = QNameModule.create(
+            URI.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote"),
+            Revision.of("2014-01-14"));
 
     public static final String STREAM_PATH_PARAM_NAME = "path";
     public static final String DATASTORE_PARAM_NAME = "datastore";
@@ -60,6 +58,8 @@ public final class RestconfStreamsConstants {
 
     public static final String DATA_CHANGE_EVENT_STREAM_PATTERN = '/' + DATA_SUBSCRIPTION + "/*";
     public static final String YANG_NOTIFICATION_STREAM_PATTERN = '/' + NOTIFICATION_STREAM + "/*";
+
+    public static final QName CREATE_DATA_CHANGE_EVENT_STREAM_NAME = QName.create(SAL_REMOTE_MODULE, "stream-name");
 
     private RestconfStreamsConstants() {
         throw new UnsupportedOperationException("Util class.");

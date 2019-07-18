@@ -55,6 +55,9 @@ public class RestconfInvokeOperationsServiceImplTest {
     @Mock
     private DOMRpcService rpcService;
 
+    @Mock
+    private TransactionChainHandler transactionChainHandler;
+
     @Before
     public void setup() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -69,8 +72,8 @@ public class RestconfInvokeOperationsServiceImplTest {
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler,
             mock(DOMSchemaService.class));
         schemaContextHandler.onModelContextUpdated(contextRef);
-        this.invokeOperationsService =
-                new RestconfInvokeOperationsServiceImpl(this.rpcServiceHandler, schemaContextHandler);
+        this.invokeOperationsService = new RestconfInvokeOperationsServiceImpl(this.rpcServiceHandler,
+                schemaContextHandler, transactionChainHandler, StreamUrlResolver.webSockets());
         when(this.rpcServiceHandler.get()).thenReturn(this.rpcService);
     }
 

@@ -21,6 +21,7 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
+import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfInvokeOperationsService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
@@ -37,13 +38,19 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 @Path("/")
 public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperationsService {
 
+    private final StreamUrlResolver streamUrlResolver;
+
     private volatile RpcServiceHandler rpcServiceHandler;
     private volatile SchemaContextHandler schemaContextHandler;
+    private volatile TransactionChainHandler transactionChainHandler;
 
     public RestconfInvokeOperationsServiceImpl(final RpcServiceHandler rpcServiceHandler,
-            final SchemaContextHandler schemaContextHandler) {
+            final SchemaContextHandler schemaContextHandler, final TransactionChainHandler transactionChainHandler,
+            final StreamUrlResolver streamUrlResolver) {
         this.rpcServiceHandler = rpcServiceHandler;
         this.schemaContextHandler = schemaContextHandler;
+        this.transactionChainHandler = transactionChainHandler;
+        this.streamUrlResolver = streamUrlResolver;
     }
 
     @Override
@@ -53,6 +60,8 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
                 schemaContextHandler = (SchemaContextHandler) object;
             } else if (object instanceof RpcServiceHandler) {
                 rpcServiceHandler = (RpcServiceHandler) object;
+            } else if (object instanceof TransactionChainHandler) {
+                transactionChainHandler = (TransactionChainHandler) object;
             }
         }
     }
@@ -68,9 +77,10 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
         final DOMRpcResult response;
         final EffectiveModelContext schemaContextRef;
         if (mountPoint == null) {
-            if (namespace.equals(RestconfStreamsConstants.SAL_REMOTE_NAMESPACE.getNamespace())) {
+            if (namespace.equals(RestconfStreamsConstants.SAL_REMOTE_MODULE.getNamespace())) {
                 if (identifier.contains(RestconfStreamsConstants.CREATE_DATA_SUBSCRIPTION)) {
-                    response = CreateStreamUtil.createDataChangeNotifiStream(payload, refSchemaCtx);
+                    response = CreateStreamUtil.createDataChangeNotifiStream(payload, refSchemaCtx,
+                            transactionChainHandler, streamUrlResolver);
                 } else {
                     throw new RestconfDocumentedException("Not supported operation", ErrorType.RPC,
                             ErrorTag.OPERATION_NOT_SUPPORTED);

@@ -7,6 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import java.net.URI;
 import java.time.Instant;
@@ -36,7 +37,6 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
-import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
 public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSubscriptionService {
     private static final Logger LOG = LoggerFactory.getLogger(RestconfStreamsSubscriptionServiceImpl.class);
 
-    private final SubscribeToStreamUtil streamUtils;
+    private final StreamUrlResolver streamUrlResolver;
 
     private HandlersHolder handlersHolder;
 
@@ -74,16 +74,15 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
      *             handler of {@link SchemaContext}
      * @param transactionChainHandler
      *             handler of {@link DOMTransactionChain}
-     * @param configuration
-     *             configuration for restconf {@link Configuration}}
+     * @param streamUrlResolver
+     *             stream URL resolver
      */
     public RestconfStreamsSubscriptionServiceImpl(final DOMDataBrokerHandler domDataBrokerHandler,
             final NotificationServiceHandler notificationServiceHandler, final SchemaContextHandler schemaHandler,
-            final TransactionChainHandler transactionChainHandler, final Configuration configuration) {
+            final TransactionChainHandler transactionChainHandler, final StreamUrlResolver streamUrlResolver) {
         this.handlersHolder = new HandlersHolder(domDataBrokerHandler, notificationServiceHandler,
                 transactionChainHandler, schemaHandler);
-        streamUtils = configuration.isUseSSE() ? SubscribeToStreamUtil.serverSentEvents()
-                : SubscribeToStreamUtil.webSockets();
+        this.streamUrlResolver = streamUrlResolver;
     }
 
     @Override
@@ -101,11 +100,11 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
 
         final URI response;
         if (identifier.contains(RestconfStreamsConstants.DATA_SUBSCRIPTION)) {
-            response = streamUtils.subscribeToDataStream(identifier, uriInfo, notificationQueryParams,
-                    this.handlersHolder);
+            response = SubscribeToStreamUtil.subscribeToDataStream(identifier, notificationQueryParams,
+                    this.handlersHolder, streamUrlResolver, uriInfo);
         } else if (identifier.contains(RestconfStreamsConstants.NOTIFICATION_STREAM)) {
-            response = streamUtils.subscribeToYangStream(identifier, uriInfo, notificationQueryParams,
-                    this.handlersHolder);
+            response = SubscribeToStreamUtil.subscribeToYangStream(identifier, notificationQueryParams,
+                    this.handlersHolder, streamUrlResolver, uriInfo);
         } else {
             final String msg = "Bad type of notification of sal-remote";
             LOG.warn(msg);
@@ -159,7 +158,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         private final TransactionChainHandler transactionChainHandler;
         private final SchemaContextHandler schemaHandler;
 
-        private HandlersHolder(final DOMDataBrokerHandler domDataBrokerHandler,
+        @VisibleForTesting
+        public HandlersHolder(final DOMDataBrokerHandler domDataBrokerHandler,
                 final NotificationServiceHandler notificationServiceHandler,
                 final TransactionChainHandler transactionChainHandler, final SchemaContextHandler schemaHandler) {
             this.domDataBrokerHandler = domDataBrokerHandler;
