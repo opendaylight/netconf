@@ -19,9 +19,9 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.JSONRestconfServiceRfc8040Impl;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.StreamUrlResolver;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesNotifWrapper;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
-import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.streams.sse.SSEInitializer;
 import org.opendaylight.restconf.nb.rfc8040.web.WebInitializer;
@@ -50,12 +50,12 @@ public class Rfc8040RestConfWiring {
             final ActionServiceHandler actionServiceHandler,
             final NotificationServiceHandler notificationServiceHandler,
             final SSEInitializer sseInit,
-            final Configuration configuration,
+            final StreamUrlResolver streamUrlResolver,
             @Reference final DOMSchemaService domSchemaService,
             final ListenersBroker listenersBroker) {
         servicesWrapper = ServicesWrapper.newInstance(schemaCtxHandler, domMountPointServiceHandler,
             transactionChainHandler, domDataBrokerHandler, rpcServiceHandler, actionServiceHandler,
-            notificationServiceHandler, domSchemaService, configuration, listenersBroker);
+            notificationServiceHandler, domSchemaService, streamUrlResolver, listenersBroker);
         servicesNotifWrapper = ServicesNotifWrapper.newInstance(sseInit, listenersBroker);
     }
 

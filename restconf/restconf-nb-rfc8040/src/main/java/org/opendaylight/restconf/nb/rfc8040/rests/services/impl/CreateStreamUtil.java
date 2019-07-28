@@ -9,7 +9,6 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import java.net.URI;
 import java.util.AbstractMap.SimpleEntry;
@@ -68,11 +67,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Utility class for creation of data-change-event or YANG notification streams.
  */
-final class CreateStreamUtil {
+public final class CreateStreamUtil {
     private static final Logger LOG = LoggerFactory.getLogger(CreateStreamUtil.class);
 
-    @VisibleForTesting
-    static final YangInstanceIdentifier STREAMS_YIID = YangInstanceIdentifier.builder()
+    public static final YangInstanceIdentifier STREAMS_YIID = YangInstanceIdentifier.builder()
             .node(MonitoringModule.CONT_RESTCONF_STATE_QNAME)
             .node(MonitoringModule.CONT_STREAMS_QNAME)
             .build();
@@ -278,8 +276,9 @@ final class CreateStreamUtil {
      * @param transaction          Transaction used for reading of existing notification streams.
      * @param streamUrlResolver    Stream URL resolver.
      * @param listenersBroker      Stream listeners register.
+     * @return Prepared streams {@link ContainerNode}.
      */
-    static void createNotificationStreams(final EffectiveModelContext updatedSchemaContext,
+    public static ContainerNode createNotificationStreams(final EffectiveModelContext updatedSchemaContext,
             final DOMDataTreeReadWriteTransaction transaction, final StreamUrlResolver streamUrlResolver,
             final ListenersBroker listenersBroker) {
         final Set<String> existingNotificationStreams = getExistingNotificationStreams(transaction);
@@ -291,9 +290,7 @@ final class CreateStreamUtil {
                 .map(notificationDefinition -> getMonitoringData(updatedSchemaContext,
                         notificationDefinition, streamUrlResolver, listenersBroker))
                 .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
-        final ContainerNode streamsContainer = RestconfMappingNodeUtil.mapNotificationStreams(
-                updatedSchemaContext, streamData);
-        transaction.merge(LogicalDatastoreType.OPERATIONAL, STREAMS_YIID, streamsContainer);
+        return RestconfMappingNodeUtil.mapNotificationStreams(updatedSchemaContext, streamData);
     }
 
     /**

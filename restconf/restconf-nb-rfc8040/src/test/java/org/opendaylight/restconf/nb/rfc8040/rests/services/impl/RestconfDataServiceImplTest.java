@@ -68,6 +68,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.MdsalRestconfStra
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.NetconfRestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.RestconfStrategy;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -205,7 +206,9 @@ public class RestconfDataServiceImplTest {
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
 
         final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(transactionChainHandler,
-                Mockito.mock(DOMSchemaService.class));
+                Mockito.mock(DOMSchemaService.class), new ListenersBroker(), StreamUrlResolver.webSockets());
+        doReturn(FluentFutures.immediateFluentFuture(Optional.empty()))
+                .when(this.readWrite).read(LogicalDatastoreType.OPERATIONAL, CreateStreamUtil.STREAMS_YIID);
 
         schemaContextHandler.onModelContextUpdated(this.contextRef);
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,

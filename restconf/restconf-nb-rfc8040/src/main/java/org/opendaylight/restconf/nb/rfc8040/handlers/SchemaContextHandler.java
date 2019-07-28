@@ -7,8 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.base.Throwables;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
@@ -18,19 +16,24 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.aries.blueprint.annotation.service.Reference;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.CreateStreamUtil;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.StreamUrlResolver;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.ConflictingModificationAppliedException;
@@ -45,25 +48,36 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class SchemaContextHandler implements SchemaContextListenerHandler, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(SchemaContextHandler.class);
+    public static final YangInstanceIdentifier CAPABILITIES_YIID = YangInstanceIdentifier.builder()
+            .node(MonitoringModule.CONT_RESTCONF_STATE_QNAME)
+            .node(MonitoringModule.CONT_CAPABILITES_QNAME)
+            .build();
 
     private final AtomicInteger moduleSetId = new AtomicInteger(0);
-
     private final TransactionChainHandler transactionChainHandler;
     private final DOMSchemaService domSchemaService;
-    private ListenerRegistration<?> listenerRegistration;
+    private final ListenersBroker listenersBroker;
+    private final StreamUrlResolver streamUrlResolver;
 
+    private ListenerRegistration<?> listenerRegistration;
     private volatile EffectiveModelContext schemaContext;
 
     /**
      * Constructor.
      *
      * @param transactionChainHandler Transaction chain handler
+     * @param domSchemaService        Schema context provider.
+     * @param listenersBroker         Stream listeners register.
+     * @param streamUrlResolver       Stream URL resolver.
      */
     @Inject
     public SchemaContextHandler(final TransactionChainHandler transactionChainHandler,
-            final @Reference DOMSchemaService domSchemaService) {
+            final @Reference DOMSchemaService domSchemaService, final ListenersBroker listenersBroker,
+            final StreamUrlResolver streamUrlResolver) {
         this.transactionChainHandler = transactionChainHandler;
         this.domSchemaService = domSchemaService;
+        this.listenersBroker = listenersBroker;
+        this.streamUrlResolver = streamUrlResolver;
     }
 
     @PostConstruct
@@ -80,24 +94,32 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
     }
 
     @Override
-    public void onModelContextUpdated(final EffectiveModelContext context) {
-        schemaContext = requireNonNull(context);
+    public void onModelContextUpdated(@NonNull final EffectiveModelContext context) {
+        schemaContext = context;
 
-        final Module ietfYangLibraryModule =
-                context.findModule(IetfYangLibrary.MODULE_QNAME).orElse(null);
-        if (ietfYangLibraryModule != null) {
-            NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
-                    RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(context.getModules(), ietfYangLibraryModule,
-                            context, String.valueOf(this.moduleSetId.incrementAndGet()));
-            putData(normNode);
-        }
+        try (DOMTransactionChain transactionChain = this.transactionChainHandler.get()) {
+            final DOMDataTreeReadWriteTransaction rwTx = transactionChain.newReadWriteTransaction();
 
-        final Module monitoringModule =
-                schemaContext.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
-        if (monitoringModule != null) {
-            NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
-                    RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
-            putData(normNode);
+            final Module ietfYangLibraryModule = context.findModule(IetfYangLibrary.MODULE_QNAME).orElse(null);
+            if (ietfYangLibraryModule != null) {
+                NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode
+                        = RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(context.getModules(),
+                        ietfYangLibraryModule, context, String.valueOf(this.moduleSetId.incrementAndGet()));
+                rwTx.put(LogicalDatastoreType.OPERATIONAL,
+                        YangInstanceIdentifier.create(NodeIdentifier.create(normNode.getNodeType())), normNode);
+            }
+
+            final Module monitoringModule = schemaContext.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
+            if (monitoringModule != null) {
+                ContainerNode streams = CreateStreamUtil.createNotificationStreams(schemaContext, rwTx,
+                        streamUrlResolver, listenersBroker);
+                rwTx.merge(LogicalDatastoreType.OPERATIONAL, CreateStreamUtil.STREAMS_YIID, streams);
+
+                NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode
+                        = RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
+                rwTx.put(LogicalDatastoreType.OPERATIONAL, CAPABILITIES_YIID, normNode);
+            }
+            commitData(rwTx);
         }
     }
 
@@ -106,14 +128,9 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
         return schemaContext;
     }
 
-    private void putData(
-            final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode) {
-        final DOMTransactionChain transactionChain = this.transactionChainHandler.get();
-        final DOMDataTreeWriteTransaction wTx = transactionChain.newWriteOnlyTransaction();
-        wTx.put(LogicalDatastoreType.OPERATIONAL,
-                YangInstanceIdentifier.create(NodeIdentifier.create(normNode.getNodeType())), normNode);
+    private void commitData(final DOMDataTreeReadWriteTransaction rwTx) {
         try {
-            wTx.commit().get();
+            rwTx.commit().get();
         } catch (InterruptedException e) {
             throw new RestconfDocumentedException("Problem occurred while putting data to DS.", e);
         } catch (ExecutionException e) {
@@ -131,8 +148,6 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
             } else {
                 throw new RestconfDocumentedException("Problem occurred while putting data to DS.", failure);
             }
-        } finally {
-            transactionChain.close();
         }
     }
 }

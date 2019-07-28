@@ -38,7 +38,6 @@ import org.opendaylight.restconf.nb.rfc8040.services.simple.api.RestconfService;
 import org.opendaylight.restconf.nb.rfc8040.services.simple.impl.RestconfImpl;
 import org.opendaylight.restconf.nb.rfc8040.services.simple.impl.RestconfOperationsServiceImpl;
 import org.opendaylight.restconf.nb.rfc8040.services.simple.impl.RestconfSchemaServiceImpl;
-import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 
 /**
@@ -76,15 +75,13 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
             final TransactionChainHandler transactionChainHandler, final DOMDataBrokerHandler domDataBrokerHandler,
             final RpcServiceHandler rpcServiceHandler, final ActionServiceHandler actionServiceHandler,
             final NotificationServiceHandler notificationServiceHandler, final DOMSchemaService domSchemaService,
-            final Configuration configuration, final ListenersBroker listenersBroker) {
+            final StreamUrlResolver streamUrlResolver, final ListenersBroker listenersBroker) {
         RestconfOperationsService restconfOpsService = new RestconfOperationsServiceImpl(schemaCtxHandler,
             domMountPointServiceHandler);
         final DOMYangTextSourceProvider yangTextSourceProvider = domSchemaService.getExtensions()
             .getInstance(DOMYangTextSourceProvider.class);
         RestconfSchemaService restconfSchemaService = new RestconfSchemaServiceImpl(schemaCtxHandler,
             domMountPointServiceHandler, yangTextSourceProvider);
-        StreamUrlResolver streamUrlResolver = configuration.isUseSSE() ? StreamUrlResolver.serverSentEvents()
-                : StreamUrlResolver.webSockets();
         RestconfStreamsSubscriptionService restconfSubscrService = new RestconfStreamsSubscriptionServiceImpl(
             domDataBrokerHandler, notificationServiceHandler, schemaCtxHandler, transactionChainHandler,
             streamUrlResolver, listenersBroker);

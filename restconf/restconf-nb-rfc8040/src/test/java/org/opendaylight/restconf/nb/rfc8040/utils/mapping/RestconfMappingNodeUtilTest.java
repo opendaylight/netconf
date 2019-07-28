@@ -107,13 +107,11 @@ public class RestconfMappingNodeUtilTest {
         assertNotNull(normNode);
         final List<Object> listOfValues = new ArrayList<>();
 
-        for (final DataContainerChild<? extends PathArgument, ?> child : normNode.getValue()) {
-            if (child.getNodeType().equals(MonitoringModule.CONT_CAPABILITES_QNAME)) {
-                for (final DataContainerChild<? extends PathArgument, ?> dataContainerChild : ((ContainerNode) child)
-                        .getValue()) {
-                    for (final Object entry : ((LeafSetNode<?>) dataContainerChild).getValue()) {
-                        listOfValues.add(((LeafSetEntryNode<?>) entry).getValue());
-                    }
+        if (normNode.getNodeType().equals(MonitoringModule.CONT_CAPABILITES_QNAME)) {
+            for (final DataContainerChild<? extends PathArgument, ?> dataContainerChild
+                    : ((ContainerNode) normNode).getValue()) {
+                for (final Object entry : ((LeafSetNode<?>) dataContainerChild).getValue()) {
+                    listOfValues.add(((LeafSetEntryNode<?>) entry).getValue());
                 }
             }
         }

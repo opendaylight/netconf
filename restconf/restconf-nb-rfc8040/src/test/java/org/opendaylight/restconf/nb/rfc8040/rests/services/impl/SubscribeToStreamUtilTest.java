@@ -37,11 +37,11 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.util.SimpleUriInfo;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
+import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMDataBrokerHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.NotificationServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
@@ -98,23 +98,14 @@ public class SubscribeToStreamUtilTest {
 
     @Before
     public void setupHandlersHolder() {
-        final DOMSchemaService domSchemaService = mock(DOMSchemaService.class);
         final TransactionChainHandler transactionChainHandler = new TransactionChainHandler(domDataBroker);
-        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(
-                transactionChainHandler, domSchemaService);
+        final SchemaContextHandler schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
         final NotificationServiceHandler notificationHandler = new NotificationServiceHandler(domNotificationService);
-        final DOMTransactionChain transactionChain = mock(DOMTransactionChain.class);
-        final DOMDataTreeWriteTransaction woTransaction = mock(DOMDataTreeWriteTransaction.class);
         final DOMDataBrokerHandler domDataBrokerHandler = new DOMDataBrokerHandler(domDataBroker);
         handlersHolder = new HandlersHolder(domDataBrokerHandler, notificationHandler,
                 transactionChainHandler, schemaContextHandler);
-
-        when(transactionChain.newWriteOnlyTransaction()).thenReturn(woTransaction);
-        when(domDataBroker.createTransactionChain(any())).thenReturn(transactionChain);
         when(domDataBroker.getExtensions()).thenReturn(ImmutableClassToInstanceMap.of(
                 DOMDataTreeChangeService.class, domDataTreeChangeService));
-        when(woTransaction.commit()).thenReturn(FluentFutures.immediateNullFluentFuture());
-        schemaContextHandler.onModelContextUpdated(schemaContext);
     }
 
     @Test

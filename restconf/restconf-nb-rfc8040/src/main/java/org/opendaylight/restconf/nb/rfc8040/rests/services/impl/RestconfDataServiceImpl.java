@@ -11,18 +11,15 @@ import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.INSERT;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.POINT;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.NOTIFICATION_STREAM;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAMS_PATH;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_ACCESS_PATH_PART;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_LOCATION_PATH_PART;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH_PART;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Optional;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
@@ -32,7 +29,6 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.dom.api.NetconfDataTreeService;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
@@ -148,8 +144,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final RestconfStrategy strategy = getRestconfStrategy(instanceIdentifier, mountPoint);
-        final NormalizedNode<?, ?> node = readData(identifier, parameters.getContent(),
-                strategy, parameters.getWithDefault(), schemaContextRef);
+        final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(parameters.getContent(), strategy,
+                parameters.getWithDefault(), schemaContextRef);
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
@@ -175,27 +171,6 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
 
         return Response.status(200).entity(new NormalizedNodeContext(instanceIdentifier, node, parameters)).build();
-    }
-
-    /**
-     * Read specific type of data from data store via transaction and if identifier read data from
-     * streams then put streams from actual schema context to datastore.
-     *
-     * @param identifier    identifier of data to read
-     * @param content       type of data to read (config, state, all)
-     * @param strategy      {@link RestconfStrategy} - object that perform the actual DS operations
-     * @param withDefa      value of with-defaults parameter
-     * @param schemaContext schema context
-     * @return {@link NormalizedNode}
-     */
-    private NormalizedNode<?, ?> readData(final String identifier, final String content,
-            final RestconfStrategy strategy, final String withDefa, final EffectiveModelContext schemaContext) {
-        if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
-            final DOMDataTreeReadWriteTransaction rwTx = Objects.requireNonNull(
-                    strategy.getTransactionChain()).newReadWriteTransaction();
-            CreateStreamUtil.createNotificationStreams(schemaContext, rwTx, streamUrlResolver, listenersBroker);
-        }
-        return ReadDataTransactionUtil.readData(content, strategy, withDefa, schemaContext);
     }
 
     @Override

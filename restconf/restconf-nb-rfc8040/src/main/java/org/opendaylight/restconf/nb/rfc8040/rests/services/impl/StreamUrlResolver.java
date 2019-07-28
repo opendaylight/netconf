@@ -7,15 +7,28 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
+import org.opendaylight.restconf.nb.rfc8040.streams.Configuration;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 
 public abstract class StreamUrlResolver {
 
     private StreamUrlResolver() {
+    }
+
+    /**
+     * Factory method - creation of corresponding {@link StreamUrlResolver} based on provided {@link Configuration}
+     * - SSE or Websockets URL resolver.
+     *
+     * @param configuration Websocket configuration.
+     * @return Instance of {@link StreamUrlResolver}.
+     */
+    public static StreamUrlResolver getInstance(final Configuration configuration) {
+        return configuration.isUseSSE() ? serverSentEvents() : webSockets();
     }
 
     /**
@@ -99,10 +112,12 @@ public abstract class StreamUrlResolver {
         }
     }
 
+    @VisibleForTesting
     public static StreamUrlResolver serverSentEvents() {
         return ServerSentEvents.INSTANCE;
     }
 
+    @VisibleForTesting
     public static StreamUrlResolver webSockets() {
         return WebSockets.INSTANCE;
     }

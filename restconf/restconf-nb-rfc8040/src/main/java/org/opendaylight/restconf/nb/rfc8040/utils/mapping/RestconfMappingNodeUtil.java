@@ -393,8 +393,6 @@ public final class RestconfMappingNodeUtil {
             mapCapabilites(final Module monitoringModule) {
         final DataSchemaNode restconfState =
                 monitoringModule.getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME);
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> restStateContBuilder =
-                Builders.containerBuilder((ContainerSchemaNode) restconfState);
         final DataSchemaNode capabilitesContSchema =
                 getChildOfCont((ContainerSchemaNode) restconfState, MonitoringModule.CONT_CAPABILITES_QNAME);
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> capabilitesContBuilder =
@@ -405,8 +403,7 @@ public final class RestconfMappingNodeUtil {
                 Builders.orderedLeafSetBuilder((LeafListSchemaNode) leafListCapa);
         fillLeafListCapa(leafListCapaBuilder, (LeafListSchemaNode) leafListCapa);
 
-        return restStateContBuilder.withChild(capabilitesContBuilder.withChild(leafListCapaBuilder.build()).build())
-                .build();
+        return capabilitesContBuilder.withChild(leafListCapaBuilder.build()).build();
     }
 
     /**
