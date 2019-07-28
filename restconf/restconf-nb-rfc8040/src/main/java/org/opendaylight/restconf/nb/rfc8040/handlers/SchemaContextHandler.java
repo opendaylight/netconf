@@ -19,11 +19,13 @@ import javax.inject.Singleton;
 import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.CreateStreamUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -32,7 +34,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.ConflictingModificationAppliedException;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.slf4j.Logger;
@@ -91,23 +92,25 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
     public void onGlobalContextUpdated(final SchemaContext context) {
         Preconditions.checkNotNull(context);
         schemaContext = context;
+        final DOMDataTreeReadWriteTransaction rwTransaction = transactionChainHandler.get().newReadWriteTransaction();
 
-        final Module ietfYangLibraryModule =
-                context.findModule(IetfYangLibrary.MODULE_QNAME).orElse(null);
-        if (ietfYangLibraryModule != null) {
-            NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
-                    RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(context.getModules(), ietfYangLibraryModule,
+        context.findModule(IetfYangLibrary.MODULE_QNAME).ifPresent(module -> {
+            final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
+                    RestconfMappingNodeUtil.mapModulesByIetfYangLibraryYang(context.getModules(), module,
                             context, String.valueOf(this.moduleSetId.incrementAndGet()));
-            putData(normNode);
-        }
+            rwTransaction.put(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.create(
+                    NodeIdentifier.create(normNode.getNodeType())), normNode);
+        });
 
-        final Module monitoringModule =
-                schemaContext.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
-        if (monitoringModule != null) {
-            NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
-                    RestconfMappingNodeUtil.mapCapabilites(monitoringModule);
-            putData(normNode);
-        }
+        schemaContext.findModule(MonitoringModule.MODULE_QNAME).ifPresent(module -> {
+            final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode =
+                    RestconfMappingNodeUtil.mapCapabilites(module);
+            rwTransaction.put(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.create(
+                    NodeIdentifier.create(normNode.getNodeType())), normNode);
+            CreateStreamUtil.createYangNotifiStreams(schemaContext, rwTransaction);
+        });
+
+        commitTransaction(rwTransaction);
     }
 
     @Override
@@ -115,18 +118,14 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
         return schemaContext;
     }
 
-    private void putData(
-            final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode) {
-        final DOMDataTreeWriteTransaction wTx = this.transactionChainHandler.get().newWriteOnlyTransaction();
-        wTx.put(LogicalDatastoreType.OPERATIONAL,
-                YangInstanceIdentifier.create(NodeIdentifier.create(normNode.getNodeType())), normNode);
+    private void commitTransaction(final DOMDataTreeWriteTransaction transaction) {
         try {
-            wTx.commit().get();
+            transaction.commit().get();
         } catch (InterruptedException e) {
             throw new RestconfDocumentedException("Problem occurred while putting data to DS.", e);
         } catch (ExecutionException e) {
             final TransactionCommitFailedException failure = Throwables.getCauseAs(e,
-                TransactionCommitFailedException.class);
+                    TransactionCommitFailedException.class);
             if (failure.getCause() instanceof ConflictingModificationAppliedException) {
                 /*
                  * Ignore error when another cluster node is already putting the same data to DS.

@@ -86,7 +86,7 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
                 new RestconfDataServiceImpl(schemaCtxHandler, transactionChainHandler, domMountPointServiceHandler,
                         restconfSubscrService);
         RestconfInvokeOperationsService restconfInvokeOpsService =
-                new RestconfInvokeOperationsServiceImpl(rpcServiceHandler, schemaCtxHandler);
+                new RestconfInvokeOperationsServiceImpl(rpcServiceHandler, schemaCtxHandler, transactionChainHandler);
         RestconfService restconfService = new RestconfImpl(schemaCtxHandler);
         return new ServicesWrapper(restconfDataService, restconfInvokeOpsService,
                 restconfSubscrService, restconfOpsService, restconfSchemaService, restconfService);

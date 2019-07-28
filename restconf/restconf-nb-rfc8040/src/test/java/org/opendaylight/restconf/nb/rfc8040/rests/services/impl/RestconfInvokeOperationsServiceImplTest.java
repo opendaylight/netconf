@@ -70,7 +70,7 @@ public class RestconfInvokeOperationsServiceImplTest {
             mock(DOMSchemaService.class));
         schemaContextHandler.onGlobalContextUpdated(contextRef.get());
         this.invokeOperationsService =
-                new RestconfInvokeOperationsServiceImpl(this.rpcServiceHandler, schemaContextHandler);
+                new RestconfInvokeOperationsServiceImpl(this.rpcServiceHandler, schemaContextHandler, txHandler);
         when(this.rpcServiceHandler.get()).thenReturn(this.rpcService);
     }
 
