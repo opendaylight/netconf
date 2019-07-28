@@ -11,17 +11,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import java.net.URI;
 import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -35,8 +39,12 @@ import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.RestconfModule;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.utils.mapping.RestconfMappingNodeUtil.StreamAccessMonitoringData;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.SchemaPathCodec;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -52,7 +60,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +73,9 @@ import org.slf4j.LoggerFactory;
 public class RestconfMappingNodeUtilTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfMappingNodeUtilTest.class);
+
+    private static final QNameModule MODULE_EXAMPLE_NOTIFICATIONS = QNameModule.create(
+            URI.create("urn:ietf:paras:xml:ns:yang:example-notifications"), Revision.of("2019-07-27"));
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -146,67 +159,121 @@ public class RestconfMappingNodeUtilTest {
     }
 
     @Test
-    public void toStreamEntryNodeTest() throws Exception {
-        final YangInstanceIdentifier path = ParserIdentifier.toInstanceIdentifier(
-                "nested-module:depth1-cont/depth2-leaf1", schemaContextMonitoring, null).getInstanceIdentifier();
-        final Instant start = Instant.now();
-        final String outputType = "XML";
-        final URI uri = new URI("uri");
-        final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
-        final boolean exist = true;
-        final String streamName = "/nested-module:depth1-cont/depth2-leaf1";
+    public void mapNotificationStreamsTest() {
+        // preparation of input data and expected data
+        final List<List<QName>> notificationsSchemaPaths = Lists.newArrayList(
+                Lists.newArrayList(QName.create(MODULE_EXAMPLE_NOTIFICATIONS, "root-notify")),
+                Lists.newArrayList(
+                        QName.create(MODULE_EXAMPLE_NOTIFICATIONS, "example-container"),
+                        QName.create(MODULE_EXAMPLE_NOTIFICATIONS, "notification-under-container")),
+                Lists.newArrayList(
+                        QName.create(MODULE_EXAMPLE_NOTIFICATIONS, "example-container"),
+                        QName.create(MODULE_EXAMPLE_NOTIFICATIONS, "sub-list"),
+                        QName.create(MODULE_EXAMPLE_NOTIFICATIONS, "sub-notification")));
+        final Map<NotificationDefinition, List<StreamAccessMonitoringData>> notificationDefinitionMap
+                = generateNotificationDefinitions(notificationsSchemaPaths);
+        final Set<StreamEntry> expectedStreamEntries = Sets.newHashSet(
+                new StreamEntry("/example-notifications:root-notify", null, false, 2, true),
+                new StreamEntry("/example-notifications:example-container/notification-under-container",
+                        "Test description", false, 2, true),
+                new StreamEntry("/example-notifications:example-container/sub-list/sub-notification",
+                        null, false, 2, true));
 
-        final Map<QName, Object> map =
-                prepareMap(streamName, uri, start, outputType);
-
-        final NormalizedNode<?, ?> mappedData =
-                RestconfMappingNodeUtil.mapDataChangeNotificationStreamByIetfRestconfMonitoring(
-                        path, start, outputType, uri, monitoringModule, exist, schemaContextMonitoring, streamName);
-        assertNotNull(mappedData);
-        testData(map, mappedData);
+        // creation of the mapping and testing of the returned container node
+        final ContainerNode streamsNode = RestconfMappingNodeUtil.mapNotificationStreams(
+                schemaContextMonitoring, notificationDefinitionMap);
+        testStreamEntries(expectedStreamEntries, streamsNode);
     }
 
     @Test
-    public void toStreamEntryNodeNotifiTest() throws Exception {
-        final Instant start = Instant.now();
-        final String outputType = "JSON";
-        final URI uri = new URI("uri");
-        final Module monitoringModule = schemaContextMonitoring.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
-        final boolean exist = true;
-        final String streamName = "/module:notif";
+    public void mapDataChangeStreamTest() {
+        // preparation of input data and expected data
+        final YangInstanceIdentifier sampleAccessEntryYiid = YangInstanceIdentifier.builder()
+                .node(MonitoringModule.CONT_RESTCONF_STATE_QNAME)
+                .node(MonitoringModule.CONT_STREAMS_QNAME)
+                .node(MonitoringModule.LIST_STREAM_QNAME)
+                .nodeWithKey(MonitoringModule.LIST_STREAM_QNAME, MonitoringModule.LEAF_NAME_STREAM_QNAME,
+                        "/example-entry")
+                .node(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME)
+                .build();
+        final StreamAccessMonitoringData streamAccessMonitoringData = new StreamAccessMonitoringData(
+                URI.create(IdentifierCodec.serialize(sampleAccessEntryYiid, schemaContextMonitoring) + "/JSON"),
+                NotificationOutputType.JSON);
+        final Set<StreamEntry> expectedStreamEntries = Collections.singleton(
+                new StreamEntry("ietf-restconf-monitoring:restconf-state/streams/stream=%2Fexample-entry/"
+                        + "replay-support", "Indicates if replay buffer is supported for this stream.\n"
+                        + "If 'true', then the server MUST support the 'start-time'\n"
+                        + "and 'stop-time' query parameters for this stream.", false, 1, true));
 
-        final Map<QName, Object> map = prepareMap(streamName, uri, start, outputType);
-        map.put(MonitoringModule.LEAF_DESCR_STREAM_QNAME, "Notifi");
-
-        final QName notifiQName = QName.create("urn:nested:module", "2014-06-03", "notifi");
-        final NormalizedNode<?, ?> mappedData =
-                RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(notifiQName,
-                    schemaContextMonitoring.getNotifications(), start, outputType, uri, monitoringModule, exist,
-                        streamName);
-        assertNotNull(mappedData);
-        testData(map, mappedData);
+        // creation of the mapping and testing of the returned container node
+        final ContainerNode streamsNode = RestconfMappingNodeUtil.mapDataChangeStream(
+                schemaContextMonitoring, sampleAccessEntryYiid, streamAccessMonitoringData);
+        testStreamEntries(expectedStreamEntries, streamsNode);
     }
 
-    private static Map<QName, Object> prepareMap(final String name, final URI uri, final Instant start,
-            final String outputType) {
-        final Map<QName, Object> map = new HashMap<>();
-        map.put(MonitoringModule.LEAF_NAME_STREAM_QNAME, name);
-        map.put(MonitoringModule.LEAF_LOCATION_ACCESS_QNAME, uri.toString());
-        map.put(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME, Boolean.TRUE);
-        map.put(MonitoringModule.LEAF_START_TIME_STREAM_QNAME, DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(
-            OffsetDateTime.ofInstant(start, ZoneId.systemDefault())));
-        map.put(MonitoringModule.LEAF_ENCODING_ACCESS_QNAME, outputType);
-        return map;
+    @Test
+    public void mapStreamSubscriptionTest() {
+        // preparation of input data and expected data
+        final String sampleStreamName = "ietf-restconf-monitoring:restconf-state/streams/stream=example-stream";
+        final Set<StreamEntry> expectedStreamEntries = Collections.singleton(
+                new StreamEntry("ietf-restconf-monitoring:restconf-state/streams/stream=example-stream", null,
+                        true, 0, false));
+
+        // creation of the mapping and testing of the returned container node
+        final MapEntryNode streamEntry = RestconfMappingNodeUtil.mapStreamSubscription(sampleStreamName, Instant.now());
+        testStreamEntry(expectedStreamEntries, streamEntry);
     }
 
-    private static void testData(final Map<QName, Object> map, final NormalizedNode<?, ?> mappedData) {
-        for (final DataContainerChild<? extends PathArgument, ?> child : ((MapEntryNode) mappedData).getValue()) {
-            if (child instanceof LeafNode) {
-                final LeafNode<?> leaf = (LeafNode<?>) child;
-                Assert.assertTrue(map.containsKey(leaf.getNodeType()));
-                Assert.assertEquals(map.get(leaf.getNodeType()), leaf.getValue());
-            }
-        }
+    private static void testStreamEntries(final Set<StreamEntry> expectedStreamEntries,
+                                          final ContainerNode streamsNode) {
+        Assert.assertEquals(1, streamsNode.getValue().size());
+        final MapNode streamsList = (MapNode) streamsNode.getValue().iterator().next();
+        Assert.assertEquals(MonitoringModule.LIST_STREAM_QNAME, streamsList.getNodeType());
+        final Collection<MapEntryNode> streamEntries = streamsList.getValue();
+        Assert.assertEquals(expectedStreamEntries.size(), streamEntries.size());
+        streamEntries.forEach(mapEntryNode -> testStreamEntry(expectedStreamEntries, mapEntryNode));
+    }
+
+    private static void testStreamEntry(final Set<StreamEntry> expectedStreamEntries, final MapEntryNode mapEntryNode) {
+        final boolean replaySupport = mapEntryNode.getChild(
+                NodeIdentifier.create(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME))
+                .map(dataContainerChild -> Boolean.valueOf(dataContainerChild.getValue().toString()))
+                .orElse(false);
+        final String streamName = mapEntryNode.getChild(NodeIdentifier.create(
+                MonitoringModule.LEAF_NAME_STREAM_QNAME))
+                .map(dataContainerChild -> dataContainerChild.getValue().toString())
+                .orElse(null);
+        final String description = mapEntryNode.getChild(NodeIdentifier.create(
+                MonitoringModule.LEAF_DESCR_STREAM_QNAME))
+                .map(dataContainerChild -> dataContainerChild.getValue().toString())
+                .orElse(null);
+        final boolean setReplayLogCreationTime = mapEntryNode.getChild(NodeIdentifier.create(
+                MonitoringModule.LEAF_START_TIME_STREAM_QNAME)).isPresent();
+        final int accessEntries = mapEntryNode.getChild(
+                NodeIdentifier.create(MonitoringModule.LIST_ACCESS_STREAM_QNAME))
+                .map(dataContainerChild -> ((MapNode) dataContainerChild).getValue().size())
+                .orElse(0);
+        Assert.assertTrue(expectedStreamEntries.contains(new StreamEntry(streamName, description,
+                setReplayLogCreationTime, accessEntries, replaySupport)));
+    }
+
+    private static Map<NotificationDefinition, List<StreamAccessMonitoringData>> generateNotificationDefinitions(
+            final List<List<QName>> notificationsSchemaPaths) {
+        return notificationsSchemaPaths.stream()
+                .map(schemaPath -> (NotificationDefinition) SchemaContextUtil.findNodeInSchemaContext(
+                        schemaContextMonitoring, schemaPath))
+                .map(notificationDefinition -> {
+                    // in this test, for simplification, serialized path is used directly to create target URI
+                    final String serializedPath = SchemaPathCodec.serialize(
+                            notificationDefinition.getPath(), schemaContextMonitoring);
+                    final List<StreamAccessMonitoringData> accessData = Lists.newArrayList(
+                            new StreamAccessMonitoringData(URI.create(serializedPath + '/'
+                                    + NotificationOutputType.JSON.name()), NotificationOutputType.JSON),
+                            new StreamAccessMonitoringData(URI.create(serializedPath + '/'
+                                    + NotificationOutputType.XML.name()), NotificationOutputType.XML));
+                    return new AbstractMap.SimpleEntry<>(notificationDefinition, accessData);
+                })
+                .collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
     }
 
     /**
@@ -292,6 +359,43 @@ public class RestconfMappingNodeUtilTest {
             assertEquals("Incorrect revision of loaded module", Revision.ofNullable(revision), m.getRevision());
 
             loadedModules.remove(name);
+        }
+    }
+
+    private static final class StreamEntry {
+        private final String streamName;
+        private final String description;
+        private final boolean setReplayLogCreationTime;
+        private final int accessEntries;
+        private final boolean replaySupport;
+
+        private StreamEntry(final String streamName, final String description, final boolean setReplayLogCreationTime,
+                final int accessEntries, final boolean replaySupport) {
+            this.streamName = streamName;
+            this.description = description;
+            this.setReplayLogCreationTime = setReplayLogCreationTime;
+            this.accessEntries = accessEntries;
+            this.replaySupport = replaySupport;
+        }
+
+        @Override
+        public boolean equals(final Object object) {
+            if (this == object) {
+                return true;
+            }
+            if (object == null || getClass() != object.getClass()) {
+                return false;
+            }
+            StreamEntry that = (StreamEntry) object;
+            return accessEntries == that.accessEntries && Objects.equals(replaySupport, that.replaySupport)
+                    && Objects.equals(streamName, that.streamName)
+                    && Objects.equals(description, that.description)
+                    && Objects.equals(setReplayLogCreationTime, that.setReplayLogCreationTime);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(streamName, description, setReplayLogCreationTime, accessEntries, replaySupport);
         }
     }
 }

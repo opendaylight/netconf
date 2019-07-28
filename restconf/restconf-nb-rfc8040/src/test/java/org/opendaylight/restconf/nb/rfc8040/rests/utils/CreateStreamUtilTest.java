@@ -13,16 +13,31 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.MockitoAnnotations;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenerAdapter;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -39,6 +54,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaNodeUtils;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
+@RunWith(MockitoJUnitRunner.class)
 public class CreateStreamUtilTest {
 
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/streams";
@@ -46,37 +62,66 @@ public class CreateStreamUtilTest {
     private NormalizedNodeContext payload;
     private SchemaContextRef refSchemaCtx;
 
+    @Mock
+    private TransactionChainHandler transactionChainHandler;
+    @Mock
+    private DOMTransactionChain domTransactionChain;
+
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         this.refSchemaCtx = new SchemaContextRef(
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT)));
+        Mockito.when(transactionChainHandler.get()).thenReturn(domTransactionChain);
     }
 
     @Test
-    public void createStreamTest() {
+    public void createDataChangeStreamTest() {
+        final DOMDataTreeWriteTransaction transaction = Mockito.mock(DOMDataTreeWriteTransaction.class);
+        Mockito.when(domTransactionChain.newWriteOnlyTransaction()).thenReturn(transaction);
+        Mockito.doReturn(FluentFutures.immediateFluentFuture(CommitInfo.empty())).when(transaction).commit();
+
         this.payload = prepareDomPayload("create-data-change-event-subscription", "input", "toaster", "path");
-        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.refSchemaCtx);
+        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.refSchemaCtx,
+                transactionChainHandler);
         assertEquals(result.getErrors(), Collections.emptyList());
         final NormalizedNode<?, ?> testedNn = result.getResult();
         assertNotNull(testedNn);
         final NormalizedNodeContext contextRef = prepareDomPayload("create-data-change-event-subscription", "output",
                 "data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=BASE", "stream-name");
         assertEquals(contextRef.getData(), testedNn);
+        final Optional<ListenerAdapter> dataChangeListener = ListenersBroker.getInstance().getDataChangeListenerFor(
+                "data-change-event-subscription/toaster:toaster/datastore=CONFIGURATION/scope=BASE");
+        Assert.assertTrue(dataChangeListener.isPresent());
+
+        final ArgumentCaptor<NormalizedNode> dataCaptor = ArgumentCaptor.forClass(NormalizedNode.class);
+        Mockito.verify(transaction, Mockito.times(1)).merge(
+                Mockito.eq(LogicalDatastoreType.OPERATIONAL), Mockito.eq(CreateStreamUtil.STREAMS_YIID),
+                dataCaptor.capture());
+        Mockito.verify(transaction, Mockito.times(1)).commit();
+        assertEquals(MonitoringModule.CONT_STREAMS_QNAME, dataCaptor.getValue().getNodeType());
     }
 
     @Test(expected = RestconfDocumentedException.class)
-    public void createStreamWrongValueTest() {
+    public void createDataChangeStreamWrongValueTest() {
         this.payload = prepareDomPayload("create-data-change-event-subscription", "input", "String value", "path");
-        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.refSchemaCtx);
+        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.refSchemaCtx,
+                transactionChainHandler);
         assertEquals(result.getErrors(), Collections.emptyList());
+        Mockito.verifyZeroInteractions(transactionChainHandler);
     }
 
     @Test(expected = RestconfDocumentedException.class)
-    public void createStreamWrongInputRpcTest() {
+    public void createDataChangeStreamWrongInputRpcTest() {
         this.payload = prepareDomPayload("create-data-change-event-subscription2", "input", "toaster", "path2");
-        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.refSchemaCtx);
+        final DOMRpcResult result = CreateStreamUtil.createDataChangeNotifiStream(this.payload, this.refSchemaCtx,
+                transactionChainHandler);
         assertEquals(result.getErrors(), Collections.emptyList());
+        Mockito.verifyZeroInteractions(transactionChainHandler);
+    }
+
+    @Test
+    public void createYangNotifiStreamsTest() {
+        
     }
 
     private NormalizedNodeContext prepareDomPayload(final String rpcName, final String inputOutput,

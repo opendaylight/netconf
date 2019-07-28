@@ -30,8 +30,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -55,7 +54,7 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -111,14 +110,6 @@ public final class SubscribeToStreamUtil {
                     ErrorTag.UNKNOWN_ELEMENT);
         }
 
-        final DOMDataTreeReadWriteTransaction writeTransaction = handlersHolder
-                .getTransactionChainHandler()
-                .get()
-                .newReadWriteTransaction();
-        final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
-        final boolean exist = checkExist(schemaContext, writeTransaction);
-        final URI uri = prepareUriByStreamName(streamName);
-
         registerToListenNotification(
                 notificationListenerAdapter.get(), handlersHolder.getNotificationServiceHandler());
         notificationListenerAdapter.get().setQueryParams(
@@ -128,16 +119,19 @@ public final class SubscribeToStreamUtil {
                 false);
         notificationListenerAdapter.get().setCloseVars(
                 handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
+
+        final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
         final String serializedPath = SchemaPathCodec.serialize(notificationListenerAdapter.get().getSchemaPath(),
                 schemaContext);
-        final NormalizedNode mapToStreams = RestconfMappingNodeUtil.mapYangNotificationStreamByIetfRestconfMonitoring(
-                notificationListenerAdapter.get().getSchemaPath().getLastComponent(),
-                schemaContext.getNotifications(), notificationQueryParams.getStart(),
-                notificationListenerAdapter.get().getOutputType(), uri, getMonitoringModule(schemaContext),
-                exist, serializedPath);
-        writeDataToDS(schemaContext, serializedPath, writeTransaction, exist, mapToStreams);
+        final MapEntryNode streamNode = RestconfMappingNodeUtil.mapStreamSubscription(serializedPath,
+                notificationQueryParams.getStart());
+        final DOMDataTreeWriteTransaction writeTransaction = handlersHolder
+                .getTransactionChainHandler().get()
+                .newWriteOnlyTransaction();
+        writeDataToDS(schemaContext, serializedPath, writeTransaction, streamNode);
         submitData(writeTransaction);
-        return uri;
+
+        return prepareUriByStreamName(streamName);
     }
 
     /**
@@ -207,23 +201,15 @@ public final class SubscribeToStreamUtil {
         listener.get().setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
         registration(datastoreType, listener.get(), handlersHolder.getDomDataBrokerHandler().get());
 
-        final URI uri = prepareUriByStreamName(streamName);
-        final DOMDataTreeReadWriteTransaction writeTransaction
-                = handlersHolder.getTransactionChainHandler().get().newReadWriteTransaction();
         final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
-        final boolean exist = checkExist(schemaContext, writeTransaction);
         final String serializedPath = IdentifierCodec.serialize(listener.get().getPath(), schemaContext);
-        final NormalizedNode mapToStreams = RestconfMappingNodeUtil
-                .mapDataChangeNotificationStreamByIetfRestconfMonitoring(listener.get().getPath(),
-                        notificationQueryParams.getStart(), listener.get().getOutputType(), uri,
-                        getMonitoringModule(schemaContext), exist, schemaContext, serializedPath);
-        writeDataToDS(schemaContext, serializedPath, writeTransaction, exist, mapToStreams);
+        final MapEntryNode streamNode = RestconfMappingNodeUtil.mapStreamSubscription(
+                serializedPath, notificationQueryParams.getStart());
+        final DOMDataTreeWriteTransaction writeTransaction = handlersHolder.getTransactionChainHandler().get()
+                .newWriteOnlyTransaction();
+        writeDataToDS(schemaContext, serializedPath, writeTransaction, streamNode);
         submitData(writeTransaction);
-        return uri;
-    }
-
-    static Module getMonitoringModule(final SchemaContext schemaContext) {
-        return schemaContext.findModule(MonitoringModule.MODULE_QNAME).orElse(null);
+        return prepareUriByStreamName(streamName);
     }
 
     /**
@@ -245,28 +231,21 @@ public final class SubscribeToStreamUtil {
         return Instant.from(accessor);
     }
 
-    @SuppressWarnings("rawtypes")
-    static void writeDataToDS(final SchemaContext schemaContext, final String name,
-            final DOMDataTreeReadWriteTransaction readWriteTransaction, final boolean exist,
-            final NormalizedNode mapToStreams) {
-        String pathId;
-        if (exist) {
-            try {
-                pathId = MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY
-                        + URLEncoder.encode(name, StandardCharsets.UTF_8.name());
-            } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException(e);
-            }
-        } else {
-            pathId = MonitoringModule.PATH_TO_STREAMS;
+    private static void writeDataToDS(final SchemaContext schemaContext, final String streamName,
+            final DOMDataTreeWriteTransaction writeTransaction, final MapEntryNode streamNode) {
+        try {
+            final String pathId = MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY
+                    + URLEncoder.encode(streamName, StandardCharsets.UTF_8.name());
+            writeTransaction.merge(LogicalDatastoreType.OPERATIONAL,
+                    IdentifierCodec.deserialize(pathId, schemaContext), streamNode);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
         }
-        readWriteTransaction.merge(LogicalDatastoreType.OPERATIONAL,
-                IdentifierCodec.deserialize(pathId, schemaContext), mapToStreams);
     }
 
-    static void submitData(final DOMDataTreeReadWriteTransaction readWriteTransaction) {
+    private static void submitData(final DOMDataTreeWriteTransaction writeTransaction) {
         try {
-            readWriteTransaction.commit().get();
+            writeTransaction.commit().get();
         } catch (final InterruptedException | ExecutionException e) {
             throw new RestconfDocumentedException("Problem while putting data to DS.", e);
         }
@@ -289,6 +268,12 @@ public final class SubscribeToStreamUtil {
         return result;
     }
 
+    /**
+     * Building of URI from stream name by appending of base part of URI.
+     *
+     * @param streamName Name of the stream without leading of trailing slash.
+     * @return Created URI.
+     */
     static URI prepareUriByStreamName(final String streamName) {
         return URI.create(RestconfConstants.BASE_URI_PATTERN + RestconfConstants.SLASH + streamName);
     }
@@ -318,16 +303,6 @@ public final class SubscribeToStreamUtil {
         listener.setRegistration(registration);
     }
 
-    static boolean checkExist(final SchemaContext schemaContext,
-                              final DOMDataTreeReadOperations readWriteTransaction) {
-        try {
-            return readWriteTransaction.exists(LogicalDatastoreType.OPERATIONAL,
-                    IdentifierCodec.deserialize(MonitoringModule.PATH_TO_STREAMS, schemaContext)).get();
-        } catch (final InterruptedException | ExecutionException exception) {
-            throw new RestconfDocumentedException("Problem while checking data if exists", exception);
-        }
-    }
-
     private static void registerToListenNotification(final NotificationListenerAdapter listener,
             final NotificationServiceHandler notificationServiceHandler) {
         if (listener.isListening()) {
@@ -353,5 +328,4 @@ public final class SubscribeToStreamUtil {
         }
         return ResolveEnumUtil.resolveEnum(clazz, value);
     }
-
 }
