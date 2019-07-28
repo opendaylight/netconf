@@ -167,9 +167,9 @@ public class CreateStreamUtilTest {
                 .collect(Collectors.toList());
 
         // execution of mapping and testing of the output container
-        CreateStreamUtil.createNotificationStreams(this.schemaContext, rwTransaction, StreamUrlResolver.webSockets(),
-                LISTENERS_BROKER);
-        checkRegisteredYangNotifyStreams(rwTransaction, expectedXmlStreams, expectedJsonStreams);
+        final ContainerNode streamsContainer = CreateStreamUtil.createNotificationStreams(this.schemaContext,
+                rwTransaction, StreamUrlResolver.webSockets(), LISTENERS_BROKER);
+        checkStreamsContainer(streamsContainer, expectedXmlStreams.size());
     }
 
     @Test
@@ -203,9 +203,9 @@ public class CreateStreamUtilTest {
                 .collect(Collectors.toList());
 
         // execution of mapping and testing of the output container
-        CreateStreamUtil.createNotificationStreams(this.schemaContext, rwTransaction, StreamUrlResolver.webSockets(),
-                LISTENERS_BROKER);
-        checkRegisteredYangNotifyStreams(rwTransaction, expectedXmlStreams, expectedJsonStreams);
+        final ContainerNode streamsContainer = CreateStreamUtil.createNotificationStreams(
+                this.schemaContext, rwTransaction, StreamUrlResolver.webSockets(), LISTENERS_BROKER);
+        checkStreamsContainer(streamsContainer, expectedXmlStreams.size());
     }
 
     private void checkRegisteredYangNotifyStreams(final DOMDataTreeReadWriteTransaction rwTransaction,
@@ -217,12 +217,17 @@ public class CreateStreamUtilTest {
         verify(rwTransaction, times(1)).merge(
                 eq(LogicalDatastoreType.OPERATIONAL), eq(CreateStreamUtil.STREAMS_YIID),
                 dataCaptor.capture());
-        assertEquals(MonitoringModule.CONT_STREAMS_QNAME, dataCaptor.getValue().getNodeType());
-        assertEquals(1, ((ContainerNode) dataCaptor.getValue()).getValue().size());
-        final Optional<DataContainerChild<? extends PathArgument, ?>> streamsListNode = ((ContainerNode) dataCaptor
-                .getValue()).getChild(NodeIdentifier.create(MonitoringModule.LIST_STREAM_QNAME));
+        final NormalizedNode<?, ?> streamsContainer = dataCaptor.getValue();
+        checkStreamsContainer((ContainerNode) streamsContainer, expectedJsonStreams.size() + expectedXmlStreams.size());
+    }
+
+    private void checkStreamsContainer(final ContainerNode streamsContainer, final int expectedNumberOfStreams) {
+        assertEquals(MonitoringModule.CONT_STREAMS_QNAME, streamsContainer.getNodeType());
+        assertEquals(1, streamsContainer.getValue().size());
+        final Optional<DataContainerChild<? extends PathArgument, ?>> streamsListNode = streamsContainer.getChild(
+                NodeIdentifier.create(MonitoringModule.LIST_STREAM_QNAME));
         assertTrue(streamsListNode.isPresent());
-        assertEquals(expectedXmlStreams.size(), ((MapNode) streamsListNode.get()).getValue().size());
+        assertEquals(expectedNumberOfStreams, ((MapNode) streamsListNode.get()).getValue().size());
     }
 
     private static void checkListenerBroker(final List<String> expectedStreams) {

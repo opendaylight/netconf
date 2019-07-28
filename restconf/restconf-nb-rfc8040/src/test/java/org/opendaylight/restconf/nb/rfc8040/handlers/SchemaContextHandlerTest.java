@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.FileNotFoundException;
+import java.util.Optional;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -23,11 +24,16 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.CreateStreamUtil;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.StreamUrlResolver;
+import org.opendaylight.restconf.nb.rfc8040.streams.listeners.ListenersBroker;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -64,11 +70,14 @@ public class SchemaContextHandlerTest {
         final TransactionChainHandler txHandler = mock(TransactionChainHandler.class);
         final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
         when(txHandler.get()).thenReturn(domTx);
-        final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
-        when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
+        final DOMDataTreeReadWriteTransaction rwTx = mock(DOMDataTreeReadWriteTransaction.class);
+        when(domTx.newReadWriteTransaction()).thenReturn(rwTx);
+        doReturn(CommitInfo.emptyFluentFuture()).when(rwTx).commit();
+        when(rwTx.read(LogicalDatastoreType.OPERATIONAL, CreateStreamUtil.STREAMS_YIID))
+                .thenReturn(FluentFutures.immediateFluentFuture(Optional.empty()));
 
-        this.schemaContextHandler = new SchemaContextHandler(txHandler, mockDOMSchemaService);
+        this.schemaContextHandler = new SchemaContextHandler(txHandler, mockDOMSchemaService, new ListenersBroker(),
+                StreamUrlResolver.webSockets());
 
         this.schemaContextHandler.onModelContextUpdated(SchemaContextHandlerTest.SCHEMA_CONTEXT);
     }

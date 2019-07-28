@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
@@ -36,6 +37,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.mdsal.common.api.CommitInfo;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeChangeService;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -56,6 +58,7 @@ import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.IdentifierCodec;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -89,12 +92,15 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(rwTx).commit();
         when(domTx.newReadWriteTransaction()).thenReturn(rwTx);
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
+        when(rwTx.read(LogicalDatastoreType.OPERATIONAL, CreateStreamUtil.STREAMS_YIID))
+                .thenReturn(FluentFutures.immediateFluentFuture(Optional.empty()));
 
         final DOMDataBroker dataBroker = mock(DOMDataBroker.class);
         doReturn(domTx).when(dataBroker).createTransactionChain(any());
 
         transactionHandler = new TransactionChainHandler(dataBroker);
-        schemaHandler = new SchemaContextHandler(transactionHandler, mock(DOMSchemaService.class));
+        schemaHandler = new SchemaContextHandler(transactionHandler, mock(DOMSchemaService.class), LISTENERS_BROKER,
+                StreamUrlResolver.webSockets());
 
         DOMDataTreeChangeService dataTreeChangeService = mock(DOMDataTreeChangeService.class);
         doReturn(mock(ListenerRegistration.class)).when(dataTreeChangeService)

@@ -35,6 +35,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
+import org.opendaylight.restconf.nb.rfc8040.rests.services.impl.StreamUrlResolver;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.PatchCont;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1;
 import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.patch.cont.MyList1Builder;
@@ -85,7 +86,8 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         domDataBroker = getDomBroker();
 
         transactionChainHandler = new TransactionChainHandler(domDataBroker);
-        schemaContextHandler = new SchemaContextHandler(transactionChainHandler, Mockito.mock(DOMSchemaService.class));
+        schemaContextHandler = new SchemaContextHandler(transactionChainHandler, Mockito.mock(DOMSchemaService.class),
+                new ListenersBroker(), StreamUrlResolver.webSockets());
         schemaContextHandler.onModelContextUpdated(SCHEMA_CONTEXT);
     }
 

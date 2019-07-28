@@ -22,15 +22,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.mdsal.common.api.CommitInfo;
-import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
-import org.opendaylight.mdsal.dom.api.DOMSchemaService;
-import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
+import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.RpcServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
@@ -64,14 +61,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         MockitoAnnotations.initMocks(this);
         final EffectiveModelContext contextRef =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
-        final TransactionChainHandler txHandler = mock(TransactionChainHandler.class);
-        final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
-        when(txHandler.get()).thenReturn(domTx);
-        final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
-        when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
-        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler,
-            mock(DOMSchemaService.class));
+        final SchemaContextHandler schemaContextHandler = TestUtils.newSchemaContextHandler(contextRef);
         schemaContextHandler.onModelContextUpdated(contextRef);
         this.invokeOperationsService = new RestconfInvokeOperationsServiceImpl(this.rpcServiceHandler,
                 schemaContextHandler, transactionChainHandler, StreamUrlResolver.webSockets(), new ListenersBroker());
