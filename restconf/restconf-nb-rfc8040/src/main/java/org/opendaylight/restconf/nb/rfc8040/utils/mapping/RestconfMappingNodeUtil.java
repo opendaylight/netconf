@@ -13,14 +13,20 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule.QueryParams;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.SchemaPathCodec;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module.ConformanceType;
+import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -38,6 +44,10 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableMapEntryNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableMapNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Deviation;
@@ -50,12 +60,32 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
+import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 /**
  * Util class for mapping nodes.
  *
  */
 public final class RestconfMappingNodeUtil {
+
+    /**
+     * Access information bounded to one created stream - stream location on the server and output format of data.
+     */
+    public static final class StreamAccessMonitoringData {
+        private final URI streamLocation;
+        private final NotificationOutputType outputType;
+
+        /**
+         * Creation of the stream access information.
+         *
+         * @param streamLocation Stream location in form of URI path.
+         * @param outputType     Output format of data (XML or JSON).
+         */
+        public StreamAccessMonitoringData(final URI streamLocation, final NotificationOutputType outputType) {
+            this.streamLocation = streamLocation;
+            this.outputType = outputType;
+        }
+    }
 
     private RestconfMappingNodeUtil() {
         throw new UnsupportedOperationException("Util class");
@@ -435,172 +465,167 @@ public final class RestconfMappingNodeUtil {
     }
 
     /**
-     * Map data of yang notification to normalized node according to
-     * ietf-restconf-monitoring.
+     * Mapping of the single data-change event stream to monitoring data at schema path: '/restconf-state/streams'.
      *
-     * @param notifiQName
-     *             qname of notification from listener
-     * @param notifications
-     *             list of notifications for find schema of notification by
-     *            notifiQName
-     * @param start
-     *             start-time query parameter of notification
-     * @param outputType
-     *             output type of notification
-     * @param uri
-     *             location of registered listener for sending data of
-     *            notification
-     * @param monitoringModule
-     *             ietf-restconf-monitoring module
-     * @param existParent
-     *             true if data of parent -
-     *            ietf-restconf-monitoring:restconf-state/streams - exist in DS
-     * @return mapped data of notification - map entry node if parent exists,
-     *         container streams with list and map entry node if not
+     * @param schemaContext Schema context used for serialization of {@link YangInstanceIdentifier} and searching for
+     *                      the schema node of the input YIID.
+     * @param dataNodePath  Path of the data-change events source.
+     * @param accessData    Stream location and resulting stream URI.
+     * @return Streams container with monitoring information bound to the input stream
+     *     specified by {@link YangInstanceIdentifier}.
      */
-    @SuppressWarnings("rawtypes")
-    public static NormalizedNode mapYangNotificationStreamByIetfRestconfMonitoring(final QName notifiQName,
-            final Set<NotificationDefinition> notifications, final Instant start, final String outputType,
-            final URI uri, final Module monitoringModule, final boolean existParent, final String streamName) {
-        for (final NotificationDefinition notificationDefinition : notifications) {
-            if (notificationDefinition.getQName().equals(notifiQName)) {
-                final DataSchemaNode streamListSchema = ((ContainerSchemaNode) ((ContainerSchemaNode) monitoringModule
-                        .getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME))
-                                .getDataChildByName(MonitoringModule.CONT_STREAMS_QNAME))
-                                        .getDataChildByName(MonitoringModule.LIST_STREAM_QNAME);
-                final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
-                        Builders.mapEntryBuilder((ListSchemaNode) streamListSchema);
-
-                final ListSchemaNode listSchema = (ListSchemaNode) streamListSchema;
-                prepareLeafAndFillEntryBuilder(streamEntry,
-                        listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME), streamName);
-
-                final Optional<String> optDesc = notificationDefinition.getDescription();
-                if (optDesc.isPresent()) {
-                    prepareLeafAndFillEntryBuilder(streamEntry,
-                            listSchema.getDataChildByName(MonitoringModule.LEAF_DESCR_STREAM_QNAME), optDesc.get());
-                }
-                prepareLeafAndFillEntryBuilder(streamEntry,
-                        listSchema.getDataChildByName(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME), true);
-                if (start != null) {
-                    prepareLeafAndFillEntryBuilder(streamEntry,
-                        listSchema.getDataChildByName(MonitoringModule.LEAF_START_TIME_STREAM_QNAME),
-                        DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start,
-                            ZoneId.systemDefault())));
-                }
-                prepareListAndFillEntryBuilder(streamEntry,
-                        (ListSchemaNode) listSchema.getDataChildByName(MonitoringModule.LIST_ACCESS_STREAM_QNAME),
-                        outputType, uri);
-
-                if (!existParent) {
-                    final DataSchemaNode contStreamsSchema = ((ContainerSchemaNode) monitoringModule
-                            .getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME))
-                                    .getDataChildByName(MonitoringModule.CONT_STREAMS_QNAME);
-                    return Builders.containerBuilder((ContainerSchemaNode) contStreamsSchema).withChild(Builders
-                            .mapBuilder((ListSchemaNode) streamListSchema).withChild(streamEntry.build()).build())
-                            .build();
-                }
-                return streamEntry.build();
-            }
+    public static ContainerNode mapDataChangeStream(final SchemaContext schemaContext,
+            final YangInstanceIdentifier dataNodePath, final StreamAccessMonitoringData accessData) {
+        final String serializedPath = ParserIdentifier.stringFromYangInstanceIdentifier(dataNodePath, schemaContext);
+        final SchemaNode schemaNode = ParserIdentifier.toInstanceIdentifier(serializedPath, schemaContext,
+                Optional.empty()).getSchemaNode();
+        if (schemaNode == null) {
+            throw new IllegalArgumentException(String.format("Cannot find schema node for data specified by YIID %s.",
+                    dataNodePath));
         }
 
-        throw new RestconfDocumentedException(notifiQName + " doesn't exist in any modul");
-    }
+        final MapEntryNode streamAccessNode = buildStreamAccessNode(accessData.outputType, accessData.streamLocation);
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamNodeBuilder
+                = createStreamMapNodeByName(serializedPath);
 
-    private static void prepareListAndFillEntryBuilder(
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry,
-            final ListSchemaNode listSchemaNode, final String outputType, final URI uriToWebsocketServer) {
-        final CollectionNodeBuilder<MapEntryNode, MapNode> accessListBuilder = Builders.mapBuilder(listSchemaNode);
-        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> entryAccessList =
-                Builders.mapEntryBuilder(listSchemaNode);
-        prepareLeafAndFillEntryBuilder(entryAccessList,
-                listSchemaNode.getDataChildByName(MonitoringModule.LEAF_ENCODING_ACCESS_QNAME), outputType);
-        prepareLeafAndFillEntryBuilder(entryAccessList,
-                listSchemaNode.getDataChildByName(MonitoringModule.LEAF_LOCATION_ACCESS_QNAME),
-                uriToWebsocketServer.toString());
-        streamEntry.withChild(accessListBuilder.withChild(entryAccessList.build()).build());
+        schemaNode.getDescription().ifPresent(description -> addDescription(streamNodeBuilder, description));
+        addAccessInformation(streamNodeBuilder, Collections.singleton(streamAccessNode));
+        addReplaySupport(streamNodeBuilder);
+        return createStreamsContainer(Collections.singletonList(streamNodeBuilder.build()));
     }
 
     /**
-     * Prepare leaf and fill entry builder.
+     * Mapping of information about YANG notification streams to monitoring data at schema-path:
+     * '/restconf-state/streams'.
      *
-     * @param streamEntry   Stream entry
-     * @param leafSchema    Leaf schema
-     * @param value         Value
+     * @param schemaContext Schema context used for serialization of {@link SchemaPath}.
+     * @param notifications Notification definitions with corresponding access information (stream location and output).
+     * @return Streams container with parsed notifications (this container contains only one list with name 'stream').
      */
-    private static void prepareLeafAndFillEntryBuilder(
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry,
-            final DataSchemaNode leafSchema, final Object value) {
-        streamEntry.withChild(Builders.leafBuilder((LeafSchemaNode) leafSchema).withValue(value).build());
+    public static ContainerNode mapNotificationStreams(final SchemaContext schemaContext,
+            final Map<NotificationDefinition, List<StreamAccessMonitoringData>> notifications) {
+        final List<MapEntryNode> streamNodes = notifications.entrySet().stream()
+                .map(entry -> buildStreamNode(entry.getKey(), entry.getValue(), schemaContext))
+                .collect(Collectors.toList());
+        return createStreamsContainer(streamNodes);
     }
 
     /**
-     * Map data of data change notification to normalized node according to
-     * ietf-restconf-monitoring.
+     * Mapping of the data-change event bound to YIID or notification definition to monitoring data with updated
+     * replay log creation time. The output {@link MapEntryNode} is at schema-path: '/restconf-state/streams/stream'.
      *
-     * @param path
-     *             path of data to listen on
-     * @param start
-     *             start-time query parameter of notification
-     * @param outputType
-     *             output type of notification
-     * @param uri
-     *             location of registered listener for sending data of
-     *            notification
-     * @param monitoringModule
-     *             ietf-restconf-monitoring module
-     * @param existParent
-     *             true if data of parent -
-     *            ietf-restconf-monitoring:restconf-state/streams - exist in DS
-     * @param schemaContext
-     *             schemaContext for parsing instance identifier to get schema
-     *            node of data
-     * @return mapped data of notification - map entry node if parent exists,
-     *         container streams with list and map entry node if not
+     * @param streamName            Stream name derived from the schema-path or YIID.
+     * @param replayLogCreationTime Time the replay log for this stream was created.
+     * @return List node for the input stream specified by notification definition.
      */
-    @SuppressWarnings("rawtypes")
-    public static NormalizedNode mapDataChangeNotificationStreamByIetfRestconfMonitoring(
-            final YangInstanceIdentifier path, final Instant start, final String outputType, final URI uri,
-            final Module monitoringModule, final boolean existParent, final SchemaContext schemaContext,
+    public static MapEntryNode mapStreamSubscription(final String streamName, final Instant replayLogCreationTime) {
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamNodeBuilder
+                = createStreamMapNodeByName(streamName);
+        addReplayLogCreationTime(streamNodeBuilder, replayLogCreationTime);
+        return streamNodeBuilder.build();
+    }
+
+    private static ContainerNode createStreamsContainer(final List<MapEntryNode> streamNodes) {
+        return ImmutableContainerNodeBuilder.create()
+                .withNodeIdentifier(NodeIdentifier.create(MonitoringModule.CONT_STREAMS_QNAME))
+                .withChild(ImmutableMapNodeBuilder.create()
+                        .withNodeIdentifier(NodeIdentifier.create(MonitoringModule.LIST_STREAM_QNAME))
+                        .withValue(streamNodes)
+                        .build())
+                .build();
+    }
+
+    /**
+     * Building of one list node for the input notification definition and corresponding access information. The output
+     * {@link MapEntryNode} is at schema-path: '/restconf-state/streams/stream'.
+     *
+     * @param notification      Structure that hold information about notification.
+     * @param accessInformation Stream location and resulting stream URI.
+     * @param schemaContext     Schema context used for serialization of {@link SchemaPath}.
+     * @return List node for the input stream.
+     */
+    private static MapEntryNode buildStreamNode(final NotificationDefinition notification,
+            final List<StreamAccessMonitoringData> accessInformation, final SchemaContext schemaContext) {
+        final String streamName = SchemaPathCodec.serialize(notification.getPath(), schemaContext);
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamNodeBuilder
+                = createStreamMapNodeByName(streamName);
+        final List<MapEntryNode> accessTypes = accessInformation.stream()
+                .map(outputURIEntry -> buildStreamAccessNode(outputURIEntry.outputType, outputURIEntry.streamLocation))
+                .collect(Collectors.toList());
+
+        notification.getDescription().ifPresent(description -> addDescription(streamNodeBuilder, description));
+        addAccessInformation(streamNodeBuilder, accessTypes);
+        addReplaySupport(streamNodeBuilder);
+        return streamNodeBuilder.build();
+    }
+
+    /**
+     * Building of one list-node for the input stream-access information. The output {@link MapEntryNode}
+     * is at schema-path: '/restconf-state/streams/stream/access'.
+     *
+     * @param outputType     Output type of data streamed via web-socket session.
+     * @param streamLocation Stream location in form of URI path.
+     * @return List node for the stream access information that holds data about stream location and output type.
+     */
+    private static MapEntryNode buildStreamAccessNode(final NotificationOutputType outputType,
+                                                      final URI streamLocation) {
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamAccessNodeBuilder
+                = ImmutableMapEntryNodeBuilder.create()
+                .withNodeIdentifier(NodeIdentifierWithPredicates.of(MonitoringModule.LIST_ACCESS_STREAM_QNAME,
+                        MonitoringModule.LEAF_ENCODING_ACCESS_QNAME, outputType.getName()));
+
+        streamAccessNodeBuilder.withChild(ImmutableLeafNodeBuilder.create()
+                .withNodeIdentifier(NodeIdentifier.create(MonitoringModule.LEAF_ENCODING_ACCESS_QNAME))
+                .withValue(outputType.getName())
+                .build());
+        streamAccessNodeBuilder.withChild(ImmutableLeafNodeBuilder.create()
+                .withNodeIdentifier(NodeIdentifier.create(MonitoringModule.LEAF_LOCATION_ACCESS_QNAME))
+                .withValue(streamLocation)
+                .build());
+
+        return streamAccessNodeBuilder.build();
+    }
+
+    private static DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> createStreamMapNodeByName(
             final String streamName) {
-        final SchemaNode schemaNode = ParserIdentifier
-                .toInstanceIdentifier(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContext),
-                        schemaContext, Optional.empty())
-                .getSchemaNode();
-        final DataSchemaNode streamListSchema = ((ContainerSchemaNode) ((ContainerSchemaNode) monitoringModule
-                .getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME))
-                        .getDataChildByName(MonitoringModule.CONT_STREAMS_QNAME))
-                                .getDataChildByName(MonitoringModule.LIST_STREAM_QNAME);
-        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamEntry =
-                Builders.mapEntryBuilder((ListSchemaNode) streamListSchema);
+        final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> streamNodeBuilder
+                = ImmutableMapEntryNodeBuilder.create().withNodeIdentifier(NodeIdentifierWithPredicates.of(
+                MonitoringModule.LIST_STREAM_QNAME, MonitoringModule.LEAF_NAME_STREAM_QNAME, streamName));
+        streamNodeBuilder.withChild(ImmutableLeafNodeBuilder.create()
+                .withNodeIdentifier(NodeIdentifier.create(MonitoringModule.LEAF_NAME_STREAM_QNAME))
+                .withValue(streamName)
+                .build());
+        return streamNodeBuilder;
+    }
 
-        final ListSchemaNode listSchema = (ListSchemaNode) streamListSchema;
-        prepareLeafAndFillEntryBuilder(streamEntry,
-                listSchema.getDataChildByName(MonitoringModule.LEAF_NAME_STREAM_QNAME), streamName);
+    private static void addDescription(final DataContainerNodeBuilder<?, ?> builder, final String description) {
+        builder.withChild(ImmutableLeafNodeBuilder.create()
+                .withNodeIdentifier(NodeIdentifier.create(MonitoringModule.LEAF_DESCR_STREAM_QNAME))
+                .withValue(description)
+                .build());
+    }
 
-        final Optional<String> optDesc = schemaNode.getDescription();
-        if (optDesc.isPresent()) {
-            prepareLeafAndFillEntryBuilder(streamEntry,
-                    listSchema.getDataChildByName(MonitoringModule.LEAF_DESCR_STREAM_QNAME), optDesc.get());
-        }
-        prepareLeafAndFillEntryBuilder(streamEntry,
-                listSchema.getDataChildByName(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME), true);
-        prepareLeafAndFillEntryBuilder(streamEntry,
-                listSchema.getDataChildByName(MonitoringModule.LEAF_START_TIME_STREAM_QNAME),
-                DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.ofInstant(start, ZoneId.systemDefault())));
-        prepareListAndFillEntryBuilder(streamEntry,
-                (ListSchemaNode) listSchema.getDataChildByName(MonitoringModule.LIST_ACCESS_STREAM_QNAME), outputType,
-                uri);
+    private static void addReplaySupport(final DataContainerNodeBuilder<?, ?> builder) {
+        builder.withChild(ImmutableLeafNodeBuilder.create()
+                .withNodeIdentifier(NodeIdentifier.create(MonitoringModule.LEAF_REPLAY_SUPP_STREAM_QNAME))
+                .withValue(true)
+                .build());
+    }
 
-        if (!existParent) {
-            final DataSchemaNode contStreamsSchema = ((ContainerSchemaNode) monitoringModule
-                    .getDataChildByName(MonitoringModule.CONT_RESTCONF_STATE_QNAME))
-                            .getDataChildByName(MonitoringModule.CONT_STREAMS_QNAME);
-            return Builders
-                    .containerBuilder((ContainerSchemaNode) contStreamsSchema).withChild(Builders
-                            .mapBuilder((ListSchemaNode) streamListSchema).withChild(streamEntry.build()).build())
-                    .build();
-        }
-        return streamEntry.build();
+    private static void addAccessInformation(final DataContainerNodeBuilder<?, ?> builder,
+                                             final Collection<MapEntryNode> accessTypes) {
+        builder.withChild(ImmutableMapNodeBuilder.create()
+                .withNodeIdentifier(NodeIdentifier.create(MonitoringModule.LIST_ACCESS_STREAM_QNAME))
+                .withValue(accessTypes)
+                .build());
+    }
+
+    private static void addReplayLogCreationTime(final DataContainerNodeBuilder<?, ?> builder,
+                                                 final Instant replayLogCreationTime) {
+        builder.withChild(ImmutableLeafNodeBuilder.create()
+                .withNodeIdentifier(NodeIdentifier.create(MonitoringModule.LEAF_START_TIME_STREAM_QNAME))
+                .withValue(DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(
+                        OffsetDateTime.ofInstant(replayLogCreationTime, ZoneId.systemDefault())))
+                .build());
     }
 }
