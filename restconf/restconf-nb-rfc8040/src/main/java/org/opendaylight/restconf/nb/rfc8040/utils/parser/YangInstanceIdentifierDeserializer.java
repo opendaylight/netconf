@@ -142,8 +142,8 @@ public final class YangInstanceIdentifierDeserializer {
                         RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
             }
 
-            final String value = findAndParsePercentEncoded(nextIdentifierFromNextSequence(
-                    ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE, variables));
+            final String value = findAndParsePercentEncoded(variables.nextIdentifierFromNextSequence(
+                    ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE));
             final Object valueByType = prepareValueByType(leafSchemaNode.get(), value, variables);
             values.put(key, valueByType);
 
@@ -241,8 +241,8 @@ public final class YangInstanceIdentifierDeserializer {
     private static QName prepareQName(final MainVarsWrapper variables) {
         variables.checkValid(ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(variables.currentChar()),
                 "Identifier must start with character from set 'a-zA-Z_'");
-        final String preparedPrefix = nextIdentifierFromNextSequence(
-                ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
+        final String preparedPrefix = variables.nextIdentifierFromNextSequence(
+                ParserBuilderConstants.Deserializer.IDENTIFIER);
         final String prefix;
         final String localName;
 
@@ -261,7 +261,7 @@ public final class YangInstanceIdentifierDeserializer {
                 variables.checkValid(
                         ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(variables.currentChar()),
                         "Identifier must start with character from set 'a-zA-Z_'");
-                localName = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
+                localName = variables.nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER);
 
                 if (!variables.allCharsConsumed()
                         && variables.currentChar() == ParserBuilderConstants.Deserializer.EQUAL) {
@@ -276,23 +276,11 @@ public final class YangInstanceIdentifierDeserializer {
         }
     }
 
-    private static String nextIdentifierFromNextSequence(final CharMatcher matcher, final MainVarsWrapper variables) {
-        final int start = variables.getOffset();
-        nextSequenceEnd(matcher, variables);
-        return variables.getData().substring(start, variables.getOffset());
-    }
-
-    private static void nextSequenceEnd(final CharMatcher matcher, final MainVarsWrapper variables) {
-        while (!variables.allCharsConsumed() && matcher.matches(variables.currentChar())) {
-            variables.skipCurrentChar();
-        }
-    }
-
     private static void prepareNodeWithValue(final QName qname, final List<PathArgument> path,
             final MainVarsWrapper variables) {
         variables.skipCurrentChar();
-        final String value = nextIdentifierFromNextSequence(
-                ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE, variables);
+        final String value = variables.nextIdentifierFromNextSequence(
+                ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE);
 
         // exception if value attribute is missing
         RestconfValidationUtils.checkDocumentedError(
@@ -456,8 +444,12 @@ public final class YangInstanceIdentifierDeserializer {
             offset++;
         }
 
-        public String getData() {
-            return data;
+        String nextIdentifierFromNextSequence(final CharMatcher matcher) {
+            final int start = offset;
+            while (!allCharsConsumed() && matcher.matches(currentChar())) {
+                skipCurrentChar();
+            }
+            return data.substring(start, offset);
         }
 
         public DataSchemaContextNode<?> getCurrent() {
