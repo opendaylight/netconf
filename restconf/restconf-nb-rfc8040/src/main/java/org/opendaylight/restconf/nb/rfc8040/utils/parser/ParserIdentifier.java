@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
+import static com.google.common.base.Verify.verifyNotNull;
+
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import java.time.format.DateTimeParseException;
@@ -16,7 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -31,16 +32,15 @@ import org.opendaylight.restconf.nb.rfc8040.utils.validations.RestconfValidation
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
+import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
+import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
-import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,40 +103,56 @@ public final class ParserIdentifier {
      * Method to create {@link InstanceIdentifierContext} from {@link YangInstanceIdentifier}
      * and {@link SchemaContext}, {@link DOMMountPoint}.
      *
-     * @param yangIId
-     *               - instance identifier
-     * @param schemaContext
-     *               - schema context
-     * @param domMountPoint
-     *               - optional mount point context
+     * @param urlPath PathArgument-based path interpretation of URL
+     * @param schemaContext SchemaContext in which the path is to be interpreted in
+     * @param mountPoint A mount point handle, if the path is being interpreted relative to a mount point
      * @return {@link InstanceIdentifierContext}
      */
-    private static InstanceIdentifierContext<?> createIIdContext(final YangInstanceIdentifier yangIId,
-            final SchemaContext schemaContext, final @Nullable DOMMountPoint domMountPoint) {
-
-        // Deal with data nodes first
-        final DataSchemaContextTree contextTree = DataSchemaContextTree.from(schemaContext);
-        final Optional<DataSchemaContextNode<?>> child = contextTree.findChild(yangIId);
-        if (child.isPresent()) {
-            return new InstanceIdentifierContext<SchemaNode>(yangIId, child.get().getDataSchemaNode(), domMountPoint,
-                schemaContext);
+    private static InstanceIdentifierContext<?> createIIdContext(final YangInstanceIdentifier urlPath,
+            final SchemaContext schemaContext, final @Nullable DOMMountPoint mountPoint) {
+        // First things first: an empty path means data invocation on SchemaContext
+        if (urlPath.isEmpty()) {
+            return new InstanceIdentifierContext<>(urlPath, schemaContext, mountPoint, schemaContext);
         }
 
-        // That failed, now try to recover by searching through the schema context
-        final List<QName> qnames = yangIId.getPathArguments().stream()
-            .filter(pathArgument -> pathArgument instanceof NodeIdentifier).map(PathArgument::getNodeType)
-            .collect(Collectors.toList());
-        final SchemaNode schemaNode = SchemaContextUtil.findNodeInSchemaContext(schemaContext, qnames);
-        if (schemaNode instanceof RpcDefinition) {
-            return new InstanceIdentifierContext<>(yangIId, (RpcDefinition) schemaNode, domMountPoint, schemaContext);
-        } else if (schemaNode instanceof ActionDefinition) {
-            return new InstanceIdentifierContext<>(yangIId, (ActionDefinition) schemaNode, domMountPoint,
+        // Peel the last component and locate the parent data node, empty path resolves to SchemaContext
+        final DataSchemaContextNode<?> parent = DataSchemaContextTree.from(schemaContext)
+                .findChild(verifyNotNull(urlPath.getParent()))
+                .orElseThrow(
+                    // Parent data node is not present, this is not a valid location.
+                    () -> new RestconfDocumentedException("Parent of " + urlPath + " not found",
+                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE));
+
+        // Now try to resolve the last component as a data item...
+        final DataSchemaContextNode<?> data = parent.getChild(urlPath.getLastPathArgument());
+        if (data != null) {
+            return new InstanceIdentifierContext<SchemaNode>(urlPath, data.getDataSchemaNode(), mountPoint,
                     schemaContext);
-        } else if (schemaNode == null) {
-            throw new IllegalArgumentException("Failed to find schema for " + qnames);
-        } else {
-            throw new IllegalStateException("Unhandled schema " + schemaNode);
         }
+
+        // ... otherwise this has to be an operation invocation. RPCs cannot be defined anywhere but schema root,
+        // actions can reside everywhere else (and SchemaContext reports them empty)
+        final QName qname = urlPath.getLastPathArgument().getNodeType();
+        final DataSchemaNode parentSchema = parent.getDataSchemaNode();
+        if (parentSchema instanceof SchemaContext) {
+            for (final RpcDefinition rpc : ((SchemaContext) parentSchema).getOperations()) {
+                if (qname.equals(rpc.getQName())) {
+                    return new InstanceIdentifierContext<>(urlPath, rpc, mountPoint, schemaContext);
+                }
+            }
+        }
+        if (parentSchema instanceof ActionNodeContainer) {
+            for (final ActionDefinition action : ((ActionNodeContainer) parentSchema).getActions()) {
+                if (qname.equals(action.getQName())) {
+                    return new InstanceIdentifierContext<>(urlPath, action, mountPoint, schemaContext);
+                }
+            }
+        }
+
+        // No luck: even if we found the parent, we did not locate a data, nor RPC, nor action node, hence the URL
+        //          is deemed invalid
+        throw new RestconfDocumentedException("Context for " + urlPath + " not found", ErrorType.PROTOCOL,
+            ErrorTag.INVALID_VALUE);
     }
 
     /**
