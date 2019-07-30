@@ -7,10 +7,10 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.CharMatcher;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -108,13 +108,13 @@ public final class YangInstanceIdentifierDeserializer {
 
     private static void prepareNodeWithPredicates(final QName qname, final List<PathArgument> path,
             final MainVarsWrapper variables, final ListSchemaNode listSchemaNode) {
-        checkValid(listSchemaNode != null, "Data schema node is null", variables.getData(), variables.getOffset());
+        variables.checkValid(listSchemaNode != null, "Data schema node is null");
 
         final Iterator<QName> keys = listSchemaNode.getKeyDefinition().iterator();
         final ImmutableMap.Builder<QName, Object> values = ImmutableMap.builder();
 
         // skip already expected equal sign
-        skipCurrentChar(variables);
+        variables.skipCurrentChar();
 
         // read key value separated by comma
         while (keys.hasNext() && !variables.allCharsConsumed() && variables.currentChar() != RestconfConstants.SLASH) {
@@ -122,7 +122,7 @@ public final class YangInstanceIdentifierDeserializer {
             // empty key value
             if (variables.currentChar() == ParserBuilderConstants.Deserializer.COMMA) {
                 values.put(keys.next(), ParserBuilderConstants.Deserializer.EMPTY_STRING);
-                skipCurrentChar(variables);
+                variables.skipCurrentChar();
                 continue;
             }
 
@@ -151,7 +151,7 @@ public final class YangInstanceIdentifierDeserializer {
             // skip comma
             if (keys.hasNext() && !variables.allCharsConsumed()
                     && variables.currentChar() == ParserBuilderConstants.Deserializer.COMMA) {
-                skipCurrentChar(variables);
+                variables.skipCurrentChar();
             }
         }
 
@@ -239,9 +239,8 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private static QName prepareQName(final MainVarsWrapper variables) {
-        checkValid(
-                ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(variables.currentChar()),
-                "Identifier must start with character from set 'a-zA-Z_'", variables.getData(), variables.getOffset());
+        variables.checkValid(ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(variables.currentChar()),
+                "Identifier must start with character from set 'a-zA-Z_'");
         final String preparedPrefix = nextIdentifierFromNextSequence(
                 ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
         final String prefix;
@@ -258,11 +257,10 @@ public final class YangInstanceIdentifierDeserializer {
                 return getQNameOfDataSchemaNode(prefix, variables);
             case ParserBuilderConstants.Deserializer.COLON:
                 prefix = preparedPrefix;
-                skipCurrentChar(variables);
-                checkValid(
+                variables.skipCurrentChar();
+                variables.checkValid(
                         ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(variables.currentChar()),
-                        "Identifier must start with character from set 'a-zA-Z_'", variables.getData(),
-                        variables.getOffset());
+                        "Identifier must start with character from set 'a-zA-Z_'");
                 localName = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
 
                 if (!variables.allCharsConsumed()
@@ -270,7 +268,7 @@ public final class YangInstanceIdentifierDeserializer {
                     return getQNameOfDataSchemaNode(localName, variables);
                 } else {
                     final Module module = moduleForPrefix(prefix, variables.getSchemaContext());
-                    Preconditions.checkArgument(module != null, "Failed to lookup prefix %s", prefix);
+                    checkArgument(module != null, "Failed to lookup prefix %s", prefix);
                     return QName.create(module.getQNameModule(), localName);
                 }
             default:
@@ -286,13 +284,13 @@ public final class YangInstanceIdentifierDeserializer {
 
     private static void nextSequenceEnd(final CharMatcher matcher, final MainVarsWrapper variables) {
         while (!variables.allCharsConsumed() && matcher.matches(variables.currentChar())) {
-            variables.setOffset(variables.getOffset() + 1);
+            variables.skipCurrentChar();
         }
     }
 
     private static void prepareNodeWithValue(final QName qname, final List<PathArgument> path,
             final MainVarsWrapper variables) {
-        skipCurrentChar(variables);
+        variables.skipCurrentChar();
         final String value = nextIdentifierFromNextSequence(
                 ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE, variables);
 
@@ -314,8 +312,8 @@ public final class YangInstanceIdentifierDeserializer {
         if (currentNode == null) {
             return;
         }
-        checkValid(!currentNode.isKeyedEntry(), "Entry " + qname + " requires key or value predicate to be present",
-                variables.getData(), variables.getOffset());
+        variables.checkValid(!currentNode.isKeyedEntry(),
+            "Entry " + qname + " requires key or value predicate to be present");
     }
 
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH") // code does check for null 'current' but FB doesn't recognize it
@@ -340,8 +338,7 @@ public final class YangInstanceIdentifierDeserializer {
                 return null;
             }
         }
-        checkValid(current != null, qname + " is not correct schema node identifier.", variables.getData(),
-                variables.getOffset());
+        variables.checkValid(current != null, qname + " is not correct schema node identifier.");
         while (current.isMixin()) {
             path.add(current.getIdentifier());
             current = current.getChild(qname);
@@ -402,29 +399,17 @@ public final class YangInstanceIdentifierDeserializer {
     private static void validArg(final MainVarsWrapper variables) {
         // every identifier except of the first MUST start with slash
         if (variables.getOffset() != MainVarsWrapper.STARTING_OFFSET) {
-            checkValid(RestconfConstants.SLASH == variables.currentChar(),
-                    "Identifier must start with '/'.", variables.getData(), variables.getOffset());
+            variables.checkValid(RestconfConstants.SLASH == variables.currentChar(), "Identifier must start with '/'.");
 
             // skip consecutive slashes, users often assume restconf URLs behave just as HTTP does by squashing
             // multiple slashes into a single one
             while (!variables.allCharsConsumed() && RestconfConstants.SLASH == variables.currentChar()) {
-                skipCurrentChar(variables);
+                variables.skipCurrentChar();
             }
 
             // check if slash is not also the last char in identifier
-            checkValid(!variables.allCharsConsumed(), "Identifier cannot end with '/'.",
-                    variables.getData(), variables.getOffset());
+            variables.checkValid(!variables.allCharsConsumed(), "Identifier cannot end with '/'.");
         }
-    }
-
-    private static void skipCurrentChar(final MainVarsWrapper variables) {
-        variables.setOffset(variables.getOffset() + 1);
-    }
-
-    private static void checkValid(final boolean condition, final String errorMsg, final String data,
-            final int offset) {
-        Preconditions.checkArgument(condition, "Could not parse Instance Identifier '%s'. Offset: %s : Reason: %s",
-                data, offset, errorMsg);
     }
 
     private static Optional<ActionDefinition> findActionDefinition(final SchemaNode dataSchemaNode,
@@ -458,8 +443,17 @@ public final class YangInstanceIdentifierDeserializer {
             return offset == data.length();
         }
 
+        void checkValid(final boolean condition, final String errorMsg) {
+            checkArgument(condition, "Could not parse Instance Identifier '%s'. Offset: %s : Reason: %s", data, offset,
+                errorMsg);
+        }
+
         char currentChar() {
             return data.charAt(offset);
+        }
+
+        void skipCurrentChar() {
+            offset++;
         }
 
         public String getData() {
@@ -476,10 +470,6 @@ public final class YangInstanceIdentifierDeserializer {
 
         public int getOffset() {
             return offset;
-        }
-
-        public void setOffset(final int offset) {
-            this.offset = offset;
         }
 
         public SchemaContext getSchemaContext() {
