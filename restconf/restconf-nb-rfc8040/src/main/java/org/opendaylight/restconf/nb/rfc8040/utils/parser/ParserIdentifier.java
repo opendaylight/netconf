@@ -40,6 +40,7 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +80,7 @@ public final class ParserIdentifier {
             final SchemaContext schemaContext,
             final Optional<DOMMountPointService> mountPointService) {
         if (identifier == null || !identifier.contains(RestconfConstants.MOUNT)) {
-            return createIIdContext(IdentifierCodec.deserialize(identifier, schemaContext), schemaContext, null);
+            return createIIdContext(schemaContext, identifier, null);
         }
         if (!mountPointService.isPresent()) {
             throw new RestconfDocumentedException("Mount point service is not available");
@@ -94,24 +95,30 @@ public final class ParserIdentifier {
 
         final SchemaContext mountSchemaContext = mountPoint.getSchemaContext();
         final String pathId = pathsIt.next().replaceFirst("/", "");
-        return createIIdContext(IdentifierCodec.deserialize(pathId, mountSchemaContext), mountSchemaContext,
-            mountPoint);
+        return createIIdContext(mountSchemaContext, pathId, mountPoint);
     }
 
     /**
      * Method to create {@link InstanceIdentifierContext} from {@link YangInstanceIdentifier}
      * and {@link SchemaContext}, {@link DOMMountPoint}.
      *
-     * @param urlPath PathArgument-based path interpretation of URL
+     * @param url Invocation URL
      * @param schemaContext SchemaContext in which the path is to be interpreted in
-     * @param mountPoint A mount point handle, if the path is being interpreted relative to a mount point
+     * @param mountPoint A mount point handle, if the URL is being interpreted relative to a mount point
      * @return {@link InstanceIdentifierContext}
+     * @throws RestconfDocumentedException if the path cannot be resolved
      */
-    private static InstanceIdentifierContext<?> createIIdContext(final YangInstanceIdentifier urlPath,
-            final SchemaContext schemaContext, final @Nullable DOMMountPoint mountPoint) {
+    private static InstanceIdentifierContext<?> createIIdContext(final SchemaContext schemaContext, final String url,
+            final @Nullable DOMMountPoint mountPoint) {
+        final YangInstanceIdentifier urlPath = IdentifierCodec.deserialize(url, schemaContext);
+        return new InstanceIdentifierContext<>(urlPath, getPathSchema(schemaContext, urlPath), mountPoint,
+                schemaContext);
+    }
+
+    private static SchemaNode getPathSchema(final SchemaContext schemaContext, final YangInstanceIdentifier urlPath) {
         // First things first: an empty path means data invocation on SchemaContext
         if (urlPath.isEmpty()) {
-            return new InstanceIdentifierContext<>(urlPath, schemaContext, mountPoint, schemaContext);
+            return schemaContext;
         }
 
         // Peel the last component and locate the parent data node, empty path resolves to SchemaContext
@@ -125,7 +132,7 @@ public final class ParserIdentifier {
         // Now try to resolve the last component as a data item...
         final DataSchemaContextNode<?> data = parent.getChild(urlPath.getLastPathArgument());
         if (data != null) {
-            return new InstanceIdentifierContext<>(urlPath, data.getDataSchemaNode(), mountPoint, schemaContext);
+            return data.getDataSchemaNode();
         }
 
         // ... otherwise this has to be an operation invocation. RPCs cannot be defined anywhere but schema root,
@@ -135,14 +142,14 @@ public final class ParserIdentifier {
         if (parentSchema instanceof SchemaContext) {
             for (final RpcDefinition rpc : ((SchemaContext) parentSchema).getOperations()) {
                 if (qname.equals(rpc.getQName())) {
-                    return new InstanceIdentifierContext<>(urlPath, rpc, mountPoint, schemaContext);
+                    return rpc;
                 }
             }
         }
         if (parentSchema instanceof ActionNodeContainer) {
             for (final ActionDefinition action : ((ActionNodeContainer) parentSchema).getActions()) {
                 if (qname.equals(action.getQName())) {
-                    return new InstanceIdentifierContext<>(urlPath, action, mountPoint, schemaContext);
+                    return action;
                 }
             }
         }
