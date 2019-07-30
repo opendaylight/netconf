@@ -83,16 +83,14 @@ public final class YangInstanceIdentifierDeserializer {
             final QName qname = prepareQName(variables);
 
             // this is the last identifier (input is consumed) or end of identifier (slash)
-            if (variables.allCharsConsumed()
-                    || currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH) {
+            if (variables.allCharsConsumed() || variables.currentChar() == RestconfConstants.SLASH) {
                 prepareIdentifier(qname, path, variables);
                 if (variables.getCurrent() == null) {
                     path.add(NodeIdentifier.create(qname));
                 } else {
                     path.add(variables.getCurrent().getIdentifier());
                 }
-            } else if (currentChar(variables.getOffset(),
-                    variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL) {
+            } else if (variables.currentChar() == ParserBuilderConstants.Deserializer.EQUAL) {
                 if (nextContextNode(qname, path, variables).getDataSchemaNode() instanceof ListSchemaNode) {
                     prepareNodeWithPredicates(qname, path, variables,
                             (ListSchemaNode) variables.getCurrent().getDataSchemaNode());
@@ -101,8 +99,7 @@ public final class YangInstanceIdentifierDeserializer {
                 }
             } else {
                 throw new IllegalArgumentException(
-                        "Bad char " + currentChar(variables.getOffset(), variables.getData()) + " on position "
-                                + variables.getOffset() + ".");
+                        "Bad char " + variables.currentChar() + " on position " + variables.getOffset() + ".");
             }
         }
 
@@ -120,11 +117,10 @@ public final class YangInstanceIdentifierDeserializer {
         skipCurrentChar(variables);
 
         // read key value separated by comma
-        while (keys.hasNext() && !variables.allCharsConsumed() && currentChar(variables.getOffset(),
-                variables.getData()) != RestconfConstants.SLASH) {
+        while (keys.hasNext() && !variables.allCharsConsumed() && variables.currentChar() != RestconfConstants.SLASH) {
 
             // empty key value
-            if (currentChar(variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.COMMA) {
+            if (variables.currentChar() == ParserBuilderConstants.Deserializer.COMMA) {
                 values.put(keys.next(), ParserBuilderConstants.Deserializer.EMPTY_STRING);
                 skipCurrentChar(variables);
                 continue;
@@ -132,8 +128,7 @@ public final class YangInstanceIdentifierDeserializer {
 
             // check if next value is parsable
             RestconfValidationUtils.checkDocumentedError(
-                    ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE
-                            .matches(currentChar(variables.getOffset(), variables.getData())),
+                    ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE.matches(variables.currentChar()),
                     RestconfError.ErrorType.PROTOCOL,
                     RestconfError.ErrorTag.MALFORMED_MESSAGE,
                     ""
@@ -154,16 +149,15 @@ public final class YangInstanceIdentifierDeserializer {
 
 
             // skip comma
-            if (keys.hasNext() && !variables.allCharsConsumed() && currentChar(
-                    variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.COMMA) {
+            if (keys.hasNext() && !variables.allCharsConsumed()
+                    && variables.currentChar() == ParserBuilderConstants.Deserializer.COMMA) {
                 skipCurrentChar(variables);
             }
         }
 
         // the last key is considered to be empty
         if (keys.hasNext()) {
-            if (variables.allCharsConsumed()
-                    || currentChar(variables.getOffset(), variables.getData()) == RestconfConstants.SLASH) {
+            if (variables.allCharsConsumed() || variables.currentChar() == RestconfConstants.SLASH) {
                 values.put(keys.next(), ParserBuilderConstants.Deserializer.EMPTY_STRING);
             }
 
@@ -246,8 +240,7 @@ public final class YangInstanceIdentifierDeserializer {
 
     private static QName prepareQName(final MainVarsWrapper variables) {
         checkValid(
-                ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR
-                        .matches(currentChar(variables.getOffset(), variables.getData())),
+                ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(variables.currentChar()),
                 "Identifier must start with character from set 'a-zA-Z_'", variables.getData(), variables.getOffset());
         final String preparedPrefix = nextIdentifierFromNextSequence(
                 ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
@@ -258,7 +251,7 @@ public final class YangInstanceIdentifierDeserializer {
             return getQNameOfDataSchemaNode(preparedPrefix, variables);
         }
 
-        switch (currentChar(variables.getOffset(), variables.getData())) {
+        switch (variables.currentChar()) {
             case RestconfConstants.SLASH:
             case ParserBuilderConstants.Deserializer.EQUAL:
                 prefix = preparedPrefix;
@@ -267,14 +260,13 @@ public final class YangInstanceIdentifierDeserializer {
                 prefix = preparedPrefix;
                 skipCurrentChar(variables);
                 checkValid(
-                        ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR
-                                .matches(currentChar(variables.getOffset(), variables.getData())),
+                        ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(variables.currentChar()),
                         "Identifier must start with character from set 'a-zA-Z_'", variables.getData(),
                         variables.getOffset());
                 localName = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER, variables);
 
-                if (!variables.allCharsConsumed() && currentChar(
-                        variables.getOffset(), variables.getData()) == ParserBuilderConstants.Deserializer.EQUAL) {
+                if (!variables.allCharsConsumed()
+                        && variables.currentChar() == ParserBuilderConstants.Deserializer.EQUAL) {
                     return getQNameOfDataSchemaNode(localName, variables);
                 } else {
                     final Module module = moduleForPrefix(prefix, variables.getSchemaContext());
@@ -293,8 +285,7 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private static void nextSequenceEnd(final CharMatcher matcher, final MainVarsWrapper variables) {
-        while (!variables.allCharsConsumed()
-                && matcher.matches(variables.getData().charAt(variables.getOffset()))) {
+        while (!variables.allCharsConsumed() && matcher.matches(variables.currentChar())) {
             variables.setOffset(variables.getOffset() + 1);
         }
     }
@@ -411,13 +402,12 @@ public final class YangInstanceIdentifierDeserializer {
     private static void validArg(final MainVarsWrapper variables) {
         // every identifier except of the first MUST start with slash
         if (variables.getOffset() != MainVarsWrapper.STARTING_OFFSET) {
-            checkValid(RestconfConstants.SLASH == currentChar(variables.getOffset(), variables.getData()),
+            checkValid(RestconfConstants.SLASH == variables.currentChar(),
                     "Identifier must start with '/'.", variables.getData(), variables.getOffset());
 
             // skip consecutive slashes, users often assume restconf URLs behave just as HTTP does by squashing
             // multiple slashes into a single one
-            while (!variables.allCharsConsumed()
-                    && RestconfConstants.SLASH == currentChar(variables.getOffset(), variables.getData())) {
+            while (!variables.allCharsConsumed() && RestconfConstants.SLASH == variables.currentChar()) {
                 skipCurrentChar(variables);
             }
 
@@ -429,10 +419,6 @@ public final class YangInstanceIdentifierDeserializer {
 
     private static void skipCurrentChar(final MainVarsWrapper variables) {
         variables.setOffset(variables.getOffset() + 1);
-    }
-
-    private static char currentChar(final int offset, final String data) {
-        return data.charAt(offset);
     }
 
     private static void checkValid(final boolean condition, final String errorMsg, final String data,
@@ -470,6 +456,10 @@ public final class YangInstanceIdentifierDeserializer {
 
         boolean allCharsConsumed() {
             return offset == data.length();
+        }
+
+        char currentChar() {
+            return data.charAt(offset);
         }
 
         public String getData() {
