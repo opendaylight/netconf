@@ -365,7 +365,7 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private static String findAndParsePercentEncoded(final String preparedPrefix) {
-        if (!preparedPrefix.contains(String.valueOf(PERCENT_ENCODING))) {
+        if (preparedPrefix.indexOf(PERCENT_ENCODING) == -1) {
             return preparedPrefix;
         }
 
