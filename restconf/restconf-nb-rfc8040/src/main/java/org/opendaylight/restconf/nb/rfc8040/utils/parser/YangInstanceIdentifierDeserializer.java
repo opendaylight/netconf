@@ -79,7 +79,7 @@ public final class YangInstanceIdentifierDeserializer {
                 YangInstanceIdentifierDeserializer.MainVarsWrapper.STARTING_OFFSET, schemaContext);
 
         while (!variables.allCharsConsumed()) {
-            validArg(variables);
+            variables.validArg();
             final QName qname = prepareQName(variables);
 
             // this is the last identifier (input is consumed) or end of identifier (slash)
@@ -384,22 +384,6 @@ public final class YangInstanceIdentifierDeserializer {
         return schemaContext.findModules(prefix).stream().findFirst().orElse(null);
     }
 
-    private static void validArg(final MainVarsWrapper variables) {
-        // every identifier except of the first MUST start with slash
-        if (variables.getOffset() != MainVarsWrapper.STARTING_OFFSET) {
-            variables.checkValid(RestconfConstants.SLASH == variables.currentChar(), "Identifier must start with '/'.");
-
-            // skip consecutive slashes, users often assume restconf URLs behave just as HTTP does by squashing
-            // multiple slashes into a single one
-            while (!variables.allCharsConsumed() && RestconfConstants.SLASH == variables.currentChar()) {
-                variables.skipCurrentChar();
-            }
-
-            // check if slash is not also the last char in identifier
-            variables.checkValid(!variables.allCharsConsumed(), "Identifier cannot end with '/'.");
-        }
-    }
-
     private static Optional<ActionDefinition> findActionDefinition(final SchemaNode dataSchemaNode,
             final String nodeName) {
         requireNonNull(dataSchemaNode, "DataSchema Node must not be null.");
@@ -450,6 +434,22 @@ public final class YangInstanceIdentifierDeserializer {
                 skipCurrentChar();
             }
             return data.substring(start, offset);
+        }
+
+        void validArg() {
+            // every identifier except of the first MUST start with slash
+            if (offset != MainVarsWrapper.STARTING_OFFSET) {
+                checkValid(RestconfConstants.SLASH == currentChar(), "Identifier must start with '/'.");
+
+                // skip consecutive slashes, users often assume restconf URLs behave just as HTTP does by squashing
+                // multiple slashes into a single one
+                while (!allCharsConsumed() && RestconfConstants.SLASH == currentChar()) {
+                    skipCurrentChar();
+                }
+
+                // check if slash is not also the last char in identifier
+                checkValid(!allCharsConsumed(), "Identifier cannot end with '/'.");
+            }
         }
 
         public DataSchemaContextNode<?> getCurrent() {
