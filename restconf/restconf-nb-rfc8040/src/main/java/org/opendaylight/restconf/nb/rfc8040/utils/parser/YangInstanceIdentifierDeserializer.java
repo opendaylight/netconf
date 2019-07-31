@@ -9,6 +9,18 @@ package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants.SLASH;
+import static org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Deserializer.COLON;
+import static org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Deserializer.COMMA;
+import static org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Deserializer.EMPTY_STRING;
+import static org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Deserializer.EQUAL;
+import static org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Deserializer.FIRST_ENCODED_CHAR;
+import static org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Deserializer.IDENTIFIER;
+import static org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR;
+import static org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE;
+import static org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Deserializer.LAST_ENCODED_CHAR;
+import static org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Deserializer.PERCENT_ENCODED_RADIX;
+import static org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Deserializer.PERCENT_ENCODING;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableList;
@@ -24,8 +36,6 @@ import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.restconf.common.util.RestconfSchemaUtil;
 import org.opendaylight.restconf.common.validation.RestconfValidationUtils;
 import org.opendaylight.restconf.nb.rfc8040.codecs.RestCodec;
-import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
-import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -87,10 +97,10 @@ public final class YangInstanceIdentifierDeserializer {
             final QName qname = prepareQName();
 
             // this is the last identifier (input is consumed) or end of identifier (slash)
-            if (allCharsConsumed() || currentChar() == RestconfConstants.SLASH) {
+            if (allCharsConsumed() || currentChar() == SLASH) {
                 prepareIdentifier(qname, path);
                 path.add(current == null ? NodeIdentifier.create(qname) : current.getIdentifier());
-            } else if (currentChar() == ParserBuilderConstants.Deserializer.EQUAL) {
+            } else if (currentChar() == EQUAL) {
                 if (nextContextNode(qname, path).getDataSchemaNode() instanceof ListSchemaNode) {
                     prepareNodeWithPredicates(qname, path, (ListSchemaNode) current.getDataSchemaNode());
                 } else {
@@ -115,22 +125,18 @@ public final class YangInstanceIdentifierDeserializer {
         skipCurrentChar();
 
         // read key value separated by comma
-        while (keys.hasNext() && !allCharsConsumed() && currentChar() != RestconfConstants.SLASH) {
+        while (keys.hasNext() && !allCharsConsumed() && currentChar() != SLASH) {
 
             // empty key value
-            if (currentChar() == ParserBuilderConstants.Deserializer.COMMA) {
-                values.put(keys.next(), ParserBuilderConstants.Deserializer.EMPTY_STRING);
+            if (currentChar() == COMMA) {
+                values.put(keys.next(), EMPTY_STRING);
                 skipCurrentChar();
                 continue;
             }
 
             // check if next value is parsable
-            RestconfValidationUtils.checkDocumentedError(
-                    ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE.matches(currentChar()),
-                    RestconfError.ErrorType.PROTOCOL,
-                    RestconfError.ErrorTag.MALFORMED_MESSAGE,
-                    ""
-            );
+            RestconfValidationUtils.checkDocumentedError(IDENTIFIER_PREDICATE.matches(currentChar()),
+                    RestconfError.ErrorType.PROTOCOL,RestconfError.ErrorTag.MALFORMED_MESSAGE, "");
 
             // parse value
             final QName key = keys.next();
@@ -140,22 +146,21 @@ public final class YangInstanceIdentifierDeserializer {
                         RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
             }
 
-            final String value = findAndParsePercentEncoded(nextIdentifierFromNextSequence(
-                    ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE));
+            final String value = findAndParsePercentEncoded(nextIdentifierFromNextSequence(IDENTIFIER_PREDICATE));
             final Object valueByType = prepareValueByType(leafSchemaNode.get(), value);
             values.put(key, valueByType);
 
 
             // skip comma
-            if (keys.hasNext() && !allCharsConsumed() && currentChar() == ParserBuilderConstants.Deserializer.COMMA) {
+            if (keys.hasNext() && !allCharsConsumed() && currentChar() == COMMA) {
                 skipCurrentChar();
             }
         }
 
         // the last key is considered to be empty
         if (keys.hasNext()) {
-            if (allCharsConsumed() || currentChar() == RestconfConstants.SLASH) {
-                values.put(keys.next(), ParserBuilderConstants.Deserializer.EMPTY_STRING);
+            if (allCharsConsumed() || currentChar() == SLASH) {
+                values.put(keys.next(), EMPTY_STRING);
             }
 
             // there should be no more missing keys
@@ -194,9 +199,9 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private QName prepareQName() {
-        checkValid(ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(currentChar()),
-                "Identifier must start with character from set 'a-zA-Z_'");
-        final String preparedPrefix = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER);
+        checkValid(IDENTIFIER_FIRST_CHAR.matches(currentChar()),
+            "Identifier must start with character from set 'a-zA-Z_'");
+        final String preparedPrefix = nextIdentifierFromNextSequence(IDENTIFIER);
         final String prefix;
         final String localName;
 
@@ -205,18 +210,18 @@ public final class YangInstanceIdentifierDeserializer {
         }
 
         switch (currentChar()) {
-            case RestconfConstants.SLASH:
-            case ParserBuilderConstants.Deserializer.EQUAL:
+            case SLASH:
+            case EQUAL:
                 prefix = preparedPrefix;
                 return getQNameOfDataSchemaNode(prefix);
-            case ParserBuilderConstants.Deserializer.COLON:
+            case COLON:
                 prefix = preparedPrefix;
                 skipCurrentChar();
-                checkValid(ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(currentChar()),
+                checkValid(IDENTIFIER_FIRST_CHAR.matches(currentChar()),
                         "Identifier must start with character from set 'a-zA-Z_'");
-                localName = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER);
+                localName = nextIdentifierFromNextSequence(IDENTIFIER);
 
-                if (!allCharsConsumed() && currentChar() == ParserBuilderConstants.Deserializer.EQUAL) {
+                if (!allCharsConsumed() && currentChar() == EQUAL) {
                     return getQNameOfDataSchemaNode(localName);
                 } else {
                     final Module module = moduleForPrefix(prefix);
@@ -230,7 +235,7 @@ public final class YangInstanceIdentifierDeserializer {
 
     private void prepareNodeWithValue(final QName qname, final List<PathArgument> path) {
         skipCurrentChar();
-        final String value = nextIdentifierFromNextSequence(ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE);
+        final String value = nextIdentifierFromNextSequence(IDENTIFIER_PREDICATE);
 
         // exception if value attribute is missing
         RestconfValidationUtils.checkDocumentedError(
@@ -324,11 +329,11 @@ public final class YangInstanceIdentifierDeserializer {
     private void validArg() {
         // every identifier except of the first MUST start with slash
         if (offset != 0) {
-            checkValid(RestconfConstants.SLASH == currentChar(), "Identifier must start with '/'.");
+            checkValid(SLASH == currentChar(), "Identifier must start with '/'.");
 
             // skip consecutive slashes, users often assume restconf URLs behave just as HTTP does by squashing
             // multiple slashes into a single one
-            while (!allCharsConsumed() && RestconfConstants.SLASH == currentChar()) {
+            while (!allCharsConsumed() && SLASH == currentChar()) {
                 skipCurrentChar();
             }
 
@@ -360,22 +365,19 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private static String findAndParsePercentEncoded(final String preparedPrefix) {
-        if (!preparedPrefix.contains(String.valueOf(ParserBuilderConstants.Deserializer.PERCENT_ENCODING))) {
+        if (!preparedPrefix.contains(String.valueOf(PERCENT_ENCODING))) {
             return preparedPrefix;
         }
 
         final StringBuilder parsedPrefix = new StringBuilder(preparedPrefix);
-        final CharMatcher matcher = CharMatcher.is(ParserBuilderConstants.Deserializer.PERCENT_ENCODING);
+        final CharMatcher matcher = CharMatcher.is(PERCENT_ENCODING);
 
         while (matcher.matchesAnyOf(parsedPrefix)) {
             final int percentCharPosition = matcher.indexIn(parsedPrefix);
-            parsedPrefix.replace(
-                    percentCharPosition,
-                    percentCharPosition + ParserBuilderConstants.Deserializer.LAST_ENCODED_CHAR,
+            parsedPrefix.replace(percentCharPosition, percentCharPosition + LAST_ENCODED_CHAR,
                     String.valueOf((char) Integer.parseInt(parsedPrefix.substring(
-                            percentCharPosition + ParserBuilderConstants.Deserializer.FIRST_ENCODED_CHAR,
-                            percentCharPosition + ParserBuilderConstants.Deserializer.LAST_ENCODED_CHAR),
-                            ParserBuilderConstants.Deserializer.PERCENT_ENCODED_RADIX)));
+                            percentCharPosition + FIRST_ENCODED_CHAR, percentCharPosition + LAST_ENCODED_CHAR),
+                            PERCENT_ENCODED_RADIX)));
         }
 
         return parsedPrefix.toString();
