@@ -199,8 +199,7 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private QName prepareQName() {
-        checkValid(IDENTIFIER_FIRST_CHAR.matches(currentChar()),
-            "Identifier must start with character from set 'a-zA-Z_'");
+        checkValidIdentifierStart();
         final String preparedPrefix = nextIdentifierFromNextSequence(IDENTIFIER);
         final String prefix;
         final String localName;
@@ -217,8 +216,7 @@ public final class YangInstanceIdentifierDeserializer {
             case COLON:
                 prefix = preparedPrefix;
                 skipCurrentChar();
-                checkValid(IDENTIFIER_FIRST_CHAR.matches(currentChar()),
-                        "Identifier must start with character from set 'a-zA-Z_'");
+                checkValidIdentifierStart();
                 localName = nextIdentifierFromNextSequence(IDENTIFIER);
 
                 if (!allCharsConsumed() && currentChar() == EQUAL) {
@@ -297,6 +295,11 @@ public final class YangInstanceIdentifierDeserializer {
     private void checkValid(final boolean condition, final String errorMsg) {
         checkArgument(condition, "Could not parse Instance Identifier '%s'. Offset: %s : Reason: %s", data, offset,
             errorMsg);
+    }
+
+    private void checkValidIdentifierStart() {
+        checkValid(IDENTIFIER_FIRST_CHAR.matches(currentChar()),
+            "Identifier must start with character from set 'a-zA-Z_'");
     }
 
     private char currentChar() {
