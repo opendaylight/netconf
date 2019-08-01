@@ -76,6 +76,8 @@ public final class Rfc8040 {
                 QName.create(IETF_RESTCONF_QNAME, RESTCONF_CONTAINER_SCHEMA_NODE).intern();
         public static final QName LIB_VER_LEAF_QNAME = QName.create(IETF_RESTCONF_QNAME, LIB_VER_LEAF_SCHEMA_NODE)
                 .intern();
+        public static final QName RESTCONF_DATA_CONTAINER_QNAME = QName.create(
+                URI.create("urn:ietf:params:xml:ns:netconf:base:1.0"), DATA_CONTAINER_SCHEMA_NODE);
 
         // ERRORS
         public static final String ERRORS_GROUPING_SCHEMA_NODE = "errors";
