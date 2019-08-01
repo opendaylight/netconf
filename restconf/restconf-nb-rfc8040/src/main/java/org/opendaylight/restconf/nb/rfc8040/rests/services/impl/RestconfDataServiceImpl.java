@@ -149,7 +149,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final NormalizedNode<?, ?> node =
                 ReadDataTransactionUtil.readData(identifier, parameters.getContent(), transactionNode, withDefa,
                         schemaContextRef, uriInfo);
-        if (identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
+        if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
             final String streamName = value.substring(
