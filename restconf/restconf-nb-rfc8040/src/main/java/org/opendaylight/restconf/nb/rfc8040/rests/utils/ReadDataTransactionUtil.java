@@ -92,39 +92,15 @@ public final class ReadDataTransactionUtil {
     /**
      * Parse parameters from URI request and check their types and values.
      *
-     *
-     * @param identifier
-     *             {@link InstanceIdentifierContext}
-     * @param uriInfo
-     *             URI info
-     * @param tagged
-     *             set tagged for {@link WriterParameters}
-     * @return {@link WriterParameters}
-     */
-    public static @NonNull WriterParameters parseUriParameters(final @NonNull InstanceIdentifierContext<?> identifier,
-            final @Nullable UriInfo uriInfo, final boolean tagged) {
-        return parseParams(identifier, uriInfo, tagged);
-    }
-
-    /**
-     * Parse parameters from URI request and check their types and values.
-     *
-     *
      * @param identifier
      *             {@link InstanceIdentifierContext}
      * @param uriInfo
      *             URI info
      * @return {@link WriterParameters}
      */
-    public static @NonNull WriterParameters parseUriParameters(final @NonNull InstanceIdentifierContext<?> identifier,
-                                                               final @Nullable UriInfo uriInfo) {
-        return parseParams(identifier, uriInfo, false);
-    }
-
-    private static WriterParameters parseParams(final InstanceIdentifierContext<?> identifier, final UriInfo uriInfo,
-            final boolean tagged) {
+    public static WriterParameters parseUriParameters(final InstanceIdentifierContext<?> identifier,
+                                                      final UriInfo uriInfo) {
         final WriterParametersBuilder builder = new WriterParametersBuilder();
-        builder.setTagged(tagged);
 
         if (uriInfo == null) {
             return builder.build();
@@ -145,6 +121,9 @@ public final class ReadDataTransactionUtil {
         final List<String> depth = uriInfo.getQueryParameters().getOrDefault(
                 RestconfDataServiceConstant.ReadData.DEPTH,
                 Collections.singletonList(RestconfDataServiceConstant.ReadData.UNBOUNDED));
+        final List<String> withDefaults = uriInfo.getQueryParameters().getOrDefault(
+                RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
+                Collections.emptyList());
         // fields
         final List<String> fields = uriInfo.getQueryParameters().getOrDefault(
                 RestconfDataServiceConstant.ReadData.FIELDS,
@@ -154,6 +133,7 @@ public final class ReadDataTransactionUtil {
         ParametersUtil.checkParameterCount(content, RestconfDataServiceConstant.ReadData.CONTENT);
         ParametersUtil.checkParameterCount(depth, RestconfDataServiceConstant.ReadData.DEPTH);
         ParametersUtil.checkParameterCount(fields, RestconfDataServiceConstant.ReadData.FIELDS);
+        ParametersUtil.checkParameterCount(fields, RestconfDataServiceConstant.ReadData.WITH_DEFAULTS);
 
         // check and set content
         final String contentValue = content.get(0);
@@ -188,6 +168,19 @@ public final class ReadDataTransactionUtil {
         // check and set fields
         if (!fields.isEmpty()) {
             builder.setFields(ParserFieldsParameter.parseFieldsParameter(identifier, fields.get(0)));
+        }
+
+        // check and set withDefaults parameter
+        if (!withDefaults.isEmpty()) {
+            switch (withDefaults.get(0)) {
+                case RestconfDataServiceConstant.ReadData.REPORT_ALL_TAGGED_DEFAULT_VALUE:
+                    builder.setTagged(true);
+                    break;
+                case RestconfDataServiceConstant.ReadData.REPORT_ALL_DEFAULT_VALUE:
+                    break;
+                default:
+                    builder.setWithDefault(withDefaults.get(0));
+            }
         }
 
         return builder.build();

@@ -46,6 +46,8 @@ public final class RestconfDataServiceConstant {
 
         public static final String READ_TYPE_TX = "READ";
         public static final String WITH_DEFAULTS = "with-defaults";
+        public static final String REPORT_ALL_DEFAULT_VALUE = "report-all";
+        public static final String REPORT_ALL_TAGGED_DEFAULT_VALUE = "report-all-tagged";
 
         private ReadData() {
             throw new UnsupportedOperationException("Util class.");
