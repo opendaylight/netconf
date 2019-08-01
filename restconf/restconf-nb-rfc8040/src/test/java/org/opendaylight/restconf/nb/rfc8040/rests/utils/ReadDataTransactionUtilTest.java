@@ -8,8 +8,10 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
@@ -36,6 +38,7 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.ReadData;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -436,5 +439,60 @@ public class ReadDataTransactionUtilTest {
             assertEquals("Error tag is not correct", ErrorTag.INVALID_VALUE, e.getErrors().get(0).getErrorTag());
             assertEquals("Error status code is not correct", 400, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
+    }
+
+    /**
+     * Testing parsing of with-defaults parameter which value doesn't match report-all or report-all-tagged patterns
+     * - non-reporting setting.
+     */
+    @Test
+    public void parseUriParametersWithDefaultAndNonTaggedTest() {
+        // preparation of input data
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
+        final String preparedDefaultValue = "sample-default";
+        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
+                Collections.singletonList(preparedDefaultValue));
+        when(uriInfo.getQueryParameters()).thenReturn(parameters);
+
+        final WriterParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
+        assertEquals(preparedDefaultValue, writerParameters.getWithDefault());
+        assertFalse(writerParameters.isTagged());
+    }
+
+    /**
+     * Testing parsing of with-defaults parameter which value matches 'report-all-tagged' setting - default value should
+     * be set to {@code null} and tagged flag should be set to {@code true}.
+     */
+    @Test
+    public void parseUriParametersWithDefaultAndTaggedTest() {
+        // preparation of input data
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
+        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
+                Collections.singletonList(ReadData.REPORT_ALL_TAGGED_DEFAULT_VALUE));
+        when(uriInfo.getQueryParameters()).thenReturn(parameters);
+
+        final WriterParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
+        assertNull(writerParameters.getWithDefault());
+        assertTrue(writerParameters.isTagged());
+    }
+
+    /**
+     * Testing parsing of with-defaults parameter which value matches 'report-all' setting - default value should
+     * be set to {@code null} and tagged flag should be set to {@code false}.
+     */
+    @Test
+    public void parseUriParametersWithDefaultAndReportAllTest() {
+        // preparation of input data
+        final UriInfo uriInfo = Mockito.mock(UriInfo.class);
+        final MultivaluedHashMap<String, String> parameters = new MultivaluedHashMap<>();
+        parameters.put(RestconfDataServiceConstant.ReadData.WITH_DEFAULTS,
+                Collections.singletonList(ReadData.REPORT_ALL_DEFAULT_VALUE));
+        when(uriInfo.getQueryParameters()).thenReturn(parameters);
+
+        final WriterParameters writerParameters = ReadDataTransactionUtil.parseUriParameters(context, uriInfo);
+        assertNull(writerParameters.getWithDefault());
+        assertFalse(writerParameters.isTagged());
     }
 }
