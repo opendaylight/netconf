@@ -270,7 +270,7 @@ public final class ReadDataTransactionUtil {
                                                 final TransactionVarsWrapper transactionNode, final String withDefa,
                                                 final SchemaContextRef schemaContextRef, final UriInfo uriInfo) {
         final SchemaContext schemaContext = schemaContextRef.get();
-        if (identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
+        if (identifier != null && identifier.contains(STREAMS_PATH) && !identifier.contains(STREAM_PATH_PART)) {
             createAllYangNotificationStreams(transactionNode, schemaContextRef, uriInfo);
         }
         return readData(content, transactionNode, withDefa, schemaContext);
