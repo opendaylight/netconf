@@ -24,6 +24,7 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateTrueFluentFuture;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -55,6 +56,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchEntity;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
+import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
@@ -63,12 +65,16 @@ import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSubscriptionService;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
@@ -213,6 +219,35 @@ public class RestconfDataServiceImplTest {
         assertNotNull(response);
         assertEquals(200, response.getStatus());
         assertEquals(this.buildBaseCont, ((NormalizedNodeContext) response.getEntity()).getData());
+    }
+
+    @Test
+    public void testReadRootData() {
+        doReturn(new MultivaluedHashMap<String, String>()).when(this.uriInfo).getQueryParameters();
+        doReturn(immediateFluentFuture(Optional.of(wrapNodeByDataRootContainer(this.buildBaseContConfig))))
+                .when(this.read)
+                .read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.EMPTY);
+        doReturn(immediateFluentFuture(Optional.of(wrapNodeByDataRootContainer(this.buildBaseContOperational))))
+                .when(this.read)
+                .read(LogicalDatastoreType.OPERATIONAL, YangInstanceIdentifier.EMPTY);
+        final Response response = this.dataService.readData(this.uriInfo);
+        assertNotNull(response);
+        assertEquals(200, response.getStatus());
+
+        final NormalizedNode<?, ?> data = ((NormalizedNodeContext) response.getEntity()).getData();
+        assertTrue(data instanceof ContainerNode);
+        final Collection<DataContainerChild<? extends PathArgument, ?>> rootNodes = ((ContainerNode) data).getValue();
+        assertEquals(1, rootNodes.size());
+        final Collection<DataContainerChild<? extends PathArgument, ?>> allDataChildren
+                = ((ContainerNode) rootNodes.iterator().next()).getValue();
+        assertEquals(3, allDataChildren.size());
+    }
+
+    private static ContainerNode wrapNodeByDataRootContainer(final DataContainerChild<?, ?> data) {
+        return ImmutableContainerNodeBuilder.create()
+                .withNodeIdentifier(NodeIdentifier.create(Rfc8040.RestconfModule.RESTCONF_DATA_CONTAINER_QNAME))
+                .withChild(data)
+                .build();
     }
 
     /**
