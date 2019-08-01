@@ -103,38 +103,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final SchemaContextRef schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
         final InstanceIdentifierContext<?> instanceIdentifier = ParserIdentifier.toInstanceIdentifier(
                 identifier, schemaContextRef.get(), Optional.of(this.mountPointServiceHandler.get()));
-
-        boolean withDefaUsed = false;
-        String withDefa = null;
-
-        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            switch (entry.getKey()) {
-                case "with-defaults":
-                    if (!withDefaUsed) {
-                        withDefaUsed = true;
-                        withDefa = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("With-defaults parameter can be used only once.");
-                    }
-                    break;
-                default:
-                    LOG.info("Unknown key : {}.", entry.getKey());
-                    break;
-            }
-        }
-        boolean tagged = false;
-        if (withDefaUsed) {
-            if ("report-all-tagged".equals(withDefa)) {
-                tagged = true;
-                withDefa = null;
-            }
-            if ("report-all".equals(withDefa)) {
-                withDefa = null;
-            }
-        }
-
-        final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(
-                instanceIdentifier, uriInfo, tagged);
+        final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
         final TransactionChainHandler localTransactionChainHandler;
@@ -146,9 +115,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 instanceIdentifier, mountPoint, localTransactionChainHandler);
-        final NormalizedNode<?, ?> node =
-                ReadDataTransactionUtil.readData(identifier, parameters.getContent(), transactionNode, withDefa,
-                        schemaContextRef, uriInfo);
+        final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(identifier, parameters.getContent(),
+                transactionNode, parameters.getWithDefault(), schemaContextRef, uriInfo);
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
