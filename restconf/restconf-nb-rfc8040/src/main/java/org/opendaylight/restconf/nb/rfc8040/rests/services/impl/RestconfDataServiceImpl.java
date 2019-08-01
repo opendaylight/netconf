@@ -106,15 +106,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final WriterParameters parameters = ReadDataTransactionUtil.parseUriParameters(instanceIdentifier, uriInfo);
 
         final DOMMountPoint mountPoint = instanceIdentifier.getMountPoint();
-        final TransactionChainHandler localTransactionChainHandler;
-        if (mountPoint == null) {
-            localTransactionChainHandler = this.transactionChainHandler;
-        } else {
-            localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
-        }
-
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                instanceIdentifier, mountPoint, localTransactionChainHandler);
+                instanceIdentifier, mountPoint, getTransactionChainHandler(mountPoint));
         final NormalizedNode<?, ?> node = ReadDataTransactionUtil.readData(identifier, parameters.getContent(),
                 transactionNode, parameters.getWithDefault(), schemaContextRef, uriInfo);
         if (identifier != null && identifier.contains(STREAM_PATH) && identifier.contains(STREAM_ACCESS_PATH_PART)
@@ -252,18 +245,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         checkQueryParams(insertUsed, pointUsed, insert);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final TransactionChainHandler localTransactionChainHandler;
-        final SchemaContextRef ref;
-        if (mountPoint == null) {
-            localTransactionChainHandler = this.transactionChainHandler;
-            ref = new SchemaContextRef(this.schemaContextHandler.get());
-        } else {
-            localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
-            ref = new SchemaContextRef(mountPoint.getSchemaContext());
-        }
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                payload.getInstanceIdentifierContext(), mountPoint, localTransactionChainHandler);
-        return PostDataTransactionUtil.postData(uriInfo, payload, transactionNode, ref, insert, point);
+                payload.getInstanceIdentifierContext(), mountPoint, getTransactionChainHandler(mountPoint));
+        return PostDataTransactionUtil.postData(uriInfo, payload, transactionNode,
+                getSchemaContext(mountPoint), insert, point);
     }
 
     @Override
@@ -293,21 +278,18 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     @Override
     public PatchStatusContext patchData(final PatchContext context, final UriInfo uriInfo) {
         final DOMMountPoint mountPoint = requireNonNull(context).getInstanceIdentifierContext().getMountPoint();
-
-        final TransactionChainHandler localTransactionChainHandler;
-        final SchemaContextRef ref;
-        if (mountPoint == null) {
-            localTransactionChainHandler = this.transactionChainHandler;
-            ref = new SchemaContextRef(this.schemaContextHandler.get());
-        } else {
-            localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
-            ref = new SchemaContextRef(mountPoint.getSchemaContext());
-        }
-
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                context.getInstanceIdentifierContext(), mountPoint, localTransactionChainHandler);
+                context.getInstanceIdentifierContext(), mountPoint, getTransactionChainHandler(mountPoint));
+        return PatchDataTransactionUtil.patchData(context, transactionNode, getSchemaContext(mountPoint));
+    }
 
-        return PatchDataTransactionUtil.patchData(context, transactionNode, ref);
+    private TransactionChainHandler getTransactionChainHandler(final DOMMountPoint mountPoint) {
+        return mountPoint == null ? transactionChainHandler : transactionChainOfMountPoint(mountPoint);
+    }
+
+    private SchemaContextRef getSchemaContext(final DOMMountPoint mountPoint) {
+        return mountPoint == null ? new SchemaContextRef(schemaContextHandler.get())
+                : new SchemaContextRef(mountPoint.getSchemaContext());
     }
 
     /**
