@@ -13,12 +13,15 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.Application;
+import org.apache.aries.blueprint.annotation.service.Reference;
+import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeXmlBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyReader;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.JsonToPatchBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.PatchJsonBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.PatchXmlBodyWriter;
@@ -33,13 +36,16 @@ public class RestconfApplication extends Application {
     private final SchemaContextHandler schemaContextHandler;
     private final DOMMountPointServiceHandler mountPointServiceHandler;
     private final ServicesWrapper servicesWrapper;
+    private final BindingNormalizedNodeSerializer bindingCodec;
 
     @Inject
     public RestconfApplication(SchemaContextHandler schemaContextHandler,
-            DOMMountPointServiceHandler mountPointServiceHandler, ServicesWrapper servicesWrapper) {
+            DOMMountPointServiceHandler mountPointServiceHandler, ServicesWrapper servicesWrapper,
+            @Reference BindingNormalizedNodeSerializer bindingCodec) {
         this.schemaContextHandler = schemaContextHandler;
         this.mountPointServiceHandler = mountPointServiceHandler;
         this.servicesWrapper = servicesWrapper;
+        this.bindingCodec = bindingCodec;
     }
 
     @Override
@@ -59,6 +65,7 @@ public class RestconfApplication extends Application {
         singletons.add(new JsonToPatchBodyReader(schemaContextHandler, mountPointServiceHandler));
         singletons.add(new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler));
         singletons.add(new XmlToPatchBodyReader(schemaContextHandler, mountPointServiceHandler));
+        singletons.add(new RestconfDocumentedExceptionMapper(bindingCodec, schemaContextHandler));
         return singletons;
     }
 }
