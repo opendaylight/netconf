@@ -23,12 +23,11 @@ public class RefreshSlaveActor {
     private final Timeout actorResponseWaitTime;
 
     public RefreshSlaveActor(final NetconfTopologySetup setup, final RemoteDeviceId id,
-                             final SchemaSourceRegistry schemaRegistry, final SchemaRepository schemaRepository,
                              final Timeout actorResponseWaitTime) {
         this.setup = setup;
         this.id = id;
-        this.schemaRegistry = schemaRegistry;
-        this.schemaRepository = schemaRepository;
+        this.schemaRegistry = setup.getSchemaResourcesDTO().getSchemaRegistry();
+        this.schemaRepository = setup.getSchemaResourcesDTO().getSchemaRepository();
         this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
