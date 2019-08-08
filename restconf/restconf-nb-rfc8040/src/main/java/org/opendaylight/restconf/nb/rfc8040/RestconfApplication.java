@@ -19,6 +19,7 @@ import org.opendaylight.restconf.nb.rfc8040.jersey.providers.JsonNormalizedNodeB
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.NormalizedNodeXmlBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.XmlNormalizedNodeBodyReader;
+import org.opendaylight.restconf.nb.rfc8040.jersey.providers.errors.RestconfDocumentedExceptionMapper;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.JsonToPatchBodyReader;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.PatchJsonBodyWriter;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.patch.PatchXmlBodyWriter;
@@ -59,6 +60,7 @@ public class RestconfApplication extends Application {
         singletons.add(new JsonToPatchBodyReader(schemaContextHandler, mountPointServiceHandler));
         singletons.add(new XmlNormalizedNodeBodyReader(schemaContextHandler, mountPointServiceHandler));
         singletons.add(new XmlToPatchBodyReader(schemaContextHandler, mountPointServiceHandler));
+        singletons.add(new RestconfDocumentedExceptionMapper(schemaContextHandler));
         return singletons;
     }
 }
