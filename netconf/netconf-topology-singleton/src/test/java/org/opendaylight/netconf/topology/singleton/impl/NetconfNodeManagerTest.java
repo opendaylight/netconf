@@ -392,8 +392,7 @@ public class NetconfNodeManagerTest {
 
         TestMasterActor(final NetconfTopologySetup setup, final RemoteDeviceId deviceId,
                 final Timeout actorResponseWaitTime, final DOMMountPointService mountPointService) {
-            super(setup, deviceId, setup.getSchemaResourcesDTO().getSchemaRegistry(),
-                    setup.getSchemaResourcesDTO().getSchemaRepository(), actorResponseWaitTime, mountPointService);
+            super(setup, deviceId, actorResponseWaitTime, mountPointService);
         }
 
         @SuppressWarnings({ "rawtypes", "unchecked" })

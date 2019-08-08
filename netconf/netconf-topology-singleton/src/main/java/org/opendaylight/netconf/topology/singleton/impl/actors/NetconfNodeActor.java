@@ -83,23 +83,19 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private ActorRef readTxActor;
     private List<SchemaSourceRegistration<YangTextSchemaSource>> registeredSchemas;
 
-    public static Props props(final NetconfTopologySetup setup,
-                              final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
-                              final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime,
-                              final DOMMountPointService mountPointService) {
+    public static Props props(final NetconfTopologySetup setup, final RemoteDeviceId id,
+            final Timeout actorResponseWaitTime, final DOMMountPointService mountPointService) {
         return Props.create(NetconfNodeActor.class, () ->
-                new NetconfNodeActor(setup, id, schemaRegistry, schemaRepository, actorResponseWaitTime,
-                        mountPointService));
+                new NetconfNodeActor(setup, id, actorResponseWaitTime, mountPointService));
     }
 
     protected NetconfNodeActor(final NetconfTopologySetup setup,
-                               final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
-                               final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime,
+                               final RemoteDeviceId id, final Timeout actorResponseWaitTime,
                                final DOMMountPointService mountPointService) {
         this.setup = setup;
         this.id = id;
-        this.schemaRegistry = schemaRegistry;
-        this.schemaRepository = schemaRepository;
+        this.schemaRegistry = setup.getSchemaResourcesDTO().getSchemaRegistry();
+        this.schemaRepository = setup.getSchemaResourcesDTO().getSchemaRepository();
         this.actorResponseWaitTime = actorResponseWaitTime;
         this.writeTxIdleTimeout = setup.getIdleTimeout();
         this.mountPointService = mountPointService;

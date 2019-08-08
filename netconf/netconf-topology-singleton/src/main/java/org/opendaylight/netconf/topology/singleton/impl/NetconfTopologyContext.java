@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import static java.util.Objects.requireNonNull;
-import static org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
 
 import akka.actor.ActorRef;
 import akka.cluster.Cluster;
@@ -82,8 +81,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             final String masterAddress =
                     Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
             masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
-                    netconfTopologyDeviceSetup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY,
-                    actorResponseWaitTime, mountService),
+                    netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime, mountService),
                     NetconfTopologyUtils.createMasterActorName(remoteDeviceId.getName(), masterAddress));
 
             remoteDeviceConnector.startRemoteDeviceConnection(newMasterSalFacade());
