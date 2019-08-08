@@ -7,8 +7,6 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
-import static org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
-
 import akka.actor.ActorRef;
 import akka.cluster.Cluster;
 import akka.dispatch.OnComplete;
@@ -18,7 +16,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
-import javax.annotation.Nonnull;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonService;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
@@ -82,8 +79,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             final String masterAddress =
                     Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
             masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
-                    netconfTopologyDeviceSetup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY,
-                    actorResponseWaitTime, mountService),
+                    netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime, mountService),
                     NetconfTopologyUtils.createMasterActorName(remoteDeviceId.getName(), masterAddress));
 
             remoteDeviceConnector.startRemoteDeviceConnection(newMasterSalFacade());
@@ -135,7 +131,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
      * Refresh, if configuration data was changed.
      * @param setup new setup
      */
-    void refresh(@Nonnull final NetconfTopologySetup setup) {
+    void refresh(final NetconfTopologySetup setup) {
         netconfTopologyDeviceSetup = Preconditions.checkNotNull(setup);
         remoteDeviceId = NetconfTopologyUtils.createRemoteDeviceId(netconfTopologyDeviceSetup.getNode().getNodeId(),
                 netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class));
