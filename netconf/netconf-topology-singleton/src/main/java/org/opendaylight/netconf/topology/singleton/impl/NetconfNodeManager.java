@@ -39,8 +39,6 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
-import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.concurrent.Future;
@@ -56,8 +54,6 @@ class NetconfNodeManager
 
     private final Timeout actorResponseWaitTime;
     private final DOMMountPointService mountPointService;
-    private final SchemaSourceRegistry schemaRegistry;
-    private final SchemaRepository schemaRepository;
 
     private volatile NetconfTopologySetup setup;
     private volatile ListenerRegistration<NetconfNodeManager> dataChangeListenerRegistration;
@@ -77,8 +73,6 @@ class NetconfNodeManager
                        final DOMMountPointService mountPointService) {
         this.setup = setup;
         this.id = id;
-        this.schemaRegistry = setup.getSchemaResourcesDTO().getSchemaRegistry();
-        this.schemaRepository = setup.getSchemaResourcesDTO().getSchemaRepository();
         this.actorResponseWaitTime = actorResponseWaitTime;
         this.mountPointService = mountPointService;
     }
@@ -213,13 +207,12 @@ class NetconfNodeManager
     @GuardedBy("this")
     private void createOrUpdateActorRef() {
         if (slaveActorRef == null) {
-            slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.props(setup, id, schemaRegistry,
-                    schemaRepository, actorResponseWaitTime, mountPointService));
+            slaveActorRef = setup.getActorSystem().actorOf(NetconfNodeActor.props(setup, id, actorResponseWaitTime,
+                    mountPointService));
             LOG.debug("{}: Slave actor created with name {}", id, slaveActorRef);
         } else {
             slaveActorRef
-                    .tell(new RefreshSlaveActor(setup, id, schemaRegistry, schemaRepository, actorResponseWaitTime),
-                            ActorRef.noSender());
+                    .tell(new RefreshSlaveActor(setup, id, actorResponseWaitTime), ActorRef.noSender());
         }
     }
 
