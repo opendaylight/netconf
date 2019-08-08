@@ -82,11 +82,13 @@ public final class Rfc8040 {
         public static final String ERRORS_CONTAINER_SCHEMA_NODE = "errors";
         public static final String ERROR_LIST_SCHEMA_NODE = "error";
 
+        public static final QName ERRORS_GROUPING_QNAME =
+                QName.create(IETF_RESTCONF_QNAME, ERRORS_GROUPING_SCHEMA_NODE).intern();
         public static final QName ERRORS_CONTAINER_QNAME =
-                QName.create(IETF_RESTCONF_QNAME, ERRORS_CONTAINER_SCHEMA_NODE);
+                QName.create(IETF_RESTCONF_QNAME, ERRORS_CONTAINER_SCHEMA_NODE).intern();
         public static final QName ERROR_LIST_QNAME = QName.create(IETF_RESTCONF_QNAME, ERROR_LIST_SCHEMA_NODE).intern();
         public static final QName ERROR_TYPE_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-type").intern();
-        public static final QName ERROR_TAG_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-tag".intern());
+        public static final QName ERROR_TAG_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-tag").intern();
         public static final QName ERROR_APP_TAG_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-app-tag").intern();
         public static final QName ERROR_MESSAGE_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-message").intern();
         public static final QName ERROR_INFO_QNAME = QName.create(IETF_RESTCONF_QNAME, "error-info").intern();
