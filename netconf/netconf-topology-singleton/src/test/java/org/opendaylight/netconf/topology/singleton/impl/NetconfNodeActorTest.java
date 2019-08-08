@@ -26,6 +26,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -70,6 +71,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
@@ -159,6 +161,9 @@ public class NetconfNodeActorTest {
     @Mock
     private EffectiveModelContext mockSchemaContext;
 
+    @Mock
+    private SchemaResourcesDTO schemaResourceDTO;
+
     @Before
     public void setup() {
         initMocks(this);
@@ -169,11 +174,13 @@ public class NetconfNodeActorTest {
         masterSchemaRepository.registerSchemaSourceListener(
                 TextToASTTransformer.create(masterSchemaRepository, masterSchemaRepository));
 
+        doReturn(masterSchemaRepository).when(schemaResourceDTO).getSchemaRepository();
+        doReturn(mockRegistry).when(schemaResourceDTO).getSchemaRegistry();
         final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create().setActorSystem(system)
-                .setIdleTimeout(Duration.apply(1, TimeUnit.SECONDS)).build();
+                .setIdleTimeout(Duration.apply(1, TimeUnit.SECONDS)).setSchemaResourceDTO(schemaResourceDTO).build();
 
-        final Props props = NetconfNodeActor.props(setup, remoteDeviceId, masterSchemaRepository,
-                masterSchemaRepository, TIMEOUT, mockMountPointService);
+        final Props props = NetconfNodeActor.props(setup, remoteDeviceId, mockRegistry,
+                mockSchemaRepository, TIMEOUT, mockMountPointService);
 
         masterRef = TestActorRef.create(system, props, "master_messages");
 
@@ -206,7 +213,8 @@ public class NetconfNodeActorTest {
         final RemoteDeviceId newRemoteDeviceId = new RemoteDeviceId("netconf-topology2",
                 new InetSocketAddress(InetAddresses.forString("127.0.0.2"), 9999));
 
-        final NetconfTopologySetup newSetup = NetconfTopologySetupBuilder.create().setActorSystem(system).build();
+        final NetconfTopologySetup newSetup = NetconfTopologySetupBuilder.create()
+                .setSchemaResourceDTO(schemaResourceDTO).setActorSystem(system).build();
 
         masterRef.tell(new RefreshSetupMasterActorData(newSetup, newRemoteDeviceId), testKit.getRef());
 
@@ -311,7 +319,11 @@ public class NetconfNodeActorTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testRegisterMountPointWithSchemaFailures() throws Exception {
-        final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create().setActorSystem(system).build();
+        SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
+        doReturn(mockRegistry).when(schemaResourceDTO2).getSchemaRegistry();
+        doReturn(mockSchemaRepository).when(schemaResourceDTO2).getSchemaRepository();
+        final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create().setSchemaResourceDTO(schemaResourceDTO2)
+                .setActorSystem(system).build();
 
         final ActorRef slaveRef = system.actorOf(NetconfNodeActor.props(setup, remoteDeviceId, mockRegistry,
                 mockSchemaRepository, TIMEOUT, mockMountPointService));
@@ -381,6 +393,27 @@ public class NetconfNodeActorTest {
 
         verify(mockMountPointBuilder, timeout(5000)).register();
         verify(mockSchemaRepository, times(2)).createEffectiveModelContextFactory();
+    }
+
+    @Test(expected = MissingSchemaSourceException.class)
+    public void testMissingSchemaSourceOnMissingProvider() throws Exception {
+        SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
+        doReturn(DEFAULT_SCHEMA_REPOSITORY).when(schemaResourceDTO2).getSchemaRegistry();
+        doReturn(DEFAULT_SCHEMA_REPOSITORY).when(schemaResourceDTO2).getSchemaRepository();
+        final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create().setActorSystem(system)
+                .setSchemaResourceDTO(schemaResourceDTO2).setIdleTimeout(Duration.apply(1, TimeUnit.SECONDS)).build();
+        final Props props = NetconfNodeActor.props(setup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY,
+                DEFAULT_SCHEMA_REPOSITORY, TIMEOUT, mockMountPointService);
+        ActorRef actor = TestActorRef.create(system, props, "master_messages_2");
+
+        final SourceIdentifier sourceIdentifier = RevisionSourceIdentifier.create("testID");
+
+        final ProxyYangTextSourceProvider proxyYangProvider =
+                new ProxyYangTextSourceProvider(actor, system.dispatcher(), TIMEOUT);
+
+        final Future<YangTextSchemaSourceSerializationProxy> resolvedSchemaFuture =
+                proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
+        Await.result(resolvedSchemaFuture, TIMEOUT.duration());
     }
 
     @Test
@@ -522,9 +555,12 @@ public class NetconfNodeActorTest {
     }
 
     private ActorRef registerSlaveMountPoint() {
+        SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
+        doReturn(mockRegistry).when(schemaResourceDTO2).getSchemaRegistry();
+        doReturn(mockSchemaRepository).when(schemaResourceDTO2).getSchemaRepository();
         final ActorRef slaveRef = system.actorOf(NetconfNodeActor.props(
-                NetconfTopologySetupBuilder.create().setActorSystem(system).build(), remoteDeviceId, mockRegistry,
-                mockSchemaRepository, TIMEOUT, mockMountPointService));
+                NetconfTopologySetupBuilder.create().setSchemaResourceDTO(schemaResourceDTO2).setActorSystem(system)
+                .build(), remoteDeviceId, mockRegistry, mockSchemaRepository, TIMEOUT, mockMountPointService));
 
         doReturn(Futures.immediateFuture(mockSchemaContext))
                 .when(mockSchemaContextFactory).createEffectiveModelContext(anyCollection());

@@ -98,8 +98,8 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                                final DOMMountPointService mountPointService) {
         this.setup = setup;
         this.id = id;
-        this.schemaRegistry = schemaRegistry;
-        this.schemaRepository = schemaRepository;
+        this.schemaRegistry = setup.getSchemaResourcesDTO().getSchemaRegistry();
+        this.schemaRepository = setup.getSchemaResourcesDTO().getSchemaRepository();
         this.actorResponseWaitTime = actorResponseWaitTime;
         this.writeTxIdleTimeout = setup.getIdleTimeout();
         this.mountPointService = mountPointService;
