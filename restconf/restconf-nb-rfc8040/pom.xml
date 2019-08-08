@@ -98,6 +98,10 @@
       <artifactId>mdsal-dom-spi</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.opendaylight.mdsal</groupId>
+      <artifactId>mdsal-binding-dom-codec</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opendaylight.controller</groupId>
       <artifactId>sal-common-impl</artifactId>
     </dependency>

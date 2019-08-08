@@ -9,11 +9,19 @@ package org.opendaylight.restconf.nb.rfc8040.test.incubate;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import javassist.ClassPool;
 import javax.annotation.PreDestroy;
 import javax.inject.Singleton;
 import org.opendaylight.mdsal.binding.api.DataBroker;
+import org.opendaylight.mdsal.binding.dom.adapter.BindingToNormalizedNodeCodec;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractBaseDataBrokerTest;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
+import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
+import org.opendaylight.mdsal.binding.dom.codec.gen.impl.DataObjectSerializerGenerator;
+import org.opendaylight.mdsal.binding.dom.codec.gen.impl.StreamWriterGenerator;
+import org.opendaylight.mdsal.binding.dom.codec.impl.BindingNormalizedNodeCodecRegistry;
+import org.opendaylight.mdsal.binding.generator.impl.GeneratedClassLoadingStrategy;
+import org.opendaylight.mdsal.binding.generator.util.JavassistUtils;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
@@ -104,6 +112,15 @@ public class InMemoryMdsalModule extends AbstractModule {
     @Provides
     @Singleton DOMRpcService getDOMRpcService(DOMSchemaService schemaService) {
         return DOMRpcRouter.newInstance(schemaService).getRpcService();
+    }
+
+    @Provides
+    @Singleton BindingNormalizedNodeSerializer getBindingNormalizedNodeSerializer() {
+        final DataObjectSerializerGenerator streamWriter = StreamWriterGenerator.create(JavassistUtils.forClassPool(
+                ClassPool.getDefault()));
+        final BindingNormalizedNodeCodecRegistry registry = new BindingNormalizedNodeCodecRegistry(streamWriter);
+        return new BindingToNormalizedNodeCodec(GeneratedClassLoadingStrategy.getTCCLClassLoadingStrategy(),
+                registry, true);
     }
 
     @PreDestroy
