@@ -215,21 +215,21 @@ public class ParserIdentifierTest {
     }
 
     /**
-     * Negative test with invalid test identifier. Test should fail with <code>IllegalArgumentException</code>.
+     * Negative test with invalid test identifier. Test should fail with <code>RestconfDocumentedException</code>.
      */
     @Test
     public void toInstanceIdentifierInvalidIdentifierNegativeTest() {
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         ParserIdentifier.toInstanceIdentifier(INVALID_TEST_IDENT, this.schemaContext, Optional.empty());
     }
 
     /**
      * Negative test when identifier contains {@link RestconfConstants#MOUNT} but identifier part is not valid. Test
-     * should fail with <code>IllegalArgumentException</code>.
+     * should fail with <code>RestconfDocumentedException</code>.
      */
     @Test
     public void toInstanceIdentifierMountPointInvalidIdentifierNegativeTest() {
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         ParserIdentifier.toInstanceIdentifier(
                 INVALID_MOUNT_POINT_IDENT, this.schemaContext, Optional.of(this.mountPointService));
     }

@@ -418,7 +418,7 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(this.schemaContextWithMountPoints);
 
         // make test
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         this.schemaService.getSchema(NOT_EXISTING_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT);
     }
 }
