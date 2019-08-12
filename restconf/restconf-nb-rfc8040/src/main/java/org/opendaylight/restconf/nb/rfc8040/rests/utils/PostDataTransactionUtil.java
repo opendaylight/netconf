@@ -21,6 +21,7 @@ import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
@@ -209,7 +210,8 @@ public final class PostDataTransactionUtil {
                 default:
                     throw new RestconfDocumentedException(
                             "Used bad value of insert parameter. Possible values are first, last, before or after, "
-                                    + "but was: " + insert);
+                                    + "but was: " + insert, RestconfError.ErrorType.PROTOCOL,
+                            RestconfError.ErrorTag.BAD_ATTRIBUTE);
             }
         }
     }
