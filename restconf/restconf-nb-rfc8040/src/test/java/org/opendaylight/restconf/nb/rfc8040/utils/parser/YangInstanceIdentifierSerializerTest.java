@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -217,7 +218,7 @@ public class YangInstanceIdentifierSerializerTest {
 
     /**
      * Negative test when it is not possible to find child node of current node. Test is expected to fail with
-     * <code>IllegalArgumentException</code> and error message is compared to expected error message.
+     * <code>RestconfDocumentedException</code> and error message is compared to expected error message.
      */
     @Test
     public void serializeChildNodeNotFoundNegativeTest() {
@@ -226,7 +227,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .node(QName.create("serializer:test", "2016-06-06", "not-existing-leaf"))
                 .build();
 
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         YangInstanceIdentifierSerializer.create(this.schemaContext, data);
     }
 
@@ -311,7 +312,7 @@ public class YangInstanceIdentifierSerializerTest {
     /**
      * Test of serialization when nodes in input <code>YangInstanceIdentifier</code> are defined in two different
      * modules by using augmentation. Augmented node in data supplied for serialization has wrong namespace.
-     * <code>IllegalArgumentException</code> is expected because augmented node is defined in other module than its
+     * <code>RestconfDocumentedException</code> is expected because augmented node is defined in other module than its
      * parent and will not be found.
      */
     @Test
@@ -328,7 +329,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .node(child)
                 .build();
 
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         YangInstanceIdentifierSerializer.create(this.schemaContext, data);
     }
 }
