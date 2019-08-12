@@ -71,6 +71,8 @@ import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSeriali
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.binding.spec.reflect.BindingReflections;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -87,12 +89,14 @@ import org.opendaylight.mdsal.dom.api.DOMService;
 import org.opendaylight.mdsal.dom.broker.DOMMountPointServiceImpl;
 import org.opendaylight.mdsal.dom.broker.DOMRpcRouter;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.mdsal.eos.dom.simple.SimpleDOMEntityOwnershipService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.mdsal.singleton.dom.impl.DOMClusterSingletonServiceProviderImpl;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
@@ -161,10 +165,12 @@ public class MountPointEndToEndTest {
             new NodeKey(NODE_ID), TOPOLOGY_ID);
 
     @Mock private DOMRpcProviderService mockRpcProviderRegistry;
+    @Mock private DOMActionProviderService mockActionProviderRegistry;
     @Mock private NetconfClientDispatcher mockClientDispatcher;
     @Mock private AAAEncryptionService mockEncryptionService;
     @Mock private ThreadPool mockThreadPool;
     @Mock private ScheduledThreadPool mockKeepaliveExecutor;
+    @Mock private DeviceActionFactory deviceActionFactory;
 
     @Mock private ActorSystemProvider mockMasterActorSystemProvider;
     @Mock private DOMMountPointListener masterMountPointListener;
@@ -265,14 +271,15 @@ public class MountPointEndToEndTest {
                     topModuleInfo.getName().getRevision()), YangTextSchemaSource.class, 1));
 
         masterNetconfTopologyManager = new NetconfTopologyManager(masterDataBroker, mockRpcProviderRegistry,
-                masterClusterSingletonServiceProvider, mockKeepaliveExecutor, mockThreadPool,
-                mockMasterActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
-                masterMountPointService, mockEncryptionService) {
+            mockActionProviderRegistry, masterClusterSingletonServiceProvider, mockKeepaliveExecutor, mockThreadPool,
+            mockMasterActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
+            masterMountPointService, mockEncryptionService, deviceActionFactory) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
-                    final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime) {
+                final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
+                final DeviceActionFactory deviceActionFactory) {
                 NetconfTopologyContext context =
-                        super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime);
+                        super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime,deviceActionFactory);
                 NetconfTopologyContext spiedContext = spy(context);
                 doAnswer(invocation -> {
                     final MasterSalFacade spiedFacade = (MasterSalFacade) spy(invocation.callRealMethod());
@@ -302,14 +309,15 @@ public class MountPointEndToEndTest {
                 .registerClusterSingletonService(any());
 
         slaveNetconfTopologyManager = new NetconfTopologyManager(slaveDataBroker, mockRpcProviderRegistry,
-                mockSlaveClusterSingletonServiceProvider, mockKeepaliveExecutor, mockThreadPool,
-                mockSlaveActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
-                slaveMountPointService, mockEncryptionService) {
+            mockActionProviderRegistry, mockSlaveClusterSingletonServiceProvider, mockKeepaliveExecutor, mockThreadPool,
+            mockSlaveActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
+            slaveMountPointService, mockEncryptionService, deviceActionFactory) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
-                    final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime) {
+                final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
+                final DeviceActionFactory deviceActionFactory) {
                 NetconfTopologyContext spiedContext =
-                        spy(super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime));
+                        spy(super.newNetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime,deviceActionFactory));
                 slaveNetconfTopologyContextFuture.set(spiedContext);
                 return spiedContext;
             }
@@ -335,6 +343,7 @@ public class MountPointEndToEndTest {
     @Test
     public void test() throws Exception {
         testMaster();
+        testMasterActionService();
 
         testSlave();
 
@@ -649,6 +658,10 @@ public class MountPointEndToEndTest {
 
     private static DOMRpcService getDOMRpcService(final DOMMountPoint mountPoint) {
         return getMountPointService(mountPoint, DOMRpcService.class);
+    }
+
+    private static DOMActionService getDomActionService(final DOMMountPoint mountPoint) {
+        return getMountPointService(mountPoint, DOMActionService.class);
     }
 
     private static <T extends DOMService> T getMountPointService(final DOMMountPoint mountPoint,

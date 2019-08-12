@@ -59,6 +59,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -128,7 +129,8 @@ public class NetconfNodeActorTest {
 
     @Mock
     private DOMRpcService mockDOMRpcService;
-
+    @Mock
+    private DOMActionService mockDOMActionService;
     @Mock
     private DOMMountPointService mockMountPointService;
 
@@ -293,6 +295,7 @@ public class NetconfNodeActorTest {
         verify(mockMountPointBuilder, after(500)).addInitialSchemaContext(mockSchemaContext);
         verify(mockMountPointBuilder).addService(eq(DOMDataBroker.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMRpcService.class), any());
+        verify(mockMountPointBuilder).addService(eq(DOMActionService.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMNotificationService.class), any());
         verify(mockSchemaSourceReg1).close();
         verify(mockRegistry, times(2)).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER1));
@@ -545,7 +548,7 @@ public class NetconfNodeActorTest {
 
     private void initializeMaster(final List<SourceIdentifier> sourceIdentifiers) {
         masterRef.tell(new CreateInitialMasterActorData(mockDOMDataBroker, sourceIdentifiers,
-                mockDOMRpcService), testKit.getRef());
+                mockDOMRpcService, mockDOMActionService), testKit.getRef());
 
         testKit.expectMsgClass(MasterActorDataInitialized.class);
     }

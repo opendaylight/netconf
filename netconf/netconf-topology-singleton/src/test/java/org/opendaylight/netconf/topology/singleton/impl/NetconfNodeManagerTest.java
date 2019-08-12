@@ -53,6 +53,7 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
@@ -119,6 +120,8 @@ public class NetconfNodeManagerTest {
 
     @Mock
     private DOMRpcService mockRpcService;
+    @Mock
+    private DOMActionService mockActionService;
 
     @Mock
     private NetconfDeviceSchemasResolver mockSchemasResolver;
@@ -382,7 +385,7 @@ public class NetconfNodeManagerTest {
         TestKit kit = new TestKit(masterSystem);
 
         testMasterActorRef.tell(new CreateInitialMasterActorData(mockDeviceDataBroker, SOURCE_IDENTIFIERS,
-                mockRpcService), kit.getRef());
+                mockRpcService,mockActionService), kit.getRef());
 
         kit.expectMsgClass(MasterActorDataInitialized.class);
     }
