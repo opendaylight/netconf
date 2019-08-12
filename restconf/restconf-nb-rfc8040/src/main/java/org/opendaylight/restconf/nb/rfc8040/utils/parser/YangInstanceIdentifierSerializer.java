@@ -7,10 +7,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
-import com.google.common.base.Preconditions;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map.Entry;
+import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Serializer;
@@ -58,9 +59,11 @@ public final class YangInstanceIdentifierSerializer {
 
             final PathArgument arg = data.getPathArguments().get(i);
             variables.setCurrent(variables.getCurrent().getChild(arg));
-
-            Preconditions.checkArgument(variables.getCurrent() != null,
-                    "Invalid input %s: schema for argument %s (after %s) not found", data, arg, path);
+            if (variables.getCurrent() == null) {
+                throw new RestconfDocumentedException(String.format("Invalid input '%s': schema for argument "
+                        + "'%s' (after '%s') not found", data, arg, path), RestconfError.ErrorType.APPLICATION,
+                        RestconfError.ErrorTag.UNKNOWN_ELEMENT);
+            }
 
             if (variables.getCurrent().isMixin()) {
                 continue;

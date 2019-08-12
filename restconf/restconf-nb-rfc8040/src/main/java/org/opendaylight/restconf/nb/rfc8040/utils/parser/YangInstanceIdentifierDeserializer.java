@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants.SLASH;
 import static org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants.Deserializer.COLON;
@@ -36,6 +35,7 @@ import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.restconf.common.util.RestconfSchemaUtil;
 import org.opendaylight.restconf.common.validation.RestconfValidationUtils;
 import org.opendaylight.restconf.nb.rfc8040.codecs.RestCodec;
+import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -107,7 +107,9 @@ public final class YangInstanceIdentifierDeserializer {
                     prepareNodeWithValue(qname, path);
                 }
             } else {
-                throw new IllegalArgumentException("Bad char " + currentChar() + " on position " + offset + ".");
+                throw new RestconfDocumentedException(String.format("Failed to parse input identifier '%s' "
+                        + "- Bad char '%c' on position '%d'.", data, currentChar(), offset),
+                        RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.MALFORMED_MESSAGE);
             }
         }
 
@@ -116,7 +118,8 @@ public final class YangInstanceIdentifierDeserializer {
 
     private void prepareNodeWithPredicates(final QName qname, final List<PathArgument> path,
             final ListSchemaNode listSchemaNode) {
-        checkValid(listSchemaNode != null, "Data schema node is null");
+        checkValid(listSchemaNode != null, "Data schema node is null",
+                RestconfError.ErrorTag.MALFORMED_MESSAGE);
 
         final Iterator<QName> keys = listSchemaNode.getKeyDefinition().iterator();
         final ImmutableMap.Builder<QName, Object> values = ImmutableMap.builder();
@@ -135,8 +138,8 @@ public final class YangInstanceIdentifierDeserializer {
             }
 
             // check if next value is parsable
-            RestconfValidationUtils.checkDocumentedError(IDENTIFIER_PREDICATE.matches(currentChar()),
-                    RestconfError.ErrorType.PROTOCOL,RestconfError.ErrorTag.MALFORMED_MESSAGE, "");
+            checkValid(ParserBuilderConstants.Deserializer.IDENTIFIER_PREDICATE.matches(currentChar()),
+                    "Value is not parsable.", RestconfError.ErrorTag.MALFORMED_MESSAGE);
 
             // parse value
             final QName key = keys.next();
@@ -159,26 +162,26 @@ public final class YangInstanceIdentifierDeserializer {
 
         // the last key is considered to be empty
         if (keys.hasNext()) {
-            if (allCharsConsumed() || currentChar() == SLASH) {
-                values.put(keys.next(), EMPTY_STRING);
-            }
+            // at this point, it must be true that current char is '/' or all chars have already been consumed
+            values.put(keys.next(), EMPTY_STRING);
 
             // there should be no more missing keys
             RestconfValidationUtils.checkDocumentedError(
                     !keys.hasNext(),
                     RestconfError.ErrorType.PROTOCOL,
                     RestconfError.ErrorTag.MISSING_ATTRIBUTE,
-                    "Key value missing for: " + qname
+                    String.format("Cannot parse input identifier '%s'. Key value is missing for QName: %s",
+                            data, qname)
             );
         }
 
-        path.add(new YangInstanceIdentifier.NodeIdentifierWithPredicates(qname, values.build()));
+        path.add(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(qname, values.build()));
     }
 
     private Object prepareValueByType(final DataSchemaNode schemaNode, final String value) {
-        Object decoded = null;
+        Object decoded;
 
-        TypeDefinition<? extends TypeDefinition<?>> typedef = null;
+        TypeDefinition<? extends TypeDefinition<?>> typedef;
         if (schemaNode instanceof LeafListSchemaNode) {
             typedef = ((LeafListSchemaNode) schemaNode).getType();
         } else {
@@ -223,11 +226,17 @@ public final class YangInstanceIdentifierDeserializer {
                     return getQNameOfDataSchemaNode(localName);
                 } else {
                     final Module module = moduleForPrefix(prefix);
-                    checkArgument(module != null, "Failed to lookup prefix %s", prefix);
+                    if (module == null) {
+                        throw new RestconfDocumentedException(String.format("Cannot parse input identifier '%s' - "
+                                + "Failed to lookup for module with name '%s'.", data, prefix),
+                                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.UNKNOWN_ELEMENT);
+                    }
                     return QName.create(module.getQNameModule(), localName);
                 }
             default:
-                throw new IllegalArgumentException("Failed build path.");
+                throw new RestconfDocumentedException(String.format("Failed to parse input identifier '%s' "
+                        + "- Bad char '%c' on position '%d'.", data, currentChar(), offset),
+                        RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.MALFORMED_MESSAGE);
         }
     }
 
@@ -240,7 +249,7 @@ public final class YangInstanceIdentifierDeserializer {
                 !value.isEmpty(),
                 RestconfError.ErrorType.PROTOCOL,
                 RestconfError.ErrorTag.MISSING_ATTRIBUTE,
-                "Value missing for: " + qname
+                String.format("Cannot parse input identifier '%s' - value is missing for QName: %s.", data, qname)
         );
         final DataSchemaNode dataSchemaNode = current.getDataSchemaNode();
         final Object valueByType = prepareValueByType(dataSchemaNode, findAndParsePercentEncoded(value));
@@ -252,7 +261,8 @@ public final class YangInstanceIdentifierDeserializer {
         if (currentNode == null) {
             return;
         }
-        checkValid(!currentNode.isKeyedEntry(), "Entry " + qname + " requires key or value predicate to be present");
+        checkValid(!currentNode.isKeyedEntry(), String.format("Entry '%s' requires key or value predicate "
+                + "to be present.", qname), RestconfError.ErrorTag.MISSING_ATTRIBUTE);
     }
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH",
@@ -276,7 +286,8 @@ public final class YangInstanceIdentifierDeserializer {
                 return null;
             }
         }
-        checkValid(current != null, qname + " is not correct schema node identifier.");
+        checkValid(current != null, String.format("'%s' is not correct schema node identifier.", qname),
+                RestconfError.ErrorTag.MALFORMED_MESSAGE);
         while (current.isMixin()) {
             path.add(current.getIdentifier());
             current = current.getChild(qname);
@@ -292,14 +303,16 @@ public final class YangInstanceIdentifierDeserializer {
         return offset == data.length();
     }
 
-    private void checkValid(final boolean condition, final String errorMsg) {
-        checkArgument(condition, "Could not parse Instance Identifier '%s'. Offset: %s : Reason: %s", data, offset,
-            errorMsg);
+    private void checkValid(final boolean condition, final String errorMsg, final RestconfError.ErrorTag errorTag) {
+        RestconfValidationUtils.checkDocumentedError(condition, RestconfError.ErrorType.PROTOCOL, errorTag,
+                String.format("Could not parse Instance Identifier '%s'. Offset: '%d' : Reason: %s",
+                        data, offset, errorMsg));
     }
 
     private void checkValidIdentifierStart() {
         checkValid(IDENTIFIER_FIRST_CHAR.matches(currentChar()),
-            "Identifier must start with character from set 'a-zA-Z_'");
+                "Identifier must start with character from set 'a-zA-Z_'",
+                RestconfError.ErrorTag.MALFORMED_MESSAGE);
     }
 
     private char currentChar() {
@@ -321,7 +334,8 @@ public final class YangInstanceIdentifierDeserializer {
     private void validArg() {
         // every identifier except of the first MUST start with slash
         if (offset != 0) {
-            checkValid(SLASH == currentChar(), "Identifier must start with '/'.");
+            checkValid(SLASH == currentChar(), "Identifier must start with '/'.",
+                    RestconfError.ErrorTag.MALFORMED_MESSAGE);
 
             // skip consecutive slashes, users often assume restconf URLs behave just as HTTP does by squashing
             // multiple slashes into a single one
@@ -330,7 +344,8 @@ public final class YangInstanceIdentifierDeserializer {
             }
 
             // check if slash is not also the last char in identifier
-            checkValid(!allCharsConsumed(), "Identifier cannot end with '/'.");
+            checkValid(!allCharsConsumed(), "Identifier cannot end with '/'.",
+                    RestconfError.ErrorTag.MALFORMED_MESSAGE);
         }
     }
 

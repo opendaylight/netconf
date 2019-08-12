@@ -310,91 +310,91 @@ public class YangInstanceIdentifierDeserializerTest {
 
     /**
      * Negative test when identifier is not followed by slash or equals. Test is expected to fail with
-     * <code>IllegalArgumentException</code>.
+     * <code>RestconfDocumentedException</code>.
      */
     @Test
     public void deserializeBadCharMissingSlashOrEqualNegativeTest() {
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         YangInstanceIdentifierDeserializer.create(this.schemaContext, "deserializer-test:cont*leaf-A");
     }
 
     /**
      * Negative test of validating identifier when there is a slash after container without next identifier. Test
-     * is expected to fail with <code>IllegalArgumentException</code>.
+     * is expected to fail with <code>RestconfDocumentedException</code>.
      */
     @Test
     public void validArgIdentifierContainerEndsWithSlashNegativeTest() {
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         YangInstanceIdentifierDeserializer.create(this.schemaContext, "deserializer-test:contA/");
     }
 
     /**
      * Negative test of validating identifier when there are multiple slashes after container without next identifier.
-     * Test is expected to fail with <code>IllegalArgumentException</code>.
+     * Test is expected to fail with <code>RestconfDocumentedException</code>.
      */
     @Test
     public void validArgIdentifierContainerEndsWithMultipleSlashesNegativeTest() {
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         YangInstanceIdentifierDeserializer.create(this.schemaContext, "deserializer-test:contA///");
     }
 
     /**
      * Negative test of validating identifier when there is a slash after list key values without next identifier. Test
-     * is expected to fail with <code>IllegalArgumentException</code>.
+     * is expected to fail with <code>RestconfDocumentedException</code>.
      */
     @Test
-    public void validArgIdentifierListEndsWithSlashNegativeTest() {
-        this.thrown.expect(IllegalArgumentException.class);
+    public void validArgIdentifierListEndsWithSlashLNegativeTest() {
+        this.thrown.expect(RestconfDocumentedException.class);
         YangInstanceIdentifierDeserializer.create(this.schemaContext, "deserializer-test:list-one-key=value/");
     }
 
     /**
      * Negative test of validating identifier when there are multiple slashes after list key values without next
-     * identifier. Test is expected to fail with <code>IllegalArgumentException</code>.
+     * identifier. Test is expected to fail with <code>RestconfDocumentedException</code>.
      */
     @Test
     public void validArgIdentifierListEndsWithSlashesNegativeTest() {
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         YangInstanceIdentifierDeserializer.create(this.schemaContext, "deserializer-test:list-one-key=value//");
     }
 
     /**
      * Negative test of creating <code>QName</code> when identifier is empty (example: '/'). Test is expected to fail
-     * with <code>IllegalArgumentException</code>.
+     * with <code>RestconfDocumentedException</code>.
      */
     @Test
     public void prepareQnameEmptyIdentifierNegativeTest() {
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         YangInstanceIdentifierDeserializer.create(this.schemaContext, "/");
     }
 
     /**
      * Negative test of creating <code>QName</code> when in identifier there is another sign than colon or equals.
-     * Test is expected to fail with <code>IllegalArgumentException</code>.
+     * Test is expected to fail with <code>RestconfDocumentedException</code>.
      */
     @Test
     public void prepareQnameBuildPathNegativeTest() {
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         YangInstanceIdentifierDeserializer.create(this.schemaContext, "deserializer-test*contA");
     }
 
     /**
      * Negative test of creating <code>QName</code> when it is not possible to find module for specified prefix. Test is
-     * expected to fail with <code>IllegalArgumentException</code>.
+     * expected to fail with <code>RestconfDocumentedException</code>.
      */
     @Test
     public void prepareQnameNotExistingPrefixNegativeTest() {
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         YangInstanceIdentifierDeserializer.create(this.schemaContext, "not-existing:contA");
     }
 
     /**
      * Negative test of creating <code>QName</code> when after prefix and colon there is not parsable identifier as
-     * local name. Test is expected to fail with <code>IllegalArgumentException</code>.
+     * local name. Test is expected to fail with <code>RestconfDocumentedException</code>.
      */
     @Test
     public void prepareQnameNotValidPrefixAndLocalNameNegativeTest() {
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         YangInstanceIdentifierDeserializer.create(this.schemaContext, "deserializer-test:*not-parsable-identifier");
     }
 
@@ -451,21 +451,21 @@ public class YangInstanceIdentifierDeserializerTest {
 
     /**
      * Negative test of getting next identifier when current node is keyed entry. Test is expected to
-     * fail with <code>IllegalArgumentException</code>.
+     * fail with <code>RestconfDocumentedException</code>.
      */
     @Test
     public void prepareIdentifierNotKeyedEntryNegativeTest() {
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         YangInstanceIdentifierDeserializer.create(this.schemaContext, "deserializer-test:list-one-key");
     }
 
     /**
      * Negative test when there is a comma also after the last key. Test is expected to fail with
-     * <code>IllegalArgumentException</code>.
+     * <code>RestconfDocumentedException</code>.
      */
     @Test
     public void deserializeKeysEndsWithComaNegativeTest() {
-        this.thrown.expect(IllegalArgumentException.class);
+        this.thrown.expect(RestconfDocumentedException.class);
         YangInstanceIdentifierDeserializer.create(this.schemaContext,
                 "deserializer-test:list-multiple-keys=value,100,false,");
     }
