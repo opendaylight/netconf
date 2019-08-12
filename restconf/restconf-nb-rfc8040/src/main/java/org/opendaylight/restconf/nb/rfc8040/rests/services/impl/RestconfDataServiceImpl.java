@@ -194,7 +194,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                         insertUsed = true;
                         insert = entry.getValue().iterator().next();
                     } else {
-                        throw new RestconfDocumentedException("Insert parameter can be used only once.");
+                        throw new RestconfDocumentedException("Insert parameter can be used only once.",
+                                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
                     }
                     break;
                 case "point":
@@ -202,11 +203,13 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                         pointUsed = true;
                         point = entry.getValue().iterator().next();
                     } else {
-                        throw new RestconfDocumentedException("Point parameter can be used only once.");
+                        throw new RestconfDocumentedException("Point parameter can be used only once.",
+                                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
                     }
                     break;
                 default:
-                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey());
+                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey(),
+                            RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
             }
         }
 
