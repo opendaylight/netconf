@@ -21,6 +21,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
+import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.validation.RestconfValidationUtils;
@@ -287,8 +288,9 @@ public final class PutDataTransactionUtil {
                     }
                 }
             default:
-                throw new RestconfDocumentedException("Used bad value of insert parameter. Possible values are "
-                        + "first, last, before or after, but was: " + insert);
+                throw new RestconfDocumentedException(
+                        "Used bad value of insert parameter. Possible values are first, last, before or after, "
+                                + "but was: " + insert, RestconfError.ErrorType.PROTOCOL, ErrorTag.BAD_ATTRIBUTE);
         }
     }
 
@@ -408,17 +410,20 @@ public final class PutDataTransactionUtil {
 
         if (dataSchemaNode instanceof ListSchemaNode) {
             if (!((ListSchemaNode) dataSchemaNode).isUserOrdered()) {
-                throw new RestconfDocumentedException("Insert parameter can be used only with ordered-by user list.");
+                throw new RestconfDocumentedException("Insert parameter can be used only with ordered-by user list.",
+                        RestconfError.ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
             }
             return dataSchemaNode;
         }
         if (dataSchemaNode instanceof LeafListSchemaNode) {
             if (!((LeafListSchemaNode) dataSchemaNode).isUserOrdered()) {
                 throw new RestconfDocumentedException(
-                        "Insert parameter can be used only with ordered-by user leaf-list.");
+                        "Insert parameter can be used only with ordered-by user leaf-list.",
+                        RestconfError.ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
             }
             return dataSchemaNode;
         }
-        throw new RestconfDocumentedException("Insert parameter can be used only with list or leaf-list");
+        throw new RestconfDocumentedException("Insert parameter can be used only with list or leaf-list",
+                RestconfError.ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
     }
 }
