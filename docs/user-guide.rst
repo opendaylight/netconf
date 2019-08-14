@@ -1,5 +1,13 @@
 .. _netconf-user-guide:
 
+.. |ss| raw:: html
+
+   <strike>
+
+.. |se| raw:: html
+
+   </strike>
+
 NETCONF User Guide
 ==================
 
@@ -78,6 +86,20 @@ This guide focuses on using RESTCONF.
      http://localhost:8181/rests/data/network-topology:network-topology?content=nonconfig
      for operational datastore.
 
+    | Also in case of `RFC-8040 <https://tools.ietf.org/html/rfc8040>`__,
+     if a data node in the path expression is a YANG leaf-list or list
+     node, the path segment has to be constructed by having leaf-list or
+     list node name, followed by an "=" character, then followed by the
+     leaf-list or list value. Any reserved characters must be
+     percent-encoded.
+    | e. g. GET
+     http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf?content=config
+     for retrieving data from configuration datastore for
+     topology-netconf value of topology list is equivalent to the deprecated request
+    | |ss| GET |se|
+     http://localhost:8181/restconf/config/network-topology:network-topology/topology/topology-netconf,
+     which is related to `draft-bierman-netconf-restconf-02
+     <https://tools.ietf.org/html/draft-bierman-netconf-restconf-02>`__.
 
 
 
