@@ -51,6 +51,37 @@ Netconf-connector configuration
 There are 2 ways for configuring netconf-connector: NETCONF or RESTCONF.
 This guide focuses on using RESTCONF.
 
+.. important::
+
+    There are 2 different endpoints related to RESTCONF protocols:
+
+    - | ``http://localhost:8181/restconf`` is related to `draft-bierman-netconf-restconf-02 <https://tools.ietf.org/html/draft-bierman-netconf-restconf-02>`__,
+      | can be activated by installing ``odl-restconf-nb-bierman02``
+       Karaf feature.
+      | This user guide uses this approach.
+
+    - | ``http://localhost:8181/rests`` is related to `RFC-8040 <https://tools.ietf.org/html/rfc8040>`__,
+      | can be activated by installing ``odl-restconf-nb-rfc8040``
+       Karaf feature.
+
+    | In case of `RFC-8040 <https://tools.ietf.org/html/rfc8040>`__
+     resources for configuration and operational datastores start
+     ``/rests/data/``,
+    | e. g. GET
+     http://localhost:8181/rests/data/network-topology:network-topology
+     with response of both datastores. It's allowed to use query
+     parameters to distinguish between them.
+    | e. g. GET
+     http://localhost:8181/rests/data/network-topology:network-topology?content=config
+     for configuration datastore
+    | and GET
+     http://localhost:8181/rests/data/network-topology:network-topology?content=nonconfig
+     for operational datastore.
+
+
+
+
+
 Default configuration
 ^^^^^^^^^^^^^^^^^^^^^
 
