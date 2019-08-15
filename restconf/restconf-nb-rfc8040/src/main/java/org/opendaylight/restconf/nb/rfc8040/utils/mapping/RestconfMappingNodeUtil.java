@@ -197,14 +197,8 @@ public final class RestconfMappingNodeUtil {
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> deviationEntryNode =
                     Builders.mapEntryBuilder((ListSchemaNode) deviationsSchema);
             final QName lastComponent = deviation.getTargetPath().getLastComponent();
-            addChildOfModuleBySpecificModuleInternal(IetfYangLibrary.SPECIFIC_MODULE_NAME_LEAF_QNAME,
-                    deviationEntryNode, context.findModule(lastComponent.getModule()).get().getName(),
-                    ietfYangLibraryModule);
-            if (lastComponent.getRevision().isPresent()) {
-                addChildOfModuleBySpecificModuleInternal(IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF_QNAME,
-                        deviationEntryNode, lastComponent.getRevision(),
-                        ietfYangLibraryModule);
-            }
+            addCommonLeafs(context.findModule(lastComponent.getModule()).get(), deviationEntryNode,
+                ietfYangLibraryModule);
             deviations.withChild(deviationEntryNode.build());
         }
         mapEntryBuilder.withChild(deviations.build());
