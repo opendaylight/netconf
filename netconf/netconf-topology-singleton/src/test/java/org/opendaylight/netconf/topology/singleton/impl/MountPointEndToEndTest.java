@@ -343,14 +343,9 @@ public class MountPointEndToEndTest {
     @Test
     public void test() throws Exception {
         testMaster();
-        testMasterActionService();
-
         testSlave();
-
         final MasterSalFacade masterSalFacade = testMasterNodeUpdated();
-
         testMasterDisconnected(masterSalFacade);
-
         testCleanup();
     }
 

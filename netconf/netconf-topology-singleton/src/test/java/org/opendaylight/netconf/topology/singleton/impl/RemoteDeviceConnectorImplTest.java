@@ -114,7 +114,7 @@ public class RemoteDeviceConnectorImplTest {
         initMocks(this);
 
         remoteDeviceId = new RemoteDeviceId(TOPOLOGY_ID,
-                new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
+            new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
 
         doReturn(txChain).when(dataBroker).createTransactionChain(any(TransactionChainListener.class));
         doReturn(writeTx).when(txChain).newWriteOnlyTransaction();
@@ -137,17 +137,17 @@ public class RemoteDeviceConnectorImplTest {
     @Test
     public void testStopRemoteDeviceConnection() {
         final Credentials credentials = new LoginPasswordBuilder()
-                .setPassword("admin").setUsername("admin").build();
+            .setPassword("admin").setUsername("admin").build();
         final NetconfNode netconfNode = new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(9999))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(1000L)
-                .setBetweenAttemptsTimeoutMillis(100)
-                .setSchemaless(false)
-                .setTcpOnly(false)
-                .setCredentials(credentials)
-                .build();
+            .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+            .setPort(new PortNumber(9999))
+            .setReconnectOnChangedSchema(true)
+            .setDefaultRequestTimeoutMillis(1000L)
+            .setBetweenAttemptsTimeoutMillis(100)
+            .setSchemaless(false)
+            .setTcpOnly(false)
+            .setCredentials(credentials)
+            .build();
         final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(NetconfNode.class, netconfNode).build();
 
         builder.setNode(node);
@@ -156,8 +156,8 @@ public class RemoteDeviceConnectorImplTest {
         final NetconfDeviceCommunicator communicator = mock(NetconfDeviceCommunicator.class);
         final RemoteDeviceHandler<NetconfSessionPreferences> salFacade = mock(RemoteDeviceHandler.class);
 
-        final TestingRemoteDeviceConnectorImpl remoteDeviceConnection =
-                new TestingRemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, communicator,deviceActionFactory);
+        final TestingRemoteDeviceConnectorImpl remoteDeviceConnection = new TestingRemoteDeviceConnectorImpl(
+            builder.build(), remoteDeviceId, communicator, deviceActionFactory);
 
         remoteDeviceConnection.startRemoteDeviceConnection(salFacade);
 
@@ -172,29 +172,29 @@ public class RemoteDeviceConnectorImplTest {
     @Test
     public void testKeapAliveFacade() {
         final Credentials credentials = new LoginPasswordBuilder()
-                .setPassword("admin").setUsername("admin").build();
+            .setPassword("admin").setUsername("admin").build();
         final NetconfNode netconfNode = new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(9999))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(1000L)
-                .setBetweenAttemptsTimeoutMillis(100)
-                .setSchemaless(false)
-                .setTcpOnly(false)
-                .setCredentials(credentials)
-                .setKeepaliveDelay(1L)
-                .build();
+            .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+            .setPort(new PortNumber(9999))
+            .setReconnectOnChangedSchema(true)
+            .setDefaultRequestTimeoutMillis(1000L)
+            .setBetweenAttemptsTimeoutMillis(100)
+            .setSchemaless(false)
+            .setTcpOnly(false)
+            .setCredentials(credentials)
+            .setKeepaliveDelay(1L)
+            .build();
 
         final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(NetconfNode.class, netconfNode).build();
         builder.setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node));
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId,deviceActionFactory);
+            new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId,deviceActionFactory);
 
         final RemoteDeviceHandler<NetconfSessionPreferences> salFacade = mock(RemoteDeviceHandler.class);
 
         final NetconfConnectorDTO connectorDTO =
-                remoteDeviceConnection.createDeviceCommunicator(NODE_ID, netconfNode, salFacade);
+            remoteDeviceConnection.createDeviceCommunicator(NODE_ID, netconfNode, salFacade);
 
         assertTrue(connectorDTO.getFacade() instanceof KeepaliveSalFacade);
     }
@@ -205,21 +205,21 @@ public class RemoteDeviceConnectorImplTest {
         final Host host = new Host(new IpAddress(new Ipv4Address("127.0.0.1")));
         final PortNumber portNumber = new PortNumber(9999);
         final NetconfNode testingNode = new NetconfNodeBuilder()
-                .setConnectionTimeoutMillis(1000L)
-                .setDefaultRequestTimeoutMillis(2000L)
-                .setHost(host)
-                .setPort(portNumber)
-                .setCredentials(new LoginPasswordBuilder()
-                        .setUsername("testuser")
-                        .setPassword("testpassword").build())
-                .setTcpOnly(true)
-                .build();
+            .setConnectionTimeoutMillis(1000L)
+            .setDefaultRequestTimeoutMillis(2000L)
+            .setHost(host)
+            .setPort(portNumber)
+            .setCredentials(new LoginPasswordBuilder()
+                .setUsername("testuser")
+                .setPassword("testpassword").build())
+            .setTcpOnly(true)
+            .build();
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, deviceActionFactory);
+            new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, deviceActionFactory);
 
         final NetconfReconnectingClientConfiguration defaultClientConfig =
-                remoteDeviceConnection.getClientConfig(listener, testingNode);
+            remoteDeviceConnection.getClientConfig(listener, testingNode);
 
         assertEquals(defaultClientConfig.getConnectionTimeoutMillis().longValue(), 1000L);
         assertEquals(defaultClientConfig.getAddress(), new InetSocketAddress(InetAddresses.forString("127.0.0.1"),

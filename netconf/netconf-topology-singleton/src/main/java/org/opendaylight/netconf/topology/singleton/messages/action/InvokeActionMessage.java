@@ -19,13 +19,19 @@ import org.opendaylight.netconf.topology.singleton.messages.SchemaPathMessage;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 public class InvokeActionMessage implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
     private final SchemaPathMessage schemaPathMessage;
     private final ContainerNodeMessage containerNodeMessage;
     private final DOMDataTreeIdentifier domDataTreeIdentifier;
 
+    /**
+     * Constructor for {@code InvokeActionMessage}.
+     *
+     * @param schemaPathMessage SchemaPathMessage
+     * @param containerNodeMessage ContainerNodeMessage
+     * @param domDataTreeIdentifier DOMDataTreeIdentifier
+     */
     public InvokeActionMessage(final SchemaPathMessage schemaPathMessage,
         final @Nullable ContainerNodeMessage containerNodeMessage, final DOMDataTreeIdentifier domDataTreeIdentifier) {
         this.schemaPathMessage = schemaPathMessage;
@@ -33,15 +39,13 @@ public class InvokeActionMessage implements Serializable {
         this.domDataTreeIdentifier = domDataTreeIdentifier;
     }
 
-    private SchemaPathMessage getSchemaPathMessage() {
-        return schemaPathMessage;
-    }
-
     public SchemaPath getSchemaPath() {
-
         return schemaPathMessage.getSchemaPath();
     }
 
+    private SchemaPathMessage getSchemaPathMessage() {
+        return schemaPathMessage;
+    }
 
     public @Nullable ContainerNodeMessage getContainerNodeMessage() {
         return containerNodeMessage;
@@ -62,14 +66,13 @@ public class InvokeActionMessage implements Serializable {
     }
 
     private static class Proxy implements Externalizable {
-
         private static final long serialVersionUID = 2L;
 
         private InvokeActionMessage invokeActionMessage;
 
         @SuppressWarnings("checkstyle:RedundantModifier")
         public Proxy() {
-            //due to Externalizable
+            //Due to Externalizable
         }
 
         Proxy(final InvokeActionMessage invokeActionMessage) {
@@ -93,5 +96,4 @@ public class InvokeActionMessage implements Serializable {
             return invokeActionMessage;
         }
     }
-
 }

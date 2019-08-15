@@ -12,23 +12,22 @@ import akka.actor.ActorSystem;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-
-import java.util.Collection;
-import org.eclipse.jdt.annotation.NonNull;
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import java.util.Collection;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
+import org.opendaylight.mdsal.dom.api.DOMActionServiceExtension;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
-import org.opendaylight.mdsal.dom.api.DOMActionServiceExtension;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringActionException;
 import org.opendaylight.netconf.topology.singleton.messages.ContainerNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.SchemaPathMessage;
 import org.opendaylight.netconf.topology.singleton.messages.action.InvokeActionMessage;
-import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringActionException;
 import org.opendaylight.netconf.topology.singleton.messages.action.InvokeActionMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -48,6 +47,14 @@ public class ProxyDOMActionService implements DOMActionService {
     private final ActorSystem actorSystem;
     private final Timeout actorResponseWaitTime;
 
+    /**
+     * Constructor for {@code ProxyDOMActionService}.
+     *
+     * @param actorSystem ActorSystem
+     * @param masterActorRef ActorRef
+     * @param remoteDeviceId {@link org.opendaylight.netconf.sal.connect.util.RemoteDeviceId} ref
+     * @param actorResponseWaitTime Timeout
+     */
     public ProxyDOMActionService(final ActorSystem actorSystem, final ActorRef masterActorRef,
         final RemoteDeviceId remoteDeviceId, final Timeout actorResponseWaitTime) {
         id = remoteDeviceId;
@@ -59,17 +66,15 @@ public class ProxyDOMActionService implements DOMActionService {
     @Override
     public FluentFuture<DOMActionResult> invokeAction(final SchemaPath type,
         final DOMDataTreeIdentifier domDataTreeIdentifier, final ContainerNode input) {
-        LOG.info("{}: Action operation invoked with schema type: {} and node: {}.", id, type, input);
+        LOG.info("{}: Action Operation invoked with schema type: {} and node: {}.", id, type, input);
 
-        final ContainerNodeMessage containerNodeMessage = input != null
-            ? new ContainerNodeMessage(YangInstanceIdentifier.EMPTY, input) : null;
+        final ContainerNodeMessage containerNodeMessage =
+            input != null ? new ContainerNodeMessage(YangInstanceIdentifier.EMPTY, input) : null;
 
         final Future<Object> scalaFuture = Patterns.ask(masterActorRef,
             new InvokeActionMessage(new SchemaPathMessage(type), containerNodeMessage, domDataTreeIdentifier),
             actorResponseWaitTime);
-
         final SettableFuture<DOMActionResult> settableFuture = SettableFuture.create();
-
         scalaFuture.onComplete(new OnComplete<Object>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {
@@ -78,26 +83,24 @@ public class ProxyDOMActionService implements DOMActionService {
                         settableFuture.setException(failure);
                     } else {
                         settableFuture.setException(
-                            new ClusteringActionException(id + ": Exception during remote Action invocation.", failure));
+                            new ClusteringActionException(id + ": Exception during remote Action invocation.",
+                                failure));
                     }
                     return;
                 }
-
                 if (response instanceof EmptyResultResponse) {
                     settableFuture.set(null);
                     return;
                 }
-
                 final Collection<? extends RpcError> errors = ((InvokeActionMessageReply) response).getRpcErrors();
-                final ContainerNodeMessage containerNodeMessage =
-                    ((InvokeActionMessageReply) response).getContainerNodeMessage();
+                final ContainerNodeMessage containerNodeMessage = ((InvokeActionMessageReply) response)
+                    .getContainerNodeMessage();
 
                 final DOMActionResult result;
                 if (containerNodeMessage == null) {
                     result = new SimpleDOMActionResult(ImmutableList.copyOf(errors));
                 } else {
-                    result = new SimpleDOMActionResult(containerNodeMessage.getNode(),
-                        ImmutableList.copyOf(errors));
+                    result = new SimpleDOMActionResult(containerNodeMessage.getNode(), ImmutableList.copyOf(errors));
                 }
                 settableFuture.set(result);
             }

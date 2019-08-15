@@ -93,7 +93,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     private final DeviceActionFactory deviceActionFactory;
 
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
-                                     final RemoteDeviceId remoteDeviceId,final DeviceActionFactory deviceActionFactory) {
+        final RemoteDeviceId remoteDeviceId, final DeviceActionFactory deviceActionFactory) {
         this.netconfTopologyDeviceSetup = requireNonNull(netconfTopologyDeviceSetup);
         this.remoteDeviceId = remoteDeviceId;
         this.deviceActionFactory = deviceActionFactory;
@@ -115,9 +115,9 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final NetconfDeviceCommunicator deviceCommunicator = deviceCommunicatorDTO.getCommunicator();
         final NetconfClientSessionListener netconfClientSessionListener = deviceCommunicatorDTO.getSessionListener();
         final NetconfReconnectingClientConfiguration clientConfig =
-                getClientConfig(netconfClientSessionListener, netconfNode);
+            getClientConfig(netconfClientSessionListener, netconfNode);
         final ListenableFuture<NetconfDeviceCapabilities> future = deviceCommunicator
-                .initializeRemoteConnection(netconfTopologyDeviceSetup.getNetconfClientDispatcher(), clientConfig);
+            .initializeRemoteConnection(netconfTopologyDeviceSetup.getNetconfClientDispatcher(), clientConfig);
 
         Futures.addCallback(future, new FutureCallback<NetconfDeviceCapabilities>() {
             @Override
@@ -146,21 +146,21 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
     @VisibleForTesting
     NetconfConnectorDTO createDeviceCommunicator(final NodeId nodeId, final NetconfNode node,
-                                                 final RemoteDeviceHandler<NetconfSessionPreferences> deviceHandler) {
+        final RemoteDeviceHandler<NetconfSessionPreferences> deviceHandler) {
         //setup default values since default value is not supported in mdsal
         final long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
-                ? NetconfTopologyUtils.DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
+            ? NetconfTopologyUtils.DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
         final long keepaliveDelay = node.getKeepaliveDelay() == null
-                ? NetconfTopologyUtils.DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
+            ? NetconfTopologyUtils.DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
         final boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
-                ? NetconfTopologyUtils.DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
+            ? NetconfTopologyUtils.DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade = deviceHandler;
         if (keepaliveDelay > 0) {
             LOG.info("{}: Adding keepalive facade.", remoteDeviceId);
             salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade,
-                    netconfTopologyDeviceSetup.getKeepaliveExecutor(), keepaliveDelay,
-                    defaultRequestTimeoutMillis);
+                netconfTopologyDeviceSetup.getKeepaliveExecutor(), keepaliveDelay,
+                defaultRequestTimeoutMillis);
         }
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = netconfTopologyDeviceSetup.getSchemaResourcesDTO();
@@ -181,14 +181,14 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                 }
 
                 for (final Map.Entry<SourceIdentifier, URL> sourceIdentifierURLEntry :
-                        libraryModulesSchemas.getAvailableModels().entrySet()) {
+                    libraryModulesSchemas.getAvailableModels().entrySet()) {
                     registeredYangLibSources
-                            .add(schemaResourcesDTO.getSchemaRegistry().registerSchemaSource(
-                                    new YangLibrarySchemaYangSourceProvider(remoteDeviceId,
-                                            libraryModulesSchemas.getAvailableModels()),
-                                    PotentialSchemaSource
-                                            .create(sourceIdentifierURLEntry.getKey(), YangTextSchemaSource.class,
-                                                    PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+                        .add(schemaResourcesDTO.getSchemaRegistry().registerSchemaSource(
+                            new YangLibrarySchemaYangSourceProvider(remoteDeviceId,
+                                libraryModulesSchemas.getAvailableModels()),
+                            PotentialSchemaSource
+                                .create(sourceIdentifierURLEntry.getKey(), YangTextSchemaSource.class,
+                                    PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
                 }
             }
         }
@@ -198,31 +198,31 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
             device = new SchemalessNetconfDevice(remoteDeviceId, salFacade);
         } else {
             device = new NetconfDeviceBuilder()
-                    .setReconnectOnSchemasChange(reconnectOnChangedSchema)
-                    .setSchemaResourcesDTO(schemaResourcesDTO)
-                    .setGlobalProcessingExecutor(netconfTopologyDeviceSetup.getProcessingExecutor())
-                    .setId(remoteDeviceId)
-                    .setSalFacade(salFacade)
-                    .setDeviceActionFactory(deviceActionFactory)
-                    .build();
+                .setReconnectOnSchemasChange(reconnectOnChangedSchema)
+                .setSchemaResourcesDTO(schemaResourcesDTO)
+                .setGlobalProcessingExecutor(netconfTopologyDeviceSetup.getProcessingExecutor())
+                .setId(remoteDeviceId)
+                .setDeviceActionFactory(deviceActionFactory)
+                .setSalFacade(salFacade)
+                .build();
         }
 
         final Optional<NetconfSessionPreferences> userCapabilities = getUserCapabilities(node);
         final int rpcMessageLimit =
-                node.getConcurrentRpcLimit() == null
-                        ? NetconfTopologyUtils.DEFAULT_CONCURRENT_RPC_LIMIT : node.getConcurrentRpcLimit();
+            node.getConcurrentRpcLimit() == null
+                ? NetconfTopologyUtils.DEFAULT_CONCURRENT_RPC_LIMIT : node.getConcurrentRpcLimit();
 
         if (rpcMessageLimit < 1) {
             LOG.info("{}: Concurrent rpc limit is smaller than 1, no limit will be enforced.", remoteDeviceId);
         }
 
         NetconfDeviceCommunicator netconfDeviceCommunicator =
-             userCapabilities.isPresent() ? new NetconfDeviceCommunicator(remoteDeviceId, device,
-             new UserPreferences(userCapabilities.get(),
-                 node.getYangModuleCapabilities() == null ? false : node.getYangModuleCapabilities().isOverride(),
-                 node.getNonModuleCapabilities() == null ? false : node.getNonModuleCapabilities().isOverride()),
-             rpcMessageLimit)
-            : new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit);
+            userCapabilities.isPresent() ? new NetconfDeviceCommunicator(remoteDeviceId, device,
+                new UserPreferences(userCapabilities.get(),
+                    node.getYangModuleCapabilities() == null ? false : node.getYangModuleCapabilities().isOverride(),
+                    node.getNonModuleCapabilities() == null ? false : node.getNonModuleCapabilities().isOverride()),
+                rpcMessageLimit)
+                : new NetconfDeviceCommunicator(remoteDeviceId, device, rpcMessageLimit);
 
         if (salFacade instanceof KeepaliveSalFacade) {
             ((KeepaliveSalFacade)salFacade).setListener(netconfDeviceCommunicator);
@@ -243,8 +243,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         //non-module capabilities should not exist in yang module capabilities
         final NetconfSessionPreferences netconfSessionPreferences = NetconfSessionPreferences.fromStrings(capabilities);
         checkState(netconfSessionPreferences.getNonModuleCaps().isEmpty(),
-                "List yang-module-capabilities/capability should contain only module based capabilities. "
-                        + "Non-module capabilities used: " + netconfSessionPreferences.getNonModuleCaps());
+            "List yang-module-capabilities/capability should contain only module based capabilities. "
+                + "Non-module capabilities used: " + netconfSessionPreferences.getNonModuleCaps());
 
         if (node.getNonModuleCapabilities() != null) {
             capabilities.addAll(node.getNonModuleCapabilities().getCapability());
@@ -260,48 +260,48 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         } else {
             final IpAddress ipAddress = host.getIpAddress();
             final String ip = ipAddress.getIpv4Address() != null ? ipAddress.getIpv4Address().getValue() :
-                    ipAddress.getIpv6Address().getValue();
+                ipAddress.getIpv6Address().getValue();
             return new InetSocketAddress(ip, port);
         }
     }
 
     @VisibleForTesting
     NetconfReconnectingClientConfiguration getClientConfig(final NetconfClientSessionListener listener,
-                                                           final NetconfNode node) {
+        final NetconfNode node) {
 
         //setup default values since default value is not supported in mdsal
         final long clientConnectionTimeoutMillis = node.getConnectionTimeoutMillis() == null
-                ? NetconfTopologyUtils.DEFAULT_CONNECTION_TIMEOUT_MILLIS : node.getConnectionTimeoutMillis();
+            ? NetconfTopologyUtils.DEFAULT_CONNECTION_TIMEOUT_MILLIS : node.getConnectionTimeoutMillis();
         final long maxConnectionAttempts = node.getMaxConnectionAttempts() == null
-                ? NetconfTopologyUtils.DEFAULT_MAX_CONNECTION_ATTEMPTS : node.getMaxConnectionAttempts();
+            ? NetconfTopologyUtils.DEFAULT_MAX_CONNECTION_ATTEMPTS : node.getMaxConnectionAttempts();
         final int betweenAttemptsTimeoutMillis = node.getBetweenAttemptsTimeoutMillis() == null
-                ? NetconfTopologyUtils.DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS : node.getBetweenAttemptsTimeoutMillis();
+            ? NetconfTopologyUtils.DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS : node.getBetweenAttemptsTimeoutMillis();
         final boolean isTcpOnly = node.isTcpOnly() == null
-                ? NetconfTopologyUtils.DEFAULT_IS_TCP_ONLY : node.isTcpOnly();
+            ? NetconfTopologyUtils.DEFAULT_IS_TCP_ONLY : node.isTcpOnly();
         final BigDecimal sleepFactor = node.getSleepFactor() == null
-                ? NetconfTopologyUtils.DEFAULT_SLEEP_FACTOR : node.getSleepFactor();
+            ? NetconfTopologyUtils.DEFAULT_SLEEP_FACTOR : node.getSleepFactor();
 
         final InetSocketAddress socketAddress = getSocketAddress(node.getHost(), node.getPort().getValue());
 
         final ReconnectStrategyFactory sf =
-                new TimedReconnectStrategyFactory(netconfTopologyDeviceSetup.getEventExecutor(), maxConnectionAttempts,
-                        betweenAttemptsTimeoutMillis, sleepFactor);
+            new TimedReconnectStrategyFactory(netconfTopologyDeviceSetup.getEventExecutor(), maxConnectionAttempts,
+                betweenAttemptsTimeoutMillis, sleepFactor);
 
 
         final NetconfReconnectingClientConfigurationBuilder reconnectingClientConfigurationBuilder;
         final Protocol protocol = node.getProtocol();
         if (isTcpOnly) {
             reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
-                    .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
-                    .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TCP)
+                .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
         } else if (protocol == null || protocol.getName() == Protocol.Name.SSH) {
             reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
-                    .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
-                    .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.SSH)
+                .withAuthHandler(getHandlerFromCredentials(node.getCredentials()));
         } else if (protocol.getName() == Protocol.Name.TLS) {
             reconnectingClientConfigurationBuilder = NetconfReconnectingClientConfigurationBuilder.create()
-                    .withSslHandlerFactory(new SslHandlerFactoryImpl(keystoreAdapter, protocol.getSpecification()))
-                    .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS);
+                .withSslHandlerFactory(new SslHandlerFactoryImpl(keystoreAdapter, protocol.getSpecification()))
+                .withProtocol(NetconfClientConfiguration.NetconfClientProtocol.TLS);
         } else {
             throw new IllegalStateException("Unsupported protocol type: " + protocol.getName());
         }
@@ -312,12 +312,12 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         }
 
         return reconnectingClientConfigurationBuilder
-                .withAddress(socketAddress)
-                .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
-                .withReconnectStrategy(sf.createReconnectStrategy())
-                .withConnectStrategyFactory(sf)
-                .withSessionListener(listener)
-                .build();
+            .withAddress(socketAddress)
+            .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)
+            .withReconnectStrategy(sf.createReconnectStrategy())
+            .withConnectStrategyFactory(sf)
+            .withSessionListener(listener)
+            .build();
     }
 
     private static List<Uri> getOdlHelloCapabilities(final NetconfNode node) {
@@ -327,27 +327,27 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
     private AuthenticationHandler getHandlerFromCredentials(final Credentials credentials) {
         if (credentials instanceof org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
-                .rev150114.netconf.node.credentials.credentials.LoginPassword) {
+            .rev150114.netconf.node.credentials.credentials.LoginPassword) {
             final org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
-                    .rev150114.netconf.node.credentials.credentials.LoginPassword loginPassword
-                    = (org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
-                    .rev150114.netconf.node.credentials.credentials.LoginPassword) credentials;
+                .rev150114.netconf.node.credentials.credentials.LoginPassword loginPassword
+                = (org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology
+                .rev150114.netconf.node.credentials.credentials.LoginPassword) credentials;
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         }
         if (credentials instanceof LoginPwUnencrypted) {
             final LoginPasswordUnencrypted loginPassword =
-                    ((LoginPwUnencrypted) credentials).getLoginPasswordUnencrypted();
+                ((LoginPwUnencrypted) credentials).getLoginPasswordUnencrypted();
             return new LoginPasswordHandler(loginPassword.getUsername(), loginPassword.getPassword());
         }
         if (credentials instanceof LoginPw) {
             final LoginPassword loginPassword = ((LoginPw) credentials).getLoginPassword();
             return new LoginPasswordHandler(loginPassword.getUsername(),
-                    encryptionService.decrypt(loginPassword.getPassword()));
+                encryptionService.decrypt(loginPassword.getPassword()));
         }
         if (credentials instanceof KeyAuth) {
             final KeyBased keyPair = ((KeyAuth) credentials).getKeyBased();
             return new DatastoreBackedPublicKeyAuth(keyPair.getUsername(), keyPair.getKeyId(),
-                    keystoreAdapter, encryptionService);
+                keystoreAdapter, encryptionService);
         }
         throw new IllegalStateException("Unsupported credential type: " + credentials.getClass());
     }

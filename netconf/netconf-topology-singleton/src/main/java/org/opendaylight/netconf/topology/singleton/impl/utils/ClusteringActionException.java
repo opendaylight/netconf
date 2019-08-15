@@ -12,10 +12,21 @@ import org.opendaylight.mdsal.dom.api.DOMActionException;
 public class ClusteringActionException extends DOMActionException {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Constructor for {@code ClusteringActionException}.
+     *
+     * @param message String
+     */
     public ClusteringActionException(final String message) {
         super(message);
     }
 
+    /**
+     * Constructor for {@code ClusteringActionException}.
+     *
+     * @param message String
+     * @param cause Throwable
+     */
     public ClusteringActionException(final String message, final Throwable cause) {
         super(message, cause);
     }

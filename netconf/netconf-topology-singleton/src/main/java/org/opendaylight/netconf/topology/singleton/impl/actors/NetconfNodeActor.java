@@ -84,26 +84,26 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private NetconfTopologySetup setup;
     private List<SourceIdentifier> sourceIdentifiers;
     private DOMRpcService deviceRpc;
+    private DOMActionService deviceAction;
     private SlaveSalFacade slaveSalManager;
     private DOMDataBroker deviceDataBroker;
     //readTxActor can be shared
     private ActorRef readTxActor;
     private List<SchemaSourceRegistration<YangTextSchemaSource>> registeredSchemas;
-    private DOMActionService deviceAction;
 
     public static Props props(final NetconfTopologySetup setup,
-                              final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
-                              final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime,
-                              final DOMMountPointService mountPointService) {
+        final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
+        final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime,
+        final DOMMountPointService mountPointService) {
         return Props.create(NetconfNodeActor.class, () ->
-                new NetconfNodeActor(setup, id, schemaRegistry, schemaRepository, actorResponseWaitTime,
-                        mountPointService));
+            new NetconfNodeActor(setup, id, schemaRegistry, schemaRepository, actorResponseWaitTime,
+                mountPointService));
     }
 
     protected NetconfNodeActor(final NetconfTopologySetup setup,
-                               final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
-                               final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime,
-                               final DOMMountPointService mountPointService) {
+        final RemoteDeviceId id, final SchemaSourceRegistry schemaRegistry,
+        final SchemaRepository schemaRepository, final Timeout actorResponseWaitTime,
+        final DOMMountPointService mountPointService) {
         this.setup = setup;
         this.id = id;
         this.schemaRegistry = schemaRegistry;
@@ -145,11 +145,9 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                 LOG.warn("{}: Received {} but we don't appear to be the master", id, askForMasterMountPoint);
                 sender().tell(new Failure(new NotMasterException(self())), self());
             }
-
         } else if (message instanceof YangTextSchemaSourceRequest) { // master
             final YangTextSchemaSourceRequest yangTextSchemaSourceRequest = (YangTextSchemaSourceRequest) message;
             sendYangTextSchemaSourceProxy(yangTextSchemaSourceRequest.getSourceIdentifier(), sender());
-
         } else if (message instanceof NewReadTransactionRequest) { // master
             sender().tell(new Success(readTxActor), self());
         } else if (message instanceof NewWriteTransactionRequest) { // master
@@ -160,7 +158,6 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             } catch (final Exception t) {
                 sender().tell(new Failure(t), self());
             }
-
         } else if (message instanceof NewReadWriteTransactionRequest) {
             try {
                 final DOMDataTreeReadWriteTransaction tx = deviceDataBroker.newReadWriteTransaction();
@@ -174,7 +171,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             invokeSlaveRpc(invokeRpcMessage.getSchemaPath(), invokeRpcMessage.getNormalizedNodeMessage(), sender());
         } else if (message instanceof InvokeActionMessage) { // master
             final InvokeActionMessage invokeActionMessage = (InvokeActionMessage) message;
-            LOG.info(" InvokeActionMessage Details : {}", invokeActionMessage.toString());
+            LOG.info("InvokeActionMessage Details : {}", invokeActionMessage.toString());
             invokeSlaveAction(invokeActionMessage.getSchemaPath(), invokeActionMessage.getContainerNodeMessage(),
                 invokeActionMessage.getDOMDataTreeIdentifier(), sender());
         } else if (message instanceof RegisterMountPoint) { //slaves
@@ -191,7 +188,6 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             setup = ((RefreshSlaveActor) message).getSetup();
             schemaRepository = ((RefreshSlaveActor) message).getSchemaRepository();
         }
-
     }
 
     @Override
@@ -208,13 +204,12 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             slaveSalManager.close();
             slaveSalManager = null;
         }
-
         closeSchemaSourceRegistrations();
     }
 
     private void sendYangTextSchemaSourceProxy(final SourceIdentifier sourceIdentifier, final ActorRef sender) {
         final ListenableFuture<YangTextSchemaSource> schemaSourceFuture =
-                schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class);
+            schemaRepository.getSchemaSource(sourceIdentifier, YangTextSchemaSource.class);
 
         Futures.addCallback(schemaSourceFuture, new FutureCallback<YangTextSchemaSource>() {
             @Override
@@ -236,19 +231,17 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     }
 
     private void invokeSlaveRpc(final SchemaPath schemaPath, final NormalizedNodeMessage normalizedNodeMessage,
-                                final ActorRef recipient) {
+        final ActorRef recipient) {
 
         LOG.debug("{}: invokeSlaveRpc for {}, input: {} on rpc service {}", id, schemaPath, normalizedNodeMessage,
-                deviceRpc);
-
+            deviceRpc);
         final ListenableFuture<DOMRpcResult> rpcResult = deviceRpc.invokeRpc(schemaPath,
-                normalizedNodeMessage != null ? normalizedNodeMessage.getNode() : null);
+            normalizedNodeMessage != null ? normalizedNodeMessage.getNode() : null);
 
         Futures.addCallback(rpcResult, new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult domRpcResult) {
                 LOG.debug("{}: invokeSlaveRpc for {}, domRpcResult: {}", id, schemaPath, domRpcResult);
-
                 if (domRpcResult == null) {
                     recipient.tell(new EmptyResultResponse(), getSender());
                     return;
@@ -256,7 +249,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                 NormalizedNodeMessage nodeMessageReply = null;
                 if (domRpcResult.getResult() != null) {
                     nodeMessageReply = new NormalizedNodeMessage(YangInstanceIdentifier.EMPTY,
-                            domRpcResult.getResult());
+                        domRpcResult.getResult());
                 }
                 recipient.tell(new InvokeRpcMessageReply(nodeMessageReply, domRpcResult.getErrors()), getSelf());
             }
@@ -268,6 +261,14 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         }, MoreExecutors.directExecutor());
     }
 
+    /**
+     * Invoking Action on Slave Node in Odl Cluster Environment.
+     *
+     * @param schemaPath {@link SchemaPath}
+     * @param containerNodeMessage {@link ContainerNodeMessage}
+     * @param domDataTreeIdentifier {@link DOMDataTreeIdentifier}
+     * @param recipient {@link ActorRef}
+     */
     private void invokeSlaveAction(final SchemaPath schemaPath, final ContainerNodeMessage containerNodeMessage,
         final DOMDataTreeIdentifier domDataTreeIdentifier, final ActorRef recipient) {
         LOG.info("{}: invokeSlaveAction for {}, input: {}, identifier: {} on action service {}", id, schemaPath,
@@ -276,7 +277,6 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             domDataTreeIdentifier, containerNodeMessage != null ? containerNodeMessage.getNode() : null);
 
         Futures.addCallback(actionResult, new FutureCallback<DOMActionResult>() {
-
             @Override
             public void onSuccess(final DOMActionResult domActionResult) {
                 LOG.debug("{}: invokeSlaveAction for {}, domActionResult: {}", id, schemaPath, domActionResult);
@@ -285,7 +285,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                     return;
                 }
                 ContainerNodeMessage nodeMessageReply = null;
-                if (domActionResult.getOutput() != null) {
+                if (domActionResult.getOutput().isPresent()) {
                     nodeMessageReply = new ContainerNodeMessage(YangInstanceIdentifier.EMPTY,
                         domActionResult.getOutput().get());
                 }
@@ -301,9 +301,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
 
     private void registerSlaveMountPoint(final ActorRef masterReference) {
         unregisterSlaveMountPoint();
-
         slaveSalManager = new SlaveSalFacade(id, setup.getActorSystem(), actorResponseWaitTime, mountPointService);
-
         resolveSchemaContext(createSchemaContextFactory(masterReference), slaveSalManager, masterReference, 1);
     }
 
@@ -317,9 +315,9 @@ public class NetconfNodeActor extends AbstractUntypedActor {
 
     private EffectiveModelContextFactory createSchemaContextFactory(final ActorRef masterReference) {
         final RemoteYangTextSourceProvider remoteYangTextSourceProvider =
-                new ProxyYangTextSourceProvider(masterReference, getContext().dispatcher(), actorResponseWaitTime);
+            new ProxyYangTextSourceProvider(masterReference, getContext().dispatcher(), actorResponseWaitTime);
         final RemoteSchemaProvider remoteProvider = new RemoteSchemaProvider(remoteYangTextSourceProvider,
-                getContext().dispatcher());
+            getContext().dispatcher());
 
         registeredSchemas = sourceIdentifiers.stream().map(sourceId -> schemaRegistry
             .registerSchemaSource(remoteProvider, PotentialSchemaSource
@@ -330,9 +328,9 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     }
 
     private void resolveSchemaContext(final EffectiveModelContextFactory schemaContextFactory,
-            final SlaveSalFacade localSlaveSalManager, final ActorRef masterReference, final int tries) {
+        final SlaveSalFacade localSlaveSalManager, final ActorRef masterReference, final int tries) {
         final ListenableFuture<EffectiveModelContext> schemaContextFuture =
-                schemaContextFactory.createEffectiveModelContext(sourceIdentifiers);
+            schemaContextFactory.createEffectiveModelContext(sourceIdentifiers);
         Futures.addCallback(schemaContextFuture, new FutureCallback<SchemaContext>() {
             @Override
             public void onSuccess(final SchemaContext result) {
@@ -341,7 +339,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                     // resolution.
                     if (slaveSalManager == localSlaveSalManager) {
                         LOG.info("{}: Schema context resolved: {} - registering slave mount point",
-                                id, result.getModules());
+                            id, result.getModules());
                         slaveSalManager.registerSlaveMountPoint(result, getDOMRpcService(masterReference),
                             getDOMActionService(masterReference), masterReference);
                     }
@@ -359,10 +357,10 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                             }
 
                             resolveSchemaContext(schemaContextFactory, localSlaveSalManager,
-                                    masterReference, tries + 1);
+                                masterReference, tries + 1);
                         } else {
                             LOG.error("{}: Failed to resolve schema context - unable to register slave mount point",
-                                    id, throwable);
+                                id, throwable);
                             closeSchemaSourceRegistrations();
                         }
                     }

@@ -24,9 +24,9 @@ public class CreateInitialMasterActorData {
 
 
     public CreateInitialMasterActorData(final DOMDataBroker deviceDataBroker,
-                                        final List<SourceIdentifier> allSourceIdentifiers,
-                                        final DOMRpcService deviceRpc,
-                                        final DOMActionService deviceAction) {
+        final List<SourceIdentifier> allSourceIdentifiers,
+        final DOMRpcService deviceRpc,
+        final DOMActionService deviceAction) {
         this.deviceDataBroker = deviceDataBroker;
         this.allSourceIdentifiers = allSourceIdentifiers;
         this.deviceRpc = deviceRpc;
@@ -44,6 +44,7 @@ public class CreateInitialMasterActorData {
     public DOMRpcService getDeviceRpc() {
         return deviceRpc;
     }
+
     public DOMActionService getDeviceAction() {
         return deviceAction;
     }

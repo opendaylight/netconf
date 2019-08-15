@@ -44,17 +44,18 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     private NetconfTopologySetup netconfTopologyDeviceSetup;
     private RemoteDeviceId remoteDeviceId;
+    private final DeviceActionFactory deviceActionFactory;
     private RemoteDeviceConnector remoteDeviceConnector;
     private NetconfNodeManager netconfNodeManager;
     private ActorRef masterActorRef;
     private final AtomicBoolean closed = new AtomicBoolean(false);
     private final AtomicBoolean stopped = new AtomicBoolean(false);
     private volatile boolean isMaster;
-    private final DeviceActionFactory deviceActionFactory;
+
 
     NetconfTopologyContext(final NetconfTopologySetup netconfTopologyDeviceSetup,
-                           final ServiceGroupIdentifier serviceGroupIdent,
-                           final Timeout actorResponseWaitTime, final DOMMountPointService mountService,final DeviceActionFactory deviceActionFactory) {
+        final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
+        final DOMMountPointService mountService, final DeviceActionFactory deviceActionFactory) {
         this.netconfTopologyDeviceSetup = requireNonNull(netconfTopologyDeviceSetup);
         this.serviceGroupIdent = serviceGroupIdent;
         this.actorResponseWaitTime = actorResponseWaitTime;
@@ -62,17 +63,15 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         this.deviceActionFactory = deviceActionFactory;
 
         remoteDeviceId = NetconfTopologyUtils.createRemoteDeviceId(netconfTopologyDeviceSetup.getNode().getNodeId(),
-                netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class));
-
-        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId, deviceActionFactory);
-
+            netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class));
+        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId,
+            deviceActionFactory);
         netconfNodeManager = createNodeDeviceManager();
     }
 
     @Override
     public void instantiateServiceInstance() {
         LOG.info("Master was selected: {}", remoteDeviceId.getHost().getIpAddress());
-
         isMaster = true;
 
         // master should not listen on netconf-node operational datastore
@@ -80,30 +79,25 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
             netconfNodeManager.close();
             netconfNodeManager = null;
         }
-
         if (!closed.get()) {
             final String masterAddress =
-                    Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
+                Cluster.get(netconfTopologyDeviceSetup.getActorSystem()).selfAddress().toString();
             masterActorRef = netconfTopologyDeviceSetup.getActorSystem().actorOf(NetconfNodeActor.props(
-                    netconfTopologyDeviceSetup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY,
-                    actorResponseWaitTime, mountService),
-                    NetconfTopologyUtils.createMasterActorName(remoteDeviceId.getName(), masterAddress));
-
+                netconfTopologyDeviceSetup, remoteDeviceId, DEFAULT_SCHEMA_REPOSITORY, DEFAULT_SCHEMA_REPOSITORY,
+                actorResponseWaitTime, mountService),
+                NetconfTopologyUtils.createMasterActorName(remoteDeviceId.getName(), masterAddress));
             remoteDeviceConnector.startRemoteDeviceConnection(newMasterSalFacade());
         }
-
     }
 
     // called when master is down/changed to slave
     @Override
     public ListenableFuture<?> closeServiceInstance() {
-
         if (!closed.get()) {
             // in case that master changes role to slave, new NodeDeviceManager must be created and listener registered
             netconfNodeManager = createNodeDeviceManager();
         }
         stopDeviceConnectorAndActor();
-
         return FluentFutures.immediateNullFluentFuture();
     }
 
@@ -114,10 +108,9 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     private NetconfNodeManager createNodeDeviceManager() {
         final NetconfNodeManager ndm =
-                new NetconfNodeManager(netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime, mountService);
+            new NetconfNodeManager(netconfTopologyDeviceSetup, remoteDeviceId, actorResponseWaitTime, mountService);
         ndm.registerDataTreeChangeListener(netconfTopologyDeviceSetup.getTopologyId(),
-                netconfTopologyDeviceSetup.getNode().key());
-
+            netconfTopologyDeviceSetup.getNode().key());
         return ndm;
     }
 
@@ -126,12 +119,10 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         if (!closed.compareAndSet(false, true)) {
             return;
         }
-
         if (netconfNodeManager != null) {
             netconfNodeManager.close();
         }
         stopDeviceConnectorAndActor();
-
     }
 
     /**
@@ -141,7 +132,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
     void refresh(final @NonNull NetconfTopologySetup setup) {
         netconfTopologyDeviceSetup = requireNonNull(setup);
         remoteDeviceId = NetconfTopologyUtils.createRemoteDeviceId(netconfTopologyDeviceSetup.getNode().getNodeId(),
-                netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class));
+            netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class));
 
         if (isMaster) {
             remoteDeviceConnector.stopRemoteDeviceConnection();
@@ -149,11 +140,12 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         if (!isMaster) {
             netconfNodeManager.refreshDevice(netconfTopologyDeviceSetup, remoteDeviceId);
         }
-        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId, deviceActionFactory);
+        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId,
+            deviceActionFactory);
 
         if (isMaster) {
             final Future<Object> future = Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(
-                    netconfTopologyDeviceSetup, remoteDeviceId), actorResponseWaitTime);
+                netconfTopologyDeviceSetup, remoteDeviceId), actorResponseWaitTime);
 
             future.onComplete(new OnComplete<Object>() {
                 @Override
@@ -175,7 +167,6 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         if (remoteDeviceConnector != null) {
             remoteDeviceConnector.stopRemoteDeviceConnection();
         }
-
         if (masterActorRef != null) {
             netconfTopologyDeviceSetup.getActorSystem().stop(masterActorRef);
             masterActorRef = null;
@@ -184,6 +175,6 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
 
     protected MasterSalFacade newMasterSalFacade() {
         return new MasterSalFacade(remoteDeviceId, netconfTopologyDeviceSetup.getActorSystem(), masterActorRef,
-                actorResponseWaitTime, mountService, netconfTopologyDeviceSetup.getDataBroker());
+            actorResponseWaitTime, mountService, netconfTopologyDeviceSetup.getDataBroker());
     }
 }

@@ -23,13 +23,18 @@ import org.opendaylight.netconf.topology.singleton.messages.ContainerNodeMessage
 import org.opendaylight.yangtools.yang.common.RpcError;
 
 public class InvokeActionMessageReply implements Serializable {
-
     private static final long serialVersionUID = 1L;
 
     @SuppressFBWarnings("SE_BAD_FIELD")
     private final Collection<? extends RpcError> rpcErrors;
     private final ContainerNodeMessage containerNodeMessage;
 
+    /**
+     * Constructor for {@code InvokeActionMessage}.
+     *
+     * @param containerNodeMessage ContainerNodeMessage
+     * @param rpcErrors rpcErrors RpcError
+     */
     public InvokeActionMessageReply(final @Nullable ContainerNodeMessage containerNodeMessage,
         final @NonNull Collection<? extends RpcError> rpcErrors) {
         this.containerNodeMessage = containerNodeMessage;
@@ -37,12 +42,10 @@ public class InvokeActionMessageReply implements Serializable {
     }
 
     public @Nullable ContainerNodeMessage getContainerNodeMessage() {
-
         return containerNodeMessage;
     }
 
     public @NonNull Collection<? extends RpcError> getRpcErrors() {
-
         return rpcErrors;
     }
 
@@ -51,7 +54,6 @@ public class InvokeActionMessageReply implements Serializable {
     }
 
     private static class Proxy implements Externalizable {
-
         private static final long serialVersionUID = 2L;
 
         private InvokeActionMessageReply invokeActionMessageReply;
@@ -86,9 +88,7 @@ public class InvokeActionMessageReply implements Serializable {
         }
 
         private Object readResolve() {
-
             return invokeActionMessageReply;
         }
     }
-
 }

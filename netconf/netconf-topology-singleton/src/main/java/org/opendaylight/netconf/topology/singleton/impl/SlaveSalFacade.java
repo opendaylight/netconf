@@ -32,9 +32,9 @@ public class SlaveSalFacade {
     private final AtomicBoolean registered = new AtomicBoolean(false);
 
     public SlaveSalFacade(final RemoteDeviceId id,
-                          final ActorSystem actorSystem,
-                          final Timeout actorResponseWaitTime,
-                          final DOMMountPointService mountPointService) {
+        final ActorSystem actorSystem,
+        final Timeout actorResponseWaitTime,
+        final DOMMountPointService mountPointService) {
         this.id = id;
         this.salProvider = new NetconfDeviceSalProvider(id, mountPointService);
         this.actorSystem = actorSystem;
@@ -46,15 +46,11 @@ public class SlaveSalFacade {
         if (!registered.compareAndSet(false, true)) {
             return;
         }
-
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
-
-        final ProxyDOMDataBroker netconfDeviceDataBroker =
-                new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(), actorResponseWaitTime);
-
-        salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, netconfDeviceDataBroker,
-                deviceRpc, notificationService, deviceAction);
-
+        final ProxyDOMDataBroker netconfDeviceDataBroker = new ProxyDOMDataBroker(id, masterActorRef,
+            actorSystem.dispatcher(), actorResponseWaitTime);
+        salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext,
+            netconfDeviceDataBroker, deviceRpc, notificationService, deviceAction);
         LOG.info("{}: Slave mount point registered.", id);
     }
 
@@ -62,9 +58,7 @@ public class SlaveSalFacade {
         if (!registered.compareAndSet(true, false)) {
             return;
         }
-
         salProvider.getMountInstance().onTopologyDeviceDisconnected();
-
         LOG.info("{}: Slave mount point unregistered.", id);
     }
 }

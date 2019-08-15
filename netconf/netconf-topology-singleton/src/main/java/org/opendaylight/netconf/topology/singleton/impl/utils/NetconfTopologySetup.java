@@ -158,7 +158,7 @@ public class NetconfTopologySetup {
         }
 
         public NetconfTopologySetupBuilder setClusterSingletonServiceProvider(
-                final ClusterSingletonServiceProvider clusterSingletonServiceProvider) {
+            final ClusterSingletonServiceProvider clusterSingletonServiceProvider) {
             this.clusterSingletonServiceProvider = clusterSingletonServiceProvider;
             return this;
         }
@@ -181,7 +181,7 @@ public class NetconfTopologySetup {
             this.actionProviderRegistry = actionProviderRegistry;
             return this;
         }
-        
+
         private DataBroker getDataBroker() {
             return dataBroker;
         }
@@ -268,7 +268,7 @@ public class NetconfTopologySetup {
         }
 
         public NetconfTopologySetupBuilder setSchemaResourceDTO(
-                final NetconfDevice.SchemaResourcesDTO schemaResourceDTO) {
+            final NetconfDevice.SchemaResourcesDTO schemaResourceDTO) {
             this.schemaResourceDTO = schemaResourceDTO;
             return this;
         }
@@ -317,6 +317,4 @@ public class NetconfTopologySetup {
             return new NetconfTopologySetupBuilder();
         }
     }
-
-
 }
