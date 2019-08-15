@@ -202,7 +202,7 @@ public final class RestconfMappingNodeUtil {
                     ietfYangLibraryModule);
             if (lastComponent.getRevision().isPresent()) {
                 addChildOfModuleBySpecificModuleInternal(IetfYangLibrary.SPECIFIC_MODULE_REVISION_LEAF_QNAME,
-                        deviationEntryNode, lastComponent.getRevision(),
+                        deviationEntryNode, lastComponent.getRevision().get().toString(),
                         ietfYangLibraryModule);
             }
             deviations.withChild(deviationEntryNode.build());
