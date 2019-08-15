@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "961bd984_fa7ada68",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-15T09:49:07Z",
+      "side": 1,
+      "message": "can we integrate this into checkDocumentedError(), so that we do not repeat string.format() even when the check does not trigger?",
+      "range": {
+        "startLine": 252,
+        "startChar": 16,
+        "endLine": 252,
+        "endChar": 29
+      },
+      "revId": "3e4cc4fbd167bd9df7a53eb7340340c44a1187c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "717e5576_fd415f1b",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-15T09:49:07Z",
+      "side": 1,
+      "message": "this really begs a\n\nRestconfDocumentedException.throwIf(boolean, String, Object...) method which behaves similar to checkArgument/checkState",
+      "range": {
+        "startLine": 63,
+        "startChar": 16,
+        "endLine": 63,
+        "endChar": 53
+      },
+      "revId": "3e4cc4fbd167bd9df7a53eb7340340c44a1187c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
