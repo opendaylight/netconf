@@ -60,7 +60,12 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMActionException;
+import org.opendaylight.mdsal.dom.api.DOMActionResult;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -71,9 +76,11 @@ import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
+import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
+import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringActionException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
@@ -90,6 +97,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
@@ -130,6 +138,9 @@ public class NetconfNodeActorTest {
 
     @Mock
     private DOMRpcService mockDOMRpcService;
+
+    @Mock
+    private DOMActionService mockDOMActionService;
 
     @Mock
     private DOMMountPointService mockMountPointService;
@@ -300,6 +311,7 @@ public class NetconfNodeActorTest {
         verify(mockMountPointBuilder, after(500)).addInitialSchemaContext(mockSchemaContext);
         verify(mockMountPointBuilder).addService(eq(DOMDataBroker.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMRpcService.class), any());
+        verify(mockMountPointBuilder).addService(eq(DOMActionService.class), any());
         verify(mockMountPointBuilder).addService(eq(DOMNotificationService.class), any());
         verify(mockSchemaSourceReg1).close();
         verify(mockRegistry, times(2)).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER1));
@@ -527,6 +539,60 @@ public class NetconfNodeActorTest {
     }
 
     @Test
+    @SuppressWarnings({"checkstyle:AvoidHidingCauseException", "checkstyle:IllegalThrows"})
+    public void testSlaveInvokeAction() throws Throwable {
+        final List<SourceIdentifier> sourceIdentifiers = Lists
+            .newArrayList(RevisionSourceIdentifier.create("testActionID"));
+        initializeMaster(sourceIdentifiers);
+        registerSlaveMountPoint();
+
+        ArgumentCaptor<DOMActionService> domActionServiceCaptor = ArgumentCaptor.forClass(DOMActionService.class);
+        verify(mockMountPointBuilder).addService(eq(DOMActionService.class), domActionServiceCaptor.capture());
+
+        final DOMActionService slaveDomActionService = domActionServiceCaptor.getValue();
+        assertTrue(slaveDomActionService instanceof ProxyDOMActionService);
+
+        final QName testQName = QName.create("test", "2019-08-16", "TestActionQname");
+        final SchemaPath schemaPath = SchemaPath.create(true, testQName);
+
+        final YangInstanceIdentifier yangIIdPath = YangInstanceIdentifier
+            .create(new YangInstanceIdentifier.NodeIdentifier(testQName));
+
+        final DOMDataTreeIdentifier domDataTreeIdentifier = new DOMDataTreeIdentifier(LogicalDatastoreType.OPERATIONAL,
+            yangIIdPath);
+
+        final ContainerNode outputNode = ImmutableContainerNodeBuilder.create()
+            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(testQName))
+            .withChild(ImmutableNodes.leafNode(testQName, "foo")).build();
+
+        // Action with no response output.
+        doReturn(FluentFutures.immediateNullFluentFuture()).when(mockDOMActionService)
+            .invokeAction(any(), any(), any());
+        DOMActionResult result = slaveDomActionService.invokeAction(schemaPath, domDataTreeIdentifier, outputNode)
+            .get(2, TimeUnit.SECONDS);
+        assertEquals(null, result);
+
+        // Action with response output.
+        doReturn(FluentFutures.immediateFluentFuture(new SimpleDOMActionResult(outputNode))).when(mockDOMActionService)
+            .invokeAction(any(), any(), any());
+        result = slaveDomActionService.invokeAction(schemaPath, domDataTreeIdentifier, outputNode)
+            .get(2, TimeUnit.SECONDS);
+
+        assertEquals(outputNode, result.getOutput().get());
+        assertTrue(result.getErrors().isEmpty());
+
+        // Action failure.
+        exception.expect(DOMActionException.class);
+        doReturn(FluentFutures.immediateFailedFluentFuture(new ClusteringActionException("mock")))
+            .when(mockDOMActionService).invokeAction(any(), any(), any());
+        try {
+            slaveDomActionService.invokeAction(schemaPath, domDataTreeIdentifier, outputNode).get(2, TimeUnit.SECONDS);
+        } catch (ExecutionException e) {
+            throw e.getCause();
+        }
+    }
+
+    @Test
     public void testSlaveNewTransactionRequests() {
 
         doReturn(mock(DOMDataTreeReadTransaction.class)).when(mockDOMDataBroker).newReadOnlyTransaction();
@@ -579,7 +645,7 @@ public class NetconfNodeActorTest {
 
     private void initializeMaster(final List<SourceIdentifier> sourceIdentifiers) {
         masterRef.tell(new CreateInitialMasterActorData(mockDOMDataBroker, sourceIdentifiers,
-                mockDOMRpcService), testKit.getRef());
+                mockDOMRpcService, mockDOMActionService), testKit.getRef());
 
         testKit.expectMsgClass(MasterActorDataInitialized.class);
     }
