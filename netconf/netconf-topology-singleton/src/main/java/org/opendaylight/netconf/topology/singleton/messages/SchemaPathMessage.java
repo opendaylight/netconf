@@ -57,9 +57,9 @@ public class SchemaPathMessage implements Serializable {
 
         @Override
         public void writeExternal(final ObjectOutput out) throws IOException {
-            out.writeInt(Iterables.size(schemaPathMessage.getSchemaPath().getPathTowardsRoot()));
+            out.writeInt(Iterables.size(schemaPathMessage.getSchemaPath().getPathFromRoot()));
 
-            for (final QName qualifiedName : schemaPathMessage.getSchemaPath().getPathTowardsRoot()) {
+            for (final QName qualifiedName : schemaPathMessage.getSchemaPath().getPathFromRoot()) {
                 out.writeObject(qualifiedName);
             }
 
