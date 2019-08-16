@@ -33,12 +33,14 @@ import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
+import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegistration;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
+import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
@@ -70,6 +72,7 @@ public class NetconfTopologyManager
 
     private final DataBroker dataBroker;
     private final DOMRpcProviderService rpcProviderRegistry;
+    private final DOMActionProviderService actionProviderRegistry;
     private final ClusterSingletonServiceProvider clusterSingletonServiceProvider;
     private final ScheduledExecutorService keepaliveExecutor;
     private final ListeningExecutorService processingExecutor;
@@ -80,21 +83,25 @@ public class NetconfTopologyManager
     private final Duration writeTxIdleTimeout;
     private final DOMMountPointService mountPointService;
     private final AAAEncryptionService encryptionService;
+    private final DeviceActionFactory deviceActionFactory;
     private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
     private String privateKeyPath;
     private String privateKeyPassphrase;
 
     public NetconfTopologyManager(final DataBroker dataBroker, final DOMRpcProviderService rpcProviderRegistry,
+                                  final DOMActionProviderService actionProviderService,
                                   final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
                                   final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
                                   final ActorSystemProvider actorSystemProvider,
                                   final EventExecutor eventExecutor, final NetconfClientDispatcher clientDispatcher,
                                   final String topologyId, final Config config,
                                   final DOMMountPointService mountPointService,
-                                  final AAAEncryptionService encryptionService) {
+                                  final AAAEncryptionService encryptionService,
+                                  final DeviceActionFactory deviceActionFactory) {
 
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcProviderRegistry = requireNonNull(rpcProviderRegistry);
+        this.actionProviderRegistry = requireNonNull(actionProviderService);
         this.clusterSingletonServiceProvider = requireNonNull(clusterSingletonServiceProvider);
         this.keepaliveExecutor = keepaliveExecutor.getExecutor();
         this.processingExecutor = MoreExecutors.listeningDecorator(processingExecutor.getExecutor());
@@ -105,6 +112,7 @@ public class NetconfTopologyManager
         this.writeTxIdleTimeout = Duration.apply(config.getWriteTransactionIdleTimeout(), TimeUnit.SECONDS);
         this.mountPointService = mountPointService;
         this.encryptionService = requireNonNull(encryptionService);
+        this.deviceActionFactory = requireNonNull(deviceActionFactory);
 
     }
 
@@ -166,7 +174,7 @@ public class NetconfTopologyManager
                 ServiceGroupIdentifier.create(instanceIdentifier.toString());
 
         final NetconfTopologyContext newNetconfTopologyContext = newNetconfTopologyContext(
-                createSetup(instanceIdentifier, node), serviceGroupIdent, actorResponseWaitTime);
+            createSetup(instanceIdentifier, node), serviceGroupIdent, actorResponseWaitTime, this.deviceActionFactory);
 
         int tries = 3;
         while (true) {
@@ -199,8 +207,10 @@ public class NetconfTopologyManager
 
     @VisibleForTesting
     protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
-            final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime) {
-        return new NetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime, mountPointService);
+        final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
+        final DeviceActionFactory deviceActionFactory) {
+        return new NetconfTopologyContext(setup, serviceGroupIdent, actorResponseWaitTime, mountPointService,
+            deviceActionFactory);
     }
 
     @Override
@@ -277,6 +287,7 @@ public class NetconfTopologyManager
                 .setDataBroker(dataBroker)
                 .setInstanceIdentifier(instanceIdentifier)
                 .setRpcProviderRegistry(rpcProviderRegistry)
+                .setActionProviderRegistry(actionProviderRegistry)
                 .setNode(node)
                 .setActorSystem(actorSystem)
                 .setEventExecutor(eventExecutor)

@@ -16,6 +16,8 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
                interface="org.opendaylight.mdsal.binding.api.DataBroker"/>
     <reference id="rpcRegistry"
                interface="org.opendaylight.mdsal.dom.api.DOMRpcProviderService"/>
+    <reference id="actionRegistry"
+               interface="org.opendaylight.mdsal.dom.api.DOMActionProviderService"/>
     <reference id="clusterSingletonService"
                interface="org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider"/>
     <reference id="keepAliveExecutor"
@@ -35,6 +37,8 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
     <reference id="mountPointService"
                interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"
                odl:type="default"/>
+    <reference id="deviceActionFactory"
+               interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
     <odl:clustered-app-config
             id="singletonConfig"
             binding-class="org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config"
@@ -57,6 +61,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
                                update-strategy="container-managed"/>
         <argument ref="dataBroker"/>
         <argument ref="rpcRegistry"/>
+        <argument ref="actionRegistry"/>
         <argument ref="clusterSingletonService"/>
         <argument ref="keepAliveExecutor"/>
         <argument ref="processingExecutor"/>
@@ -69,6 +74,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         <property name="privateKeyPath" value="${private-key-path}"/>
         <property name="privateKeyPassphrase" value="${private-key-passphrase}"/>
         <argument ref="encryptionService" />
+        <argument ref="deviceActionFactory"/>
     </bean>
     <service ref="netconfTopologyManager"
              interface="org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService"/>
