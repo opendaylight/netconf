@@ -11,6 +11,7 @@ package org.opendaylight.netconf.topology.singleton.impl;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
+import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -27,8 +28,9 @@ class TestingRemoteDeviceConnectorImpl extends RemoteDeviceConnectorImpl {
 
     TestingRemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
                                      final RemoteDeviceId remoteDeviceId,
-                                     final NetconfDeviceCommunicator communicator) {
-        super(netconfTopologyDeviceSetup, remoteDeviceId);
+                                     final NetconfDeviceCommunicator communicator,
+                                     final DeviceActionFactory deviceActionFactory) {
+        super(netconfTopologyDeviceSetup, remoteDeviceId, deviceActionFactory);
         this.communicator = communicator;
     }
 
@@ -39,5 +41,4 @@ class TestingRemoteDeviceConnectorImpl extends RemoteDeviceConnectorImpl {
         doReturn(FluentFutures.immediateNullFluentFuture()).when(communicator).initializeRemoteConnection(any(), any());
         return connectorDTO;
     }
-
 }

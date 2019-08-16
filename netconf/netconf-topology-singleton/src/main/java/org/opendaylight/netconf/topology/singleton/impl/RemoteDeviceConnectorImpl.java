@@ -33,6 +33,7 @@ import org.opendaylight.netconf.nettyutil.ReconnectStrategyFactory;
 import org.opendaylight.netconf.nettyutil.TimedReconnectStrategyFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.LoginPasswordHandler;
+import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.LibraryModulesSchemas;
@@ -89,12 +90,14 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     private final AAAEncryptionService encryptionService;
     private NetconfConnectorDTO deviceCommunicatorDTO;
     private final NetconfKeystoreAdapter keystoreAdapter;
+    private final DeviceActionFactory deviceActionFactory;
 
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
-                                     final RemoteDeviceId remoteDeviceId) {
+        final RemoteDeviceId remoteDeviceId, final DeviceActionFactory deviceActionFactory) {
 
         this.netconfTopologyDeviceSetup = requireNonNull(netconfTopologyDeviceSetup);
         this.remoteDeviceId = remoteDeviceId;
+        this.deviceActionFactory = deviceActionFactory;
         this.privateKeyPath = netconfTopologyDeviceSetup.getPrivateKeyPath();
         this.privateKeyPassphrase = netconfTopologyDeviceSetup.getPrivateKeyPassphrase();
         this.encryptionService = netconfTopologyDeviceSetup.getEncryptionService();
@@ -200,6 +203,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                     .setSchemaResourcesDTO(schemaResourcesDTO)
                     .setGlobalProcessingExecutor(netconfTopologyDeviceSetup.getProcessingExecutor())
                     .setId(remoteDeviceId)
+                    .setDeviceActionFactory(deviceActionFactory)
                     .setSalFacade(salFacade)
                     .build();
         }
