@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "606f529c_60e0aa18",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/errors/JsonStreamWriterWithDisabledValidation.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2019-08-19T17:17:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8be726d5_faf6bb1b",
+      "range": {
+        "startLine": 46,
+        "startChar": 41,
+        "endLine": 46,
+        "endChar": 73
+      },
+      "revId": "e9bcdb6c9383d9427c5d37c8ea9ce5286bdf7b0c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f4126c09_7e84a4c5",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/errors/RestconfDocumentedExceptionMapper.java",
         "patchSetId": 8
@@ -36,6 +60,30 @@
       "writtenOn": "2019-08-15T09:45:06Z",
       "side": 1,
       "message": "I wonder -- cannot we use MediaType.isCompatibleType()/isCompatibleSubtype() here?",
+      "range": {
+        "startLine": 382,
+        "startChar": 41,
+        "endLine": 382,
+        "endChar": 78
+      },
+      "revId": "e9bcdb6c9383d9427c5d37c8ea9ce5286bdf7b0c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2ebe3621_256f2c59",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/errors/RestconfDocumentedExceptionMapper.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 8319
+      },
+      "writtenOn": "2019-08-19T17:17:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4126c09_7e84a4c5",
       "range": {
         "startLine": 382,
         "startChar": 41,
