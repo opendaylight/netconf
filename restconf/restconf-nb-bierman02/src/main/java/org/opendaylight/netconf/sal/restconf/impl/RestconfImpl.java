@@ -73,7 +73,6 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.util.DataChangeScope;
-import org.opendaylight.restconf.common.validation.RestconfValidationUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
 import org.opendaylight.yangtools.yang.common.Empty;
@@ -913,10 +912,10 @@ public final class RestconfImpl implements RestconfService {
 
         final Map<QName, Object> mutableCopyUriKeyValues = Maps.newHashMap(uriKeyValues);
         for (final QName keyDefinition : keyDefinitions) {
-            final Object uriKeyValue = mutableCopyUriKeyValues.remove(keyDefinition);
-            // should be caught during parsing URI to InstanceIdentifier
-            RestconfValidationUtils.checkDocumentedError(uriKeyValue != null, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
-                    "Missing key " + keyDefinition + " in URI.");
+            final Object uriKeyValue = RestconfDocumentedException.throwIfNull(
+                // should be caught during parsing URI to InstanceIdentifier
+                mutableCopyUriKeyValues.remove(keyDefinition), ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
+                "Missing key %s in URI.", keyDefinition);
 
             final Object dataKeyValue = payload.getIdentifier().getKeyValues().get(keyDefinition);
 

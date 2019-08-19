@@ -29,21 +29,6 @@ public final class RestconfValidationUtils {
     }
 
     /**
-     * Method returns {@link RestconfDocumentedException} for a false condition.
-     *
-     * @param condition - condition for rise {@link RestconfDocumentedException}
-     * @param type      - input {@link ErrorType} for create {@link RestconfDocumentedException}
-     * @param tag       - input {@link ErrorTag} for create {@link RestconfDocumentedException}
-     * @param message   - input error message for create {@link RestconfDocumentedException}
-     */
-    public static void checkDocumentedError(final boolean condition, final ErrorType type,
-            final ErrorTag tag, final String message) {
-        if (!condition) {
-            throw new RestconfDocumentedException(message, type, tag);
-        }
-    }
-
-    /**
      * Method returns {@link RestconfDocumentedException} if value is NULL or same input value.
      * {@link ErrorType} is relevant for server application layer
      * {@link ErrorTag} is 404 data-missing

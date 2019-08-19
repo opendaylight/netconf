@@ -34,7 +34,6 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.util.RestUtil;
 import org.opendaylight.restconf.common.util.RestconfSchemaUtil;
-import org.opendaylight.restconf.common.validation.RestconfValidationUtils;
 import org.opendaylight.restconf.nb.rfc8040.codecs.RestCodec;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -135,8 +134,8 @@ public final class YangInstanceIdentifierDeserializer {
             }
 
             // check if next value is parsable
-            RestconfValidationUtils.checkDocumentedError(IDENTIFIER_PREDICATE.matches(currentChar()),
-                    RestconfError.ErrorType.PROTOCOL,RestconfError.ErrorTag.MALFORMED_MESSAGE, "");
+            RestconfDocumentedException.throwIf(!IDENTIFIER_PREDICATE.matches(currentChar()), "",
+                    RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.MALFORMED_MESSAGE);
 
             // parse value
             final QName key = keys.next();
@@ -164,12 +163,9 @@ public final class YangInstanceIdentifierDeserializer {
             }
 
             // there should be no more missing keys
-            RestconfValidationUtils.checkDocumentedError(
-                    !keys.hasNext(),
-                    RestconfError.ErrorType.PROTOCOL,
-                    RestconfError.ErrorTag.MISSING_ATTRIBUTE,
-                    "Key value missing for: " + qname
-            );
+            RestconfDocumentedException.throwIf(keys.hasNext(),
+                    RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.MISSING_ATTRIBUTE,
+                    "Key value missing for: %s", qname);
         }
 
         path.add(new YangInstanceIdentifier.NodeIdentifierWithPredicates(qname, values.build()));
@@ -236,12 +232,11 @@ public final class YangInstanceIdentifierDeserializer {
         final String value = nextIdentifierFromNextSequence(IDENTIFIER_PREDICATE);
 
         // exception if value attribute is missing
-        RestconfValidationUtils.checkDocumentedError(
-                !value.isEmpty(),
+        RestconfDocumentedException.throwIf(
+                value.isEmpty(),
                 RestconfError.ErrorType.PROTOCOL,
                 RestconfError.ErrorTag.MISSING_ATTRIBUTE,
-                "Value missing for: " + qname
-        );
+                "Value missing for: %s", qname);
         final DataSchemaNode dataSchemaNode = current.getDataSchemaNode();
         final Object valueByType = prepareValueByType(dataSchemaNode, findAndParsePercentEncoded(value));
         path.add(new YangInstanceIdentifier.NodeWithValue<>(qname, valueByType));
@@ -346,7 +341,7 @@ public final class YangInstanceIdentifierDeserializer {
     }
 
     private static <T extends DataNodeContainer & SchemaNode & ActionNodeContainer> QName getQNameOfDataSchemaNode(
-            final T parent, String nodeName) {
+            final T parent, final String nodeName) {
         final Optional<ActionDefinition> actionDef = findActionDefinition(parent, nodeName);
         final SchemaNode node;
         if (actionDef.isPresent()) {
