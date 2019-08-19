@@ -14,7 +14,6 @@ import java.util.Locale;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
-import org.opendaylight.restconf.common.validation.RestconfValidationUtils;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.yangtools.yang.common.Revision;
 
@@ -36,8 +35,8 @@ public final class RestconfValidation {
      * @return {@link Date}
      */
     public static Revision validateAndGetRevision(final Iterator<String> revisionDate) {
-        RestconfValidationUtils.checkDocumentedError(revisionDate.hasNext(), ErrorType.PROTOCOL,
-                ErrorTag.INVALID_VALUE, "Revision date must be supplied.");
+        RestconfDocumentedException.throwIf(!revisionDate.hasNext(), "Revision date must be supplied.",
+            ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         try {
             return Revision.of(revisionDate.next());
         } catch (final DateTimeParseException e) {
@@ -53,31 +52,18 @@ public final class RestconfValidation {
      * @return {@link String}
      */
     public static String validateAndGetModulName(final Iterator<String> moduleName) {
-        RestconfValidationUtils.checkDocumentedError(
-                moduleName.hasNext(),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                "Module name must be supplied."
-        );
-
+        RestconfDocumentedException.throwIf(!moduleName.hasNext(), "Module name must be supplied.", ErrorType.PROTOCOL,
+            ErrorTag.INVALID_VALUE);
         final String name = moduleName.next();
 
-        RestconfValidationUtils.checkDocumentedError(
-                !name.isEmpty() && ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(name.charAt(0)),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                "Identifier must start with character from set 'a-zA-Z_"
-        );
-
-        RestconfValidationUtils.checkDocumentedError(
-                !name.toUpperCase(Locale.ROOT).startsWith("XML"),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                "Identifier must NOT start with XML ignore case."
-        );
-
-        RestconfValidationUtils.checkDocumentedError(
-                ParserBuilderConstants.Deserializer.IDENTIFIER.matchesAllOf(name.substring(1)),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE,
-                "Supplied name has not expected identifier format."
-        );
+        RestconfDocumentedException.throwIf(
+            name.isEmpty() || !ParserBuilderConstants.Deserializer.IDENTIFIER_FIRST_CHAR.matches(name.charAt(0)),
+            "Identifier must start with character from set 'a-zA-Z_", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        RestconfDocumentedException.throwIf(name.toUpperCase(Locale.ROOT).startsWith("XML"),
+            "Identifier must NOT start with XML ignore case.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+        RestconfDocumentedException.throwIf(
+            !ParserBuilderConstants.Deserializer.IDENTIFIER.matchesAllOf(name.substring(1)),
+            "Supplied name has not expected identifier format.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
 
         return name;
     }
