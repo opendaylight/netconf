@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.common.errors;
 
 import com.google.common.base.Preconditions;
@@ -15,6 +14,8 @@ import java.util.Collection;
 import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
@@ -173,6 +174,60 @@ public class RestconfDocumentedException extends WebApplicationException {
             }
         }
         throw new RestconfDocumentedException(message, cause, cause.getErrorList());
+    }
+
+    /**
+     * Throw an instance of this exception if an expression evaluates to true. If the expression evaluates to false,
+     * this method does nothing.
+     *
+     * @param expression Expression to be evaluated
+     * @param errorType The enumerated type indicating the layer where the error occurred.
+     * @param errorTag The enumerated tag representing a more specific error cause.
+     * @param format Format string, according to {@link String#format(String, Object...)}.
+     * @param args Format string arguments, according to {@link String#format(String, Object...)}
+     * @throws RestconfDocumentedException if the expression evaluates to true.
+     */
+    public static void throwIf(final boolean expression, final ErrorType errorType, final ErrorTag errorTag,
+            final @NonNull String format, final Object... args) {
+        if (expression) {
+            throw new RestconfDocumentedException(String.format(format, args), errorType, errorTag);
+        }
+    }
+
+    /**
+     * Throw an instance of this exception if an expression evaluates to true. If the expression evaluates to false,
+     * this method does nothing.
+     *
+     * @param expression Expression to be evaluated
+     * @param message error message
+     * @param errorType The enumerated type indicating the layer where the error occurred.
+     * @param errorTag The enumerated tag representing a more specific error cause.
+     * @throws RestconfDocumentedException if the expression evaluates to true.
+     */
+    public static void throwIf(final boolean expression, final @NonNull String message,
+            final ErrorType errorType, final ErrorTag errorTag) {
+        if (expression) {
+            throw new RestconfDocumentedException(message, errorType, errorTag);
+        }
+    }
+
+    /**
+     * Throw an instance of this exception if an object is null. If the object is non-null, it will
+     * be returned as the result of this method.
+     *
+     * @param obj Object reference to be checked
+     * @param errorType The enumerated type indicating the layer where the error occurred.
+     * @param errorTag The enumerated tag representing a more specific error cause.
+     * @param format Format string, according to {@link String#format(String, Object...)}.
+     * @param args Format string arguments, according to {@link String#format(String, Object...)}
+     * @throws RestconfDocumentedException if the expression evaluates to true.
+     */
+    public static <T> @NonNull T throwIfNull(final @Nullable T obj, final ErrorType errorType, final ErrorTag errorTag,
+            final @NonNull String format, final Object... args) {
+        if (obj == null) {
+            throw new RestconfDocumentedException(String.format(format, args), errorType, errorTag);
+        }
+        return obj;
     }
 
     private static List<RestconfError> convertToRestconfErrors(final Collection<? extends RpcError> rpcErrors) {
