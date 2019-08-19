@@ -61,11 +61,11 @@ public class SchemaRetrievalServiceImpl implements SchemaRetrievalService {
 
         }
 
-        RestconfValidationUtils.checkDocumentedError(componentIter.hasNext(),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, "Module name must be supplied.");
+        RestconfDocumentedException.throwIf(!componentIter.hasNext(), "Module name must be supplied.",
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         final String moduleName = componentIter.next();
-        RestconfValidationUtils.checkDocumentedError(componentIter.hasNext(),
-                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, "Revision date must be supplied.");
+        RestconfDocumentedException.throwIf(!componentIter.hasNext(), "Revision date must be supplied.",
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         final String revisionString = componentIter.next();
         return getExportUsingNameAndRevision(schemaContext, moduleName, revisionString,
                 salContext.getYangTextSourceProvider());
