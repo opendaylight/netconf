@@ -441,6 +441,100 @@
                 <type>xml</type>
                 <classifier>features</classifier>
             </dependency>
+
+            <!-- RESTCONF -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ietf-restconf</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ietf-restconf-monitoring</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>restconf-common-models</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>restconf-common</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>restconf-nb-bierman02</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>restconf-nb-rfc8040</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sal-rest-connector-config</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sal-rest-docgen</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sal-rest-docgen-maven</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sal-restconf-broker</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>websocket-client</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+            </dependency>
+
+            <!-- restconf features -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>features-restconf</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>odl-mdsal-apidocs</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>odl-restconf</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>odl-restconf-all</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>odl-restconf-common</artifactId>
+                <version>1.11.0-SNAPSHOT</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>
