@@ -30,6 +30,7 @@
 
     <modules>
         <module>artifacts</module>
+        <module>parent</module>
         <module>features</module>
         <module>karaf</module>
         <module>netconf</module>
