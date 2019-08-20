@@ -24,16 +24,12 @@
 
     <name>OpenDaylight :: Netconf :: Mdsal</name>
 
-    <properties>
-        <netconf.version>1.8.0-SNAPSHOT</netconf.version>
-    </properties>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>netconf-artifacts</artifactId>
-                <version>${netconf.version}</version>
+                <version>1.8.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -44,28 +40,24 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-all</artifactId>
-            <version>${netconf.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-tcp</artifactId>
-            <version>${netconf.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-ssh</artifactId>
-            <version>${netconf.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-client</artifactId>
-            <version>${netconf.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
