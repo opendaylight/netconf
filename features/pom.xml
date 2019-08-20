@@ -26,6 +26,7 @@
   </properties>
 
   <modules>
+    <module>parent</module>
     <module>netconf</module>
     <module>netconf-connector</module>
     <module>restconf</module>
