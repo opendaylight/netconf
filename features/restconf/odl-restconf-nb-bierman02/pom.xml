@@ -34,8 +34,8 @@
             </dependency>
             <dependency>
                 <groupId>org.opendaylight.netconf</groupId>
-                <artifactId>restconf-artifacts</artifactId>
-                <version>1.11.0-SNAPSHOT</version>
+                <artifactId>netconf-artifacts</artifactId>
+                <version>1.8.0-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
