@@ -8,31 +8,18 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <groupId>org.opendaylight.odlparent</groupId>
-        <artifactId>single-feature-parent</artifactId>
-        <version>8.1.0</version>
-        <relativePath/>
+        <groupId>org.opendaylight.netconf</groupId>
+        <artifactId>feature-parent</artifactId>
+        <version>1.13.0-SNAPSHOT</version>
+        <relativePath>../../parent</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-test-tools</artifactId>
-    <version>1.13.0-SNAPSHOT</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: NETCONF Test Tools :: Tools used for performance testing</name>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-artifacts</artifactId>
-                <version>1.13.0-SNAPSHOT</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
