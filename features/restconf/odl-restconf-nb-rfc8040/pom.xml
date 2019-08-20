@@ -18,7 +18,7 @@
 
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-restconf-nb-rfc8040</artifactId>
-    <version>1.11.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Restconf :: NB :: RFC8040</name>
