@@ -18,10 +18,18 @@
   <artifactId>netconf-karaf</artifactId>
   <version>1.11.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <properties>
-    <netconf.version>1.8.0-SNAPSHOT</netconf.version>
-    <restconf.version>1.11.0-SNAPSHOT</restconf.version>
-  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.opendaylight.netconf</groupId>
+        <artifactId>netconf-artifacts</artifactId>
+        <version>1.8.0-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -34,7 +42,6 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>features-netconf</artifactId>
-      <version>${netconf.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
       <scope>runtime</scope>
@@ -42,7 +49,6 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>features-netconf-connector</artifactId>
-      <version>${netconf.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
       <scope>runtime</scope>
@@ -50,7 +56,6 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>features-restconf</artifactId>
-      <version>${restconf.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
       <scope>runtime</scope>
@@ -58,7 +63,6 @@
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>features-yanglib</artifactId>
-      <version>${netconf.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
       <scope>runtime</scope>
