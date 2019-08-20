@@ -1,0 +1,280 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1e121719_8452d79a",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-20T16:00:30Z",
+      "side": 1,
+      "message": "+4 spaces here",
+      "range": {
+        "startLine": 84,
+        "startChar": 4,
+        "endLine": 84,
+        "endChar": 8
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "356f2d5a_d719104a",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-20T16:00:30Z",
+      "side": 1,
+      "message": "unrelated reformat -- please reconfigure your editor and review your patch output before (or just after) assigning reviewers.",
+      "range": {
+        "startLine": 130,
+        "startChar": 8,
+        "endLine": 130,
+        "endChar": 12
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8d07f6f_14230d4d",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-20T16:00:30Z",
+      "side": 1,
+      "message": "please keep the collector step on its own line (fix auto-format?)",
+      "range": {
+        "startLine": 152,
+        "startChar": 88,
+        "endLine": 152,
+        "endChar": 115
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df1e21d7_f5c5956f",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-20T16:00:30Z",
+      "side": 1,
+      "message": "this should be after \u0027mountService\u0027",
+      "range": {
+        "startLine": 52,
+        "startChar": 12,
+        "endLine": 52,
+        "endChar": 17
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1ac51cfb_5ce982cb",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-20T16:00:30Z",
+      "side": 1,
+      "message": "unrelated indent",
+      "range": {
+        "startLine": 141,
+        "startChar": 8,
+        "endLine": 141,
+        "endChar": 12
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "53b920b9_a7206c75",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-20T16:00:30Z",
+      "side": 1,
+      "message": "do not ever split class from its static method, it makes things unreadable and ungreppable.",
+      "range": {
+        "startLine": 153,
+        "startChar": 50,
+        "endLine": 154,
+        "endChar": 16
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "98fd481f_8b28d360",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-20T16:00:30Z",
+      "side": 1,
+      "message": "do not introduce wasteful \u0027this.\u0027 references -- they are just waste of space.",
+      "range": {
+        "startLine": 177,
+        "startChar": 93,
+        "endLine": 177,
+        "endChar": 98
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f5f85490_7bb7dbf6",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-20T16:00:30Z",
+      "side": 1,
+      "message": "retain whitespace",
+      "range": {
+        "startLine": 210,
+        "startChar": 4,
+        "endLine": 210,
+        "endChar": 8
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "817bc013_6ac2bd7c",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMActionService.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-20T16:00:30Z",
+      "side": 1,
+      "message": "please do add some about of documentation here.",
+      "range": {
+        "startLine": 41,
+        "startChar": 13,
+        "endLine": 41,
+        "endChar": 34
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b15a1d69_490a5515",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMActionService.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-20T16:00:30Z",
+      "side": 1,
+      "message": "if these are required, they should be properly null-annotated and carry a requireNonNull()",
+      "range": {
+        "startLine": 60,
+        "startChar": 0,
+        "endLine": 63,
+        "endChar": 59
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ce510aee_5f9aa73f",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMActionService.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-20T16:00:30Z",
+      "side": 1,
+      "message": "non-null is guaranteed by invokeAction(), this should not be here -- this should be a requireNonNull() on first internal reference.",
+      "range": {
+        "startLine": 72,
+        "startChar": 12,
+        "endLine": 72,
+        "endChar": 97
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "98f76d1c_85a34de1",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/ProxyDOMActionService.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-20T16:00:30Z",
+      "side": 1,
+      "message": "please do not split object reference and invocation unless absolutely necessary",
+      "range": {
+        "startLine": 96,
+        "startChar": 65,
+        "endLine": 97,
+        "endChar": 47
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
