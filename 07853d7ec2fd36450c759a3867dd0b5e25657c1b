@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "c475c887_351fe71b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-20T16:22:23Z",
+      "side": 1,
+      "message": "Please provide a commit message similar to:\n\nhttps://git.opendaylight.org/gerrit/#/c/bgpcep/+/83753/6//COMMIT_MSG",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 72
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e121719_8452d79a",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
         "patchSetId": 6
