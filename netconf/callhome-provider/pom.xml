@@ -33,12 +33,10 @@
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>callhome-protocol</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
             <artifactId>callhome-model</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
