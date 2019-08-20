@@ -10,41 +10,35 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.opendaylight.odlparent</groupId>
-        <artifactId>single-feature-parent</artifactId>
-        <version>8.1.0</version>
-        <relativePath/>
+        <groupId>org.opendaylight.netconf</groupId>
+        <artifactId>feature-parent</artifactId>
+        <version>1.13.0-SNAPSHOT</version>
+        <relativePath>../../parent</relativePath>
     </parent>
 
-    <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-client</artifactId>
-    <version>1.13.0-SNAPSHOT</version>
     <packaging>feature</packaging>
 
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.controller</groupId>
             <artifactId>odl-controller-exp-netty-config</artifactId>
-            <version>3.0.6</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>odl-netconf-netty-util</artifactId>
-            <version>${project.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>netconf-client</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>netconf-config</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

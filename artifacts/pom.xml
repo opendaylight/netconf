@@ -263,6 +263,11 @@
                 <artifactId>netconf-topology-singleton</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>netconf-console</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -514,6 +519,13 @@
                 <version>1.13.0-SNAPSHOT</version>
             </dependency>
             <dependency>
+                <groupId>org.opendaylight.netconf</groupId>
+                <artifactId>sal-rest-connector-config</artifactId>
+                <version>1.13.0-SNAPSHOT</version>
+                <type>cfg</type>
+                <classifier>restconf</classifier>
+            </dependency>
+            <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sal-rest-docgen</artifactId>
                 <version>1.13.0-SNAPSHOT</version>
@@ -566,6 +578,20 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>odl-restconf-common</artifactId>
+                <version>1.13.0-SNAPSHOT</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>odl-restconf-nb-bierman02</artifactId>
+                <version>1.13.0-SNAPSHOT</version>
+                <type>xml</type>
+                <classifier>features</classifier>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>odl-restconf-nb-rfc8040</artifactId>
                 <version>1.13.0-SNAPSHOT</version>
                 <type>xml</type>
                 <classifier>features</classifier>
