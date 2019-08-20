@@ -29,6 +29,7 @@
     </properties>
 
     <modules>
+        <module>artifacts</module>
         <module>features</module>
         <module>karaf</module>
         <module>netconf</module>
