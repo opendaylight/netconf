@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.util;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
@@ -43,29 +44,44 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public final class NetconfUtil {
-
-    public static final QName NETCONF_QNAME =
-            QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "netconf").intern();
-    public static final QName NETCONF_DATA_QNAME = QName.create(NETCONF_QNAME, "data").intern();
-    public static final XMLOutputFactory XML_FACTORY;
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfUtil.class);
 
+    /**
+     * QName of NETCONF top-level data node. It seems to be defined in https://tools.ietf.org/html/rfc6241#section-3.1,
+     * making it a protocol-data level construct.
+     *
+     * @deprecated What does this contract mean?
+     */
+    // FIXME: what is this contract saying?
+    //        - is it saying all data is going to be interpreted with this root?
+    //        - is this saying we are following a specific interface contract (i.e. do we have schema mounts?)
+    //        - is it also inferring some abilities w.r.t. RFC8342?
+    @Deprecated
+    public static final QName NETCONF_DATA_QNAME = SchemaContext.NAME;
+    public static final QName NETCONF_QNAME = QName.create(SchemaContext.NAME, "netconf").intern();
+    public static final XMLOutputFactory XML_FACTORY;
+
     static {
-        XML_FACTORY = XMLOutputFactory.newFactory();
-        XML_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
+        final XMLOutputFactory f = XMLOutputFactory.newFactory();
+        // FIXME: not repairing namespaces is probably common, this should be availabe as common XML constant.
+        f.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
+        XML_FACTORY = f;
     }
 
-    private NetconfUtil() {}
+    private NetconfUtil() {
+        // No-op
+    }
 
     public static Document checkIsMessageOk(final Document response) throws DocumentedException {
-        XmlElement element = XmlElement.fromDomDocument(response);
-        Preconditions.checkState(element.getName().equals(XmlNetconfConstants.RPC_REPLY_KEY));
-        element = element.getOnlyChildElement();
-        if (element.getName().equals(XmlNetconfConstants.OK)) {
+        final XmlElement docElement = XmlElement.fromDomDocument(response);
+        checkState(XmlNetconfConstants.RPC_REPLY_KEY.equals(docElement.getName()));
+        final XmlElement element = docElement.getOnlyChildElement();
+        if (XmlNetconfConstants.OK.equals(element.getName())) {
             return response;
         }
+
         LOG.warn("Can not load last configuration. Operation failed.");
+        // FIXME: we should be throwing a DocumentedException here
         throw new IllegalStateException("Can not load last configuration. Operation failed: "
                 + XmlUtil.toString(response));
     }
@@ -145,6 +161,7 @@ public final class NetconfUtil {
         }
     }
 
+    // FIXME: document this interface contract. Does it support RFC8528/RFC8542? How?
     public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final SchemaContext schemaContext,
             final DOMSource value) throws XMLStreamException, URISyntaxException, IOException, SAXException {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
