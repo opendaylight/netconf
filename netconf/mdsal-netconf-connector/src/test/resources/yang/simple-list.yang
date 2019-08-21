@@ -1,0 +1,16 @@
+module simple-list {
+    namespace "urn:dummy:list";
+    prefix "list-0";
+    revision "2019-08-21";
+
+    list user {
+             key "name";
+             config true;
+             description "This is a list of users in the system.";
+
+             leaf name {
+                 type string;
+             }
+     }
+
+}

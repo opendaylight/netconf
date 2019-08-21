@@ -28,6 +28,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
+import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
+import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeWriter;
@@ -60,6 +62,7 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
 
     protected Node transformNormalizedNode(final Document document, final NormalizedNode<?, ?> data,
                                            final YangInstanceIdentifier dataRoot) {
+
         final DOMResult result = new DOMResult(document.createElement(XmlNetconfConstants.DATA_KEY));
 
         final XMLStreamWriter xmlWriter = getXmlStreamWriter(result);
@@ -69,7 +72,14 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
 
         final NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(nnStreamWriter, true);
 
-        writeRootElement(xmlWriter, nnWriter, (ContainerNode) data);
+        if (data instanceof ContainerNode) {
+            writeRootElement(xmlWriter, nnWriter, (ContainerNode) data);
+        } else if (data instanceof MapNode) {
+            writeRootElement(xmlWriter, nnWriter, (MapNode) data);
+        } else {
+            throw new IllegalArgumentException(data.getClass().toString());
+        }
+
         return result.getNode();
     }
 
@@ -91,6 +101,23 @@ public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
         try {
             if (data.getNodeType().equals(SchemaContext.NAME)) {
                 for (final DataContainerChild<? extends PathArgument, ?> child : data.getValue()) {
+                    nnWriter.write(child);
+                }
+            } else {
+                nnWriter.write(data);
+            }
+            nnWriter.flush();
+            xmlWriter.flush();
+        } catch (XMLStreamException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void writeRootElement(final XMLStreamWriter xmlWriter, final NormalizedNodeWriter nnWriter,
+                                         final MapNode data) {
+        try {
+            if (data.getNodeType().equals(SchemaContext.NAME)) {
+                for (final MapEntryNode child : data.getValue()) {
                     nnWriter.write(child);
                 }
             } else {
