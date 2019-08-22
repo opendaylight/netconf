@@ -101,6 +101,10 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     }
 
     public ResourceList getResourceList(final UriInfo uriInfo, final Long id) {
+        return getResourceList(uriInfo, id, 0, true);
+    }
+
+    public ResourceList getResourceList(final UriInfo uriInfo, final Long id, final int pageNum, boolean all) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         if (iid == null) {
             return null; // indicating not found.
@@ -115,7 +119,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         dataStores.setPath(swaggerGenerator.generatePath(uriInfo, DATASTORES_LABEL, DATASTORES_REVISION));
         resources.add(dataStores);
         final String urlPrefix = getYangMountUrl(iid);
-        final ResourceList list = swaggerGenerator.getResourceListing(uriInfo, context, urlPrefix);
+        final ResourceList list = swaggerGenerator.getResourceListing(uriInfo, context, urlPrefix, pageNum, all);
         resources.addAll(list.getApis());
         list.setApis(resources);
         return list;
