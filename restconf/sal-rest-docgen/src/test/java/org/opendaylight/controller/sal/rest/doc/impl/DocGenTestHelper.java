@@ -7,6 +7,7 @@
  */
 package org.opendaylight.controller.sal.rest.doc.impl;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -121,6 +122,7 @@ public class DocGenTestHelper {
         final UriInfo info = mock(UriInfo.class);
 
         when(info.getRequestUriBuilder()).thenReturn(mockBuilder);
+        when(mockBuilder.replaceQuery(any())).thenReturn(mockBuilder);
         when(info.getBaseUri()).thenReturn(uri);
         return info;
     }
