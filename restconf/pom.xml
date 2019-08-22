@@ -29,7 +29,6 @@
 
     <modules>
         <module>restconf-parent</module>
-        <module>restconf-artifacts</module>
         <module>restconf-models</module>
         <module>restconf-common-models</module>
         <module>restconf-common</module>
