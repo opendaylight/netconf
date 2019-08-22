@@ -12,7 +12,7 @@ var loadMountList = function( dom ) {
             for( var key in myData )
             {
                 list.append( "<tr><td><a href=\"#\" onclick=\"loadMount(" +
-                        myData[key].id + ", '" + myData[key].instance + "')\">" +
+                        myData[key].id + ", 0, '" + myData[key].instance + "')\">" +
                         myData[key].instance + "</a></td></tr>");
             }
             dom.empty();
