@@ -35,6 +35,11 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
  */
 public class ApiDocServiceImpl implements ApiDocService {
 
+    public static final int DEFAULT_PAGESIZE = 20;
+    // Query parameter
+    private static final String TOTAL_PAGES = "totalPages";
+    private static final String PAGE_NUM = "pageNum";
+
     private final MountPointSwagger mountPointSwaggerDraft02;
     private final MountPointSwagger mountPointSwaggerRFC8040;
     private final ApiDocGeneratorDraftO2 apiDocGeneratorDraft02;
@@ -108,10 +113,26 @@ public class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getMountRootDoc(final String instanceNum, final UriInfo uriInfo) {
         final ResourceList resourceList;
+
+        if (uriInfo.getQueryParameters().getFirst(TOTAL_PAGES) != null) {
+            if (isNew(uriInfo)) {
+                resourceList = mountPointSwaggerRFC8040.getResourceList(uriInfo, Long.parseLong(instanceNum));
+            } else {
+                resourceList = mountPointSwaggerDraft02.getResourceList(uriInfo, Long.parseLong(instanceNum));
+            }
+            int size = resourceList.getApis().size();
+            return Response.ok(size % DEFAULT_PAGESIZE == 0 ? size / DEFAULT_PAGESIZE
+                    : size / DEFAULT_PAGESIZE + 1).build();
+        }
+
+        final int pageNum = Integer.parseInt(uriInfo.getQueryParameters().getFirst(PAGE_NUM));
+
         if (isNew(uriInfo)) {
-            resourceList = mountPointSwaggerRFC8040.getResourceList(uriInfo, Long.parseLong(instanceNum));
+            resourceList = mountPointSwaggerRFC8040.getResourceList(uriInfo, Long.parseLong(instanceNum), pageNum,
+                    false);
         } else {
-            resourceList = mountPointSwaggerDraft02.getResourceList(uriInfo, Long.parseLong(instanceNum));
+            resourceList = mountPointSwaggerDraft02.getResourceList(uriInfo, Long.parseLong(instanceNum), pageNum,
+                    false);
         }
         return Response.ok(resourceList).build();
     }
