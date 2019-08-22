@@ -1,0 +1,211 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ae3fd973_2b2050d1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2019-08-22T14:40:58Z",
+      "side": 1,
+      "message": "This is not a good subject for commit, ever. You generally want to avoid purely mentioning files in commits. This should be a quick summary for whomever is going to apply this, to this quickly figure out what this does.\nSo here the subject can be something like this:\nTeach AbstractGet how to transform MapNodes\n\nI suggest reading through https://chris.beams.io/posts/git-commit/ for example, to get some ideas on how to write good commit messages.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 23
+      },
+      "revId": "192e7da81790a0dccb980b4334fa6bd47a77af87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0a994090_58e81c0b",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/AbstractGet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2019-08-22T14:40:58Z",
+      "side": 1,
+      "message": "This would not tell us much when we would encounter this at a glance. Please include a proper message, something like: \"Unable to transform node of type: \" +  data.getClass().toString() + \" offending node: \" + data.toString()\".",
+      "range": {
+        "startLine": 80,
+        "startChar": 47,
+        "endLine": 80,
+        "endChar": 73
+      },
+      "revId": "192e7da81790a0dccb980b4334fa6bd47a77af87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5be3a424_d5a69995",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/Netconf538Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2019-08-22T14:40:58Z",
+      "side": 1,
+      "message": "no need to instantiate a map when we only have one Qname-value, you can just use the NodeIdentifierWithPredicates.of() overload.",
+      "range": {
+        "startLine": 53,
+        "startChar": 0,
+        "endLine": 54,
+        "endChar": 59
+      },
+      "revId": "192e7da81790a0dccb980b4334fa6bd47a77af87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8502bde3_d10fec45",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/Netconf538Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2019-08-22T14:40:58Z",
+      "side": 1,
+      "message": "since the value is a string this can be a string.",
+      "range": {
+        "startLine": 56,
+        "startChar": 17,
+        "endLine": 56,
+        "endChar": 23
+      },
+      "revId": "192e7da81790a0dccb980b4334fa6bd47a77af87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6cec3687_7d45a4a5",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/Netconf538Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2019-08-22T14:40:58Z",
+      "side": 1,
+      "message": "this should be a constant",
+      "range": {
+        "startLine": 58,
+        "startChar": 67,
+        "endLine": 58,
+        "endChar": 71
+      },
+      "revId": "192e7da81790a0dccb980b4334fa6bd47a77af87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "79393798_472003b7",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/Netconf538Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2019-08-22T14:40:58Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 59,
+        "startChar": 28,
+        "endLine": 59,
+        "endChar": 36
+      },
+      "revId": "192e7da81790a0dccb980b4334fa6bd47a77af87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bf8a367b_206927e4",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/Netconf538Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2019-08-22T14:40:58Z",
+      "side": 1,
+      "message": "This is fine, but better way would be to use the previously constructed nodes to verify these match. Here that would be data.getIdentifier().getNodeType().getLocalName()",
+      "range": {
+        "startLine": 75,
+        "startChar": 29,
+        "endLine": 75,
+        "endChar": 33
+      },
+      "revId": "192e7da81790a0dccb980b4334fa6bd47a77af87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8252cc92_9a5303a4",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/Netconf538Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2019-08-22T14:40:58Z",
+      "side": 1,
+      "message": "same here, you would just use leafNode instead.",
+      "range": {
+        "startLine": 77,
+        "startChar": 28,
+        "endLine": 77,
+        "endChar": 34
+      },
+      "revId": "192e7da81790a0dccb980b4334fa6bd47a77af87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "14fa54c6_c847a836",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/Netconf538Test.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2019-08-22T14:40:58Z",
+      "side": 1,
+      "message": "and here",
+      "range": {
+        "startLine": 78,
+        "startChar": 29,
+        "endLine": 78,
+        "endChar": 37
+      },
+      "revId": "192e7da81790a0dccb980b4334fa6bd47a77af87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
