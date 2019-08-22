@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
+import static org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.DEFAULT_PAGESIZE;
 import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolvePathArgumentsName;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,33 +81,47 @@ public abstract class BaseYangSwaggerGenerator {
     public ResourceList getResourceListing(final UriInfo uriInfo) {
         final SchemaContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
-        return getResourceListing(uriInfo, schemaContext, "");
+        return getResourceListing(uriInfo, schemaContext, "", 0, true);
+    }
+
+    public ResourceList getResourceListing(final UriInfo uriInfo, final SchemaContext schemaContext,
+                                           final String context) {
+        return getResourceListing(uriInfo, schemaContext, context, 0, true);
     }
 
     /**
      * Return list of modules converted to swagger compliant resource list.
      */
     public ResourceList getResourceListing(final UriInfo uriInfo, final SchemaContext schemaContext,
-            final String context) {
+            final String context, final int pageNum, boolean all) {
 
         final ResourceList resourceList = createResourceList();
 
         final Set<Module> modules = getSortedModules(schemaContext);
 
-        final List<Resource> resources = new ArrayList<>(modules.size());
+        final List<Resource> resources = new ArrayList<>(DEFAULT_PAGESIZE);
 
         LOG.info("Modules found [{}]", modules.size());
-
+        final int start = DEFAULT_PAGESIZE * pageNum;
+        final int end = start + DEFAULT_PAGESIZE;
+        int count = 0;
         for (final Module module : modules) {
             final String revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
-            final Resource resource = new Resource();
+
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
             final ApiDeclaration doc =
                     getApiDeclaration(module.getName(), revisionString, uriInfo, schemaContext, context);
-
             if (doc != null) {
-                resource.setPath(generatePath(uriInfo, module.getName(), revisionString));
-                resources.add(resource);
+                count++;
+                if (count >= start && count < end || all) {
+                    final Resource resource = new Resource();
+                    resource.setPath(generatePath(uriInfo, module.getName(), revisionString));
+                    resources.add(resource);
+                }
+
+                if (count >= end && !all) {
+                    break;
+                }
             } else {
                 LOG.warn("Could not generate doc for {},{}", module.getName(), revisionString);
             }
@@ -125,7 +140,7 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     public String generatePath(final UriInfo uriInfo, final String name, final String revision) {
-        final URI uri = uriInfo.getRequestUriBuilder().path(generateCacheKey(name, revision)).build();
+        final URI uri = uriInfo.getRequestUriBuilder().replaceQuery("").path(generateCacheKey(name, revision)).build();
         return uri.toASCIIString();
     }
 
