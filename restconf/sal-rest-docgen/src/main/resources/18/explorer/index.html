@@ -19,6 +19,8 @@
     <link rel="stylesheet" type="text/css" href="../../explorer/static/opendaylight.css">
     <link rel="stylesheet" type="text/css"
           href="../../explorer/css/ui-lightness/jquery-ui-1.10.4.custom.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="../../explorer/css/simplePagination.css">
     <script type="text/javascript" src="../../explorer/lib/shred.bundle.js"></script>
     <script src='../../explorer/lib/jquery-1.8.0.min.js' type='text/javascript'></script>
     <script src='../../explorer/lib/jquery-ui-1.11.0.min.js' type="text/javascript"></script>
@@ -33,6 +35,8 @@
     <script src='lib/odl/list_mounts.js' type='text/javascript'></script>
     <script src='../../explorer/lib/highlight.7.3.pack.js' type='text/javascript'></script>
     <script src='../../explorer/lib/odl/swagger.js' type='text/javascript'></script>
+    <script src='../../explorer/lib/odl/page.js' type='text/javascript'></script>
+    <script src='../../explorer/lib/jquery.simplePagination.js' type='text/javascript'></script>
 
     <script type="text/javascript">
 
@@ -42,6 +46,7 @@
         $("#message").append( "<p>Loading...</p>" );
         loadSwagger("/apidoc/18/apis/mounts/" + mountIndex,
                 "swagger-ui-container");
+        loadPagination("/apidoc/18/apis/mounts/", mountIndex, mountPath, "swagger-ui-container");
         $("#message").empty();
         $("#message").append( "<h2><b>Showing mount points for " + mountPath + "</b></h2>");
         }
@@ -120,7 +125,9 @@
 
 <!-- the swagger is always loaded in this div -->
 <div id="swagger-ui-container" class="swagger-ui-wrap"></div>
-
+<div class="pagination-holder clearfix">
+    <div id="light-pagination" class="pagination light-theme simple-pagination"></div>
+</div>
 <div id="message-bar" class="swagger-ui-wrap">&nbsp;</div>
 </body>
 
