@@ -19,13 +19,13 @@
     <groupId>org.opendaylight.netconf</groupId>
     <artifactId>odl-netconf-mdsal</artifactId>
     <!-- This matches controller -->
-    <version>1.9.2-SNAPSHOT</version>
+    <version>1.9.2</version>
     <packaging>feature</packaging>
 
     <name>OpenDaylight :: Netconf :: Mdsal</name>
 
     <properties>
-        <netconf.version>1.6.2-SNAPSHOT</netconf.version>
+        <netconf.version>1.6.2</netconf.version>
     </properties>
 
     <dependencyManagement>

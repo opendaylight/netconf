@@ -11,12 +11,12 @@
     <parent>
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>netconf-parent</artifactId>
-        <version>1.6.2-SNAPSHOT</version>
+        <version>1.6.2</version>
         <relativePath>../netconf-parent</relativePath>
     </parent>
 
     <artifactId>mdsal-netconf-notification</artifactId>
-    <version>1.6.2-SNAPSHOT</version>
+    <version>1.6.2</version>
     <name>${project.artifactId}</name>
     <packaging>bundle</packaging>
 
