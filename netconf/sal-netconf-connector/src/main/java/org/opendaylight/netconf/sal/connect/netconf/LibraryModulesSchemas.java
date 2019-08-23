@@ -32,7 +32,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -289,13 +288,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
     private static boolean guessJsonFromFileName(final String fileName) {
-        String extension = "";
-        final int i = fileName.lastIndexOf(46);
-        if (i != -1) {
-            extension = fileName.substring(i).toLowerCase(Locale.ROOT);
-        }
-
-        return extension.equals(".json");
+        final int i = fileName.lastIndexOf('.');
+        return i != 1 && ".json".equalsIgnoreCase(fileName.substring(i));
     }
 
     private static Optional<NormalizedNode<?, ?>> readJson(final InputStream in) {
