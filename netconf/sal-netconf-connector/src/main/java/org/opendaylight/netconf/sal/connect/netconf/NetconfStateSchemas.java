@@ -67,14 +67,10 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
     private static final YangInstanceIdentifier STATE_SCHEMAS_IDENTIFIER =
             YangInstanceIdentifier.builder().node(NetconfState.QNAME).node(Schemas.QNAME).build();
 
-    private static final ContainerNode GET_SCHEMAS_RPC;
-
-    static {
-        final DataContainerChild<?, ?> filter = NetconfMessageTransformUtil.toFilterStructure(STATE_SCHEMAS_IDENTIFIER,
-                BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext());
-        GET_SCHEMAS_RPC
-                = Builders.containerBuilder().withNodeIdentifier(NETCONF_GET_NODEID).withChild(filter).build();
-    }
+    private static final ContainerNode GET_SCHEMAS_RPC = Builders.containerBuilder()
+            .withNodeIdentifier(NETCONF_GET_NODEID)
+            .withChild(NetconfMessageTransformUtil.toFilterStructure(STATE_SCHEMAS_IDENTIFIER,
+                BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext())).build();
 
     private final Set<RemoteYangSchema> availableYangSchemas;
 
