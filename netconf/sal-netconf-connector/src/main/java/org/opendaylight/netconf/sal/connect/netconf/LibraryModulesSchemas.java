@@ -7,13 +7,15 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
 import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_PATH;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.stream.JsonReader;
@@ -128,9 +130,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
      * @return Resolved URLs with YANG schema resources for all yang modules from yang library
      */
     public static LibraryModulesSchemas create(final String url, final String username, final String password) {
-        Preconditions.checkNotNull(url);
         try {
-            final URL urlConnection = new URL(url);
+            final URL urlConnection = new URL(requireNonNull(url));
             final URLConnection connection = urlConnection.openConnection();
 
             if (connection instanceof HttpURLConnection) {
@@ -171,13 +172,12 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             return new LibraryModulesSchemas(Collections.emptyMap());
         }
 
-
         final Optional<? extends NormalizedNode<?, ?>> modulesStateNode =
                 findModulesStateNode(moduleListNodeResult.getResult());
         if (modulesStateNode.isPresent()) {
-            Preconditions.checkState(modulesStateNode.get() instanceof ContainerNode,
-                    "Expecting container containing schemas, but was %s", modulesStateNode.get());
-            return create((ContainerNode) modulesStateNode.get());
+            final NormalizedNode<?, ?> node = modulesStateNode.get();
+            checkState(node instanceof ContainerNode, "Expecting container containing schemas, but was %s", node);
+            return create((ContainerNode) node);
         }
 
         LOG.warn("{}: Unable to detect available schemas, get to {} was empty", deviceId, toId(ModulesState.QNAME));
@@ -187,16 +187,14 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     private static LibraryModulesSchemas create(final ContainerNode modulesStateNode) {
         final YangInstanceIdentifier.NodeIdentifier moduleListNodeId =
                 new YangInstanceIdentifier.NodeIdentifier(Module.QNAME);
-        final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> moduleListNode =
-                modulesStateNode.getChild(moduleListNodeId);
-        Preconditions.checkState(moduleListNode.isPresent(),
-                "Unable to find list: %s in %s", moduleListNodeId, modulesStateNode);
-        Preconditions.checkState(moduleListNode.get() instanceof MapNode,
-                "Unexpected structure for container: %s in : %s. Expecting a list",
+        final Optional<DataContainerChild<?, ?>> moduleListNode = modulesStateNode.getChild(moduleListNodeId);
+        checkState(moduleListNode.isPresent(), "Unable to find list: %s in %s", moduleListNodeId, modulesStateNode);
+        final DataContainerChild<?, ?> node = moduleListNode.get();
+        checkState(node instanceof MapNode, "Unexpected structure for container: %s in : %s. Expecting a list",
                 moduleListNodeId, modulesStateNode);
 
         final ImmutableMap.Builder<QName, URL> schemasMapping = new ImmutableMap.Builder<>();
-        for (final MapEntryNode moduleNode : ((MapNode) moduleListNode.get()).getValue()) {
+        for (final MapEntryNode moduleNode : ((MapNode) node).getValue()) {
             final Optional<Map.Entry<QName, URL>> schemaMappingEntry = createFromEntry(moduleNode);
             if (schemaMappingEntry.isPresent()) {
                 schemasMapping.put(createFromEntry(moduleNode).get());
@@ -212,9 +210,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
      * @return Resolved URLs with YANG schema resources for all yang modules from yang library
      */
     public static LibraryModulesSchemas create(final String url) {
-        Preconditions.checkNotNull(url);
         try {
-            final URL urlConnection = new URL(url);
+            final URL urlConnection = new URL(requireNonNull(url));
             final URLConnection connection = urlConnection.openConnection();
 
             if (connection instanceof HttpURLConnection) {
@@ -251,8 +248,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             contentType = "application/json";
         }
 
-        Preconditions.checkNotNull(contentType, "Content type unknown");
-        Preconditions.checkState(contentType.equals("application/json") || contentType.equals("application/xml"),
+        requireNonNull(contentType, "Content type unknown");
+        checkState(contentType.equals("application/json") || contentType.equals("application/xml"),
                 "Only XML and JSON types are supported.");
         try (InputStream in = connection.getInputStream()) {
             final Optional<NormalizedNode<?, ?>> optionalModulesStateNode =
@@ -263,23 +260,22 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             }
 
             final NormalizedNode<?, ?> modulesStateNode = optionalModulesStateNode.get();
-            Preconditions.checkState(modulesStateNode.getNodeType().equals(ModulesState.QNAME),
-                    "Wrong QName %s", modulesStateNode.getNodeType());
-            Preconditions.checkState(modulesStateNode instanceof ContainerNode,
-                    "Expecting container containing module list, but was %s", modulesStateNode);
+            final QName nodeType = modulesStateNode.getNodeType();
+            checkState(nodeType.equals(ModulesState.QNAME), "Wrong QName %s", nodeType);
+            checkState(modulesStateNode instanceof ContainerNode,
+                "Expecting container containing module list, but was %s", modulesStateNode);
 
             final YangInstanceIdentifier.NodeIdentifier moduleListNodeId =
                     new YangInstanceIdentifier.NodeIdentifier(Module.QNAME);
             final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> moduleListNode =
                     ((ContainerNode) modulesStateNode).getChild(moduleListNodeId);
-            Preconditions.checkState(moduleListNode.isPresent(),
-                    "Unable to find list: %s in %s", moduleListNodeId, modulesStateNode);
-            Preconditions.checkState(moduleListNode.get() instanceof MapNode,
-                    "Unexpected structure for container: %s in : %s. Expecting a list",
+            checkState(moduleListNode.isPresent(), "Unable to find list: %s in %s", moduleListNodeId, modulesStateNode);
+            final DataContainerChild<?, ?> node = moduleListNode.get();
+            checkState(node instanceof MapNode, "Unexpected structure for container: %s in : %s. Expecting a list",
                     moduleListNodeId, modulesStateNode);
 
             final ImmutableMap.Builder<QName, URL> schemasMapping = new ImmutableMap.Builder<>();
-            for (final MapEntryNode moduleNode : ((MapNode) moduleListNode.get()).getValue()) {
+            for (final MapEntryNode moduleNode : ((MapNode) node).getValue()) {
                 final Optional<Map.Entry<QName, URL>> schemaMappingEntry = createFromEntry(moduleNode);
                 if (schemaMappingEntry.isPresent()) {
                     schemasMapping.put(createFromEntry(moduleNode).get());
@@ -351,8 +347,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
     private static Optional<Map.Entry<QName, URL>> createFromEntry(final MapEntryNode moduleNode) {
-        Preconditions.checkArgument(
-                moduleNode.getNodeType().equals(Module.QNAME), "Wrong QName %s", moduleNode.getNodeType());
+        checkArgument(moduleNode.getNodeType().equals(Module.QNAME), "Wrong QName %s", moduleNode.getNodeType());
 
         YangInstanceIdentifier.NodeIdentifier childNodeId =
                 new YangInstanceIdentifier.NodeIdentifier(QName.create(Module.QNAME, "name"));
@@ -393,7 +388,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
                                                             final YangInstanceIdentifier.NodeIdentifier childNodeId) {
         final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> node =
                 schemaNode.getChild(childNodeId);
-        Preconditions.checkArgument(node.isPresent(), "Child node %s not present", childNodeId.getNodeType());
+        checkArgument(node.isPresent(), "Child node %s not present", childNodeId.getNodeType());
         return getValueOfSimpleNode(node.get());
     }
 
