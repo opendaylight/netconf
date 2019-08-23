@@ -7,6 +7,9 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
+import static org.opendaylight.netconf.util.NetconfUtil.NETCONF_DATA_QNAME;
+import static org.opendaylight.netconf.util.NetconfUtil.NETCONF_QNAME;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -113,11 +116,8 @@ public final class NetconfMessageTransformUtil {
     public static final QName IETF_NETCONF_NOTIFICATIONS =
             QName.create(NetconfCapabilityChange.QNAME, "ietf-netconf-notifications").intern();
 
-    public static final QName NETCONF_QNAME =
-            QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "netconf").intern();
     public static final URI NETCONF_URI = NETCONF_QNAME.getNamespace();
 
-    public static final QName NETCONF_DATA_QNAME = QName.create(NETCONF_QNAME, "data").intern();
     public static final NodeIdentifier NETCONF_DATA_NODEID = NodeIdentifier.create(NETCONF_DATA_QNAME);
 
     public static final QName NETCONF_RPC_REPLY_QNAME = QName.create(NETCONF_QNAME, "rpc-reply").intern();
@@ -370,7 +370,7 @@ public final class NetconfMessageTransformUtil {
                 .build();
     }
 
-    private static NormalizedMetadata leafMetadata(YangInstanceIdentifier path, final ModifyAction oper) {
+    private static NormalizedMetadata leafMetadata(final YangInstanceIdentifier path, final ModifyAction oper) {
         final List<PathArgument> args = path.getPathArguments();
         final Deque<Builder> builders = new ArrayDeque<>(args.size());
 

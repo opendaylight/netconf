@@ -17,7 +17,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.GET_SCHEMA_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_CANDIDATE_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME;
@@ -28,6 +27,7 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toFilterStructure;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
+import static org.opendaylight.netconf.util.NetconfUtil.NETCONF_DATA_QNAME;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -622,7 +622,7 @@ public class NetconfMessageTransformerTest {
 
     private static Node checkBasePartOfActionRequest(final NetconfMessage actionRequest) {
         Node baseRpc = actionRequest.getDocument().getFirstChild();
-        checkNode(baseRpc, "rpc", "rpc", NetconfMessageTransformUtil.NETCONF_QNAME.getNamespace().toString());
+        checkNode(baseRpc, "rpc", "rpc", NetconfUtil.NETCONF_QNAME.getNamespace().toString());
         assertTrue(baseRpc.getLocalName().equals("rpc"));
         assertTrue(baseRpc.getNodeName().equals("rpc"));
 
