@@ -47,7 +47,9 @@ import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.hamcrest.CoreMatchers;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
@@ -95,9 +97,33 @@ public class NetconfMessageTransformerTest {
     private static final String REVISION_EXAMPLE_SERVER_FARM_2 = "2019-05-20";
     private static final String URN_EXAMPLE_SERVER_FARM_2 = "urn:example:server-farm-2";
 
+    private static SchemaContext PARTIAL_SCHEMA;
+    private static SchemaContext SCHEMA;
+    private static SchemaContext ACTION_SCHEMA;
+
     private NetconfMessageTransformer actionNetconfMessageTransformer;
     private NetconfMessageTransformer netconfMessageTransformer;
-    private SchemaContext schema;
+
+    @BeforeClass
+    public static void beforeClass() {
+        final ModuleInfoBackedContext context = ModuleInfoBackedContext.create();
+        context.addModuleInfos(Collections.singleton(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf
+            .netconf.monitoring.rev101004.$YangModuleInfoImpl.getInstance()));
+        PARTIAL_SCHEMA = context.tryToCreateSchemaContext().get();
+
+        context.addModuleInfos(Collections.singleton($YangModuleInfoImpl.getInstance()));
+        SCHEMA = context.tryToCreateSchemaContext().get();
+
+        ACTION_SCHEMA = YangParserTestUtils.parseYangResources(NetconfMessageTransformerTest.class,
+            "/schemas/example-server-farm.yang","/schemas/example-server-farm-2.yang");
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        PARTIAL_SCHEMA = null;
+        SCHEMA = null;
+        ACTION_SCHEMA = null;
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -105,15 +131,13 @@ public class NetconfMessageTransformerTest {
         XMLUnit.setIgnoreAttributeOrder(true);
         XMLUnit.setIgnoreComments(true);
 
-        schema = getSchema(true);
-        netconfMessageTransformer = getTransformer(schema);
-        actionNetconfMessageTransformer = getActionMessageTransformer();
+        netconfMessageTransformer = getTransformer(SCHEMA);
+        actionNetconfMessageTransformer = new NetconfMessageTransformer(ACTION_SCHEMA, true);
     }
 
     @Test
     public void testLockRequestBaseSchemaNotPresent() throws Exception {
-        final SchemaContext partialSchema = getSchema(false);
-        final NetconfMessageTransformer transformer = getTransformer(partialSchema);
+        final NetconfMessageTransformer transformer = getTransformer(PARTIAL_SCHEMA);
         final NetconfMessage netconfMessage = transformer.toRpcRequest(toPath(NETCONF_LOCK_QNAME),
                 NetconfBaseOps.getLockContent(NETCONF_CANDIDATE_QNAME));
 
@@ -123,12 +147,8 @@ public class NetconfMessageTransformerTest {
 
     @Test
     public void testCreateSubscriberNotificationSchemaNotPresent() throws Exception {
-        final SchemaContext partialSchema = getSchema(true);
-        final NetconfMessageTransformer transformer = new NetconfMessageTransformer(
-                partialSchema,
-                true,
-                BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS
-        );
+        final NetconfMessageTransformer transformer = new NetconfMessageTransformer(SCHEMA, true,
+                BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS);
         NetconfMessage netconfMessage = transformer.toRpcRequest(
                 toPath(CREATE_SUBSCRIPTION_RPC_QNAME),
                 CREATE_SUBSCRIPTION_RPC_CONTENT
@@ -140,8 +160,7 @@ public class NetconfMessageTransformerTest {
 
     @Test
     public void tesLockSchemaRequest() throws Exception {
-        final SchemaContext partialSchema = getSchema(false);
-        final NetconfMessageTransformer transformer = getTransformer(partialSchema);
+        final NetconfMessageTransformer transformer = getTransformer(PARTIAL_SCHEMA);
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
         transformer.toRpcResult(new NetconfMessage(XmlUtil.readXmlToDocument(result)), toPath(NETCONF_LOCK_QNAME));
@@ -171,7 +190,7 @@ public class NetconfMessageTransformerTest {
 
     @Test
     public void testGetSchemaResponse() throws Exception {
-        final NetconfMessageTransformer transformer = getTransformer(getSchema(true));
+        final NetconfMessageTransformer transformer = getTransformer(SCHEMA);
         final NetconfMessage response = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<rpc-reply message-id=\"101\"\n"
                         + "xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">\n"
@@ -209,7 +228,7 @@ public class NetconfMessageTransformerTest {
                 + "</data>\n"
                 + "</rpc-reply>"));
 
-        final NetconfMessageTransformer transformer = getTransformer(getSchema(true));
+        final NetconfMessageTransformer transformer = getTransformer(SCHEMA);
         final DOMRpcResult compositeNodeRpcResult =
                 transformer.toRpcResult(response, toPath(NETCONF_GET_CONFIG_QNAME));
         assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
@@ -233,7 +252,7 @@ public class NetconfMessageTransformerTest {
                 .getResult()).getChild(toId(NETCONF_DATA_QNAME)).get();
 
         NormalizedNodeResult nodeResult =
-                NetconfUtil.transformDOMSourceToNormalizedNode(schema, data.getValue());
+                NetconfUtil.transformDOMSourceToNormalizedNode(SCHEMA, data.getValue());
         ContainerNode result = (ContainerNode) nodeResult.getResult();
         final ContainerNode state = (ContainerNode) result.getChild(toId(NetconfState.QNAME)).get();
         final ContainerNode schemas = (ContainerNode) state.getChild(toId(Schemas.QNAME)).get();
@@ -248,7 +267,7 @@ public class NetconfMessageTransformerTest {
         final DataContainerChild<?, ?> filter = toFilterStructure(
                 YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Schemas.QNAME), toId(Schema.QNAME),
                     new NodeIdentifierWithPredicates(Schema.QNAME, ImmutableMap.of()),
-                    toId(QName.create(Schemas.QNAME, "version"))), schema);
+                    toId(QName.create(Schemas.QNAME, "version"))), SCHEMA);
 
         final DataContainerChild<?, ?> source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
 
@@ -276,7 +295,7 @@ public class NetconfMessageTransformerTest {
     @Test
     public void testGetConfigRequest() throws Exception {
         final DataContainerChild<?, ?> filter = toFilterStructure(
-                YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Schemas.QNAME)), schema);
+                YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Schemas.QNAME)), SCHEMA);
 
         final DataContainerChild<?, ?> source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
 
@@ -360,7 +379,7 @@ public class NetconfMessageTransformerTest {
         final QName capability = QName.create(Capabilities.QNAME, "capability");
         final DataContainerChild<?, ?> filter = toFilterStructure(
                 YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Capabilities.QNAME), toId(capability),
-                    new YangInstanceIdentifier.NodeWithValue<>(capability, "a:b:c")), schema);
+                    new YangInstanceIdentifier.NodeWithValue<>(capability, "a:b:c")), SCHEMA);
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_QNAME),
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_QNAME, filter));
@@ -391,17 +410,6 @@ public class NetconfMessageTransformerTest {
                 netconfMessageTransformer.toRpcResult(response, toPath(NETCONF_COMMIT_QNAME));
         assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
         assertNull(compositeNodeRpcResult.getResult());
-    }
-
-    public SchemaContext getSchema(final boolean addBase) {
-        final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        if (addBase) {
-            moduleInfoBackedContext.addModuleInfos(Collections.singleton($YangModuleInfoImpl.getInstance()));
-        }
-        moduleInfoBackedContext
-                .addModuleInfos(Collections.singleton(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf
-                        .netconf.monitoring.rev101004.$YangModuleInfoImpl.getInstance()));
-        return moduleInfoBackedContext.tryToCreateSchemaContext().get();
     }
 
     @Test
@@ -664,14 +672,5 @@ public class NetconfMessageTransformerTest {
         assertEquals(childServer.getLocalName(), expectedLocalName);
         assertEquals(childServer.getNodeName(), expectedNodeName);
         assertEquals(childServer.getNamespaceURI(), expectedNamespace);
-    }
-
-    private static SchemaContext getActionSchema() {
-        return YangParserTestUtils.parseYangResources(NetconfMessageTransformerTest.class,
-                "/schemas/example-server-farm.yang","/schemas/example-server-farm-2.yang");
-    }
-
-    private static NetconfMessageTransformer getActionMessageTransformer() {
-        return new NetconfMessageTransformer(getActionSchema(), true);
     }
 }
