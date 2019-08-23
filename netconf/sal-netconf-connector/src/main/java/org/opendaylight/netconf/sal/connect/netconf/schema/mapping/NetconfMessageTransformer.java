@@ -14,6 +14,7 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Maps;
@@ -86,7 +87,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     private final SchemaContext schemaContext;
     private final BaseSchema baseSchema;
     private final MessageCounter counter;
-    private final Map<QName, RpcDefinition> mappedRpcs;
+    private final ImmutableMap<QName, RpcDefinition> mappedRpcs;
     private final Multimap<QName, NotificationDefinition> mappedNotifications;
     private final boolean strictParsing;
     private final Set<ActionDefinition> actions;
@@ -184,7 +185,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         // and also check if the device exposed model for base netconf.
         // If no, use pre built base netconf operations model
         final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName);
-        final Map<QName, RpcDefinition> currentMappedRpcs;
+        final ImmutableMap<QName, RpcDefinition> currentMappedRpcs;
         if (needToUseBaseCtx) {
             currentMappedRpcs = baseSchema.getMappedRpcs();
         } else {
@@ -194,8 +195,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         final RpcDefinition mappedRpc = Preconditions.checkNotNull(currentMappedRpcs.get(rpcQName),
                 "Unknown rpc %s, available rpcs: %s", rpcQName, currentMappedRpcs.keySet());
         if (mappedRpc.getInput().getChildNodes().isEmpty()) {
-            return new NetconfMessage(NetconfMessageTransformUtil
-                    .prepareDomResultForRpcRequest(rpcQName, counter).getNode().getOwnerDocument());
+            return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpcQName, counter)
+                .getNode().getOwnerDocument());
         }
 
         Preconditions.checkNotNull(payload, "Transforming an rpc with input: %s, payload cannot be null", rpcQName);
@@ -281,15 +282,14 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                     new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
                     .withChild(anyXmlNode).build();
         } else {
-
-            Map<QName, RpcDefinition> currentMappedRpcs = mappedRpcs;
-
             // Determine whether a base netconf operation is being invoked
             // and also check if the device exposed model for base netconf.
             // If no, use pre built base netconf operations model
-            final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName);
-            if (needToUseBaseCtx) {
+            final ImmutableMap<QName, RpcDefinition> currentMappedRpcs;
+            if (mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName)) {
                 currentMappedRpcs = baseSchema.getMappedRpcs();
+            } else {
+                currentMappedRpcs = mappedRpcs;
             }
 
             final RpcDefinition rpcDefinition = currentMappedRpcs.get(rpcQName);
