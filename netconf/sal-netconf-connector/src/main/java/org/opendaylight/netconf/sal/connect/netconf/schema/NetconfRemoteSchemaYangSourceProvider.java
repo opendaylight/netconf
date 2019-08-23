@@ -10,7 +10,7 @@ package org.opendaylight.netconf.sal.connect.netconf.schema;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.GET_SCHEMA_QNAME;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_QNAME;
+import static org.opendaylight.netconf.util.NetconfUtil.NETCONF_DATA_QNAME;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.util.concurrent.Futures;

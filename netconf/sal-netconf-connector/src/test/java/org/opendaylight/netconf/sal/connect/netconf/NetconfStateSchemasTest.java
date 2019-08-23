@@ -114,8 +114,7 @@ public class NetconfStateSchemasTest {
                 .withChild(compositeNodeSchemas)
                 .build();
         final ContainerNode data = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier
-                        .NodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_QNAME))
+                .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
                 .withChild(netconfState)
                 .build();
         final ContainerNode rpcReply = Builders.containerBuilder()
