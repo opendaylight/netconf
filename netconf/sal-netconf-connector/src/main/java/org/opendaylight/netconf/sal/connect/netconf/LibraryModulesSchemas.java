@@ -31,6 +31,7 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,6 +42,7 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
@@ -114,7 +116,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
     public Map<SourceIdentifier, URL> getAvailableModels() {
         final Map<SourceIdentifier, URL> result = new HashMap<>();
-        for (final Map.Entry<QName, URL> entry : availableModels.entrySet()) {
+        for (final Entry<QName, URL> entry : availableModels.entrySet()) {
             final SourceIdentifier sId = RevisionSourceIdentifier.create(entry.getKey().getLocalName(),
                 entry.getKey().getRevision());
             result.put(sId, entry.getValue());
@@ -192,11 +194,13 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         checkState(node instanceof MapNode, "Unexpected structure for container: %s in : %s. Expecting a list",
                 moduleListNodeId, modulesStateNode);
 
-        final ImmutableMap.Builder<QName, URL> schemasMapping = new ImmutableMap.Builder<>();
-        for (final MapEntryNode moduleNode : ((MapNode) node).getValue()) {
-            final Optional<Map.Entry<QName, URL>> schemaMappingEntry = createFromEntry(moduleNode);
-            if (schemaMappingEntry.isPresent()) {
-                schemasMapping.put(createFromEntry(moduleNode).get());
+        final MapNode moduleList = (MapNode) node;
+        final Collection<MapEntryNode> modules = moduleList.getValue();
+        final ImmutableMap.Builder<QName, URL> schemasMapping = ImmutableMap.builderWithExpectedSize(modules.size());
+        for (final MapEntryNode moduleNode : modules) {
+            final Entry<QName, URL> entry = createFromEntry(moduleNode);
+            if (entry != null) {
+                schemasMapping.put(entry);
             }
         }
 
@@ -264,23 +268,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             checkState(modulesStateNode instanceof ContainerNode,
                 "Expecting container containing module list, but was %s", modulesStateNode);
 
-            final NodeIdentifier moduleListNodeId = new NodeIdentifier(Module.QNAME);
-            final Optional<DataContainerChild<?, ?>> moduleListNode =
-                    ((ContainerNode) modulesStateNode).getChild(moduleListNodeId);
-            checkState(moduleListNode.isPresent(), "Unable to find list: %s in %s", moduleListNodeId, modulesStateNode);
-            final DataContainerChild<?, ?> node = moduleListNode.get();
-            checkState(node instanceof MapNode, "Unexpected structure for container: %s in : %s. Expecting a list",
-                    moduleListNodeId, modulesStateNode);
-
-            final ImmutableMap.Builder<QName, URL> schemasMapping = new ImmutableMap.Builder<>();
-            for (final MapEntryNode moduleNode : ((MapNode) node).getValue()) {
-                final Optional<Map.Entry<QName, URL>> schemaMappingEntry = createFromEntry(moduleNode);
-                if (schemaMappingEntry.isPresent()) {
-                    schemasMapping.put(createFromEntry(moduleNode).get());
-                }
-            }
-
-            return new LibraryModulesSchemas(schemasMapping.build());
+            return create((ContainerNode) modulesStateNode);
         } catch (final IOException e) {
             LOG.warn("Unable to download yang library from {}", connection.getURL(), e);
             return new LibraryModulesSchemas(ImmutableMap.of());
@@ -339,7 +327,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         return Optional.empty();
     }
 
-    private static Optional<Entry<QName, URL>> createFromEntry(final MapEntryNode moduleNode) {
+    private static @Nullable Entry<QName, URL> createFromEntry(final MapEntryNode moduleNode) {
         checkArgument(moduleNode.getNodeType().equals(Module.QNAME), "Wrong QName %s", moduleNode.getNodeType());
 
         NodeIdentifier childNodeId = new NodeIdentifier(QName.create(Module.QNAME, "name"));
@@ -350,7 +338,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         if (revision.isPresent()) {
             if (!Revision.STRING_FORMAT_PATTERN.matcher(revision.get()).matches()) {
                 LOG.warn("Skipping library schema for {}. Revision {} is in wrong format.", moduleNode, revision.get());
-                return Optional.empty();
+                return null;
             }
         }
 
@@ -367,11 +355,11 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
                 : QName.create(URI.create(moduleNameSpace), moduleName);
 
         try {
-            return Optional.of(new SimpleImmutableEntry<>(moduleQName, new URL(schemaUriAsString.get())));
+            return new SimpleImmutableEntry<>(moduleQName, new URL(schemaUriAsString.get()));
         } catch (final MalformedURLException e) {
             LOG.warn("Skipping library schema for {}. URL {} representing yang schema resource is not valid",
                     moduleNode, schemaUriAsString.get());
-            return Optional.empty();
+            return null;
         }
     }
 
