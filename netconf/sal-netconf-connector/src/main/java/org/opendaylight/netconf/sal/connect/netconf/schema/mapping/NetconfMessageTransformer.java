@@ -46,7 +46,6 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransform
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
-import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.YangConstants;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -312,9 +311,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         final ContainerNode normalizedNode = (ContainerNode) parseResult(message, actionDefinition);
 
         if (normalizedNode == null) {
-            return new SimpleDOMActionResult(Collections.<RpcError>emptyList());
+            return new SimpleDOMActionResult(Collections.emptyList());
         } else {
-            return new SimpleDOMActionResult(normalizedNode, Collections.<RpcError>emptyList());
+            return new SimpleDOMActionResult(normalizedNode, Collections.emptyList());
         }
     }
 
