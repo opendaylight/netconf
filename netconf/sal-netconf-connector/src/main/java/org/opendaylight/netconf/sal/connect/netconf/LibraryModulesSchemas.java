@@ -30,9 +30,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.AbstractMap;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -52,6 +53,7 @@ import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
@@ -183,8 +185,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
     private static LibraryModulesSchemas create(final ContainerNode modulesStateNode) {
-        final YangInstanceIdentifier.NodeIdentifier moduleListNodeId =
-                new YangInstanceIdentifier.NodeIdentifier(Module.QNAME);
+        final NodeIdentifier moduleListNodeId = new NodeIdentifier(Module.QNAME);
         final Optional<DataContainerChild<?, ?>> moduleListNode = modulesStateNode.getChild(moduleListNodeId);
         checkState(moduleListNode.isPresent(), "Unable to find list: %s in %s", moduleListNodeId, modulesStateNode);
         final DataContainerChild<?, ?> node = moduleListNode.get();
@@ -263,9 +264,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             checkState(modulesStateNode instanceof ContainerNode,
                 "Expecting container containing module list, but was %s", modulesStateNode);
 
-            final YangInstanceIdentifier.NodeIdentifier moduleListNodeId =
-                    new YangInstanceIdentifier.NodeIdentifier(Module.QNAME);
-            final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> moduleListNode =
+            final NodeIdentifier moduleListNodeId = new NodeIdentifier(Module.QNAME);
+            final Optional<DataContainerChild<?, ?>> moduleListNode =
                     ((ContainerNode) modulesStateNode).getChild(moduleListNodeId);
             checkState(moduleListNode.isPresent(), "Unable to find list: %s in %s", moduleListNodeId, modulesStateNode);
             final DataContainerChild<?, ?> node = moduleListNode.get();
@@ -339,14 +339,13 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         return Optional.empty();
     }
 
-    private static Optional<Map.Entry<QName, URL>> createFromEntry(final MapEntryNode moduleNode) {
+    private static Optional<Entry<QName, URL>> createFromEntry(final MapEntryNode moduleNode) {
         checkArgument(moduleNode.getNodeType().equals(Module.QNAME), "Wrong QName %s", moduleNode.getNodeType());
 
-        YangInstanceIdentifier.NodeIdentifier childNodeId =
-                new YangInstanceIdentifier.NodeIdentifier(QName.create(Module.QNAME, "name"));
+        NodeIdentifier childNodeId = new NodeIdentifier(QName.create(Module.QNAME, "name"));
         final String moduleName = getSingleChildNodeValue(moduleNode, childNodeId).get();
 
-        childNodeId = new YangInstanceIdentifier.NodeIdentifier(QName.create(Module.QNAME, "revision"));
+        childNodeId = new NodeIdentifier(QName.create(Module.QNAME, "revision"));
         final Optional<String> revision = getSingleChildNodeValue(moduleNode, childNodeId);
         if (revision.isPresent()) {
             if (!Revision.STRING_FORMAT_PATTERN.matcher(revision.get()).matches()) {
@@ -357,10 +356,10 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         // FIXME leaf schema with url that represents the yang schema resource for this module is not mandatory
         // don't fail if schema node is not present, just skip the entry or add some default URL
-        childNodeId = new YangInstanceIdentifier.NodeIdentifier(QName.create(Module.QNAME, "schema"));
+        childNodeId = new NodeIdentifier(QName.create(Module.QNAME, "schema"));
         final Optional<String> schemaUriAsString = getSingleChildNodeValue(moduleNode, childNodeId);
 
-        childNodeId = new YangInstanceIdentifier.NodeIdentifier(QName.create(Module.QNAME, "namespace"));
+        childNodeId = new NodeIdentifier(QName.create(Module.QNAME, "namespace"));
         final String moduleNameSpace = getSingleChildNodeValue(moduleNode, childNodeId).get();
 
         final QName moduleQName = revision.isPresent()
@@ -368,8 +367,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
                 : QName.create(URI.create(moduleNameSpace), moduleName);
 
         try {
-            return Optional.of(new AbstractMap.SimpleImmutableEntry<>(
-                    moduleQName, new URL(schemaUriAsString.get())));
+            return Optional.of(new SimpleImmutableEntry<>(moduleQName, new URL(schemaUriAsString.get())));
         } catch (final MalformedURLException e) {
             LOG.warn("Skipping library schema for {}. URL {} representing yang schema resource is not valid",
                     moduleNode, schemaUriAsString.get());
@@ -378,15 +376,13 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
     private static Optional<String> getSingleChildNodeValue(final DataContainerNode<?> schemaNode,
-                                                            final YangInstanceIdentifier.NodeIdentifier childNodeId) {
-        final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> node =
-                schemaNode.getChild(childNodeId);
+                                                            final NodeIdentifier childNodeId) {
+        final Optional<DataContainerChild<?, ?>> node = schemaNode.getChild(childNodeId);
         checkArgument(node.isPresent(), "Child node %s not present", childNodeId.getNodeType());
         return getValueOfSimpleNode(node.get());
     }
 
-    private static Optional<String> getValueOfSimpleNode(
-            final NormalizedNode<? extends YangInstanceIdentifier.PathArgument, ?> node) {
+    private static Optional<String> getValueOfSimpleNode(final NormalizedNode<?, ?> node) {
         final String valueStr = node.getValue().toString();
         return Strings.isNullOrEmpty(valueStr) ? Optional.empty() : Optional.of(valueStr.trim());
     }
