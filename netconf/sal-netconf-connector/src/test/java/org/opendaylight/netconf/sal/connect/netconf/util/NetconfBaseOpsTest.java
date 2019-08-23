@@ -37,6 +37,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -180,7 +181,7 @@ public class NetconfBaseOpsTest {
         final Optional<NormalizedNode<?, ?>> dataOpt =
                 baseOps.getConfigRunningData(callback, Optional.of(YangInstanceIdentifier.EMPTY)).get();
         Assert.assertTrue(dataOpt.isPresent());
-        Assert.assertEquals(NetconfMessageTransformUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
+        Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
     }
 
     @Test
@@ -188,7 +189,7 @@ public class NetconfBaseOpsTest {
         final Optional<NormalizedNode<?, ?>> dataOpt =
                 baseOps.getData(callback, Optional.of(YangInstanceIdentifier.EMPTY)).get();
         Assert.assertTrue(dataOpt.isPresent());
-        Assert.assertEquals(NetconfMessageTransformUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
+        Assert.assertEquals(NetconfUtil.NETCONF_DATA_QNAME, dataOpt.get().getNodeType());
     }
 
     @Test

@@ -121,8 +121,7 @@ public class BaseRpcSchemalessTransformerTest {
         Assert.assertNotNull(result.getResult());
         final ContainerNode rpcReply = (ContainerNode) result.getResult();
         Assert.assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.getNodeType());
-        final Optional<?> dataOpt = rpcReply.getChild(
-                new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_QNAME));
+        final Optional<?> dataOpt = rpcReply.getChild(NetconfMessageTransformUtil.NETCONF_DATA_NODEID);
         Assert.assertTrue(dataOpt.isPresent());
         final AnyXmlNode data = (AnyXmlNode) dataOpt.get();
         final Diff diff = XMLUnit.compareXML(dataElement.getOwnerDocument(), (Document) data.getValue().getNode());
