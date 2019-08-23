@@ -221,20 +221,18 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
      * @return Resolved URLs with YANG schema resources for all yang modules from yang library
      */
     public static LibraryModulesSchemas create(final String url) {
+        final URLConnection connection;
         try {
-            final URL urlConnection = new URL(requireNonNull(url));
-            final URLConnection connection = urlConnection.openConnection();
-
-            if (connection instanceof HttpURLConnection) {
-                connection.setRequestProperty("Accept", "application/xml");
-            }
-
-            return createFromURLConnection(connection);
-
+            connection = new URL(requireNonNull(url)).openConnection();
         } catch (final IOException e) {
             LOG.warn("Unable to download yang library from {}", url, e);
             return new LibraryModulesSchemas(ImmutableMap.of());
         }
+
+        if (connection instanceof HttpURLConnection) {
+            connection.setRequestProperty("Accept", "application/xml");
+        }
+        return createFromURLConnection(connection);
     }
 
     private static Optional<? extends NormalizedNode<?, ?>> findModulesStateNode(final NormalizedNode<?, ?> result) {
@@ -262,27 +260,26 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         requireNonNull(contentType, "Content type unknown");
         checkState(contentType.equals("application/json") || contentType.equals("application/xml"),
                 "Only XML and JSON types are supported.");
+
+        Optional<NormalizedNode<?, ?>> optionalModulesStateNode = Optional.empty();
         try (InputStream in = connection.getInputStream()) {
-            final Optional<NormalizedNode<?, ?>> optionalModulesStateNode =
-                    contentType.equals("application/json") ? readJson(in) : readXml(in);
-
-            if (!optionalModulesStateNode.isPresent()) {
-                return new LibraryModulesSchemas(ImmutableMap.of());
-            }
-
-            final NormalizedNode<?, ?> modulesStateNode = optionalModulesStateNode.get();
-            checkState(modulesStateNode instanceof ContainerNode,
-                "Expecting container containing module list, but was %s", modulesStateNode);
-            final ContainerNode modulesState = (ContainerNode) modulesStateNode;
-
-            final NodeIdentifier nodeName = modulesState.getIdentifier();
-            checkState(MODULES_STATE_NID.equals(nodeName), "Wrong container identifier %s", nodeName);
-
-            return create((ContainerNode) modulesStateNode);
+            optionalModulesStateNode = contentType.equals("application/json") ? readJson(in) : readXml(in);
         } catch (final IOException e) {
             LOG.warn("Unable to download yang library from {}", connection.getURL(), e);
+        }
+
+        if (!optionalModulesStateNode.isPresent()) {
             return new LibraryModulesSchemas(ImmutableMap.of());
         }
+
+        final NormalizedNode<?, ?> modulesStateNode = optionalModulesStateNode.get();
+        checkState(modulesStateNode instanceof ContainerNode, "Expecting container containing module list, but was %s",
+            modulesStateNode);
+        final ContainerNode modulesState = (ContainerNode) modulesStateNode;
+        final NodeIdentifier nodeName = modulesState.getIdentifier();
+        checkState(MODULES_STATE_NID.equals(nodeName), "Wrong container identifier %s", nodeName);
+
+        return create((ContainerNode) modulesStateNode);
     }
 
     private static boolean guessJsonFromFileName(final String fileName) {
