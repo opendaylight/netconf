@@ -34,7 +34,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -97,6 +96,47 @@ public class NetconfMessageTransformerTest {
     private static final String REVISION_EXAMPLE_SERVER_FARM_2 = "2019-05-20";
     private static final String URN_EXAMPLE_SERVER_FARM_2 = "urn:example:server-farm-2";
 
+    private static final String URN_EXAMPLE_CONFLICT = "urn:example:conflict";
+
+    private static final QName SERVER_QNAME =
+            QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "server");
+    private static final QName RESET_QNAME = QName.create(SERVER_QNAME, "reset");
+    private static final SchemaPath RESET_SERVER_PATH = SchemaPath.create(true, SERVER_QNAME, RESET_QNAME);
+    private static final QName APPLICATIONS_QNAME = QName.create(URN_EXAMPLE_SERVER_FARM_2,
+            REVISION_EXAMPLE_SERVER_FARM_2, "applications");
+    private static final QName APPLICATION_QNAME = QName.create(APPLICATIONS_QNAME, "application");
+    private static final QName KILL_QNAME = QName.create(APPLICATION_QNAME, "kill");
+    private static final SchemaPath KILL_SERVER_APP_PATH =
+            SchemaPath.create(true, SERVER_QNAME, APPLICATIONS_QNAME, APPLICATION_QNAME, KILL_QNAME);
+
+    private static final QName DEVICE_QNAME =
+            QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "device");
+    private static final QName START_QNAME = QName.create(DEVICE_QNAME, "start");
+    private static final SchemaPath START_DEVICE_PATH = SchemaPath.create(true, DEVICE_QNAME, START_QNAME);
+    private static final QName INTERFACE_QNAME = QName.create(DEVICE_QNAME, "interface");
+    private static final QName ENABLE_QNAME = QName.create(INTERFACE_QNAME, "enable");
+    private static final SchemaPath ENABLE_INTERFACE_PATH =
+            SchemaPath.create(true, DEVICE_QNAME, INTERFACE_QNAME, ENABLE_QNAME);
+
+    private static final QName BOX_OUT_QNAME =
+            QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "box-out");
+    private static final QName BOX_IN_QNAME = QName.create(BOX_OUT_QNAME, "box-in");
+    private static final QName OPEN_QNAME = QName.create(BOX_IN_QNAME, "open");
+    private static final SchemaPath OPEN_BOXES_PATH =
+            SchemaPath.create(true, BOX_OUT_QNAME, BOX_IN_QNAME, OPEN_QNAME);
+
+    private static final QName FOO_QNAME = QName.create(URN_EXAMPLE_CONFLICT, "foo");
+    private static final QName BAR_QNAME = QName.create(URN_EXAMPLE_CONFLICT, "bar");
+    private static final QName XYZZY_QNAME = QName.create(URN_EXAMPLE_CONFLICT, "xyzzy");
+    private static final SchemaPath XYZZY_FOO_PATH = SchemaPath.create(true, FOO_QNAME, XYZZY_QNAME);
+    private static final SchemaPath XYZZY_BAR_PATH = SchemaPath.create(true, BAR_QNAME, XYZZY_QNAME);
+
+    private static final QName CONFLICT_CHOICE_QNAME = QName.create(URN_EXAMPLE_CONFLICT, "conflict-choice");
+    private static final QName CHOICE_CONT_QNAME = QName.create(URN_EXAMPLE_CONFLICT, "choice-cont");
+    private static final QName CHOICE_ACTION_QNAME = QName.create(URN_EXAMPLE_CONFLICT, "choice-action");
+    private static final SchemaPath CHOICE_ACTION_PATH =
+            SchemaPath.create(true, CONFLICT_CHOICE_QNAME, CHOICE_CONT_QNAME, CHOICE_CONT_QNAME, CHOICE_ACTION_QNAME);
+
     private static SchemaContext PARTIAL_SCHEMA;
     private static SchemaContext SCHEMA;
     private static SchemaContext ACTION_SCHEMA;
@@ -115,7 +155,8 @@ public class NetconfMessageTransformerTest {
         SCHEMA = context.tryToCreateSchemaContext().get();
 
         ACTION_SCHEMA = YangParserTestUtils.parseYangResources(NetconfMessageTransformerTest.class,
-            "/schemas/example-server-farm.yang","/schemas/example-server-farm-2.yang");
+            "/schemas/example-server-farm.yang","/schemas/example-server-farm-2.yang",
+            "/schemas/conflicting-actions.yang");
     }
 
     @AfterClass
@@ -414,123 +455,115 @@ public class NetconfMessageTransformerTest {
 
     @Test
     public void getActionsTest() {
-        QName reset = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "reset");
-        QName start = QName.create(reset, "start");
-        QName open = QName.create(start, "open");
-        QName enable = QName.create(open, "enable");
-        QName kill = QName.create(URN_EXAMPLE_SERVER_FARM_2, REVISION_EXAMPLE_SERVER_FARM_2, "kill");
-        Set<QName> qnames = new HashSet<>(Arrays.asList(reset, start, open, enable, kill));
-        Set<ActionDefinition> actions = NetconfMessageTransformer.getActions(ACTION_SCHEMA);
-        assertTrue(!actions.isEmpty());
+        Set<SchemaPath> schemaPaths = new HashSet<>();
+        schemaPaths.add(RESET_SERVER_PATH);
+        schemaPaths.add(START_DEVICE_PATH);
+        schemaPaths.add(ENABLE_INTERFACE_PATH);
+        schemaPaths.add(OPEN_BOXES_PATH);
+        schemaPaths.add(KILL_SERVER_APP_PATH);
+        schemaPaths.add(XYZZY_FOO_PATH);
+        schemaPaths.add(XYZZY_BAR_PATH);
+        schemaPaths.add(CHOICE_ACTION_PATH);
+
+        List<ActionDefinition> actions = NetconfMessageTransformer.getActions(ACTION_SCHEMA);
+        assertEquals(schemaPaths.size(), actions.size());
         for (ActionDefinition actionDefinition : actions) {
-            QName qname = actionDefinition.getQName();
-            assertTrue(qnames.contains(qname));
-            qnames.remove(qname);
+            SchemaPath path = actionDefinition.getPath();
+            assertTrue(schemaPaths.contains(path));
+            schemaPaths.remove(path);
         }
     }
 
     @Test
     public void toActionRequestListTopLevelTest() {
-        QName qname = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "server");
-        QName nameQname = QName.create(qname, "name");
-        QName actionResetQName = QName.create(qname, "reset");
+        QName nameQname = QName.create(SERVER_QNAME, "name");
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
-        nodeIdentifiers.add(new NodeIdentifier(qname));
-        nodeIdentifiers.add(new NodeIdentifierWithPredicates(qname, nameQname, "test"));
+        nodeIdentifiers.add(new NodeIdentifier(SERVER_QNAME));
+        nodeIdentifiers.add(new NodeIdentifierWithPredicates(SERVER_QNAME, nameQname, "test"));
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        ContainerNode data = initInputAction(QName.create(qname, "reset-at"), "now");
+        ContainerNode data = initInputAction(QName.create(SERVER_QNAME, "reset-at"), "now");
 
         NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
-                SchemaPath.create(true, actionResetQName), domDataTreeIdentifier, data);
+                RESET_SERVER_PATH, domDataTreeIdentifier, data);
 
         Node childAction = checkBasePartOfActionRequest(actionRequest);
 
         Node childServer = childAction.getFirstChild();
-        checkNode(childServer, "server", "server", qname.getNamespace().toString());
+        checkNode(childServer, "server", "server", URN_EXAMPLE_SERVER_FARM);
 
         Node childName = childServer.getFirstChild();
-        checkNode(childName, "name", "name", qname.getNamespace().toString());
+        checkNode(childName, "name", "name", URN_EXAMPLE_SERVER_FARM);
 
         Node childTest = childName.getFirstChild();
         assertEquals(childTest.getNodeValue(), "test");
 
-        checkAction(actionResetQName, childName.getNextSibling(), "reset-at", "reset-at", "now");
+        checkAction(RESET_QNAME, childName.getNextSibling(), "reset-at", "reset-at", "now");
     }
 
     @Test
     public void toActionRequestContainerTopLevelTest() {
-        QName qname = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "device");
-        QName actionStartQName = QName.create(qname, "start");
-
-        List<PathArgument> nodeIdentifiers = Collections.singletonList(NodeIdentifier.create(qname));
+        List<PathArgument> nodeIdentifiers = Collections.singletonList(NodeIdentifier.create(DEVICE_QNAME));
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        NormalizedNode<?, ?> payload = initInputAction(QName.create(qname, "start-at"), "now");
+        NormalizedNode<?, ?> payload = initInputAction(QName.create(DEVICE_QNAME, "start-at"), "now");
         NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
-                SchemaPath.create(true, actionStartQName), domDataTreeIdentifier, payload);
+                START_DEVICE_PATH, domDataTreeIdentifier, payload);
 
         Node childAction = checkBasePartOfActionRequest(actionRequest);
 
         Node childDevice = childAction.getFirstChild();
-        checkNode(childDevice, "device", "device", qname.getNamespace().toString());
+        checkNode(childDevice, "device", "device", URN_EXAMPLE_SERVER_FARM);
 
-        checkAction(actionStartQName, childDevice.getFirstChild(), "start-at", "start-at", "now");
+        checkAction(START_QNAME, childDevice.getFirstChild(), "start-at", "start-at", "now");
     }
 
     @Test
     public void toActionRequestContainerInContainerTest() {
-        QName boxOutQName = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "box-out");
-        QName boxInQName = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "box-in");
-        QName actionOpenQName = QName.create(boxOutQName, "open");
-
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
-        nodeIdentifiers.add(NodeIdentifier.create(boxOutQName));
-        nodeIdentifiers.add(NodeIdentifier.create(boxInQName));
+        nodeIdentifiers.add(NodeIdentifier.create(BOX_OUT_QNAME));
+        nodeIdentifiers.add(NodeIdentifier.create(BOX_IN_QNAME));
 
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        NormalizedNode<?, ?> payload = initInputAction(QName.create(boxOutQName, "start-at"), "now");
+        NormalizedNode<?, ?> payload = initInputAction(QName.create(BOX_OUT_QNAME, "start-at"), "now");
         NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
-                SchemaPath.create(true, actionOpenQName), domDataTreeIdentifier, payload);
+                OPEN_BOXES_PATH, domDataTreeIdentifier, payload);
 
         Node childAction = checkBasePartOfActionRequest(actionRequest);
 
         Node childBoxOut = childAction.getFirstChild();
-        checkNode(childBoxOut, "box-out", "box-out", boxOutQName.getNamespace().toString());
+        checkNode(childBoxOut, "box-out", "box-out", URN_EXAMPLE_SERVER_FARM);
 
         Node childBoxIn = childBoxOut.getFirstChild();
-        checkNode(childBoxIn, "box-in", "box-in", boxOutQName.getNamespace().toString());
+        checkNode(childBoxIn, "box-in", "box-in", URN_EXAMPLE_SERVER_FARM);
 
         Node action = childBoxIn.getFirstChild();
-        checkNode(action, null, actionOpenQName.getLocalName(), null);
+        checkNode(action, null, OPEN_QNAME.getLocalName(), null);
     }
 
     @Test
     public void toActionRequestListInContainerTest() {
-        QName qnameDevice = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "device");
-        QName qnameInterface = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "interface");
-        QName nameQname = QName.create(qnameInterface, "name");
-        QName actionEnableQName = QName.create(qnameInterface, "enable");
+        QName nameQname = QName.create(INTERFACE_QNAME, "name");
 
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
-        nodeIdentifiers.add(NodeIdentifier.create(qnameDevice));
-        nodeIdentifiers.add(NodeIdentifier.create(qnameInterface));
-        nodeIdentifiers.add(new NodeIdentifierWithPredicates(qnameInterface, nameQname, "test"));
+        nodeIdentifiers.add(NodeIdentifier.create(DEVICE_QNAME));
+        nodeIdentifiers.add(NodeIdentifier.create(INTERFACE_QNAME));
+        nodeIdentifiers.add(new NodeIdentifierWithPredicates(INTERFACE_QNAME, nameQname, "test"));
 
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        NormalizedNode<?, ?> payload = initEmptyInputAction(qnameInterface);
+        NormalizedNode<?, ?> payload = initEmptyInputAction(INTERFACE_QNAME);
         NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
-                SchemaPath.create(true, actionEnableQName), domDataTreeIdentifier, payload);
+                ENABLE_INTERFACE_PATH, domDataTreeIdentifier, payload);
 
         Node childAction = checkBasePartOfActionRequest(actionRequest);
 
         Node childDevice = childAction.getFirstChild();
-        checkNode(childDevice, "device", "device", qnameDevice.getNamespace().toString());
+        checkNode(childDevice, "device", "device", URN_EXAMPLE_SERVER_FARM);
 
         Node childInterface = childDevice.getFirstChild();
-        checkNode(childInterface, "interface", "interface", qnameInterface.getNamespace().toString());
+        checkNode(childInterface, "interface", "interface", URN_EXAMPLE_SERVER_FARM);
 
         Node childName = childInterface.getFirstChild();
         checkNode(childName, "name", "name", nameQname.getNamespace().toString());
@@ -539,77 +572,144 @@ public class NetconfMessageTransformerTest {
         assertEquals(childTest.getNodeValue(), "test");
 
         Node action = childInterface.getLastChild();
-        checkNode(action, null, actionEnableQName.getLocalName(), null);
+        checkNode(action, null, ENABLE_QNAME.getLocalName(), null);
     }
 
     @Test
     public void toActionRequestListInContainerAugmentedIntoListTest() {
-        QName qnameServer = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "server");
-        QName serverNameQname = QName.create(qnameServer, "name");
-        QName qnameAppliactions = QName.create(URN_EXAMPLE_SERVER_FARM_2,
-                REVISION_EXAMPLE_SERVER_FARM_2, "applications");
-        QName qnameAppliaction = QName.create(URN_EXAMPLE_SERVER_FARM_2,
-                REVISION_EXAMPLE_SERVER_FARM_2, "application");
-        QName applicationNameQname = QName.create(qnameAppliaction, "name");
-        QName actionKillQName = QName.create(qnameAppliaction, "kill");
+        QName serverNameQname = QName.create(SERVER_QNAME, "name");
+        QName applicationNameQname = QName.create(APPLICATION_QNAME, "name");
 
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
-        nodeIdentifiers.add(NodeIdentifier.create(qnameServer));
-        nodeIdentifiers.add(new NodeIdentifierWithPredicates(qnameServer, serverNameQname, "testServer"));
+        nodeIdentifiers.add(NodeIdentifier.create(SERVER_QNAME));
+        nodeIdentifiers.add(new NodeIdentifierWithPredicates(SERVER_QNAME, serverNameQname, "testServer"));
         nodeIdentifiers.add(new YangInstanceIdentifier
-                .AugmentationIdentifier(Collections.singleton(qnameAppliactions)));
-        nodeIdentifiers.add(NodeIdentifier.create(qnameAppliactions));
-        nodeIdentifiers.add(NodeIdentifier.create(qnameAppliaction));
-        nodeIdentifiers.add(new NodeIdentifierWithPredicates(qnameAppliaction,
+                .AugmentationIdentifier(Collections.singleton(APPLICATIONS_QNAME)));
+        nodeIdentifiers.add(NodeIdentifier.create(APPLICATIONS_QNAME));
+        nodeIdentifiers.add(NodeIdentifier.create(APPLICATION_QNAME));
+        nodeIdentifiers.add(new NodeIdentifierWithPredicates(APPLICATION_QNAME,
                 applicationNameQname, "testApplication"));
 
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
-        NormalizedNode<?, ?> payload = initEmptyInputAction(qnameAppliaction);
+        NormalizedNode<?, ?> payload = initEmptyInputAction(APPLICATION_QNAME);
         NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
-                SchemaPath.create(true, actionKillQName), domDataTreeIdentifier, payload);
+                KILL_SERVER_APP_PATH, domDataTreeIdentifier, payload);
 
         Node childAction = checkBasePartOfActionRequest(actionRequest);
 
         Node childServer = childAction.getFirstChild();
-        checkNode(childServer, "server", "server", qnameServer.getNamespace().toString());
+        checkNode(childServer, "server", "server", URN_EXAMPLE_SERVER_FARM);
 
         Node childServerName = childServer.getFirstChild();
-        checkNode(childServerName, "name", "name", serverNameQname.getNamespace().toString());
+        checkNode(childServerName, "name", "name", URN_EXAMPLE_SERVER_FARM);
 
         Node childServerNameTest = childServerName.getFirstChild();
         assertEquals(childServerNameTest.getNodeValue(), "testServer");
 
         Node childApplications = childServer.getLastChild();
-        checkNode(childApplications, "applications", "applications", qnameAppliactions.getNamespace().toString());
+        checkNode(childApplications, "applications", "applications", URN_EXAMPLE_SERVER_FARM_2);
 
         Node childApplication = childApplications.getFirstChild();
-        checkNode(childApplication, "application", "application", qnameAppliaction.getNamespace().toString());
+        checkNode(childApplication, "application", "application", URN_EXAMPLE_SERVER_FARM_2);
 
         Node childApplicationName = childApplication.getFirstChild();
-        checkNode(childApplicationName, "name", "name", applicationNameQname.getNamespace().toString());
+        checkNode(childApplicationName, "name", "name", URN_EXAMPLE_SERVER_FARM_2);
 
         Node childApplicationNameTest = childApplicationName.getFirstChild();
         assertEquals(childApplicationNameTest.getNodeValue(), "testApplication");
 
         Node childKillAction = childApplication.getLastChild();
-        checkNode(childApplication, "application", "application", qnameAppliaction.getNamespace().toString());
-        checkNode(childKillAction, null, actionKillQName.getLocalName(), null);
+        checkNode(childApplication, "application", "application", URN_EXAMPLE_SERVER_FARM_2);
+        checkNode(childKillAction, null, KILL_QNAME.getLocalName(), null);
+    }
+
+    @Test
+    public void toActionRequestConflictingInListTest() {
+        QName barInputQname = QName.create(BAR_QNAME, "bar");
+        QName barIdQname = QName.create(BAR_QNAME, "bar-id");
+        Byte barInput = new Byte("1");
+
+        List<PathArgument> nodeIdentifiers = new ArrayList<>();
+        nodeIdentifiers.add(NodeIdentifier.create(BAR_QNAME));
+        nodeIdentifiers.add(new NodeIdentifierWithPredicates(BAR_QNAME, barIdQname, "test"));
+
+        DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
+
+        ImmutableLeafNodeBuilder<Byte> immutableLeafNodeBuilder = new ImmutableLeafNodeBuilder<>();
+        DataContainerChild<NodeIdentifier, Byte> build = immutableLeafNodeBuilder.withNodeIdentifier(
+                NodeIdentifier.create(barInputQname)).withValue(barInput).build();
+        NormalizedNode<?, ?> payload = ImmutableContainerNodeBuilder.create().withNodeIdentifier(NodeIdentifier.create(
+                QName.create(barInputQname, "input"))).withChild(build).build();
+
+        NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
+                XYZZY_BAR_PATH, domDataTreeIdentifier, payload);
+
+        Node childAction = checkBasePartOfActionRequest(actionRequest);
+
+        Node childBar = childAction.getFirstChild();
+        checkNode(childBar, "bar", "bar", URN_EXAMPLE_CONFLICT);
+
+        Node childBarId = childBar.getFirstChild();
+        checkNode(childBarId, "bar-id", "bar-id", URN_EXAMPLE_CONFLICT);
+
+        Node childTest = childBarId.getFirstChild();
+        assertEquals(childTest.getNodeValue(), "test");
+
+        Node action = childBar.getLastChild();
+        checkNode(action, null, XYZZY_QNAME.getLocalName(), null);
+    }
+
+    @Test
+    public void toActionRequestConflictingInContainerTest() {
+        QName fooInputQname = QName.create(FOO_QNAME, "foo");
+
+        List<PathArgument> nodeIdentifiers = new ArrayList<>();
+        nodeIdentifiers.add(NodeIdentifier.create(FOO_QNAME));
+        DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
+        NormalizedNode<?, ?> payload = initInputAction(fooInputQname, "test");
+
+        NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
+                XYZZY_FOO_PATH, domDataTreeIdentifier, payload);
+
+        Node childAction = checkBasePartOfActionRequest(actionRequest);
+
+        Node childBar = childAction.getFirstChild();
+        checkNode(childBar, "foo", "foo", URN_EXAMPLE_CONFLICT);
+
+        Node action = childBar.getLastChild();
+        checkNode(action, null, XYZZY_QNAME.getLocalName(), null);
+    }
+
+    @Test
+    public void toActionRequestChoiceTest() {
+        List<PathArgument> nodeIdentifiers = new ArrayList<>();
+        nodeIdentifiers.add(NodeIdentifier.create(CHOICE_CONT_QNAME));
+        DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
+        NormalizedNode<?, ?> payload = initEmptyInputAction(CHOICE_ACTION_QNAME);
+
+        NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
+                CHOICE_ACTION_PATH, domDataTreeIdentifier, payload);
+
+        Node childAction = checkBasePartOfActionRequest(actionRequest);
+
+        Node childChoiceCont = childAction.getFirstChild();
+        checkNode(childChoiceCont, "choice-cont", "choice-cont", URN_EXAMPLE_CONFLICT);
+
+        Node action = childChoiceCont.getLastChild();
+        checkNode(action, null, CHOICE_ACTION_QNAME.getLocalName(), null);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void toActionResultTest() throws Exception {
-        QName qname = QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "reset");
-
         NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
                 + "<reset-finished-at xmlns=\"urn:example:server-farm\">"
                 + "now"
                 + "</reset-finished-at>"
                 + "</rpc-reply>"));
-        DOMActionResult actionResult = actionNetconfMessageTransformer.toActionResult(
-                SchemaPath.create(true, qname), message);
+        DOMActionResult actionResult = actionNetconfMessageTransformer.toActionResult(RESET_SERVER_PATH, message);
         assertNotNull(actionResult);
         ContainerNode containerNode = actionResult.getOutput().get();
         assertNotNull(containerNode);
