@@ -48,8 +48,6 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.YangConstants;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
@@ -274,13 +272,13 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         final NormalizedNode<?, ?> normalizedNode;
         final QName rpcQName = rpc.getLastComponent();
         if (NetconfMessageTransformUtil.isDataRetrievalOperation(rpcQName)) {
-            final Element xmlData = NetconfMessageTransformUtil.getDataSubtree(message.getDocument());
-            final AnyXmlNode anyXmlNode = Builders.anyXmlBuilder()
-                    .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
-                    .withValue(new DOMSource(xmlData)).build();
-            normalizedNode = Builders.containerBuilder().withNodeIdentifier(
-                    new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
-                    .withChild(anyXmlNode).build();
+            normalizedNode = Builders.containerBuilder()
+                    .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_NODEID)
+                    .withChild(Builders.anyXmlBuilder()
+                        .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
+                        .withValue(new DOMSource(NetconfMessageTransformUtil.getDataSubtree(message.getDocument())))
+                        .build())
+                    .build();
         } else {
             // Determine whether a base netconf operation is being invoked
             // and also check if the device exposed model for base netconf.
