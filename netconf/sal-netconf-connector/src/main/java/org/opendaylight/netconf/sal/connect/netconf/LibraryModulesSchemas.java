@@ -14,7 +14,6 @@ import static javax.xml.bind.DatatypeConverter.printBase64Binary;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_PATH;
-import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -97,11 +96,21 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         LIBRARY_CONTEXT = moduleInfoBackedContext.tryToCreateSchemaContext().get();
     }
 
+    private static final NodeIdentifier MODULES_STATE_NID = NodeIdentifier.create(ModulesState.QNAME);
+    private static final NodeIdentifier MODULE_NID = NodeIdentifier.create(Module.QNAME);
+    private static final NodeIdentifier NAME_NID = NodeIdentifier.create(QName.create(Module.QNAME, "name").intern());
+    private static final NodeIdentifier REVISION_NID = NodeIdentifier.create(
+        QName.create(Module.QNAME, "revision").intern());
+    private static final NodeIdentifier SCHEMA_NID = NodeIdentifier.create(
+        QName.create(Module.QNAME, "schema").intern());
+    private static final NodeIdentifier NAMESPACE_NID = NodeIdentifier.create(
+        QName.create(Module.QNAME, "namespace").intern());
+
     private static final JSONCodecFactory JSON_CODECS = JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02
             .getShared(LIBRARY_CONTEXT);
 
     private static final YangInstanceIdentifier MODULES_STATE_MODULE_LIST =
-            YangInstanceIdentifier.builder().node(ModulesState.QNAME).node(Module.QNAME).build();
+            YangInstanceIdentifier.create(MODULES_STATE_NID, MODULE_NID);
 
     private static final ContainerNode GET_MODULES_STATE_MODULE_LIST_RPC = Builders.containerBuilder()
             .withNodeIdentifier(NETCONF_GET_NODEID)
@@ -182,17 +191,16 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             return create((ContainerNode) node);
         }
 
-        LOG.warn("{}: Unable to detect available schemas, get to {} was empty", deviceId, toId(ModulesState.QNAME));
+        LOG.warn("{}: Unable to detect available schemas, get to {} was empty", deviceId, MODULES_STATE_NID);
         return new LibraryModulesSchemas(ImmutableMap.of());
     }
 
     private static LibraryModulesSchemas create(final ContainerNode modulesStateNode) {
-        final NodeIdentifier moduleListNodeId = new NodeIdentifier(Module.QNAME);
-        final Optional<DataContainerChild<?, ?>> moduleListNode = modulesStateNode.getChild(moduleListNodeId);
-        checkState(moduleListNode.isPresent(), "Unable to find list: %s in %s", moduleListNodeId, modulesStateNode);
+        final Optional<DataContainerChild<?, ?>> moduleListNode = modulesStateNode.getChild(MODULE_NID);
+        checkState(moduleListNode.isPresent(), "Unable to find list: %s in %s", MODULE_NID, modulesStateNode);
         final DataContainerChild<?, ?> node = moduleListNode.get();
         checkState(node instanceof MapNode, "Unexpected structure for container: %s in : %s. Expecting a list",
-                moduleListNodeId, modulesStateNode);
+            MODULE_NID, modulesStateNode);
 
         final MapNode moduleList = (MapNode) node;
         final Collection<MapEntryNode> modules = moduleList.getValue();
@@ -239,7 +247,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             return Optional.empty();
         }
 
-        return ((DataContainerNode<?>) dataNode.get()).getChild(toId(ModulesState.QNAME));
+        return ((DataContainerNode<?>) dataNode.get()).getChild(MODULES_STATE_NID);
     }
 
     private static LibraryModulesSchemas createFromURLConnection(final URLConnection connection) {
@@ -263,10 +271,12 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             }
 
             final NormalizedNode<?, ?> modulesStateNode = optionalModulesStateNode.get();
-            final QName nodeType = modulesStateNode.getNodeType();
-            checkState(nodeType.equals(ModulesState.QNAME), "Wrong QName %s", nodeType);
             checkState(modulesStateNode instanceof ContainerNode,
                 "Expecting container containing module list, but was %s", modulesStateNode);
+            final ContainerNode modulesState = (ContainerNode) modulesStateNode;
+
+            final NodeIdentifier nodeName = modulesState.getIdentifier();
+            checkState(MODULES_STATE_NID.equals(nodeName), "Wrong container identifier %s", nodeName);
 
             return create((ContainerNode) modulesStateNode);
         } catch (final IOException e) {
@@ -330,11 +340,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     private static @Nullable Entry<QName, URL> createFromEntry(final MapEntryNode moduleNode) {
         checkArgument(moduleNode.getNodeType().equals(Module.QNAME), "Wrong QName %s", moduleNode.getNodeType());
 
-        NodeIdentifier childNodeId = new NodeIdentifier(QName.create(Module.QNAME, "name"));
-        final String moduleName = getSingleChildNodeValue(moduleNode, childNodeId).get();
-
-        childNodeId = new NodeIdentifier(QName.create(Module.QNAME, "revision"));
-        final Optional<String> revision = getSingleChildNodeValue(moduleNode, childNodeId);
+        final String moduleName = getSingleChildNodeValue(moduleNode, NAME_NID).get();
+        final Optional<String> revision = getSingleChildNodeValue(moduleNode, REVISION_NID);
         if (revision.isPresent()) {
             if (!Revision.STRING_FORMAT_PATTERN.matcher(revision.get()).matches()) {
                 LOG.warn("Skipping library schema for {}. Revision {} is in wrong format.", moduleNode, revision.get());
@@ -344,11 +351,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         // FIXME leaf schema with url that represents the yang schema resource for this module is not mandatory
         // don't fail if schema node is not present, just skip the entry or add some default URL
-        childNodeId = new NodeIdentifier(QName.create(Module.QNAME, "schema"));
-        final Optional<String> schemaUriAsString = getSingleChildNodeValue(moduleNode, childNodeId);
-
-        childNodeId = new NodeIdentifier(QName.create(Module.QNAME, "namespace"));
-        final String moduleNameSpace = getSingleChildNodeValue(moduleNode, childNodeId).get();
+        final Optional<String> schemaUriAsString = getSingleChildNodeValue(moduleNode, SCHEMA_NID);
+        final String moduleNameSpace = getSingleChildNodeValue(moduleNode, NAMESPACE_NID).get();
 
         final QName moduleQName = revision.isPresent()
                 ? QName.create(moduleNameSpace, revision.get(), moduleName)
