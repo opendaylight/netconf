@@ -7,9 +7,9 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import java.util.Arrays;
-import java.util.Map;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -35,7 +35,7 @@ public enum BaseSchema implements SchemaContextProvider {
             .$YangModuleInfoImpl.getInstance()
     );
 
-    private final Map<QName, RpcDefinition> mappedRpcs;
+    private final ImmutableMap<QName, RpcDefinition> mappedRpcs;
     private final SchemaContext schemaContext;
 
     BaseSchema(final YangModuleInfo... modules) {
@@ -45,7 +45,7 @@ public enum BaseSchema implements SchemaContextProvider {
         mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), RpcDefinition::getQName);
     }
 
-    Map<QName, RpcDefinition> getMappedRpcs() {
+    ImmutableMap<QName, RpcDefinition> getMappedRpcs() {
         return mappedRpcs;
     }
 
