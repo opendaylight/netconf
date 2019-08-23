@@ -220,23 +220,21 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     @Override
-    public NetconfMessage toActionRequest(SchemaPath action, final DOMDataTreeIdentifier domDataTreeIdentifier,
+    public NetconfMessage toActionRequest(final SchemaPath action, final DOMDataTreeIdentifier domDataTreeIdentifier,
             final NormalizedNode<?, ?> payload) {
         ActionDefinition actionDefinition = null;
-        SchemaPath schemaPath = action;
         for (ActionDefinition actionDef : actions) {
             if (actionDef.getPath().getLastComponent().equals(action.getLastComponent())) {
                 actionDefinition = actionDef;
-                schemaPath = actionDef.getPath();
             }
         }
         Preconditions.checkNotNull(actionDefinition, "Action does not exist: %s", action.getLastComponent());
 
-        if (actionDefinition.getInput().getChildNodes().isEmpty()) {
+        final ContainerSchemaNode inputDef = actionDefinition.getInput();
+        if (inputDef.getChildNodes().isEmpty()) {
             return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForActionRequest(
                     DataSchemaContextTree.from(schemaContext), domDataTreeIdentifier, action, counter,
-                    actionDefinition.getQName().getLocalName())
-                    .getNode().getOwnerDocument());
+                    actionDefinition.getQName().getLocalName()).getNode().getOwnerDocument());
         }
 
         Preconditions.checkNotNull(payload, "Transforming an action with input: %s, payload cannot be null",
@@ -244,15 +242,15 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         Preconditions.checkArgument(payload instanceof ContainerNode,
                 "Transforming an rpc with input: %s, payload has to be a container, but was: %s",
                 action.getLastComponent(), payload);
-        // Set the path to the input of rpc for the node stream writer
-        action = action.createChild(QName.create(action.getLastComponent(), "input").intern());
+
+        // Set the path to the input of action for the node stream writer
         final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForActionRequest(
-                DataSchemaContextTree.from(schemaContext), domDataTreeIdentifier, action, counter,
+                DataSchemaContextTree.from(schemaContext), domDataTreeIdentifier, inputDef.getPath(), counter,
                 actionDefinition.getQName().getLocalName());
 
         try {
-            NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result,
-                    schemaPath.createChild(QName.create(action.getLastComponent(), "input").intern()), schemaContext);
+            NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result, inputDef.getPath(),
+                schemaContext);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize " + action, e);
         }
