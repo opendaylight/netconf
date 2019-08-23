@@ -31,7 +31,6 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -98,8 +97,6 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     private static final JSONCodecFactory JSON_CODECS = JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02
             .getShared(LIBRARY_CONTEXT);
 
-    private final Map<QName, URL> availableModels;
-
     private static final YangInstanceIdentifier MODULES_STATE_MODULE_LIST =
             YangInstanceIdentifier.builder().node(ModulesState.QNAME).node(Module.QNAME).build();
 
@@ -108,8 +105,10 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             .withChild(NetconfMessageTransformUtil.toFilterStructure(MODULES_STATE_MODULE_LIST, LIBRARY_CONTEXT))
             .build();
 
-    private LibraryModulesSchemas(final Map<QName, URL> availableModels) {
-        this.availableModels = availableModels;
+    private final ImmutableMap<QName, URL> availableModels;
+
+    private LibraryModulesSchemas(final ImmutableMap<QName, URL> availableModels) {
+        this.availableModels = requireNonNull(availableModels);
     }
 
     public Map<SourceIdentifier, URL> getAvailableModels() {
@@ -146,7 +145,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         } catch (final IOException e) {
             LOG.warn("Unable to download yang library from {}", url, e);
-            return new LibraryModulesSchemas(Collections.emptyMap());
+            return new LibraryModulesSchemas(ImmutableMap.of());
         }
     }
 
@@ -163,13 +162,13 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         } catch (final ExecutionException e) {
             LOG.warn("{}: Unable to detect available schemas, get to {} failed", deviceId,
                     MODULES_STATE_MODULE_LIST, e);
-            return new LibraryModulesSchemas(Collections.emptyMap());
+            return new LibraryModulesSchemas(ImmutableMap.of());
         }
 
         if (moduleListNodeResult.getErrors().isEmpty() == false) {
             LOG.warn("{}: Unable to detect available schemas, get to {} failed, {}",
                     deviceId, MODULES_STATE_MODULE_LIST, moduleListNodeResult.getErrors());
-            return new LibraryModulesSchemas(Collections.emptyMap());
+            return new LibraryModulesSchemas(ImmutableMap.of());
         }
 
         final Optional<? extends NormalizedNode<?, ?>> modulesStateNode =
@@ -181,7 +180,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
         }
 
         LOG.warn("{}: Unable to detect available schemas, get to {} was empty", deviceId, toId(ModulesState.QNAME));
-        return new LibraryModulesSchemas(Collections.emptyMap());
+        return new LibraryModulesSchemas(ImmutableMap.of());
     }
 
     private static LibraryModulesSchemas create(final ContainerNode modulesStateNode) {
@@ -222,7 +221,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
         } catch (final IOException e) {
             LOG.warn("Unable to download yang library from {}", url, e);
-            return new LibraryModulesSchemas(Collections.emptyMap());
+            return new LibraryModulesSchemas(ImmutableMap.of());
         }
     }
 
@@ -256,7 +255,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
                     contentType.equals("application/json") ? readJson(in) : readXml(in);
 
             if (!optionalModulesStateNode.isPresent()) {
-                return new LibraryModulesSchemas(Collections.emptyMap());
+                return new LibraryModulesSchemas(ImmutableMap.of());
             }
 
             final NormalizedNode<?, ?> modulesStateNode = optionalModulesStateNode.get();
@@ -285,7 +284,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
             return new LibraryModulesSchemas(schemasMapping.build());
         } catch (final IOException e) {
             LOG.warn("Unable to download yang library from {}", connection.getURL(), e);
-            return new LibraryModulesSchemas(Collections.emptyMap());
+            return new LibraryModulesSchemas(ImmutableMap.of());
         }
     }
 
