@@ -420,7 +420,7 @@ public class NetconfMessageTransformerTest {
         QName enable = QName.create(open, "enable");
         QName kill = QName.create(URN_EXAMPLE_SERVER_FARM_2, REVISION_EXAMPLE_SERVER_FARM_2, "kill");
         Set<QName> qnames = new HashSet<>(Arrays.asList(reset, start, open, enable, kill));
-        Set<ActionDefinition> actions = actionNetconfMessageTransformer.getActions();
+        Set<ActionDefinition> actions = NetconfMessageTransformer.getActions(ACTION_SCHEMA);
         assertTrue(!actions.isEmpty());
         for (ActionDefinition actionDefinition : actions) {
             QName qname = actionDefinition.getQName();

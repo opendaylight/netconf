@@ -98,7 +98,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         this.counter = new MessageCounter();
         this.schemaContext = schemaContext;
         this.mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
-        this.actions = getActions();
+        this.actions = getActions(schemaContext);
         this.mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
             node -> node.getQName().withoutRevision());
         this.baseSchema = baseSchema;
@@ -106,7 +106,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     @VisibleForTesting
-    Set<ActionDefinition> getActions() {
+    static Set<ActionDefinition> getActions(final SchemaContext schemaContext) {
         final Builder<ActionDefinition> builder = ImmutableSet.builder();
         for (DataSchemaNode dataSchemaNode : schemaContext.getChildNodes()) {
             if (dataSchemaNode instanceof ActionNodeContainer) {
@@ -116,7 +116,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         return builder.build();
     }
 
-    private void findAction(final DataSchemaNode dataSchemaNode, final Builder<ActionDefinition> builder) {
+    private static void findAction(final DataSchemaNode dataSchemaNode, final Builder<ActionDefinition> builder) {
         if (dataSchemaNode instanceof ActionNodeContainer) {
             final ActionNodeContainer containerSchemaNode = (ActionNodeContainer) dataSchemaNode;
             for (ActionDefinition actionDefinition : containerSchemaNode.getActions()) {
