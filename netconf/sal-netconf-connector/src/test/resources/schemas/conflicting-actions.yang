@@ -1,0 +1,35 @@
+module conflicting-actions {
+  yang-version 1.1;
+  namespace "urn:example:conflict";
+  prefix "conflict";
+
+  container foo {
+     action xyzzy {
+       input {
+         leaf foo {
+           type string;
+         }
+       }
+     }
+   }
+
+  list bar {
+     key "bar-id";
+     leaf bar-id {
+       type string;
+     }
+     action xyzzy {
+       input {
+         leaf bar {
+           type int8;
+         }
+       }
+     }
+  }
+
+  choice conflict-choice {
+     container choice-cont {
+       action choice-action;
+     }
+  }
+}

@@ -16,7 +16,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -24,10 +23,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
@@ -57,6 +57,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
+import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -87,7 +89,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     private final ImmutableMap<QName, RpcDefinition> mappedRpcs;
     private final Multimap<QName, NotificationDefinition> mappedNotifications;
     private final boolean strictParsing;
-    private final Set<ActionDefinition> actions;
+    private final ImmutableMap<SchemaPath, ActionDefinition> actions;
 
     public NetconfMessageTransformer(final SchemaContext schemaContext, final boolean strictParsing) {
         this(schemaContext, strictParsing, BaseSchema.BASE_NETCONF_CTX);
@@ -98,7 +100,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         this.counter = new MessageCounter();
         this.schemaContext = schemaContext;
         this.mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
-        this.actions = getActions(schemaContext);
+        this.actions = Maps.uniqueIndex(getActions(schemaContext), ActionDefinition::getPath);
         this.mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
             node -> node.getQName().withoutRevision());
         this.baseSchema = baseSchema;
@@ -106,26 +108,25 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     @VisibleForTesting
-    static Set<ActionDefinition> getActions(final SchemaContext schemaContext) {
-        final Builder<ActionDefinition> builder = ImmutableSet.builder();
-        for (DataSchemaNode dataSchemaNode : schemaContext.getChildNodes()) {
-            if (dataSchemaNode instanceof ActionNodeContainer) {
-                findAction(dataSchemaNode, builder);
-            }
-        }
-        return builder.build();
+    static List<ActionDefinition> getActions(final SchemaContext schemaContext) {
+        final List<ActionDefinition> builder = new ArrayList<>();
+        findAction(schemaContext, builder);
+        return builder;
     }
 
-    private static void findAction(final DataSchemaNode dataSchemaNode, final Builder<ActionDefinition> builder) {
+    private static void findAction(final DataSchemaNode dataSchemaNode, final List<ActionDefinition> builder) {
         if (dataSchemaNode instanceof ActionNodeContainer) {
-            final ActionNodeContainer containerSchemaNode = (ActionNodeContainer) dataSchemaNode;
-            for (ActionDefinition actionDefinition : containerSchemaNode.getActions()) {
+            for (ActionDefinition actionDefinition : ((ActionNodeContainer) dataSchemaNode).getActions()) {
                 builder.add(actionDefinition);
             }
         }
         if (dataSchemaNode instanceof DataNodeContainer) {
             for (DataSchemaNode innerDataSchemaNode : ((DataNodeContainer) dataSchemaNode).getChildNodes()) {
                 findAction(innerDataSchemaNode, builder);
+            }
+        } else if (dataSchemaNode instanceof ChoiceSchemaNode) {
+            for (CaseSchemaNode caze : ((ChoiceSchemaNode) dataSchemaNode).getCases().values()) {
+                findAction(caze, builder);
             }
         }
     }
@@ -222,31 +223,24 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     @Override
     public NetconfMessage toActionRequest(final SchemaPath action, final DOMDataTreeIdentifier domDataTreeIdentifier,
             final NormalizedNode<?, ?> payload) {
-        ActionDefinition actionDefinition = null;
-        for (ActionDefinition actionDef : actions) {
-            if (actionDef.getPath().getLastComponent().equals(action.getLastComponent())) {
-                actionDefinition = actionDef;
-            }
-        }
-        Preconditions.checkNotNull(actionDefinition, "Action does not exist: %s", action.getLastComponent());
+        final ActionDefinition actionDef = actions.get(action);
+        Preconditions.checkArgument(actionDef != null, "Action does not exist: %s", action);
 
-        final ContainerSchemaNode inputDef = actionDefinition.getInput();
+        final ContainerSchemaNode inputDef = actionDef.getInput();
         if (inputDef.getChildNodes().isEmpty()) {
             return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForActionRequest(
                     DataSchemaContextTree.from(schemaContext), domDataTreeIdentifier, action, counter,
-                    actionDefinition.getQName().getLocalName()).getNode().getOwnerDocument());
+                    actionDef.getQName().getLocalName()).getNode().getOwnerDocument());
         }
 
-        Preconditions.checkNotNull(payload, "Transforming an action with input: %s, payload cannot be null",
-                action.getLastComponent());
+        Preconditions.checkNotNull(payload, "Transforming an action with input: %s, payload cannot be null", action);
         Preconditions.checkArgument(payload instanceof ContainerNode,
-                "Transforming an rpc with input: %s, payload has to be a container, but was: %s",
-                action.getLastComponent(), payload);
+                "Transforming an action with input: %s, payload has to be a container, but was: %s", action, payload);
 
         // Set the path to the input of action for the node stream writer
         final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForActionRequest(
                 DataSchemaContextTree.from(schemaContext), domDataTreeIdentifier, inputDef.getPath(), counter,
-                actionDefinition.getQName().getLocalName());
+                actionDef.getQName().getLocalName());
 
         try {
             NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result, inputDef.getPath(),
@@ -255,9 +249,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             throw new IllegalStateException("Unable to serialize " + action, e);
         }
 
-        final Document node = result.getNode().getOwnerDocument();
-
-        return new NetconfMessage(node);
+        return new NetconfMessage(result.getNode().getOwnerDocument());
     }
 
     private static boolean isBaseOrNotificationRpc(final QName rpc) {
@@ -299,13 +291,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     @Override
     public DOMActionResult toActionResult(final SchemaPath action, final NetconfMessage message) {
-        ActionDefinition actionDefinition = null;
-        for (ActionDefinition actionDef : actions) {
-            if (actionDef.getPath().getLastComponent().equals(action.getLastComponent())) {
-                actionDefinition = actionDef;
-            }
-        }
-        Preconditions.checkNotNull(actionDefinition, "Action does not exist: %s", action);
+        final ActionDefinition actionDefinition = actions.get(action);
+        Preconditions.checkArgument(actionDefinition != null, "Action does not exist: %s", action);
         final ContainerNode normalizedNode = (ContainerNode) parseResult(message, actionDefinition);
 
         if (normalizedNode == null) {
