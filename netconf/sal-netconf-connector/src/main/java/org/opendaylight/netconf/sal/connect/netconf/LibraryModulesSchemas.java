@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.stream.XMLStreamException;
@@ -238,21 +239,29 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     }
 
     private static LibraryModulesSchemas createFromURLConnection(final URLConnection connection) {
-
-        String contentType = connection.getContentType();
-
-        // TODO try to guess Json also from intput stream
+        // TODO try to guess Json also from input stream
+        final String contentType;
         if (guessJsonFromFileName(connection.getURL().getFile())) {
             contentType = "application/json";
+        } else {
+            contentType = connection.getContentType();
         }
 
-        requireNonNull(contentType, "Content type unknown");
-        checkState(contentType.equals("application/json") || contentType.equals("application/xml"),
-                "Only XML and JSON types are supported.");
-        try (InputStream in = connection.getInputStream()) {
-            final Optional<NormalizedNode<?, ?>> optionalModulesStateNode =
-                    contentType.equals("application/json") ? readJson(in) : readXml(in);
+        // Determine read function
+        final Function<InputStream, Optional<NormalizedNode<?, ?>>> readFunction;
+        switch (requireNonNull(contentType, "Content type unknown")) {
+            case "application/json":
+                readFunction = LibraryModulesSchemas::readJson;
+                break;
+            case "application/xml":
+                readFunction = LibraryModulesSchemas::readXml;
+                break;
+            default:
+                throw new IllegalStateException("Only XML and JSON types are supported.");
+        }
 
+        try (InputStream in = connection.getInputStream()) {
+            final Optional<NormalizedNode<?, ?>> optionalModulesStateNode = readFunction.apply(in);
             if (!optionalModulesStateNode.isPresent()) {
                 return new LibraryModulesSchemas(ImmutableMap.of());
             }
@@ -265,7 +274,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
             final YangInstanceIdentifier.NodeIdentifier moduleListNodeId =
                     new YangInstanceIdentifier.NodeIdentifier(Module.QNAME);
-            final Optional<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> moduleListNode =
+            final Optional<DataContainerChild<?, ?>> moduleListNode =
                     ((ContainerNode) modulesStateNode).getChild(moduleListNodeId);
             checkState(moduleListNode.isPresent(), "Unable to find list: %s in %s", moduleListNodeId, modulesStateNode);
             final DataContainerChild<?, ?> node = moduleListNode.get();
