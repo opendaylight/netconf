@@ -32,6 +32,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabi
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class NetconfDeviceSalFacadeTest {
@@ -95,7 +96,8 @@ public class NetconfDeviceSalFacadeTest {
                 NetconfSessionPreferences.fromStrings(getCapabilities());
 
         final DOMRpcService deviceRpc = mock(DOMRpcService.class);
-        deviceFacade.onDeviceConnected(schemaContext, netconfSessionPreferences, deviceRpc, null);
+        deviceFacade.onDeviceConnected(new EmptyMountPointContext(schemaContext), netconfSessionPreferences, deviceRpc,
+            null);
 
         verify(mountInstance, times(1)).onTopologyDeviceConnected(eq(schemaContext),
                 any(DOMDataBroker.class), eq(deviceRpc), any(NetconfDeviceNotificationService.class),
