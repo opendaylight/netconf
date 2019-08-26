@@ -33,9 +33,9 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,13 +125,13 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
     }
 
     @Override
-    public void onDeviceConnected(final SchemaContext remoteSchemaContext,
+    public void onDeviceConnected(final MountPointContext remoteSchemaContext,
                           final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc) {
         onDeviceConnected(remoteSchemaContext, netconfSessionPreferences, deviceRpc, null);
     }
 
     @Override
-    public void onDeviceConnected(final SchemaContext remoteSchemaContext,
+    public void onDeviceConnected(final MountPointContext remoteSchemaContext,
             final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService deviceRpc,
             final DOMActionService deviceAction) {
         this.currentDeviceRpc = deviceRpc;

@@ -39,6 +39,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.util.NetconfUtil;
+import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -89,7 +90,8 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
                 .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME)))
                 .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
-        final MessageTransformer<NetconfMessage> transformer = new NetconfMessageTransformer(SCHEMA_CONTEXT, true);
+        final MessageTransformer<NetconfMessage> transformer = new NetconfMessageTransformer(
+            new EmptyMountPointContext(SCHEMA_CONTEXT), true);
         final DOMRpcService rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, listener, transformer);
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
