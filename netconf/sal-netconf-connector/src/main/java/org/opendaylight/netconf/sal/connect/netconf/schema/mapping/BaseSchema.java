@@ -10,7 +10,9 @@ package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import java.util.Arrays;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
+import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -35,22 +37,26 @@ public enum BaseSchema implements SchemaContextProvider {
             .$YangModuleInfoImpl.getInstance()
     );
 
-    private final ImmutableMap<QName, RpcDefinition> mappedRpcs;
-    private final SchemaContext schemaContext;
+    private final @NonNull ImmutableMap<QName, RpcDefinition> mappedRpcs;
+    private final @NonNull EmptyMountPointContext mountContext;
 
     BaseSchema(final YangModuleInfo... modules) {
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
         moduleInfoBackedContext.addModuleInfos(Arrays.asList(modules));
-        schemaContext = moduleInfoBackedContext.tryToCreateSchemaContext().get();
-        mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), RpcDefinition::getQName);
+        mountContext = new EmptyMountPointContext(moduleInfoBackedContext.tryToCreateSchemaContext().get());
+        mappedRpcs = Maps.uniqueIndex(getSchemaContext().getOperations(), RpcDefinition::getQName);
     }
 
-    ImmutableMap<QName, RpcDefinition> getMappedRpcs() {
+    @NonNull ImmutableMap<QName, RpcDefinition> getMappedRpcs() {
         return mappedRpcs;
     }
 
+    public @NonNull EmptyMountPointContext getMountPointContext() {
+        return mountContext;
+    }
+
     @Override
-    public SchemaContext getSchemaContext() {
-        return schemaContext;
+    public @NonNull SchemaContext getSchemaContext() {
+        return mountContext.getSchemaContext();
     }
 }
