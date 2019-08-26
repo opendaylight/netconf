@@ -76,11 +76,10 @@ import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.xml.sax.SAXException;
 
 @SuppressWarnings("checkstyle:IllegalCatch")
-public class NetconfDeviceTest {
+public class NetconfDeviceTest extends AbstractTestModelTest {
 
     private static final NetconfMessage NOTIFICATION;
 
@@ -118,13 +117,13 @@ public class NetconfDeviceTest {
     private static final NetconfDeviceSchemasResolver STATE_SCHEMAS_RESOLVER =
         (deviceRpc, remoteSessionCapabilities, id, schemaContext) -> NetconfStateSchemas.EMPTY;
 
+
     @Test
     public void testNetconfDeviceFlawedModelFailedResolution() throws Exception {
         final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
 
         final SchemaContextFactory schemaFactory = getSchemaFactory();
-        final SchemaContext schema = getSchema();
         final SchemaRepository schemaRepository = getSchemaRepository();
 
         final SchemaResolutionException schemaResolutionException =
@@ -133,13 +132,13 @@ public class NetconfDeviceTest {
             if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
                 return Futures.immediateFailedFuture(schemaResolutionException);
             } else {
-                return Futures.immediateFuture(schema);
+                return Futures.immediateFuture(SCHEMA_CONTEXT);
             }
         }).when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
 
         final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id,
                 schemaContext) -> {
-            final Module first = Iterables.getFirst(schema.getModules(), null);
+            final Module first = Iterables.getFirst(SCHEMA_CONTEXT.getModules(), null);
             final QName qName = QName.create(first.getQNameModule(), first.getName());
             final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
             final NetconfStateSchemas.RemoteYangSchema source2 =
@@ -207,7 +206,6 @@ public class NetconfDeviceTest {
     public void testNetconfDeviceMissingSource() throws Exception {
         final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
         final NetconfDeviceCommunicator listener = getListener();
-        final SchemaContext schema = getSchema();
 
         final SchemaContextFactory schemaFactory = getSchemaFactory();
         final SchemaRepository schemaRepository = getSchemaRepository();
@@ -221,13 +219,13 @@ public class NetconfDeviceTest {
             if (((Collection<?>) invocation.getArguments()[0]).size() == 2) {
                 return Futures.immediateFailedFuture(schemaResolutionException);
             } else {
-                return Futures.immediateFuture(schema);
+                return Futures.immediateFuture(SCHEMA_CONTEXT);
             }
         }).when(schemaFactory).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
 
         final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id,
             schemaContext) -> {
-            final Module first = Iterables.getFirst(schema.getModules(), null);
+            final Module first = Iterables.getFirst(SCHEMA_CONTEXT.getModules(), null);
             final QName qName = QName.create(first.getQNameModule(), first.getName());
             final NetconfStateSchemas.RemoteYangSchema source1 = new NetconfStateSchemas.RemoteYangSchema(qName);
             final NetconfStateSchemas.RemoteYangSchema source2 =
@@ -368,7 +366,7 @@ public class NetconfDeviceTest {
         device.onRemoteSessionDown();
         verify(facade, timeout(5000)).onDeviceDisconnected();
         //complete schema setup
-        schemaFuture.set(getSchema());
+        schemaFuture.set(SCHEMA_CONTEXT);
         //facade.onDeviceDisconnected() was called, so facade.onDeviceConnected() shouldn't be called anymore
         verify(facade, after(1000).never()).onDeviceConnected(any(), any(), any(), any(DOMActionService.class));
     }
@@ -414,13 +412,9 @@ public class NetconfDeviceTest {
 
     private static SchemaContextFactory getSchemaFactory() throws Exception {
         final SchemaContextFactory schemaFactory = mockClass(SchemaContextFactory.class);
-        doReturn(Futures.immediateFuture(getSchema()))
+        doReturn(Futures.immediateFuture(SCHEMA_CONTEXT))
                 .when(schemaFactory).createSchemaContext(any(Collection.class));
         return schemaFactory;
-    }
-
-    public static SchemaContext getSchema() {
-        return YangParserTestUtils.parseYangResource("/schemas/test-module.yang");
     }
 
     private static RemoteDeviceHandler<NetconfSessionPreferences> getFacade() throws Exception {
