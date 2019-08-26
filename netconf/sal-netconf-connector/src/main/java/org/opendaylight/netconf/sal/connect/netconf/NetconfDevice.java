@@ -19,6 +19,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -37,7 +37,6 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
-import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
 import org.opendaylight.netconf.sal.connect.api.RemoteDevice;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
@@ -46,8 +45,6 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabi
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
-import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider;
-import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -62,7 +59,6 @@ import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
-import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
@@ -81,7 +77,9 @@ import org.slf4j.LoggerFactory;
 public class NetconfDevice
         implements RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfDevice.class);
+    @SuppressFBWarnings(value = "SLF4J_LOGGER_SHOULD_BE_PRIVATE",
+            justification = "Needed for common logging of related classes")
+    static final Logger LOG = LoggerFactory.getLogger(NetconfDevice.class);
 
     protected final RemoteDeviceId id;
     protected final SchemaContextFactory schemaContextFactory;
@@ -148,9 +146,8 @@ public class NetconfDevice
         final BaseSchema baseSchema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported());
         final NetconfDeviceRpc initRpc = new NetconfDeviceRpc(baseSchema.getSchemaContext(), listener,
             new NetconfMessageTransformer(baseSchema.getMountPointContext(), false, baseSchema));
-        final DeviceSourcesResolver task = new DeviceSourcesResolver(remoteSessionCapabilities, id,
-            stateSchemasResolver, initRpc, baseSchema.getSchemaContext());
-        final ListenableFuture<DeviceSources> sourceResolverFuture = processingExecutor.submit(task);
+        final ListenableFuture<DeviceSources> sourceResolverFuture = processingExecutor.submit(
+            new DeviceSourcesResolver(id, baseSchema, initRpc, remoteSessionCapabilities, stateSchemasResolver));
 
         if (shouldListenOnSchemaChange(remoteSessionCapabilities)) {
             registerToBaseNetconfStream(initRpc, listener);
@@ -328,117 +325,6 @@ public class NetconfDevice
 
         public NetconfDeviceSchemasResolver getStateSchemasResolver() {
             return stateSchemasResolver;
-        }
-    }
-
-    /**
-     * Schema building callable.
-     */
-    private static class DeviceSourcesResolver implements Callable<DeviceSources> {
-
-        private final NetconfDeviceRpc deviceRpc;
-        private final NetconfSessionPreferences remoteSessionCapabilities;
-        private final RemoteDeviceId id;
-        private final NetconfDeviceSchemasResolver stateSchemasResolver;
-        private final SchemaContext schemaContext;
-
-        DeviceSourcesResolver(final NetconfDeviceRpc deviceRpc,
-                              final NetconfSessionPreferences remoteSessionCapabilities,
-                              final RemoteDeviceId id, final NetconfDeviceSchemasResolver stateSchemasResolver,
-                              final SchemaContext schemaContext) {
-            this.deviceRpc = deviceRpc;
-            this.remoteSessionCapabilities = remoteSessionCapabilities;
-            this.id = id;
-            this.stateSchemasResolver = stateSchemasResolver;
-            this.schemaContext = schemaContext;
-        }
-
-        DeviceSourcesResolver(final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id,
-                                     final NetconfDeviceSchemasResolver stateSchemasResolver,
-                                     final NetconfDeviceRpc rpcForMonitoring, final SchemaContext schemaCtx) {
-            this(rpcForMonitoring, remoteSessionCapabilities, id, stateSchemasResolver, schemaCtx);
-        }
-
-        @Override
-        public DeviceSources call() {
-            final NetconfDeviceSchemas availableSchemas =
-                    stateSchemasResolver.resolve(deviceRpc, remoteSessionCapabilities, id, schemaContext);
-            LOG.debug("{}: Schemas exposed by ietf-netconf-monitoring: {}", id,
-                    availableSchemas.getAvailableYangSchemasQNames());
-
-            final Set<QName> requiredSources = Sets.newHashSet(remoteSessionCapabilities.getModuleBasedCaps());
-            final Set<QName> providedSources = availableSchemas.getAvailableYangSchemasQNames();
-
-            final Set<QName> requiredSourcesNotProvided = Sets.difference(requiredSources, providedSources);
-            if (!requiredSourcesNotProvided.isEmpty()) {
-                LOG.warn("{}: Netconf device does not provide all yang models reported in hello message capabilities,"
-                        + " required but not provided: {}", id, requiredSourcesNotProvided);
-                LOG.warn("{}: Attempting to build schema context from required sources", id);
-            }
-
-            // Here all the sources reported in netconf monitoring are merged with those reported in hello.
-            // It is necessary to perform this since submodules are not mentioned in hello but still required.
-            // This clashes with the option of a user to specify supported yang models manually in configuration
-            // for netconf-connector and as a result one is not able to fully override yang models of a device.
-            // It is only possible to add additional models.
-            final Set<QName> providedSourcesNotRequired = Sets.difference(providedSources, requiredSources);
-            if (!providedSourcesNotRequired.isEmpty()) {
-                LOG.warn("{}: Netconf device provides additional yang models not reported in "
-                        + "hello message capabilities: {}", id, providedSourcesNotRequired);
-                LOG.warn("{}: Adding provided but not required sources as required to prevent failures", id);
-                LOG.debug("{}: Netconf device reported in hello: {}", id, requiredSources);
-                requiredSources.addAll(providedSourcesNotRequired);
-            }
-
-            final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
-            if (availableSchemas instanceof LibraryModulesSchemas) {
-                sourceProvider = new YangLibrarySchemaYangSourceProvider(id,
-                        ((LibraryModulesSchemas) availableSchemas).getAvailableModels());
-            } else {
-                sourceProvider = new NetconfRemoteSchemaYangSourceProvider(id, deviceRpc);
-            }
-
-            return new DeviceSources(requiredSources, providedSources, sourceProvider);
-        }
-    }
-
-    /**
-     * Contains RequiredSources - sources from capabilities.
-     */
-    private static final class DeviceSources {
-        private final Set<QName> requiredSources;
-        private final Set<QName> providedSources;
-        private final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
-
-        DeviceSources(final Set<QName> requiredSources, final Set<QName> providedSources,
-                             final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
-            this.requiredSources = requiredSources;
-            this.providedSources = providedSources;
-            this.sourceProvider = sourceProvider;
-        }
-
-        public Set<QName> getRequiredSourcesQName() {
-            return requiredSources;
-        }
-
-        public Set<QName> getProvidedSourcesQName() {
-            return providedSources;
-        }
-
-        public Collection<SourceIdentifier> getRequiredSources() {
-            return Collections2.transform(requiredSources, DeviceSources::toSourceId);
-        }
-
-        public Collection<SourceIdentifier> getProvidedSources() {
-            return Collections2.transform(providedSources, DeviceSources::toSourceId);
-        }
-
-        public SchemaSourceProvider<YangTextSchemaSource> getSourceProvider() {
-            return sourceProvider;
-        }
-
-        private static SourceIdentifier toSourceId(final QName input) {
-            return RevisionSourceIdentifier.create(input.getLocalName(), input.getRevision());
         }
     }
 
