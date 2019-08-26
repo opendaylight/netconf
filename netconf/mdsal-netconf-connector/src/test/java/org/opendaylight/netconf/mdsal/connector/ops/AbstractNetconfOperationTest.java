@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYangResources;
 
 import com.google.common.io.ByteSource;
 import com.google.common.util.concurrent.Futures;
@@ -26,7 +27,9 @@ import javax.xml.transform.stream.StreamResult;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.mockito.MockitoAnnotations;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -58,8 +61,21 @@ public abstract class AbstractNetconfOperationTest {
     private static final String DATA_ELEMENT = "data";
     protected static final Document RPC_REPLY_OK = getReplyOk();
 
+    private static SchemaContext SCHEMA_CONTEXT;
+
     private CurrentSchemaContext currentSchemaContext;
     private TransactionProvider transactionProvider;
+
+    @BeforeClass
+    public static void beforeClass() {
+        SCHEMA_CONTEXT = parseYangResources(AbstractNetconfOperationTest.class,
+            "/yang/mdsal-netconf-mapping-test.yang");
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        SCHEMA_CONTEXT = null;
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -68,8 +84,7 @@ public abstract class AbstractNetconfOperationTest {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
 
-        final SchemaContext schemaContext = getSchemaContext();
-        final DOMSchemaService schemaService = new SchemaServiceStub(schemaContext);
+        final DOMSchemaService schemaService = new SchemaServiceStub(SCHEMA_CONTEXT);
         final DOMStore operStore = InMemoryDOMDataStoreFactory.create("DOM-OPER", schemaService);
         final DOMStore configStore = InMemoryDOMDataStoreFactory.create("DOM-CFG", schemaService);
 
@@ -90,8 +105,6 @@ public abstract class AbstractNetconfOperationTest {
             MoreExecutors.listeningDecorator(listenableFutureExecutor));
         this.transactionProvider = new TransactionProvider(sdb, SESSION_ID_FOR_REPORTING);
     }
-
-    protected abstract SchemaContext getSchemaContext();
 
     protected CurrentSchemaContext getCurrentSchemaContext() {
         return currentSchemaContext;
