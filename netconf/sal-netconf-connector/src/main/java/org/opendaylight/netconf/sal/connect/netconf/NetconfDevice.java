@@ -65,7 +65,6 @@ import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
@@ -88,8 +87,7 @@ public class NetconfDevice
     protected final SchemaSourceRegistry schemaRegistry;
     protected final SchemaRepository schemaRepository;
 
-    protected final List<SchemaSourceRegistration<? extends SchemaSourceRepresentation>> sourceRegistrations =
-            new ArrayList<>();
+    protected final List<SchemaSourceRegistration<?>> sourceRegistrations = new ArrayList<>();
 
     private final RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
     private final ListeningExecutorService processingExecutor;
@@ -301,10 +299,8 @@ public class NetconfDevice
         notificationHandler.onRemoteSchemaDown();
 
         salFacade.onDeviceDisconnected();
-        for (final SchemaSourceRegistration<? extends SchemaSourceRepresentation> sourceRegistration
-                : sourceRegistrations) {
-            sourceRegistration.close();
-        }
+        sourceRegistrations.forEach(SchemaSourceRegistration::close);
+        sourceRegistrations.clear();
         resetMessageTransformer();
     }
 
