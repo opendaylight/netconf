@@ -34,6 +34,7 @@ import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
+import org.opendaylight.netconf.sal.connect.netconf.AbstractTestModelTest;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
@@ -45,21 +46,18 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.SAXException;
 
-public class NetconfBaseOpsTest {
+public class NetconfBaseOpsTest extends AbstractTestModelTest {
+    private static final QName CONTAINER_Q_NAME = QName.create("test:namespace", "2013-07-22", "c");
 
     static {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreComments(true);
     }
-
-    private static final QName CONTAINER_Q_NAME = QName.create("test:namespace", "2013-07-22", "c");
 
     @Mock
     private RemoteDeviceCommunicator<NetconfMessage> listener;
@@ -91,14 +89,12 @@ public class NetconfBaseOpsTest {
                 .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME)))
                 .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
-        final SchemaContext schemaContext =
-                YangParserTestUtils.parseYangResource("/schemas/test-module.yang");
-        final MessageTransformer<NetconfMessage> transformer = new NetconfMessageTransformer(schemaContext, true);
-        final DOMRpcService rpc = new NetconfDeviceRpc(schemaContext, listener, transformer);
+        final MessageTransformer<NetconfMessage> transformer = new NetconfMessageTransformer(SCHEMA_CONTEXT, true);
+        final DOMRpcService rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, listener, transformer);
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
         callback = new NetconfRpcFutureCallback("prefix", id);
-        baseOps = new NetconfBaseOps(rpc, schemaContext);
+        baseOps = new NetconfBaseOps(rpc, SCHEMA_CONTEXT);
     }
 
     @Test
