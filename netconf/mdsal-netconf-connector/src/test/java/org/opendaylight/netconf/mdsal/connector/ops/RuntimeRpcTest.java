@@ -27,7 +27,9 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
@@ -115,7 +117,7 @@ public class RuntimeRpcTest {
         public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
             final Collection<DataContainerChild<? extends PathArgument, ?>> children =
                     (Collection<DataContainerChild<? extends PathArgument, ?>>) input.getValue();
-            final Module module = schemaContext.findModules(type.getLastComponent().getNamespace()).stream()
+            final Module module = SCHEMA_CONTEXT.findModules(type.getLastComponent().getNamespace()).stream()
                 .findFirst().orElse(null);
             final RpcDefinition rpcDefinition = getRpcDefinitionFromModule(
                 module, module.getNamespace(), type.getLastComponent().getLocalName());
@@ -133,7 +135,7 @@ public class RuntimeRpcTest {
         }
     };
 
-    private SchemaContext schemaContext = null;
+    private static SchemaContext SCHEMA_CONTEXT = null;
     private CurrentSchemaContext currentSchemaContext = null;
 
     @Mock
@@ -145,15 +147,25 @@ public class RuntimeRpcTest {
     @Mock
     private SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
+    @BeforeClass
+    public static void beforeClass() {
+        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResource("/yang/mdsal-netconf-rpc-test.yang");
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        SCHEMA_CONTEXT = null;
+    }
+
     @Before
     public void setUp() throws Exception {
         initMocks(this);
         doNothing().when(registration).close();
         doReturn(listener).when(registration).getInstance();
-        doReturn(schemaContext).when(schemaService).getGlobalContext();
-        doReturn(schemaContext).when(schemaService).getSessionContext();
+        doReturn(null).when(schemaService).getGlobalContext();
+        doReturn(null).when(schemaService).getSessionContext();
         doAnswer(invocationOnMock -> {
-            ((SchemaContextListener) invocationOnMock.getArguments()[0]).onGlobalContextUpdated(schemaContext);
+            ((SchemaContextListener) invocationOnMock.getArguments()[0]).onGlobalContextUpdated(SCHEMA_CONTEXT);
             return registration;
         }).when(schemaService).registerSchemaContextListener(any(SchemaContextListener.class));
 
@@ -167,7 +179,6 @@ public class RuntimeRpcTest {
             return immediateFluentFuture(yangTextSchemaSource);
         }).when(sourceProvider).getSource(any(SourceIdentifier.class));
 
-        this.schemaContext = YangParserTestUtils.parseYangResource("/yang/mdsal-netconf-rpc-test.yang");
         this.currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
     }
 
