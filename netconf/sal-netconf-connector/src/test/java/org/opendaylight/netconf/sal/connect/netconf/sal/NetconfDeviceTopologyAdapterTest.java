@@ -19,7 +19,9 @@ import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.awaitility.Awaitility;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -48,6 +50,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class NetconfDeviceTopologyAdapterTest {
+    private static SchemaContext SCHEMA_CONTEXT;
 
     private final RemoteDeviceId id = new RemoteDeviceId("test", new InetSocketAddress("localhost", 22));
 
@@ -60,7 +63,6 @@ public class NetconfDeviceTopologyAdapterTest {
 
     private final String txIdent = "test transaction";
 
-    private SchemaContext schemaContext = null;
     private final String sessionIdForReporting = "netconf-test-session1";
 
     private TransactionChain transactionChain;
@@ -68,6 +70,19 @@ public class NetconfDeviceTopologyAdapterTest {
     private DataBroker dataBroker;
 
     private DOMDataBroker domDataBroker;
+
+    @BeforeClass
+    public static void beforeClass() {
+        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResources(NetconfDeviceTopologyAdapterTest.class,
+            "/schemas/network-topology@2013-10-21.yang", "/schemas/ietf-inet-types@2013-07-15.yang",
+            "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang",
+            "/schemas/network-topology-augment-test@2016-08-08.yang");
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        SCHEMA_CONTEXT = null;
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -80,16 +95,10 @@ public class NetconfDeviceTopologyAdapterTest {
 
         doReturn(txIdent).when(writeTx).getIdentifier();
 
-        this.schemaContext = YangParserTestUtils.parseYangResources(NetconfDeviceTopologyAdapterTest.class,
-            "/schemas/network-topology@2013-10-21.yang", "/schemas/ietf-inet-types@2013-07-15.yang",
-            "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang",
-            "/schemas/network-topology-augment-test@2016-08-08.yang");
-        schemaContext.getModules();
-
         ConcurrentDataBrokerTestCustomizer customizer = new ConcurrentDataBrokerTestCustomizer(true);
         domDataBroker = customizer.getDOMDataBroker();
         dataBroker = customizer.createDataBroker();
-        customizer.updateSchema(schemaContext);
+        customizer.updateSchema(SCHEMA_CONTEXT);
 
         transactionChain = dataBroker.createTransactionChain(new TransactionChainListener() {
             @Override
