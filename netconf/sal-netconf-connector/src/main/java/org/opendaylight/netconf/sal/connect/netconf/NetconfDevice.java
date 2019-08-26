@@ -32,7 +32,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.lock.qual.GuardedBy;
-import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -201,28 +200,19 @@ public class NetconfDevice
                 NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_PATH,
                 NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_CONTENT);
 
-        final NotificationHandler.NotificationFilter filter = new NotificationHandler.NotificationFilter() {
-            @Override
-            public Optional<DOMNotification> filterNotification(final DOMNotification notification) {
-                if (isCapabilityChanged(notification)) {
-                    LOG.info("{}: Schemas change detected, reconnecting", id);
-                    // Only disconnect is enough,
-                    // the reconnecting nature of the connector will take care of reconnecting
-                    listener.disconnect();
-                    return Optional.empty();
-                }
-                return Optional.of(notification);
-            }
-
-            private boolean isCapabilityChanged(final DOMNotification notification) {
-                return notification.getBody().getNodeType().equals(NetconfCapabilityChange.QNAME);
-            }
-        };
-
         Futures.addCallback(rpcResultListenableFuture, new FutureCallback<DOMRpcResult>() {
             @Override
             public void onSuccess(final DOMRpcResult domRpcResult) {
-                notificationHandler.addNotificationFilter(filter);
+                notificationHandler.addNotificationFilter(notification -> {
+                    if (NetconfCapabilityChange.QNAME.equals(notification.getBody().getNodeType())) {
+                        LOG.info("{}: Schemas change detected, reconnecting", id);
+                        // Only disconnect is enough,
+                        // the reconnecting nature of the connector will take care of reconnecting
+                        listener.disconnect();
+                        return Optional.empty();
+                    }
+                    return Optional.of(notification);
+                });
             }
 
             @Override
