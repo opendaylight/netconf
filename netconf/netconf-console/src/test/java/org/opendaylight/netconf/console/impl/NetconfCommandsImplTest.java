@@ -23,7 +23,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.awaitility.Awaitility;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
@@ -63,20 +65,28 @@ public class NetconfCommandsImplTest {
             NetconfNodeConnectionStatus.ConnectionStatus.Connected;
     private static final String CAP_PREFIX = "prefix";
 
+    private static SchemaContext SCHEMA_CONTEXT;
+
     private DataBroker dataBroker;
-    private SchemaContext schemaContext;
     private NetconfCommandsImpl netconfCommands;
+
+    @BeforeClass
+    public static void beforeClass() {
+        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResources(NetconfCommandsImplTest.class,
+            "/schemas/network-topology@2013-10-21.yang", "/schemas/ietf-inet-types@2013-07-15.yang",
+            "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang");
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        SCHEMA_CONTEXT = null;
+    }
 
     @Before
     public void setUp() throws Exception {
-        schemaContext = YangParserTestUtils.parseYangResources(NetconfCommandsImplTest.class,
-            "/schemas/network-topology@2013-10-21.yang", "/schemas/ietf-inet-types@2013-07-15.yang",
-            "/schemas/yang-ext.yang", "/schemas/netconf-node-topology.yang");
-        schemaContext.getModules();
-
         ConcurrentDataBrokerTestCustomizer customizer = new ConcurrentDataBrokerTestCustomizer(true);
         dataBroker = customizer.createDataBroker();
-        customizer.updateSchema(schemaContext);
+        customizer.updateSchema(SCHEMA_CONTEXT);
 
         netconfCommands = new NetconfCommandsImpl(dataBroker);
     }
