@@ -30,6 +30,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificatio
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
+import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -68,20 +69,20 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     }
 
     @Override
-    public void onDeviceConnected(final SchemaContext remoteSchemaContext,
+    public void onDeviceConnected(final MountPointContext mountContext,
                                   final NetconfSessionPreferences sessionPreferences,
                                   final DOMRpcService domRpcService, final DOMActionService domActionService) {
         this.deviceAction = domActionService;
         LOG.debug("{}: YANG 1.1 actions are supported in clustered netconf topology, "
             + "DOMActionService exposed for the device", id);
-        onDeviceConnected(remoteSchemaContext, sessionPreferences, domRpcService);
+        onDeviceConnected(mountContext, sessionPreferences, domRpcService);
     }
 
     @Override
-    public void onDeviceConnected(final SchemaContext remoteSchemaContext,
+    public void onDeviceConnected(final MountPointContext mountContext,
                                   final NetconfSessionPreferences sessionPreferences,
                                   final DOMRpcService domRpcService) {
-        this.currentSchemaContext = remoteSchemaContext;
+        this.currentSchemaContext = mountContext.getSchemaContext();
         this.netconfSessionPreferences = sessionPreferences;
         this.deviceRpc = domRpcService;
 
