@@ -20,7 +20,9 @@ import java.nio.file.Paths;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -56,25 +58,36 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     private static final String JSON_NOTIF_UPDATE = "/listener-adapter-test/notif-update.json";
     private static final String JSON_NOTIF_DEL = "/listener-adapter-test/notif-del.json";
 
-    private static YangInstanceIdentifier PATCH_CONT_YIID =
+    private static final YangInstanceIdentifier PATCH_CONT_YIID =
             YangInstanceIdentifier.create(new YangInstanceIdentifier.NodeIdentifier(PatchCont.QNAME));
+
+    private static SchemaContext SCHEMA_CONTEXT;
 
     private DataBroker dataBroker;
     private DOMDataBroker domDataBroker;
     private TransactionChainHandler transactionChainHandler;
     private SchemaContextHandler schemaContextHandler;
 
+    @BeforeClass
+    public static void beforeClass() {
+        SCHEMA_CONTEXT = YangParserTestUtils.parseYangResource(
+                "/instanceidentifier/yang/instance-identifier-patch-module.yang");
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        SCHEMA_CONTEXT = null;
+    }
+
     @Before
     public void setUp() throws Exception {
         dataBroker = getDataBroker();
         domDataBroker = getDomBroker();
-        SchemaContext sc = YangParserTestUtils.parseYangResource(
-                "/instanceidentifier/yang/instance-identifier-patch-module.yang");
 
         transactionChainHandler = new TransactionChainHandler(domDataBroker);
         schemaContextHandler = SchemaContextHandler.newInstance(transactionChainHandler,
                 Mockito.mock(DOMSchemaService.class));
-        schemaContextHandler.onGlobalContextUpdated(sc);
+        schemaContextHandler.onGlobalContextUpdated(SCHEMA_CONTEXT);
     }
 
     class ListenerAdapterTester extends ListenerAdapter {
