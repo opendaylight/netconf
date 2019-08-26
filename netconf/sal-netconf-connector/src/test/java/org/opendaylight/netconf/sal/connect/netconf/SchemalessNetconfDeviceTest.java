@@ -30,7 +30,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 
 public class SchemalessNetconfDeviceTest {
 
@@ -56,7 +56,7 @@ public class SchemalessNetconfDeviceTest {
 
         device.onRemoteSessionUp(sessionCaps, listener);
         verify(facade).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
+                any(MountPointContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class));
 
         device.onNotification(netconfMessage);
         verify(facade).onNotification(isNull());
@@ -73,7 +73,7 @@ public class SchemalessNetconfDeviceTest {
         final RemoteDeviceHandler<NetconfSessionPreferences> remoteDeviceHandler =
                 mockCloseableClass(RemoteDeviceHandler.class);
         doNothing().when(remoteDeviceHandler).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
+                any(MountPointContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class));
         doNothing().when(remoteDeviceHandler).onDeviceDisconnected();
         doNothing().when(remoteDeviceHandler).onNotification(any(DOMNotification.class));
         return remoteDeviceHandler;
