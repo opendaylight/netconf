@@ -16,8 +16,10 @@ import com.google.common.util.concurrent.Futures;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -47,6 +49,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Node;
 
 public class NetconfDeviceRpcTest {
+    private static SchemaContext SCHEMA_CONTEXT;
 
     @Mock
     private DOMRpcAvailabilityListener listener;
@@ -56,13 +59,23 @@ public class NetconfDeviceRpcTest {
     private NetconfDeviceRpc rpc;
     private SchemaPath path;
     private DOMRpcResult expectedReply;
-    private SchemaContext schema;
+
+    @BeforeClass
+    public static void beforeClass() {
+        final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
+        moduleInfoBackedContext.addModuleInfos(Collections.singleton($YangModuleInfoImpl.getInstance()));
+        SCHEMA_CONTEXT = moduleInfoBackedContext.tryToCreateSchemaContext().get();
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        SCHEMA_CONTEXT = null;
+    }
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        schema = getSchema();
-        NetconfMessageTransformer transformer = new NetconfMessageTransformer(schema, true);
+        NetconfMessageTransformer transformer = new NetconfMessageTransformer(SCHEMA_CONTEXT, true);
         final NetconfMessage reply = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                         + "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"101\">\n"
@@ -72,7 +85,7 @@ public class NetconfDeviceRpcTest {
         RpcResult<NetconfMessage> result = RpcResultBuilder.success(reply).build();
         doReturn(Futures.immediateFuture(result))
                 .when(communicator).sendRequest(any(NetconfMessage.class), any(QName.class));
-        rpc = new NetconfDeviceRpc(schema, communicator, transformer);
+        rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, communicator, transformer);
 
         path = SchemaPath
                 .create(true, QName.create("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "get-config"));
@@ -103,7 +116,7 @@ public class NetconfDeviceRpcTest {
 
         verify(listener).onRpcAvailable(argument.capture());
         final Collection<DOMRpcIdentifier> argValue = argument.getValue();
-        final Set<RpcDefinition> operations = schema.getOperations();
+        final Set<RpcDefinition> operations = SCHEMA_CONTEXT.getOperations();
         Assert.assertEquals(argValue.size(), operations.size());
         for (RpcDefinition operation : operations) {
             final DOMRpcIdentifier domRpcIdentifier = DOMRpcIdentifier.create(operation.getPath());
@@ -115,11 +128,5 @@ public class NetconfDeviceRpcTest {
     private static ContainerNode createNode(final String namespace, final String date, final String localName) {
         return Builders.containerBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(QName.create(namespace, date, localName))).build();
-    }
-
-    private static SchemaContext getSchema() {
-        final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        moduleInfoBackedContext.addModuleInfos(Collections.singleton($YangModuleInfoImpl.getInstance()));
-        return moduleInfoBackedContext.tryToCreateSchemaContext().get();
     }
 }
