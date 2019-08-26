@@ -58,6 +58,8 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev19
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
+import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
+import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
@@ -114,7 +116,7 @@ public class NetconfDevice
         final BaseSchema baseSchema = resolveBaseSchema(notificationSupport);
 
         return new NetconfDeviceRpc(baseSchema.getSchemaContext(), listener,
-                new NetconfMessageTransformer(baseSchema.getSchemaContext(), false, baseSchema));
+                new NetconfMessageTransformer(baseSchema.getMountPointContext(), false, baseSchema));
     }
 
     private static BaseSchema resolveBaseSchema(final boolean notificationSupport) {
@@ -237,7 +239,7 @@ public class NetconfDevice
         return remoteSessionCapabilities.isNotificationsSupported() && reconnectOnSchemasChange;
     }
 
-    private synchronized void handleSalInitializationSuccess(final SchemaContext result,
+    private synchronized void handleSalInitializationSuccess(final MountPointContext result,
                                         final NetconfSessionPreferences remoteSessionCapabilities,
                                         final DOMRpcService deviceRpc,
                                         final RemoteDeviceCommunicator<NetconfMessage> listener) {
@@ -252,7 +254,7 @@ public class NetconfDevice
             // salFacade.onDeviceConnected has to be called before the notification handler is initialized
             this.salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc,
                     this.deviceActionFactory == null ? null : this.deviceActionFactory.createDeviceAction(
-                            this.messageTransformer, listener, result));
+                            this.messageTransformer, listener, result.getSchemaContext()));
             this.notificationHandler.onRemoteSchemaUp(this.messageTransformer);
 
             LOG.info("{}: Netconf connector initialized successfully", id);
@@ -530,8 +532,9 @@ public class NetconfDevice
                                             remoteSessionCapabilities.getNonModuleBasedCapsOrigin().get(entry)).build())
                             .collect(Collectors.toList()));
 
-                    handleSalInitializationSuccess(result, remoteSessionCapabilities, getDeviceSpecificRpc(result),
-                            listener);
+                    final MountPointContext mountContext = new EmptyMountPointContext(result);
+                    handleSalInitializationSuccess(mountContext, remoteSessionCapabilities,
+                        getDeviceSpecificRpc(mountContext), listener);
                     return;
                 } catch (final ExecutionException e) {
                     // schemaBuilderFuture.checkedGet() throws only SchemaResolutionException
@@ -619,8 +622,9 @@ public class NetconfDevice
             return resolutionException.getResolvedSources();
         }
 
-        protected NetconfDeviceRpc getDeviceSpecificRpc(final SchemaContext result) {
-            return new NetconfDeviceRpc(result, listener, new NetconfMessageTransformer(result, true));
+        protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result) {
+            return new NetconfDeviceRpc(result.getSchemaContext(), listener,
+                new NetconfMessageTransformer(result, true));
         }
 
         private Collection<SourceIdentifier> stripUnavailableSource(final Collection<SourceIdentifier> requiredSources,
