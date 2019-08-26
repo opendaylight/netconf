@@ -206,6 +206,8 @@ public final class NetconfMessageTransformUtil {
     public static final ContainerNode CREATE_SUBSCRIPTION_RPC_CONTENT = Builders.containerBuilder()
             .withNodeIdentifier(NodeIdentifier.create(CREATE_SUBSCRIPTION_RPC_QNAME)).build();
 
+    public static final SchemaPath CREATE_SUBSCRIPTION_RPC_PATH = toPath(CREATE_SUBSCRIPTION_RPC_QNAME);
+
     public static final NodeIdentifier NETCONF_FILTER_NODEID = NodeIdentifier.create(NETCONF_FILTER_QNAME);
 
     public static final DataContainerChild<?, ?> EMPTY_FILTER;

@@ -200,7 +200,7 @@ public class NetconfDevice
         // Perhaps add a default schema context to support create-subscription if the model was not provided
         // (same as what we do for base netconf operations in transformer)
         final ListenableFuture<DOMRpcResult> rpcResultListenableFuture = deviceRpc.invokeRpc(
-                NetconfMessageTransformUtil.toPath(NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME),
+                NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_PATH,
                 NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_CONTENT);
 
         final NotificationHandler.NotificationFilter filter = new NotificationHandler.NotificationFilter() {
