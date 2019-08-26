@@ -37,10 +37,10 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommun
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class KeepaliveSalFacadeResponseWaitingTest {
 
@@ -119,7 +119,7 @@ public class KeepaliveSalFacadeResponseWaitingTest {
         private DOMRpcService localDeviceRpc;
 
         @Override
-        public void onDeviceConnected(final SchemaContext remoteSchemaContext,
+        public void onDeviceConnected(final MountPointContext remoteSchemaContext,
                 final NetconfSessionPreferences netconfSessionPreferences, final DOMRpcService currentDeviceRpc,
                 final DOMActionService deviceAction) {
             localDeviceRpc = currentDeviceRpc;

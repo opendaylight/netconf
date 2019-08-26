@@ -58,6 +58,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
+import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -161,8 +162,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 getSessionCaps(true, Lists.newArrayList(TEST_CAPABILITY, TEST_CAPABILITY2));
         device.onRemoteSessionUp(sessionCaps, listener);
 
-        Mockito.verify(facade, Mockito.timeout(5000)).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class), isNull());
+        Mockito.verify(facade, Mockito.timeout(5000)).onDeviceConnected(any(MountPointContext.class),
+            any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class), isNull());
         Mockito.verify(schemaFactory, times(2)).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
     }
 
@@ -248,8 +249,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 getSessionCaps(true, Lists.newArrayList(TEST_CAPABILITY, TEST_CAPABILITY2));
         device.onRemoteSessionUp(sessionCaps, listener);
 
-        Mockito.verify(facade, Mockito.timeout(5000)).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class), isNull());
+        Mockito.verify(facade, Mockito.timeout(5000)).onDeviceConnected(any(MountPointContext.class),
+            any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class), isNull());
         Mockito.verify(schemaFactory, times(1)).createSchemaContext(anyCollectionOf(SourceIdentifier.class));
     }
 
@@ -327,7 +328,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         verify(schemaContextProviderFactory, timeout(5000)).createSchemaContext(any(Collection.class));
         verify(facade, timeout(5000)).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
+                any(MountPointContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
                 isNull());
 
         device.onRemoteSessionDown();
@@ -337,7 +338,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         verify(schemaContextProviderFactory, timeout(5000).times(2)).createSchemaContext(any(Collection.class));
         verify(facade, timeout(5000).times(2)).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
+                any(MountPointContext.class), any(NetconfSessionPreferences.class), any(DOMRpcService.class),
                 isNull());
     }
 
@@ -400,8 +401,8 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
         final ArgumentCaptor<NetconfSessionPreferences> argument =
                 ArgumentCaptor.forClass(NetconfSessionPreferences.class);
-        verify(facade, timeout(5000))
-                .onDeviceConnected(any(SchemaContext.class), argument.capture(), any(DOMRpcService.class), isNull());
+        verify(facade, timeout(5000)).onDeviceConnected(any(MountPointContext.class), argument.capture(),
+            any(DOMRpcService.class), isNull());
         final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().getNetconfDeviceCapabilities();
 
         netconfDeviceCaps.getResolvedCapabilities()
@@ -421,7 +422,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final RemoteDeviceHandler<NetconfSessionPreferences> remoteDeviceHandler =
                 mockCloseableClass(RemoteDeviceHandler.class);
         doNothing().when(remoteDeviceHandler).onDeviceConnected(
-                any(SchemaContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class),
+                any(MountPointContext.class), any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class),
                 any(DOMActionService.class));
         doNothing().when(remoteDeviceHandler).onDeviceDisconnected();
         doNothing().when(remoteDeviceHandler).onNotification(any(DOMNotification.class));

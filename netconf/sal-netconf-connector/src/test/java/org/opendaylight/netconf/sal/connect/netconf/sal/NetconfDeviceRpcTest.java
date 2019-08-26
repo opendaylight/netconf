@@ -34,6 +34,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl;
+import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
@@ -75,7 +76,8 @@ public class NetconfDeviceRpcTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        NetconfMessageTransformer transformer = new NetconfMessageTransformer(SCHEMA_CONTEXT, true);
+        NetconfMessageTransformer transformer = new NetconfMessageTransformer(
+            new EmptyMountPointContext(SCHEMA_CONTEXT), true);
         final NetconfMessage reply = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                         + "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"101\">\n"

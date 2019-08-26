@@ -23,8 +23,8 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 public class SchemalessNetconfDevice implements
         RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> {
 
-    private RemoteDeviceId id;
-    private RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
+    private final RemoteDeviceId id;
+    private final RemoteDeviceHandler<NetconfSessionPreferences> salFacade;
     private final SchemalessMessageTransformer messageTransformer;
     private final BaseRpcSchemalessTransformer rpcTransformer;
 
@@ -52,7 +52,7 @@ public class SchemalessNetconfDevice implements
         final SchemalessNetconfDeviceRpc schemalessNetconfDeviceRpc = new SchemalessNetconfDeviceRpc(id,
                 netconfDeviceCommunicator, rpcTransformer, messageTransformer);
 
-        salFacade.onDeviceConnected(BaseSchema.BASE_NETCONF_CTX.getSchemaContext(),
+        salFacade.onDeviceConnected(BaseSchema.BASE_NETCONF_CTX.getMountPointContext(),
                 remoteSessionCapabilities, schemalessNetconfDeviceRpc);
 
     }

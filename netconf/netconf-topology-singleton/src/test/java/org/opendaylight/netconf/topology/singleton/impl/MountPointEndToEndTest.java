@@ -124,6 +124,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
@@ -359,7 +360,7 @@ public class MountPointEndToEndTest {
 
         final MasterSalFacade masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
 
-        masterSalFacade.onDeviceConnected(deviceSchemaContext,
+        masterSalFacade.onDeviceConnected(new EmptyMountPointContext(deviceSchemaContext),
                 NetconfSessionPreferences.fromStrings(Collections.emptyList()), deviceRpcService.getRpcService());
 
         DOMMountPoint masterMountPoint = awaitMountPoint(masterMountPointService);
@@ -434,7 +435,7 @@ public class MountPointEndToEndTest {
 
         MasterSalFacade masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
 
-        masterSalFacade.onDeviceConnected(deviceSchemaContext,
+        masterSalFacade.onDeviceConnected(new EmptyMountPointContext(deviceSchemaContext),
                 NetconfSessionPreferences.fromStrings(Collections.emptyList()), deviceRpcService.getRpcService());
 
         verify(masterMountPointListener, timeout(5000)).onMountPointCreated(yangNodeInstanceId);
