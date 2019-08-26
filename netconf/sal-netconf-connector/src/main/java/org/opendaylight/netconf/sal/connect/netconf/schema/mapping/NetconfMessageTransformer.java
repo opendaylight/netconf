@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
+import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.CREATE_SUBSCRIPTION_RPC_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.IETF_NETCONF_NOTIFICATIONS;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_URI;
@@ -44,6 +45,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
+import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.YangConstants;
@@ -81,7 +83,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         IETF_NETCONF_NOTIFICATIONS.getNamespace(),
         CREATE_SUBSCRIPTION_RPC_QNAME.getNamespace());
 
-    private final SchemaContext schemaContext;
+    private final MountPointContext mountContext;
+    private final DataSchemaContextTree contextTree;
     private final BaseSchema baseSchema;
     private final MessageCounter counter;
     private final ImmutableMap<QName, RpcDefinition> mappedRpcs;
@@ -89,14 +92,18 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     private final boolean strictParsing;
     private final ImmutableMap<SchemaPath, ActionDefinition> actions;
 
-    public NetconfMessageTransformer(final SchemaContext schemaContext, final boolean strictParsing) {
-        this(schemaContext, strictParsing, BaseSchema.BASE_NETCONF_CTX);
+    public NetconfMessageTransformer(final MountPointContext mountContext, final boolean strictParsing) {
+        this(mountContext, strictParsing, BaseSchema.BASE_NETCONF_CTX);
     }
 
-    public NetconfMessageTransformer(final SchemaContext schemaContext, final boolean strictParsing,
+    public NetconfMessageTransformer(final MountPointContext mountContext, final boolean strictParsing,
                                      final BaseSchema baseSchema) {
         this.counter = new MessageCounter();
-        this.schemaContext = schemaContext;
+        this.mountContext = requireNonNull(mountContext);
+
+        final SchemaContext schemaContext = mountContext.getSchemaContext();
+        this.contextTree = DataSchemaContextTree.from(schemaContext);
+
         this.mappedRpcs = Maps.uniqueIndex(schemaContext.getOperations(), SchemaNode::getQName);
         this.actions = Maps.uniqueIndex(getActions(schemaContext), ActionDefinition::getPath);
         this.mappedNotifications = Multimaps.index(schemaContext.getNotifications(),
@@ -152,7 +159,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         try {
             final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
             final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-            final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext,
+            final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
                     notificationAsContainerSchemaNode, strictParsing);
             xmlParser.traverse(new DOMSource(element));
             content = (ContainerNode) resultHolder.getResult();
@@ -204,7 +211,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             // If the schema context for netconf device does not contain model for base netconf operations,
             // use default pre build context with just the base model
             // This way operations like lock/unlock are supported even if the source for base model was not provided
-            final SchemaContext ctx = needToUseBaseCtx ? baseSchema.getSchemaContext() : schemaContext;
+            final SchemaContext ctx = needToUseBaseCtx ? baseSchema.getSchemaContext()
+                    : mountContext.getSchemaContext();
             NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result, rpcInput, ctx);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize " + rpcInput, e);
@@ -223,9 +231,9 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         final ContainerSchemaNode inputDef = actionDef.getInput();
         if (inputDef.getChildNodes().isEmpty()) {
-            return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForActionRequest(
-                    DataSchemaContextTree.from(schemaContext), domDataTreeIdentifier, action, counter,
-                    actionDef.getQName().getLocalName()).getNode().getOwnerDocument());
+            return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForActionRequest(contextTree,
+                domDataTreeIdentifier, action, counter,
+                actionDef.getQName().getLocalName()).getNode().getOwnerDocument());
         }
 
         Preconditions.checkNotNull(payload, "Transforming an action with input: %s, payload cannot be null", action);
@@ -233,13 +241,12 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 "Transforming an action with input: %s, payload has to be a container, but was: %s", action, payload);
 
         // Set the path to the input of action for the node stream writer
-        final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForActionRequest(
-                DataSchemaContextTree.from(schemaContext), domDataTreeIdentifier, inputDef.getPath(), counter,
-                actionDef.getQName().getLocalName());
+        final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForActionRequest(contextTree,
+            domDataTreeIdentifier, inputDef.getPath(), counter, actionDef.getQName().getLocalName());
 
         try {
             NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result, inputDef.getPath(),
-                schemaContext);
+                mountContext.getSchemaContext());
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize " + action, e);
         }
@@ -309,7 +316,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             try {
                 final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
                 final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-                final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext,
+                final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
                         operationDefinition.getOutput(), strictParsing);
                 xmlParser.traverse(new DOMSource(element));
                 return resultHolder.getResult();

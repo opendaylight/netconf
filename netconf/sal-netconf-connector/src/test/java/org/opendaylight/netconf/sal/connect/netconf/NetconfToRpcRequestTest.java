@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
+import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -59,7 +60,7 @@ public class NetconfToRpcRequestTest {
 
         cfgCtx = YangParserTestUtils.parseYangResources(NetconfToRpcRequestTest.class,
             "/schemas/config-test-rpc.yang", "/schemas/rpc-notification-subscription.yang");
-        messageTransformer = new NetconfMessageTransformer(cfgCtx, true);
+        messageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(cfgCtx), true);
     }
 
     private static LeafNode<Object> buildLeaf(final QName running, final Object value) {
