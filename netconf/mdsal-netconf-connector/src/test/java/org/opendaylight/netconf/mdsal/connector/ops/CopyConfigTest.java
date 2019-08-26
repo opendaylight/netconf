@@ -5,12 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.opendaylight.yangtools.yang.test.util.YangParserTestUtils.parseYangResources;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,20 +23,12 @@ import org.opendaylight.netconf.api.DocumentedException.ErrorTag;
 import org.opendaylight.netconf.api.DocumentedException.ErrorType;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public class CopyConfigTest extends AbstractNetconfOperationTest {
     @Rule
     public TemporaryFolder tmpDir = new TemporaryFolder();
-
-    @Override
-    protected SchemaContext getSchemaContext() {
-        return parseYangResources(CopyConfigTest.class,
-            "/yang/mdsal-netconf-mapping-test.yang");
-    }
-
 
     @Test
     public void testTargetMissing() throws Exception {

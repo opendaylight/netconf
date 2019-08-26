@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import static org.junit.Assert.assertEquals;
@@ -34,8 +33,6 @@ import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -69,12 +66,6 @@ public class NetconfMDSalMappingTest extends AbstractNetconfOperationTest {
 
     private static final YangInstanceIdentifier AUGMENTED_CONTAINER_IN_MODULES =
             YangInstanceIdentifier.builder().node(TOP).node(MODULES).build();
-
-    @Override
-    protected SchemaContext getSchemaContext() {
-        return YangParserTestUtils.parseYangResources(NetconfMDSalMappingTest.class,
-            "/yang/mdsal-netconf-mapping-test.yang");
-    }
 
     @Test
     public void testEmptyDatastore() throws Exception {
