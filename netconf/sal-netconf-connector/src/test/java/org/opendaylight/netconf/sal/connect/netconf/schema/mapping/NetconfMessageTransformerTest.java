@@ -66,6 +66,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
+import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -174,7 +175,8 @@ public class NetconfMessageTransformerTest {
         XMLUnit.setIgnoreComments(true);
 
         netconfMessageTransformer = getTransformer(SCHEMA);
-        actionNetconfMessageTransformer = new NetconfMessageTransformer(ACTION_SCHEMA, true);
+        actionNetconfMessageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(ACTION_SCHEMA),
+            true);
     }
 
     @Test
@@ -189,8 +191,8 @@ public class NetconfMessageTransformerTest {
 
     @Test
     public void testCreateSubscriberNotificationSchemaNotPresent() throws Exception {
-        final NetconfMessageTransformer transformer = new NetconfMessageTransformer(SCHEMA, true,
-                BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS);
+        final NetconfMessageTransformer transformer = new NetconfMessageTransformer(new EmptyMountPointContext(SCHEMA),
+            true, BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS);
         NetconfMessage netconfMessage = transformer.toRpcRequest(
                 toPath(CREATE_SUBSCRIPTION_RPC_QNAME),
                 CREATE_SUBSCRIPTION_RPC_CONTENT
@@ -440,7 +442,7 @@ public class NetconfMessageTransformerTest {
     }
 
     private static NetconfMessageTransformer getTransformer(final SchemaContext schema) {
-        return new NetconfMessageTransformer(schema, true);
+        return new NetconfMessageTransformer(new EmptyMountPointContext(schema), true);
     }
 
     @Test
