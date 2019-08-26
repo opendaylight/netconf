@@ -33,6 +33,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
@@ -70,10 +71,10 @@ public final class NetconfDeviceSalFacade implements AutoCloseable, RemoteDevice
     }
 
     @Override
-    public synchronized void onDeviceConnected(final SchemaContext schemaContext,
+    public synchronized void onDeviceConnected(final MountPointContext mountContext,
                                                final NetconfSessionPreferences netconfSessionPreferences,
                                                final DOMRpcService deviceRpc, final DOMActionService deviceAction) {
-
+        final SchemaContext schemaContext = mountContext.getSchemaContext();
         final NetconfDeviceDataBroker netconfDeviceDataBroker =
                 new NetconfDeviceDataBroker(id, schemaContext, deviceRpc, netconfSessionPreferences);
         registerLockListener(netconfDeviceDataBroker);
