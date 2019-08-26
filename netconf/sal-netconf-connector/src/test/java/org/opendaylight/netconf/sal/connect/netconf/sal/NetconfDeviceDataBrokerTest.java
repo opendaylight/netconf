@@ -17,8 +17,10 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import com.google.common.collect.Lists;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -44,21 +46,31 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 public class NetconfDeviceDataBrokerTest {
+    private static SchemaContext SCHEMA_CONTEXT;
 
     @Mock
     private DOMRpcService rpcService;
-    private SchemaContext schemaContext;
     private NetconfDeviceDataBroker dataBroker;
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+    @BeforeClass
+    public static void beforeClass() {
         final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
         moduleInfoBackedContext.addModuleInfos(
                 Lists.newArrayList($YangModuleInfoImpl.getInstance(),
                         org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns
                                 .netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance()));
-        schemaContext = moduleInfoBackedContext.tryToCreateSchemaContext().get();
+        SCHEMA_CONTEXT = moduleInfoBackedContext.tryToCreateSchemaContext().get();
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        SCHEMA_CONTEXT = null;
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+
         DOMRpcResult result = new DefaultDOMRpcResult();
         when(rpcService.invokeRpc(any(SchemaPath.class), any(NormalizedNode.class)))
                 .thenReturn(FluentFutures.immediateFluentFuture(result));
@@ -107,7 +119,7 @@ public class NetconfDeviceDataBrokerTest {
         NetconfSessionPreferences prefs = NetconfSessionPreferences.fromStrings(Arrays.asList(caps));
         final RemoteDeviceId id =
                 new RemoteDeviceId("device-1", InetSocketAddress.createUnresolved("localhost", 17830));
-        return new NetconfDeviceDataBroker(id, schemaContext, rpcService, prefs);
+        return new NetconfDeviceDataBroker(id, SCHEMA_CONTEXT, rpcService, prefs);
     }
 
 }
