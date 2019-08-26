@@ -106,22 +106,6 @@ public class NetconfDevice
     // Message transformer is constructed once the schemas are available
     private MessageTransformer<NetconfMessage> messageTransformer;
 
-    /**
-     * Create rpc implementation capable of handling RPC for monitoring and notifications
-     * even before the schemas of remote device are downloaded.
-     */
-    static NetconfDeviceRpc getRpcForInitialization(final NetconfDeviceCommunicator listener,
-                                                    final boolean notificationSupport) {
-        final BaseSchema baseSchema = resolveBaseSchema(notificationSupport);
-
-        return new NetconfDeviceRpc(baseSchema.getSchemaContext(), listener,
-                new NetconfMessageTransformer(baseSchema.getMountPointContext(), false, baseSchema));
-    }
-
-    private static BaseSchema resolveBaseSchema(final boolean notificationSupport) {
-        return notificationSupport ? BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS : BaseSchema.BASE_NETCONF_CTX;
-    }
-
     public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id,
                          final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
                          final ListeningExecutorService globalProcessingExecutor,
@@ -161,11 +145,11 @@ public class NetconfDevice
         setConnected(true);
         LOG.debug("{}: Session to remote device established with {}", id, remoteSessionCapabilities);
 
-        final NetconfDeviceRpc initRpc =
-                getRpcForInitialization(listener, remoteSessionCapabilities.isNotificationsSupported());
-        final DeviceSourcesResolver task =
-                new DeviceSourcesResolver(remoteSessionCapabilities, id, stateSchemasResolver, initRpc,
-                        resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()).getSchemaContext());
+        final BaseSchema baseSchema = resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported());
+        final NetconfDeviceRpc initRpc = new NetconfDeviceRpc(baseSchema.getSchemaContext(), listener,
+            new NetconfMessageTransformer(baseSchema.getMountPointContext(), false, baseSchema));
+        final DeviceSourcesResolver task = new DeviceSourcesResolver(remoteSessionCapabilities, id,
+            stateSchemasResolver, initRpc, baseSchema.getSchemaContext());
         final ListenableFuture<DeviceSources> sourceResolverFuture = processingExecutor.submit(task);
 
         if (shouldListenOnSchemaChange(remoteSessionCapabilities)) {
@@ -305,6 +289,10 @@ public class NetconfDevice
     @Override
     public void onNotification(final NetconfMessage notification) {
         notificationHandler.handleNotification(notification);
+    }
+
+    private static BaseSchema resolveBaseSchema(final boolean notificationSupport) {
+        return notificationSupport ? BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS : BaseSchema.BASE_NETCONF_CTX;
     }
 
     /**
