@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "ac17b868_5e50c327",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-08-28T09:05:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c475c887_351fe71b",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 72
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e121719_8452d79a",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/MasterSalFacade.java",
         "patchSetId": 6
@@ -117,6 +141,30 @@
     },
     {
       "key": {
+        "uuid": "fd626bde_61bc3461",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-08-28T09:05:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df1e21d7_f5c5956f",
+      "range": {
+        "startLine": 52,
+        "startChar": 12,
+        "endLine": 52,
+        "endChar": 17
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1ac51cfb_5ce982cb",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
         "patchSetId": 6
@@ -163,6 +211,30 @@
     },
     {
       "key": {
+        "uuid": "271c7fc6_3efcf050",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-08-28T09:05:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53b920b9_a7206c75",
+      "range": {
+        "startLine": 153,
+        "startChar": 50,
+        "endLine": 154,
+        "endChar": 16
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "98fd481f_8b28d360",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
         "patchSetId": 6
@@ -186,6 +258,30 @@
     },
     {
       "key": {
+        "uuid": "fdd5346c_b10b1fc1",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-08-28T09:05:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98fd481f_8b28d360",
+      "range": {
+        "startLine": 177,
+        "startChar": 93,
+        "endLine": 177,
+        "endChar": 98
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f5f85490_7bb7dbf6",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
         "patchSetId": 6
@@ -197,6 +293,30 @@
       "writtenOn": "2019-08-20T16:00:30Z",
       "side": 1,
       "message": "retain whitespace",
+      "range": {
+        "startLine": 210,
+        "startChar": 4,
+        "endLine": 210,
+        "endChar": 8
+      },
+      "revId": "07853d7ec2fd36450c759a3867dd0b5e25657c1b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fe6a5d54_0e280d3a",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyManager.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 8431
+      },
+      "writtenOn": "2019-08-28T09:05:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f5f85490_7bb7dbf6",
       "range": {
         "startLine": 210,
         "startChar": 4,
