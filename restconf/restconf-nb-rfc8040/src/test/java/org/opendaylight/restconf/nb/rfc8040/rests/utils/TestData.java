@@ -9,6 +9,8 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
@@ -57,22 +59,21 @@ class TestData {
     final QName listQname = QName.create(base, "list");
 
     TestData() {
-        final YangInstanceIdentifier.NodeIdentifierWithPredicates nodeWithKey =
-                new YangInstanceIdentifier.NodeIdentifierWithPredicates(listQname, listKeyQName, "keyValue");
-        final YangInstanceIdentifier.NodeIdentifierWithPredicates nodeWithKey2 =
-                new YangInstanceIdentifier.NodeIdentifierWithPredicates(listQname, listKeyQName, "keyValue2");
+        final NodeIdentifierWithPredicates nodeWithKey =
+                NodeIdentifierWithPredicates.of(listQname, listKeyQName, "keyValue");
+        final NodeIdentifierWithPredicates nodeWithKey2 =
+                NodeIdentifierWithPredicates.of(listQname, listKeyQName, "keyValue2");
         final LeafNode<Object> content = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(base, "leaf-content")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(base, "leaf-content")))
                 .withValue("content")
                 .build();
         final LeafNode<Object> content2 = Builders.leafBuilder()
-                .withNodeIdentifier(
-                        new YangInstanceIdentifier.NodeIdentifier(QName.create(base, "leaf-content-different")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(base, "leaf-content-different")))
                 .withValue("content-different")
                 .build();
-        final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> dataContainer =
+        final DataContainerChild<?, ?> dataContainer =
                 Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(listQname, "identifier")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(listQname, "identifier")))
                 .withValue("id")
                 .build();
         data = Builders.mapEntryBuilder()
@@ -89,11 +90,11 @@ class TestData {
                 .withChild(content)
                 .build();
         listData = Builders.mapBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(listQname, "list")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(listQname, "list")))
                 .withChild(data)
                 .build();
         listData2 = Builders.mapBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(listQname, "list")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(listQname, "list")))
                 .withChild(data)
                 .withChild(data2)
                 .build();
@@ -112,15 +113,15 @@ class TestData {
                 .node(listQname)
                 .build();
         contentLeaf = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(base, "content")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(base, "content")))
                 .withValue("test")
                 .build();
         contentLeaf2 = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(base, "content2")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(base, "content2")))
                 .withValue("test2")
                 .build();
         data3 = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(base, "container")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(base, "container")))
                 .withChild(contentLeaf)
                 .build();
         data4 = Builders.containerBuilder()
@@ -130,30 +131,30 @@ class TestData {
 
         leafSetNodePath = YangInstanceIdentifier.builder().node(QName.create(base, "cont"))
                 .node(leafListQname).build();
-        leafSetNode1 = Builders.<String>leafSetBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(
+        leafSetNode1 = Builders.<String>leafSetBuilder().withNodeIdentifier(new NodeIdentifier(
                 leafListQname)).withChildValue("one").withChildValue("two").build();
 
-        leafSetNode2 = Builders.<String>leafSetBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(
+        leafSetNode2 = Builders.<String>leafSetBuilder().withNodeIdentifier(new NodeIdentifier(
                 leafListQname)).withChildValue("three").build();
 
         orderedLeafSetNode1 = Builders.<String>orderedLeafSetBuilder().withNodeIdentifier(
-                new YangInstanceIdentifier.NodeIdentifier(leafListQname)).withChildValue("one")
+                new NodeIdentifier(leafListQname)).withChildValue("one")
                 .withChildValue("two").build();
         orderedLeafSetNode2 = Builders.<String>orderedLeafSetBuilder().withNodeIdentifier(
-                new YangInstanceIdentifier.NodeIdentifier(leafListQname)).withChildValue("three")
+                new NodeIdentifier(leafListQname)).withChildValue("three")
                 .withChildValue("four").build();
 
         orderedMapNode1 = Builders.orderedMapBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(listQname)).withChild(data).build();
+                .withNodeIdentifier(new NodeIdentifier(listQname)).withChild(data).build();
 
         orderedMapNode2 = Builders.orderedMapBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(listQname)).withChild(data)
+                .withNodeIdentifier(new NodeIdentifier(listQname)).withChild(data)
                 .withChild(data2).build();
 
         unkeyedListEntryNode1 = Builders.unkeyedListEntryBuilder().withNodeIdentifier(
-                new YangInstanceIdentifier.NodeIdentifier(listQname)).withChild(content).build();
+                new NodeIdentifier(listQname)).withChild(content).build();
         unkeyedListNode1 = Builders.unkeyedListBuilder().withNodeIdentifier(
-                new YangInstanceIdentifier.NodeIdentifier(listQname)).withChild(unkeyedListEntryNode1).build();
+                new NodeIdentifier(listQname)).withChild(unkeyedListEntryNode1).build();
 
         unkeyedListEntryNode2 = Builders.unkeyedListEntryBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(listQname)).withChild(content2).build();
@@ -165,19 +166,19 @@ class TestData {
         rpc = SchemaPath.create(true, rpcQname);
         errorRpc = SchemaPath.create(true, errorRpcQname);
         final LeafNode contentLeafNode = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(rpcQname, "content")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(rpcQname, "content")))
                 .withValue("test")
                 .build();
         input = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(rpcQname, "input")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(rpcQname, "input")))
                 .withChild(contentLeafNode)
                 .build();
         final LeafNode resultLeafNode = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(rpcQname, "content")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(rpcQname, "content")))
                 .withValue("operation result")
                 .build();
         output = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(rpcQname, "output")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(rpcQname, "output")))
                 .withChild(resultLeafNode)
                 .build();
     }

@@ -43,6 +43,8 @@ import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -89,8 +91,8 @@ public class PatchDataTransactionUtilTest {
         final QName containerLibraryQName = QName.create(baseQName, "library");
         final QName listArtistQName = QName.create(baseQName, "artist");
         final QName leafNameQName = QName.create(baseQName, "name");
-        final YangInstanceIdentifier.NodeIdentifierWithPredicates nodeWithKey =
-            new YangInstanceIdentifier.NodeIdentifierWithPredicates(listArtistQName, leafNameQName, "name of artist");
+        final NodeIdentifierWithPredicates nodeWithKey = NodeIdentifierWithPredicates.of(listArtistQName, leafNameQName,
+            "name of artist");
 
         /* instance identifier for accessing container node "player" */
         this.instanceIdContainer = YangInstanceIdentifier.builder()
@@ -103,17 +105,17 @@ public class PatchDataTransactionUtilTest {
 
         /* values that are used for creating leaf for testPatchDataCreateAndDelete test */
         final LeafNode<?> buildGapLeaf = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(leafGapQName))
+                .withNodeIdentifier(new NodeIdentifier(leafGapQName))
                 .withValue(0.2)
                 .build();
 
         final ContainerNode buildPlayerContainer = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(containerPlayerQName))
+                .withNodeIdentifier(new NodeIdentifier(containerPlayerQName))
                 .withChild(buildGapLeaf)
                 .build();
 
         this.buildBaseContainerForTests = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(baseQName))
+                .withNodeIdentifier(new NodeIdentifier(baseQName))
                 .withChild(buildPlayerContainer)
                 .build();
 
@@ -133,12 +135,12 @@ public class PatchDataTransactionUtilTest {
 
         /* values that are used for creating leaf for testPatchDataReplaceMergeAndRemove test */
         final LeafNode<Object> contentName = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(baseQName, "name")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "name")))
                 .withValue("name of artist")
                 .build();
 
         final LeafNode<Object> contentDescription = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(baseQName, "description")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "description")))
                 .withValue("description of artist")
                 .build();
 

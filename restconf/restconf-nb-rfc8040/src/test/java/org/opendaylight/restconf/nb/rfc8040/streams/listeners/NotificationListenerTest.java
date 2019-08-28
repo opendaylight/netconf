@@ -17,8 +17,6 @@ import com.google.common.collect.Lists;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -173,9 +171,8 @@ public class NotificationListenerTest {
 
     private static MapEntryNode mockMapEntry(final QName entryQName, final LeafNode<String> leaf) {
         final MapEntryNode entry = mock(MapEntryNode.class);
-        final Map<QName, Object> keyValues = new HashMap<>();
-        keyValues.put(leaf.getNodeType(), "value");
-        final NodeIdentifierWithPredicates nodeId = new NodeIdentifierWithPredicates(leaf.getNodeType(), keyValues);
+        final NodeIdentifierWithPredicates nodeId = NodeIdentifierWithPredicates.of(leaf.getNodeType(),
+            leaf.getNodeType(), "value");
         when(entry.getIdentifier()).thenReturn(nodeId);
         when(entry.getChild(any())).thenReturn(Optional.of(leaf));
 

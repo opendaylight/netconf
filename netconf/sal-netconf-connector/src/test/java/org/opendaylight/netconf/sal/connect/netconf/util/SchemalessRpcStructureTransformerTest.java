@@ -31,6 +31,8 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.w3c.dom.Document;
@@ -141,18 +143,16 @@ public class SchemalessRpcStructureTransformerTest {
         Assert.assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
     }
 
-    private static YangInstanceIdentifier.NodeIdentifier createNodeId(final String name) {
-        return new YangInstanceIdentifier.NodeIdentifier(QName.create(NAMESPACE, name));
+    private static NodeIdentifier createNodeId(final String name) {
+        return new NodeIdentifier(QName.create(NAMESPACE, name));
     }
 
-    private static YangInstanceIdentifier.NodeIdentifierWithPredicates createListNodeId(
+    private static NodeIdentifierWithPredicates createListNodeId(
             final String nodeName, final String keyName, final String id) {
-        return new YangInstanceIdentifier
-                .NodeIdentifierWithPredicates(QName.create(NAMESPACE, nodeName), QName.create(NAMESPACE, keyName), id);
+        return NodeIdentifierWithPredicates.of(QName.create(NAMESPACE, nodeName), QName.create(NAMESPACE, keyName), id);
     }
 
-    private static YangInstanceIdentifier.NodeIdentifierWithPredicates createListNodeId(
-            final String nodeName, final Map<QName, Object> keys) {
-        return new YangInstanceIdentifier.NodeIdentifierWithPredicates(QName.create(NAMESPACE, nodeName), keys);
+    private static NodeIdentifierWithPredicates createListNodeId(final String nodeName, final Map<QName, Object> keys) {
+        return NodeIdentifierWithPredicates.of(QName.create(NAMESPACE, nodeName), keys);
     }
 }

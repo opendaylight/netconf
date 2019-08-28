@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.restconf.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -21,6 +20,7 @@ import org.opendaylight.restconf.common.util.IdentityValuesDTO;
 import org.opendaylight.yangtools.concepts.Codec;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -54,7 +54,7 @@ public class InstanceIdentifierCodecImplTest {
                 .build();
 
         this.instanceIdentifierOKList = YangInstanceIdentifier.builder()
-                .node(new YangInstanceIdentifier.NodeIdentifierWithPredicates(
+                .node(NodeIdentifierWithPredicates.of(
                         QName.create(baseQName, "list-one-key"),
                         QName.create(QName.create(baseQName, "list-one-key"), "name"), "value"))
                 .build();

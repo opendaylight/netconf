@@ -25,7 +25,6 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
@@ -99,8 +98,8 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
         keyLeafNodeIdentifier = NodeIdentifier.create(mapEntryNodeKey);
         keyLeafNodeValue = "key-value";
 
-        mapEntryNodeIdentifier = new YangInstanceIdentifier.NodeIdentifierWithPredicates(
-                QName.create("namespace", "list-entry"), Collections.singletonMap(mapEntryNodeKey, keyLeafNodeValue));
+        mapEntryNodeIdentifier = NodeIdentifierWithPredicates.of(
+                QName.create("namespace", "list-entry"), mapEntryNodeKey, keyLeafNodeValue);
         when(mapEntryNodeData.getIdentifier()).thenReturn(mapEntryNodeIdentifier);
         when(mapEntryNodeData.getChild(keyLeafNodeIdentifier)).thenReturn(Optional.of(keyLeafNodeData));
 

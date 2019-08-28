@@ -309,8 +309,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
     }
 
     private static NodeIdentifierWithPredicates toIdentifier(final String localName, final Map<QName, Object> keys) {
-        return new NodeIdentifierWithPredicates(QName.create("urn:nested:module", "2014-06-03", localName),
-                keys);
+        return NodeIdentifierWithPredicates.of(QName.create("urn:nested:module", "2014-06-03", localName), keys);
     }
 
     private static NodeWithValue<?> toIdentifier(final String localName, final Object value) {

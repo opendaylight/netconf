@@ -33,6 +33,8 @@ import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -85,10 +87,10 @@ public class PutDataTransactionUtilTest {
         final QName listQname = QName.create(baseQName, "playlist");
         final QName listKeyQname = QName.create(baseQName, "name");
 
-        final YangInstanceIdentifier.NodeIdentifierWithPredicates nodeWithKey =
-                new YangInstanceIdentifier.NodeIdentifierWithPredicates(listQname, listKeyQname, "name of band");
-        final YangInstanceIdentifier.NodeIdentifierWithPredicates nodeWithKey2 =
-                new YangInstanceIdentifier.NodeIdentifierWithPredicates(listQname, listKeyQname, "name of band 2");
+        final NodeIdentifierWithPredicates nodeWithKey =
+                NodeIdentifierWithPredicates.of(listQname, listKeyQname, "name of band");
+        final NodeIdentifierWithPredicates nodeWithKey2 =
+                NodeIdentifierWithPredicates.of(listQname, listKeyQname, "name of band 2");
 
         this.iid = YangInstanceIdentifier.builder()
                 .node(baseQName)
@@ -110,23 +112,23 @@ public class PutDataTransactionUtilTest {
         this.schemaNode3 = DataSchemaContextTree.from(this.schema).getChild(this.iid3).getDataSchemaNode();
 
         this.buildLeaf = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(leafQname))
+                .withNodeIdentifier(new NodeIdentifier(leafQname))
                 .withValue(0.2)
                 .build();
         final ContainerNode buildPlayerCont = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(containerQname))
+                .withNodeIdentifier(new NodeIdentifier(containerQname))
                 .withChild(this.buildLeaf)
                 .build();
         this.buildBaseCont = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(baseQName))
+                .withNodeIdentifier(new NodeIdentifier(baseQName))
                 .withChild(buildPlayerCont)
                 .build();
         final LeafNode<Object> content = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(baseQName, "name")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "name")))
                 .withValue("name of band")
                 .build();
         final LeafNode<Object> content2 = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(baseQName, "description")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "description")))
                 .withValue("band description")
                 .build();
         this.buildListEntry = Builders.mapEntryBuilder()
@@ -135,11 +137,11 @@ public class PutDataTransactionUtilTest {
                 .withChild(content2)
                 .build();
         final LeafNode<Object> content3 = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(baseQName, "name")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "name")))
                 .withValue("name of band 2")
                 .build();
         final LeafNode<Object> content4 = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(baseQName, "description")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "description")))
                 .withValue("band description 2")
                 .build();
         final MapEntryNode buildListEntry2 = Builders.mapEntryBuilder()
@@ -148,12 +150,12 @@ public class PutDataTransactionUtilTest {
                 .withChild(content4)
                 .build();
         final MapNode buildList = Builders.mapBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(listQname))
+                .withNodeIdentifier(new NodeIdentifier(listQname))
                 .withChild(this.buildListEntry)
                 .withChild(buildListEntry2)
                 .build();
         this.buildBaseContWithList = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(baseQName))
+                .withNodeIdentifier(new NodeIdentifier(baseQName))
                 .withChild(buildList)
                 .build();
 

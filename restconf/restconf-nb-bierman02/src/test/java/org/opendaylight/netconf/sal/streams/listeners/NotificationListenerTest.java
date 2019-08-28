@@ -187,7 +187,7 @@ public class NotificationListenerTest {
         final MapEntryNode entry = mock(MapEntryNode.class);
         final Map<QName, Object> keyValues = new HashMap<>();
         keyValues.put(leaf.getNodeType(), "value");
-        final NodeIdentifierWithPredicates nodeId = new NodeIdentifierWithPredicates(leaf.getNodeType(), keyValues);
+        final NodeIdentifierWithPredicates nodeId = NodeIdentifierWithPredicates.of(leaf.getNodeType(), keyValues);
         when(entry.getIdentifier()).thenReturn(nodeId);
         when(entry.getChild(any())).thenReturn(Optional.of(leaf));
 

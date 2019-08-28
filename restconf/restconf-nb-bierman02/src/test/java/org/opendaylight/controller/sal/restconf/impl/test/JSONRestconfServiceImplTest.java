@@ -243,7 +243,7 @@ public class JSONRestconfServiceImplTest {
         assertTrue("Expected MapNode. Actual " + mapChild.get().getClass(), mapChild.get() instanceof MapNode);
         final MapNode mapNode = (MapNode)mapChild.get();
 
-        final NodeIdentifierWithPredicates entryNodeID = new NodeIdentifierWithPredicates(
+        final NodeIdentifierWithPredicates entryNodeID = NodeIdentifierWithPredicates.of(
                 INTERFACE_QNAME, NAME_QNAME, "eth0");
         final java.util.Optional<MapEntryNode> entryChild = mapNode.getChild(entryNodeID);
         assertEquals(entryNodeID.toString() + " present", true, entryChild.isPresent());

@@ -24,6 +24,7 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
@@ -64,7 +65,7 @@ public class Bug8072Test {
         keyValues.put(NAME_QNAME, "name");
         keyValues.put(TYPE_QNAME, MODULE_TYPE_QNAME);
         final YangInstanceIdentifier expectedYII = YangInstanceIdentifier.of(MODULES_QNAME).node(MODULE_QNAME)
-            .node(new YangInstanceIdentifier.NodeIdentifierWithPredicates(MODULE_QNAME, keyValues));
+            .node(NodeIdentifierWithPredicates.of(MODULE_QNAME, keyValues));
 
         assertEquals(expectedYII, ctx.getInstanceIdentifier());
     }

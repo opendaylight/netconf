@@ -50,6 +50,9 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
@@ -174,9 +177,9 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             final QName namespace = QName.create(Schema.QNAME, "namespace");
 
             CollectionNodeBuilder<MapEntryNode, MapNode> schemaMapEntryNodeMapNodeCollectionNodeBuilder = Builders
-                    .mapBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(Schema.QNAME));
+                    .mapBuilder().withNodeIdentifier(new NodeIdentifier(Schema.QNAME));
             LeafSetEntryNode locationLeafSetEntryNode = Builders.leafSetEntryBuilder().withNodeIdentifier(
-                            new YangInstanceIdentifier.NodeWithValue(location, "NETCONF")).withValue("NETCONF").build();
+                            new NodeWithValue<>(location, "NETCONF")).withValue("NETCONF").build();
 
             Map<QName, Object> keyValues = Maps.newHashMap();
             for (final Schema schema : monitor.getSchemas().getSchema()) {
@@ -184,18 +187,18 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                 keyValues.put(version, schema.getVersion());
                 keyValues.put(format, Yang.QNAME);
 
-                MapEntryNode schemaMapEntryNode = Builders.mapEntryBuilder().withNodeIdentifier(
-                                new YangInstanceIdentifier.NodeIdentifierWithPredicates(Schema.QNAME, keyValues))
-                        .withChild(Builders.leafBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(
-                                identifier)).withValue(schema.getIdentifier()).build())
-                        .withChild(Builders.leafBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(
-                                                version)).withValue(schema.getVersion()).build())
-                        .withChild(Builders.leafBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(
-                                                format)).withValue(Yang.QNAME).build())
-                        .withChild(Builders.leafBuilder().withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(
-                                                namespace)).withValue(schema.getNamespace().getValue()).build())
+                MapEntryNode schemaMapEntryNode = Builders.mapEntryBuilder()
+                        .withNodeIdentifier(NodeIdentifierWithPredicates.of(Schema.QNAME, keyValues))
+                        .withChild(Builders.leafBuilder().withNodeIdentifier(new NodeIdentifier(identifier))
+                            .withValue(schema.getIdentifier()).build())
+                        .withChild(Builders.leafBuilder().withNodeIdentifier(new NodeIdentifier(version))
+                            .withValue(schema.getVersion()).build())
+                        .withChild(Builders.leafBuilder().withNodeIdentifier(new NodeIdentifier(format))
+                            .withValue(Yang.QNAME).build())
+                        .withChild(Builders.leafBuilder().withNodeIdentifier(new NodeIdentifier(namespace))
+                            .withValue(schema.getNamespace().getValue()).build())
                         .withChild((DataContainerChild<?, ?>) Builders.leafSetBuilder().withNodeIdentifier(
-                                        new YangInstanceIdentifier.NodeIdentifier(location))
+                                        new NodeIdentifier(location))
                                 .withChild(locationLeafSetEntryNode).build())
                         .build();
 
@@ -205,9 +208,9 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             DataContainerChild<?, ?> schemaList = schemaMapEntryNodeMapNodeCollectionNodeBuilder.build();
 
             ContainerNode schemasContainer = Builders.containerBuilder().withNodeIdentifier(
-                    new YangInstanceIdentifier.NodeIdentifier(Schemas.QNAME)).withChild(schemaList).build();
+                    new NodeIdentifier(Schemas.QNAME)).withChild(schemaList).build();
             return Builders.containerBuilder().withNodeIdentifier(
-                    new YangInstanceIdentifier.NodeIdentifier(NetconfState.QNAME)).withChild(schemasContainer).build();
+                    new NodeIdentifier(NetconfState.QNAME)).withChild(schemasContainer).build();
         }
 
         private static DOMDataBroker createDataStore(final DOMSchemaService schemaService, final long sessionId) {

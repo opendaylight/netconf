@@ -97,8 +97,8 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
         keyLeafNodeIdentifier = NodeIdentifier.create(mapEntryNodeKey);
         keyLeafNodeValue = "key-value";
 
-        mapEntryNodeIdentifier = new NodeIdentifierWithPredicates(
-                QName.create("namespace", "list-entry"), Collections.singletonMap(mapEntryNodeKey, keyLeafNodeValue));
+        mapEntryNodeIdentifier = NodeIdentifierWithPredicates.of(
+                QName.create("namespace", "list-entry"), mapEntryNodeKey, keyLeafNodeValue);
         Mockito.when(mapEntryNodeData.getIdentifier()).thenReturn(mapEntryNodeIdentifier);
         Mockito.when(mapEntryNodeData.getNodeType()).thenReturn(mapEntryNodeIdentifier.getNodeType());
         Mockito.when(mapEntryNodeData.getChild(keyLeafNodeIdentifier)).thenReturn(Optional.of(keyLeafNodeData));

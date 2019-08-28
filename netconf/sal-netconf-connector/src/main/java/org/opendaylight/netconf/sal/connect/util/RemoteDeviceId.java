@@ -48,12 +48,12 @@ public final class RemoteDeviceId {
     private RemoteDeviceId(final String name) {
         this.name = Preconditions.checkNotNull(name);
         this.topologyPath = DEFAULT_TOPOLOGY_NODE
-                .node(new NodeIdentifierWithPredicates(Node.QNAME, NODE_ID_QNAME, name));
+                .node(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME, name));
         this.key = new NodeKey(new NodeId(name));
         this.topologyBindingPath = DEFAULT_TOPOLOGY_IID.child(Node.class, key);
     }
 
-    public RemoteDeviceId(final String name, InetSocketAddress address) {
+    public RemoteDeviceId(final String name, final InetSocketAddress address) {
         this(name);
         this.address = address;
         this.host = buildHost();
