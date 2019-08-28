@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bd5dd14c_9e083913",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/CreateStreamUtil.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-28T12:41:01Z",
+      "side": 1,
+      "message": "Operating on single-char string is superfluous here... essentially we are checking the first character. Even if we do that, we should have the constant string an explicit constant, not create it each and every time.",
+      "range": {
+        "startLine": 251,
+        "startChar": 37,
+        "endLine": 251,
+        "endChar": 74
+      },
+      "revId": "1bac0a3f3978da50d469d8a077e29e27437d0dcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bb6bff48_4d515639",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/CreateStreamUtil.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-08-28T12:41:01Z",
+      "side": 1,
+      "message": "So which inputs are transformed how?\n\n.a -\u003e a\n./a -\u003e a\n/a -\u003e a\n/.a -\u003e .a\n\nI would like to minimize substring() invocations here, if possible",
+      "range": {
+        "startLine": 252,
+        "startChar": 12,
+        "endLine": 252,
+        "endChar": 55
+      },
+      "revId": "1bac0a3f3978da50d469d8a077e29e27437d0dcd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
