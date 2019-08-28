@@ -48,7 +48,6 @@ import org.hamcrest.CoreMatchers;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
@@ -684,9 +683,9 @@ public class NetconfMessageTransformerTest {
     }
 
     @Test
-    @Ignore
     public void toActionRequestChoiceTest() {
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
+        nodeIdentifiers.add(NodeIdentifier.create(CONFLICT_CHOICE_QNAME));
         nodeIdentifiers.add(NodeIdentifier.create(CHOICE_CONT_QNAME));
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
         NormalizedNode<?, ?> payload = initEmptyInputAction(CHOICE_ACTION_QNAME);
