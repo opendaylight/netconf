@@ -288,7 +288,7 @@ public final class RestCodec {
                                             validNamespace);
                             predicatesMap.put(listKey.getQName(), predicate.getValue());
                         }
-                        pathArgument = new NodeIdentifierWithPredicates(qName, predicatesMap);
+                        pathArgument = NodeIdentifierWithPredicates.of(qName, predicatesMap);
                     } else {
                         LOG.info("Node {} is not List or Leaf-list.", node);
                         LOG.info("Instance-identifier will be translated as NULL for data - {}",

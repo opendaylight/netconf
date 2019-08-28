@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertEquals;
@@ -44,7 +43,7 @@ public class Bug3595Test {
     @Test
     public void testLeafrefListKeyDeserializtion() {
         final YangInstanceIdentifier node1IIexpected = YangInstanceIdentifier.of(CONT_QNAME)
-                .node(LST_WITH_LFREF_KEY_QNAME).node(new NodeIdentifierWithPredicates(
+                .node(LST_WITH_LFREF_KEY_QNAME).node(NodeIdentifierWithPredicates.of(
                         LST_WITH_LFREF_KEY_QNAME, LFREF_KEY_QNAME, "node1"));
         final InstanceIdentifierContext<?> iiContext =
                 controllerContext.toInstanceIdentifier("leafref-module:cont/lst-with-lfref-key/node1");

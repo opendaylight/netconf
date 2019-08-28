@@ -205,7 +205,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
 
         AbstractMapMixin(final ListSchemaNode list) {
             super(NodeIdentifier.create(list.getQName()));
-            this.innerNode = new ListEntry(new NodeIdentifierWithPredicates(list.getQName(), ImmutableMap.of()), list);
+            this.innerNode = new ListEntry(NodeIdentifierWithPredicates.of(list.getQName()), list);
         }
 
         @Override

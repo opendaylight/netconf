@@ -109,7 +109,7 @@ public class RestconfImplTest {
 
         final MapEntryNode payload = mock(MapEntryNode.class);
         final NodeIdentifierWithPredicates nodeIdWithPred =
-                new NodeIdentifierWithPredicates(keyDef, keyDef, al2.toArray());
+                NodeIdentifierWithPredicates.of(keyDef, keyDef, al2.toArray());
         when(payload.getIdentifier()).thenReturn(nodeIdWithPred);
 
         final List<QName> keyDefinitions = new ArrayList<>();

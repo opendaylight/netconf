@@ -25,7 +25,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Sessions;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -60,20 +61,20 @@ public class NetconfUtilTest {
         moduleInfoBackedContext.addModuleInfos(Collections.singletonList($YangModuleInfoImpl.getInstance()));
         final SchemaContext context = moduleInfoBackedContext.getSchemaContext();
         final LeafNode<?> username = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(Session.QNAME, "username")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(Session.QNAME, "username")))
                 .withValue("admin")
                 .build();
         final MapEntryNode session1 = Builders.mapEntryBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier
-                        .NodeIdentifierWithPredicates(Session.QNAME, QName.create(Session.QNAME, "session-id"), 1L))
+                .withNodeIdentifier(
+                        NodeIdentifierWithPredicates.of(Session.QNAME, QName.create(Session.QNAME, "session-id"), 1L))
                 .withChild(username)
                 .build();
         final MapNode sessionList = Builders.mapBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(Session.QNAME))
+                .withNodeIdentifier(new NodeIdentifier(Session.QNAME))
                 .withChild(session1)
                 .build();
         final ContainerNode sessions = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(Sessions.QNAME))
+                .withNodeIdentifier(new NodeIdentifier(Sessions.QNAME))
                 .withChild(sessionList)
                 .build();
         final DOMResult result = new DOMResult(XmlUtil.newDocument());

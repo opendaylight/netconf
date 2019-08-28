@@ -65,6 +65,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSu
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
@@ -136,38 +137,38 @@ public class RestconfDataServiceImplTest {
         final QName listPlaylistQName = QName.create(this.baseQName, "playlist");
 
         final LeafNode buildLeaf = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(this.leafQname))
+                .withNodeIdentifier(new NodeIdentifier(this.leafQname))
                 .withValue(0.2)
                 .build();
 
         this.buildPlayerCont = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(this.containerPlayerQname))
+                .withNodeIdentifier(new NodeIdentifier(this.containerPlayerQname))
                 .withChild(buildLeaf)
                 .build();
 
         this.buildLibraryCont = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(containerLibraryQName))
+                .withNodeIdentifier(new NodeIdentifier(containerLibraryQName))
                 .build();
 
         this.buildPlaylistList = Builders.mapBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(listPlaylistQName))
+                .withNodeIdentifier(new NodeIdentifier(listPlaylistQName))
                 .build();
 
         this.buildBaseCont = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(this.baseQName))
+                .withNodeIdentifier(new NodeIdentifier(this.baseQName))
                 .withChild(this.buildPlayerCont)
                 .build();
 
         // config contains one child the same as in operational and one additional
         this.buildBaseContConfig = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(this.baseQName))
+                .withNodeIdentifier(new NodeIdentifier(this.baseQName))
                 .withChild(this.buildPlayerCont)
                 .withChild(this.buildLibraryCont)
                 .build();
 
         // operational contains one child the same as in config and one additional
         this.buildBaseContOperational = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(this.baseQName))
+                .withNodeIdentifier(new NodeIdentifier(this.baseQName))
                 .withChild(this.buildPlayerCont)
                 .withChild(this.buildPlaylistList)
                 .build();
@@ -383,14 +384,14 @@ public class RestconfDataServiceImplTest {
     public void testPostData() {
         final QName listQname = QName.create(this.baseQName, "playlist");
         final QName listKeyQname = QName.create(this.baseQName, "name");
-        final YangInstanceIdentifier.NodeIdentifierWithPredicates nodeWithKey =
-                new YangInstanceIdentifier.NodeIdentifierWithPredicates(listQname, listKeyQname, "name of band");
+        final NodeIdentifierWithPredicates nodeWithKey =
+                NodeIdentifierWithPredicates.of(listQname, listKeyQname, "name of band");
         final LeafNode<Object> content = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(this.baseQName, "name")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(this.baseQName, "name")))
                 .withValue("name of band")
                 .build();
         final LeafNode<Object> content2 = Builders.leafBuilder()
-            .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(this.baseQName, "description")))
+            .withNodeIdentifier(new NodeIdentifier(QName.create(this.baseQName, "description")))
             .withValue("band description")
             .build();
         final MapEntryNode mapEntryNode = Builders.mapEntryBuilder()
@@ -399,7 +400,7 @@ public class RestconfDataServiceImplTest {
                 .withChild(content2)
                 .build();
         final MapNode buildList = Builders.mapBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(listQname))
+                .withNodeIdentifier(new NodeIdentifier(listQname))
                 .withChild(mapEntryNode)
                 .build();
 
@@ -410,7 +411,7 @@ public class RestconfDataServiceImplTest {
         doReturn(immediateFluentFuture(Optional.empty()))
                 .when(this.read).read(LogicalDatastoreType.CONFIGURATION, this.iidBase);
         final MapNode data = (MapNode) payload.getData();
-        final YangInstanceIdentifier.NodeIdentifierWithPredicates identifier =
+        final NodeIdentifierWithPredicates identifier =
                 data.getValue().iterator().next().getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);

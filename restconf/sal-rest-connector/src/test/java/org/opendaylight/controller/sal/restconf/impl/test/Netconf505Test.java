@@ -65,7 +65,7 @@ public class Netconf505Test {
         final Map<QName, Object> keyValues = new HashMap<>();
         keyValues.put(KEY_QNAME, "id-string");
         final YangInstanceIdentifier expectedYII = YangInstanceIdentifier.of(CONT_QNAME).node(LIST_QNAME)
-            .node(new YangInstanceIdentifier.NodeIdentifierWithPredicates(LIST_QNAME, keyValues));
+            .node(YangInstanceIdentifier.NodeIdentifierWithPredicates.of(LIST_QNAME, keyValues));
 
         assertEquals(expectedYII, ctx.getInstanceIdentifier());
     }

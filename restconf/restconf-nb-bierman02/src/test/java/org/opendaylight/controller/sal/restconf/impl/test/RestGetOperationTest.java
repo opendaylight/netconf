@@ -206,10 +206,9 @@ public class RestGetOperationTest extends JerseyTest {
         final QName qNameList = newTestModuleQName("lst1");
         final QName qNameKeyList = newTestModuleQName("lf11");
 
-        parameters.add(new YangInstanceIdentifier.NodeIdentifier(qNameCont));
-        parameters.add(new YangInstanceIdentifier.NodeIdentifier(qNameList));
-        parameters.add(new YangInstanceIdentifier.NodeIdentifierWithPredicates(qNameList, qNameKeyList,
-                "GigabitEthernet0/0/0/0"));
+        parameters.add(new NodeIdentifier(qNameCont));
+        parameters.add(new NodeIdentifier(qNameList));
+        parameters.add(NodeIdentifierWithPredicates.of(qNameList, qNameKeyList, "GigabitEthernet0/0/0/0"));
         return YangInstanceIdentifier.create(parameters);
     }
 
@@ -234,15 +233,15 @@ public class RestGetOperationTest extends JerseyTest {
         setControllerContext(schemaContextTestModule);
 
         final QName moduleQN = newTestModuleQName("module");
-        final ImmutableMap<QName, Object> keyMap = ImmutableMap.<QName, Object>builder()
-                .put(newTestModuleQName("type"), newTestModuleQName("test-identity"))
-                .put(newTestModuleQName("name"), "foo").build();
+        final ImmutableMap<QName, Object> keyMap = ImmutableMap.of(
+                newTestModuleQName("type"), newTestModuleQName("test-identity"),
+                newTestModuleQName("name"), "foo");
         final YangInstanceIdentifier iid = YangInstanceIdentifier.builder().node(newTestModuleQName("modules"))
                 .node(moduleQN).nodeWithKey(moduleQN, keyMap).build();
         @SuppressWarnings("rawtypes")
         final NormalizedNode data = ImmutableMapNodeBuilder.create().withNodeIdentifier(
                 new NodeIdentifier(moduleQN)).withChild(ImmutableNodes.mapEntryBuilder()
-                    .withNodeIdentifier(new NodeIdentifierWithPredicates(moduleQN, keyMap))
+                    .withNodeIdentifier(NodeIdentifierWithPredicates.of(moduleQN, keyMap))
                     .withChild(ImmutableNodes.leafNode(newTestModuleQName("type"), newTestModuleQName("test-identity")))
                     .withChild(ImmutableNodes.leafNode(newTestModuleQName("name"), "foo"))
                     .withChild(ImmutableNodes.leafNode(newTestModuleQName("data"), "bar")).build()).build();

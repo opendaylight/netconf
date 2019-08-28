@@ -5,13 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,6 +23,8 @@ import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -87,8 +88,7 @@ public class YangInstanceIdentifierSerializerTest {
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(QName.create("serializer:test", "2016-06-06", "contA"))
                 .node(list)
-                .node(new YangInstanceIdentifier.NodeIdentifierWithPredicates(
-                        list, QName.create(list, "list-key"), 100))
+                .node(NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), 100))
                 .node(leafList)
                 .node(new NodeWithValue<>(leafList, "instance"))
                 .build();
@@ -297,9 +297,8 @@ public class YangInstanceIdentifierSerializerTest {
 
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(list)
-                .node(new YangInstanceIdentifier.NodeIdentifierWithPredicates(
-                        list, QName.create(list, "list-key"), 100))
-                .node(new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(child)))
+                .node(NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), 100))
+                .node(new AugmentationIdentifier(ImmutableSet.of(child)))
                 .node(child)
                 .build();
 
@@ -323,9 +322,8 @@ public class YangInstanceIdentifierSerializerTest {
 
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(list)
-                .node(new YangInstanceIdentifier.NodeIdentifierWithPredicates(
-                        list, QName.create(list, "list-key"), 100))
-                .node(new YangInstanceIdentifier.AugmentationIdentifier(Sets.newHashSet(child)))
+                .node(NodeIdentifierWithPredicates.of(list, QName.create(list, "list-key"), 100))
+                .node(new AugmentationIdentifier(ImmutableSet.of(child)))
                 .node(child)
                 .build();
 

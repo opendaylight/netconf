@@ -41,6 +41,8 @@ import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWr
 import org.opendaylight.yangtools.util.SingletonSet;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -89,31 +91,31 @@ public class PostDataTransactionUtilTest {
         final QName leafQname = QName.create(baseQName, "gap");
         final QName listQname = QName.create(baseQName, "playlist");
         final QName listKeyQname = QName.create(baseQName, "name");
-        final YangInstanceIdentifier.NodeIdentifierWithPredicates nodeWithKey =
-                new YangInstanceIdentifier.NodeIdentifierWithPredicates(listQname, listKeyQname, "name of band");
+        final NodeIdentifierWithPredicates nodeWithKey = NodeIdentifierWithPredicates.of(listQname, listKeyQname,
+            "name of band");
         this.iid2 = YangInstanceIdentifier.builder()
                 .node(baseQName)
                 .build();
 
         final LeafNode<?> buildLeaf = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(leafQname))
+                .withNodeIdentifier(new NodeIdentifier(leafQname))
                 .withValue(0.2)
                 .build();
         final ContainerNode buildPlayerCont = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(containerQname))
+                .withNodeIdentifier(new NodeIdentifier(containerQname))
                 .withChild(buildLeaf)
                 .build();
         this.buildBaseCont = Builders.containerBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(baseQName))
+                .withNodeIdentifier(new NodeIdentifier(baseQName))
                 .withChild(buildPlayerCont)
                 .build();
 
         final LeafNode<Object> content = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(baseQName, "name")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "name")))
                 .withValue("name of band")
                 .build();
         final LeafNode<Object> content2 = Builders.leafBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(QName.create(baseQName, "description")))
+                .withNodeIdentifier(new NodeIdentifier(QName.create(baseQName, "description")))
                 .withValue("band description")
                 .build();
         final MapEntryNode mapEntryNode = Builders.mapEntryBuilder()
@@ -122,7 +124,7 @@ public class PostDataTransactionUtilTest {
                 .withChild(content2)
                 .build();
         this.buildList = Builders.mapBuilder()
-                .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(listQname))
+                .withNodeIdentifier(new NodeIdentifier(listQname))
                 .withChild(mapEntryNode)
                 .build();
 
@@ -142,7 +144,7 @@ public class PostDataTransactionUtilTest {
 
         doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
             this.iid2);
-        final YangInstanceIdentifier.NodeIdentifier identifier =
+        final NodeIdentifier identifier =
                 ((ContainerNode) ((SingletonSet<?>) payload.getData().getValue()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
@@ -166,8 +168,7 @@ public class PostDataTransactionUtilTest {
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildList);
 
         final MapNode data = (MapNode) payload.getData();
-        final YangInstanceIdentifier.NodeIdentifierWithPredicates identifier =
-                data.getValue().iterator().next().getIdentifier();
+        final NodeIdentifierWithPredicates identifier = data.getValue().iterator().next().getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);
         doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
@@ -190,7 +191,7 @@ public class PostDataTransactionUtilTest {
 
         doReturn(immediateFalseFluentFuture()).when(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION,
             this.iid2);
-        final YangInstanceIdentifier.NodeIdentifier identifier =
+        final NodeIdentifier identifier =
                 ((ContainerNode) ((SingletonSet<?>) payload.getData().getValue()).iterator().next()).getIdentifier();
         final YangInstanceIdentifier node =
                 payload.getInstanceIdentifierContext().getInstanceIdentifier().node(identifier);

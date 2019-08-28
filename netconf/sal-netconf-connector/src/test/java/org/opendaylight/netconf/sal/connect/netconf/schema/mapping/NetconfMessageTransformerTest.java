@@ -29,7 +29,6 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 import static org.opendaylight.netconf.util.NetconfUtil.NETCONF_DATA_QNAME;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.io.IOException;
@@ -68,8 +67,10 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -276,17 +277,17 @@ public class NetconfMessageTransformerTest {
         assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
         assertNotNull(compositeNodeRpcResult.getResult());
 
-        final List<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> values = Lists.newArrayList(
+        final List<DataContainerChild<?, ?>> values = Lists.newArrayList(
                 NetconfRemoteSchemaYangSourceProvider
                         .createGetSchemaRequest("module", Optional.of("2012-12-12")).getValue());
 
         final Map<QName, Object> keys = new HashMap<>();
-        for (final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> value : values) {
+        for (final DataContainerChild<?, ?> value : values) {
             keys.put(value.getNodeType(), value.getValue());
         }
 
-        final YangInstanceIdentifier.NodeIdentifierWithPredicates identifierWithPredicates =
-                new YangInstanceIdentifier.NodeIdentifierWithPredicates(Schema.QNAME, keys);
+        final NodeIdentifierWithPredicates identifierWithPredicates =
+                NodeIdentifierWithPredicates.of(Schema.QNAME, keys);
         final MapEntryNode schemaNode =
                 Builders.mapEntryBuilder().withNodeIdentifier(identifierWithPredicates).withValue(values).build();
 
@@ -308,7 +309,7 @@ public class NetconfMessageTransformerTest {
     public void testGetConfigLeafRequest() throws Exception {
         final DataContainerChild<?, ?> filter = toFilterStructure(
                 YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Schemas.QNAME), toId(Schema.QNAME),
-                    new NodeIdentifierWithPredicates(Schema.QNAME, ImmutableMap.of()),
+                    NodeIdentifierWithPredicates.of(Schema.QNAME),
                     toId(QName.create(Schemas.QNAME, "version"))), SCHEMA);
 
         final DataContainerChild<?, ?> source = NetconfBaseOps.getSourceNode(NETCONF_RUNNING_QNAME);
@@ -360,17 +361,17 @@ public class NetconfMessageTransformerTest {
 
     @Test
     public void testEditConfigRequest() throws Exception {
-        final List<DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?>> values = Lists.newArrayList(
+        final List<DataContainerChild<?, ?>> values = Lists.newArrayList(
                 NetconfRemoteSchemaYangSourceProvider
                         .createGetSchemaRequest("module", Optional.of("2012-12-12")).getValue());
 
         final Map<QName, Object> keys = new HashMap<>();
-        for (final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> value : values) {
+        for (final DataContainerChild<?, ?> value : values) {
             keys.put(value.getNodeType(), value.getValue());
         }
 
-        final YangInstanceIdentifier.NodeIdentifierWithPredicates identifierWithPredicates =
-                new YangInstanceIdentifier.NodeIdentifierWithPredicates(Schema.QNAME, keys);
+        final NodeIdentifierWithPredicates identifierWithPredicates =
+                NodeIdentifierWithPredicates.of(Schema.QNAME, keys);
         final MapEntryNode schemaNode =
                 Builders.mapEntryBuilder().withNodeIdentifier(identifierWithPredicates).withValue(values).build();
 
@@ -421,7 +422,7 @@ public class NetconfMessageTransformerTest {
         final QName capability = QName.create(Capabilities.QNAME, "capability");
         final DataContainerChild<?, ?> filter = toFilterStructure(
                 YangInstanceIdentifier.create(toId(NetconfState.QNAME), toId(Capabilities.QNAME), toId(capability),
-                    new YangInstanceIdentifier.NodeWithValue<>(capability, "a:b:c")), SCHEMA);
+                    new NodeWithValue<>(capability, "a:b:c")), SCHEMA);
 
         final NetconfMessage netconfMessage = netconfMessageTransformer.toRpcRequest(toPath(NETCONF_GET_QNAME),
                 NetconfMessageTransformUtil.wrap(NETCONF_GET_QNAME, filter));
@@ -479,7 +480,7 @@ public class NetconfMessageTransformerTest {
         QName nameQname = QName.create(SERVER_QNAME, "name");
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
         nodeIdentifiers.add(new NodeIdentifier(SERVER_QNAME));
-        nodeIdentifiers.add(new NodeIdentifierWithPredicates(SERVER_QNAME, nameQname, "test"));
+        nodeIdentifiers.add(NodeIdentifierWithPredicates.of(SERVER_QNAME, nameQname, "test"));
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
         ContainerNode data = initInputAction(QName.create(SERVER_QNAME, "reset-at"), "now");
@@ -549,7 +550,7 @@ public class NetconfMessageTransformerTest {
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
         nodeIdentifiers.add(NodeIdentifier.create(DEVICE_QNAME));
         nodeIdentifiers.add(NodeIdentifier.create(INTERFACE_QNAME));
-        nodeIdentifiers.add(new NodeIdentifierWithPredicates(INTERFACE_QNAME, nameQname, "test"));
+        nodeIdentifiers.add(NodeIdentifierWithPredicates.of(INTERFACE_QNAME, nameQname, "test"));
 
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 
@@ -582,12 +583,11 @@ public class NetconfMessageTransformerTest {
 
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
         nodeIdentifiers.add(NodeIdentifier.create(SERVER_QNAME));
-        nodeIdentifiers.add(new NodeIdentifierWithPredicates(SERVER_QNAME, serverNameQname, "testServer"));
-        nodeIdentifiers.add(new YangInstanceIdentifier
-                .AugmentationIdentifier(Collections.singleton(APPLICATIONS_QNAME)));
+        nodeIdentifiers.add(NodeIdentifierWithPredicates.of(SERVER_QNAME, serverNameQname, "testServer"));
+        nodeIdentifiers.add(new AugmentationIdentifier(Collections.singleton(APPLICATIONS_QNAME)));
         nodeIdentifiers.add(NodeIdentifier.create(APPLICATIONS_QNAME));
         nodeIdentifiers.add(NodeIdentifier.create(APPLICATION_QNAME));
-        nodeIdentifiers.add(new NodeIdentifierWithPredicates(APPLICATION_QNAME,
+        nodeIdentifiers.add(NodeIdentifierWithPredicates.of(APPLICATION_QNAME,
                 applicationNameQname, "testApplication"));
 
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
@@ -632,7 +632,7 @@ public class NetconfMessageTransformerTest {
 
         List<PathArgument> nodeIdentifiers = new ArrayList<>();
         nodeIdentifiers.add(NodeIdentifier.create(BAR_QNAME));
-        nodeIdentifiers.add(new NodeIdentifierWithPredicates(BAR_QNAME, barIdQname, "test"));
+        nodeIdentifiers.add(NodeIdentifierWithPredicates.of(BAR_QNAME, barIdQname, "test"));
 
         DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
 

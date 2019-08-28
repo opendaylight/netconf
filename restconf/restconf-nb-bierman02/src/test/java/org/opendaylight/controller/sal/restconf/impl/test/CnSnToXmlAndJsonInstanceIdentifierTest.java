@@ -132,7 +132,7 @@ public class CnSnToXmlAndJsonInstanceIdentifierTest extends YangAndXmlAndDataSch
         keyValues.put(QName.create(new URI("augment:module"), "keyvalue111"), "value1");
         keyValues.put(QName.create(new URI("augment:module"), "keyvalue112"), "value2");
         final NodeIdentifierWithPredicates nodeIdentifierWithPredicates =
-                new NodeIdentifierWithPredicates(qName, keyValues);
+                NodeIdentifierWithPredicates.of(qName, keyValues);
         pathArguments.add(nodeIdentifierWithPredicates);
 
         pathArguments.add(new NodeIdentifier(QName.create(new URI("augment:augment:module"), "lf112")));

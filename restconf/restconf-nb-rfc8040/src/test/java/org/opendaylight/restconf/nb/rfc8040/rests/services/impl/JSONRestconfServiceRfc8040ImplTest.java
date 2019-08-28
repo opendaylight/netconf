@@ -290,13 +290,12 @@ public class JSONRestconfServiceRfc8040ImplTest {
         final ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
         assertEquals("ContainerNode node type", INTERFACES_QNAME, actualNode.getNodeType());
 
-        final Optional<DataContainerChild<?, ?>> mapChild = actualNode.getChild(
-            new NodeIdentifier(INTERFACE_QNAME));
+        final Optional<DataContainerChild<?, ?>> mapChild = actualNode.getChild(new NodeIdentifier(INTERFACE_QNAME));
         assertEquals(INTERFACE_QNAME.toString() + " present", true, mapChild.isPresent());
         assertTrue("Expected MapNode. Actual " + mapChild.get().getClass(), mapChild.get() instanceof MapNode);
         final MapNode mapNode = (MapNode)mapChild.get();
 
-        final NodeIdentifierWithPredicates entryNodeID = new NodeIdentifierWithPredicates(
+        final NodeIdentifierWithPredicates entryNodeID = NodeIdentifierWithPredicates.of(
                 INTERFACE_QNAME, NAME_QNAME, "eth0");
         final Optional<MapEntryNode> entryChild = mapNode.getChild(entryNodeID);
         assertEquals(entryNodeID.toString() + " present", true, entryChild.isPresent());

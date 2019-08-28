@@ -217,7 +217,7 @@ public final class TestUtils {
             predicate.put(QName.create(namespace, revision, key), keys.get(key));
         }
 
-        return new NodeIdentifierWithPredicates(QName.create(namespace, revision, localName), predicate);
+        return NodeIdentifierWithPredicates.of(QName.create(namespace, revision, localName), predicate);
     }
 
     public static NodeIdentifierWithPredicates getNodeIdentifierPredicate(final String localName,
@@ -231,7 +231,7 @@ public final class TestUtils {
             predicate.put(QName.create(namespace, revision, keysAndValues[index++]), keysAndValues[index++]);
         }
 
-        return new NodeIdentifierWithPredicates(QName.create(namespace, revision, localName), predicate);
+        return NodeIdentifierWithPredicates.of(QName.create(namespace, revision, localName), predicate);
     }
 
     public static NormalizedNode<?, ?> prepareNormalizedNodeWithIetfInterfacesInterfacesData() throws ParseException {
