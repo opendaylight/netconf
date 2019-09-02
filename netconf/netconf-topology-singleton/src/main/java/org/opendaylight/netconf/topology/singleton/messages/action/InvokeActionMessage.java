@@ -9,6 +9,7 @@ package org.opendaylight.netconf.topology.singleton.messages.action;
 
 import static java.util.Objects.requireNonNull;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -50,6 +51,8 @@ public class InvokeActionMessage implements Serializable {
         return schemaPathMessage.getSchemaPath();
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private SchemaPathMessage getSchemaPathMessage() {
         return schemaPathMessage;
     }
