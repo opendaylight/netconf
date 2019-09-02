@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.RestCodec.InstanceIdentifierCodecImpl;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO;
-import org.opendaylight.yangtools.concepts.Codec;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -27,7 +26,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 public class InstanceIdentifierCodecImplTest {
     private static SchemaContext schemaContext;
 
-    private Codec<IdentityValuesDTO, YangInstanceIdentifier> instanceIdentifierDTO;
+    private InstanceIdentifierCodecImpl instanceIdentifierDTO;
     private YangInstanceIdentifier instanceIdentifierBadNamespace;
     private YangInstanceIdentifier instanceIdentifierOKList;
     private YangInstanceIdentifier instanceIdentifierOKLeafList;
