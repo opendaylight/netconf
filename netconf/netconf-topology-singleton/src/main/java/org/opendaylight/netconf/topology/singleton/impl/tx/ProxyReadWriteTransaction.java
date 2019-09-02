@@ -13,6 +13,7 @@ import akka.util.Timeout;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -156,6 +157,8 @@ public class ProxyReadWriteTransaction implements DOMDataTreeReadWriteTransactio
         }
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void executePriorTransactionOperations(final ProxyTransactionFacade newTransactionFacade) {
         while (true) {
             // Access to queuedTxOperations and transactionFacade must be protected and atomic

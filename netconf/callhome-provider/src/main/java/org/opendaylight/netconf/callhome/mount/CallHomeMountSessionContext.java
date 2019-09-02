@@ -9,6 +9,7 @@ package org.opendaylight.netconf.callhome.mount;
 
 import static java.util.Objects.requireNonNull;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
 import java.security.PublicKey;
@@ -39,8 +40,8 @@ class CallHomeMountSessionContext {
     // FIXME: Remove this
     private final ContextKey key;
 
-    CallHomeMountSessionContext(String nodeId, CallHomeProtocolSessionContext protocol,
-                                CallHomeChannelActivator activator, CloseCallback callback) {
+    CallHomeMountSessionContext(final String nodeId, final CallHomeProtocolSessionContext protocol,
+                                final CallHomeChannelActivator activator, final CloseCallback callback) {
 
         this.nodeId = new NodeId(requireNonNull(nodeId, "nodeId"));
         this.key = ContextKey.from(protocol.getRemoteAddress());
@@ -73,7 +74,7 @@ class CallHomeMountSessionContext {
     }
 
     @SuppressWarnings("unchecked")
-    <V> Promise<V> activateNetconfChannel(NetconfClientSessionListener sessionListener) {
+    <V> Promise<V> activateNetconfChannel(final NetconfClientSessionListener sessionListener) {
         return (Promise<V>) activator.activate(wrap(sessionListener));
     }
 
@@ -81,12 +82,12 @@ class CallHomeMountSessionContext {
     private NetconfClientSessionListener wrap(final NetconfClientSessionListener delegate) {
         return new NetconfClientSessionListener() {
             @Override
-            public void onSessionUp(NetconfClientSession session) {
+            public void onSessionUp(final NetconfClientSession session) {
                 delegate.onSessionUp(session);
             }
 
             @Override
-            public void onSessionTerminated(NetconfClientSession session, NetconfTerminationReason reason) {
+            public void onSessionTerminated(final NetconfClientSession session, final NetconfTerminationReason reason) {
                 try {
                     delegate.onSessionTerminated(session, reason);
                 } finally {
@@ -95,7 +96,7 @@ class CallHomeMountSessionContext {
             }
 
             @Override
-            public void onSessionDown(NetconfClientSession session, Exception exc) {
+            public void onSessionDown(final NetconfClientSession session, final Exception exc) {
                 try {
                     removeSelf();
                 } finally {
@@ -104,12 +105,14 @@ class CallHomeMountSessionContext {
             }
 
             @Override
-            public void onMessage(NetconfClientSession session, NetconfMessage message) {
+            public void onMessage(final NetconfClientSession session, final NetconfMessage message) {
                 delegate.onMessage(session, message);
             }
         };
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void removeSelf() {
         onClose.onClosed(this);
     }
