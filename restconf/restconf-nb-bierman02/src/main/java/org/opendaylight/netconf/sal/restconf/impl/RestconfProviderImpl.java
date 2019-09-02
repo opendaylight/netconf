@@ -40,7 +40,7 @@ public class RestconfProviderImpl extends AbstractMXBean
 
     public void start() {
         this.webSocketServerThread = new Thread(WebSocketServer.createInstance(
-                websocketAddress.stringValue(), websocketPort.getValue()));
+                websocketAddress.stringValue(), websocketPort.getValue().toJava()));
         this.webSocketServerThread.setName("Web socket server on port " + websocketPort);
         this.webSocketServerThread.start();
 
