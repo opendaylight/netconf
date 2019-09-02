@@ -10,6 +10,7 @@ package org.opendaylight.netconf.callhome.protocol;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.VisibleForTesting;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -103,10 +104,14 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
         };
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static void doPostAuth(final ClientSession session) {
         CallHomeSessionContext.getFrom(session).openNetconfChannel();
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void doAuth(final ClientSession session) {
         try {
             final AuthFuture authFuture = CallHomeSessionContext.getFrom(session).authorize();

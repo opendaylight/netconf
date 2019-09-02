@@ -332,6 +332,8 @@ public final class RestCodec {
         }
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static Module getModuleByNamespace(final String namespace, final DOMMountPoint mountPoint,
             final ControllerContext controllerContext) {
         final URI validNamespace = resolveValidNamespace(namespace, mountPoint, controllerContext);
