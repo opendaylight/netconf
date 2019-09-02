@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.nettyutil.handler;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -69,6 +70,8 @@ final class ThreadLocalTransformers {
         return PRETTY_TRANSFORMER.get();
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static Transformer createTransformer() {
         try {
             return FACTORY.newTransformer();
