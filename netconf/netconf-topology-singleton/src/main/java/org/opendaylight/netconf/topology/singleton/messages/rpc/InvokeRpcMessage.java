@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.topology.singleton.messages.rpc;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -29,6 +30,8 @@ public class InvokeRpcMessage implements Serializable {
         this.normalizedNodeMessage = normalizedNodeMessage;
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private SchemaPathMessage getSchemaPathMessage() {
         return schemaPathMessage;
     }
@@ -36,7 +39,6 @@ public class InvokeRpcMessage implements Serializable {
     public SchemaPath getSchemaPath() {
         return schemaPathMessage.getSchemaPath();
     }
-
 
     public @Nullable NormalizedNodeMessage getNormalizedNodeMessage() {
         return normalizedNodeMessage;

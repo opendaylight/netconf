@@ -40,7 +40,7 @@ final class ApplicationSettings {
             this.password = password;
         }
 
-        private static Credentials extractCredentials(final String basicAuthentication) {
+        static Credentials extractCredentials(final String basicAuthentication) {
             final String[] credentials = basicAuthentication.split(":");
             Preconditions.checkArgument(credentials.length == 2, "Both username and password must be specified in the "
                     + "format [username]:[password] for basic authentication.");
