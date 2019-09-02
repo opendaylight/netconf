@@ -41,7 +41,7 @@ public final class NetconfSessionPreferences {
             this.skipLength = name.length();
         }
 
-        private String from(final Iterable<String> params) {
+        String from(final Iterable<String> params) {
             final Optional<String> o = Iterables.tryFind(params, predicate);
             if (!o.isPresent()) {
                 return null;
