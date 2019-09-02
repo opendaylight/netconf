@@ -14,6 +14,7 @@ import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import java.util.Optional;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -70,7 +71,7 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
 
         final Future<Object> future = Patterns.ask(masterTxActor, new CancelRequest(), askTimeout);
 
-        future.onComplete(new OnComplete<Object>() {
+        future.onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {
                 if (failure != null) {
@@ -93,7 +94,7 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
         final Future<Object> future = Patterns.ask(masterTxActor, new ReadRequest(store, path), askTimeout);
 
         final SettableFuture<Optional<NormalizedNode<?, ?>>> settableFuture = SettableFuture.create();
-        future.onComplete(new OnComplete<Object>() {
+        future.onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {
                 if (failure != null) {
@@ -133,7 +134,7 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
         final Future<Object> future = Patterns.ask(masterTxActor, new ExistsRequest(store, path), askTimeout);
 
         final SettableFuture<Boolean> settableFuture = SettableFuture.create();
-        future.onComplete(new OnComplete<Object>() {
+        future.onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {
                 if (failure != null) {
@@ -185,7 +186,7 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
         final Future<Object> future = Patterns.ask(masterTxActor, new SubmitRequest(), askTimeout);
 
         final SettableFuture<CommitInfo> settableFuture = SettableFuture.create();
-        future.onComplete(new OnComplete<Object>() {
+        future.onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {
                 if (failure != null) {
@@ -203,11 +204,15 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
         return FluentFuture.from(settableFuture);
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private TransactionCommitFailedException newTransactionCommitFailedException(final Throwable failure) {
         return new TransactionCommitFailedException(String.format("%s: Commit of transaction failed", getIdentifier()),
                 failure);
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private Throwable processFailure(final Throwable failure) {
         if (failure instanceof AskTimeoutException) {
             return NetconfTopologyUtils.createMasterIsDownException(id, (Exception)failure);
