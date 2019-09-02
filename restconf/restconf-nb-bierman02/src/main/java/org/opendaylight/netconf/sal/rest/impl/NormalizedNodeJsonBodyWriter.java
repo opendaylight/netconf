@@ -32,8 +32,8 @@ import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
@@ -116,11 +116,11 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
             nnWriter = createNormalizedNodeWriter(context,path,jsonWriter, depth);
             if (data instanceof ContainerNode) {
                 writeChildren(nnWriter,(ContainerNode) data);
-            } else if (data instanceof AnyXmlNode) {
+            } else if (data instanceof DOMSourceAnyxmlNode) {
                 try {
                     writeChildren(nnWriter,
                             (ContainerNode) NetconfUtil.transformDOMSourceToNormalizedNode(
-                                    context.getSchemaContext(), ((AnyXmlNode)data).getValue()).getResult());
+                                    context.getSchemaContext(), ((DOMSourceAnyxmlNode)data).getValue()).getResult());
                 } catch (XMLStreamException | URISyntaxException | SAXException e) {
                     throw new IOException("Cannot write anyxml.", e);
                 }

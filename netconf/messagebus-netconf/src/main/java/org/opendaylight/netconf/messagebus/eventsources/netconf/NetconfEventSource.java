@@ -55,8 +55,8 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
@@ -240,7 +240,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
         }
     }
 
-    private AnyXmlNode encapsulate(final DOMNotification body) {
+    private DOMSourceAnyxmlNode encapsulate(final DOMNotification body) {
         // FIXME: Introduce something like YangModeledAnyXmlNode in Yangtools
         final Document doc = XmlUtil.newDocument();
         final Optional<String> namespace = Optional.of(PAYLOAD_ARG.getNodeType().getNamespace().toString());

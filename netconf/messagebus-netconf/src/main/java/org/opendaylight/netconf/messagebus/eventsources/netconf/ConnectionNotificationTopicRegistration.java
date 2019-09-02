@@ -23,8 +23,8 @@ import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.even
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -138,7 +138,7 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
         return dn;
     }
 
-    private static AnyXmlNode encapsulate(final EventSourceStatusNotification notification) {
+    private static DOMSourceAnyxmlNode encapsulate(final EventSourceStatusNotification notification) {
         Document doc = UntrustedXML.newDocumentBuilder().newDocument();
 
         final Element rootElement = XmlUtil.createElement(doc, "EventSourceStatusNotification",

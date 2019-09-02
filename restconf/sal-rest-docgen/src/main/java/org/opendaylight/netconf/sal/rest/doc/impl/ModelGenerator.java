@@ -26,7 +26,7 @@ import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Post;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.AnyDataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.AnyXmlSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
@@ -339,8 +339,8 @@ public class ModelGenerator {
                     }
                     continue;
 
-                } else if (node instanceof AnyXmlSchemaNode) {
-                    property = processAnyXMLNode((AnyXmlSchemaNode) node);
+                } else if (node instanceof AnyxmlSchemaNode) {
+                    property = processAnyXMLNode((AnyxmlSchemaNode) node);
 
                 } else if (node instanceof AnyDataSchemaNode) {
                     property = processAnydataNode((AnyDataSchemaNode) node);
@@ -411,8 +411,8 @@ public class ModelGenerator {
                 }
                 continue;
 
-            } else if (node instanceof AnyXmlSchemaNode) {
-                property = processAnyXMLNode((AnyXmlSchemaNode) node);
+            } else if (node instanceof AnyxmlSchemaNode) {
+                property = processAnyXMLNode((AnyxmlSchemaNode) node);
 
             } else if (node instanceof AnyDataSchemaNode) {
                 property = processAnydataNode((AnyDataSchemaNode) node);
@@ -470,7 +470,7 @@ public class ModelGenerator {
         return property;
     }
 
-    private static ObjectNode processAnyXMLNode(final AnyXmlSchemaNode leafNode) {
+    private static ObjectNode processAnyXMLNode(final AnyxmlSchemaNode leafNode) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse(null);
