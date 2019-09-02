@@ -12,7 +12,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.Augmentat
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -39,7 +39,7 @@ class NormalizedDataPrunner {
             return node;
         }
 
-        if (node instanceof LeafNode || node instanceof LeafSetNode || node instanceof AnyXmlNode
+        if (node instanceof LeafNode || node instanceof LeafSetNode || node instanceof AnyxmlNode
                 || node instanceof OrderedLeafSetNode) {
             return node;
         } else if (node instanceof MixinNode) {

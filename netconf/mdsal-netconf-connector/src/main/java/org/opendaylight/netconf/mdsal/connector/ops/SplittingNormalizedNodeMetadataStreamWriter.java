@@ -24,7 +24,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.api.ModifyAction;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.EditConfigInput;
-import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadataStreamWriter;
+import org.opendaylight.yangtools.rfc7952.data.api.StreamWriterMetadataExtension;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -39,7 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNodeStreamWriter,
-        NormalizedMetadataStreamWriter {
+        StreamWriterMetadataExtension {
     private static final Logger LOG = LoggerFactory.getLogger(SplittingNormalizedNodeMetadataStreamWriter.class);
     private static final QName OPERATION_ATTRIBUTE = QName.create(EditConfigInput.QNAME.getNamespace(),
         XmlNetconfConstants.OPERATION_ATTR_KEY);
@@ -74,7 +74,7 @@ final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNod
 
     @Override
     public ClassToInstanceMap<NormalizedNodeStreamWriterExtension> getExtensions() {
-        return ImmutableClassToInstanceMap.of(NormalizedMetadataStreamWriter.class, this);
+        return ImmutableClassToInstanceMap.of(StreamWriterMetadataExtension.class, this);
     }
 
     @Override
@@ -89,7 +89,7 @@ final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNod
         writer.metadata(filterMeta(metadata));
     }
 
-    private static ImmutableMap<QName, Object> filterMeta(ImmutableMap<QName, Object> metadata) {
+    private static ImmutableMap<QName, Object> filterMeta(final ImmutableMap<QName, Object> metadata) {
         // FIXME: also remove prefixed attributes?
         return ImmutableMap.copyOf(Maps.filterKeys(metadata,
             key -> !XmlParserStream.LEGACY_ATTRIBUTE_NAMESPACE.equals(key.getModule())));
@@ -168,10 +168,20 @@ final class SplittingNormalizedNodeMetadataStreamWriter implements NormalizedNod
         pushPath(identifier);
     }
 
+
     @Override
-    public void startAnyxmlNode(final NodeIdentifier name) throws IOException {
-        writer.startAnyxmlNode(name);
-        pushPath(name);
+    public boolean startAnydataNode(final NodeIdentifier name, final Class<?> objectModel) throws IOException {
+        // FIXME: add anydata support
+        return false;
+    }
+
+    @Override
+    public boolean startAnyxmlNode(final NodeIdentifier name, final Class<?> objectModel) throws IOException {
+        final boolean ret = writer.startAnyxmlNode(name, objectModel);
+        if (ret) {
+            pushPath(name);
+        }
+        return ret;
     }
 
     @Override
