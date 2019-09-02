@@ -50,7 +50,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.util.RestUtil;
-import org.opendaylight.yangtools.concepts.Codec;
+import org.opendaylight.yangtools.concepts.IllegalArgumentCodec;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -541,7 +541,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
 
     private String toUriString(final Object object, final LeafSchemaNode leafNode, final DOMMountPoint mount)
             throws UnsupportedEncodingException {
-        final Codec<Object, Object> codec = RestCodec.from(leafNode.getType(), mount, this);
+        final IllegalArgumentCodec<Object, Object> codec = RestCodec.from(leafNode.getType(), mount, this);
         // FIXME: UrlEncoder looks up a well-known charset, we need something that will use it directly
         return object == null ? "" : URLEncoder.encode(codec.serialize(object).toString(), URI_ENCODING_CHARSET.name());
     }
@@ -804,7 +804,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         if (baseType instanceof LeafrefTypeDefinition) {
             typedef = SchemaContextUtil.getBaseTypeForLeafRef((LeafrefTypeDefinition) baseType, schemaContext, node);
         }
-        final Codec<Object, Object> codec = RestCodec.from(typedef, mountPoint, this);
+        final IllegalArgumentCodec<Object, Object> codec = RestCodec.from(typedef, mountPoint, this);
         Object decoded = codec.deserialize(urlDecoded);
         String additionalInfo = "";
         if (decoded == null) {
