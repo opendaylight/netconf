@@ -56,6 +56,7 @@ import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.patch.PatchStatusEntity;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -432,7 +433,7 @@ public class JSONRestconfServiceImplTest {
         assertTrue("Expected ContainerNode. Actual " + capturedNode.getValue().getClass(),
                 capturedNode.getValue() instanceof ContainerNode);
         final ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
-        verifyLeafNode(actualNode, TOASTER_DONENESS_QNAME, 10L);
+        verifyLeafNode(actualNode, TOASTER_DONENESS_QNAME, Uint32.valueOf(10));
         verifyLeafNode(actualNode, TOASTER_TYPE_QNAME, WHEAT_BREAD_QNAME);
     }
 
@@ -525,7 +526,7 @@ public class JSONRestconfServiceImplTest {
 
     void verifyLeafNode(final DataContainerNode<?> parent, final QName leafType, final Object leafValue) {
         final java.util.Optional<DataContainerChild<?, ?>> leafChild = parent.getChild(new NodeIdentifier(leafType));
-        assertEquals(leafType.toString() + " present", true, leafChild.isPresent());
+        assertTrue(leafType.toString() + " present", leafChild.isPresent());
         assertEquals(leafType.toString() + " value", leafValue, leafChild.get().getValue());
     }
 

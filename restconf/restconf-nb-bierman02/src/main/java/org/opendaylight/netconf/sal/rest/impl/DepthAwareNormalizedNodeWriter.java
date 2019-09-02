@@ -16,10 +16,11 @@ import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
+import org.opendaylight.yangtools.yang.data.api.schema.AnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -150,11 +151,17 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
             writer.scalarValue(nodeAsLeaf.getValue());
             writer.endNode();
             return true;
-        } else if (node instanceof AnyXmlNode) {
-            final AnyXmlNode anyXmlNode = (AnyXmlNode)node;
-            writer.startAnyxmlNode(anyXmlNode.getIdentifier());
-            writer.domSourceValue(anyXmlNode.getValue());
-            writer.endNode();
+        } else if (node instanceof AnyxmlNode) {
+            final AnyxmlNode<?> anyxmlNode = (AnyxmlNode<?>)node;
+            final Class<?> objectModel = anyxmlNode.getValueObjectModel();
+            if (writer.startAnyxmlNode(anyxmlNode.getIdentifier(), objectModel)) {
+                if (DOMSource.class.isAssignableFrom(objectModel)) {
+                    writer.domSourceValue((DOMSource) anyxmlNode.getValue());
+                } else {
+                    writer.scalarValue(anyxmlNode.getValue());
+                }
+                writer.endNode();
+            }
             return true;
         }
 

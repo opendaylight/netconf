@@ -28,7 +28,7 @@ import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -53,8 +53,9 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
     public Optional<NormalizedNode<?, ?>> selectFromDataStructure(
             final DataContainerChild<? extends YangInstanceIdentifier.PathArgument, ?> data,
             final YangInstanceIdentifier path) {
-        Preconditions.checkArgument(data instanceof AnyXmlNode);
-        final List<XmlElement> xmlElements = selectMatchingNodes(getSourceElement(((AnyXmlNode)data).getValue()), path);
+        Preconditions.checkArgument(data instanceof DOMSourceAnyxmlNode);
+        final List<XmlElement> xmlElements = selectMatchingNodes(
+            getSourceElement(((DOMSourceAnyxmlNode)data).getValue()), path);
         final Document result = XmlUtil.newDocument();
         final Element dataElement =
                 result.createElementNS(NETCONF_DATA_QNAME.getNamespace().toString(), NETCONF_DATA_QNAME.getLocalName());
@@ -62,7 +63,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
         for (XmlElement xmlElement : xmlElements) {
             dataElement.appendChild(result.importNode(xmlElement.getDomElement(), true));
         }
-        final AnyXmlNode resultAnyxml = Builders.anyXmlBuilder()
+        final DOMSourceAnyxmlNode resultAnyxml = Builders.anyXmlBuilder()
                 .withNodeIdentifier(NETCONF_DATA_NODEID)
                 .withValue(new DOMSource(result))
                 .build();
@@ -78,13 +79,13 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
      * @return config structure
      */
     @Override
-    public AnyXmlNode createEditConfigStructure(final Optional<NormalizedNode<?, ?>> data,
+    public DOMSourceAnyxmlNode createEditConfigStructure(final Optional<NormalizedNode<?, ?>> data,
                                                 final YangInstanceIdentifier dataPath,
                                                 final Optional<ModifyAction> operation) {
         Preconditions.checkArgument(data.isPresent());
-        Preconditions.checkArgument(data.get() instanceof AnyXmlNode);
+        Preconditions.checkArgument(data.get() instanceof DOMSourceAnyxmlNode);
 
-        final AnyXmlNode anxmlData = (AnyXmlNode) data.get();
+        final DOMSourceAnyxmlNode anxmlData = (DOMSourceAnyxmlNode) data.get();
         final Document document = XmlUtil.newDocument();
         final Element dataNode = (Element) document.importNode(getSourceElement(anxmlData.getValue()), true);
         checkDataValidForPath(dataPath, dataNode);
