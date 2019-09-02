@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 import org.opendaylight.netconf.sal.restconf.impl.RestCodec;
-import org.opendaylight.yangtools.concepts.Codec;
+import org.opendaylight.yangtools.concepts.IllegalArgumentCodec;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
@@ -25,7 +25,8 @@ public class RestCodecExceptionsTest {
 
     @Test
     public void serializeExceptionTest() {
-        final Codec<Object, Object> codec = RestCodec.from(BaseTypes.bitsTypeBuilder(PATH).build(), null, null);
+        final IllegalArgumentCodec<Object, Object> codec = RestCodec.from(BaseTypes.bitsTypeBuilder(PATH).build(),
+            null, null);
         final String serializedValue = (String) codec.serialize("incorrect value"); // set
                                                                               // expected
         assertEquals("incorrect value", serializedValue);
@@ -35,7 +36,7 @@ public class RestCodecExceptionsTest {
     public void deserializeExceptionTest() {
         final IdentityrefTypeDefinition mockedIidentityrefType = mock(IdentityrefTypeDefinition.class);
 
-        final Codec<Object, Object> codec = RestCodec.from(mockedIidentityrefType, null, null);
+        final IllegalArgumentCodec<Object, Object> codec = RestCodec.from(mockedIidentityrefType, null, null);
         assertNull(codec.deserialize("incorrect value"));
     }
 

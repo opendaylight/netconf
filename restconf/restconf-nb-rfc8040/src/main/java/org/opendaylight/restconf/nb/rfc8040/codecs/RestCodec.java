@@ -24,7 +24,7 @@ import org.opendaylight.restconf.common.util.IdentityValuesDTO;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO.IdentityValue;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO.Predicate;
 import org.opendaylight.restconf.common.util.RestUtil;
-import org.opendaylight.yangtools.concepts.Codec;
+import org.opendaylight.yangtools.concepts.IllegalArgumentCodec;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -35,7 +35,7 @@ import org.opendaylight.yangtools.yang.data.api.codec.IdentityrefCodec;
 import org.opendaylight.yangtools.yang.data.api.codec.InstanceIdentifierCodec;
 import org.opendaylight.yangtools.yang.data.api.codec.LeafrefCodec;
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
-import org.opendaylight.yangtools.yang.model.api.AnyXmlSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
@@ -60,19 +60,20 @@ public final class RestCodec {
     private RestCodec() {
     }
 
-    public static Codec<Object, Object> from(final TypeDefinition<?> typeDefinition,
+    // FIXME: IllegalArgumentCodec is not quite accurate
+    public static IllegalArgumentCodec<Object, Object> from(final TypeDefinition<?> typeDefinition,
             final DOMMountPoint mountPoint, final SchemaContext schemaContext) {
         return new ObjectCodec(typeDefinition, mountPoint, schemaContext);
     }
 
     @SuppressWarnings("rawtypes")
-    public static final class ObjectCodec implements Codec<Object, Object> {
+    public static final class ObjectCodec implements IllegalArgumentCodec<Object, Object> {
 
         private static final Logger LOG = LoggerFactory.getLogger(ObjectCodec.class);
 
-        public static final Codec LEAFREF_DEFAULT_CODEC = new LeafrefCodecImpl();
-        private final Codec instanceIdentifier;
-        private final Codec identityrefCodec;
+        public static final IllegalArgumentCodec LEAFREF_DEFAULT_CODEC = new LeafrefCodecImpl();
+        private final IllegalArgumentCodec instanceIdentifier;
+        private final IllegalArgumentCodec identityrefCodec;
 
         private final TypeDefinition<?> type;
 
@@ -427,6 +428,6 @@ public final class RestCodec {
     private static boolean isInstantiatedDataSchema(final DataSchemaNode node) {
         return node instanceof LeafSchemaNode || node instanceof LeafListSchemaNode
                 || node instanceof ContainerSchemaNode || node instanceof ListSchemaNode
-                || node instanceof AnyXmlSchemaNode;
+                || node instanceof AnyxmlSchemaNode;
     }
 }
