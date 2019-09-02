@@ -11,6 +11,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Optional;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -155,6 +156,8 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
         }, connectionTimeoutMillis, TimeUnit.MILLISECONDS);
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void cancelTimeout() {
         if (timeout != null) {
             timeout.cancel();
