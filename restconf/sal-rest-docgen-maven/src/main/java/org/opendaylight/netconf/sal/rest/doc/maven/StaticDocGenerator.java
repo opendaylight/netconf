@@ -27,8 +27,8 @@ import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGeneratorDraft0
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang2sources.spi.BasicCodeGenerator;
 import org.opendaylight.yangtools.yang2sources.spi.MavenProjectAware;
 import org.slf4j.Logger;
@@ -50,7 +50,7 @@ public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
 
     @Override
     @SuppressFBWarnings("DM_DEFAULT_ENCODING")
-    public Collection<File> generateSources(final SchemaContext context, final File outputBaseDir,
+    public Collection<File> generateSources(final EffectiveModelContext context, final File outputBaseDir,
             final Set<Module> currentModules, final Function<Module, Optional<String>> moduleResourcePathResolver)
                     throws IOException {
         List<File> result = new ArrayList<>();
