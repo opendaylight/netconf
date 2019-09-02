@@ -69,6 +69,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
 import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
 import org.opendaylight.yangtools.yang.common.OperationFailedException;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
@@ -492,7 +493,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
         assertTrue("Expected ContainerNode. Actual " + capturedNode.getValue().getClass(),
                 capturedNode.getValue() instanceof ContainerNode);
         final ContainerNode actualNode = (ContainerNode) capturedNode.getValue();
-        verifyLeafNode(actualNode, TOASTER_DONENESS_QNAME, 10L);
+        verifyLeafNode(actualNode, TOASTER_DONENESS_QNAME, Uint32.valueOf(10L));
         verifyLeafNode(actualNode, TOASTER_TYPE_QNAME, WHEAT_BREAD_QNAME);
     }
 
