@@ -9,6 +9,7 @@
 package org.opendaylight.restconf.websocket.client;
 
 import com.google.common.base.Preconditions;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -40,6 +41,8 @@ final class ApplicationSettings {
             this.password = password;
         }
 
+        @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+                justification = "https://github.com/spotbugs/spotbugs/issues/811")
         private static Credentials extractCredentials(final String basicAuthentication) {
             final String[] credentials = basicAuthentication.split(":");
             Preconditions.checkArgument(credentials.length == 2, "Both username and password must be specified in the "

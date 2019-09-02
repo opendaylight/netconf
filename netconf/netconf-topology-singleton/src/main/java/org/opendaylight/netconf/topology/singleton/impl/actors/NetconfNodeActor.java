@@ -18,6 +18,7 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -314,10 +315,14 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         resolveSchemaContext(createSchemaContextFactory(masterReference), slaveSalManager, masterReference, 1);
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private DOMRpcService getDOMRpcService(final ActorRef masterReference) {
         return new ProxyDOMRpcService(setup.getActorSystem(), masterReference, id, actorResponseWaitTime);
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private DOMActionService getDOMActionService(final ActorRef masterReference) {
         return new ProxyDOMActionService(setup.getActorSystem(), masterReference, id, actorResponseWaitTime);
     }

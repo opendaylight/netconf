@@ -14,6 +14,7 @@ import akka.pattern.Patterns;
 import akka.util.Timeout;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.SettableFuture;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import java.util.Optional;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -198,21 +199,20 @@ class ActorProxyTransactionFacade implements ProxyTransactionFacade {
 
                 settableFuture.set(CommitInfo.empty());
             }
+
+            private TransactionCommitFailedException newTransactionCommitFailedException(final Throwable failure) {
+                return new TransactionCommitFailedException(String.format("%s: Commit of transaction failed",
+                    getIdentifier()), failure);
+            }
         }, executionContext);
 
         return FluentFuture.from(settableFuture);
     }
 
-    private TransactionCommitFailedException newTransactionCommitFailedException(final Throwable failure) {
-        return new TransactionCommitFailedException(String.format("%s: Commit of transaction failed", getIdentifier()),
-                failure);
-    }
-
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private Throwable processFailure(final Throwable failure) {
-        if (failure instanceof AskTimeoutException) {
-            return NetconfTopologyUtils.createMasterIsDownException(id, (Exception)failure);
-        }
-
-        return failure;
+        return failure instanceof AskTimeoutException
+                ? NetconfTopologyUtils.createMasterIsDownException(id, (Exception)failure) : failure;
     }
 }

@@ -233,6 +233,8 @@ public class NetconfDevice
         return remoteSessionCapabilities.isNotificationsSupported() && reconnectOnSchemasChange;
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private synchronized void handleSalInitializationSuccess(final MountPointContext result,
                                         final NetconfSessionPreferences remoteSessionCapabilities,
                                         final DOMRpcService deviceRpc,
@@ -257,6 +259,8 @@ public class NetconfDevice
         }
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void handleSalInitializationFailure(final Throwable throwable,
                                                 final RemoteDeviceCommunicator<NetconfMessage> listener) {
         LOG.error("{}: Initialization in sal failed, disconnecting from device", id, throwable);
@@ -280,6 +284,8 @@ public class NetconfDevice
         this.connected = connected;
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void addProvidedSourcesToSchemaRegistry(final DeviceSources deviceSources) {
         final SchemaSourceProvider<YangTextSchemaSource> yangProvider = deviceSources.getSourceProvider();
         for (final SourceIdentifier sourceId : deviceSources.getProvidedSources()) {
