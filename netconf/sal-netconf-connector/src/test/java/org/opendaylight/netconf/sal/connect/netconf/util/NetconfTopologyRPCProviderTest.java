@@ -33,6 +33,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.unencrypted.LoginPasswordUnencryptedBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yangtools.yang.common.Uint16;
 
 public class NetconfTopologyRPCProviderTest {
     private static final NodeId NODE_ID = new NodeId("testing-node");
@@ -91,7 +92,7 @@ public class NetconfTopologyRPCProviderTest {
 
         builder.setCredentials(credentials);
         builder.setHost(new Host(new IpAddress(new Ipv4Address("10.18.16.188"))));
-        builder.setPort(new PortNumber(830));
+        builder.setPort(new PortNumber(Uint16.valueOf(830)));
         builder.setTcpOnly(Boolean.FALSE);
         builder.setNodeId(NODE_ID.toString());
         return builder.build();
