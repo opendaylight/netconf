@@ -16,6 +16,7 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -200,6 +201,8 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
         return genericNotificationPublisherReg;
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void unregisterNotificationPublisher(
             final StreamNameType streamName,
             final GenericNotificationPublisherReg genericNotificationPublisherReg) {
