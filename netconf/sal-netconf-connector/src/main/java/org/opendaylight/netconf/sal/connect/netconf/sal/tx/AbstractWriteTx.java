@@ -16,6 +16,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -239,6 +240,8 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
         return transformed;
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void extractResult(final List<DOMRpcResult> domRpcResults,
                                final SettableFuture<RpcResult<Void>> transformed) {
         DocumentedException.ErrorType errType = DocumentedException.ErrorType.APPLICATION;
