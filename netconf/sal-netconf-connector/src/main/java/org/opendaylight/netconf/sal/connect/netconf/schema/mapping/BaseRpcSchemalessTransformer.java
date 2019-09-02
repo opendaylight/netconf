@@ -24,8 +24,8 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransform
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.YangConstants;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -93,7 +93,7 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfM
             final Element xmlData = NetconfMessageTransformUtil.getDataSubtree(message.getDocument());
             final Document data = XmlUtil.newDocument();
             data.appendChild(data.importNode(xmlData, true));
-            AnyXmlNode xmlDataNode = Builders.anyXmlBuilder()
+            DOMSourceAnyxmlNode xmlDataNode = Builders.anyXmlBuilder()
                     .withNodeIdentifier(NetconfMessageTransformUtil.NETCONF_DATA_NODEID)
                     .withValue(new DOMSource(data))
                     .build();

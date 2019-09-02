@@ -21,8 +21,8 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransform
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -57,7 +57,7 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
                     + message + ", cannot find namespace", e);
         }
 
-        final AnyXmlNode notificationPayload = Builders.anyXmlBuilder()
+        final DOMSourceAnyxmlNode notificationPayload = Builders.anyXmlBuilder()
                 .withNodeIdentifier(new NodeIdentifier(notificationNoRev))
                 .withValue(new DOMSource(stripped.getValue().getDomElement()))
                 .build();
@@ -74,7 +74,7 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
     public NetconfMessage toRpcRequest(final SchemaPath rpc, final NormalizedNode<?, ?> input) {
         final DOMSource payload = (DOMSource) input.getValue();
         wrapPayload((Document) payload.getNode());
-        return new NetconfMessage((Document) ((AnyXmlNode) input).getValue().getNode());
+        return new NetconfMessage((Document) ((DOMSourceAnyxmlNode) input).getValue().getNode());
     }
 
     /**
@@ -86,7 +86,7 @@ public class SchemalessMessageTransformer implements MessageTransformer<NetconfM
     @Override
     public DOMRpcResult toRpcResult(final NetconfMessage rpcReply, final SchemaPath rpc) {
         final Document document = rpcReply.getDocument();
-        final AnyXmlNode result;
+        final DOMSourceAnyxmlNode result;
         if (BaseRpcSchemalessTransformer.isOkPresent(document)) {
             result =  null;
         } else {

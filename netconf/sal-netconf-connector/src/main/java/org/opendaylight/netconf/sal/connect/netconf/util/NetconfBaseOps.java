@@ -51,8 +51,8 @@ import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -285,7 +285,7 @@ public final class NetconfBaseOps {
     public DataContainerChild<?, ?> createEditConfigStrcture(final Optional<NormalizedNode<?, ?>> lastChild,
                                                              final Optional<ModifyAction> operation,
                                                              final YangInstanceIdentifier dataPath) {
-        final AnyXmlNode configContent = transformer.createEditConfigStructure(lastChild, dataPath, operation);
+        final DOMSourceAnyxmlNode configContent = transformer.createEditConfigStructure(lastChild, dataPath, operation);
         return Builders.choiceBuilder().withNodeIdentifier(EDIT_CONTENT_NODEID).withChild(configContent).build();
     }
 
