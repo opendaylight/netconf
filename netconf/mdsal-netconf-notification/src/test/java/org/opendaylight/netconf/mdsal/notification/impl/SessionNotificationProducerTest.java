@@ -37,6 +37,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.not
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionStart;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.ZeroBasedCounter32;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,7 +124,7 @@ public class SessionNotificationProducerTest {
                 .setSessionId(id)
                 .setSourceHost(HostBuilder.getDefaultInstance("0.0.0.0"))
                 .setUsername("user")
-                .setInRpcs(new ZeroBasedCounter32(inRpc))
+                .setInRpcs(new ZeroBasedCounter32(Uint32.valueOf(inRpc)))
                 .build();
     }
 
