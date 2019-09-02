@@ -21,7 +21,7 @@ import org.opendaylight.restconf.common.util.IdentityValuesDTO;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO.IdentityValue;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO.Predicate;
 import org.opendaylight.restconf.common.util.RestUtil;
-import org.opendaylight.yangtools.concepts.Codec;
+import org.opendaylight.yangtools.concepts.IllegalArgumentCodec;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -51,21 +51,22 @@ public final class RestCodec {
     private RestCodec() {
     }
 
-    public static Codec<Object, Object> from(final TypeDefinition<?> typeDefinition,
+    // FIXME: IllegalArgumentCodec is not quite accurate
+    public static IllegalArgumentCodec<Object, Object> from(final TypeDefinition<?> typeDefinition,
             final DOMMountPoint mountPoint, final ControllerContext controllerContext) {
         return new ObjectCodec(typeDefinition, mountPoint, controllerContext);
     }
 
     @SuppressWarnings("rawtypes")
-    public static final class ObjectCodec implements Codec<Object, Object> {
+    public static final class ObjectCodec implements IllegalArgumentCodec<Object, Object> {
 
         private static final Logger LOG = LoggerFactory.getLogger(ObjectCodec.class);
 
-        public static final Codec LEAFREF_DEFAULT_CODEC = new LeafrefCodecImpl();
+        public static final IllegalArgumentCodec LEAFREF_DEFAULT_CODEC = new LeafrefCodecImpl();
 
         private final ControllerContext controllerContext;
-        private final Codec instanceIdentifier;
-        private final Codec identityrefCodec;
+        private final IllegalArgumentCodec instanceIdentifier;
+        private final IllegalArgumentCodec identityrefCodec;
 
         private final TypeDefinition<?> type;
 
