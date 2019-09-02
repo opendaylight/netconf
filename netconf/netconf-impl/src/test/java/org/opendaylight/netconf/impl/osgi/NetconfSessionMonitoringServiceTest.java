@@ -35,16 +35,17 @@ import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistrat
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.HostBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 public class NetconfSessionMonitoringServiceTest {
 
     private static final Session SESSION_1 = new SessionBuilder()
-            .setSessionId(1L)
+            .setSessionId(Uint32.valueOf(1))
             .setSourceHost(HostBuilder.getDefaultInstance("0.0.0.0"))
             .setUsername("admin")
             .build();
     private static final Session SESSION_2 = new SessionBuilder()
-            .setSessionId(2L)
+            .setSessionId(Uint32.valueOf(2))
             .setSourceHost(HostBuilder.getDefaultInstance("0.0.0.0"))
             .setUsername("admin")
             .build();

@@ -132,6 +132,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcError.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -590,7 +591,7 @@ public class MountPointEndToEndTest {
             throws InterruptedException, ExecutionException, TimeoutException {
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(1234))
+                .setPort(new PortNumber(Uint16.valueOf(1234)))
                 .setActorResponseWaitTime(10)
                 .setTcpOnly(Boolean.TRUE)
                 .setSchemaless(Boolean.FALSE)
