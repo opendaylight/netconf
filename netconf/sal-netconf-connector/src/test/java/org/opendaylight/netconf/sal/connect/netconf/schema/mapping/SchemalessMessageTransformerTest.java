@@ -21,7 +21,7 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransform
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Document;
@@ -66,8 +66,8 @@ public class SchemalessMessageTransformerTest {
                 SchemalessMessageTransformer.SCHEMALESS_NOTIFICATION_PAYLOAD.getNodeType());
         final QName qName =
                 QName.create("org:opendaylight:notification:test:ns:yang:user-notification", "user-visited-page");
-        final AnyXmlNode dataContainerChild =
-                (AnyXmlNode) domNotification.getBody().getChild(new YangInstanceIdentifier.NodeIdentifier(qName)).get();
+        final DOMSourceAnyxmlNode dataContainerChild = (DOMSourceAnyxmlNode) domNotification.getBody()
+                .getChild(new YangInstanceIdentifier.NodeIdentifier(qName)).get();
         final Diff diff = XMLUnit.compareXML(payload, dataContainerChild.getValue().getNode().getOwnerDocument());
         Assert.assertTrue(diff.toString(), diff.similar());
 
@@ -76,7 +76,7 @@ public class SchemalessMessageTransformerTest {
     @Test
     public void toRpcRequest() throws Exception {
         final Node src = XmlUtil.readXmlToDocument("<test-rpc xmlns=\"test-ns\"><input>aaa</input></test-rpc>");
-        final AnyXmlNode input = Builders.anyXmlBuilder()
+        final DOMSourceAnyxmlNode input = Builders.anyXmlBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(TEST_RPC))
                 .withValue(new DOMSource(src))
                 .build();

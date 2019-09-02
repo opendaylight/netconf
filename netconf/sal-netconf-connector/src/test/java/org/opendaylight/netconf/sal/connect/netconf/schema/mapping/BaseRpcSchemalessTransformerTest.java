@@ -25,9 +25,9 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.re
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.edit.config.input.target.config.target.Candidate;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -75,7 +75,7 @@ public class BaseRpcSchemalessTransformerTest {
     public void toRpcRequest() throws Exception {
         final Document doc =
                 XmlUtil.readXmlToDocument(getClass().getResourceAsStream("/schemaless/edit-config/container.xml"));
-        final AnyXmlNode xml = Builders.anyXmlBuilder()
+        final DOMSourceAnyxmlNode xml = Builders.anyXmlBuilder()
                 .withNodeIdentifier(new YangInstanceIdentifier.NodeIdentifier(
                         NetconfMessageTransformUtil.NETCONF_CONFIG_QNAME))
                 .withValue(new DOMSource(doc.getDocumentElement()))
@@ -123,7 +123,7 @@ public class BaseRpcSchemalessTransformerTest {
         Assert.assertEquals(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME, rpcReply.getNodeType());
         final Optional<?> dataOpt = rpcReply.getChild(NetconfMessageTransformUtil.NETCONF_DATA_NODEID);
         Assert.assertTrue(dataOpt.isPresent());
-        final AnyXmlNode data = (AnyXmlNode) dataOpt.get();
+        final DOMSourceAnyxmlNode data = (DOMSourceAnyxmlNode) dataOpt.get();
         final Diff diff = XMLUnit.compareXML(dataElement.getOwnerDocument(), (Document) data.getValue().getNode());
         Assert.assertTrue(diff.toString(), diff.similar());
     }

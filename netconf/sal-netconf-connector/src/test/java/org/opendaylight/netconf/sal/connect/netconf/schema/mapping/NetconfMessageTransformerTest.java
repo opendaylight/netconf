@@ -72,8 +72,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -249,8 +249,8 @@ public class NetconfMessageTransformerTest {
         final DOMRpcResult compositeNodeRpcResult = transformer.toRpcResult(response, toPath(GET_SCHEMA_QNAME));
         assertTrue(compositeNodeRpcResult.getErrors().isEmpty());
         assertNotNull(compositeNodeRpcResult.getResult());
-        final DOMSource schemaContent =
-            ((AnyXmlNode) ((ContainerNode) compositeNodeRpcResult.getResult()).getValue().iterator().next()).getValue();
+        final DOMSource schemaContent = ((DOMSourceAnyxmlNode) ((ContainerNode) compositeNodeRpcResult.getResult())
+                .getValue().iterator().next()).getValue();
         assertThat(schemaContent.getNode().getTextContent(),
                 CoreMatchers.containsString("Random YANG SCHEMA"));
     }
@@ -292,8 +292,8 @@ public class NetconfMessageTransformerTest {
         final MapEntryNode schemaNode =
                 Builders.mapEntryBuilder().withNodeIdentifier(identifierWithPredicates).withValue(values).build();
 
-        final AnyXmlNode data = (AnyXmlNode) ((ContainerNode) compositeNodeRpcResult
-                .getResult()).getChild(toId(NETCONF_DATA_QNAME)).get();
+        final DOMSourceAnyxmlNode data = (DOMSourceAnyxmlNode) ((ContainerNode) compositeNodeRpcResult.getResult())
+                .getChild(toId(NETCONF_DATA_QNAME)).get();
 
         NormalizedNodeResult nodeResult =
                 NetconfUtil.transformDOMSourceToNormalizedNode(SCHEMA, data.getValue());
