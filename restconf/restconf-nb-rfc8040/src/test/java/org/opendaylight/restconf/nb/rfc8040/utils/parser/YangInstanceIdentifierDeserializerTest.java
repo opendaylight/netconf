@@ -26,6 +26,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint8;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
@@ -511,7 +512,7 @@ public class YangInstanceIdentifierDeserializerTest {
                 ((NodeIdentifierWithPredicates)result.getLastPathArgument()).entrySet().iterator();
 
         assertEquals(":foo", resultListKeys.next().getValue());
-        assertEquals(new Short("1"), resultListKeys.next().getValue());
+        assertEquals(Uint8.ONE, resultListKeys.next().getValue());
         assertEquals(true, resultListKeys.next().getValue());
     }
 
