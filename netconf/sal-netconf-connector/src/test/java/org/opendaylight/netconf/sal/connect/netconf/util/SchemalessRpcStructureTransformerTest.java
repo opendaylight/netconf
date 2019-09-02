@@ -33,7 +33,7 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -110,11 +110,11 @@ public class SchemalessRpcStructureTransformerTest {
         if (expectedException != null) {
             thrown.expect(expectedException);
         }
-        AnyXmlNode data = Builders.anyXmlBuilder()
+        DOMSourceAnyxmlNode data = Builders.anyXmlBuilder()
                 .withNodeIdentifier(createNodeId(path.getLastPathArgument().getNodeType().getLocalName()))
                 .withValue(source)
                 .build();
-        final AnyXmlNode anyXmlNode =
+        final DOMSourceAnyxmlNode anyXmlNode =
                 adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(ModifyAction.REPLACE));
         final String s = XmlUtil.toString((Element) anyXmlNode.getValue().getNode());
         Diff diff = new Diff(expectedConfig, s);
@@ -123,7 +123,7 @@ public class SchemalessRpcStructureTransformerTest {
 
     @Test
     public void testToFilterStructure() throws Exception {
-        final AnyXmlNode anyXmlNode = (AnyXmlNode) adapter.toFilterStructure(path);
+        final DOMSourceAnyxmlNode anyXmlNode = (DOMSourceAnyxmlNode) adapter.toFilterStructure(path);
         final String s = XmlUtil.toString((Element) anyXmlNode.getValue().getNode());
         Diff diff = new Diff(expectedFilter, s);
         Assert.assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
@@ -131,11 +131,12 @@ public class SchemalessRpcStructureTransformerTest {
 
     @Test
     public void testSelectFromDataStructure() throws Exception {
-        AnyXmlNode data = Builders.anyXmlBuilder()
+        DOMSourceAnyxmlNode data = Builders.anyXmlBuilder()
                 .withNodeIdentifier(createNodeId(path.getLastPathArgument().getNodeType().getLocalName()))
                 .withValue(new DOMSource(XmlUtil.readXmlToDocument(getConfigData).getDocumentElement()))
                 .build();
-        final AnyXmlNode dataStructure = (AnyXmlNode) adapter.selectFromDataStructure(data, path).get();
+        final DOMSourceAnyxmlNode dataStructure = (DOMSourceAnyxmlNode) adapter.selectFromDataStructure(data, path)
+                .get();
         final XmlElement s = XmlElement.fromDomDocument((Document) dataStructure.getValue().getNode());
         final String dataFromReply = XmlUtil.toString(s.getOnlyChildElement().getDomElement());
         final String expectedData = XmlUtil.toString((Element) source.getNode());
