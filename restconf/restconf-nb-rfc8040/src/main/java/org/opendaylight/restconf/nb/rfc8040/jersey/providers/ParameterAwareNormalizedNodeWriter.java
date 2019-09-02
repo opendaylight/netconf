@@ -21,10 +21,10 @@ import java.util.Set;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.AugmentationNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ChoiceNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
@@ -162,8 +162,8 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
             writer.scalarValue(nodeAsLeaf.getValue());
             writer.endNode();
             return true;
-        } else if (node instanceof AnyXmlNode) {
-            final AnyXmlNode anyXmlNode = (AnyXmlNode)node;
+        } else if (node instanceof DOMSourceAnyxmlNode) {
+            final DOMSourceAnyxmlNode anyXmlNode = (DOMSourceAnyxmlNode)node;
             writer.startAnyxmlNode(anyXmlNode.getIdentifier());
             writer.domSourceValue(anyXmlNode.getValue());
             writer.endNode();

@@ -27,7 +27,7 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransform
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.common.RpcResult;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
@@ -54,7 +54,7 @@ public final class SchemalessNetconfDeviceRpc implements DOMRpcService {
     @Override
     public ListenableFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
         final MessageTransformer<NetconfMessage> transformer;
-        if (input instanceof AnyXmlNode) {
+        if (input instanceof DOMSourceAnyxmlNode) {
             transformer = schemalessTransformer;
         } else if (isBaseRpc(type)) {
             transformer = baseRpcTransformer;

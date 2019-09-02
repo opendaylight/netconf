@@ -28,7 +28,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithV
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
-import org.opendaylight.yangtools.yang.model.api.AnyXmlSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AugmentationTarget;
 import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
@@ -78,8 +78,8 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
             return new Choice((ChoiceSchemaNode) potential);
         } else if (potential instanceof LeafListSchemaNode) {
             return fromLeafListSchemaNode((LeafListSchemaNode) potential);
-        } else if (potential instanceof AnyXmlSchemaNode) {
-            return new AnyXml((AnyXmlSchemaNode) potential);
+        } else if (potential instanceof AnyxmlSchemaNode) {
+            return new AnyXml((AnyxmlSchemaNode) potential);
         }
         return null;
     }
@@ -236,7 +236,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
     }
 
     private static final class AnyXml extends AbstractSimple<NodeIdentifier> {
-        AnyXml(final AnyXmlSchemaNode schema) {
+        AnyXml(final AnyxmlSchemaNode schema) {
             super(NodeIdentifier.create(schema.getQName()));
         }
 

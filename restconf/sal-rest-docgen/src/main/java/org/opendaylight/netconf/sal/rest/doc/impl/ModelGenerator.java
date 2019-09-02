@@ -25,8 +25,8 @@ import java.util.regex.Pattern;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Post;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.model.api.AnyDataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.AnyXmlSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.AnydataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
@@ -339,11 +339,11 @@ public class ModelGenerator {
                     }
                     continue;
 
-                } else if (node instanceof AnyXmlSchemaNode) {
-                    property = processAnyXMLNode((AnyXmlSchemaNode) node);
+                } else if (node instanceof AnyxmlSchemaNode) {
+                    property = processAnyXMLNode((AnyxmlSchemaNode) node);
 
-                } else if (node instanceof AnyDataSchemaNode) {
-                    property = processAnydataNode((AnyDataSchemaNode) node);
+                } else if (node instanceof AnydataSchemaNode) {
+                    property = processAnydataNode((AnydataSchemaNode) node);
 
                 } else if (node instanceof ContainerSchemaNode) {
                     property = processDataNodeContainer((ContainerSchemaNode) node, parentName, models, isConfig,
@@ -411,11 +411,11 @@ public class ModelGenerator {
                 }
                 continue;
 
-            } else if (node instanceof AnyXmlSchemaNode) {
-                property = processAnyXMLNode((AnyXmlSchemaNode) node);
+            } else if (node instanceof AnyxmlSchemaNode) {
+                property = processAnyXMLNode((AnyxmlSchemaNode) node);
 
-            } else if (node instanceof AnyDataSchemaNode) {
-                property = processAnydataNode((AnyDataSchemaNode) node);
+            } else if (node instanceof AnydataSchemaNode) {
+                property = processAnydataNode((AnydataSchemaNode) node);
 
             } else if (node instanceof ContainerSchemaNode) {
                 property = processDataNodeContainer((ContainerSchemaNode) node, moduleName, models, isConfig,
@@ -457,7 +457,7 @@ public class ModelGenerator {
         return property;
     }
 
-    private static ObjectNode processAnydataNode(final AnyDataSchemaNode leafNode) {
+    private static ObjectNode processAnydataNode(final AnydataSchemaNode leafNode) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse(null);
@@ -470,7 +470,7 @@ public class ModelGenerator {
         return property;
     }
 
-    private static ObjectNode processAnyXMLNode(final AnyXmlSchemaNode leafNode) {
+    private static ObjectNode processAnyXMLNode(final AnyxmlSchemaNode leafNode) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
         final String leafDescription = leafNode.getDescription().orElse(null);

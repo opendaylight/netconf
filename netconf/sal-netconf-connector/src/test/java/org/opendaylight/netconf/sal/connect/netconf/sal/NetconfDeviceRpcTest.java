@@ -39,8 +39,8 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
@@ -105,7 +105,7 @@ public class NetconfDeviceRpcTest {
     private static Node resolveNode(final DOMRpcResult result) {
         DataContainerChild<?, ?> value = ((ContainerNode) result.getResult())
                 .getChild(NetconfMessageTransformUtil.NETCONF_DATA_NODEID).get();
-        Node node = ((AnyXmlNode)value).getValue().getNode();
+        Node node = ((DOMSourceAnyxmlNode)value).getValue().getNode();
         assertNotNull(node);
         return node;
     }

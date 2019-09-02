@@ -40,8 +40,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.schemas.Schema;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.AnyXmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
@@ -169,12 +169,12 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
         }
 
         final DataContainerChild<?, ?> rpcResult = rpcResultOpt.get();
-        verify(rpcResult instanceof AnyXmlNode, "Unexpected result %s", rpcResult);
+        verify(rpcResult instanceof DOMSourceAnyxmlNode, "Unexpected result %s", rpcResult);
         final NormalizedNode<?, ?> dataNode;
 
         try {
             dataNode = NetconfUtil.transformDOMSourceToNormalizedNode(schemaContext,
-                    ((AnyXmlNode) rpcResult).getValue()).getResult();
+                    ((DOMSourceAnyxmlNode) rpcResult).getValue()).getResult();
         } catch (XMLStreamException | URISyntaxException | IOException | SAXException e) {
             LOG.warn("Failed to transform {}", rpcResult, e);
             return Optional.empty();
