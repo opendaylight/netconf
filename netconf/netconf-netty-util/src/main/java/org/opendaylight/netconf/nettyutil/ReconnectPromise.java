@@ -9,6 +9,7 @@ package org.opendaylight.netconf.nettyutil;
 
 import static java.util.Objects.requireNonNull;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -74,6 +75,8 @@ final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionL
      * @return true if initial connection was established successfully, false if initial connection failed due to e.g.
      *         Connection refused, Negotiation failed
      */
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private synchronized boolean isInitialConnectFinished() {
         requireNonNull(pending);
         return pending.isDone() && pending.isSuccess();
