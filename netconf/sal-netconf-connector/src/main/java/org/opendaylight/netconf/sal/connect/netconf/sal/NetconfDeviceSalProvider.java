@@ -11,6 +11,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.Transaction;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
@@ -29,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class NetconfDeviceSalProvider implements AutoCloseable {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfDeviceSalProvider.class);
 
     private final RemoteDeviceId id;
@@ -78,18 +78,18 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
     }
 
     public NetconfDeviceTopologyAdapter getTopologyDatastoreAdapter() {
-        checkState(topologyDatastoreAdapter != null,
-                "%s: Sal provider %s was not initialized by sal. Cannot get topology datastore adapter", id);
-        return topologyDatastoreAdapter;
+        final NetconfDeviceTopologyAdapter local = topologyDatastoreAdapter;
+        checkState(local != null,
+                "%s: Sal provider %s was not initialized by sal. Cannot get topology datastore adapter", id, this);
+        return local;
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void resetTransactionChainForAdapaters() {
         txChain = requireNonNull(dataBroker).createTransactionChain(transactionChainListener);
-
         topologyDatastoreAdapter.setTxChain(txChain);
-
         LOG.trace("{}: Resetting TransactionChain {}", id, txChain);
-
     }
 
     @Override
