@@ -152,9 +152,9 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
                                                  final RemoteDeviceHandler<NetconfSessionPreferences> deviceHandler) {
         //setup default values since default value is not supported in mdsal
         final long defaultRequestTimeoutMillis = node.getDefaultRequestTimeoutMillis() == null
-                ? NetconfTopologyUtils.DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis();
+                ? NetconfTopologyUtils.DEFAULT_REQUEST_TIMEOUT_MILLIS : node.getDefaultRequestTimeoutMillis().toJava();
         final long keepaliveDelay = node.getKeepaliveDelay() == null
-                ? NetconfTopologyUtils.DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay();
+                ? NetconfTopologyUtils.DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay().toJava();
         final boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
                 ? NetconfTopologyUtils.DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
 
@@ -215,7 +215,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final Optional<NetconfSessionPreferences> userCapabilities = getUserCapabilities(node);
         final int rpcMessageLimit =
                 node.getConcurrentRpcLimit() == null
-                        ? NetconfTopologyUtils.DEFAULT_CONCURRENT_RPC_LIMIT : node.getConcurrentRpcLimit();
+                        ? NetconfTopologyUtils.DEFAULT_CONCURRENT_RPC_LIMIT : node.getConcurrentRpcLimit().toJava();
 
         if (rpcMessageLimit < 1) {
             LOG.info("{}: Concurrent rpc limit is smaller than 1, no limit will be enforced.", remoteDeviceId);
@@ -276,17 +276,18 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         //setup default values since default value is not supported in mdsal
         final long clientConnectionTimeoutMillis = node.getConnectionTimeoutMillis() == null
-                ? NetconfTopologyUtils.DEFAULT_CONNECTION_TIMEOUT_MILLIS : node.getConnectionTimeoutMillis();
+                ? NetconfTopologyUtils.DEFAULT_CONNECTION_TIMEOUT_MILLIS : node.getConnectionTimeoutMillis().toJava();
         final long maxConnectionAttempts = node.getMaxConnectionAttempts() == null
-                ? NetconfTopologyUtils.DEFAULT_MAX_CONNECTION_ATTEMPTS : node.getMaxConnectionAttempts();
+                ? NetconfTopologyUtils.DEFAULT_MAX_CONNECTION_ATTEMPTS : node.getMaxConnectionAttempts().toJava();
         final int betweenAttemptsTimeoutMillis = node.getBetweenAttemptsTimeoutMillis() == null
-                ? NetconfTopologyUtils.DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS : node.getBetweenAttemptsTimeoutMillis();
+                ? NetconfTopologyUtils.DEFAULT_BETWEEN_ATTEMPTS_TIMEOUT_MILLIS
+                : node.getBetweenAttemptsTimeoutMillis().toJava();
         final boolean isTcpOnly = node.isTcpOnly() == null
                 ? NetconfTopologyUtils.DEFAULT_IS_TCP_ONLY : node.isTcpOnly();
         final BigDecimal sleepFactor = node.getSleepFactor() == null
                 ? NetconfTopologyUtils.DEFAULT_SLEEP_FACTOR : node.getSleepFactor();
 
-        final InetSocketAddress socketAddress = getSocketAddress(node.getHost(), node.getPort().getValue());
+        final InetSocketAddress socketAddress = getSocketAddress(node.getHost(), node.getPort().getValue().toJava());
 
         final ReconnectStrategyFactory sf =
                 new TimedReconnectStrategyFactory(netconfTopologyDeviceSetup.getEventExecutor(), maxConnectionAttempts,
