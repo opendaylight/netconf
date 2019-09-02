@@ -186,7 +186,8 @@ public class NetconfDevice
                             LOG.info("{} : Try to remount device.", id);
                             onRemoteSessionDown();
                             salFacade.onDeviceReconnected(remoteSessionCapabilities, node);
-                        }, nodeOptional.getIgnoreMissingSchemaSources().getReconnectTime(), TimeUnit.MILLISECONDS);
+                        }, nodeOptional.getIgnoreMissingSchemaSources().getReconnectTime().toJava(),
+                            TimeUnit.MILLISECONDS);
                         return;
                     }
                 }
