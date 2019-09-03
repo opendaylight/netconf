@@ -45,6 +45,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
 public class NetconfCapabilityMonitoringServiceTest {
@@ -61,7 +62,7 @@ public class NetconfCapabilityMonitoringServiceTest {
     private YangModuleCapability moduleCapability1;
     private YangModuleCapability moduleCapability2;
     private static final Session SESSION = new SessionBuilder()
-            .setSessionId(1L)
+            .setSessionId(Uint32.valueOf(1))
             .setSourceHost(HostBuilder.getDefaultInstance("0.0.0.0"))
             .setUsername("admin")
             .build();
