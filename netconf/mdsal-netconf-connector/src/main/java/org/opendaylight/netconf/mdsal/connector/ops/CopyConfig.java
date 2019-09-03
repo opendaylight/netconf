@@ -104,7 +104,7 @@ public final class CopyConfig extends AbstractEdit {
         // <copy-config>, unlike <edit-config>, always replaces entire configuration,
         // so remove old configuration first:
         final DOMDataTreeReadWriteTransaction rwTx = transactionProvider.getOrCreateTransaction();
-        rwTx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.EMPTY, EMPTY_ROOT_NODE);
+        rwTx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.empty(), EMPTY_ROOT_NODE);
 
         // Then create nodes present in the <config> element:
         for (final XmlElement element : configElements) {
@@ -169,7 +169,7 @@ public final class CopyConfig extends AbstractEdit {
     private ContainerNode readData(final XmlElement source) throws DocumentedException {
         final Datastore sourceDatastore = getDatastore(source);
         final DOMDataTreeReadWriteTransaction rwTx = getTransaction(sourceDatastore);
-        final YangInstanceIdentifier dataRoot = YangInstanceIdentifier.EMPTY;
+        final YangInstanceIdentifier dataRoot = YangInstanceIdentifier.empty();
         try {
             final Optional<NormalizedNode<?, ?>> normalizedNodeOptional = rwTx.read(
                 LogicalDatastoreType.CONFIGURATION, dataRoot).get();
