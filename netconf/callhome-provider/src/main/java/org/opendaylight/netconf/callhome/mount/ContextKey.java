@@ -19,6 +19,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yangtools.yang.common.Uint16;
 
 class ContextKey {
     private final IpAddress address;
@@ -77,7 +78,7 @@ class ContextKey {
             checkArgument(ipAddress instanceof Inet6Address);
             yangIp = new IpAddress(IetfInetUtil.INSTANCE.ipv6AddressFor(ipAddress));
         }
-        return new ContextKey(yangIp, new PortNumber(inetSocketAddr.getPort()));
+        return new ContextKey(yangIp, new PortNumber(Uint16.valueOf(inetSocketAddr.getPort())));
     }
 
     @Override
