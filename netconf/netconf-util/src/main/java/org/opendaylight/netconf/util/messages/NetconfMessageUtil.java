@@ -25,7 +25,9 @@ public final class NetconfMessageUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageUtil.class);
 
-    private NetconfMessageUtil() {}
+    private NetconfMessageUtil() {
+
+    }
 
     public static boolean isOKMessage(final NetconfMessage message) throws NetconfDocumentedException {
         return isOKMessage(message.getDocument());
