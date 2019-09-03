@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.console.commands;
 
 import static java.util.Objects.requireNonNull;
@@ -31,6 +30,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.parameters.protocol.specification.tls._case.TlsBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
+import org.opendaylight.yangtools.yang.common.Uint16;
 
 @Service
 @Command(name = "connect-device", scope = "netconf", description = "Connect to a netconf device.")
@@ -132,7 +132,7 @@ public class NetconfConnectDeviceCommand implements Action {
 
         final NetconfNodeBuilder netconfNodeBuilder = new NetconfNodeBuilder();
         netconfNodeBuilder.setHost(new Host(new IpAddress(new Ipv4Address(deviceIp))))
-                          .setPort(new PortNumber(Integer.decode(devicePort)))
+                          .setPort(new PortNumber(Uint16.valueOf(Integer.decode(devicePort))))
                           .setTcpOnly(isTcpOnly)
                           .setSchemaless(isSchemaless);
 
