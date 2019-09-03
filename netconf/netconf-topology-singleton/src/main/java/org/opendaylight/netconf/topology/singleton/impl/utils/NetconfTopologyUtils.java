@@ -214,7 +214,7 @@ public final class NetconfTopologyUtils {
         final IpAddress ipAddress = node.getHost().getIpAddress();
         final InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null
                 ? ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue(),
-                node.getPort().getValue());
+                node.getPort().getValue().intValue());
         return new RemoteDeviceId(nodeId.getValue(), address);
     }
 
