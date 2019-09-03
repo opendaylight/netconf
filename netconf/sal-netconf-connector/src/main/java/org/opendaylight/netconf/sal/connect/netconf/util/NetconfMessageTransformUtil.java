@@ -96,7 +96,9 @@ public final class NetconfMessageTransformUtil {
     private static final Document BLANK_DOCUMENT = XmlUtil.newDocument();
     public static final String EVENT_TIME = "eventTime";
 
-    private NetconfMessageTransformUtil() {}
+    private NetconfMessageTransformUtil() {
+
+    }
 
     public static final QName IETF_NETCONF_MONITORING =
             QName.create(NetconfState.QNAME, "ietf-netconf-monitoring").intern();
