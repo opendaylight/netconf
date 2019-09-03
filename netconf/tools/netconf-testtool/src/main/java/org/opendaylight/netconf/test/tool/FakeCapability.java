@@ -5,10 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.opendaylight.netconf.api.capability.BasicCapability;
 import org.opendaylight.netconf.api.capability.YangModuleCapability;
 
@@ -47,6 +46,6 @@ public class FakeCapability extends BasicCapability {
      */
     @Override
     public Optional<String> getCapabilitySchema() {
-        return Optional.absent();
+        return Optional.empty();
     }
 }

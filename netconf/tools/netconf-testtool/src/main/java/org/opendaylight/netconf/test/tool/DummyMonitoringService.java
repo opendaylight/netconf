@@ -44,10 +44,10 @@ public class DummyMonitoringService implements NetconfMonitoringService {
             .setIdentifier(capability.getModuleName().get())
             .setNamespace(new Uri(capability.getModuleNamespace().get()))
             .setFormat(Yang.class)
-            .setVersion(capability.getRevision().or(""))
+            .setVersion(capability.getRevision().orElse(""))
             .setLocation(Collections.singletonList(new Location(Enumeration.NETCONF)))
             .withKey(new SchemaKey(Yang.class, capability.getModuleName().get(),
-                capability.getRevision().or("")))
+                capability.getRevision().orElse("")))
             .build();
 
     private final Capabilities capabilities;

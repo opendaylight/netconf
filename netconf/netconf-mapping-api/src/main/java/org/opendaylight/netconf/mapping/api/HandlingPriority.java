@@ -5,13 +5,14 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mapping.api;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import java.util.Objects;
+import java.util.Optional;
 
 public final class HandlingPriority implements Comparable<HandlingPriority> {
 
@@ -21,11 +22,11 @@ public final class HandlingPriority implements Comparable<HandlingPriority> {
 
     private Integer priority;
 
-    public static HandlingPriority getHandlingPriority(int priority) {
+    public static HandlingPriority getHandlingPriority(final int priority) {
         return new HandlingPriority(priority);
     }
 
-    private HandlingPriority(int priority) {
+    private HandlingPriority(final int priority) {
         this.priority = priority;
     }
 
@@ -38,13 +39,13 @@ public final class HandlingPriority implements Comparable<HandlingPriority> {
      * @return priority number or Optional.absent otherwise
      */
     public Optional<Integer> getPriority() {
-        return Optional.fromNullable(priority);
+        return Optional.ofNullable(priority);
     }
 
-    public HandlingPriority increasePriority(int priorityIncrease) {
-        Preconditions.checkState(priority != null, "Unable to increase priority for %s", this);
-        Preconditions.checkArgument(priorityIncrease > 0, "Negative increase");
-        Preconditions.checkArgument(Long.valueOf(priority) + priorityIncrease < Integer.MAX_VALUE,
+    public HandlingPriority increasePriority(final int priorityIncrease) {
+        checkState(priority != null, "Unable to increase priority for %s", this);
+        checkArgument(priorityIncrease > 0, "Negative increase");
+        checkArgument(Long.valueOf(priority) + priorityIncrease < Integer.MAX_VALUE,
                 "Resulting priority cannot be higher than %s", Integer.MAX_VALUE);
         return getHandlingPriority(priority + priorityIncrease);
     }
@@ -55,7 +56,7 @@ public final class HandlingPriority implements Comparable<HandlingPriority> {
 
     @Override
     @SuppressWarnings("checkstyle:parameterName")
-    public int compareTo(HandlingPriority o) {
+    public int compareTo(final HandlingPriority o) {
         if (this == o) {
             return 0;
         }
@@ -80,7 +81,7 @@ public final class HandlingPriority implements Comparable<HandlingPriority> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }

@@ -5,11 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.api.capability;
 
-import com.google.common.base.Optional;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Contains capability URI announced by server hello message and optionally its
