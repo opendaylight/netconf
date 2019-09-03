@@ -27,6 +27,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddressBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yangtools.yang.common.Uint16;
 
 public class ContextKeyTest {
     private IpAddress address1;
@@ -48,8 +49,8 @@ public class ContextKeyTest {
         address1 = IpAddressBuilder.getDefaultInstance("1.2.3.4");
         address2 = IpAddressBuilder.getDefaultInstance("5.6.7.8");
 
-        port1 = new PortNumber(123);
-        port2 = new PortNumber(456);
+        port1 = new PortNumber(Uint16.valueOf(123));
+        port2 = new PortNumber(Uint16.valueOf(456));
 
         mockNode = mock(NetconfNode.class);
         mockSession = mock(NetconfClientSession.class);

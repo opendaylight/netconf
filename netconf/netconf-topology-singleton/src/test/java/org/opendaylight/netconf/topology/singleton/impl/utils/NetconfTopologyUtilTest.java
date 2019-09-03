@@ -23,13 +23,15 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.Uint16;
 
 public class NetconfTopologyUtilTest {
 
     @Test
     public void testCreateRemoteDeviceId() {
         final Host host = new Host(new IpAddress(new Ipv4Address("127.0.0.1")));
-        final NetconfNode netconfNode = new NetconfNodeBuilder().setHost(host).setPort(new PortNumber(9999)).build();
+        final NetconfNode netconfNode = new NetconfNodeBuilder().setHost(host)
+                .setPort(new PortNumber(Uint16.valueOf(9999))).build();
         final NodeId nodeId = new NodeId("testing-node");
         final RemoteDeviceId id = NetconfTopologyUtils.createRemoteDeviceId(nodeId, netconfNode);
 
