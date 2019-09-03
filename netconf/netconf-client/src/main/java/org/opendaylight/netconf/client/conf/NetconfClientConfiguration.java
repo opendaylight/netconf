@@ -7,9 +7,10 @@
  */
 package org.opendaylight.netconf.client.conf;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.base.MoreObjects.ToStringHelper;
-import com.google.common.base.Preconditions;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
@@ -96,8 +97,7 @@ public class NetconfClientConfiguration {
     }
 
     private void validateConfiguration() {
-        Preconditions.checkNotNull(clientProtocol, " ");
-        switch (clientProtocol) {
+        switch (requireNonNull(clientProtocol)) {
             case TLS:
                 validateTlsConfiguration();
                 validateTcpConfiguration();
@@ -115,19 +115,19 @@ public class NetconfClientConfiguration {
     }
 
     protected void validateTlsConfiguration() {
-        Preconditions.checkNotNull(sslHandlerFactory, "sslHandlerFactory");
+        requireNonNull(sslHandlerFactory, "sslHandlerFactory");
     }
 
     protected void validateSshConfiguration() {
-        Preconditions.checkNotNull(authHandler, "authHandler");
+        requireNonNull(authHandler, "authHandler");
     }
 
     protected void validateTcpConfiguration() {
-        Preconditions.checkNotNull(address, "address");
-        Preconditions.checkNotNull(clientProtocol, "clientProtocol");
-        Preconditions.checkNotNull(connectionTimeoutMillis, "connectionTimeoutMillis");
-        Preconditions.checkNotNull(sessionListener, "sessionListener");
-        Preconditions.checkNotNull(reconnectStrategy, "reconnectStrategy");
+        requireNonNull(address, "address");
+        requireNonNull(clientProtocol, "clientProtocol");
+        requireNonNull(connectionTimeoutMillis, "connectionTimeoutMillis");
+        requireNonNull(sessionListener, "sessionListener");
+        requireNonNull(reconnectStrategy, "reconnectStrategy");
     }
 
     @Override
