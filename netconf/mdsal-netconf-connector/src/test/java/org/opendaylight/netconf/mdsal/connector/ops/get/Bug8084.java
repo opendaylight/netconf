@@ -62,7 +62,7 @@ public class Bug8084 {
                 QName.create(BASE, "id13"),
                 QName.create("urn:opendaylight:mdsal:mapping:test", "2015-02-26", "foo"));
         final QName idActual = (QName) ((NodeIdentifierWithPredicates) actual.getLastPathArgument())
-                .getKeyValues().get(QName.create(BASE, "id12"));
+                .getValue(QName.create(BASE, "id12"));
 
         final YangInstanceIdentifier expected = YangInstanceIdentifier.builder()
                 .node(BASE)
@@ -70,7 +70,7 @@ public class Bug8084 {
                 .nodeWithKey(QName.create(BASE, "multi-key-list2"), inputs)
                 .build();
         final QName idExpected = (QName) ((NodeIdentifierWithPredicates) expected.getLastPathArgument())
-                .getKeyValues().get(QName.create(BASE, "id12"));
+                .getValue(QName.create(BASE, "id12"));
         assertEquals(idExpected, idActual);
         assertEquals(expected, actual);
     }

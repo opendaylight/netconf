@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -541,11 +540,11 @@ public class JSONRestconfServiceImplTest {
                 expNodeType = (QName) listEntry[0];
 
                 assertTrue(actual instanceof NodeIdentifierWithPredicates);
-                final Map<QName, Object> keyValues = ((NodeIdentifierWithPredicates)actual).getKeyValues();
-                assertEquals(String.format("Path arg %d keyValues size", index + 1), 1, keyValues.size());
+                final NodeIdentifierWithPredicates nip = (NodeIdentifierWithPredicates)actual;
+                assertEquals(String.format("Path arg %d keyValues size", index + 1), 1, nip.size());
                 final QName expKey = (QName) listEntry[1];
                 assertEquals(String.format("Path arg %d keyValue for %s", index + 1, expKey), listEntry[2],
-                        keyValues.get(expKey));
+                    nip.getValue(expKey));
             } else {
                 expNodeType = (QName) expArgs[index];
             }

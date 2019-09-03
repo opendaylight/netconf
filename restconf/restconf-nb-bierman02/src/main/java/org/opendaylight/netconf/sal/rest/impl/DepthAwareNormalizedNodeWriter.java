@@ -13,7 +13,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.netconf.sal.rest.api.RestconfNormalizedNodeWriter;
@@ -182,19 +182,18 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
         if (currentDepth < maxDepth) {
             writeChildren(mapEntryNode.getValue());
         } else if (currentDepth == maxDepth) {
-            writeOnlyKeys(mapEntryNode.getIdentifier().getKeyValues());
+            writeOnlyKeys(mapEntryNode.getIdentifier().entrySet());
         }
         return true;
     }
 
-    private void writeOnlyKeys(final Map<QName, Object> keyValues) throws IllegalArgumentException, IOException {
-        for (final Map.Entry<QName, Object> entry : keyValues.entrySet()) {
+    private void writeOnlyKeys(final Set<Entry<QName, Object>> entries) throws IOException {
+        for (final Entry<QName, Object> entry : entries) {
             writer.startLeafNode(new NodeIdentifier(entry.getKey()));
             writer.scalarValue(entry.getValue());
             writer.endNode();
         }
         writer.endNode();
-
     }
 
     protected boolean writeMapEntryNode(final MapEntryNode node) throws IOException {
@@ -268,7 +267,7 @@ public class DepthAwareNormalizedNodeWriter implements RestconfNormalizedNodeWri
             final NormalizedNodeStreamWriter writer = getWriter();
             writer.startMapEntryNode(node.getIdentifier(), childSizeHint(node.getValue()));
 
-            final Set<QName> qnames = node.getIdentifier().getKeyValues().keySet();
+            final Set<QName> qnames = node.getIdentifier().keySet();
             // Write out all the key children
             for (final QName qname : qnames) {
                 final Optional<? extends NormalizedNode<?, ?>> child = node.getChild(new NodeIdentifier(qname));

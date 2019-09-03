@@ -114,8 +114,7 @@ public final class PutDataTransactionUtil {
         if (schemaNode instanceof ListSchemaNode) {
             final List<QName> keyDefinitions = ((ListSchemaNode) schemaNode).getKeyDefinition();
             if (lastPathArgument instanceof NodeIdentifierWithPredicates && data instanceof MapEntryNode) {
-                final Map<QName, Object> uriKeyValues = ((NodeIdentifierWithPredicates) lastPathArgument)
-                        .getKeyValues();
+                final Map<QName, Object> uriKeyValues = ((NodeIdentifierWithPredicates) lastPathArgument).asMap();
                 isEqualUriAndPayloadKeyValues(uriKeyValues, (MapEntryNode) data, keyDefinitions);
             }
         }
@@ -129,7 +128,7 @@ public final class PutDataTransactionUtil {
                 mutableCopyUriKeyValues.remove(keyDefinition), ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
                 "Missing key %s in URI.", keyDefinition);
 
-            final Object dataKeyValue = payload.getIdentifier().getKeyValues().get(keyDefinition);
+            final Object dataKeyValue = payload.getIdentifier().getValue(keyDefinition);
 
             if (!uriKeyValue.equals(dataKeyValue)) {
                 final String errMsg = "The value '" + uriKeyValue + "' for key '" + keyDefinition.getLocalName()

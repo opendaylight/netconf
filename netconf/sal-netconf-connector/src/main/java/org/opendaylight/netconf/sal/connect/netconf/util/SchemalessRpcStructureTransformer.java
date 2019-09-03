@@ -19,7 +19,6 @@ import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
@@ -160,8 +159,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
                                             final YangInstanceIdentifier.PathArgument lastPathArgument) {
         final YangInstanceIdentifier.NodeIdentifierWithPredicates keyedId =
                 (YangInstanceIdentifier.NodeIdentifierWithPredicates) lastPathArgument;
-        final Map<QName, Object> keyValues = keyedId.getKeyValues();
-        for (Entry<QName, Object> entry : keyValues.entrySet()) {
+        for (Entry<QName, Object> entry : keyedId.entrySet()) {
             QName qualifiedName = entry.getKey();
             final List<XmlElement> key =
                     dataElement.getChildElementsWithinNamespace(qualifiedName.getLocalName(),
@@ -204,7 +202,7 @@ class SchemalessRpcStructureTransformer implements RpcStructureTransformer {
             if (pathArgument instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates) {
                 YangInstanceIdentifier.NodeIdentifierWithPredicates listNode =
                         (YangInstanceIdentifier.NodeIdentifierWithPredicates) pathArgument;
-                for (Map.Entry<QName, Object> key : listNode.getKeyValues().entrySet()) {
+                for (Entry<QName, Object> key : listNode.entrySet()) {
                     final Element keyElement =
                             doc.createElementNS(key.getKey().getNamespace().toString(), key.getKey().getLocalName());
                     keyElement.setTextContent(key.getValue().toString());

@@ -326,7 +326,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
             final NodeIdentifierWithPredicates identifier = (NodeIdentifierWithPredicates) arg;
             writer.startMapEntryNode(identifier, UNKNOWN_SIZE);
 
-            for (Entry<QName, Object> entry : identifier.getKeyValues().entrySet()) {
+            for (Entry<QName, Object> entry : identifier.entrySet()) {
                 writer.startLeafNode(new NodeIdentifier(entry.getKey()));
                 writer.scalarValue(entry.getValue());
                 writer.endNode();
