@@ -47,6 +47,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +83,7 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         NetconfNodeBuilder netconfNodeBuilder = new NetconfNodeBuilder();
         netconfNodeBuilder.setConnectionStatus(ConnectionStatus.Connecting);
         netconfNodeBuilder.setHost(id.getHost());
-        netconfNodeBuilder.setPort(new PortNumber(id.getAddress().getPort()));
+        netconfNodeBuilder.setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())));
         nodeBuilder.addAugmentation(NetconfNode.class, netconfNodeBuilder.build());
         Node node = nodeBuilder.build();
 
@@ -141,7 +142,7 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
 
         final NetconfNode data = new NetconfNodeBuilder()
                 .setHost(id.getHost())
-                .setPort(new PortNumber(id.getAddress().getPort()))
+                .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
                 .setConnectionStatus(ConnectionStatus.UnableToConnect).setConnectedMessage(reason).build();
 
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
@@ -168,7 +169,7 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
 
         return new NetconfNodeBuilder()
             .setHost(id.getHost())
-            .setPort(new PortNumber(id.getAddress().getPort()))
+            .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
             .setConnectionStatus(connectionStatus)
             .setAvailableCapabilities(avCapabalitiesBuilder.build())
             .setUnavailableCapabilities(unavailableCapabilities(capabilities.getUnresolvedCapabilites()))
@@ -185,7 +186,7 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
 
         final NetconfNodeBuilder netconfNodeBuilder = new NetconfNodeBuilder()
                 .setHost(id.getHost())
-                .setPort(new PortNumber(id.getAddress().getPort()))
+                .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())))
                 .setConnectionStatus(up ? ConnectionStatus.Connected : ConnectionStatus.Connecting)
                 .setAvailableCapabilities(avCapabalitiesBuilder.build())
                 .setUnavailableCapabilities(unavailableCapabilities(capabilities.getUnresolvedCapabilites()))
