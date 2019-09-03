@@ -22,6 +22,8 @@ import org.opendaylight.aaa.web.WebContextBuilder;
 import org.opendaylight.aaa.web.WebContextRegistration;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
+import org.opendaylight.aaa.web.jetty.CommonGzipHandler;
+import org.opendaylight.aaa.web.jetty.CommonGzipHandlerBuilder;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.nb.rfc8040.RestconfApplication;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
@@ -43,6 +45,11 @@ public class WebInitializer {
             @Reference ServletSupport servletSupport, RestconfApplication webApp,
             @Reference CustomFilterAdapterConfiguration customFilterAdapterConfig,
             WebSocketInitializer webSocketServlet) throws ServletException {
+
+        CommonGzipHandler commonGzipHandler = new CommonGzipHandlerBuilder().setIncludedMimeTypes("application/xml",
+            "application/yang.data+xml", "xml", "application/json", "application/yang.data+json")
+            .setIncludedPaths("/*").build();
+
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath(RestconfConstants.BASE_URI_PATTERN)
                 .supportsSessions(false)
                 .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
@@ -54,11 +61,7 @@ public class WebInitializer {
                 // Allows user to add javax.servlet.Filter(s) in front of REST services
                 .addFilter(FilterDetails.builder().filter(new CustomFilterAdapter(customFilterAdapterConfig))
                     .addUrlPattern("/*").build())
-
-                .addFilter(FilterDetails.builder().filter(new org.eclipse.jetty.servlets.GzipFilter())
-                    .putInitParam("mimeTypes",
-                        "application/xml,application/yang.data+xml,xml,application/json,application/yang.data+json")
-                    .addUrlPattern("/*").build());
+                .addCommonHandler(commonGzipHandler);
 
         webContextSecurer.requireAuthentication(webContextBuilder, "/*");
 
