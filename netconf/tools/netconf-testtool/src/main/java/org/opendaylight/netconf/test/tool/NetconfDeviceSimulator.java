@@ -9,7 +9,6 @@
 package org.opendaylight.netconf.test.tool;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
-import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -30,6 +29,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -145,8 +145,8 @@ public class NetconfDeviceSimulator implements Closeable {
         } else if (configuration.isXmlConfigurationProvided()) {
             LOG.info("using SimulatedOperationProvider.");
             operationProvider = new SimulatedOperationProvider(idProvider, transformedCapabilities,
-                    Optional.fromNullable(configuration.getNotificationFile()),
-                    Optional.fromNullable(configuration.getInitialConfigXMLFile()));
+                    Optional.ofNullable(configuration.getNotificationFile()),
+                    Optional.ofNullable(configuration.getInitialConfigXMLFile()));
         } else {
             LOG.info("using OperationsProvider.");
             operationProvider = new OperationsProvider(idProvider, transformedCapabilities,

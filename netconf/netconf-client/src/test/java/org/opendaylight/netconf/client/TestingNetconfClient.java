@@ -5,11 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.client;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.collect.Sets;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.util.HashedWheelTimer;
@@ -20,6 +19,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -46,8 +46,8 @@ public class TestingNetconfClient implements Closeable {
     private final NetconfClientSessionListener sessionListener;
     private final long sessionId;
 
-    public TestingNetconfClient(String clientLabel,
-                                NetconfClientDispatcher netconfClientDispatcher,
+    public TestingNetconfClient(final String clientLabel,
+                                final NetconfClientDispatcher netconfClientDispatcher,
                                 final NetconfClientConfiguration config) throws InterruptedException {
         this.label = clientLabel;
         sessionListener = config.getSessionListener();
@@ -56,7 +56,8 @@ public class TestingNetconfClient implements Closeable {
         this.sessionId = clientSession.getSessionId();
     }
 
-    private static NetconfClientSession get(Future<NetconfClientSession> clientFuture) throws InterruptedException {
+    private static NetconfClientSession get(final Future<NetconfClientSession> clientFuture)
+            throws InterruptedException {
         try {
             return clientFuture.get();
         } catch (CancellationException e) {
@@ -66,16 +67,16 @@ public class TestingNetconfClient implements Closeable {
         }
     }
 
-    public Future<NetconfMessage> sendRequest(NetconfMessage message) {
+    public Future<NetconfMessage> sendRequest(final NetconfMessage message) {
         return ((SimpleNetconfClientSessionListener) sessionListener).sendRequest(message);
     }
 
-    public NetconfMessage sendMessage(NetconfMessage message, int attemptMsDelay) throws ExecutionException,
+    public NetconfMessage sendMessage(final NetconfMessage message, final int attemptMsDelay) throws ExecutionException,
             InterruptedException, TimeoutException {
         return sendRequest(message).get(attemptMsDelay, TimeUnit.MILLISECONDS);
     }
 
-    public NetconfMessage sendMessage(NetconfMessage message) throws ExecutionException,
+    public NetconfMessage sendMessage(final NetconfMessage message) throws ExecutionException,
             InterruptedException, TimeoutException {
         return sendMessage(message, DEFAULT_CONNECT_TIMEOUT);
     }
@@ -99,11 +100,11 @@ public class TestingNetconfClient implements Closeable {
     }
 
     public Set<String> getCapabilities() {
-        Preconditions.checkState(clientSession != null, "Client was not initialized successfully");
+        checkState(clientSession != null, "Client was not initialized successfully");
         return Sets.newHashSet(clientSession.getServerCapabilities());
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(final String[] args) throws Exception {
         HashedWheelTimer hashedWheelTimer = new HashedWheelTimer();
         NioEventLoopGroup nettyGroup = new NioEventLoopGroup();
         NetconfClientDispatcherImpl netconfClientDispatcher = new NetconfClientDispatcherImpl(nettyGroup, nettyGroup,
@@ -114,8 +115,8 @@ public class TestingNetconfClient implements Closeable {
         System.console().writer().println(client.getCapabilities());
     }
 
-    private static NetconfClientConfiguration getClientConfig(String host, int port, boolean ssh, Optional<? extends
-            AuthenticationHandler> maybeAuthHandler) throws UnknownHostException {
+    private static NetconfClientConfiguration getClientConfig(final String host, final int port, final boolean ssh,
+            final Optional<? extends AuthenticationHandler> maybeAuthHandler) throws UnknownHostException {
         InetSocketAddress netconfAddress = new InetSocketAddress(InetAddress.getByName(host), port);
         final NetconfClientConfigurationBuilder b = NetconfClientConfigurationBuilder.create();
         b.withAddress(netconfAddress);

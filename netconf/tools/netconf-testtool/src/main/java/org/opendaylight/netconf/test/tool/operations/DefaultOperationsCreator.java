@@ -5,11 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.operations;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
+import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.impl.SessionIdProvider;
@@ -58,12 +57,12 @@ public final class DefaultOperationsCreator implements OperationsCreator {
             final SimulatedGet sGet = new SimulatedGet(String.valueOf(currentSessionId), storage);
             final SimulatedEditConfig sEditConfig = new SimulatedEditConfig(String.valueOf(currentSessionId), storage);
             final SimulatedGetConfig sGetConfig = new SimulatedGetConfig(
-                String.valueOf(currentSessionId), storage, Optional.absent());
+                String.valueOf(currentSessionId), storage, Optional.empty());
             final SimulatedCommit sCommit = new SimulatedCommit(String.valueOf(currentSessionId));
             final SimulatedLock sLock = new SimulatedLock(String.valueOf(currentSessionId));
             final SimulatedUnLock sUnlock = new SimulatedUnLock(String.valueOf(currentSessionId));
             final SimulatedCreateSubscription sCreateSubs = new SimulatedCreateSubscription(
-                String.valueOf(currentSessionId), Optional.absent());
+                String.valueOf(currentSessionId), Optional.empty());
             final SimulatedDiscardChanges sDiscardChanges = new SimulatedDiscardChanges(
                 String.valueOf(currentSessionId));
             return Sets.newHashSet(
