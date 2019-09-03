@@ -5,10 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.api.messages;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.net.InetAddresses;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,8 +39,8 @@ public class NetconfHelloMessageAdditionalHeader {
     private final String transport;
     private final String sessionIdentifier;
 
-    public NetconfHelloMessageAdditionalHeader(String userName, String hostAddress, String port,
-                                               String transport, String sessionIdentifier) {
+    public NetconfHelloMessageAdditionalHeader(final String userName, final String hostAddress, final String port,
+                                               final String transport, final String sessionIdentifier) {
         this.userName = userName;
         this.hostAddress = hostAddress;
         this.port = port;
@@ -71,11 +72,11 @@ public class NetconfHelloMessageAdditionalHeader {
      * Format additional header into a string suitable as a prefix for netconf hello message.
      */
     public String toFormattedString() {
-        Preconditions.checkNotNull(userName);
-        Preconditions.checkNotNull(hostAddress);
-        Preconditions.checkNotNull(port);
-        Preconditions.checkNotNull(transport);
-        Preconditions.checkNotNull(sessionIdentifier);
+        requireNonNull(userName);
+        requireNonNull(hostAddress);
+        requireNonNull(port);
+        requireNonNull(transport);
+        requireNonNull(sessionIdentifier);
         return "[" + userName + SC + hostAddress + ":" + port + SC + transport + SC + sessionIdentifier + SC + "]"
                 + System.lineSeparator();
     }
@@ -101,16 +102,16 @@ public class NetconfHelloMessageAdditionalHeader {
     /**
      * Parse additional header from a formatted string.
      */
-    public static NetconfHelloMessageAdditionalHeader fromString(String additionalHeader) {
+    public static NetconfHelloMessageAdditionalHeader fromString(final String additionalHeader) {
         String additionalHeaderTrimmed = additionalHeader.trim();
         Matcher matcher = PATTERN.matcher(additionalHeaderTrimmed);
         Matcher matcher2 = CUSTOM_HEADER_PATTERN.matcher(additionalHeaderTrimmed);
-        Preconditions.checkArgument(matcher.matches(), "Additional header in wrong format %s, expected %s",
+        checkArgument(matcher.matches(), "Additional header in wrong format %s, expected %s",
                 additionalHeaderTrimmed, PATTERN);
 
         String username = matcher.group("username");
         String address = matcher.group("address");
-        Preconditions.checkArgument(InetAddresses.isInetAddress(address));
+        checkArgument(InetAddresses.isInetAddress(address));
         String port = matcher.group("port");
         String transport = matcher.group("transport");
         String sessionIdentifier = "client";
@@ -119,5 +120,4 @@ public class NetconfHelloMessageAdditionalHeader {
         }
         return new NetconfHelloMessageAdditionalHeader(username, address, port, transport, sessionIdentifier);
     }
-
 }
