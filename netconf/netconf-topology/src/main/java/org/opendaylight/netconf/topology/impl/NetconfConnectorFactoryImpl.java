@@ -31,6 +31,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +65,7 @@ public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
                                 .build())
                 .build();
         final Host host = HostBuilder.getDefaultInstance(address);
-        final PortNumber portNumber = new PortNumber(port);
+        final PortNumber portNumber = new PortNumber(Uint16.valueOf(port));
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setHost(host)
                 .setPort(portNumber)

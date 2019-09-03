@@ -68,6 +68,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 
 public class NetconfTopologyImplTest {
@@ -161,7 +162,7 @@ public class NetconfTopologyImplTest {
 
         final NetconfNode testingNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(9999))
+                .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setReconnectOnChangedSchema(true)
                 .setDefaultRequestTimeoutMillis(1000L)
                 .setBetweenAttemptsTimeoutMillis(100)
@@ -203,7 +204,7 @@ public class NetconfTopologyImplTest {
 
         final NetconfNode testingNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(9999))
+                .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setReconnectOnChangedSchema(true)
                 .setDefaultRequestTimeoutMillis(1000L)
                 .setBetweenAttemptsTimeoutMillis(100)
@@ -221,7 +222,7 @@ public class NetconfTopologyImplTest {
 
         final NetconfNode testingNode2 = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(9999))
+                .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setReconnectOnChangedSchema(true)
                 .setDefaultRequestTimeoutMillis(1000L)
                 .setBetweenAttemptsTimeoutMillis(100)
@@ -239,7 +240,7 @@ public class NetconfTopologyImplTest {
 
         final NetconfNode testingNode3 = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(9999))
+                .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setReconnectOnChangedSchema(true)
                 .setDefaultRequestTimeoutMillis(1000L)
                 .setBetweenAttemptsTimeoutMillis(100)
@@ -258,7 +259,7 @@ public class NetconfTopologyImplTest {
 
         final NetconfNode testingNode4 = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(9999))
+                .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setReconnectOnChangedSchema(true)
                 .setDefaultRequestTimeoutMillis(1000L)
                 .setBetweenAttemptsTimeoutMillis(100)
@@ -306,7 +307,7 @@ public class NetconfTopologyImplTest {
         final String password = "pa$$word";
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(9999))
+                .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setReconnectOnChangedSchema(true)
                 .setDefaultRequestTimeoutMillis(1000L)
                 .setBetweenAttemptsTimeoutMillis(100)
