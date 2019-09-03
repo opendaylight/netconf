@@ -73,7 +73,7 @@ public class IdentifierCodecTest {
     @Test
     public void codecDeserializeNullTest() {
         final YangInstanceIdentifier dataYangII = IdentifierCodec.deserialize(null, this.schemaContext);
-        assertEquals("Failed codec deserialization test", YangInstanceIdentifier.EMPTY, dataYangII);
+        assertEquals("Failed codec deserialization test", YangInstanceIdentifier.empty(), dataYangII);
     }
 
     /**
@@ -82,7 +82,7 @@ public class IdentifierCodecTest {
      */
     @Test
     public void codecSerializeEmptyTest() {
-        final String serialized = IdentifierCodec.serialize(YangInstanceIdentifier.EMPTY, this.schemaContext);
+        final String serialized = IdentifierCodec.serialize(YangInstanceIdentifier.empty(), this.schemaContext);
         assertTrue("Failed codec serialization test", serialized.isEmpty());
     }
 
@@ -92,8 +92,8 @@ public class IdentifierCodecTest {
      */
     @Test
     public void codecDeserializeAndSerializeEmptyTest() {
-        final String serialized = IdentifierCodec.serialize(YangInstanceIdentifier.EMPTY, this.schemaContext);
+        final String serialized = IdentifierCodec.serialize(YangInstanceIdentifier.empty(), this.schemaContext);
         assertEquals("Failed codec serialization and deserialization test",
-                YangInstanceIdentifier.EMPTY, IdentifierCodec.deserialize(serialized, this.schemaContext));
+                YangInstanceIdentifier.empty(), IdentifierCodec.deserialize(serialized, this.schemaContext));
     }
 }

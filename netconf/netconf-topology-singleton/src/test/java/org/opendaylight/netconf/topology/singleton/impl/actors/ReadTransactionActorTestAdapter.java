@@ -40,7 +40,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
  * @author Thomas Pantelis
  */
 public abstract class ReadTransactionActorTestAdapter {
-    static final YangInstanceIdentifier PATH = YangInstanceIdentifier.EMPTY;
+    static final YangInstanceIdentifier PATH = YangInstanceIdentifier.empty();
     static final LogicalDatastoreType STORE = LogicalDatastoreType.CONFIGURATION;
     static final Timeout TIMEOUT = Timeout.apply(5, TimeUnit.SECONDS);
     static final NormalizedNode<?, ?> NODE = Builders.containerBuilder()

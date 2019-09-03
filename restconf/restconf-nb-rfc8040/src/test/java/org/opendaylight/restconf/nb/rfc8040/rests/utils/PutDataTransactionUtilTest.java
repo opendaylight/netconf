@@ -188,7 +188,7 @@ public class PutDataTransactionUtilTest {
         final InstanceIdentifierContext<DataSchemaNode> iidContext =
                 new InstanceIdentifierContext<>(this.iid, this.schemaNode, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildLeaf);
-        PutDataTransactionUtil.validTopLevelNodeName(YangInstanceIdentifier.EMPTY, payload);
+        PutDataTransactionUtil.validTopLevelNodeName(YangInstanceIdentifier.empty(), payload);
     }
 
     @Test(expected = RestconfDocumentedException.class)

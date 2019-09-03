@@ -190,7 +190,7 @@ public class YangInstanceIdentifierSerializerTest {
     @Test
     public void serializeNullSchemaContextNegativeTest() {
         this.thrown.expect(NullPointerException.class);
-        YangInstanceIdentifierSerializer.create(null, YangInstanceIdentifier.EMPTY);
+        YangInstanceIdentifierSerializer.create(null, YangInstanceIdentifier.empty());
     }
 
     /**
@@ -211,7 +211,8 @@ public class YangInstanceIdentifierSerializerTest {
      */
     @Test
     public void serializeEmptyDataTest() {
-        final String result = YangInstanceIdentifierSerializer.create(this.schemaContext, YangInstanceIdentifier.EMPTY);
+        final String result = YangInstanceIdentifierSerializer.create(this.schemaContext,
+            YangInstanceIdentifier.empty());
         assertTrue("Empty identifier is expected", result.isEmpty());
     }
 

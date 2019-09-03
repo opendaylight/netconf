@@ -43,7 +43,7 @@ import org.w3c.dom.Node;
 
 public abstract class AbstractGet extends AbstractSingletonNetconfOperation {
     private static final XMLOutputFactory XML_OUTPUT_FACTORY;
-    private static final YangInstanceIdentifier ROOT = YangInstanceIdentifier.EMPTY;
+    private static final YangInstanceIdentifier ROOT = YangInstanceIdentifier.empty();
     private static final String FILTER = "filter";
 
     static {
