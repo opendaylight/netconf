@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.client;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.concurrent.Promise;
@@ -26,8 +27,8 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
         private final NetconfMessage request;
 
         RequestEntry(final Promise<NetconfMessage> future, final NetconfMessage request) {
-            this.promise = Preconditions.checkNotNull(future);
-            this.request = Preconditions.checkNotNull(request);
+            this.promise = requireNonNull(future);
+            this.request = requireNonNull(request);
         }
     }
 
@@ -57,7 +58,7 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
     @Override
     @SuppressWarnings("checkstyle:hiddenField")
     public final synchronized void onSessionUp(final NetconfClientSession clientSession) {
-        this.clientSession = Preconditions.checkNotNull(clientSession);
+        this.clientSession = requireNonNull(clientSession);
         LOG.debug("Client session {} went up", clientSession);
         dispatchRequest();
     }

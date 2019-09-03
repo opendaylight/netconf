@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops.get;
 
+import static java.util.Objects.requireNonNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import com.google.common.base.Preconditions;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -142,7 +142,7 @@ public class FilterContentValidatorTest {
         try {
             return QName.create(input);
         } catch (IllegalArgumentException e) {
-            return QName.create(Preconditions.checkNotNull(prev), input);
+            return QName.create(requireNonNull(prev), input);
         }
     }
 }

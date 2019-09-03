@@ -7,7 +7,10 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -64,10 +67,10 @@ public final class TimedReconnectStrategy implements ReconnectStrategy {
 
     public TimedReconnectStrategy(final EventExecutor executor, final int connectTime, final long minSleep,
             final double sleepFactor, final Long maxSleep, final Long maxAttempts, final Long deadline) {
-        Preconditions.checkArgument(maxSleep == null || minSleep <= maxSleep);
-        Preconditions.checkArgument(sleepFactor >= 1);
-        Preconditions.checkArgument(connectTime >= 0);
-        this.executor = Preconditions.checkNotNull(executor);
+        checkArgument(maxSleep == null || minSleep <= maxSleep);
+        checkArgument(sleepFactor >= 1);
+        checkArgument(connectTime >= 0);
+        this.executor = requireNonNull(executor);
         this.deadline = deadline;
         this.maxAttempts = maxAttempts;
         this.minSleep = minSleep;
@@ -81,7 +84,7 @@ public final class TimedReconnectStrategy implements ReconnectStrategy {
         LOG.debug("Connection attempt failed", cause);
 
         // Check if a reconnect attempt is scheduled
-        Preconditions.checkState(!this.scheduled);
+        checkState(!this.scheduled);
 
         // Get a stable 'now' time for deadline calculations
         final long now = System.nanoTime();
@@ -130,7 +133,7 @@ public final class TimedReconnectStrategy implements ReconnectStrategy {
         // Schedule a task for the right time. It will also clear the flag.
         return this.executor.schedule(() -> {
             synchronized (TimedReconnectStrategy.this) {
-                Preconditions.checkState(TimedReconnectStrategy.this.scheduled);
+                checkState(TimedReconnectStrategy.this.scheduled);
                 TimedReconnectStrategy.this.scheduled = false;
             }
 
@@ -140,7 +143,7 @@ public final class TimedReconnectStrategy implements ReconnectStrategy {
 
     @Override
     public synchronized void reconnectSuccessful() {
-        Preconditions.checkState(!this.scheduled);
+        checkState(!this.scheduled);
         this.attempts = 0;
     }
 

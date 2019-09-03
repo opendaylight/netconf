@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.impl.mapping.operations;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collections;
 import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
@@ -48,7 +49,7 @@ public class DefaultCloseSession extends AbstractSingletonNetconfOperation imple
             throws DocumentedException {
         try {
             sessionResources.close();
-            Preconditions.checkNotNull(session, "Session was not set").delayedClose();
+            requireNonNull(session, "Session was not set").delayedClose();
             LOG.info("Session {} closing", session.getSessionId());
         } catch (final Exception e) {
             throw new DocumentedException("Unable to properly close session "

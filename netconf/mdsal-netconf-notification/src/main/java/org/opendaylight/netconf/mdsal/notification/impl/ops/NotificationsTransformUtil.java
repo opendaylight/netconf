@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.mdsal.notification.impl.ops;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -42,12 +44,10 @@ public final class NotificationsTransformUtil {
         moduleInfoBackedContext.addModuleInfos(Collections.singletonList(org.opendaylight.yang.gen.v1.urn.ietf.params
                 .xml.ns.yang.ietf.netconf.notifications.rev120206.$YangModuleInfoImpl.getInstance()));
         final Optional<SchemaContext> schemaContextOptional = moduleInfoBackedContext.tryToCreateSchemaContext();
-        Preconditions.checkState(schemaContextOptional.isPresent());
+        checkState(schemaContextOptional.isPresent());
         NOTIFICATIONS_SCHEMA_CTX = schemaContextOptional.get();
 
-        CREATE_SUBSCRIPTION_RPC = Preconditions.checkNotNull(findCreateSubscriptionRpc());
-
-        Preconditions.checkNotNull(CREATE_SUBSCRIPTION_RPC);
+        CREATE_SUBSCRIPTION_RPC = requireNonNull(findCreateSubscriptionRpc());
 
         CODEC_REGISTRY = new BindingNormalizedNodeCodecRegistry(BindingRuntimeContext.create(moduleInfoBackedContext,
                 NOTIFICATIONS_SCHEMA_CTX));

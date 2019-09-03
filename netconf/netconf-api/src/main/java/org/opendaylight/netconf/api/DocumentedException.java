@@ -5,13 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.api;
 
+import static java.util.Objects.requireNonNull;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.RPC_REPLY_KEY;
 import static org.opendaylight.netconf.api.xml.XmlNetconfConstants.URN_IETF_PARAMS_XML_NS_NETCONF_BASE_1_0;
 
-import com.google.common.base.Preconditions;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +67,7 @@ public class DocumentedException extends Exception {
         private final String typeValue;
 
         ErrorType(final String typeValue) {
-            this.typeValue = Preconditions.checkNotNull(typeValue);
+            this.typeValue = requireNonNull(typeValue);
         }
 
         public String getTypeValue() {
@@ -134,7 +133,7 @@ public class DocumentedException extends Exception {
         private final String severityValue;
 
         ErrorSeverity(final String severityValue) {
-            this.severityValue = Preconditions.checkNotNull(severityValue);
+            this.severityValue = requireNonNull(severityValue);
         }
 
         public String getSeverityValue() {

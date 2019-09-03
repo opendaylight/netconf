@@ -14,8 +14,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.Before;
@@ -79,7 +79,7 @@ public class CapabilityChangeNotificationProducerTest {
         final List<Uri> newCapabilitiesList =
                 Lists.newArrayList(new Uri("newCapability"), new Uri("createdCapability"));
         Capabilities newCapabilities = new CapabilitiesBuilder().setCapability(newCapabilitiesList).build();
-        Map<InstanceIdentifier<?>, DataObject> createdData = Maps.newHashMap();
+        Map<InstanceIdentifier<?>, DataObject> createdData = new HashMap<>();
         createdData.put(capabilitiesIdentifier, newCapabilities);
         verifyDataTreeChange(DataObjectModification.ModificationType.WRITE, null, newCapabilities,
                 changedCapabilitesFrom(newCapabilitiesList, Collections.emptyList()));

@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.mdsal.connector;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,7 +63,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
 
         this.rootSchemaSourceProviderDependency = schemaService.getExtensions()
                 .getInstance(DOMYangTextSourceProvider.class);
-        this.currentSchemaContext = new CurrentSchemaContext(Preconditions.checkNotNull(schemaService),
+        this.currentSchemaContext = new CurrentSchemaContext(requireNonNull(schemaService),
                 rootSchemaSourceProviderDependency);
         this.netconfOperationServiceFactoryListener = netconfOperationServiceFactoryListener;
         this.netconfOperationServiceFactoryListener.onAddNetconfOperationServiceFactory(this);
@@ -69,7 +71,7 @@ public class MdsalNetconfOperationServiceFactory implements NetconfOperationServ
 
     @Override
     public MdsalNetconfOperationService createService(final String netconfSessionIdForReporting) {
-        Preconditions.checkState(dataBroker != null, "MD-SAL provider not yet initialized");
+        checkState(dataBroker != null, "MD-SAL provider not yet initialized");
         return new MdsalNetconfOperationService(currentSchemaContext, netconfSessionIdForReporting, dataBroker,
                 rpcService);
     }

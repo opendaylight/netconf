@@ -7,7 +7,10 @@
  */
 package org.opendaylight.netconf.mdsal.notification.impl;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
@@ -98,8 +101,8 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
     public synchronized NotificationListenerRegistration registerNotificationListener(
             final StreamNameType stream,
             final NetconfNotificationListener listener) {
-        Preconditions.checkNotNull(stream);
-        Preconditions.checkNotNull(listener);
+        requireNonNull(stream);
+        requireNonNull(listener);
 
         LOG.trace("Notification listener registered for stream: {}", stream);
 
@@ -165,8 +168,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
     @Override
     public synchronized NotificationPublisherRegistration registerNotificationPublisher(final Stream stream) {
-        Preconditions.checkNotNull(stream);
-        final StreamNameType streamName = stream.getName();
+        final StreamNameType streamName = requireNonNull(stream).getName();
 
         LOG.debug("Notification publisher registered for stream: {}", streamName);
         if (LOG.isTraceEnabled()) {
@@ -251,8 +253,8 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
         @Override
         public void onNotification(final StreamNameType stream, final NetconfNotification notification) {
-            Preconditions.checkState(baseListener != null, "Already closed");
-            Preconditions.checkArgument(stream.equals(registeredStream));
+            checkState(baseListener != null, "Already closed");
+            checkArgument(stream.equals(registeredStream));
             baseListener.onNotification(stream, notification);
         }
     }
