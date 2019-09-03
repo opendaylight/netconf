@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -36,9 +38,9 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
     NetconfSessionPromise(final EventExecutor executor, final InetSocketAddress address,
             final ReconnectStrategy strategy, final Bootstrap bootstrap) {
         super(executor);
-        this.strategy = Preconditions.checkNotNull(strategy);
-        this.address = Preconditions.checkNotNull(address);
-        this.bootstrap = Preconditions.checkNotNull(bootstrap);
+        this.strategy = requireNonNull(strategy);
+        this.address = requireNonNull(address);
+        this.bootstrap = requireNonNull(bootstrap);
     }
 
     @SuppressWarnings("checkstyle:illegalCatch")
@@ -87,7 +89,7 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
                 LOG.debug("Promise {} connection resolved", NetconfSessionPromise.this);
 
                 // Triggered when a connection attempt is resolved.
-                Preconditions.checkState(NetconfSessionPromise.this.pending.equals(cf));
+                checkState(NetconfSessionPromise.this.pending.equals(cf));
 
                 /*
                  * The promise we gave out could have been cancelled,
@@ -124,7 +126,7 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
             public void operationComplete(final Future<Void> sf) {
                 synchronized (NetconfSessionPromise.this) {
                     // Triggered when a connection attempt is to be made.
-                    Preconditions.checkState(NetconfSessionPromise.this.pending.equals(sf));
+                    checkState(NetconfSessionPromise.this.pending.equals(sf));
 
                     /*
                      * The promise we gave out could have been cancelled,

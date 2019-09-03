@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
 import org.slf4j.Logger;
@@ -24,8 +26,8 @@ public final class ReconnectImmediatelyStrategy implements ReconnectStrategy {
     private final int timeout;
 
     public ReconnectImmediatelyStrategy(final EventExecutor executor, final int timeout) {
-        Preconditions.checkArgument(timeout >= 0);
-        this.executor = Preconditions.checkNotNull(executor);
+        checkArgument(timeout >= 0);
+        this.executor = requireNonNull(executor);
         this.timeout = timeout;
     }
 

@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -73,9 +74,9 @@ public abstract class AbstractNetconfDispatcher<S extends NetconfSession, L exte
 
     protected AbstractNetconfDispatcher(final EventExecutor executor, final EventLoopGroup bossGroup,
             final EventLoopGroup workerGroup) {
-        this.bossGroup = Preconditions.checkNotNull(bossGroup);
-        this.workerGroup = Preconditions.checkNotNull(workerGroup);
-        this.executor = Preconditions.checkNotNull(executor);
+        this.bossGroup = requireNonNull(bossGroup);
+        this.workerGroup = requireNonNull(workerGroup);
+        this.executor = requireNonNull(executor);
     }
 
 
