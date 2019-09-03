@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.listener;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -16,6 +15,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
@@ -88,7 +88,7 @@ public class NetconfDeviceCommunicator
             final RemoteDeviceId id,
             final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> remoteDevice,
             final int rpcMessageLimit) {
-        this(id, remoteDevice, Optional.absent(), rpcMessageLimit);
+        this(id, remoteDevice, Optional.empty(), rpcMessageLimit);
     }
 
     private NetconfDeviceCommunicator(

@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.test.tool.rpc;
 
-import com.google.common.base.Optional;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
@@ -24,8 +24,7 @@ import org.xml.sax.SAXException;
 public class SimulatedGetConfig extends AbstractLastNetconfOperation {
 
     private final DataList storage;
-    private static final Logger LOG = LoggerFactory
-            .getLogger(SimulatedGetConfig.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SimulatedGetConfig.class);
 
     public SimulatedGetConfig(final String netconfSessionIdForReporting, final DataList storage,
                               final Optional<File> initialConfigXMLFile) {
