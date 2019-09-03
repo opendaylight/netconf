@@ -10,7 +10,6 @@ package org.opendaylight.netconf.nettyutil;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.Optional;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
@@ -22,6 +21,7 @@ import io.netty.util.Timer;
 import io.netty.util.TimerTask;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -100,8 +100,7 @@ public abstract class AbstractNetconfSessionNegotiator<P extends NetconfSessionP
     }
 
     private static Optional<SslHandler> getSslHandler(final Channel channel) {
-        final SslHandler sslHandler = channel.pipeline().get(SslHandler.class);
-        return sslHandler == null ? Optional.absent() : Optional.of(sslHandler);
+        return Optional.ofNullable(channel.pipeline().get(SslHandler.class));
     }
 
     public P getSessionPreferences() {

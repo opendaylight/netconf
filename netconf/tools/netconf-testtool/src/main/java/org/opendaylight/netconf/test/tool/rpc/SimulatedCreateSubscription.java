@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.test.tool.rpc;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import java.io.File;
@@ -18,6 +17,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -51,7 +51,7 @@ public class SimulatedCreateSubscription extends AbstractLastNetconfOperation im
             notifs = Optional.of(loadNotifications(notificationsFile.get()));
             scheduledExecutorService = Executors.newScheduledThreadPool(1);
         } else {
-            notifs = Optional.absent();
+            notifs = Optional.empty();
         }
 
         if (notifs.isPresent()) {
