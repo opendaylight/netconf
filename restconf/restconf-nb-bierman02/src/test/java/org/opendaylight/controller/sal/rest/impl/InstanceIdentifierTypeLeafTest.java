@@ -37,15 +37,15 @@ public class InstanceIdentifierTypeLeafTest {
         Assert.assertTrue(lastPathArgument.getNodeType().getLocalName().equals("iid-list"));
 
         final NodeIdentifierWithPredicates list = (NodeIdentifierWithPredicates) lastPathArgument;
-        final YangInstanceIdentifier value = (YangInstanceIdentifier) list.getKeyValues()
-                .get(QName.create(lastPathArgument.getNodeType(), "iid-leaf"));
+        final YangInstanceIdentifier value = (YangInstanceIdentifier) list.getValue(
+            QName.create(lastPathArgument.getNodeType(), "iid-leaf"));
         final PathArgument lastPathArgumentOfValue = value.getLastPathArgument();
         Assert.assertTrue(lastPathArgumentOfValue.getNodeType().getNamespace().toString().equals("iid:value:module"));
         Assert.assertTrue(lastPathArgumentOfValue.getNodeType().getLocalName().equals("values-iid"));
 
         final NodeIdentifierWithPredicates valueList = (NodeIdentifierWithPredicates) lastPathArgumentOfValue;
-        final String valueIid = (String) valueList.getKeyValues()
-                .get(QName.create(lastPathArgumentOfValue.getNodeType(), "value-iid"));
+        final String valueIid = (String) valueList.getValue(
+                QName.create(lastPathArgumentOfValue.getNodeType(), "value-iid"));
         Assert.assertEquals("value", valueIid);
     }
 

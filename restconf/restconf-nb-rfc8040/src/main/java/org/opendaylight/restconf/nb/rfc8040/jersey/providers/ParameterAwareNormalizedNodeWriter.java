@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.jersey.providers;
 
 import static org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter.UNKNOWN_SIZE;
@@ -16,7 +15,7 @@ import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.api.RestconfNormalizedNodeWriter;
@@ -229,13 +228,13 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
         if (selectedByParameters(mapEntryNode, false)) {
             writeChildren(mapEntryNode.getValue(), false);
         } else if (fields == null && maxDepth != null && currentDepth == maxDepth) {
-            writeOnlyKeys(mapEntryNode.getIdentifier().getKeyValues());
+            writeOnlyKeys(mapEntryNode.getIdentifier().entrySet());
         }
         return true;
     }
 
-    private void writeOnlyKeys(final Map<QName, Object> keyValues) throws IllegalArgumentException, IOException {
-        for (final Map.Entry<QName, Object> entry : keyValues.entrySet()) {
+    private void writeOnlyKeys(final Set<Entry<QName, Object>> entries) throws IOException {
+        for (final Entry<QName, Object> entry : entries) {
             writer.startLeafNode(new NodeIdentifier(entry.getKey()));
             writer.scalarValue(entry.getValue());
             writer.endNode();
@@ -327,7 +326,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
             final NormalizedNodeStreamWriter writer = getWriter();
             writer.startMapEntryNode(node.getIdentifier(), childSizeHint(node.getValue()));
 
-            final Set<QName> qnames = node.getIdentifier().getKeyValues().keySet();
+            final Set<QName> qnames = node.getIdentifier().keySet();
             // Write out all the key children
             currentDepth++;
             for (final QName qname : qnames) {

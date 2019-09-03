@@ -492,7 +492,7 @@ public final class NetconfMessageTransformUtil {
             if (next instanceof NodeWithValue) {
                 actualElement.setNodeValue(((NodeWithValue) next).getValue().toString());
             } else if (next instanceof NodeIdentifierWithPredicates) {
-                for (Entry<QName, Object> entry : ((NodeIdentifierWithPredicates) next).getKeyValues().entrySet()) {
+                for (Entry<QName, Object> entry : ((NodeIdentifierWithPredicates) next).entrySet()) {
                     final Element entryElement = document.createElementNS(entry.getKey().getNamespace().toString(),
                             entry.getKey().getLocalName());
                     entryElement.setTextContent(entry.getValue().toString());

@@ -107,9 +107,7 @@ public final class YangInstanceIdentifierSerializer {
     private static void prepareNodeWithPredicates(final StringBuilder path, final PathArgument arg) {
         path.append(arg.getNodeType().getLocalName());
 
-        final Iterator<Entry<QName, Object>> iterator = ((NodeIdentifierWithPredicates) arg).getKeyValues()
-                .entrySet().iterator();
-
+        final Iterator<Entry<QName, Object>> iterator = ((NodeIdentifierWithPredicates) arg).entrySet().iterator();
         if (iterator.hasNext()) {
             path.append(ParserBuilderConstants.Deserializer.EQUAL);
         }

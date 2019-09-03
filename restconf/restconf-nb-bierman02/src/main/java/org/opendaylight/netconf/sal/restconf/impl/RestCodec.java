@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.sal.rest.impl.StringModuleInstanceIdentifierCodec;
 import org.opendaylight.restconf.common.util.IdentityValuesDTO;
@@ -220,7 +221,7 @@ public final class RestCodec {
                 final IdentityValue identityValue = qNameToIdentityValue(pathArgument.getNodeType());
                 if (pathArgument instanceof NodeIdentifierWithPredicates && identityValue != null) {
                     final List<Predicate> predicates =
-                            keyValuesToPredicateList(((NodeIdentifierWithPredicates) pathArgument).getKeyValues());
+                            keyValuesToPredicateList(((NodeIdentifierWithPredicates) pathArgument).entrySet());
                     identityValue.setPredicates(predicates);
                 } else if (pathArgument instanceof NodeWithValue && identityValue != null) {
                     final List<Predicate> predicates = new ArrayList<>();
@@ -313,9 +314,9 @@ public final class RestCodec {
             return result.isEmpty() ? null : YangInstanceIdentifier.create(result);
         }
 
-        private static List<Predicate> keyValuesToPredicateList(final Map<QName, Object> keyValues) {
+        private static List<Predicate> keyValuesToPredicateList(final Set<Entry<QName, Object>> keyValues) {
             final List<Predicate> result = new ArrayList<>();
-            for (final Entry<QName, Object> entry : keyValues.entrySet()) {
+            for (final Entry<QName, Object> entry : keyValues) {
                 final QName qualifiedName = entry.getKey();
                 final Object value = entry.getValue();
                 result.add(new Predicate(qNameToIdentityValue(qualifiedName), String.valueOf(value)));

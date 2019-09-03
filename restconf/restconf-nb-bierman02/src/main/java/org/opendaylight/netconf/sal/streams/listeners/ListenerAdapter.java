@@ -13,7 +13,6 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
@@ -318,8 +317,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
             textContent.append("/");
             writeIdentifierWithNamespacePrefix(element, textContent, pathArgument.getNodeType());
             if (pathArgument instanceof NodeIdentifierWithPredicates) {
-                final Map<QName, Object> predicates = ((NodeIdentifierWithPredicates) pathArgument).getKeyValues();
-                for (final Entry<QName, Object> entry : predicates.entrySet()) {
+                for (final Entry<QName, Object> entry : ((NodeIdentifierWithPredicates) pathArgument).entrySet()) {
                     final QName keyValue = entry.getKey();
                     final String predicateValue = String.valueOf(entry.getValue());
                     textContent.append("[");
