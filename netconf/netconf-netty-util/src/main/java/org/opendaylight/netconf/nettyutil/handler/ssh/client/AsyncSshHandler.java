@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -78,8 +78,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      */
     public AsyncSshHandler(final AuthenticationHandler authenticationHandler,
                            final SshClient sshClient) {
-        this.authenticationHandler = Preconditions.checkNotNull(authenticationHandler);
-        this.sshClient = Preconditions.checkNotNull(sshClient);
+        this.authenticationHandler = requireNonNull(authenticationHandler);
+        this.sshClient = requireNonNull(sshClient);
     }
 
     public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler) {

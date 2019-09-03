@@ -8,7 +8,8 @@
 
 package org.opendaylight.netconf.sal.connect.netconf;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.util.concurrent.Futures;
@@ -47,9 +48,9 @@ public class DeviceActionFactoryImpl implements DeviceActionFactory {
             @Override
             public ListenableFuture<? extends DOMActionResult> invokeAction(final SchemaPath schemaPath,
                     final DOMDataTreeIdentifier dataTreeIdentifier, final ContainerNode input) {
-                Preconditions.checkNotNull(schemaPath);
-                Preconditions.checkNotNull(dataTreeIdentifier);
-                Preconditions.checkNotNull(input);
+                requireNonNull(schemaPath);
+                requireNonNull(dataTreeIdentifier);
+                requireNonNull(input);
 
                 final ListenableFuture<RpcResult<NetconfMessage>> actionResultFuture = listener.sendRequest(
                         messageTransformer.toActionRequest(schemaPath, dataTreeIdentifier, input), input.getNodeType());

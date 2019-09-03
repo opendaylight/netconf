@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.mdsal.notification.impl.ops;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -67,16 +69,16 @@ public class CreateSubscription extends AbstractSingletonNetconfOperation
         // Replay not supported
         final Optional<XmlElement> startTime =
                 operationElement.getOnlyChildElementWithSameNamespaceOptionally("startTime");
-        Preconditions.checkArgument(!startTime.isPresent(), "StartTime element not yet supported");
+        checkArgument(!startTime.isPresent(), "StartTime element not yet supported");
 
         // Stop time not supported
         final Optional<XmlElement> stopTime =
                 operationElement.getOnlyChildElementWithSameNamespaceOptionally("stopTime");
-        Preconditions.checkArgument(!stopTime.isPresent(), "StopTime element not yet supported");
+        checkArgument(!stopTime.isPresent(), "StopTime element not yet supported");
 
         final StreamNameType streamNameType = parseStreamIfPresent(operationElement);
 
-        Preconditions.checkNotNull(netconfSession);
+        requireNonNull(netconfSession);
         // Premature streams are allowed (meaning listener can register even if no provider is available yet)
         if (!notifications.isStreamAvailable(streamNameType)) {
             LOG.warn("Registering premature stream {}. No publisher available yet for session {}", streamNameType,

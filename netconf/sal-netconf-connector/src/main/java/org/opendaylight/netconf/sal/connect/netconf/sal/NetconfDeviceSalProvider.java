@@ -7,7 +7,10 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.Transaction;
 import org.opendaylight.mdsal.binding.api.TransactionChain;
@@ -63,25 +66,25 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
         mountInstance = new MountInstance(mountService, id);
         this.dataBroker = dataBroker;
         if (dataBroker != null) {
-            txChain = Preconditions.checkNotNull(dataBroker).createTransactionChain(transactionChainListener);
+            txChain = requireNonNull(dataBroker).createTransactionChain(transactionChainListener);
             topologyDatastoreAdapter = new NetconfDeviceTopologyAdapter(id, txChain);
         }
     }
 
     public MountInstance getMountInstance() {
-        Preconditions.checkState(mountInstance != null,
-                "%s: Mount instance was not initialized by sal. Cannot get mount instance", id);
+        checkState(mountInstance != null, "%s: Mount instance was not initialized by sal. Cannot get mount instance",
+                id);
         return mountInstance;
     }
 
     public NetconfDeviceTopologyAdapter getTopologyDatastoreAdapter() {
-        Preconditions.checkState(topologyDatastoreAdapter != null,
+        checkState(topologyDatastoreAdapter != null,
                 "%s: Sal provider %s was not initialized by sal. Cannot get topology datastore adapter", id);
         return topologyDatastoreAdapter;
     }
 
     private void resetTransactionChainForAdapaters() {
-        txChain = Preconditions.checkNotNull(dataBroker).createTransactionChain(transactionChainListener);
+        txChain = requireNonNull(dataBroker).createTransactionChain(transactionChainListener);
 
         topologyDatastoreAdapter.setTxChain(txChain);
 
@@ -110,8 +113,8 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
         private ObjectRegistration<DOMMountPoint> topologyRegistration;
 
         MountInstance(final DOMMountPointService mountService, final RemoteDeviceId id) {
-            this.mountService = Preconditions.checkNotNull(mountService);
-            this.id = Preconditions.checkNotNull(id);
+            this.mountService = requireNonNull(mountService);
+            this.id = requireNonNull(id);
         }
 
         public void onTopologyDeviceConnected(final SchemaContext initialCtx,
@@ -123,8 +126,8 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
         public synchronized void onTopologyDeviceConnected(final SchemaContext initialCtx,
                 final DOMDataBroker broker, final DOMRpcService rpc,
                 final NetconfDeviceNotificationService newNotificationService, final DOMActionService deviceAction) {
-            Preconditions.checkNotNull(mountService, "Closed");
-            Preconditions.checkState(topologyRegistration == null, "Already initialized");
+            requireNonNull(mountService, "Closed");
+            checkState(topologyRegistration == null, "Already initialized");
 
             final DOMMountPointService.DOMMountPointBuilder mountBuilder =
                     mountService.createMountPoint(id.getTopologyPath());
@@ -166,9 +169,8 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
         }
 
         public synchronized void publish(final DOMNotification domNotification) {
-            Preconditions.checkNotNull(notificationService, "Device not set up yet, cannot handle notification {}",
-                    domNotification);
-            notificationService.publishNotification(domNotification);
+            checkNotNull(notificationService, "Device not set up yet, cannot handle notification %s", domNotification)
+                .publishNotification(domNotification);
         }
     }
 

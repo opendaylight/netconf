@@ -7,8 +7,9 @@
  */
 package org.opendaylight.netconf.client.conf;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.MoreObjects.ToStringHelper;
-import com.google.common.base.Preconditions;
 import java.net.InetSocketAddress;
 import java.util.List;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
@@ -43,7 +44,7 @@ public final class NetconfReconnectingClientConfiguration extends NetconfClientC
     }
 
     private void validateReconnectConfiguration() {
-        Preconditions.checkNotNull(connectStrategyFactory);
+        requireNonNull(connectStrategyFactory);
     }
 
     @Override

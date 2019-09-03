@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.sal.connect.util;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import java.net.InetSocketAddress;
 import java.util.Objects;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
@@ -46,7 +47,7 @@ public final class RemoteDeviceId {
     private Host host;
 
     private RemoteDeviceId(final String name) {
-        this.name = Preconditions.checkNotNull(name);
+        this.name = requireNonNull(name);
         this.topologyPath = DEFAULT_TOPOLOGY_NODE
                 .node(NodeIdentifierWithPredicates.of(Node.QNAME, NODE_ID_QNAME, name));
         this.key = new NodeKey(new NodeId(name));

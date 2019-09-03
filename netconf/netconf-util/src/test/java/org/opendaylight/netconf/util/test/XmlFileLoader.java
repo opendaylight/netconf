@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.util.test;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.io.ByteSource;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +21,6 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 public final class XmlFileLoader {
-
     private XmlFileLoader() {
 
     }
@@ -44,7 +43,7 @@ public final class XmlFileLoader {
     public static Document xmlFileToDocument(final String fileName) throws IOException, SAXException,
             ParserConfigurationException {
         try (InputStream resourceAsStream = XmlFileLoader.class.getClassLoader().getResourceAsStream(fileName)) {
-            Preconditions.checkNotNull(resourceAsStream, fileName);
+            requireNonNull(resourceAsStream, fileName);
             final Document doc = XmlUtil.readXmlToDocument(resourceAsStream);
             return doc;
         }
@@ -52,7 +51,7 @@ public final class XmlFileLoader {
 
     public static String fileToString(final String fileName) throws IOException {
         try (InputStream resourceAsStream = XmlFileLoader.class.getClassLoader().getResourceAsStream(fileName)) {
-            Preconditions.checkNotNull(resourceAsStream);
+            requireNonNull(resourceAsStream);
             return new ByteSource() {
                 @Override
                 public InputStream openStream() {

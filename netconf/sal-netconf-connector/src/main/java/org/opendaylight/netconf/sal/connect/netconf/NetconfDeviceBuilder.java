@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.ListeningExecutorService;
 import io.netty.util.concurrent.EventExecutor;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
@@ -86,9 +86,9 @@ public class NetconfDeviceBuilder {
     }
 
     private void validation() {
-        Preconditions.checkNotNull(this.id, "RemoteDeviceId is not initialized");
-        Preconditions.checkNotNull(this.salFacade, "RemoteDeviceHandler is not initialized");
-        Preconditions.checkNotNull(this.globalProcessingExecutor, "ExecutorService is not initialized");
-        Preconditions.checkNotNull(this.schemaResourcesDTO, "SchemaResourceDTO is not initialized");
+        requireNonNull(this.id, "RemoteDeviceId is not initialized");
+        requireNonNull(this.salFacade, "RemoteDeviceHandler is not initialized");
+        requireNonNull(this.globalProcessingExecutor, "ExecutorService is not initialized");
+        requireNonNull(this.schemaResourcesDTO, "SchemaResourceDTO is not initialized");
     }
 }

@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
 
     NetconfDeviceTopologyAdapter(final RemoteDeviceId id, final TransactionChain txChain) {
         this.id = id;
-        this.txChain = Preconditions.checkNotNull(txChain);
+        this.txChain = requireNonNull(txChain);
 
         this.networkTopologyPath = InstanceIdentifier.builder(NetworkTopology.class).build();
         this.topologyListPath = networkTopologyPath
@@ -266,6 +267,6 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
     }
 
     public void setTxChain(final TransactionChain txChain) {
-        this.txChain = Preconditions.checkNotNull(txChain);
+        this.txChain = requireNonNull(txChain);
     }
 }

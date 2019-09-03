@@ -7,8 +7,9 @@
  */
 package org.opendaylight.netconf.sal.connect.util;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -56,9 +57,9 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
                                       final AAAEncryptionService encryptionService,
                                       final String topologyId) {
         this.dataBroker = dataBroker;
-        this.encryptionService = Preconditions.checkNotNull(encryptionService);
+        this.encryptionService = requireNonNull(encryptionService);
         this.topologyPath = InstanceIdentifier.builder(NetworkTopology.class)
-                .child(Topology.class, new TopologyKey(new TopologyId(Preconditions.checkNotNull(topologyId)))).build();
+                .child(Topology.class, new TopologyKey(new TopologyId(requireNonNull(topologyId)))).build();
     }
 
     @Override

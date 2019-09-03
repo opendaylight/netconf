@@ -5,12 +5,12 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.listener;
+
+import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -63,8 +63,8 @@ public final class NetconfSessionPreferences {
 
     NetconfSessionPreferences(final Map<String, CapabilityOrigin> nonModuleCaps,
                               final Map<QName, CapabilityOrigin> moduleBasedCaps) {
-        this.nonModuleCaps = Preconditions.checkNotNull(nonModuleCaps);
-        this.moduleBasedCaps = Preconditions.checkNotNull(moduleBasedCaps);
+        this.nonModuleCaps = requireNonNull(nonModuleCaps);
+        this.moduleBasedCaps = requireNonNull(moduleBasedCaps);
     }
 
     public Set<QName> getModuleBasedCaps() {

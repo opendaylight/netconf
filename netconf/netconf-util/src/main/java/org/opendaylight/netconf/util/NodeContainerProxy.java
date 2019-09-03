@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.util;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Collection;
@@ -43,7 +44,7 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     public NodeContainerProxy(final QName qualifiedName, final Map<QName, DataSchemaNode> childNodes,
                               final Set<AugmentationSchemaNode> availableAugmentations) {
         this.availableAugmentations = availableAugmentations;
-        this.childNodes = Preconditions.checkNotNull(childNodes, "childNodes");
+        this.childNodes = requireNonNull(childNodes, "childNodes");
         this.qualifiedName = qualifiedName;
     }
 

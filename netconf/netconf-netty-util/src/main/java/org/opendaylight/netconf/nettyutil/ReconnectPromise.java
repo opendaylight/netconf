@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.nettyutil;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -37,10 +38,10 @@ final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionL
             final Bootstrap bootstrap, final AbstractNetconfDispatcher.PipelineInitializer<S> initializer) {
         super(executor);
         this.bootstrap = bootstrap;
-        this.initializer = Preconditions.checkNotNull(initializer);
-        this.dispatcher = Preconditions.checkNotNull(dispatcher);
-        this.address = Preconditions.checkNotNull(address);
-        this.strategyFactory = Preconditions.checkNotNull(connectStrategyFactory);
+        this.initializer = requireNonNull(initializer);
+        this.dispatcher = requireNonNull(dispatcher);
+        this.address = requireNonNull(address);
+        this.strategyFactory = requireNonNull(connectStrategyFactory);
     }
 
     synchronized void connect() {
@@ -74,14 +75,14 @@ final class ReconnectPromise<S extends NetconfSession, L extends NetconfSessionL
      *         Connection refused, Negotiation failed
      */
     private synchronized boolean isInitialConnectFinished() {
-        Preconditions.checkNotNull(pending);
+        requireNonNull(pending);
         return pending.isDone() && pending.isSuccess();
     }
 
     @Override
     public synchronized boolean cancel(final boolean mayInterruptIfRunning) {
         if (super.cancel(mayInterruptIfRunning)) {
-            Preconditions.checkNotNull(pending);
+            requireNonNull(pending);
             this.pending.cancel(mayInterruptIfRunning);
             return true;
         }

@@ -7,7 +7,10 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -36,8 +39,8 @@ final class NotificationHandler {
     private MessageTransformer<NetconfMessage> messageTransformer;
 
     NotificationHandler(final RemoteDeviceHandler<?> salFacade, final RemoteDeviceId id) {
-        this.salFacade = Preconditions.checkNotNull(salFacade);
-        this.id = Preconditions.checkNotNull(id);
+        this.salFacade = requireNonNull(salFacade);
+        this.id = requireNonNull(id);
     }
 
     synchronized void handleNotification(final NetconfMessage notification) {
@@ -53,7 +56,7 @@ final class NotificationHandler {
      * @param transformer Message transformer
      */
     synchronized void onRemoteSchemaUp(final MessageTransformer<NetconfMessage> transformer) {
-        this.messageTransformer = Preconditions.checkNotNull(transformer);
+        this.messageTransformer = requireNonNull(transformer);
 
         passNotifications = true;
 
@@ -65,14 +68,12 @@ final class NotificationHandler {
     }
 
     private DOMNotification transformNotification(final NetconfMessage cachedNotification) {
-        final DOMNotification parsedNotification = messageTransformer.toNotification(cachedNotification);
-        Preconditions.checkNotNull(
-                parsedNotification, "%s: Unable to parse received notification: %s", id, cachedNotification);
-        return parsedNotification;
+        return checkNotNull(messageTransformer.toNotification(cachedNotification),
+            "%s: Unable to parse received notification: %s", id, cachedNotification);
     }
 
     private void queueNotification(final NetconfMessage notification) {
-        Preconditions.checkState(!passNotifications);
+        checkState(!passNotifications);
 
         LOG.debug("{}: Caching notification {}, remote schema not yet fully built", id, notification);
         if (LOG.isTraceEnabled()) {

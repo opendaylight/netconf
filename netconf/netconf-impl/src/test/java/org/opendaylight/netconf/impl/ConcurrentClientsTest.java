@@ -5,18 +5,16 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.ByteStreams;
 import io.netty.channel.ChannelFuture;
@@ -29,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -91,7 +90,8 @@ public class ConcurrentClientsTest {
     private final Class<? extends Runnable> clientRunnable;
     private final Set<String> serverCaps;
 
-    public ConcurrentClientsTest(int nettyThreads, Class<? extends Runnable> clientRunnable, Set<String> serverCaps) {
+    public ConcurrentClientsTest(final int nettyThreads, final Class<? extends Runnable> clientRunnable,
+            final Set<String> serverCaps) {
         this.nettyThreads = nettyThreads;
         this.clientRunnable = clientRunnable;
         this.serverCaps = serverCaps;
@@ -198,7 +198,7 @@ public class ConcurrentClientsTest {
     @Test(timeout = CONCURRENCY * 1000)
     public void testConcurrentClients() throws Exception {
 
-        List<Future<?>> futures = Lists.newArrayListWithCapacity(CONCURRENCY);
+        List<Future<?>> futures = new ArrayList<>(CONCURRENCY);
 
         for (int i = 0; i < CONCURRENCY; i++) {
             futures.add(clientExecutor.submit(getInstanceOfClientRunnable()));
@@ -244,7 +244,7 @@ public class ConcurrentClientsTest {
         private final AtomicLong counter = new AtomicLong();
 
         @Override
-        public HandlingPriority canHandle(Document message) {
+        public HandlingPriority canHandle(final Document message) {
             return XmlUtil.toString(message).contains(NetconfStartExiMessage.START_EXI)
                     ? HandlingPriority.CANNOT_HANDLE :
                     HandlingPriority.HANDLE_WITH_MAX_PRIORITY;
@@ -252,8 +252,8 @@ public class ConcurrentClientsTest {
 
         @SuppressWarnings("checkstyle:IllegalCatch")
         @Override
-        public Document handle(Document requestMessage, NetconfOperationChainedExecution subsequentOperation)
-                throws DocumentedException {
+        public Document handle(final Document requestMessage,
+                final NetconfOperationChainedExecution subsequentOperation) throws DocumentedException {
             try {
                 LOG.info("Handling netconf message from test {}", XmlUtil.toString(requestMessage));
                 counter.getAndIncrement();
@@ -290,7 +290,7 @@ public class ConcurrentClientsTest {
         }
 
         @Override
-        public NetconfOperationService createService(String netconfSessionIdForReporting) {
+        public NetconfOperationService createService(final String netconfSessionIdForReporting) {
             return new NetconfOperationService() {
 
                 @Override
@@ -321,10 +321,10 @@ public class ConcurrentClientsTest {
         }
 
         private void run2() throws Exception {
-            InputStream clientHello = checkNotNull(XmlFileLoader
-                    .getResourceAsStream("netconfMessages/client_hello.xml"));
-            final InputStream getConfig =
-                    checkNotNull(XmlFileLoader.getResourceAsStream("netconfMessages/getConfig.xml"));
+            InputStream clientHello = requireNonNull(XmlFileLoader.getResourceAsStream(
+                "netconfMessages/client_hello.xml"));
+            final InputStream getConfig = requireNonNull(XmlFileLoader.getResourceAsStream(
+                "netconfMessages/getConfig.xml"));
 
             Socket clientSocket = new Socket(NETCONF_ADDRESS.getHostString(), NETCONF_ADDRESS.getPort());
             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
@@ -373,7 +373,7 @@ public class ConcurrentClientsTest {
                 NetconfMessage result = netconfClient.sendRequest(getMessage).get();
                 LOG.info("Client with session id {}: got result {}", sessionId, result);
 
-                Preconditions.checkState(NetconfMessageUtil.isErrorMessage(result) == false,
+                checkState(NetconfMessageUtil.isErrorMessage(result) == false,
                         "Received error response: " + XmlUtil.toString(result.getDocument()) + " to request: "
                                 + XmlUtil.toString(getMessage.getDocument()));
 
