@@ -84,6 +84,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -363,7 +364,7 @@ public class NetconfNodeManagerTest {
     private NetconfNode newNetconfNode() {
         return new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(9999))
+                .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setConnectionStatus(NetconfNodeConnectionStatus.ConnectionStatus.Connected)
                 .setClusteredConnectionStatus(new ClusteredConnectionStatusBuilder()
                         .setNetconfMasterNode(masterAddress).build())

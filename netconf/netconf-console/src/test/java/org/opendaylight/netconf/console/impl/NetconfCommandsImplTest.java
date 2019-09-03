@@ -53,6 +53,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -127,7 +128,8 @@ public class NetconfCommandsImplTest {
     @Test
     public void testConnectDisconnectDevice() throws InterruptedException, TimeoutException, ExecutionException {
         final NetconfNode netconfNode = new NetconfNodeBuilder()
-                .setPort(new PortNumber(7777)).setHost(HostBuilder.getDefaultInstance("10.10.1.1")).build();
+                .setPort(new PortNumber(Uint16.valueOf(7777))).setHost(HostBuilder.getDefaultInstance("10.10.1.1"))
+                .build();
 
         createTopology(LogicalDatastoreType.CONFIGURATION);
         netconfCommands.connectDevice(netconfNode, "netconf-ID");
@@ -229,7 +231,7 @@ public class NetconfCommandsImplTest {
             final NetconfNodeConnectionStatus.ConnectionStatus cs, final String notificationCapabilityPrefix) {
 
         final Host host = HostBuilder.getDefaultInstance(ip);
-        final PortNumber port = new PortNumber(portNumber);
+        final PortNumber port = new PortNumber(Uint16.valueOf(portNumber));
 
         final List<AvailableCapability> avCapList = new ArrayList<>();
         avCapList.add(new AvailableCapabilityBuilder()
