@@ -153,7 +153,7 @@ public class NetconfDevice
             registerToBaseNetconfStream(initRpc, listener);
         }
 
-        final FutureCallback<DeviceSources> resolvedSourceCallback = new FutureCallback<DeviceSources>() {
+        final FutureCallback<DeviceSources> resolvedSourceCallback = new FutureCallback<>() {
             @Override
             public void onSuccess(final DeviceSources result) {
                 addProvidedSourcesToSchemaRegistry(result);
@@ -438,7 +438,7 @@ public class NetconfDevice
                     LOG.info("{} : Try to remount device.", id);
                     onRemoteSessionDown();
                     salFacade.onDeviceReconnected(remoteSessionCapabilities, node);
-                }, nodeOptional.getIgnoreMissingSchemaSources().getReconnectTime(), TimeUnit.MILLISECONDS);
+                }, nodeOptional.getIgnoreMissingSchemaSources().getReconnectTime().longValue(), TimeUnit.MILLISECONDS);
             } else {
                 final IllegalStateException cause =
                         new IllegalStateException(id + ": No more sources for schema context");
