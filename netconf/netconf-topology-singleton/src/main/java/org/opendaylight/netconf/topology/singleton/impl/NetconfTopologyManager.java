@@ -109,7 +109,7 @@ public class NetconfTopologyManager
         this.eventExecutor = requireNonNull(eventExecutor);
         this.clientDispatcher = requireNonNull(clientDispatcher);
         this.topologyId = requireNonNull(topologyId);
-        this.writeTxIdleTimeout = Duration.apply(config.getWriteTransactionIdleTimeout(), TimeUnit.SECONDS);
+        this.writeTxIdleTimeout = Duration.apply(config.getWriteTransactionIdleTimeout().longValue(), TimeUnit.SECONDS);
         this.mountPointService = mountPointService;
         this.encryptionService = requireNonNull(encryptionService);
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
@@ -167,8 +167,8 @@ public class NetconfTopologyManager
         requireNonNull(netconfNode.getHost());
         requireNonNull(netconfNode.getHost().getIpAddress());
 
-        final Timeout actorResponseWaitTime = new Timeout(Duration.create(netconfNode.getActorResponseWaitTime(),
-                "seconds"));
+        final Timeout actorResponseWaitTime = new Timeout(Duration.create(
+            netconfNode.getActorResponseWaitTime().longValue(), TimeUnit.SECONDS));
 
         final ServiceGroupIdentifier serviceGroupIdent =
                 ServiceGroupIdentifier.create(instanceIdentifier.toString());
