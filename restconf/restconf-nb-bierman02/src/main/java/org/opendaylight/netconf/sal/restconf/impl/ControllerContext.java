@@ -171,7 +171,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         checkPreconditions();
 
         if (restconfInstance == null) {
-            return new InstanceIdentifierContext<>(YangInstanceIdentifier.EMPTY, this.globalSchema, null,
+            return new InstanceIdentifierContext<>(YangInstanceIdentifier.empty(), this.globalSchema, null,
                     this.globalSchema);
         }
 
