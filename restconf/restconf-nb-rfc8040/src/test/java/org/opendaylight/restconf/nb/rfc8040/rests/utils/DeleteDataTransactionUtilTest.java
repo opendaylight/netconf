@@ -49,7 +49,7 @@ public class DeleteDataTransactionUtilTest {
         MockitoAnnotations.initMocks(this);
         Mockito.when(this.transactionChain.newReadWriteTransaction()).thenReturn(this.readWrite);
         Mockito.doReturn(CommitInfo.emptyFluentFuture()).when(this.readWrite).commit();
-        Mockito.when(this.context.getInstanceIdentifier()).thenReturn(YangInstanceIdentifier.EMPTY);
+        Mockito.when(this.context.getInstanceIdentifier()).thenReturn(YangInstanceIdentifier.empty());
 
         Mockito.doReturn(transactionChain).when(mockDataBroker).createTransactionChain(Mockito.any());
         transactionChainHandler = new TransactionChainHandler(mockDataBroker);
@@ -62,7 +62,7 @@ public class DeleteDataTransactionUtilTest {
     public void deleteData() throws Exception {
         // assert that data to delete exists
         Mockito.when(this.transactionChain.newReadWriteTransaction().exists(LogicalDatastoreType.CONFIGURATION,
-                YangInstanceIdentifier.EMPTY)).thenReturn(immediateTrueFluentFuture());
+                YangInstanceIdentifier.empty())).thenReturn(immediateTrueFluentFuture());
 
         // test
         final Response response = DeleteDataTransactionUtil.deleteData(
@@ -79,7 +79,7 @@ public class DeleteDataTransactionUtilTest {
     public void deleteDataNegativeTest() throws Exception {
         // assert that data to delete does NOT exist
         Mockito.when(this.transactionChain.newReadWriteTransaction().exists(LogicalDatastoreType.CONFIGURATION,
-                YangInstanceIdentifier.EMPTY)).thenReturn(immediateFalseFluentFuture());
+                YangInstanceIdentifier.empty())).thenReturn(immediateFalseFluentFuture());
 
         // test and assert error
         try {
