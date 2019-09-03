@@ -62,6 +62,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import scala.concurrent.duration.Duration;
 
 public class RemoteDeviceConnectorImplTest {
@@ -140,7 +141,7 @@ public class RemoteDeviceConnectorImplTest {
                 .setPassword("admin").setUsername("admin").build();
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(9999))
+                .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setReconnectOnChangedSchema(true)
                 .setDefaultRequestTimeoutMillis(1000L)
                 .setBetweenAttemptsTimeoutMillis(100)
@@ -175,7 +176,7 @@ public class RemoteDeviceConnectorImplTest {
                 .setPassword("admin").setUsername("admin").build();
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(9999))
+                .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setReconnectOnChangedSchema(true)
                 .setDefaultRequestTimeoutMillis(1000L)
                 .setBetweenAttemptsTimeoutMillis(100)
@@ -203,7 +204,7 @@ public class RemoteDeviceConnectorImplTest {
     public void testGetClientConfig() {
         final NetconfClientSessionListener listener = mock(NetconfClientSessionListener.class);
         final Host host = new Host(new IpAddress(new Ipv4Address("127.0.0.1")));
-        final PortNumber portNumber = new PortNumber(9999);
+        final PortNumber portNumber = new PortNumber(Uint16.valueOf(9999));
         final NetconfNode testingNode = new NetconfNodeBuilder()
                 .setConnectionTimeoutMillis(1000L)
                 .setDefaultRequestTimeoutMillis(2000L)
