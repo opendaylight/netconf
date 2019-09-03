@@ -28,7 +28,9 @@ import org.w3c.dom.NamedNodeMap;
 public final class SendErrorExceptionUtil {
     private static final Logger LOG = LoggerFactory.getLogger(SendErrorExceptionUtil.class);
 
-    private SendErrorExceptionUtil() {}
+    private SendErrorExceptionUtil() {
+
+    }
 
     public static void sendErrorMessage(final NetconfSession session,
             final DocumentedException sendErrorException) {
