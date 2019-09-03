@@ -9,9 +9,9 @@ package org.opendaylight.netconf.nettyutil.handler;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.common.io.Files;
 import io.netty.buffer.Unpooled;
 import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -23,7 +23,7 @@ public class NetconfMessageFactoryTest {
         File authHelloFile = new File(getClass().getResource("/netconfMessages/client_hello_with_auth.xml").getFile());
 
         final List<Object> out = new ArrayList<>();
-        parser.decode(null, Unpooled.wrappedBuffer(Files.toByteArray(authHelloFile)), out);
+        parser.decode(null, Unpooled.wrappedBuffer(Files.readAllBytes(authHelloFile.toPath())), out);
         assertEquals(1, out.size());
     }
 }
