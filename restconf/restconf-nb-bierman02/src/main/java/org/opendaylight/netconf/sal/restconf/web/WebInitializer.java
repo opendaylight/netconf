@@ -21,6 +21,8 @@ import org.opendaylight.aaa.web.WebContextBuilder;
 import org.opendaylight.aaa.web.WebContextRegistration;
 import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
+import org.opendaylight.aaa.web.jetty.CommonGzipHandler;
+import org.opendaylight.aaa.web.jetty.CommonGzipHandlerBuilder;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.netconf.sal.rest.impl.RestconfApplication;
 
@@ -39,18 +41,18 @@ public class WebInitializer {
             final @Reference ServletSupport servletSupport, final RestconfApplication webApp,
             final @Reference CustomFilterAdapterConfiguration customFilterAdapterConfig) throws ServletException {
 
+        CommonGzipHandler commonGzipHandler = new CommonGzipHandlerBuilder().addIncludedMimeTypes("application/xml",
+            "application/yang.data+xml", "xml", "application/json", "application/yang.data+json")
+            .addIncludedPaths("/*").build();
+
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath("restconf").supportsSessions(false)
-                .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
-                    .addUrlPattern("/*").build())
+            .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
+                .addUrlPattern("/*").build())
 
-                // Allows user to add javax.servlet.Filter(s) in front of REST services
-                .addFilter(FilterDetails.builder().filter(new CustomFilterAdapter(customFilterAdapterConfig))
-                    .addUrlPattern("/*").build())
-
-                .addFilter(FilterDetails.builder().filter(new org.eclipse.jetty.servlets.GzipFilter())
-                    .putInitParam("mimeTypes",
-                        "application/xml,application/yang.data+xml,xml,application/json,application/yang.data+json")
-                    .addUrlPattern("/*").build());
+            // Allows user to add javax.servlet.Filter(s) in front of REST services
+            .addFilter(FilterDetails.builder().filter(new CustomFilterAdapter(customFilterAdapterConfig))
+                .addUrlPattern("/*").build())
+            .addCommonHandler(commonGzipHandler);
 
         webContextSecurer.requireAuthentication(webContextBuilder, "/*");
 
