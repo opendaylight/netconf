@@ -77,7 +77,7 @@ public class NetconfOperationRouterImplTest {
         doNothing().when(operationService).close();
 
         operationRouter = new NetconfOperationRouterImpl(operationService, null, "session-1");
-        doReturn(Collections.EMPTY_SET).when(operationService2).getNetconfOperations();
+        doReturn(Collections.emptySet()).when(operationService2).getNetconfOperations();
         emptyOperationRouter = new NetconfOperationRouterImpl(operationService2, null, "session-1");
     }
 

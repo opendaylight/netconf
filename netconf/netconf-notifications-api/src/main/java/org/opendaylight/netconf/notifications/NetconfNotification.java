@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.notifications;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.text.ParsePosition;
 import java.time.Instant;
@@ -197,8 +197,8 @@ public final class NetconfNotification extends NetconfMessage {
     }
 
     private static Document wrapNotification(final Document notificationContent, final Date eventTime) {
-        Preconditions.checkNotNull(notificationContent);
-        Preconditions.checkNotNull(eventTime);
+        requireNonNull(notificationContent);
+        requireNonNull(eventTime);
 
         final Element baseNotification = notificationContent.getDocumentElement();
         final Element entireNotification = notificationContent.createElementNS(NOTIFICATION_NAMESPACE, NOTIFICATION);

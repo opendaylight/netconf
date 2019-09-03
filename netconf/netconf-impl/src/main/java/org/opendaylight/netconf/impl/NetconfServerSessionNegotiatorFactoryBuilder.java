@@ -5,10 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import io.netty.util.Timer;
 import java.util.Set;
 import org.opendaylight.netconf.api.monitoring.NetconfMonitoringService;
@@ -66,13 +67,14 @@ public class NetconfServerSessionNegotiatorFactoryBuilder {
 
 
     private void validate() {
-        Preconditions.checkNotNull(timer, "timer not initialized");
-        Preconditions.checkNotNull(aggregatedOpService, "NetconfOperationServiceFactory not initialized");
-        Preconditions.checkNotNull(idProvider, "SessionIdProvider not initialized");
-        Preconditions.checkArgument(connectionTimeoutMillis > 0, "connection time out <=0");
-        Preconditions.checkNotNull(monitoringService, "NetconfMonitoringService not initialized");
+        requireNonNull(timer, "timer not initialized");
+        requireNonNull(aggregatedOpService, "NetconfOperationServiceFactory not initialized");
+        requireNonNull(idProvider, "SessionIdProvider not initialized");
+        checkArgument(connectionTimeoutMillis > 0, "connection time out <=0");
+        requireNonNull(monitoringService, "NetconfMonitoringService not initialized");
 
-        baseCapabilities = (baseCapabilities == null) ? NetconfServerSessionNegotiatorFactory
-                .DEFAULT_BASE_CAPABILITIES : baseCapabilities;
+        if (baseCapabilities == null) {
+            baseCapabilities = NetconfServerSessionNegotiatorFactory.DEFAULT_BASE_CAPABILITIES;
+        }
     }
 }

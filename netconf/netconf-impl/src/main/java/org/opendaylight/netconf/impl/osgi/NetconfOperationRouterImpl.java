@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.impl.osgi;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,7 +42,7 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
 
     public NetconfOperationRouterImpl(final NetconfOperationService netconfOperationServiceSnapshot,
                                       final NetconfMonitoringService netconfMonitoringService, final String sessionId) {
-        this.netconfOperationServiceSnapshot = Preconditions.checkNotNull(netconfOperationServiceSnapshot);
+        this.netconfOperationServiceSnapshot = requireNonNull(netconfOperationServiceSnapshot);
 
         final Set<NetconfOperation> ops = new HashSet<>();
         ops.add(new DefaultCloseSession(sessionId, this));
@@ -56,7 +58,7 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
     @Override
     public Document onNetconfMessage(final Document message, final NetconfServerSession session) throws
             DocumentedException {
-        Preconditions.checkNotNull(allNetconfOperations, "Operation router was not initialized properly");
+        requireNonNull(allNetconfOperations, "Operation router was not initialized properly");
 
         final NetconfOperationExecution netconfOperationExecution;
         try {
@@ -141,7 +143,7 @@ public class NetconfOperationRouterImpl implements NetconfOperationRouter {
             }
             if (!handlingPriority.equals(HandlingPriority.CANNOT_HANDLE)) {
 
-                Preconditions.checkState(!sortedPriority.containsKey(handlingPriority),
+                checkState(!sortedPriority.containsKey(handlingPriority),
                         "Multiple %s available to handle message %s with priority %s, %s and %s",
                         NetconfOperation.class.getName(), message, handlingPriority, netconfOperation, sortedPriority
                                 .get(handlingPriority));
