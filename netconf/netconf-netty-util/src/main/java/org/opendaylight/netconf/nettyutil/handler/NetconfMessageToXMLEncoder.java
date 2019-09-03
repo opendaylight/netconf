@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.nettyutil.handler;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,9 +16,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +29,14 @@ import org.w3c.dom.Comment;
 public class NetconfMessageToXMLEncoder extends MessageToByteEncoder<NetconfMessage> {
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageToXMLEncoder.class);
 
-    private final Optional<String> clientId;
+    private final @Nullable String clientId;
 
     public NetconfMessageToXMLEncoder() {
-        this(Optional.absent());
+        this(Optional.empty());
     }
 
     public NetconfMessageToXMLEncoder(final Optional<String> clientId) {
-        this.clientId = clientId;
+        this.clientId = clientId.orElse(null);
     }
 
     @Override
@@ -44,8 +45,8 @@ public class NetconfMessageToXMLEncoder extends MessageToByteEncoder<NetconfMess
             throws IOException, TransformerException {
         LOG.trace("Sent to encode : {}", msg);
 
-        if (clientId.isPresent()) {
-            Comment comment = msg.getDocument().createComment("clientId:" + clientId.get());
+        if (clientId != null) {
+            Comment comment = msg.getDocument().createComment("clientId:" + clientId);
             msg.getDocument().appendChild(comment);
         }
 

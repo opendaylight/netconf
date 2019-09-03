@@ -7,11 +7,12 @@
  */
 package org.opendaylight.netconf.mdsal.connector;
 
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.util.concurrent.FluentFuture;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
@@ -53,11 +54,7 @@ public class TransactionProvider implements AutoCloseable {
     }
 
     public synchronized Optional<DOMDataTreeReadWriteTransaction> getCandidateTransaction() {
-        if (candidateTransaction == null) {
-            return Optional.absent();
-        }
-
-        return Optional.of(candidateTransaction);
+        return Optional.ofNullable(candidateTransaction);
     }
 
     public synchronized DOMDataTreeReadWriteTransaction getOrCreateTransaction() {
@@ -139,8 +136,7 @@ public class TransactionProvider implements AutoCloseable {
 
     public synchronized void abortRunningTransaction(final DOMDataTreeReadWriteTransaction tx) {
         LOG.debug("Aborting current running Transaction");
-        Preconditions.checkState(runningTransaction != null,
-                NO_TRANSACTION_FOUND_FOR_SESSION + netconfSessionIdForReporting);
+        checkState(runningTransaction != null, NO_TRANSACTION_FOUND_FOR_SESSION + netconfSessionIdForReporting);
         tx.cancel();
         allOpenReadWriteTransactions.remove(tx);
     }
