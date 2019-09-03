@@ -14,6 +14,8 @@ import javax.servlet.ServletException;
 import org.apache.aries.blueprint.annotation.service.Reference;
 import org.opendaylight.aaa.filterchain.configuration.CustomFilterAdapterConfiguration;
 import org.opendaylight.aaa.filterchain.filters.CustomFilterAdapter;
+import org.opendaylight.aaa.web.CommonGzipHandler;
+import org.opendaylight.aaa.web.CommonGzipHandlerBuilder;
 import org.opendaylight.aaa.web.FilterDetails;
 import org.opendaylight.aaa.web.ServletDetails;
 import org.opendaylight.aaa.web.WebContext;
@@ -39,18 +41,18 @@ public class WebInitializer {
             final @Reference ServletSupport servletSupport, final RestconfApplication webApp,
             final @Reference CustomFilterAdapterConfiguration customFilterAdapterConfig) throws ServletException {
 
+        CommonGzipHandler commonGzipHandler = new CommonGzipHandlerBuilder().setIncludedMimeTypes("application/xml",
+            "application/yang.data+xml", "xml", "application/json", "application/yang.data+json")
+            .setIncludedPaths("/*").build();
+
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath("restconf").supportsSessions(false)
-                .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
-                    .addUrlPattern("/*").build())
+            .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
+                .addUrlPattern("/*").build())
 
-                // Allows user to add javax.servlet.Filter(s) in front of REST services
-                .addFilter(FilterDetails.builder().filter(new CustomFilterAdapter(customFilterAdapterConfig))
-                    .addUrlPattern("/*").build())
-
-                .addFilter(FilterDetails.builder().filter(new org.eclipse.jetty.servlets.GzipFilter())
-                    .putInitParam("mimeTypes",
-                        "application/xml,application/yang.data+xml,xml,application/json,application/yang.data+json")
-                    .addUrlPattern("/*").build());
+            // Allows user to add javax.servlet.Filter(s) in front of REST services
+            .addFilter(FilterDetails.builder().filter(new CustomFilterAdapter(customFilterAdapterConfig))
+                .addUrlPattern("/*").build())
+            .commonGzipHandler(commonGzipHandler);
 
         webContextSecurer.requireAuthentication(webContextBuilder, "/*");
 
