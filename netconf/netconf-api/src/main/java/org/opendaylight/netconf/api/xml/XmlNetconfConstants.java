@@ -8,8 +8,9 @@
 package org.opendaylight.netconf.api.xml;
 
 public final class XmlNetconfConstants {
+    private XmlNetconfConstants() {
 
-    private XmlNetconfConstants() {}
+    }
 
     public static final String CAPABILITY = "capability";
     public static final String CAPABILITIES = "capabilities";

@@ -23,8 +23,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
 public final class XmlUnitUtil {
+    private XmlUnitUtil() {
 
-    private XmlUnitUtil() {}
+    }
 
     public static void assertContainsElementWithText(final Document doc,
                                                      final String textToFind) throws NodeTestException {
@@ -34,7 +35,7 @@ public final class XmlUnitUtil {
             boolean textFound = false;
 
             @Override
-            public void testText(Text text) throws NodeTestException {
+            public void testText(final Text text) throws NodeTestException {
                 if (!textFound) {
                     if (text.getData().equalsIgnoreCase(textToFind)) {
                         textFound = true;
@@ -43,7 +44,7 @@ public final class XmlUnitUtil {
             }
 
             @Override
-            public void noMoreNodes(NodeTest forTest) throws NodeTestException {
+            public void noMoreNodes(final NodeTest forTest) throws NodeTestException {
                 assertTrue(textFound);
             }
         };
@@ -57,7 +58,7 @@ public final class XmlUnitUtil {
             private boolean elementFound = false;
 
             @Override
-            public void testElement(Element element) throws NodeTestException {
+            public void testElement(final Element element) throws NodeTestException {
                 if (!elementFound) {
                     if (element.isEqualNode(testElement)) {
                         elementFound = true;
@@ -66,7 +67,7 @@ public final class XmlUnitUtil {
             }
 
             @Override
-            public void noMoreNodes(NodeTest forTest) throws NodeTestException {
+            public void noMoreNodes(final NodeTest forTest) throws NodeTestException {
                 assertTrue(elementFound);
             }
         };
@@ -81,7 +82,7 @@ public final class XmlUnitUtil {
             private boolean elementFound = false;
 
             @Override
-            public void testElement(Element element) throws NodeTestException {
+            public void testElement(final Element element) throws NodeTestException {
                 if (!elementFound) {
                     if (element.getNodeName() != null && element.getNodeName().equals(elementName)) {
                         elementFound = true;
@@ -90,7 +91,7 @@ public final class XmlUnitUtil {
             }
 
             @Override
-            public void noMoreNodes(NodeTest forTest) throws NodeTestException {
+            public void noMoreNodes(final NodeTest forTest) throws NodeTestException {
                 assertTrue(XmlUtil.toString(doc), elementFound);
             }
         };
@@ -104,14 +105,14 @@ public final class XmlUnitUtil {
             private int elementFound = 0;
 
             @Override
-            public void testElement(Element element) throws NodeTestException {
+            public void testElement(final Element element) throws NodeTestException {
                 if (element.getNodeName() != null && element.getNodeName().equals(elementName)) {
                     elementFound++;
                 }
             }
 
             @Override
-            public void noMoreNodes(NodeTest forTest) throws NodeTestException {
+            public void noMoreNodes(final NodeTest forTest) throws NodeTestException {
                 assertEquals(expectedCount, elementFound);
             }
         };
