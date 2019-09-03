@@ -57,13 +57,13 @@ public class ProxyDOMRpcService implements DOMRpcService {
         LOG.trace("{}: Rpc operation invoked with schema type: {} and node: {}.", id, type, input);
 
         final NormalizedNodeMessage normalizedNodeMessage = input != null
-                ? new NormalizedNodeMessage(YangInstanceIdentifier.EMPTY, input) : null;
+                ? new NormalizedNodeMessage(YangInstanceIdentifier.empty(), input) : null;
         final Future<Object> scalaFuture = Patterns.ask(masterActorRef,
                 new InvokeRpcMessage(new SchemaPathMessage(type), normalizedNodeMessage), actorResponseWaitTime);
 
         final SettableFuture<DOMRpcResult> settableFuture = SettableFuture.create();
 
-        scalaFuture.onComplete(new OnComplete<Object>() {
+        scalaFuture.onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object response) {
                 if (failure != null) {
