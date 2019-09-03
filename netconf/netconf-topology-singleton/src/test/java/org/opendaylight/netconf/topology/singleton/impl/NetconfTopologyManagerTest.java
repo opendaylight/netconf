@@ -79,6 +79,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
+import org.opendaylight.yangtools.yang.common.Uint16;
 
 public class NetconfTopologyManagerTest {
     private static final int ACTOR_RESPONSE_WAIT_TIME = 10;
@@ -187,7 +188,7 @@ public class NetconfTopologyManagerTest {
 
         final NetconfNode netconfNode1 = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(1111))
+                .setPort(new PortNumber(Uint16.valueOf(1111)))
                 .setActorResponseWaitTime(ACTOR_RESPONSE_WAIT_TIME)
                 .build();
         final Node node1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(NetconfNode.class,
@@ -201,7 +202,7 @@ public class NetconfTopologyManagerTest {
 
         final NetconfNode netconfNode2 = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(2222))
+                .setPort(new PortNumber(Uint16.valueOf(2222)))
                 .setActorResponseWaitTime(ACTOR_RESPONSE_WAIT_TIME)
                 .build();
         final Node node2 = new NodeBuilder().setNodeId(nodeId2).addAugmentation(NetconfNode.class,
@@ -249,7 +250,7 @@ public class NetconfTopologyManagerTest {
         mockContextMap.clear();
 
         final NetconfNode updatedNetconfNode1 = new NetconfNodeBuilder(netconfNode1)
-                .setPort(new PortNumber(33333)).build();
+                .setPort(new PortNumber(Uint16.valueOf(33333))).build();
         final Node updatedNode1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(NetconfNode.class,
                 updatedNetconfNode1).build();
 
@@ -345,7 +346,7 @@ public class NetconfTopologyManagerTest {
 
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(10))
+                .setPort(new PortNumber(Uint16.valueOf(10)))
                 .setActorResponseWaitTime(ACTOR_RESPONSE_WAIT_TIME).build();
         final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(NetconfNode.class,
                 netconfNode).build();
