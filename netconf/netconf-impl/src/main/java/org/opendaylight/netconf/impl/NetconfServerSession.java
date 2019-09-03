@@ -43,6 +43,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.ZeroBasedCounter32;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,7 +118,8 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
     public Session toManagementSession() {
         SessionBuilder builder = new SessionBuilder();
 
-        builder.setSessionId(getSessionId());
+        final Uint32 sessionId = Uint32.valueOf(getSessionId());
+        builder.setSessionId(sessionId);
         IpAddress address;
         InetAddress address1 = InetAddresses.forString(header.getAddress());
         if (address1 instanceof Inet4Address) {
@@ -135,16 +137,16 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
                 formattedDateTime, DATE_TIME_PATTERN);
         builder.setLoginTime(new DateAndTime(formattedDateTime));
 
-        builder.setInBadRpcs(new ZeroBasedCounter32(inRpcFail));
-        builder.setInRpcs(new ZeroBasedCounter32(inRpcSuccess));
-        builder.setOutRpcErrors(new ZeroBasedCounter32(outRpcError));
+        builder.setInBadRpcs(new ZeroBasedCounter32(Uint32.valueOf(inRpcFail)));
+        builder.setInRpcs(new ZeroBasedCounter32(Uint32.valueOf(inRpcSuccess)));
+        builder.setOutRpcErrors(new ZeroBasedCounter32(Uint32.valueOf(outRpcError)));
 
         builder.setUsername(header.getUserName());
         builder.setTransport(getTransportForString(header.getTransport()));
 
-        builder.setOutNotifications(new ZeroBasedCounter32(outNotification));
+        builder.setOutNotifications(new ZeroBasedCounter32(Uint32.valueOf(outNotification)));
 
-        builder.withKey(new SessionKey(getSessionId()));
+        builder.withKey(new SessionKey(sessionId));
 
         Session1Builder builder1 = new Session1Builder();
         builder1.setSessionIdentifier(header.getSessionIdentifier());

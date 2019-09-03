@@ -30,8 +30,8 @@ public class RestconfProviderImpl extends AbstractMXBean
     private final StatisticsRestconfServiceWrapper stats;
     private Thread webSocketServerThread;
 
-    public RestconfProviderImpl(StatisticsRestconfServiceWrapper stats, IpAddress websocketAddress,
-            PortNumber websocketPort) {
+    public RestconfProviderImpl(final StatisticsRestconfServiceWrapper stats, final IpAddress websocketAddress,
+            final PortNumber websocketPort) {
         super("Draft02ProviderStatistics", "restconf-connector", null);
         this.stats = Preconditions.checkNotNull(stats);
         this.websocketAddress = Preconditions.checkNotNull(websocketAddress);
@@ -40,7 +40,7 @@ public class RestconfProviderImpl extends AbstractMXBean
 
     public void start() {
         this.webSocketServerThread = new Thread(WebSocketServer.createInstance(
-                websocketAddress.stringValue(), websocketPort.getValue()));
+                websocketAddress.stringValue(), websocketPort.getValue().intValue()));
         this.webSocketServerThread.setName("Web socket server on port " + websocketPort);
         this.webSocketServerThread.start();
 
