@@ -33,7 +33,7 @@ final class MonitoringSession {
 
     @XmlElement(name = "session-id")
     public long getId() {
-        return managementSession.getSessionId();
+        return managementSession.getSessionId().longValue();
     }
 
     @XmlElement(name = "source-host")
@@ -53,22 +53,22 @@ final class MonitoringSession {
 
     @XmlElement(name = "in-bad-rpcs")
     public Long getInBadRpcs() {
-        return managementSession.getInBadRpcs().getValue();
+        return managementSession.getInBadRpcs().getValue().longValue();
     }
 
     @XmlElement(name = "in-rpcs")
     public Long getInRpcs() {
-        return managementSession.getInRpcs().getValue();
+        return managementSession.getInRpcs().getValue().longValue();
     }
 
     @XmlElement(name = "out-notifications")
     public Long getOutNotifications() {
-        return managementSession.getOutNotifications().getValue();
+        return managementSession.getOutNotifications().getValue().longValue();
     }
 
     @XmlElement(name = "out-rpc-errors")
     public Long getOutRpcErrors() {
-        return managementSession.getOutRpcErrors().getValue();
+        return managementSession.getOutRpcErrors().getValue().longValue();
     }
 
     @XmlElement(name = "transport")
