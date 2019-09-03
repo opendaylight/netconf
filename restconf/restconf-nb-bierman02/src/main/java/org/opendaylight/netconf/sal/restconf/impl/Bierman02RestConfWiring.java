@@ -22,6 +22,7 @@ import org.opendaylight.netconf.sal.restconf.web.WebInitializer;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddressBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
+import org.opendaylight.yangtools.yang.common.Uint16;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,18 +48,19 @@ public class Bierman02RestConfWiring {
 
     @Inject
     // The point of all the arguments here is simply to make your chosen Dependency Injection (DI) framework init. them
-    public Bierman02RestConfWiring(RestConfConfig config,
-            DOMSchemaService domSchemaService, DOMMountPointService domMountPointService, DOMRpcService domRpcService,
-            DOMDataBroker domDataBroker, DOMNotificationService domNotificationService,
-            ControllerContext controllerContext, RestconfApplication application,
-            BrokerFacade broker, RestconfImpl restconf, StatisticsRestconfServiceWrapper stats,
-            JSONRestconfServiceImpl jsonRestconfServiceImpl,
-            WebInitializer webInitializer) {
+    public Bierman02RestConfWiring(final RestConfConfig config,
+            final DOMSchemaService domSchemaService, final DOMMountPointService domMountPointService,
+            final DOMRpcService domRpcService, final DOMDataBroker domDataBroker,
+            final DOMNotificationService domNotificationService, final ControllerContext controllerContext,
+            final RestconfApplication application, final BrokerFacade broker, final RestconfImpl restconf,
+            final StatisticsRestconfServiceWrapper stats, final JSONRestconfServiceImpl jsonRestconfServiceImpl,
+            final WebInitializer webInitializer) {
 
         // WebSocket
         LOG.info("webSocketAddress = {}, webSocketPort = {}", config.webSocketAddress(), config.webSocketPort());
         IpAddress wsIpAddress = IpAddressBuilder.getDefaultInstance(config.webSocketAddress().getHostAddress());
-        this.webSocketServer = new RestconfProviderImpl(stats, wsIpAddress, new PortNumber(config.webSocketPort()));
+        this.webSocketServer = new RestconfProviderImpl(stats, wsIpAddress,
+            new PortNumber(Uint16.valueOf(config.webSocketPort())));
     }
 
     @PostConstruct
