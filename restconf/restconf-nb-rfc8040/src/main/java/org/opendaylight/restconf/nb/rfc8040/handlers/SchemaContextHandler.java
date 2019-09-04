@@ -7,7 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Throwables;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
@@ -89,8 +90,7 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
     @Override
     @SuppressWarnings("checkstyle:hiddenField")
     public void onGlobalContextUpdated(final SchemaContext context) {
-        Preconditions.checkNotNull(context);
-        schemaContext = context;
+        schemaContext = requireNonNull(context);
 
         final Module ietfYangLibraryModule =
                 context.findModule(IetfYangLibrary.MODULE_QNAME).orElse(null);

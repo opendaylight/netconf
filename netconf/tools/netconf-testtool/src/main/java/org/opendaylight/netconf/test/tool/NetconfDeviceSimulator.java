@@ -5,13 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool;
 
 import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -28,6 +25,8 @@ import java.net.Inet4Address;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.channels.AsynchronousChannelGroup;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -81,8 +80,8 @@ public class NetconfDeviceSimulator implements Closeable {
 
     private final NioEventLoopGroup nettyThreadgroup;
     private final HashedWheelTimer hashedWheelTimer;
-    private final List<Channel> devicesChannels = Lists.newArrayList();
-    private final List<SshProxyServer> sshWrappers = Lists.newArrayList();
+    private final List<Channel> devicesChannels = new ArrayList<>();
+    private final List<SshProxyServer> sshWrappers = new ArrayList<>();
     private final ScheduledExecutorService minaTimerExecutor;
     private final ExecutorService nioExecutor;
     private final Configuration configuration;
@@ -103,7 +102,7 @@ public class NetconfDeviceSimulator implements Closeable {
     private NetconfServerDispatcherImpl createDispatcher(final Set<Capability> capabilities,
             final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
 
-        final Set<Capability> transformedCapabilities = Sets.newHashSet(Collections2.transform(capabilities, input -> {
+        final Set<Capability> transformedCapabilities = new HashSet<>(Collections2.transform(capabilities, input -> {
             if (sendFakeSchema) {
                 sendFakeSchema = false;
                 return new FakeCapability((YangModuleCapability) input);
@@ -184,7 +183,7 @@ public class NetconfDeviceSimulator implements Closeable {
 
         int currentPort = configuration.getStartingPort();
 
-        final List<Integer> openDevices = Lists.newArrayList();
+        final List<Integer> openDevices = new ArrayList<>();
 
         // Generate key to temp folder
         final KeyPairProvider keyPairProvider = new VirtualKeyPairProvider();
@@ -285,7 +284,7 @@ public class NetconfDeviceSimulator implements Closeable {
     }
 
     private Set<Capability> parseSchemasToModuleCapabilities(final SharedSchemaRepository consumer) {
-        final Set<SourceIdentifier> loadedSources = Sets.newHashSet();
+        final Set<SourceIdentifier> loadedSources = new HashSet<>();
         consumer.registerSchemaSourceListener(TextToASTTransformer.create(consumer, consumer));
         consumer.registerSchemaSourceListener(new SchemaSourceListener() {
             @Override
@@ -334,7 +333,7 @@ public class NetconfDeviceSimulator implements Closeable {
             throw new RuntimeException("Cannot parse schema context", e);
         }
 
-        final Set<Capability> capabilities = Sets.newHashSet();
+        final Set<Capability> capabilities = new HashSet<>();
 
         for (final Module module : schemaContext.getModules()) {
             for (final Module subModule : module.getSubmodules()) {

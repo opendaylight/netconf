@@ -7,13 +7,14 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl;
 
+import static java.util.Objects.requireNonNull;
+
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.cluster.Cluster;
 import akka.dispatch.OnComplete;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
-import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -129,11 +130,9 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     }
 
     private void registerMasterMountPoint() {
-        Preconditions.checkNotNull(id);
-        Preconditions.checkNotNull(currentSchemaContext,
-                "Device has no remote schema context yet. Probably not fully connected.");
-        Preconditions.checkNotNull(netconfSessionPreferences,
-                "Device has no capabilities yet. Probably not fully connected.");
+        requireNonNull(id);
+        requireNonNull(currentSchemaContext, "Device has no remote schema context yet. Probably not fully connected.");
+        requireNonNull(netconfSessionPreferences, "Device has no capabilities yet. Probably not fully connected.");
 
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
         deviceDataBroker = newDeviceDataBroker();

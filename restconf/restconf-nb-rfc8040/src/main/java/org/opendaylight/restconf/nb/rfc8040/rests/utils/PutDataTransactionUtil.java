@@ -7,8 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FluentFuture;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -122,7 +122,7 @@ public final class PutDataTransactionUtil {
 
     private static void isEqualUriAndPayloadKeyValues(final Map<QName, Object> uriKeyValues, final MapEntryNode payload,
             final List<QName> keyDefinitions) {
-        final Map<QName, Object> mutableCopyUriKeyValues = Maps.newHashMap(uriKeyValues);
+        final Map<QName, Object> mutableCopyUriKeyValues = new HashMap<>(uriKeyValues);
         for (final QName keyDefinition : keyDefinitions) {
             final Object uriKeyValue = RestconfDocumentedException.throwIfNull(
                 mutableCopyUriKeyValues.remove(keyDefinition), ErrorType.PROTOCOL, ErrorTag.DATA_MISSING,
