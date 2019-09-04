@@ -7,8 +7,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collection;
@@ -63,10 +66,10 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
             final NotificationOutputType outputType) {
         setLocalNameOfPath(path.getLastPathArgument().getNodeType().getLocalName());
 
-        this.outputType = Preconditions.checkNotNull(outputType);
-        this.path = Preconditions.checkNotNull(path);
-        Preconditions.checkArgument(streamName != null && !streamName.isEmpty());
-        this.streamName = streamName;
+        this.outputType = requireNonNull(outputType);
+        this.path = requireNonNull(path);
+        this.streamName = requireNonNull(streamName);
+        checkArgument(!streamName.isEmpty());
     }
 
     @Override
@@ -190,7 +193,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
                 .append(normalizedNode.getIdentifier()).build();
 
         final Optional<DataSchemaContextNode<?>> childrenSchemaNode = dataSchemaContextTree.findChild(yiid);
-        Preconditions.checkState(childrenSchemaNode.isPresent());
+        checkState(childrenSchemaNode.isPresent());
         boolean isNodeMixin = childrenSchemaNode.get().isMixin();
         boolean isSkippedNonLeaf = getLeafNodesOnly() && !(normalizedNode instanceof LeafNode);
         if (!isNodeMixin && !isSkippedNonLeaf) {
@@ -258,7 +261,7 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
         try {
             SchemaPath nodePath;
             final Optional<DataSchemaContextNode<?>> childrenSchemaNode = dataSchemaContextTree.findChild(eventPath);
-            Preconditions.checkState(childrenSchemaNode.isPresent());
+            checkState(childrenSchemaNode.isPresent());
             if (normalized instanceof MapEntryNode || normalized instanceof UnkeyedListEntryNode) {
                 nodePath = childrenSchemaNode.get().getDataSchemaNode().getPath();
             } else {

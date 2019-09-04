@@ -88,9 +88,12 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
     private final String privateKeyPath;
     private final String privateKeyPassphrase;
     private final AAAEncryptionService encryptionService;
-    private NetconfConnectorDTO deviceCommunicatorDTO;
     private final NetconfKeystoreAdapter keystoreAdapter;
     private final DeviceActionFactory deviceActionFactory;
+
+    // FIXME: this seems to be a builder-like transition between {start,stop}RemoteDeviceConnection. More documentation
+    //        is needed, as to what the lifecycle is here.
+    private NetconfConnectorDTO deviceCommunicatorDTO;
 
     public RemoteDeviceConnectorImpl(final NetconfTopologySetup netconfTopologyDeviceSetup,
             final RemoteDeviceId remoteDeviceId, final DeviceActionFactory deviceActionFactory) {
@@ -155,7 +158,7 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final boolean reconnectOnChangedSchema = node.isReconnectOnChangedSchema() == null
                 ? NetconfTopologyUtils.DEFAULT_RECONNECT_ON_CHANGED_SCHEMA : node.isReconnectOnChangedSchema();
 
-        RemoteDeviceHandler<NetconfSessionPreferences> salFacade = deviceHandler;
+        RemoteDeviceHandler<NetconfSessionPreferences> salFacade = requireNonNull(deviceHandler);
         if (keepaliveDelay > 0) {
             LOG.info("{}: Adding keepalive facade.", remoteDeviceId);
             salFacade = new KeepaliveSalFacade(remoteDeviceId, salFacade,
@@ -166,6 +169,8 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = netconfTopologyDeviceSetup.getSchemaResourcesDTO();
 
         // pre register yang library sources as fallback schemas to schema registry
+        // FIXME: this list not used anywhere. Should it be retained or discarded? (why?)
+        //        it would seem those registrations should be bound to NetconfConnectorDTO
         final List<SchemaSourceRegistration<YangTextSchemaSource>> registeredYangLibSources = Lists.newArrayList();
         if (node.getYangLibrary() != null) {
             final String yangLibURL = node.getYangLibrary().getYangLibraryUrl().getValue();

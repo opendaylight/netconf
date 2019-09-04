@@ -7,12 +7,13 @@
  */
 package org.opendaylight.restconf.nb.rfc8040;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import com.google.common.base.Preconditions;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -114,7 +115,6 @@ public final class TestUtils {
     }
 
     public static String getDocumentInPrintableForm(final Document doc) {
-        Preconditions.checkNotNull(doc);
         try {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final TransformerFactory tf = TransformerFactory.newInstance();
@@ -125,7 +125,7 @@ public final class TestUtils {
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
-            transformer.transform(new DOMSource(doc), new StreamResult(new OutputStreamWriter(out,
+            transformer.transform(new DOMSource(requireNonNull(doc)), new StreamResult(new OutputStreamWriter(out,
                 StandardCharsets.UTF_8)));
             final byte[] charData = out.toByteArray();
             return new String(charData, StandardCharsets.UTF_8);
@@ -235,8 +235,7 @@ public final class TestUtils {
 
     public static NodeIdentifierWithPredicates getNodeIdentifierPredicate(final String localName,
             final String namespace, final String revision, final String... keysAndValues) throws ParseException {
-        Preconditions.checkArgument(keysAndValues.length % 2 == 0,
-                "number of keys argument have to be divisible by 2 (map)");
+        checkArgument(keysAndValues.length % 2 == 0, "number of keys argument have to be divisible by 2 (map)");
         final Map<QName, Object> predicate = new HashMap<>();
 
         int index = 0;

@@ -5,10 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.client.stress;
 
-import com.google.common.collect.Lists;
+import java.util.ArrayList;
 import java.util.List;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
@@ -30,7 +29,7 @@ abstract class AbstractExecutionStrategy implements ExecutionStrategy {
     }
 
     private static List<Integer> countEditBatchSizes(final Parameters params, final int amount) {
-        final List<Integer> editBatches = Lists.newArrayList();
+        final List<Integer> editBatches = new ArrayList<>();
         if (params.editBatchSize != amount) {
             final int fullBatches = amount / params.editBatchSize;
             for (int i = 0; i < fullBatches; i++) {
