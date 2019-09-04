@@ -957,12 +957,8 @@ public final class ControllerContext implements SchemaContextListener, Closeable
             final ListSchemaNode node, final DOMMountPoint mount) {
         final QName nodeType = argument.getNodeType();
         final CharSequence nodeIdentifier = this.toRestconfIdentifier(nodeType, mount);
-        final Map<QName, Object> keyValues = argument.getKeyValues();
 
-        final StringBuilder builder = new StringBuilder();
-        builder.append('/');
-        builder.append(nodeIdentifier);
-        builder.append('/');
+        final StringBuilder builder = new StringBuilder().append('/').append(nodeIdentifier).append('/');
 
         final List<QName> keyDefinition = node.getKeyDefinition();
         boolean hasElements = false;
@@ -975,12 +971,14 @@ public final class ControllerContext implements SchemaContextListener, Closeable
                         builder.append('/');
                     }
 
+                    Preconditions.checkState(listChild instanceof LeafSchemaNode,
+                        "List key has to consist of leaves, not %s", listChild);
+
+                    final Object value = argument.getValue(key);
                     try {
-                        Preconditions.checkState(listChild instanceof LeafSchemaNode,
-                            "List key has to consist of leaves, not %s", listChild);
-                        builder.append(toUriString(keyValues.get(key), (LeafSchemaNode)listChild, mount));
+                        builder.append(toUriString(value, (LeafSchemaNode)listChild, mount));
                     } catch (final UnsupportedEncodingException e) {
-                        LOG.error("Error parsing URI: {}", keyValues.get(key), e);
+                        LOG.error("Error parsing URI: {}", value, e);
                         return null;
                     }
                     break;
