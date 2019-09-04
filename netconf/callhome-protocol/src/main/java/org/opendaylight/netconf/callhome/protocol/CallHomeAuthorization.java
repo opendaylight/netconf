@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.callhome.protocol;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableSet;
 import java.security.KeyPair;
 import java.util.Collection;
@@ -104,8 +106,8 @@ public abstract class CallHomeAuthorization {
         private final Set<KeyPair> clientKeys = new HashSet<>();
 
         Builder(final String nodeId, final String username) {
-            this.nodeId = Preconditions.checkNotNull(nodeId);
-            this.username = Preconditions.checkNotNull(username);
+            this.nodeId = requireNonNull(nodeId);
+            this.username = requireNonNull(username);
         }
 
         /**
@@ -146,10 +148,10 @@ public abstract class CallHomeAuthorization {
 
         ServerAllowed(final String nodeId, final String username, final Collection<String> passwords,
                       final Collection<KeyPair> clientKeyPairs) {
-            this.username = Preconditions.checkNotNull(username);
+            this.username = requireNonNull(username);
             this.passwords = ImmutableSet.copyOf(passwords);
             this.clientKeyPair = ImmutableSet.copyOf(clientKeyPairs);
-            this.nodeId = Preconditions.checkNotNull(nodeId);
+            this.nodeId = requireNonNull(nodeId);
         }
 
         @Override
@@ -164,7 +166,7 @@ public abstract class CallHomeAuthorization {
 
         @Override
         protected void applyTo(final ClientSession session) {
-            Preconditions.checkArgument(session instanceof ClientSessionImpl);
+            checkArgument(session instanceof ClientSessionImpl);
             session.setUsername(username);
 
             // First try authentication using server host keys, else try password.

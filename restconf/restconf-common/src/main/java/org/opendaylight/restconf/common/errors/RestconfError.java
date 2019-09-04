@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.common.errors;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import java.io.Serializable;
 import java.util.Locale;
 import org.opendaylight.yangtools.yang.common.RpcError;
@@ -198,10 +198,8 @@ public class RestconfError implements Serializable {
      */
     public RestconfError(final ErrorType errorType, final ErrorTag errorTag, final String errorMessage,
                          final String errorAppTag, final String errorInfo, final YangInstanceIdentifier errorPath) {
-        Preconditions.checkNotNull(errorType, "Error type is required for RestConfError");
-        Preconditions.checkNotNull(errorTag, "Error tag is required for RestConfError");
-        this.errorType = errorType;
-        this.errorTag = errorTag;
+        this.errorType = requireNonNull(errorType, "Error type is required for RestConfError");
+        this.errorTag = requireNonNull(errorTag, "Error tag is required for RestConfError");
         this.errorMessage = errorMessage;
         this.errorAppTag = errorAppTag;
         this.errorInfo = errorInfo;
