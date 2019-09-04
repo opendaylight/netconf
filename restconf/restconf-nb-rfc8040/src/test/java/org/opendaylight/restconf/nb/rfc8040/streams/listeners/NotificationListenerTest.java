@@ -7,12 +7,12 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
+import static java.util.Objects.requireNonNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import java.net.URI;
 import java.util.ArrayList;
@@ -214,7 +214,6 @@ public class NotificationListenerTest {
     private String prepareJson(final DOMNotification notificationData, final SchemaPath schemaPathNotifi) {
         final NotificationListenerAdapter notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
                 schemaPathNotifi, "stream-name", NotificationOutputType.JSON);
-        final String result = notifiAdapter.prepareJson(schmeaCtx, notificationData);
-        return Preconditions.checkNotNull(result);
+        return requireNonNull(notifiAdapter.prepareJson(schmeaCtx, notificationData));
     }
 }

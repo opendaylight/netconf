@@ -7,7 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.services.simple.impl;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ForwardingObject;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -41,7 +42,7 @@ final class FakeImportedModule extends ForwardingObject implements Module {
     private final Module delegate;
 
     FakeImportedModule(final Module delegate) {
-        this.delegate = Preconditions.checkNotNull(delegate);
+        this.delegate = requireNonNull(delegate);
     }
 
     @Override

@@ -7,9 +7,11 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
@@ -55,10 +57,10 @@ public class NotificationListenerAdapter extends AbstractCommonSubscriber implem
     NotificationListenerAdapter(final SchemaPath path, final String streamName, final String outputType) {
         setLocalNameOfPath(path.getLastComponent().getLocalName());
 
-        this.outputType = Preconditions.checkNotNull(outputType);
-        this.path = Preconditions.checkNotNull(path);
-        Preconditions.checkArgument(streamName != null && !streamName.isEmpty());
-        this.streamName = streamName;
+        this.outputType = requireNonNull(outputType);
+        this.path = requireNonNull(path);
+        this.streamName = requireNonNull(streamName);
+        checkArgument(!streamName.isEmpty());
     }
 
     /**
