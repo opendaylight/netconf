@@ -7,7 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.services.simple.impl;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import java.util.Optional;
 import org.opendaylight.yangtools.concepts.SemVer;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -23,7 +24,7 @@ final class FakeModuleImport implements ModuleImport {
     private final Module module;
 
     FakeModuleImport(final Module module) {
-        this.module = Preconditions.checkNotNull(module);
+        this.module = requireNonNull(module);
     }
 
     @Override

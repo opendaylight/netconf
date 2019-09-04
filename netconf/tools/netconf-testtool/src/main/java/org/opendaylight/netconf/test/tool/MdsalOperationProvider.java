@@ -9,11 +9,11 @@ package org.opendaylight.netconf.test.tool;
 
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableClassToInstanceMap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -181,7 +181,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             LeafSetEntryNode locationLeafSetEntryNode = Builders.leafSetEntryBuilder().withNodeIdentifier(
                             new NodeWithValue<>(location, "NETCONF")).withValue("NETCONF").build();
 
-            Map<QName, Object> keyValues = Maps.newHashMap();
+            Map<QName, Object> keyValues = new HashMap<>();
             for (final Schema schema : monitor.getSchemas().getSchema()) {
                 keyValues.put(identifier, schema.getIdentifier());
                 keyValues.put(version, schema.getVersion());

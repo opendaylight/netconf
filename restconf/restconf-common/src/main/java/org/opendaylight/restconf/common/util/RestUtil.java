@@ -7,7 +7,8 @@
  */
 package org.opendaylight.restconf.common.util;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
@@ -52,8 +53,7 @@ public final class RestUtil {
      *
      */
     public static Optional<InputStream> isInputStreamEmpty(final InputStream entityStream) throws IOException {
-        Preconditions.checkNotNull(entityStream);
-        final PushbackInputStream pushbackInputStream = new PushbackInputStream(entityStream);
+        final PushbackInputStream pushbackInputStream = new PushbackInputStream(requireNonNull(entityStream));
 
         int firstByte = pushbackInputStream.read();
         if (firstByte == -1) {

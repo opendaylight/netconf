@@ -7,7 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.codecs;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
@@ -339,6 +340,8 @@ public final class RestCodec {
         }
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static Module getModuleByNamespace(final String namespace, final DOMMountPoint mountPoint,
             final SchemaContext schemaContext) {
         final URI validNamespace = resolveValidNamespace(namespace, mountPoint, schemaContext);
@@ -379,9 +382,11 @@ public final class RestCodec {
         return null;
     }
 
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private static DataSchemaNode findInstanceDataChildByNameAndNamespace(final DataNodeContainer container,
             final String name, final URI namespace) {
-        Preconditions.checkNotNull(namespace);
+        requireNonNull(namespace);
 
         final Iterable<DataSchemaNode> result = Iterables.filter(findInstanceDataChildrenByName(container, name),
             node -> namespace.equals(node.getQName().getNamespace()));
@@ -390,11 +395,9 @@ public final class RestCodec {
 
     private static List<DataSchemaNode> findInstanceDataChildrenByName(final DataNodeContainer container,
             final String name) {
-        Preconditions.checkNotNull(container);
-        Preconditions.checkNotNull(name);
-
         final List<DataSchemaNode> instantiatedDataNodeContainers = new ArrayList<>();
-        collectInstanceDataNodeContainers(instantiatedDataNodeContainers, container, name);
+        collectInstanceDataNodeContainers(instantiatedDataNodeContainers, requireNonNull(container),
+            requireNonNull(name));
         return instantiatedDataNodeContainers;
     }
 

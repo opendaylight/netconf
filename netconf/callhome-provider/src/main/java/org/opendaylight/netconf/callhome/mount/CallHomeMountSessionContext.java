@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.mount;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import io.netty.util.concurrent.Promise;
 import java.net.InetSocketAddress;
 import java.security.PublicKey;
@@ -42,11 +42,11 @@ class CallHomeMountSessionContext {
     CallHomeMountSessionContext(String nodeId, CallHomeProtocolSessionContext protocol,
                                 CallHomeChannelActivator activator, CloseCallback callback) {
 
-        this.nodeId = new NodeId(Preconditions.checkNotNull(nodeId, "nodeId"));
+        this.nodeId = new NodeId(requireNonNull(nodeId, "nodeId"));
         this.key = ContextKey.from(protocol.getRemoteAddress());
-        this.protocol = Preconditions.checkNotNull(protocol, "protocol");
-        this.activator = Preconditions.checkNotNull(activator, "activator");
-        this.onClose = Preconditions.checkNotNull(callback, "callback");
+        this.protocol = requireNonNull(protocol, "protocol");
+        this.activator = requireNonNull(activator, "activator");
+        this.onClose = requireNonNull(callback, "callback");
     }
 
     NodeId getId() {

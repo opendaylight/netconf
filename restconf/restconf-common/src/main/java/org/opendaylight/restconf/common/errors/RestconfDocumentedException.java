@@ -7,7 +7,8 @@
  */
 package org.opendaylight.restconf.common.errors;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -152,14 +153,12 @@ public class RestconfDocumentedException extends WebApplicationException {
      *            the HTTP status.
      */
     public RestconfDocumentedException(final Status status) {
-        Preconditions.checkNotNull(status, "Status can't be null");
         errors = ImmutableList.of();
-        this.status = status;
+        this.status = requireNonNull(status, "Status can't be null");
     }
 
     public RestconfDocumentedException(final Throwable cause, final RestconfError error) {
         super(cause, error.getErrorTag().getStatusCode());
-        Preconditions.checkNotNull(error, "RestconfError can't be null");
         errors = ImmutableList.of(error);
         status = null;
     }
