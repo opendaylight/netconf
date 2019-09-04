@@ -5,12 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.client.stress;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +33,7 @@ class AsyncExecutionStrategy extends AbstractExecutionStrategy {
     @Override
     public void invoke() {
         final AtomicInteger responseCounter = new AtomicInteger(0);
-        final List<ListenableFuture<RpcResult<NetconfMessage>>> futures = Lists.newArrayList();
+        final List<ListenableFuture<RpcResult<NetconfMessage>>> futures = new ArrayList<>();
 
         int batchI = 0;
         for (final Integer editBatch : getEditBatches()) {

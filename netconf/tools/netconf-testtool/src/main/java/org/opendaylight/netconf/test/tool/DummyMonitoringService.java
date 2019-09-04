@@ -10,9 +10,9 @@ package org.opendaylight.netconf.test.tool;
 import com.google.common.base.Function;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.netconf.api.capability.Capability;
@@ -57,9 +57,9 @@ public class DummyMonitoringService implements NetconfMonitoringService {
     public DummyMonitoringService(final Set<Capability> capabilities) {
 
         this.capabilities = new CapabilitiesBuilder().setCapability(
-                Lists.newArrayList(Collections2.transform(capabilities, CAPABILITY_URI_FUNCTION))).build();
+                new ArrayList<>(Collections2.transform(capabilities, CAPABILITY_URI_FUNCTION))).build();
 
-        Set<Capability> moduleCapabilities = Sets.newHashSet();
+        Set<Capability> moduleCapabilities = new HashSet<>();
         this.capabilityMultiMap = ArrayListMultimap.create();
         for (Capability cap : capabilities) {
             if (cap.getModuleName().isPresent()) {
@@ -69,7 +69,7 @@ public class DummyMonitoringService implements NetconfMonitoringService {
         }
 
         this.schemas = new SchemasBuilder().setSchema(
-            Lists.newArrayList(Collections2.transform(moduleCapabilities, CAPABILITY_SCHEMA_FUNCTION))).build();
+            new ArrayList<>(Collections2.transform(moduleCapabilities, CAPABILITY_SCHEMA_FUNCTION))).build();
     }
 
     @Override

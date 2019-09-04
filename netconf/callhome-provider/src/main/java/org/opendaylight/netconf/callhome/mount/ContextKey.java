@@ -5,11 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.mount;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -21,13 +21,12 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 
 class ContextKey {
-
     private final IpAddress address;
     private final PortNumber port;
 
-    ContextKey(IpAddress address, PortNumber port) {
-        this.address = Preconditions.checkNotNull(address);
-        this.port = Preconditions.checkNotNull(port);
+    ContextKey(final IpAddress address, final PortNumber port) {
+        this.address = requireNonNull(address);
+        this.port = requireNonNull(port);
     }
 
     @Override
@@ -40,7 +39,7 @@ class ContextKey {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -51,7 +50,7 @@ class ContextKey {
             return false;
         }
         ContextKey other = (ContextKey) obj;
-        return Objects.equal(address, other.address) && Objects.equal(port, other.port);
+        return address.equals(other.address) && port.equals(other.port);
     }
 
     IpAddress getIpAddress() {
@@ -62,12 +61,12 @@ class ContextKey {
         return port;
     }
 
-    public static ContextKey from(NetconfNode node) {
+    public static ContextKey from(final NetconfNode node) {
         return new ContextKey(node.getHost().getIpAddress(), node.getPort());
     }
 
-    public static ContextKey from(SocketAddress remoteAddress) {
-        Preconditions.checkArgument(remoteAddress instanceof InetSocketAddress);
+    public static ContextKey from(final SocketAddress remoteAddress) {
+        checkArgument(remoteAddress instanceof InetSocketAddress);
         InetSocketAddress inetSocketAddr = (InetSocketAddress) remoteAddress;
         InetAddress ipAddress = inetSocketAddr.getAddress();
 
@@ -75,7 +74,7 @@ class ContextKey {
         if (ipAddress instanceof Inet4Address) {
             yangIp = new IpAddress(IetfInetUtil.INSTANCE.ipv4AddressFor(ipAddress));
         } else {
-            Preconditions.checkArgument(ipAddress instanceof Inet6Address);
+            checkArgument(ipAddress instanceof Inet6Address);
             yangIp = new IpAddress(IetfInetUtil.INSTANCE.ipv6AddressFor(ipAddress));
         }
         return new ContextKey(yangIp, new PortNumber(inetSocketAddr.getPort()));

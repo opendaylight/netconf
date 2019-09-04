@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.protocol;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.AbstractServerChannel;
 import io.netty.channel.ChannelConfig;
@@ -43,9 +43,9 @@ class MinaSshNettyChannel extends AbstractServerChannel {
 
     MinaSshNettyChannel(final CallHomeSessionContext context, final ClientSession session,
         final ClientChannel sshChannel) {
-        this.context = Preconditions.checkNotNull(context);
-        this.session = Preconditions.checkNotNull(session);
-        this.sshChannel = Preconditions.checkNotNull(sshChannel);
+        this.context = requireNonNull(context);
+        this.session = requireNonNull(session);
+        this.sshChannel = requireNonNull(sshChannel);
         this.sshReadHandler = new AsyncSshHandlerReader(
             new ConnectionClosedDuringRead(), new FireReadMessage(), "netconf", sshChannel.getAsyncOut());
         this.sshWriteAsyncHandler = new AsyncSshHandlerWriter(sshChannel.getAsyncIn());

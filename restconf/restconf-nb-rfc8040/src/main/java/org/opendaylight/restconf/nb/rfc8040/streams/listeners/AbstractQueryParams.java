@@ -7,8 +7,9 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import java.io.StringReader;
 import java.time.Instant;
 import javax.xml.XMLConstants;
@@ -68,7 +69,7 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     @SuppressWarnings("checkstyle:hiddenField")
     public void setQueryParams(final Instant start, final Instant stop, final String filter,
             final boolean leafNodesOnly) {
-        this.start = Preconditions.checkNotNull(start);
+        this.start = requireNonNull(start);
         this.stop = stop;
         this.filter = filter;
         this.leafNodesOnly = leafNodesOnly;
