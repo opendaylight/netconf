@@ -56,7 +56,9 @@ public final class NetconfUtil {
         XML_FACTORY.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
     }
 
-    private NetconfUtil() {}
+    private NetconfUtil() {
+
+    }
 
     public static Document checkIsMessageOk(final Document response) throws DocumentedException {
         XmlElement element = XmlElement.fromDomDocument(response);

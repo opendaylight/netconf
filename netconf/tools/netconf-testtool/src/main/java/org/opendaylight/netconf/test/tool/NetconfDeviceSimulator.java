@@ -289,7 +289,9 @@ public class NetconfDeviceSimulator implements Closeable {
         consumer.registerSchemaSourceListener(TextToASTTransformer.create(consumer, consumer));
         consumer.registerSchemaSourceListener(new SchemaSourceListener() {
             @Override
-            public void schemaSourceEncountered(final SchemaSourceRepresentation schemaSourceRepresentation) {}
+            public void schemaSourceEncountered(final SchemaSourceRepresentation schemaSourceRepresentation) {
+
+            }
 
             @Override
             public void schemaSourceRegistered(final Iterable<PotentialSchemaSource<?>> potentialSchemaSources) {
@@ -299,7 +301,9 @@ public class NetconfDeviceSimulator implements Closeable {
             }
 
             @Override
-            public void schemaSourceUnregistered(final PotentialSchemaSource<?> potentialSchemaSource) {}
+            public void schemaSourceUnregistered(final PotentialSchemaSource<?> potentialSchemaSource) {
+
+            }
         });
 
         if (configuration.getSchemasDir() != null) {
