@@ -27,7 +27,9 @@ public final class NetconfState {
         this.schemas = monitoringService.getSchemas();
     }
 
-    public NetconfState() {}
+    public NetconfState() {
+
+    }
 
     @XmlElementWrapper(name = "schemas")
     @XmlElement(name = "schema")
