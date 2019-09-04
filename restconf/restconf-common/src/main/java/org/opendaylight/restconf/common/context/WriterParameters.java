@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.common.context;
 
 import java.util.List;
@@ -61,7 +60,9 @@ public final class WriterParameters {
         private boolean tagged;
         private String withDefault;
 
-        public WriterParametersBuilder() {}
+        public WriterParametersBuilder() {
+
+        }
 
         public WriterParametersBuilder setContent(final String content) {
             this.content = content;
