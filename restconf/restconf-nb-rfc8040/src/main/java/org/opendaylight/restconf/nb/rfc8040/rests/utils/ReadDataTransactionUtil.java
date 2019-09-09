@@ -439,7 +439,7 @@ public final class ReadDataTransactionUtil {
                 transactionNode.getLogicalDatastoreType(),
                 transactionNode.getInstanceIdentifier().getInstanceIdentifier());
             FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
-                dataFactory);
+                dataFactory,transactionNode.getTransactionChain());
         }
         return dataFactory.build();
     }
