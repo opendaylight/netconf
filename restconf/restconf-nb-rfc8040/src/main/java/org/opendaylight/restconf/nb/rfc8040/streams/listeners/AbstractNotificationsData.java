@@ -26,6 +26,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
@@ -77,10 +78,12 @@ abstract class AbstractNotificationsData {
      * Delete data in DS.
      */
     protected void deleteDataInDS() throws Exception {
-        final DOMDataTreeWriteTransaction wTx = this.transactionChainHandler.get().newWriteOnlyTransaction();
+        final DOMTransactionChain transactionChain = this.transactionChainHandler.get();
+        final DOMDataTreeWriteTransaction wTx = transactionChain.newWriteOnlyTransaction();
         wTx.delete(LogicalDatastoreType.OPERATIONAL, IdentifierCodec
                 .deserialize(MonitoringModule.PATH_TO_STREAM_WITHOUT_KEY + this.localName, this.schemaHandler.get()));
         wTx.commit().get();
+        transactionChain.close();
     }
 
     /**

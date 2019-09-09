@@ -12,9 +12,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.api.NetconfDocumentedException;
@@ -50,7 +52,28 @@ final class FutureCallbackTx {
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
     static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
-            final FutureDataFactory<? super T> dataFactory) throws RestconfDocumentedException {
+                                final FutureDataFactory<? super T> dataFactory) throws RestconfDocumentedException {
+        addCallback(listenableFuture,txType,dataFactory,null);
+    }
+
+    /**
+     * Add callback to the future object and close transaction chain.
+     *
+     * @param listenableFuture
+     *             future object
+     * @param txType
+     *             type of operation (READ, POST, PUT, DELETE)
+     * @param dataFactory
+     *             factory setting result
+     * @param transactionChain
+     *             transaction chain
+     * @throws RestconfDocumentedException
+     *             if the Future throws an exception
+     */
+    @SuppressWarnings("checkstyle:IllegalCatch")
+    static <T> void addCallback(final ListenableFuture<T> listenableFuture, final String txType,
+            final FutureDataFactory<? super T> dataFactory, @Nullable final DOMTransactionChain transactionChain)
+            throws RestconfDocumentedException {
 
         try {
             final T result = listenableFuture.get();
@@ -91,6 +114,10 @@ final class FutureCallbackTx {
                 throw new RestconfDocumentedException("Transaction(" + txType + ") not committed correctly", e);
             } else {
                 throw new RestconfDocumentedException("Transaction failed", e);
+            }
+        } finally {
+            if (transactionChain != null) {
+                transactionChain.close();
             }
         }
     }

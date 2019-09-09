@@ -18,6 +18,7 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
@@ -140,7 +141,8 @@ public final class PutDataTransactionUtil {
     }
 
     /**
-     * Check mount point and prepare variables for put data to DS.
+     * Check mount point and prepare variables for put data to DS. Close {@link DOMTransactionChain} inside of object
+     * {@link TransactionVarsWrapper} provided as a parameter.
      *
      * @param payload
      *             data to put
@@ -171,7 +173,9 @@ public final class PutDataTransactionUtil {
                 new ResponseFactory(existsResponse.result ? Status.NO_CONTENT : Status.CREATED);
         final FluentFuture<? extends CommitInfo> submitData = submitData(path, schemaContext,
                 transactionNode.getTransactionChainHandler(), readWriteTransaction, payload.getData(), insert, point);
-        FutureCallbackTx.addCallback(submitData, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, responseFactory);
+        //This method will close transactionChain
+        FutureCallbackTx.addCallback(submitData, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, responseFactory,
+                transactionNode.getTransactionChain());
         return responseFactory.build();
     }
 
