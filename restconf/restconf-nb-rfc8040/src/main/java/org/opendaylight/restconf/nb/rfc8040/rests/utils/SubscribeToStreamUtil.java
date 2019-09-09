@@ -32,6 +32,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -110,10 +111,8 @@ public final class SubscribeToStreamUtil {
                     ErrorTag.UNKNOWN_ELEMENT);
         }
 
-        final DOMDataTreeReadWriteTransaction writeTransaction = handlersHolder
-                .getTransactionChainHandler()
-                .get()
-                .newReadWriteTransaction();
+        final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
+        final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
         final boolean exist = checkExist(schemaContext, writeTransaction);
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
@@ -136,6 +135,7 @@ public final class SubscribeToStreamUtil {
                 notificationListenerAdapter.get().getSchemaPath().getLastComponent().getLocalName(), writeTransaction,
                 exist, mapToStreams);
         submitData(writeTransaction);
+        transactionChain.close();
         return uri;
     }
 
@@ -208,8 +208,8 @@ public final class SubscribeToStreamUtil {
         registration(datastoreType, listener.get(), handlersHolder.getDomDataBrokerHandler().get());
 
         final URI uri = prepareUriByStreamName(uriInfo, streamName);
-        final DOMDataTreeReadWriteTransaction writeTransaction
-                = handlersHolder.getTransactionChainHandler().get().newReadWriteTransaction();
+        final DOMTransactionChain transactionChain = handlersHolder.getTransactionChainHandler().get();
+        final DOMDataTreeReadWriteTransaction writeTransaction = transactionChain.newReadWriteTransaction();
         final SchemaContext schemaContext = handlersHolder.getSchemaHandler().get();
         final boolean exist = checkExist(schemaContext, writeTransaction);
 
@@ -220,6 +220,7 @@ public final class SubscribeToStreamUtil {
         writeDataToDS(schemaContext, listener.get().getPath().getLastPathArgument().getNodeType().getLocalName(),
                 writeTransaction, exist, mapToStreams);
         submitData(writeTransaction);
+        transactionChain.close();
         return uri;
     }
 
