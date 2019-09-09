@@ -26,6 +26,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.WriterParameters;
 import org.opendaylight.restconf.common.context.WriterParameters.WriterParametersBuilder;
@@ -203,7 +204,8 @@ public final class ReadDataTransactionUtil {
     }
 
     /**
-     * Read specific type of data from data store via transaction.
+     * Read specific type of data from data store via transaction. Close {@link DOMTransactionChain} inside of object
+     * {@link TransactionVarsWrapper} provided as a parameter.
      *
      * @param valueOfContent
      *            type of data to read (config, state, all)
@@ -234,6 +236,7 @@ public final class ReadDataTransactionUtil {
                 return readAllData(transactionNode, withDefa, ctx);
 
             default:
+                transactionNode.getTransactionChain().close();
                 throw new RestconfDocumentedException(
                         new RestconfError(RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.INVALID_VALUE,
                                 "Invalid content parameter: " + valueOfContent, null,
@@ -425,7 +428,9 @@ public final class ReadDataTransactionUtil {
     /**
      * If is set specific {@link LogicalDatastoreType} in
      * {@link TransactionVarsWrapper}, then read this type of data from DS. If
-     * don't, we have to read all data from DS (state + config)
+     * don't, we have to read all data from DS (state + config).
+     * This method will close {@link org.opendaylight.mdsal.dom.api.DOMTransactionChain} inside of
+     * {@link TransactionVarsWrapper}.
      *
      * @param transactionNode
      *             {@link TransactionVarsWrapper} - wrapper for variables
@@ -433,19 +438,43 @@ public final class ReadDataTransactionUtil {
      */
     private static @Nullable NormalizedNode<?, ?> readDataViaTransaction(
             final @NonNull TransactionVarsWrapper transactionNode) {
+        return readDataViaTransaction(transactionNode, true);
+    }
+
+
+    /**
+     * If is set specific {@link LogicalDatastoreType} in
+     * {@link TransactionVarsWrapper}, then read this type of data from DS. If
+     * don't, we have to read all data from DS (state + config)
+     *
+     * @param transactionNode
+     *             {@link TransactionVarsWrapper} - wrapper for variables
+     * @param closeTransactionChain
+     *             If is set to true, after transaction it will close transactionChain in {@link TransactionVarsWrapper}
+     * @return {@link NormalizedNode}
+     */
+    private static @Nullable NormalizedNode<?, ?> readDataViaTransaction(
+            final @NonNull TransactionVarsWrapper transactionNode, final boolean closeTransactionChain) {
         final NormalizedNodeFactory dataFactory = new NormalizedNodeFactory();
         try (DOMDataTreeReadTransaction tx = transactionNode.getTransactionChain().newReadOnlyTransaction()) {
             final FluentFuture<Optional<NormalizedNode<?, ?>>> listenableFuture = tx.read(
                 transactionNode.getLogicalDatastoreType(),
                 transactionNode.getInstanceIdentifier().getInstanceIdentifier());
-            FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
-                dataFactory);
+            if (closeTransactionChain) {
+                //Method close transactionChain inside of TransactionVarsWrapper, if is provide as a parameter.
+                FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+                        dataFactory, transactionNode.getTransactionChain());
+            } else {
+                FutureCallbackTx.addCallback(listenableFuture, RestconfDataServiceConstant.ReadData.READ_TYPE_TX,
+                        dataFactory);
+            }
         }
         return dataFactory.build();
     }
 
     /**
-     * Read config and state data, then map them.
+     * Read config and state data, then map them. Close {@link DOMTransactionChain} inside of object
+     * {@link TransactionVarsWrapper} provided as a parameter.
      *
      * @param transactionNode
      *            {@link TransactionVarsWrapper} - wrapper for variables
@@ -459,11 +488,12 @@ public final class ReadDataTransactionUtil {
             final String withDefa, final SchemaContext ctx) {
         // PREPARE STATE DATA NODE
         transactionNode.setLogicalDatastoreType(LogicalDatastoreType.OPERATIONAL);
-        final NormalizedNode<?, ?> stateDataNode = readDataViaTransaction(transactionNode);
+        final NormalizedNode<?, ?> stateDataNode = readDataViaTransaction(transactionNode, false);
 
         // PREPARE CONFIG DATA NODE
         transactionNode.setLogicalDatastoreType(LogicalDatastoreType.CONFIGURATION);
         final NormalizedNode<?, ?> configDataNode;
+        //Here will be closed transactionChain
         if (withDefa == null) {
             configDataNode = readDataViaTransaction(transactionNode);
         } else {
