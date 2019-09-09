@@ -8,6 +8,8 @@
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
 import java.util.Objects;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,19 +33,19 @@ public class TransactionChainHandler implements Handler<DOMTransactionChain>, Au
         public void onTransactionChainFailed(final DOMTransactionChain chain, final DOMDataTreeTransaction transaction,
                 final Throwable cause) {
             LOG.warn("TransactionChain({}) {} FAILED!", chain, transaction.getIdentifier(), cause);
-            reset();
+            removeTransactionChain(chain);
             throw new RestconfDocumentedException("TransactionChain(" + chain + ") not committed correctly", cause);
         }
 
         @Override
         public void onTransactionChainSuccessful(final DOMTransactionChain chain) {
             LOG.trace("TransactionChain({}) SUCCESSFUL", chain);
+            removeTransactionChain(chain);
         }
     };
 
     private final DOMDataBroker dataBroker;
-
-    private volatile DOMTransactionChain transactionChain;
+    private final Queue<DOMTransactionChain> transactionChainList;
 
     /**
      * Prepare transaction chain service for Restconf services.
@@ -51,23 +53,27 @@ public class TransactionChainHandler implements Handler<DOMTransactionChain>, Au
     @Inject
     public TransactionChainHandler(final DOMDataBroker dataBroker) {
         this.dataBroker = Objects.requireNonNull(dataBroker);
-        transactionChain = Objects.requireNonNull(dataBroker.createTransactionChain(transactionChainListener));
+        this.transactionChainList = new ConcurrentLinkedQueue<>();
     }
 
     @Override
     public DOMTransactionChain get() {
-        return this.transactionChain;
-    }
-
-    public synchronized void reset() {
-        LOG.trace("Resetting TransactionChain({})", transactionChain);
-        transactionChain.close();
-        transactionChain = dataBroker.createTransactionChain(transactionChainListener);
+        final DOMTransactionChain transactionChain = dataBroker.createTransactionChain(transactionChainListener);
+        this.transactionChainList.add(transactionChain);
+        LOG.trace("Started TransactionChain({})", transactionChain);
+        return transactionChain;
     }
 
     @Override
     @PreDestroy
     public synchronized void close() {
-        transactionChain.close();
+        for (DOMTransactionChain transactionChain: this.transactionChainList) {
+            transactionChain.close();
+            LOG.trace("Closed TransactionChain({})", transactionChain);
+        }
+    }
+
+    boolean removeTransactionChain(DOMTransactionChain transactionChain) {
+        return this.transactionChainList.remove(transactionChain);
     }
 }
