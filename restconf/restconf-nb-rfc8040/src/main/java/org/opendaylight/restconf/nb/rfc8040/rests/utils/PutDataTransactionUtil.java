@@ -171,7 +171,8 @@ public final class PutDataTransactionUtil {
                 new ResponseFactory(existsResponse.result ? Status.NO_CONTENT : Status.CREATED);
         final FluentFuture<? extends CommitInfo> submitData = submitData(path, schemaContext,
                 transactionNode.getTransactionChainHandler(), readWriteTransaction, payload.getData(), insert, point);
-        FutureCallbackTx.addCallback(submitData, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, responseFactory);
+        FutureCallbackTx.addCallback(submitData, RestconfDataServiceConstant.PutData.PUT_TX_TYPE, responseFactory,
+                transactionNode.getTransactionChain());
         return responseFactory.build();
     }
 
