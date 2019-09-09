@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response.Status;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.restconf.nb.rfc8040.handlers.TransactionChainHandler;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 
@@ -35,28 +35,28 @@ public final class DeleteDataTransactionUtil {
      * @return {@link Response}
      */
     public static Response deleteData(final TransactionVarsWrapper transactionNode) {
-        final FluentFuture<? extends CommitInfo> future = submitData(transactionNode.getTransactionChainHandler(),
+        final DOMTransactionChain transactionChain = transactionNode.getTransactionChainHandler().get();
+        final FluentFuture<? extends CommitInfo> future = submitData(transactionChain,
                 transactionNode.getInstanceIdentifier().getInstanceIdentifier());
         final ResponseFactory response = new ResponseFactory(Status.NO_CONTENT);
-        FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE, response);
+        FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE, response,
+                transactionChain);
         return response.build();
     }
 
     /**
      * Delete data via transaction. Return error if data to delete does not exist.
      *
-     * @param transactionChainHandler
-     *             transaction chain handler
-     * @param readWriteTx
-     *             read and write transaction
+     * @param transactionChain
+     *             transaction chain
      * @param path
      *             path of data to delete
      * @return {@link FluentFuture}
      */
     private static FluentFuture<? extends CommitInfo> submitData(
-            final TransactionChainHandler transactionChainHandler, final YangInstanceIdentifier path) {
-        final DOMDataTreeReadWriteTransaction readWriteTx = transactionChainHandler.get().newReadWriteTransaction();
-        TransactionUtil.checkItemExists(transactionChainHandler, readWriteTx, LogicalDatastoreType.CONFIGURATION, path,
+            final DOMTransactionChain transactionChain, final YangInstanceIdentifier path) {
+        final DOMDataTreeReadWriteTransaction readWriteTx = transactionChain.newReadWriteTransaction();
+        TransactionUtil.checkItemExists(transactionChain, readWriteTx, LogicalDatastoreType.CONFIGURATION, path,
                 RestconfDataServiceConstant.DeleteData.DELETE_TX_TYPE);
         readWriteTx.delete(LogicalDatastoreType.CONFIGURATION, path);
         return readWriteTx.commit();
