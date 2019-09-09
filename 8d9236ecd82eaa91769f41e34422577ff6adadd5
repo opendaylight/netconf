@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "34909ca4_89cc23b9",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/SchemaContextHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-09T16:17:23Z",
+      "side": 1,
+      "message": "Should removeTransactionChain be called, to avoid accumulating old chains?\nApplies to every added similar line in this patch.",
+      "range": {
+        "startLine": 145,
+        "startChar": 36,
+        "endLine": 145,
+        "endChar": 37
+      },
+      "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "64071148_c5a4a631",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-09T16:17:23Z",
+      "side": 1,
+      "message": "Ok, in both cases the chain is removed from the list. But do we want to explicitly close it? Not sure whether garbage collector can do that for us, but the rest of the code calls chain.close() explicitly.",
+      "range": {
+        "startLine": 45,
+        "startChar": 4,
+        "endLine": 45,
+        "endChar": 6
+      },
+      "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d6d68399_70607554",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-09T16:17:23Z",
+      "side": 1,
+      "message": "\"get\" hints there is a possibility of re-use, which currently is not supported. \"create\" or \"register\" are better verbs.",
+      "range": {
+        "startLine": 60,
+        "startChar": 31,
+        "endLine": 60,
+        "endChar": 34
+      },
+      "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8cac5e73_32b7c050",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-09T16:17:23Z",
+      "side": 1,
+      "message": "Document the return value.",
+      "range": {
+        "startLine": 76,
+        "startChar": 4,
+        "endLine": 76,
+        "endChar": 11
+      },
+      "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "573e28f6_20ded7c2",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-09T16:17:23Z",
+      "side": 1,
+      "message": "Should the caller close the chain before calling this?\nI would prefer this method to perform the close, and to be called \"closeAndRemoveTransactionChain\" or \"deleteTransactionChain\" or \"unregisterTransactionChain\" or similar.",
+      "range": {
+        "startLine": 77,
+        "startChar": 48,
+        "endLine": 77,
+        "endChar": 64
+      },
+      "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a244f9c0_7d622fed",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/DeleteDataTransactionUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-09T16:17:23Z",
+      "side": 1,
+      "message": "Never unregistered/closed?\nApplies to some other added similar lines.",
+      "range": {
+        "startLine": 38,
+        "startChar": 34,
+        "endLine": 38,
+        "endChar": 50
+      },
+      "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "daa80717_8fba3455",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandlerTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-09T16:17:23Z",
+      "side": 1,
+      "message": "Add tests that verify no method that internally calls TransactionChainHandler.get() keeps the chain in the list (or not closed) after use.",
+      "range": {
+        "startLine": 57,
+        "startChar": 4,
+        "endLine": 57,
+        "endChar": 5
+      },
+      "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
