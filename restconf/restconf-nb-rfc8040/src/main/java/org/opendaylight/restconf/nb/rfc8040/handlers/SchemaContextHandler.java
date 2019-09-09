@@ -22,6 +22,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.common.api.TransactionCommitFailedException;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
@@ -117,7 +118,8 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
 
     private void putData(
             final NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>> normNode) {
-        final DOMDataTreeWriteTransaction wTx = this.transactionChainHandler.get().newWriteOnlyTransaction();
+        final DOMTransactionChain transactionChain = this.transactionChainHandler.get();
+        final DOMDataTreeWriteTransaction wTx = transactionChain.newWriteOnlyTransaction();
         wTx.put(LogicalDatastoreType.OPERATIONAL,
                 YangInstanceIdentifier.create(NodeIdentifier.create(normNode.getNodeType())), normNode);
         try {
@@ -136,10 +138,11 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
                  * This is workaround for bug https://bugs.opendaylight.org/show_bug.cgi?id=7728
                  */
                 LOG.warn("Ignoring that another cluster node is already putting the same data to DS.", e);
-                this.transactionChainHandler.reset();
             } else {
                 throw new RestconfDocumentedException("Problem occurred while putting data to DS.", failure);
             }
+        } finally {
+            transactionChain.close();
         }
     }
 }
