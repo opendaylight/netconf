@@ -18,6 +18,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadOperations;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
+import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -56,7 +57,8 @@ public final class PatchDataTransactionUtil {
                                                final SchemaContextRef schemaContextRef) {
         final List<PatchStatusEntity> editCollection = new ArrayList<>();
         boolean noError = true;
-        final DOMDataTreeReadWriteTransaction tx = transactionNode.getTransactionChain().newReadWriteTransaction();
+        final DOMTransactionChain transactionChain = transactionNode.getTransactionChain();
+        final DOMDataTreeReadWriteTransaction tx = transactionChain.newReadWriteTransaction();
 
         for (final PatchEntity patchEntity : context.getData()) {
             if (noError) {
@@ -134,7 +136,7 @@ public final class PatchDataTransactionUtil {
             final FluentFuture<? extends CommitInfo> future = tx.commit();
 
             try {
-                FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response);
+                FutureCallbackTx.addCallback(future, PatchData.PATCH_TX_TYPE, response, transactionChain);
             } catch (final RestconfDocumentedException e) {
                 // if errors occurred during transaction commit then patch failed and global errors are reported
                 return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), false,
@@ -144,7 +146,7 @@ public final class PatchDataTransactionUtil {
             return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection), true, null);
         } else {
             tx.cancel();
-            transactionNode.getTransactionChainHandler().reset();
+            transactionChain.close();
             return new PatchStatusContext(context.getPatchId(), ImmutableList.copyOf(editCollection),
                     false, null);
         }
