@@ -57,9 +57,10 @@ public class SchemaPathMessage implements Serializable {
 
         @Override
         public void writeExternal(final ObjectOutput out) throws IOException {
-            out.writeInt(Iterables.size(schemaPathMessage.getSchemaPath().getPathTowardsRoot()));
-
-            for (final QName qualifiedName : schemaPathMessage.getSchemaPath().getPathTowardsRoot()) {
+            final Iterable<QName> path = schemaPathMessage.getSchemaPath().getPathFromRoot();
+            out.writeInt(Iterables.size(path));
+            for (final QName qualifiedName : path) {
+                // FIXME: switch to QName.writeTo() or a sal-clustering-commons stream
                 out.writeObject(qualifiedName);
             }
 
@@ -71,6 +72,7 @@ public class SchemaPathMessage implements Serializable {
             final int sizePath = in.readInt();
             final QName[] paths = new QName[sizePath];
             for (int i = 0; i < sizePath; i++) {
+                // FIXME: switch to QName.readFrom() or a sal-clustering-commons stream
                 paths[i] = (QName) in.readObject();
             }
             final boolean absolute = in.readBoolean();

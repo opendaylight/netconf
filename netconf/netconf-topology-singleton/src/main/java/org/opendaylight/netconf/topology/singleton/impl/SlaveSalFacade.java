@@ -11,6 +11,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.util.Timeout;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
@@ -41,7 +42,7 @@ public class SlaveSalFacade {
     }
 
     public void registerSlaveMountPoint(final SchemaContext remoteSchemaContext, final DOMRpcService deviceRpc,
-                                        final ActorRef masterActorRef) {
+                                        final DOMActionService deviceAction, final ActorRef masterActorRef) {
         if (!registered.compareAndSet(false, true)) {
             return;
         }
@@ -52,7 +53,7 @@ public class SlaveSalFacade {
                 new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(), actorResponseWaitTime);
 
         salProvider.getMountInstance().onTopologyDeviceConnected(remoteSchemaContext, netconfDeviceDataBroker,
-                deviceRpc, notificationService);
+                deviceRpc, notificationService, deviceAction);
 
         LOG.info("{}: Slave mount point registered.", id);
     }
