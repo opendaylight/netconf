@@ -61,6 +61,7 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.topology.api.NetconfTopology;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IetfInetUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.NetconfNodeAugmentedOptional;
@@ -219,10 +220,16 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final long keepaliveDelay = node.getKeepaliveDelay() == null
                 ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay().toJava();
 
-        final IpAddress ipAddress = node.getHost().getIpAddress();
-        final InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null
-                ? ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue(),
-                node.getPort().getValue().toJava());
+        final InetSocketAddress address;
+        final Host host = node.getHost();
+        final IpAddress ipAddress = host.getIpAddress();
+        if (ipAddress != null) {
+            address = new InetSocketAddress(IetfInetUtil.INSTANCE.inetAddressFor(ipAddress),
+                    node.getPort().getValue().toJava());
+        } else {
+            address = new InetSocketAddress(host.getDomainName().getValue(),
+                    node.getPort().getValue().toJava());
+        }
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId(nodeId.getValue(), address);
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade = createSalFacade(remoteDeviceId);
