@@ -52,6 +52,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     private NetconfSessionPreferences netconfSessionPreferences = null;
     private DOMRpcService deviceRpc = null;
     private DOMDataBroker deviceDataBroker = null;
+    private DOMActionService deviceAction = null;
 
     MasterSalFacade(final RemoteDeviceId id,
                     final ActorSystem actorSystem,
@@ -70,12 +71,9 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     public void onDeviceConnected(final SchemaContext remoteSchemaContext,
                                   final NetconfSessionPreferences sessionPreferences,
                                   final DOMRpcService domRpcService, final DOMActionService domActionService) {
-        // We do not support actions in clustered topology yet
-        if (domActionService != null) {
-            LOG.warn("{}: YANG 1.1 actions are not supported in clustered netconf topology, "
-                    + "DOMActionService will not be exposed for the device", id);
-        }
-
+        this.deviceAction = domActionService;
+        LOG.debug("{}: YANG 1.1 actions are supported in clustered netconf topology, "
+            + "DOMActionService exposed for the device", id);
         onDeviceConnected(remoteSchemaContext, sessionPreferences, domRpcService);
     }
 
@@ -144,8 +142,8 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
         // on leader node would be same as on follower node
         final ProxyDOMDataBroker proxyDataBroker =
                 new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(), actorResponseWaitTime);
-        salProvider.getMountInstance()
-                .onTopologyDeviceConnected(currentSchemaContext, proxyDataBroker, deviceRpc, notificationService);
+        salProvider.getMountInstance().onTopologyDeviceConnected(currentSchemaContext, proxyDataBroker, deviceRpc,
+            notificationService, deviceAction);
     }
 
     protected DOMDataBroker newDeviceDataBroker() {
@@ -163,7 +161,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
         // send initial data to master actor
         return Patterns.ask(masterActorRef, new CreateInitialMasterActorData(deviceDataBroker, sourceIdentifiers,
-                deviceRpc), actorResponseWaitTime);
+                deviceRpc, deviceAction), actorResponseWaitTime);
     }
 
     private void updateDeviceData() {

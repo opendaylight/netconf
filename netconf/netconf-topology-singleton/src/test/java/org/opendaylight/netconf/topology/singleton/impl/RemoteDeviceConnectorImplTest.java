@@ -42,6 +42,7 @@ import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
+import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -102,6 +103,9 @@ public class RemoteDeviceConnectorImplTest {
     @Mock
     private WriteTransaction writeTx;
 
+    @Mock
+    private DeviceActionFactory deviceActionFactory;
+
     private NetconfTopologySetup.NetconfTopologySetupBuilder builder;
     private RemoteDeviceId remoteDeviceId;
 
@@ -153,7 +157,7 @@ public class RemoteDeviceConnectorImplTest {
         final RemoteDeviceHandler<NetconfSessionPreferences> salFacade = mock(RemoteDeviceHandler.class);
 
         final TestingRemoteDeviceConnectorImpl remoteDeviceConnection =
-                new TestingRemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, communicator);
+                new TestingRemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, communicator, deviceActionFactory);
 
         remoteDeviceConnection.startRemoteDeviceConnection(salFacade);
 
@@ -185,7 +189,7 @@ public class RemoteDeviceConnectorImplTest {
         builder.setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node));
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId);
+                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, deviceActionFactory);
 
         final RemoteDeviceHandler<NetconfSessionPreferences> salFacade = mock(RemoteDeviceHandler.class);
 
@@ -212,7 +216,7 @@ public class RemoteDeviceConnectorImplTest {
                 .build();
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
-                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId);
+                new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, deviceActionFactory);
 
         final NetconfReconnectingClientConfiguration defaultClientConfig =
                 remoteDeviceConnection.getClientConfig(listener, testingNode);

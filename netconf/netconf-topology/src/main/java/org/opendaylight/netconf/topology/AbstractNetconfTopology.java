@@ -381,10 +381,9 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                     .setSalFacade(salFacade)
                     .setNode(node)
                     .setEventExecutor(eventExecutor)
-                    .setNodeOptional(nodeOptional);
-            if (this.deviceActionFactory != null) {
-                netconfDeviceBuilder.setDeviceActionFactory(this.deviceActionFactory);
-            }
+                    .setNodeOptional(nodeOptional)
+                    .setDeviceActionFactory(deviceActionFactory);
+
             device = netconfDeviceBuilder.build();
         }
 
