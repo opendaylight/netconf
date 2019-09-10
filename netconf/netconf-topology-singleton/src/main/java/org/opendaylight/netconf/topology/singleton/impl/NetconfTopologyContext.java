@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonService;
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
+import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.RemoteDeviceConnector;
 import org.opendaylight.netconf.topology.singleton.impl.actors.NetconfNodeActor;
@@ -40,6 +41,7 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
     private final ServiceGroupIdentifier serviceGroupIdent;
     private final Timeout actorResponseWaitTime;
     private final DOMMountPointService mountService;
+    private final DeviceActionFactory deviceActionFactory;
 
     private NetconfTopologySetup netconfTopologyDeviceSetup;
     private RemoteDeviceId remoteDeviceId;
@@ -51,18 +53,19 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
     private volatile boolean isMaster;
 
     NetconfTopologyContext(final NetconfTopologySetup netconfTopologyDeviceSetup,
-                           final ServiceGroupIdentifier serviceGroupIdent,
-                           final Timeout actorResponseWaitTime, final DOMMountPointService mountService) {
+            final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
+            final DOMMountPointService mountService, final DeviceActionFactory deviceActionFactory) {
         this.netconfTopologyDeviceSetup = requireNonNull(netconfTopologyDeviceSetup);
         this.serviceGroupIdent = serviceGroupIdent;
         this.actorResponseWaitTime = actorResponseWaitTime;
         this.mountService = mountService;
+        this.deviceActionFactory = deviceActionFactory;
 
         remoteDeviceId = NetconfTopologyUtils.createRemoteDeviceId(netconfTopologyDeviceSetup.getNode().getNodeId(),
                 netconfTopologyDeviceSetup.getNode().augmentation(NetconfNode.class));
 
-        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId);
-
+        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId,
+            deviceActionFactory);
         netconfNodeManager = createNodeDeviceManager();
     }
 
@@ -146,7 +149,8 @@ class NetconfTopologyContext implements ClusterSingletonService, AutoCloseable {
         if (!isMaster) {
             netconfNodeManager.refreshDevice(netconfTopologyDeviceSetup, remoteDeviceId);
         }
-        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId);
+        remoteDeviceConnector = new RemoteDeviceConnectorImpl(netconfTopologyDeviceSetup, remoteDeviceId,
+            deviceActionFactory);
 
         if (isMaster) {
             final Future<Object> future = Patterns.ask(masterActorRef, new RefreshSetupMasterActorData(

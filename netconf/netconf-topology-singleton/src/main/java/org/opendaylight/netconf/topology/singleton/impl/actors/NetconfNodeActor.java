@@ -25,7 +25,10 @@ import org.opendaylight.controller.cluster.common.actor.AbstractUntypedActor;
 import org.opendaylight.controller.cluster.schema.provider.RemoteYangTextSourceProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.RemoteSchemaProvider;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
+import org.opendaylight.mdsal.dom.api.DOMActionResult;
+import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
+import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
@@ -33,11 +36,13 @@ import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMActionService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyDOMRpcService;
 import org.opendaylight.netconf.topology.singleton.impl.ProxyYangTextSourceProvider;
 import org.opendaylight.netconf.topology.singleton.impl.SlaveSalFacade;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.messages.AskForMasterMountPoint;
+import org.opendaylight.netconf.topology.singleton.messages.ContainerNodeMessage;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.netconf.topology.singleton.messages.MasterActorDataInitialized;
 import org.opendaylight.netconf.topology.singleton.messages.NormalizedNodeMessage;
@@ -47,6 +52,8 @@ import org.opendaylight.netconf.topology.singleton.messages.RefreshSlaveActor;
 import org.opendaylight.netconf.topology.singleton.messages.RegisterMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.UnregisterSlaveMountPoint;
 import org.opendaylight.netconf.topology.singleton.messages.YangTextSchemaSourceRequest;
+import org.opendaylight.netconf.topology.singleton.messages.action.InvokeActionMessage;
+import org.opendaylight.netconf.topology.singleton.messages.action.InvokeActionMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessage;
 import org.opendaylight.netconf.topology.singleton.messages.rpc.InvokeRpcMessageReply;
 import org.opendaylight.netconf.topology.singleton.messages.transactions.EmptyResultResponse;
@@ -77,6 +84,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
     private NetconfTopologySetup setup;
     private List<SourceIdentifier> sourceIdentifiers;
     private DOMRpcService deviceRpc;
+    private DOMActionService deviceAction;
     private SlaveSalFacade slaveSalManager;
     private DOMDataBroker deviceDataBroker;
     //readTxActor can be shared
@@ -118,6 +126,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             final DOMDataTreeReadTransaction tx = deviceDataBroker.newReadOnlyTransaction();
             readTxActor = context().actorOf(ReadTransactionActor.props(tx));
             this.deviceRpc = masterActorData.getDeviceRpc();
+            this.deviceAction = masterActorData.getDeviceAction();
 
             sender().tell(new MasterActorDataInitialized(), self());
 
@@ -168,6 +177,11 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             final InvokeRpcMessage invokeRpcMessage = (InvokeRpcMessage) message;
             invokeSlaveRpc(invokeRpcMessage.getSchemaPath(), invokeRpcMessage.getNormalizedNodeMessage(), sender());
 
+        } else if (message instanceof InvokeActionMessage) { // master
+            final InvokeActionMessage invokeActionMessage = (InvokeActionMessage) message;
+            LOG.info("InvokeActionMessage Details : {}", invokeActionMessage.toString());
+            invokeSlaveAction(invokeActionMessage.getSchemaPath(), invokeActionMessage.getContainerNodeMessage(),
+                invokeActionMessage.getDOMDataTreeIdentifier(), sender());
         } else if (message instanceof RegisterMountPoint) { //slaves
             RegisterMountPoint registerMountPoint = (RegisterMountPoint)message;
             sourceIdentifiers = registerMountPoint.getSourceIndentifiers();
@@ -259,6 +273,45 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         }, MoreExecutors.directExecutor());
     }
 
+    /**
+     * Invoking Action on Slave Node in Odl Cluster Environment.
+     *
+     * @param schemaPath {@link SchemaPath}
+     * @param containerNodeMessage {@link ContainerNodeMessage}
+     * @param domDataTreeIdentifier {@link DOMDataTreeIdentifier}
+     * @param recipient {@link ActorRef}
+     */
+    private void invokeSlaveAction(final SchemaPath schemaPath, final ContainerNodeMessage containerNodeMessage,
+        final DOMDataTreeIdentifier domDataTreeIdentifier, final ActorRef recipient) {
+        LOG.info("{}: invokeSlaveAction for {}, input: {}, identifier: {} on action service {}", id, schemaPath,
+            containerNodeMessage, domDataTreeIdentifier, deviceAction);
+
+        final ListenableFuture<? extends DOMActionResult> actionResult = deviceAction.invokeAction(schemaPath,
+            domDataTreeIdentifier, containerNodeMessage != null ? containerNodeMessage.getNode() : null);
+
+        Futures.addCallback(actionResult, new FutureCallback<DOMActionResult>() {
+
+            @Override
+            public void onSuccess(final DOMActionResult domActionResult) {
+                LOG.debug("{}: invokeSlaveAction for {}, domActionResult: {}", id, schemaPath, domActionResult);
+                if (domActionResult == null) {
+                    recipient.tell(new EmptyResultResponse(), getSender());
+                    return;
+                }
+
+                //Check DomActionResult containing Ok onSuccess pass empty nodeMessageReply
+                ContainerNodeMessage nodeMessageReply = domActionResult.getOutput().map(ContainerNodeMessage::new)
+                    .orElse(null);
+                recipient.tell(new InvokeActionMessageReply(nodeMessageReply, domActionResult.getErrors()), getSelf());
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                recipient.tell(new Failure(throwable), getSelf());
+            }
+        }, MoreExecutors.directExecutor());
+    }
+
     private void registerSlaveMountPoint(final ActorRef masterReference) {
         unregisterSlaveMountPoint();
 
@@ -269,6 +322,10 @@ public class NetconfNodeActor extends AbstractUntypedActor {
 
     private DOMRpcService getDOMRpcService(final ActorRef masterReference) {
         return new ProxyDOMRpcService(setup.getActorSystem(), masterReference, id, actorResponseWaitTime);
+    }
+
+    private DOMActionService getDOMActionService(final ActorRef masterReference) {
+        return new ProxyDOMActionService(setup.getActorSystem(), masterReference, id, actorResponseWaitTime);
     }
 
     private EffectiveModelContextFactory createSchemaContextFactory(final ActorRef masterReference) {
@@ -300,7 +357,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
                         LOG.info("{}: Schema context resolved: {} - registering slave mount point",
                                 id, result.getModules());
                         slaveSalManager.registerSlaveMountPoint(result, getDOMRpcService(masterReference),
-                                masterReference);
+                            getDOMActionService(masterReference), masterReference);
                     }
                 });
             }
