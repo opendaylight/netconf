@@ -219,10 +219,16 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         final long keepaliveDelay = node.getKeepaliveDelay() == null
                 ? DEFAULT_KEEPALIVE_DELAY : node.getKeepaliveDelay().toJava();
 
-        final IpAddress ipAddress = node.getHost().getIpAddress();
-        final InetSocketAddress address = new InetSocketAddress(ipAddress.getIpv4Address() != null
-                ? ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue(),
-                node.getPort().getValue().toJava());
+        final InetSocketAddress address;
+        if (node.getHost().getIpAddress() != null) {
+            final IpAddress ipAddress = node.getHost().getIpAddress();
+            address = new InetSocketAddress(ipAddress.getIpv4Address() != null
+                    ? ipAddress.getIpv4Address().getValue() : ipAddress.getIpv6Address().getValue(),
+                    node.getPort().getValue().toJava());
+        } else {
+            address = new InetSocketAddress(node.getHost().getDomainName().getValue(),
+                    node.getPort().getValue().toJava());
+        }
         final RemoteDeviceId remoteDeviceId = new RemoteDeviceId(nodeId.getValue(), address);
 
         RemoteDeviceHandler<NetconfSessionPreferences> salFacade = createSalFacade(remoteDeviceId);
