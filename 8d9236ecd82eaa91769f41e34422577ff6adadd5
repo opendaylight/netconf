@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "a3b963fe_6ecd68e2",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-12T16:57:21Z",
+      "side": 1,
+      "message": "Oh, this is the callback called after closing the chain. Nevermind.",
+      "parentUuid": "64071148_c5a4a631",
+      "range": {
+        "startLine": 45,
+        "startChar": 4,
+        "endLine": 45,
+        "endChar": 6
+      },
+      "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d6d68399_70607554",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
         "patchSetId": 3
@@ -68,6 +92,30 @@
       "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8dc1cd53_85551ed1",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-12T16:57:21Z",
+      "side": 1,
+      "message": "The name is kept, as the method is public, javadoc is enough.",
+      "parentUuid": "d6d68399_70607554",
+      "range": {
+        "startLine": 60,
+        "startChar": 31,
+        "endLine": 60,
+        "endChar": 34
+      },
+      "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -94,6 +142,30 @@
     },
     {
       "key": {
+        "uuid": "b6781a49_a6044cbd",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-12T16:57:21Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "8cac5e73_32b7c050",
+      "range": {
+        "startLine": 76,
+        "startChar": 4,
+        "endLine": 76,
+        "endChar": 11
+      },
+      "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "573e28f6_20ded7c2",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
         "patchSetId": 3
@@ -114,6 +186,30 @@
       "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f3afcbee_076100af",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-12T16:57:21Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "573e28f6_20ded7c2",
+      "range": {
+        "startLine": 77,
+        "startChar": 48,
+        "endLine": 77,
+        "endChar": 64
+      },
+      "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -160,6 +256,30 @@
       "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "832199f8_e03dff48",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandlerTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-12T16:57:21Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "daa80717_8fba3455",
+      "range": {
+        "startLine": 57,
+        "startChar": 4,
+        "endLine": 57,
+        "endChar": 5
+      },
+      "revId": "8d9236ecd82eaa91769f41e34422577ff6adadd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
