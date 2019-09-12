@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6278ffda_f3c37d5d",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-12T12:05:43Z",
+      "side": 1,
+      "message": "Ok, but it is still not clear when should removeTransactionChain() be called.",
+      "range": {
+        "startLine": 61,
+        "startChar": 94,
+        "endLine": 61,
+        "endChar": 101
+      },
+      "revId": "c1d441545b3999964fd5755798af30f80e6e66a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2c618345_047c3da2",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-12T12:05:43Z",
+      "side": 1,
+      "message": "This is the first time javadoc mentions such a queue exists. How should a caller know when to remove from it?",
+      "range": {
+        "startLine": 82,
+        "startChar": 79,
+        "endLine": 82,
+        "endChar": 84
+      },
+      "revId": "c1d441545b3999964fd5755798af30f80e6e66a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c9d0686e_1209e7ce",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-12T12:05:43Z",
+      "side": 1,
+      "message": "I expected something related to closing chains here.\n\"get\" closes nothing and creates a new chain instead.",
+      "range": {
+        "startLine": 462,
+        "startChar": 53,
+        "endLine": 462,
+        "endChar": 56
+      },
+      "revId": "c1d441545b3999964fd5755798af30f80e6e66a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
