@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "061d6fee_6a825b8b",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-12T16:57:21Z",
+      "side": 1,
+      "message": "In the callback, without users noticing. Ack.",
+      "parentUuid": "6278ffda_f3c37d5d",
+      "range": {
+        "startLine": 61,
+        "startChar": 94,
+        "endLine": 61,
+        "endChar": 101
+      },
+      "revId": "c1d441545b3999964fd5755798af30f80e6e66a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2c618345_047c3da2",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
         "patchSetId": 6
@@ -45,6 +69,30 @@
       "revId": "c1d441545b3999964fd5755798af30f80e6e66a2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bba58f9e_1abaeeca",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-12T16:57:21Z",
+      "side": 1,
+      "message": "The method is private, so allowed callers should know what the queue is. Ack.",
+      "parentUuid": "2c618345_047c3da2",
+      "range": {
+        "startLine": 82,
+        "startChar": 79,
+        "endLine": 82,
+        "endChar": 84
+      },
+      "revId": "c1d441545b3999964fd5755798af30f80e6e66a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
