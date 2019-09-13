@@ -116,6 +116,30 @@
       "revId": "c1d441545b3999964fd5755798af30f80e6e66a2",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3aa0d170_7d4f38f6",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-13T10:21:51Z",
+      "side": 1,
+      "message": "Ack. I missed that contrary to .get(), .getTransactionChain() returns a cached reference to existing chain (and addCallback() closes it).",
+      "parentUuid": "c9d0686e_1209e7ce",
+      "range": {
+        "startLine": 462,
+        "startChar": 53,
+        "endLine": 462,
+        "endChar": 56
+      },
+      "revId": "c1d441545b3999964fd5755798af30f80e6e66a2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
