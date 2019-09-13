@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "ecf0e772_d613eae2",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/handlers/TransactionChainHandler.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-13T10:21:51Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0c29cd01_2c4cef88",
+      "range": {
+        "startLine": 82,
+        "startChar": 7,
+        "endLine": 82,
+        "endChar": 13
+      },
+      "revId": "0f95610761975e91938f6204f02ea67f8cb60ef7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f3ece303_6634cd17",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/DeleteDataTransactionUtil.java",
         "patchSetId": 7
@@ -45,6 +69,30 @@
       "revId": "0f95610761975e91938f6204f02ea67f8cb60ef7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "508866d7_84e36f2e",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/DeleteDataTransactionUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-13T10:21:51Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "f3ece303_6634cd17",
+      "range": {
+        "startLine": 43,
+        "startChar": 16,
+        "endLine": 43,
+        "endChar": 32
+      },
+      "revId": "0f95610761975e91938f6204f02ea67f8cb60ef7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "4a5aaa09_e18b5e99",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/PatchDataTransactionUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-13T10:21:51Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "8583517f_1b89ea82",
+      "range": {
+        "startLine": 52,
+        "startChar": 14,
+        "endLine": 52,
+        "endChar": 29
+      },
+      "revId": "0f95610761975e91938f6204f02ea67f8cb60ef7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "80df6ce8_77946948",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/PatchDataTransactionUtil.java",
         "patchSetId": 7
@@ -91,6 +163,30 @@
       "revId": "0f95610761975e91938f6204f02ea67f8cb60ef7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2ea20023_8e0a87f7",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/PatchDataTransactionUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-13T10:21:51Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "80df6ce8_77946948",
+      "range": {
+        "startLine": 139,
+        "startChar": 88,
+        "endLine": 139,
+        "endChar": 104
+      },
+      "revId": "0f95610761975e91938f6204f02ea67f8cb60ef7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "639e8ba4_284560e3",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/PostDataTransactionUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-13T10:21:51Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "23a2ef40_f62e0c4d",
+      "range": {
+        "startLine": 56,
+        "startChar": 14,
+        "endLine": 56,
+        "endChar": 29
+      },
+      "revId": "0f95610761975e91938f6204f02ea67f8cb60ef7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "73aeb44f_799650f0",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/PostDataTransactionUtil.java",
         "patchSetId": 7
@@ -137,6 +257,30 @@
       "revId": "0f95610761975e91938f6204f02ea67f8cb60ef7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7b9f555a_58786d5b",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/PostDataTransactionUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-13T10:21:51Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "73aeb44f_799650f0",
+      "range": {
+        "startLine": 75,
+        "startChar": 16,
+        "endLine": 75,
+        "endChar": 53
+      },
+      "revId": "0f95610761975e91938f6204f02ea67f8cb60ef7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
@@ -186,6 +330,30 @@
     },
     {
       "key": {
+        "uuid": "82e9370a_baa0d4ae",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/PutDataTransactionUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-13T10:21:51Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "39e7f76b_3ab7b417",
+      "range": {
+        "startLine": 149,
+        "startChar": 14,
+        "endLine": 149,
+        "endChar": 29
+      },
+      "revId": "0f95610761975e91938f6204f02ea67f8cb60ef7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bd80820d_69e37906",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtil.java",
         "patchSetId": 7
@@ -206,6 +374,30 @@
       "revId": "0f95610761975e91938f6204f02ea67f8cb60ef7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "29b86401_862ec422",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 475,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2019-09-13T10:21:51Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "bd80820d_69e37906",
+      "range": {
+        "startLine": 475,
+        "startChar": 14,
+        "endLine": 475,
+        "endChar": 29
+      },
+      "revId": "0f95610761975e91938f6204f02ea67f8cb60ef7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
