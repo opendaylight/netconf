@@ -24,7 +24,7 @@ import org.apache.sshd.common.io.IoInputStream;
 import org.apache.sshd.common.io.IoOutputStream;
 import org.apache.sshd.server.Environment;
 import org.apache.sshd.server.ExitCallback;
-import org.apache.sshd.server.SessionAware;
+import org.apache.sshd.server.channel.ChannelSession;
 import org.apache.sshd.server.command.AsyncCommand;
 import org.apache.sshd.server.command.Command;
 import org.apache.sshd.server.session.ServerSession;
@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Command is Apache Mina SSH terminology for objects handling ssh data.
  */
-public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
+public class RemoteNetconfCommand implements AsyncCommand {
 
     private static final Logger LOG = LoggerFactory.getLogger(RemoteNetconfCommand.class);
 
@@ -102,7 +102,21 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
     }
 
     @Override
-    public void start(final Environment env) {
+    public void start(final ChannelSession channel, final Environment env) {
+        final ServerSession session = channel.getServerSession();
+        final SocketAddress remoteAddress = session.getIoSession().getRemoteAddress();
+        final String hostName;
+        final String port;
+        if (remoteAddress instanceof InetSocketAddress) {
+            hostName = ((InetSocketAddress) remoteAddress).getAddress().getHostAddress();
+            port = Integer.toString(((InetSocketAddress) remoteAddress).getPort());
+        } else {
+            hostName = "";
+            port = "";
+        }
+        netconfHelloMessageAdditionalHeader = new NetconfHelloMessageAdditionalHeader(session.getUsername(), hostName,
+            port, "ssh", "client");
+
         LOG.trace("Establishing internal connection to netconf server for client: {}", getClientAddress());
 
         final Bootstrap clientBootstrap = new Bootstrap();
@@ -130,7 +144,7 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
     }
 
     @Override
-    public void destroy() {
+    public void destroy(final ChannelSession channel) {
         LOG.trace("Releasing internal connection to netconf server for client: {} on channel: {}",
                 getClientAddress(), clientChannel);
 
@@ -147,19 +161,6 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
 
     private String getClientAddress() {
         return netconfHelloMessageAdditionalHeader.getAddress();
-    }
-
-    @Override
-    public void setSession(final ServerSession session) {
-        final SocketAddress remoteAddress = session.getIoSession().getRemoteAddress();
-        String hostName = "";
-        String port = "";
-        if (remoteAddress instanceof InetSocketAddress) {
-            hostName = ((InetSocketAddress) remoteAddress).getAddress().getHostAddress();
-            port = Integer.toString(((InetSocketAddress) remoteAddress).getPort());
-        }
-        netconfHelloMessageAdditionalHeader = new NetconfHelloMessageAdditionalHeader(
-                session.getUsername(), hostName, port, "ssh", "client");
     }
 
     public static class NetconfCommandFactory implements NamedFactory<Command> {
@@ -185,5 +186,4 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
             return new RemoteNetconfCommand(clientBootstrap, localAddress);
         }
     }
-
 }
