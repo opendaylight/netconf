@@ -1,41 +1,90 @@
 module example-actions {
-     yang-version 1.1;
-     namespace "https://example.com/ns/example-actions";
-     prefix "act";
+  yang-version 1.1;
+  namespace "https://example.com/ns/example-actions";
+  prefix "act";
 
-     organization "Example, Inc.";
-     contact "support at example.com";
-     description "Example Actions Data Model Module.";
+  organization "Example, Inc.";
+  contact "support at example.com";
+  description "Example Actions Data Model Module.";
 
-     revision "2016-07-07" {
-       description "Initial version.";
-       reference "example.com document 2-9973.";
-     }
+  revision "2016-07-07" {
+    description "Initial version.";
+    reference "example.com document 2-9973.";
+  }
 
-     container interfaces {
-       description "System interfaces.";
+  container interfaces {
+    description "System interfaces.";
 
-      list interface {
-         key name;
-         description "One interface entry.";
-         leaf name {
-           type string;
-           description "Interface name.";
-         }
+    list interface {
+      key name;
+      description "One interface entry.";
+      leaf name {
+        type string;
+        description "Interface name.";
+      }
 
-         action reset {
-           description "Reset an interface.";
-           input {
-             leaf delay {
-               type uint32;
-               units "seconds";
-               default 0;
-               description
-                 "Number of seconds to wait before starting the
-                  interface reset.";
-             }
-           }
-         }
-       }
-     }
-   }
+      action reset {
+        description "Reset an interface.";
+        input {
+          leaf delay {
+            type uint32;
+            units "seconds";
+            default 0;
+            description
+              "Number of seconds to wait before starting the
+               interface reset.";
+          }
+        }
+      }
+    }
+
+    choice protocol {
+      case protocol-type {
+        container udp {
+          action reboot {
+            description "Reboot operation.";
+            input {
+              leaf delay {
+                type uint32;
+                units "seconds";
+                description  "Number of seconds to wait before initiating the reboot operation.";
+              }
+              leaf message {
+                type string;
+                description  "Log message to display when reboot is started.";
+              }
+            }
+          }
+        }
+      }
+    }
+
+    choice interface-type {
+      container typeA-gigabyte {
+        list interface {
+          key name;
+          description "One interface entry.";
+          leaf name {
+            type string;
+            description "Interface name.";
+          }
+
+          action reboot {
+            description "Reboot operation.";
+            input {
+              leaf delay {
+                type uint32;
+                units "seconds";
+                description  "Number of seconds to wait before initiating the reboot operation.";
+              }
+              leaf message {
+                type string;
+                description  "Log message to display when reboot is started.";
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

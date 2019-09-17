@@ -46,6 +46,9 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
  * Unit tests for {@link YangInstanceIdentifierDeserializer}.
  */
 public class YangInstanceIdentifierDeserializerTest {
+    private static final QName ACTIONS_INTERFACES =
+        QName.create("https://example.com/ns/example-actions", "2016-07-07", "interfaces");
+
     // schema context
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
@@ -116,15 +119,58 @@ public class YangInstanceIdentifierDeserializerTest {
             "example-actions:interfaces/interface=eth0/reset");
         assertEquals(4, result.size());
         // container
-        assertEquals(NodeIdentifier.create(
-            QName.create("https://example.com/ns/example-actions", "2016-07-07", "interfaces")), result.get(0));
+        assertEquals(NodeIdentifier.create(ACTIONS_INTERFACES), result.get(0));
         // list
-        final QName list = QName.create("https://example.com/ns/example-actions", "2016-07-07", "interface");
+        final QName list = QName.create(ACTIONS_INTERFACES, "interface");
         assertEquals(NodeIdentifier.create(list), result.get(1));
         assertEquals(NodeIdentifierWithPredicates.of(list, QName.create(list, "name"), "eth0"), result.get(2));
         // action
-        assertEquals(NodeIdentifier.create(
-            QName.create("https://example.com/ns/example-actions", "2016-07-07", "reset")), result.get(3));
+        assertEquals(NodeIdentifier.create(QName.create(ACTIONS_INTERFACES, "reset")), result.get(3));
+    }
+
+    /**
+     * Test of deserialization <code>String</code> URI with container containing choice node with Action to
+     * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
+     */
+    @Test
+    public void deserializeContainerWithChoiceSchemaNodeWithActionTest() {
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+            "example-actions:interfaces/typeA-gigabyte/interface=eth0/reboot");
+        assertEquals(6, result.size());
+
+        // container
+        assertEquals(NodeIdentifier.create(ACTIONS_INTERFACES), result.get(0));
+        // choice
+        assertEquals(NodeIdentifier.create(QName.create(ACTIONS_INTERFACES, "interface-type")), result.get(1));
+        // container
+        assertEquals(NodeIdentifier.create(QName.create(ACTIONS_INTERFACES, "typeA-gigabyte")), result.get(2));
+
+        // list
+        final QName list = QName.create(ACTIONS_INTERFACES, "interface");
+        assertEquals(NodeIdentifier.create(list), result.get(3));
+        assertEquals(NodeIdentifierWithPredicates.of(list, QName.create(list, "name"), "eth0"), result.get(4));
+
+        // action QName
+        assertEquals(NodeIdentifier.create(QName.create(ACTIONS_INTERFACES, "reboot")), result.get(5));
+    }
+
+    /**
+     * Test of deserialization <code>String</code> URI with container containing choice node with Action to
+     * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
+     */
+    @Test
+    public void deserializeContainerWithChoiceCaseSchemaNodeWithActionTest() {
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+            "example-actions:interfaces/udp/reboot");
+        assertEquals(4, result.size());
+        // container
+        assertEquals(NodeIdentifier.create(ACTIONS_INTERFACES), result.get(0));
+        // choice
+        assertEquals(NodeIdentifier.create(QName.create(ACTIONS_INTERFACES, "protocol")), result.get(1));
+        // choice container
+        assertEquals(NodeIdentifier.create(QName.create(ACTIONS_INTERFACES, "udp")), result.get(2));
+        // action QName
+        assertEquals(NodeIdentifier.create(QName.create(ACTIONS_INTERFACES, "reboot")), result.get(3));
     }
 
     /**
