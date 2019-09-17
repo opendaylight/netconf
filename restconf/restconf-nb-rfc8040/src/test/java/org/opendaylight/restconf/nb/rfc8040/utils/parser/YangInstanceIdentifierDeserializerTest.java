@@ -124,6 +124,65 @@ public class YangInstanceIdentifierDeserializerTest {
     }
 
     /**
+     * Test of deserialization <code>String</code> URI with container containing choice node with Action to
+     * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
+     */
+    @Test
+    public void deserializeContainerWithChoiceSchemaNodeWithActionTest() {
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+            "example-action-choice-node:interfaces/typeA-gigabyte/interface=eth0/reboot");
+        assertEquals(6, result.size());
+
+        // container
+        assertEquals(NodeIdentifier.create(
+            QName.create("https://example.com/ns/example-action-choice-node", "2019-11-11", "interfaces")),
+            result.get(0));
+
+        // container
+        assertEquals(NodeIdentifier.create(
+            QName.create("https://example.com/ns/example-action-choice-node", "2019-11-11", "typeA-gigabyte")),
+            result.get(1));
+
+        // list
+        final QName list = QName.create("https://example.com/ns/example-action-choice-node", "2019-11-11", "interface");
+        assertEquals(NodeIdentifier.create(list), result.get(2));
+        assertEquals(NodeIdentifierWithPredicates.of(list, QName.create(list, "name"), "eth0"), result.get(3));
+
+        // action QName
+        final QName action = QName.create("https://example.com/ns/example-action-choice-node", "2019-11-11", "reboot");
+        assertEquals(NodeIdentifier.create(action), result.get(4));
+
+        // FIXME: assert the rest
+    }
+
+    /**
+     * Test of deserialization <code>String</code> URI with container containing choice node with Action to
+     * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
+     */
+    @Test
+    public void deserializeContainerWithChoiceCaseSchemaNodeWithActionTest() {
+        final var result = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+            "example-action-choice-node:interfaces/udp/reboot");
+        assertEquals(6, result.size());
+
+        // container
+        assertEquals(NodeIdentifier.create(
+            QName.create("https://example.com/ns/example-action-choice-node", "2019-11-11", "interfaces")),
+            result.get(0));
+
+        // choice container
+        assertEquals(NodeIdentifier.create(
+            QName.create("https://example.com/ns/example-action-choice-node", "2019-11-11", "udp")),
+            result.get(1));
+
+        // action QName
+        final QName action = QName.create("https://example.com/ns/example-action-choice-node", "2019-11-11", "reboot");
+        assertEquals(NodeIdentifier.create(action), result.get(2));
+
+        // FIXME: assert the rest
+    }
+
+    /**
      * Test of deserialization <code>String</code> URI containing list with no keys to
      * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
      */

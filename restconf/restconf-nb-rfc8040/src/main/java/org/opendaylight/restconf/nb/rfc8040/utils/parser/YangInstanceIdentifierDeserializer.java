@@ -32,6 +32,8 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
+import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerLike;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -261,7 +263,7 @@ public final class YangInstanceIdentifierDeserializer {
             }
         }
         checkValid(current != null, ErrorTag.MALFORMED_MESSAGE, "'%s' is not correct schema node identifier.", qname);
-        while (current.isMixin()) {
+        while (current.isMixin() && !(current.getDataSchemaNode() instanceof ChoiceSchemaNode)) {
             path.add(current.getIdentifier());
             current = current.getChild(qname);
         }
@@ -342,6 +344,12 @@ public final class YangInstanceIdentifierDeserializer {
             return getQNameOfDataSchemaNode((ContainerLike) dataSchemaNode, nodeName);
         } else if (dataSchemaNode instanceof ListSchemaNode) {
             return getQNameOfDataSchemaNode((ListSchemaNode) dataSchemaNode, nodeName);
+        } else if (dataSchemaNode instanceof ChoiceSchemaNode) {
+            for (final CaseSchemaNode caseNode : ((ChoiceSchemaNode) dataSchemaNode).getCases()) {
+                if (caseNode.getQName().getLocalName().equals(nodeName)) {
+                    return caseNode.getQName();
+                }
+            }
         }
 
         throw new UnsupportedOperationException("Unsupported schema node " + dataSchemaNode);
