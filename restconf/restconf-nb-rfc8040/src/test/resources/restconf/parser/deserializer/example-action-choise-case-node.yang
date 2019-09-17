@@ -1,0 +1,37 @@
+module example-action-choice-case-node {
+  yang-version 1.1;
+  namespace "https://example.com/ns/example-action-choice-case-node";
+  prefix "act";
+
+  organization "Example, Inc.";
+  contact "support at example.com";
+  description "Example Actions Data Model Module.";
+
+  revision "2018-11-13" {
+     description "Initial version.";
+     reference "example.com document 2-9973.";
+  }
+
+  container interfaces {
+    choice protocol {
+      case protocol-type {
+        container udp {
+          action reboot {
+            description "Reboot operation.";
+            input {
+              leaf delay {
+                type uint32;
+                units "seconds";
+                description  "Number of seconds to wait before initiating the reboot operation.";
+              }
+              leaf message {
+                type string;
+                description  "Log message to display when reboot is started.";
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
