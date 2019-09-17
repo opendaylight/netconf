@@ -147,6 +147,45 @@ public class YangInstanceIdentifierDeserializerTest {
     }
 
     /**
+     * Test of deserialization <code>String</code> URI with container containing choice node with Action to
+     * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
+     */
+    @Test
+    public void deserializeContainerWithChoiceListWithActionTest() {
+        final Iterable<PathArgument> result = YangInstanceIdentifierDeserializer.create(this.schemaContext,
+            "example-action-choice-node:interfaces/interface-type/typeA-gigabyte/interface=eth0/reboot");
+        assertEquals("Result does not contains expected number of path arguments", Iterables.size(result), 6);
+
+        final Iterator<PathArgument> iterator = result.iterator();
+
+        // container
+        assertEquals("Not expected path argument",
+            NodeIdentifier.create(QName.create("https://example.com/ns/example-action-choice-node", "2019-11-11", "interfaces")),
+            iterator.next());
+
+        // choice container
+        assertEquals("Not expected path argument",
+            NodeIdentifier.create(QName.create("https://example.com/ns/example-action-choice-node", "2019-11-11", "interface-type")),
+            iterator.next());
+
+        // container
+        assertEquals("Not expected path argument",
+            NodeIdentifier.create(QName.create("https://example.com/ns/example-action-choice-node", "2019-11-11", "typeA-gigabyte")),
+            iterator.next());
+
+        // list
+        final QName list = QName.create("https://example.com/ns/example-action-choice-node", "2019-11-11", "interface");
+        assertEquals("Not expected path argument", NodeIdentifier.create(list), iterator.next());
+        assertEquals("Not expected path argument",
+            NodeIdentifierWithPredicates.of(list, QName.create(list, "name"), "eth0"), iterator.next());
+
+        // action QName
+        final QName action = QName.create("https://example.com/ns/example-action-choice-node", "2019-11-11", "reboot");
+        assertEquals("Not expected path argument", NodeIdentifier.create(action),
+            iterator.next());
+    }
+
+    /**
      * Test of deserialization <code>String</code> URI containing list with no keys to
      * {@code Iterable<YangInstanceIdentifier.PathArgument>}.
      */
