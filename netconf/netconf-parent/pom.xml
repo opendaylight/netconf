@@ -17,7 +17,7 @@
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>netconf-parent</artifactId>
-  <version>1.7.0-SNAPSHOT</version>
+  <version>1.7.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <dependencyManagement>
@@ -25,21 +25,21 @@
       <dependency>
         <groupId>org.opendaylight.aaa</groupId>
         <artifactId>aaa-artifacts</artifactId>
-        <version>0.10.0-SNAPSHOT</version>
+        <version>0.10.1-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.opendaylight.controller</groupId>
         <artifactId>mdsal-artifacts</artifactId>
-        <version>1.10.0-SNAPSHOT</version>
+        <version>1.10.1-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.opendaylight.netconf</groupId>
         <artifactId>netconf-artifacts</artifactId>
-        <version>1.7.0-SNAPSHOT</version>
+        <version>1.7.1-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
