@@ -1,0 +1,8 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Mario Abraham <mario.abraham@pantheon.tech>
+Code-Review+2: Tomas Cere <tomas.cere@pantheon.tech>
+Submitted-by: Robert Varga <nite@hq.sk>
+Submitted-at: Sun, 22 Sep 2019 03:14:30 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/84031
+Project: netconf
+Branch: refs/heads/stable/sodium
