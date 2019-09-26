@@ -56,6 +56,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
+import org.opendaylight.yangtools.rfc8528.model.api.SchemaMountConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
@@ -154,17 +155,12 @@ public class NetconfDevice
         }
 
         // Set up the SchemaContext for the device
-        final ListenableFuture<SchemaContext> futureSchema = Futures.transformAsync(sourceResolverFuture, schemas -> {
-            LOG.debug("{}: Resolved device sources to {}", id, schemas);
-            addProvidedSourcesToSchemaRegistry(schemas);
-            return new SchemaSetup(schemas, remoteSessionCapabilities).startResolution();
-        }, processingExecutor);
+        final ListenableFuture<SchemaContext> futureSchema = Futures.transformAsync(sourceResolverFuture,
+            deviceSources -> assembleSchemaContext(deviceSources, remoteSessionCapabilities), processingExecutor);
 
         // Potentially acquire mount point list and interpret it
-        final ListenableFuture<MountPointContext> futureContext = Futures.transform(futureSchema, schemaContext -> {
-            // FIXME: check if there is RFC8528 schema available
-            return new EmptyMountPointContext(schemaContext);
-        }, processingExecutor);
+        final ListenableFuture<MountPointContext> futureContext = Futures.transformAsync(futureSchema,
+            this::createMountPointContext, processingExecutor);
 
         Futures.addCallback(futureContext, new FutureCallback<MountPointContext>() {
             @Override
@@ -280,13 +276,26 @@ public class NetconfDevice
         this.connected = connected;
     }
 
-    private void addProvidedSourcesToSchemaRegistry(final DeviceSources deviceSources) {
+    private ListenableFuture<SchemaContext> assembleSchemaContext(final DeviceSources deviceSources,
+            final NetconfSessionPreferences remoteSessionCapabilities) {
+        LOG.debug("{}: Resolved device sources to {}", id, deviceSources);
         final SchemaSourceProvider<YangTextSchemaSource> yangProvider = deviceSources.getSourceProvider();
         for (final SourceIdentifier sourceId : deviceSources.getProvidedSources()) {
             sourceRegistrations.add(schemaRegistry.registerSchemaSource(yangProvider,
-                    PotentialSchemaSource.create(
-                            sourceId, YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+                PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class,
+                    PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
         }
+
+        return new SchemaSetup(deviceSources, remoteSessionCapabilities).startResolution();
+    }
+
+    private ListenableFuture<MountPointContext> createMountPointContext(final SchemaContext schemaContext) {
+        if (schemaContext.findModule(SchemaMountConstants.RFC8528_MODULE).isPresent()) {
+            LOG.debug("{}: Acquiring available mount points", id);
+            // FIXME: actually acquire the model, for which we'll need a NetconfDeviceTransformer
+        }
+
+        return Futures.immediateFuture(new EmptyMountPointContext(schemaContext));
     }
 
     @Override
