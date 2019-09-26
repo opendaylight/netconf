@@ -28,8 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -153,25 +153,52 @@ public class NetconfDevice
             registerToBaseNetconfStream(initRpc, listener);
         }
 
-        final FutureCallback<DeviceSources> resolvedSourceCallback = new FutureCallback<DeviceSources>() {
-            @Override
-            public void onSuccess(final DeviceSources result) {
-                addProvidedSourcesToSchemaRegistry(result);
-                setUpSchema(result);
-            }
+        // Set up the SchemaContext for the device
+        final ListenableFuture<SchemaContext> futureSchema = Futures.transformAsync(sourceResolverFuture, schemas -> {
+            LOG.debug("{}: Resolved device sources to {}", id, schemas);
+            addProvidedSourcesToSchemaRegistry(schemas);
 
-            private void setUpSchema(final DeviceSources result) {
-                processingExecutor.submit(new SchemaSetup(result, remoteSessionCapabilities, listener));
+            // FIXME: remove the entire 'SchemaSetup' atrocity
+            return Futures.immediateFuture(new SchemaSetup(schemas, remoteSessionCapabilities, listener).call());
+        }, processingExecutor);
+
+        // Potentially acquire mount point list and interpret it
+        final ListenableFuture<MountPointContext> futureContext = Futures.transform(futureSchema, schemaContext -> {
+            // FIXME: check if there is RFC8528 schema available
+            return new EmptyMountPointContext(schemaContext);
+        }, processingExecutor);
+
+        Futures.addCallback(futureContext, new FutureCallback<MountPointContext>() {
+            @Override
+            public void onSuccess(final MountPointContext result) {
+                handleSalInitializationSuccess(result, remoteSessionCapabilities,
+                    getDeviceSpecificRpc(result, listener), listener);
             }
 
             @Override
             public void onFailure(final Throwable throwable) {
                 LOG.warn("{}: Unexpected error resolving device sources", id, throwable);
+
+                // FIXME: untangle this mess
+                //              // No more sources, fail or try to reconnect
+                //              if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources().isAllowed()) {
+                //                  eventExecutor.schedule(() -> {
+                //                      LOG.warn("Reconnection is allowed! This can lead to unexpected errors at runtime.");
+                //                      LOG.warn("{} : No more sources for schema context.", id);
+                //                      LOG.info("{} : Try to remount device.", id);
+                //                      onRemoteSessionDown();
+                //                      salFacade.onDeviceReconnected(remoteSessionCapabilities, node);
+                //                  }, nodeOptional.getIgnoreMissingSchemaSources().getReconnectTime(), TimeUnit.MILLISECONDS);
+                //              } else {
+                //                  final IllegalStateException cause =
+                //
+                //                  handleSalInitializationFailure(cause, listener);
+                //                  salFacade.onDeviceFailed(cause);
+                //              }
+
                 handleSalInitializationFailure(throwable, listener);
             }
-        };
-
-        Futures.addCallback(sourceResolverFuture, resolvedSourceCallback, MoreExecutors.directExecutor());
+        }, MoreExecutors.directExecutor());
     }
 
     private void registerToBaseNetconfStream(final NetconfDeviceRpc deviceRpc,
@@ -292,6 +319,12 @@ public class NetconfDevice
         return notificationSupport ? BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS : BaseSchema.BASE_NETCONF_CTX;
     }
 
+    protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result,
+            final RemoteDeviceCommunicator<NetconfMessage> listener) {
+        return new NetconfDeviceRpc(result.getSchemaContext(), listener,
+            new NetconfMessageTransformer(result, true));
+    }
+
     /**
      * Just a transfer object containing schema related dependencies. Injected in constructor.
      */
@@ -331,7 +364,7 @@ public class NetconfDevice
     /**
      * Schema builder that tries to build schema context from provided sources or biggest subset of it.
      */
-    private final class SchemaSetup implements Runnable {
+    private final class SchemaSetup implements Callable<SchemaContext> {
         private final DeviceSources deviceSources;
         private final NetconfSessionPreferences remoteSessionCapabilities;
         private final RemoteDeviceCommunicator<NetconfMessage> listener;
@@ -346,7 +379,7 @@ public class NetconfDevice
         }
 
         @Override
-        public void run() {
+        public SchemaContext call() throws Exception {
 
             final Collection<SourceIdentifier> requiredSources = deviceSources.getRequiredSources();
             final Collection<SourceIdentifier> missingSources = filterMissingSources(requiredSources);
@@ -355,7 +388,7 @@ public class NetconfDevice
                     UnavailableCapability.FailureReason.MissingSource);
 
             requiredSources.removeAll(missingSources);
-            setUpSchema(requiredSources);
+            return setUpSchema(requiredSources);
         }
 
         private Collection<SourceIdentifier> filterMissingSources(final Collection<SourceIdentifier> requiredSources) {
@@ -373,9 +406,11 @@ public class NetconfDevice
          * Build schema context, in case of success or final failure notify device.
          *
          * @param requiredSources required sources
+         * @throws InterruptedException
          */
         @SuppressWarnings("checkstyle:IllegalCatch")
-        private void setUpSchema(Collection<SourceIdentifier> requiredSources) {
+        private SchemaContext setUpSchema(Collection<SourceIdentifier> requiredSources)
+                throws ExecutionException, InterruptedException {
             while (!requiredSources.isEmpty()) {
                 LOG.trace("{}: Trying to build schema context from {}", id, requiredSources);
                 try {
@@ -396,16 +431,12 @@ public class NetconfDevice
                                             remoteSessionCapabilities.getNonModuleBasedCapsOrigin().get(entry)).build())
                             .collect(Collectors.toList()));
 
-                    final MountPointContext mountContext = new EmptyMountPointContext(result);
-                    handleSalInitializationSuccess(mountContext, remoteSessionCapabilities,
-                        getDeviceSpecificRpc(mountContext), listener);
-                    return;
+                    return result;
                 } catch (final ExecutionException e) {
                     // schemaBuilderFuture.checkedGet() throws only SchemaResolutionException
                     // that might be wrapping a MissingSchemaSourceException so we need to look
                     // at the cause of the exception to make sure we don't misinterpret it.
                     final Throwable cause = e.getCause();
-
                     if (cause instanceof MissingSchemaSourceException) {
                         requiredSources = handleMissingSchemaSourceException(
                                 requiredSources, (MissingSchemaSourceException) cause);
@@ -415,30 +446,12 @@ public class NetconfDevice
                         requiredSources = handleSchemaResolutionException(requiredSources,
                             (SchemaResolutionException) cause);
                     } else {
-                        handleSalInitializationFailure(e, listener);
-                        return;
+                        throw e;
                     }
-                } catch (final Exception e) {
-                    // unknown error, fail
-                    handleSalInitializationFailure(e, listener);
-                    return;
                 }
             }
-            // No more sources, fail or try to reconnect
-            if (nodeOptional != null && nodeOptional.getIgnoreMissingSchemaSources().isAllowed()) {
-                eventExecutor.schedule(() -> {
-                    LOG.warn("Reconnection is allowed! This can lead to unexpected errors at runtime.");
-                    LOG.warn("{} : No more sources for schema context.", id);
-                    LOG.info("{} : Try to remount device.", id);
-                    onRemoteSessionDown();
-                    salFacade.onDeviceReconnected(remoteSessionCapabilities, node);
-                }, nodeOptional.getIgnoreMissingSchemaSources().getReconnectTime(), TimeUnit.MILLISECONDS);
-            } else {
-                final IllegalStateException cause =
-                        new IllegalStateException(id + ": No more sources for schema context");
-                handleSalInitializationFailure(cause, listener);
-                salFacade.onDeviceFailed(cause);
-            }
+
+            throw new IllegalStateException(id + ": No more sources for schema context");
         }
 
         private Collection<SourceIdentifier> handleMissingSchemaSourceException(
@@ -484,11 +497,6 @@ public class NetconfDevice
             LOG.debug("{}: Unable to build schema context, unsatisfied imports {}, will reattempt with resolved only",
                 id, resolutionException.getUnsatisfiedImports(), resolutionException);
             return resolutionException.getResolvedSources();
-        }
-
-        protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result) {
-            return new NetconfDeviceRpc(result.getSchemaContext(), listener,
-                new NetconfMessageTransformer(result, true));
         }
 
         private Collection<SourceIdentifier> stripUnavailableSource(final Collection<SourceIdentifier> requiredSources,
