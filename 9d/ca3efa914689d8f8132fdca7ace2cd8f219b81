@@ -1,0 +1,7 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+2: Robert Varga <nite@hq.sk>
+Submitted-by: Robert Varga <nite@hq.sk>
+Submitted-at: Thu, 26 Sep 2019 06:56:54 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/84628
+Project: netconf
+Branch: refs/heads/stable/sodium
