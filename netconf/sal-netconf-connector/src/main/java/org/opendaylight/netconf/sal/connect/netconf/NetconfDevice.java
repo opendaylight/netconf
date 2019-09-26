@@ -9,6 +9,7 @@ package org.opendaylight.netconf.sal.connect.netconf;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
@@ -56,7 +57,14 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.unavailable.capabilities.UnavailableCapability;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
+import org.opendaylight.yangtools.rfc8528.model.api.SchemaMountConstants;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.RpcError;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
@@ -80,6 +88,11 @@ public class NetconfDevice
     @SuppressFBWarnings(value = "SLF4J_LOGGER_SHOULD_BE_PRIVATE",
             justification = "Needed for common logging of related classes")
     static final Logger LOG = LoggerFactory.getLogger(NetconfDevice.class);
+
+    private static final QName RFC8528_SCHEMA_MOUNTS_QNAME = QName.create(
+        SchemaMountConstants.RFC8528_MODULE, "schema-mounts").intern();
+    private static final YangInstanceIdentifier RFC8528_SCHEMA_MOUNTS = YangInstanceIdentifier.create(
+        NodeIdentifier.create(RFC8528_SCHEMA_MOUNTS_QNAME));
 
     protected final RemoteDeviceId id;
     protected final SchemaContextFactory schemaContextFactory;
@@ -154,17 +167,12 @@ public class NetconfDevice
         }
 
         // Set up the SchemaContext for the device
-        final ListenableFuture<SchemaContext> futureSchema = Futures.transformAsync(sourceResolverFuture, schemas -> {
-            LOG.debug("{}: Resolved device sources to {}", id, schemas);
-            addProvidedSourcesToSchemaRegistry(schemas);
-            return new SchemaSetup(schemas, remoteSessionCapabilities).startResolution();
-        }, processingExecutor);
+        final ListenableFuture<SchemaContext> futureSchema = Futures.transformAsync(sourceResolverFuture,
+            deviceSources -> assembleSchemaContext(deviceSources, remoteSessionCapabilities), processingExecutor);
 
         // Potentially acquire mount point list and interpret it
-        final ListenableFuture<MountPointContext> futureContext = Futures.transform(futureSchema, schemaContext -> {
-            // FIXME: check if there is RFC8528 schema available
-            return new EmptyMountPointContext(schemaContext);
-        }, processingExecutor);
+        final ListenableFuture<MountPointContext> futureContext = Futures.transformAsync(futureSchema,
+            schemaContext -> createMountPointContext(schemaContext, baseSchema, listener), processingExecutor);
 
         Futures.addCallback(futureContext, new FutureCallback<MountPointContext>() {
             @Override
@@ -280,13 +288,54 @@ public class NetconfDevice
         this.connected = connected;
     }
 
-    private void addProvidedSourcesToSchemaRegistry(final DeviceSources deviceSources) {
+    private ListenableFuture<SchemaContext> assembleSchemaContext(final DeviceSources deviceSources,
+            final NetconfSessionPreferences remoteSessionCapabilities) {
+        LOG.debug("{}: Resolved device sources to {}", id, deviceSources);
         final SchemaSourceProvider<YangTextSchemaSource> yangProvider = deviceSources.getSourceProvider();
         for (final SourceIdentifier sourceId : deviceSources.getProvidedSources()) {
             sourceRegistrations.add(schemaRegistry.registerSchemaSource(yangProvider,
-                    PotentialSchemaSource.create(
-                            sourceId, YangTextSchemaSource.class, PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
+                PotentialSchemaSource.create(sourceId, YangTextSchemaSource.class,
+                    PotentialSchemaSource.Costs.REMOTE_IO.getValue())));
         }
+
+        return new SchemaSetup(deviceSources, remoteSessionCapabilities).startResolution();
+    }
+
+    private ListenableFuture<MountPointContext> createMountPointContext(final SchemaContext schemaContext,
+            final BaseSchema baseSchema, final NetconfDeviceCommunicator listener) {
+        final MountPointContext emptyContext = new EmptyMountPointContext(schemaContext);
+        if (!schemaContext.findModule(SchemaMountConstants.RFC8528_MODULE).isPresent()) {
+            return Futures.immediateFuture(emptyContext);
+        }
+
+        // Create a temporary RPC invoker and acquire the mount point tree
+        LOG.debug("{}: Acquiring available mount points", id);
+        final NetconfDeviceRpc deviceRpc = new NetconfDeviceRpc(schemaContext, listener,
+            new NetconfMessageTransformer(emptyContext, false, baseSchema));
+
+        return Futures.transform(deviceRpc.invokeRpc(NetconfMessageTransformUtil.NETCONF_GET_PATH,
+            Builders.containerBuilder().withNodeIdentifier(NETCONF_GET_NODEID)
+                .withChild(NetconfMessageTransformUtil.toFilterStructure(RFC8528_SCHEMA_MOUNTS, schemaContext))
+                .build()), rpcResult -> processSchemaMounts(rpcResult, emptyContext), MoreExecutors.directExecutor());
+    }
+
+    private MountPointContext processSchemaMounts(final DOMRpcResult rpcResult, final MountPointContext emptyContext) {
+        final Collection<? extends RpcError> errors = rpcResult.getErrors();
+        if (!errors.isEmpty()) {
+            LOG.warn("{}: Schema-mounts acquisition resulted in errors {}", id, errors);
+        }
+        final NormalizedNode<?, ?> schemaMounts = rpcResult.getResult();
+        if (schemaMounts == null) {
+            LOG.debug("{}: device does not define any schema mounts", id);
+            return emptyContext;
+        }
+        if (!(schemaMounts instanceof ContainerNode)) {
+            LOG.warn("{}: ignoring non-container schema mounts {}", id, schemaMounts);
+            return emptyContext;
+        }
+
+        // FIXME: interpret the context
+        return emptyContext;
     }
 
     @Override
