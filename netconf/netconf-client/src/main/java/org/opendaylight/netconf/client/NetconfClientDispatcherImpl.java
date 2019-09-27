@@ -17,7 +17,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfDispatcher;
-import org.opendaylight.netconf.shaded.sshd.client.SshClient;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +29,10 @@ public class NetconfClientDispatcherImpl
     private static final Logger LOG = LoggerFactory.getLogger(NetconfClientDispatcherImpl.class);
 
     private final Timer timer;
-    private final SshClient sshClient;
+    private final NetconfSshClient sshClient;
 
     public NetconfClientDispatcherImpl(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup,
-                                       final Timer timer, @Nullable final SshClient sshClient) {
+                                       final Timer timer, @Nullable final NetconfSshClient sshClient) {
         super(bossGroup, workerGroup);
         this.timer = timer;
         this.sshClient = sshClient;
