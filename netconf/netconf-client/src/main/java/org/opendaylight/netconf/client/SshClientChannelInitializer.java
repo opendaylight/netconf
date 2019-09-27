@@ -9,22 +9,22 @@ package org.opendaylight.netconf.client;
 
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
-import org.apache.sshd.client.SshClient;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 
 final class SshClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {
 
     private final AuthenticationHandler authenticationHandler;
     private final NetconfClientSessionNegotiatorFactory negotiatorFactory;
     private final NetconfClientSessionListener sessionListener;
-    private final SshClient sshClient;
+    private final NetconfSshClient sshClient;
 
     SshClientChannelInitializer(final AuthenticationHandler authHandler,
             final NetconfClientSessionNegotiatorFactory negotiatorFactory,
-            final NetconfClientSessionListener sessionListener, @Nullable final SshClient sshClient) {
+            final NetconfClientSessionListener sessionListener, @Nullable final NetconfSshClient sshClient) {
         this.authenticationHandler = authHandler;
         this.negotiatorFactory = negotiatorFactory;
         this.sessionListener = sessionListener;
