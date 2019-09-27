@@ -69,7 +69,6 @@ final class SshProxyClientHandler extends ChannelInboundHandlerAdapter {
             ctx.writeAndFlush(msg);
         }, "ssh" + netconfHelloMessageAdditionalHeader.getAddress(), in);
 
-
         super.channelActive(ctx);
     }
 
