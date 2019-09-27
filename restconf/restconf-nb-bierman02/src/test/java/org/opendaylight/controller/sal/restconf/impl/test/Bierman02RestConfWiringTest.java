@@ -8,10 +8,10 @@
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opendaylight.infrautils.testutils.web.TestWebClient.Method.GET;
 
 import com.google.inject.AbstractModule;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import javax.inject.Inject;
 import org.junit.Rule;
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class Bierman02RestConfWiringTest {
     @Inject TestWebClient webClient;
 
     @Test
-    public void testWiring() throws IOException {
-        assertThat(webClient.request(GET, "/restconf/modules/").getStatus()).isEqualTo(200);
+    public void testWiring() throws IOException, InterruptedException, URISyntaxException {
+        assertThat(webClient.request("get", "/restconf/modules/").statusCode()).isEqualTo(200);
     }
 }
