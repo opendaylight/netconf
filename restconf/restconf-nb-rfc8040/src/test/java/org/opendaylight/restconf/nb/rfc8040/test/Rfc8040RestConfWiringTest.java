@@ -8,12 +8,12 @@
 package org.opendaylight.restconf.nb.rfc8040.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.opendaylight.infrautils.testutils.web.TestWebClient.Method.GET;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.junit.Rule;
@@ -60,7 +60,7 @@ public class Rfc8040RestConfWiringTest {
         }
 
         @Provides
-        @Singleton ServicesWrapper getServicesWrapper(Rfc8040RestConfWiring wiring) {
+        @Singleton ServicesWrapper getServicesWrapper(final Rfc8040RestConfWiring wiring) {
             return wiring.getServicesWrapper();
         }
 
@@ -82,8 +82,8 @@ public class Rfc8040RestConfWiringTest {
     @Inject SchemaContextHandler schemaContextHandler;
 
     @Test
-    public void testWiring() throws IOException {
+    public void testWiring() throws IOException, InterruptedException, URISyntaxException {
         schemaContextHandler.onGlobalContextUpdated(schemaContextProvider.getSchemaContext());
-        assertThat(webClient.request(GET, "/rests/yang-library-version").getStatus()).isEqualTo(200);
+        assertThat(webClient.request("GET", "/rests/yang-library-version").statusCode()).isEqualTo(200);
     }
 }
