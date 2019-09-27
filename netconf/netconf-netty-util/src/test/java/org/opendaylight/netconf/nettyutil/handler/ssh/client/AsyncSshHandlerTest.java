@@ -10,7 +10,6 @@ package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyObject;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -26,7 +25,7 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
-import io.netty.buffer.ByteBuf;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -36,8 +35,6 @@ import io.netty.channel.DefaultChannelPromise;
 import io.netty.channel.EventLoop;
 import java.io.IOException;
 import java.net.SocketAddress;
-import org.apache.sshd.client.SshClient;
-import org.apache.sshd.client.channel.ChannelSubsystem;
 import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
@@ -63,7 +60,7 @@ import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.Authenticat
 public class AsyncSshHandlerTest {
 
     @Mock
-    private SshClient sshClient;
+    private NetconfSshClient sshClient;
     @Mock
     private AuthenticationHandler authHandler;
     @Mock
@@ -82,7 +79,7 @@ public class AsyncSshHandlerTest {
     private SshFutureListener<ConnectFuture> sshConnectListener;
     private SshFutureListener<AuthFuture> sshAuthListener;
     private SshFutureListener<OpenFuture> sshChannelOpenListener;
-
+    private PooledByteBufAllocator pooledByteBufAllocator;
     private ChannelPromise promise;
 
     @Before
@@ -96,6 +93,7 @@ public class AsyncSshHandlerTest {
         stubRemoteAddress();
 
         promise = getMockedPromise();
+        pooledByteBufAllocator = PooledByteBufAllocator.DEFAULT;
 
         asyncSshHandler = new AsyncSshHandler(authHandler, sshClient);
     }
@@ -174,7 +172,7 @@ public class AsyncSshHandlerTest {
 
         final IoInputStream asyncOut = getMockedIoInputStream();
         final IoOutputStream asyncIn = getMockedIoOutputStream();
-        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final NetconfChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 
@@ -186,80 +184,7 @@ public class AsyncSshHandlerTest {
 
         verify(promise).setSuccess();
         verify(ctx).fireChannelActive();
-    }
-
-    @Test
-    public void testRead() throws Exception {
-        asyncSshHandler.connect(ctx, remoteAddress, localAddress, promise);
-
-        final IoInputStream asyncOut = getMockedIoInputStream();
-        final IoOutputStream asyncIn = getMockedIoOutputStream();
-        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
-        final ClientSession sshSession = getMockedSshSession(subsystemChannel);
-        final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
-
-        sshConnectListener.operationComplete(connectFuture);
-        sshAuthListener.operationComplete(getSuccessAuthFuture());
-        sshChannelOpenListener.operationComplete(getSuccessOpenFuture());
-
-        verify(ctx).fireChannelRead(any(ByteBuf.class));
-    }
-
-    @Test
-    public void testReadClosed() throws Exception {
-        asyncSshHandler.connect(ctx, remoteAddress, localAddress, promise);
-
-        final IoInputStream asyncOut = getMockedIoInputStream();
-        final IoReadFuture mockedReadFuture = asyncOut.read(null);
-
-        Futures.addCallback(stubAddListener(mockedReadFuture), new SuccessFutureListener<IoReadFuture>() {
-            @Override
-            public void onSuccess(final SshFutureListener<IoReadFuture> result) {
-                doReturn(new IllegalStateException()).when(mockedReadFuture).getException();
-                doReturn(mockedReadFuture).when(mockedReadFuture).removeListener(any());
-                doReturn(true).when(asyncOut).isClosing();
-                doReturn(true).when(asyncOut).isClosed();
-                result.operationComplete(mockedReadFuture);
-            }
-        }, MoreExecutors.directExecutor());
-
-        final IoOutputStream asyncIn = getMockedIoOutputStream();
-        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
-        final ClientSession sshSession = getMockedSshSession(subsystemChannel);
-        final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
-
-        sshConnectListener.operationComplete(connectFuture);
-        sshAuthListener.operationComplete(getSuccessAuthFuture());
-        sshChannelOpenListener.operationComplete(getSuccessOpenFuture());
-
-        verify(ctx).fireChannelInactive();
-    }
-
-    @Test
-    public void testReadFail() throws Exception {
-        asyncSshHandler.connect(ctx, remoteAddress, localAddress, promise);
-
-        final IoInputStream asyncOut = getMockedIoInputStream();
-        final IoReadFuture mockedReadFuture = asyncOut.read(null);
-
-        Futures.addCallback(stubAddListener(mockedReadFuture), new SuccessFutureListener<IoReadFuture>() {
-            @Override
-            public void onSuccess(final SshFutureListener<IoReadFuture> result) {
-                doReturn(new IllegalStateException()).when(mockedReadFuture).getException();
-                doReturn(mockedReadFuture).when(mockedReadFuture).removeListener(any());
-                result.operationComplete(mockedReadFuture);
-            }
-        }, MoreExecutors.directExecutor());
-
-        final IoOutputStream asyncIn = getMockedIoOutputStream();
-        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
-        final ClientSession sshSession = getMockedSshSession(subsystemChannel);
-        final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
-
-        sshConnectListener.operationComplete(connectFuture);
-        sshAuthListener.operationComplete(getSuccessAuthFuture());
-        sshChannelOpenListener.operationComplete(getSuccessOpenFuture());
-
+        asyncSshHandler.close(ctx, getMockedPromise());
         verify(ctx).fireChannelInactive();
     }
 
@@ -269,7 +194,7 @@ public class AsyncSshHandlerTest {
 
         final IoInputStream asyncOut = getMockedIoInputStream();
         final IoOutputStream asyncIn = getMockedIoOutputStream();
-        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final NetconfChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 
@@ -303,7 +228,7 @@ public class AsyncSshHandlerTest {
             }
         }, MoreExecutors.directExecutor());
 
-        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final NetconfChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 
@@ -325,7 +250,7 @@ public class AsyncSshHandlerTest {
         final IoOutputStream asyncIn = getMockedIoOutputStream();
         final IoWriteFuture ioWriteFuture = asyncIn.writePacket(new ByteArrayBuffer());
 
-        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final NetconfChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 
@@ -374,7 +299,7 @@ public class AsyncSshHandlerTest {
         final IoOutputStream asyncIn = getMockedIoOutputStream();
         final IoWriteFuture ioWriteFuture = asyncIn.writePacket(new ByteArrayBuffer());
 
-        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final NetconfChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 
@@ -406,7 +331,7 @@ public class AsyncSshHandlerTest {
 
         final IoInputStream asyncOut = getMockedIoInputStream();
         final IoOutputStream asyncIn = getMockedIoOutputStream();
-        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final NetconfChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 
@@ -419,7 +344,7 @@ public class AsyncSshHandlerTest {
 
         verify(sshSession).close(anyBoolean());
         verify(disconnectPromise).setSuccess();
-        verify(ctx).fireChannelInactive();
+        //verify(ctx).fireChannelInactive();
     }
 
     private static OpenFuture getSuccessOpenFuture() {
@@ -442,8 +367,9 @@ public class AsyncSshHandlerTest {
         return connectFuture;
     }
 
-    private static ClientSession getMockedSshSession(final ChannelSubsystem subsystemChannel) throws IOException {
-        final ClientSession sshSession = mock(ClientSession.class);
+    private NetconfClientSession getMockedSshSession(final NetconfChannelSubsystem subsystemChannel)
+            throws IOException {
+        final NetconfClientSession sshSession = mock(NetconfClientSession.class);
 
         doReturn("sshSession").when(sshSession).toString();
         doReturn("serverVersion").when(sshSession).getServerVersion();
@@ -459,14 +385,14 @@ public class AsyncSshHandlerTest {
         }, MoreExecutors.directExecutor());
         doReturn(closeFuture).when(sshSession).close(false);
 
-        doReturn(subsystemChannel).when(sshSession).createSubsystemChannel(anyString());
+        doReturn(subsystemChannel).when(sshSession).createNetconfSubsystemChannel(any(), any());
 
         return sshSession;
     }
 
-    private ChannelSubsystem getMockedSubsystemChannel(final IoInputStream asyncOut,
+    private NetconfChannelSubsystem getMockedSubsystemChannel(final IoInputStream asyncOut,
                                                        final IoOutputStream asyncIn) throws IOException {
-        final ChannelSubsystem subsystemChannel = mock(ChannelSubsystem.class);
+        final NetconfChannelSubsystem subsystemChannel = mock(NetconfChannelSubsystem.class);
         doReturn("subsystemChannel").when(subsystemChannel).toString();
 
         doNothing().when(subsystemChannel).setStreaming(any(ClientChannel.Streaming.class));
@@ -483,6 +409,8 @@ public class AsyncSshHandlerTest {
 
         doReturn(openFuture).when(subsystemChannel).open();
         doReturn(asyncIn).when(subsystemChannel).getAsyncIn();
+        doNothing().when(subsystemChannel).onClose(any());
+        doNothing().when(subsystemChannel).close();
         return subsystemChannel;
     }
 
@@ -535,7 +463,7 @@ public class AsyncSshHandlerTest {
 
         final IoInputStream asyncOut = getMockedIoInputStream();
         final IoOutputStream asyncIn = getMockedIoOutputStream();
-        final ChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
+        final NetconfChannelSubsystem subsystemChannel = getMockedSubsystemChannel(asyncOut, asyncIn);
         final ClientSession sshSession = getMockedSshSession(subsystemChannel);
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 
@@ -553,7 +481,7 @@ public class AsyncSshHandlerTest {
     public void testConnectFailAuth() throws Exception {
         asyncSshHandler.connect(ctx, remoteAddress, localAddress, promise);
 
-        final ClientSession sshSession = mock(ClientSession.class);
+        final NetconfClientSession sshSession = mock(NetconfClientSession.class);
         doReturn(true).when(sshSession).isClosed();
         final ConnectFuture connectFuture = getSuccessConnectFuture(sshSession);
 
@@ -563,6 +491,8 @@ public class AsyncSshHandlerTest {
 
         sshAuthListener.operationComplete(authFuture);
         verify(promise).setFailure(any(Throwable.class));
+        asyncSshHandler.close(ctx, getMockedPromise());
+        verify(ctx, times(0)).fireChannelInactive();
     }
 
     private static AuthFuture getFailedAuthFuture() {

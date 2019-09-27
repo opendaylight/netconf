@@ -7,8 +7,10 @@
  */
 package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
+import static com.google.common.base.Verify.verify;
 import static java.util.Objects.requireNonNull;
 
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -22,6 +24,7 @@ import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
 import org.apache.sshd.client.session.ClientSession;
+import org.apache.sshd.common.SshConstants;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.slf4j.Logger;
@@ -33,16 +36,14 @@ import org.slf4j.LoggerFactory;
 public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandler.class);
 
-    public static final String SUBSYSTEM = "netconf";
-
     public static final int SSH_DEFAULT_NIO_WORKERS = 8;
     // Disable default timeouts from mina sshd
     private static final long DEFAULT_TIMEOUT = -1L;
 
-    public static final SshClient DEFAULT_CLIENT;
+    public static final NetconfSshClient DEFAULT_CLIENT;
 
     static {
-        final SshClient c = SshClient.setUpDefaultClient();
+        final NetconfSshClient c = new NetconfClientBuilder().build();
         c.getProperties().put(SshClient.AUTH_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
         c.getProperties().put(SshClient.IDLE_TIMEOUT, Long.toString(DEFAULT_TIMEOUT));
 
@@ -54,22 +55,25 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     private final AtomicBoolean isDisconnected = new AtomicBoolean();
     private final AuthenticationHandler authenticationHandler;
-    private final SshClient sshClient;
     private final Future<?> negotiationFuture;
+    private final NetconfSshClient sshClient;
+    private final PooledByteBufAllocator byteBufAllocator;
 
-    private AsyncSshHandlerReader sshReadAsyncListener;
     private AsyncSshHandlerWriter sshWriteAsyncHandler;
 
-    private ClientChannel channel;
+    private NetconfChannelSubsystem channel;
     private ClientSession session;
     private ChannelPromise connectPromise;
     private GenericFutureListener negotiationFutureListener;
 
-    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient,
+    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient,
             final Future<?> negotiationFuture) {
         this.authenticationHandler = requireNonNull(authenticationHandler);
         this.sshClient = requireNonNull(sshClient);
         this.negotiationFuture = negotiationFuture;
+        this.byteBufAllocator = new PooledByteBufAllocator(true, PooledByteBufAllocator.defaultNumHeapArena(),
+                PooledByteBufAllocator.defaultNumDirectArena(), SshConstants.SSH_REQUIRED_PAYLOAD_PACKET_LENGTH_SUPPORT,
+                PooledByteBufAllocator.defaultMaxOrder());
     }
 
     /**
@@ -78,7 +82,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      * @param authenticationHandler authentication handler
      * @param sshClient             started SshClient
      */
-    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient) {
+    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final NetconfSshClient sshClient) {
         this(authenticationHandler, sshClient, null);
     }
 
@@ -95,7 +99,7 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      * @return                      {@code AsyncSshHandler}
      */
     public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler,
-            final Future<?> negotiationFuture, @Nullable final SshClient sshClient) {
+            final Future<?> negotiationFuture, final @Nullable NetconfSshClient sshClient) {
         return new AsyncSshHandler(authenticationHandler, sshClient != null ? sshClient : DEFAULT_CLIENT,
                 negotiationFuture);
     }
@@ -118,8 +122,10 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             LOG.trace("SSH session created on channel: {}", ctx.channel());
 
             session = future.getSession();
+            verify(session instanceof NetconfClientSession, "Unexpected session %s", session);
+
             final AuthFuture authenticateFuture = authenticationHandler.authenticate(session);
-            final ClientSession localSession = session;
+            final NetconfClientSession localSession = (NetconfClientSession) session;
             authenticateFuture.addListener(future1 -> {
                 if (future1.isSuccess()) {
                     handleSshAuthenticated(localSession, ctx);
@@ -135,12 +141,13 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         }
     }
 
-    private synchronized void handleSshAuthenticated(final ClientSession newSession, final ChannelHandlerContext ctx) {
+    private synchronized void handleSshAuthenticated(final NetconfClientSession newSession,
+            final ChannelHandlerContext ctx) {
         try {
             LOG.debug("SSH session authenticated on channel: {}, server version: {}", ctx.channel(),
                     newSession.getServerVersion());
 
-            channel = newSession.createSubsystemChannel(SUBSYSTEM);
+            channel = newSession.createNetconfSubsystemChannel(ctx, byteBufAllocator);
             channel.setStreaming(ClientChannel.Streaming.Async);
             channel.open().addListener(future -> {
                 if (future.isOpened()) {
@@ -163,18 +170,9 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             connectPromise.setSuccess();
         }
 
-        // TODO we should also read from error stream and at least log from that
-
-        ClientChannel localChannel = channel;
-        sshReadAsyncListener = new AsyncSshHandlerReader(() -> AsyncSshHandler.this.disconnect(ctx, ctx.newPromise()),
-            ctx::fireChannelRead, localChannel.toString(), localChannel.getAsyncOut());
-
-        // if readAsyncListener receives immediate close,
-        // it will close this handler and closing this handler sets channel variable to null
-        if (channel != null) {
-            sshWriteAsyncHandler = new AsyncSshHandlerWriter(channel.getAsyncIn());
-            ctx.fireChannelActive();
-        }
+        sshWriteAsyncHandler = new AsyncSshHandlerWriter(channel.getAsyncIn());
+        ctx.fireChannelActive();
+        channel.onClose(() -> disconnect(ctx, ctx.newPromise()));
     }
 
     private synchronized void handleSshSetupFailure(final ChannelHandlerContext ctx, final Throwable error) {
@@ -238,10 +236,6 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             sshWriteAsyncHandler.close();
         }
 
-        if (sshReadAsyncListener != null) {
-            sshReadAsyncListener.close();
-        }
-
         //If connection promise is not already set, it means negotiation failed
         //we must set connection promise to failure
         if (!connectPromise.isDone()) {
@@ -277,7 +271,12 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
             LOG.warn("Unable to cleanup all resources for channel: {}. Ignoring.", ctx.channel(), e);
         }
 
-        channel = null;
+        if (channel != null) {
+            //TODO: see if calling just close() is sufficient
+            //channel.close(false);
+            channel.close();
+            channel = null;
+        }
         promise.setSuccess();
         LOG.debug("SSH session closed on channel: {}", ctx.channel());
     }

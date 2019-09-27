@@ -16,7 +16,6 @@ import org.apache.sshd.common.io.IoInputStream;
 import org.apache.sshd.common.io.IoOutputStream;
 import org.apache.sshd.server.ExitCallback;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
-import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerReader;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,6 @@ final class SshProxyClientHandler extends ChannelInboundHandlerAdapter {
     private final IoInputStream in;
     private final IoOutputStream out;
 
-    private AsyncSshHandlerReader asyncSshHandlerReader;
     private AsyncSshHandlerWriter asyncSshHandlerWriter;
 
     private final NetconfHelloMessageAdditionalHeader netconfHelloMessageAdditionalHeader;
@@ -52,24 +50,6 @@ final class SshProxyClientHandler extends ChannelInboundHandlerAdapter {
         writeAdditionalHeader(ctx);
 
         asyncSshHandlerWriter = new AsyncSshHandlerWriter(out);
-        asyncSshHandlerReader = new AsyncSshHandlerReader(() -> {
-            // Close both sessions (delegate server and remote client)
-            ctx.fireChannelInactive();
-            ctx.disconnect();
-            ctx.close();
-            asyncSshHandlerReader.close();
-            asyncSshHandlerWriter.close();
-        }, msg -> {
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Forwarding message for client: {} on channel: {}, message: {}",
-                        netconfHelloMessageAdditionalHeader.getAddress(), ctx.channel(),
-                        AsyncSshHandlerWriter.byteBufToString(msg));
-            }
-            // Just forward to delegate
-            ctx.writeAndFlush(msg);
-        }, "ssh" + netconfHelloMessageAdditionalHeader.getAddress(), in);
-
-
         super.channelActive(ctx);
     }
 
