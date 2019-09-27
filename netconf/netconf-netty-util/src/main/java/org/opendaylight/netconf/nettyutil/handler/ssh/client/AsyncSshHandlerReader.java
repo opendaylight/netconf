@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
  * Listener on async input stream from SSH session.
  * This listeners schedules reads in a loop until the session is closed or read fails.
  */
+// FIXME: eliminate this class, as NetconfChannelSubsystem should handle all of its functionality
 public final class AsyncSshHandlerReader implements SshFutureListener<IoReadFuture>, AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(AsyncSshHandlerReader.class);
