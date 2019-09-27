@@ -1,0 +1,62 @@
+/*
+ * Copyright (c) 2019 PANTHEON.tech, s.r.o. and others.  All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
+package org.opendaylight.netconf.nettyutil.handler.ssh.client;
+
+import static java.util.Objects.requireNonNull;
+
+import com.google.common.annotations.Beta;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.ChannelHandlerContext;
+import java.io.IOException;
+import org.apache.sshd.client.channel.ChannelSubsystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * A {@link ChannelSubsystem} for NETCONF subsystem, which routes incoming data to a particular
+ * {@link ChannelHandlerContext}.
+ */
+@Beta
+public class NetconfChannelSubsystem extends ChannelSubsystem {
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfChannelSubsystem.class);
+    private static final String SUBSYSTEM = "netconf";
+
+    private final ChannelHandlerContext ctx;
+    private final PooledByteBufAllocator byteBufAllocator;
+
+    public NetconfChannelSubsystem(final ChannelHandlerContext ctx, final PooledByteBufAllocator byteBufAllocator) {
+        super(SUBSYSTEM);
+        this.ctx = requireNonNull(ctx);
+        this.byteBufAllocator = byteBufAllocator;
+    }
+
+    @Override
+    protected void doWriteData(final byte[] data, final int off, final long len) throws IOException {
+        // If we're already closing, ignore incoming data
+        if (isClosing()) {
+            return;
+        }
+
+        ctx.fireChannelRead(byteBufAllocator.directBuffer().setBytes(0, data, off, (int)len).setIndex(0, (int)len));
+    }
+
+    @Override
+    protected void doWriteExtendedData(final byte[] data, final int off, final long len) throws IOException {
+        // If we're already closing, ignore incoming data
+        if (isClosing()) {
+            return;
+        }
+
+        LOG.debug("Discarding {} bytes of extended data", len);
+    }
+
+    @Override
+    public void close() {
+        this.close(false);
+    }
+}
