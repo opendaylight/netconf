@@ -5,24 +5,23 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.client.stress;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.Timer;
 import java.util.Set;
-import org.apache.sshd.client.SshClient;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 
 public final class ConfigurableClientDispatcher extends NetconfClientDispatcherImpl {
 
     private final Set<String> capabilities;
 
     private ConfigurableClientDispatcher(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup,
-            final Timer timer, final Set<String> capabilities, @Nullable final SshClient sshClient) {
+            final Timer timer, final Set<String> capabilities, final @Nullable NetconfSshClient sshClient) {
         super(bossGroup, workerGroup, timer, sshClient);
         this.capabilities = capabilities;
     }
@@ -31,7 +30,7 @@ public final class ConfigurableClientDispatcher extends NetconfClientDispatcherI
      * EXI + chunked framing.
      */
     public static ConfigurableClientDispatcher createChunkedExi(final EventLoopGroup bossGroup,
-            final EventLoopGroup workerGroup, final Timer timer, @Nullable final SshClient sshClient) {
+            final EventLoopGroup workerGroup, final Timer timer, final @Nullable NetconfSshClient sshClient) {
         return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer,
             NetconfClientSessionNegotiatorFactory.EXI_CLIENT_CAPABILITIES, sshClient);
     }
@@ -40,7 +39,7 @@ public final class ConfigurableClientDispatcher extends NetconfClientDispatcherI
      * EXI + ]]gt;]]gt; framing.
      */
     public static ConfigurableClientDispatcher createLegacyExi(final EventLoopGroup bossGroup,
-            final EventLoopGroup workerGroup, final Timer timer, @Nullable final SshClient sshClient) {
+            final EventLoopGroup workerGroup, final Timer timer, final @Nullable NetconfSshClient sshClient) {
         return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer,
             NetconfClientSessionNegotiatorFactory.LEGACY_EXI_CLIENT_CAPABILITIES, sshClient);
     }
@@ -49,7 +48,7 @@ public final class ConfigurableClientDispatcher extends NetconfClientDispatcherI
      * Chunked framing.
      */
     public static ConfigurableClientDispatcher createChunked(final EventLoopGroup bossGroup,
-            final EventLoopGroup workerGroup, final Timer timer, @Nullable final SshClient sshClient) {
+            final EventLoopGroup workerGroup, final Timer timer, final @Nullable NetconfSshClient sshClient) {
         return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer,
             NetconfClientSessionNegotiatorFactory.DEFAULT_CLIENT_CAPABILITIES, sshClient);
     }
@@ -58,7 +57,7 @@ public final class ConfigurableClientDispatcher extends NetconfClientDispatcherI
      * ]]gt;]]gt; framing.
      */
     public static ConfigurableClientDispatcher createLegacy(final EventLoopGroup bossGroup,
-            final EventLoopGroup workerGroup, final Timer timer, @Nullable final SshClient sshClient) {
+            final EventLoopGroup workerGroup, final Timer timer, final @Nullable NetconfSshClient sshClient) {
         return new ConfigurableClientDispatcher(bossGroup, workerGroup, timer,
             NetconfClientSessionNegotiatorFactory.LEGACY_FRAMING_CLIENT_CAPABILITIES, sshClient);
     }
