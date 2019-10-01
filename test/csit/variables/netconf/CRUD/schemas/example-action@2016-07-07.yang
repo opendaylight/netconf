@@ -1,0 +1,89 @@
+module example-action {
+  yang-version 1.1;
+  namespace "https://example.com/ns/example-action";
+  prefix act;
+
+  import ietf-yang-types {
+    prefix yang;
+  }
+
+  organization
+    "Example, Inc.";
+  contact
+    "support at example.com";
+  description
+    "Example Actions Data Model Module.";
+
+  revision 2016-07-07 {
+    description
+      "Initial version.";
+    reference
+      "example.com document 2-9973.";
+  }
+
+  container interfaces {
+    description
+      "System interfaces.";
+    list interface {
+      key "name";
+      description
+        "One interface entry.";
+      leaf name {
+        type string;
+        description
+          "Interface name.";
+      }
+
+      action reset {
+        description
+          "Reset an interface.";
+        input {
+          leaf delay {
+            type uint32;
+            units "seconds";
+            default "0";
+            description
+              "Number of seconds to wait before starting the
+               interface reset.";
+          }
+        }
+      }
+
+      action get-last-reset-time {
+        description
+          "Retrieve the last interface reset time.";
+
+        output {
+          leaf last-reset {
+            type yang:date-and-time;
+            mandatory true;
+            description
+              "Date and time of the last interface reset, or
+               the last reboot time of the device.";
+          }
+        }
+      }
+    }
+  }
+  rpc reboot {
+    description "Reboot operation.";
+    input {
+      leaf delay {
+        type uint32;
+        units "seconds";
+        default 0;
+        description "Number of seconds to wait before initiating the reboot operation.";
+      }
+      leaf message {
+        type string;
+        description "Log message to display when reboot is started.";
+      }
+      leaf language {
+        type string;
+        description "Language identifier string.";
+        reference "RFC 5646.";
+      }
+    }
+  }
+}
+

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<input xmlns="https://example.com/ns/example-action">
+  <delay>600</delay>
+</input>
+
