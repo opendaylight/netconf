@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rpcs>
+   <rpc>
+      <input>
+         <action xmlns="urn:ietf:params:xml:ns:yang:1">
+            <interfaces xmlns="https://example.com/ns/example-action">
+               <interface>
+                  <name>eth1</name>
+                  <reset>
+                     <delay>600</delay>
+                  </reset>
+               </interface>
+            </interfaces>
+         </action>
+      </input>
+      <output>
+         <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" xmlns:sys="https://example.com/ns/example-action">
+            <ok />
+         </rpc-reply>
+      </output>
+   </rpc>
+</rpcs>
+
