@@ -50,8 +50,8 @@ public class WriteRunningTx extends AbstractWriteTx {
         this(id, netOps, rollbackSupport, true);
     }
 
-    public WriteRunningTx(RemoteDeviceId id, NetconfBaseOps netconfOps, boolean rollbackSupport,
-            boolean isLockAllowed) {
+    public WriteRunningTx(final RemoteDeviceId id, final NetconfBaseOps netconfOps, final boolean rollbackSupport,
+            final boolean isLockAllowed) {
         super(id, netconfOps, rollbackSupport, isLockAllowed);
     }
 
@@ -109,8 +109,8 @@ public class WriteRunningTx extends AbstractWriteTx {
             this.defaultOperation = defaultOperation;
         }
 
-        private ListenableFuture<DOMRpcResult> execute(final RemoteDeviceId id, final NetconfBaseOps netOps,
-                                                       final boolean rollbackSupport) {
+        ListenableFuture<DOMRpcResult> execute(final RemoteDeviceId id, final NetconfBaseOps netOps,
+                                               final boolean rollbackSupport) {
             final NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit running", id);
             if (defaultOperation.isPresent()) {
                 return netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(),
