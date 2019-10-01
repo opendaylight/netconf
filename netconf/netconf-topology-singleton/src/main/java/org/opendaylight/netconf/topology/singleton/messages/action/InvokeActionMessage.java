@@ -50,7 +50,7 @@ public class InvokeActionMessage implements Serializable {
         return schemaPathMessage.getSchemaPath();
     }
 
-    private SchemaPathMessage getSchemaPathMessage() {
+    SchemaPathMessage getSchemaPathMessage() {
         return schemaPathMessage;
     }
 

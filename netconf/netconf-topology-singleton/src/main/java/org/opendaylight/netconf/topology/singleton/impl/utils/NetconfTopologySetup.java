@@ -151,9 +151,10 @@ public class NetconfTopologySetup {
         private AAAEncryptionService encryptionService;
 
         public NetconfTopologySetupBuilder() {
+
         }
 
-        private ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
+        ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
             return clusterSingletonServiceProvider;
         }
 
@@ -163,7 +164,7 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        private DOMRpcProviderService getRpcProviderRegistry() {
+        DOMRpcProviderService getRpcProviderRegistry() {
             return rpcProviderRegistry;
         }
 
@@ -172,7 +173,7 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        private DOMActionProviderService getActionProviderRegistry() {
+        DOMActionProviderService getActionProviderRegistry() {
             return actionProviderRegistry;
         }
 
@@ -182,7 +183,7 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        private DataBroker getDataBroker() {
+        DataBroker getDataBroker() {
             return dataBroker;
         }
 
@@ -191,7 +192,7 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        private InstanceIdentifier<Node> getInstanceIdentifier() {
+        InstanceIdentifier<Node> getInstanceIdentifier() {
             return instanceIdentifier;
         }
 
@@ -213,7 +214,7 @@ public class NetconfTopologySetup {
             return new NetconfTopologySetup(this);
         }
 
-        private ScheduledExecutorService getKeepaliveExecutor() {
+        ScheduledExecutorService getKeepaliveExecutor() {
             return keepaliveExecutor;
         }
 
@@ -222,7 +223,7 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        private ListeningExecutorService getProcessingExecutor() {
+        ListeningExecutorService getProcessingExecutor() {
             return processingExecutor;
         }
 
@@ -231,7 +232,7 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        private ActorSystem getActorSystem() {
+        ActorSystem getActorSystem() {
             return actorSystem;
         }
 
@@ -240,7 +241,7 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        private EventExecutor getEventExecutor() {
+        EventExecutor getEventExecutor() {
             return eventExecutor;
         }
 
@@ -249,7 +250,7 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        private String getTopologyId() {
+        String getTopologyId() {
             return topologyId;
         }
 
@@ -258,7 +259,7 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        private NetconfClientDispatcher getNetconfClientDispatcher() {
+        NetconfClientDispatcher getNetconfClientDispatcher() {
             return netconfClientDispatcher;
         }
 
@@ -273,7 +274,7 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        private NetconfDevice.SchemaResourcesDTO getSchemaResourceDTO() {
+        NetconfDevice.SchemaResourcesDTO getSchemaResourceDTO() {
             return schemaResourceDTO;
         }
 
@@ -282,7 +283,7 @@ public class NetconfTopologySetup {
             return this;
         }
 
-        private Duration getIdleTimeout() {
+        Duration getIdleTimeout() {
             return idleTimeout;
         }
 
@@ -304,7 +305,7 @@ public class NetconfTopologySetup {
             return this.privateKeyPassphrase;
         }
 
-        private AAAEncryptionService getEncryptionService() {
+        AAAEncryptionService getEncryptionService() {
             return this.encryptionService;
         }
 

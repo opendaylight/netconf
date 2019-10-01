@@ -80,7 +80,7 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
                         doAuth(clientSession);
                         break;
                     case Authenticated:
-                        doPostAuth(clientSession);
+                        CallHomeSessionContext.getFrom(clientSession).openNetconfChannel();
                         break;
                     default:
                         break;
@@ -100,20 +100,16 @@ public class NetconfCallHomeServer implements AutoCloseable, ServerKeyVerifier {
                 }
                 LOG.debug("SSH Session {} closed", session);
             }
+
+            private void doAuth(final ClientSession session) {
+                try {
+                    final AuthFuture authFuture = CallHomeSessionContext.getFrom(session).authorize();
+                    authFuture.addListener(newAuthSshFutureListener(session));
+                } catch (IOException e) {
+                    LOG.error("Failed to authorize session {}", session, e);
+                }
+            }
         };
-    }
-
-    private static void doPostAuth(final ClientSession session) {
-        CallHomeSessionContext.getFrom(session).openNetconfChannel();
-    }
-
-    private void doAuth(final ClientSession session) {
-        try {
-            final AuthFuture authFuture = CallHomeSessionContext.getFrom(session).authorize();
-            authFuture.addListener(newAuthSshFutureListener(session));
-        } catch (IOException e) {
-            LOG.error("Failed to authorize session {}", session, e);
-        }
     }
 
     private SshFutureListener<AuthFuture> newAuthSshFutureListener(final ClientSession session) {
