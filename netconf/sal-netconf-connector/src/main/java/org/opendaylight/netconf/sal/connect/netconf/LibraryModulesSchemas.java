@@ -62,9 +62,9 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
+import org.opendaylight.yangtools.yang.data.codec.gson.LhotkaJSONCodecFactory;
+import org.opendaylight.yangtools.yang.data.codec.gson.LhotkaJSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
@@ -106,7 +106,7 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
     private static final NodeIdentifier NAMESPACE_NID = NodeIdentifier.create(
         QName.create(Module.QNAME, "namespace").intern());
 
-    private static final JSONCodecFactory JSON_CODECS = JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02
+    private static final LhotkaJSONCodecFactory JSON_CODECS = LhotkaJSONCodecFactorySupplier.getInstance()
             .getShared(LIBRARY_CONTEXT);
 
     private static final YangInstanceIdentifier MODULES_STATE_MODULE_LIST =

@@ -16,9 +16,9 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
+import org.opendaylight.yangtools.yang.data.codec.gson.Rfc7951JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
 /**
@@ -43,7 +43,7 @@ final class JsonStreamWriterWithDisabledValidation extends StreamWriterWithDisab
         super(excludedQName);
         this.jsonWriter = JsonWriterFactory.createJsonWriter(outputWriter);
         this.jsonNodeStreamWriter = JSONNormalizedNodeStreamWriter.createExclusiveWriter(
-                JSONCodecFactorySupplier.RFC7951.getShared(schemaContextHandler.get()),
+                Rfc7951JSONCodecFactorySupplier.getInstance().getShared(schemaContextHandler.get()),
                 schemaPath, initialNs, jsonWriter);
     }
 

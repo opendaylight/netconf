@@ -38,10 +38,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
+import org.opendaylight.yangtools.yang.data.codec.gson.LhotkaJSONCodecFactory;
+import org.opendaylight.yangtools.yang.data.codec.gson.LhotkaJSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -160,7 +160,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
             final Optional<Integer> depth) {
 
         final SchemaNode schema = context.getSchemaNode();
-        final JSONCodecFactory codecs = getCodecFactory(context);
+        final LhotkaJSONCodecFactory codecs = getCodecFactory(context);
 
         final URI initialNs;
         if (schema instanceof DataSchemaNode && !((DataSchemaNode)schema).isAugmenting()
@@ -189,8 +189,8 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
     }
 
-    private static JSONCodecFactory getCodecFactory(final InstanceIdentifierContext<?> context) {
+    private static LhotkaJSONCodecFactory getCodecFactory(final InstanceIdentifierContext<?> context) {
         // TODO: Performance: Cache JSON Codec factory and schema context
-        return JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(context.getSchemaContext());
+        return LhotkaJSONCodecFactorySupplier.getInstance().getShared(context.getSchemaContext());
     }
 }

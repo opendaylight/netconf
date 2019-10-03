@@ -41,8 +41,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonParserStream;
+import org.opendaylight.yangtools.yang.data.codec.gson.LhotkaJSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.ResultAlreadySetException;
@@ -123,7 +123,7 @@ public class JsonNormalizedNodeBodyReader
         }
 
         final JsonParserStream jsonParser = JsonParserStream.create(writer,
-            JSONCodecFactorySupplier.DRAFT_LHOTKA_NETMOD_YANG_JSON_02.getShared(path.getSchemaContext()), parentSchema);
+            LhotkaJSONCodecFactorySupplier.getInstance().getShared(path.getSchemaContext()), parentSchema);
         final JsonReader reader = new JsonReader(new InputStreamReader(nonEmptyInputStreamOptional.get(),
                 StandardCharsets.UTF_8));
         jsonParser.parse(reader);

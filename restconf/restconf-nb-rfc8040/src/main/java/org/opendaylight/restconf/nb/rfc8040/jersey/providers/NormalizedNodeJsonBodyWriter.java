@@ -36,10 +36,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactory;
-import org.opendaylight.yangtools.yang.data.codec.gson.JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
+import org.opendaylight.yangtools.yang.data.codec.gson.Rfc7951JSONCodecFactory;
+import org.opendaylight.yangtools.yang.data.codec.gson.Rfc7951JSONCodecFactorySupplier;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -164,7 +164,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
             final Integer depth, final List<Set<QName>> fields) {
 
         final SchemaNode schema = context.getSchemaNode();
-        final JSONCodecFactory codecs = getCodecFactory(context);
+        final Rfc7951JSONCodecFactory codecs = getCodecFactory(context);
 
         final NormalizedNodeStreamWriter streamWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(
                 codecs, path, initialNamespaceFor(schema, depth), jsonWriter);
@@ -192,8 +192,8 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         return JsonWriterFactory.createJsonWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
     }
 
-    private static JSONCodecFactory getCodecFactory(final InstanceIdentifierContext<?> context) {
+    private static Rfc7951JSONCodecFactory getCodecFactory(final InstanceIdentifierContext<?> context) {
         // TODO: Performance: Cache JSON Codec factory and schema context
-        return JSONCodecFactorySupplier.RFC7951.getShared(context.getSchemaContext());
+        return Rfc7951JSONCodecFactorySupplier.getInstance().getShared(context.getSchemaContext());
     }
 }
