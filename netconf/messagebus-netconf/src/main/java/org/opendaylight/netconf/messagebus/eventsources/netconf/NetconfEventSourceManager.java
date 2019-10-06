@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Verify.verifyNotNull;
+import static java.util.Objects.requireNonNull;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,22 +59,17 @@ public final class NetconfEventSourceManager implements DataTreeChangeListener<N
                                      final DOMNotificationPublishService domPublish,
                                      final DOMMountPointService domMount,
                                      final EventSourceRegistry eventSourceRegistry) {
-        Preconditions.checkNotNull(dataBroker);
-        Preconditions.checkNotNull(domPublish);
-        Preconditions.checkNotNull(domMount);
-        Preconditions.checkNotNull(eventSourceRegistry);
-        this.dataBroker = dataBroker;
-        this.domMounts = domMount;
-        this.publishService = domPublish;
-        this.eventSourceRegistry = eventSourceRegistry;
+        this.dataBroker = requireNonNull(dataBroker);
+        this.domMounts = requireNonNull(domMount);
+        this.publishService = requireNonNull(domPublish);
+        this.eventSourceRegistry = requireNonNull(eventSourceRegistry);
     }
 
     /**
      * Invoked by blueprint.
      */
     public void initialize() {
-        Preconditions.checkNotNull(dataBroker);
-        listenerRegistration = dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(
+        listenerRegistration = verifyNotNull(dataBroker).registerDataTreeChangeListener(DataTreeIdentifier.create(
                 LogicalDatastoreType.OPERATIONAL, NETCONF_DEVICE_PATH), this);
         LOG.info("NetconfEventSourceManager initialized.");
     }
@@ -98,13 +95,12 @@ public final class NetconfEventSourceManager implements DataTreeChangeListener<N
     }
 
     private void nodeCreated(final InstanceIdentifier<?> key, final Node node) {
-        Preconditions.checkNotNull(key);
         if (!validateNode(node)) {
-            LOG.warn("NodeCreated event : Node [{}] is null or not valid.", key.toString());
+            LOG.warn("NodeCreated event : Node [{}] is null or not valid.", key);
             return;
         }
-        LOG.info("Netconf event source [{}] is creating...", key.toString());
-        NetconfEventSourceRegistration nesr = NetconfEventSourceRegistration.create(key, node, this);
+        LOG.info("Netconf event source [{}] is creating...", key);
+        NetconfEventSourceRegistration nesr = NetconfEventSourceRegistration.create(requireNonNull(key), node, this);
         if (nesr != null) {
             NetconfEventSourceRegistration nesrOld = registrationMap.put(key, nesr);
             if (nesrOld != null) {
@@ -114,9 +110,8 @@ public final class NetconfEventSourceManager implements DataTreeChangeListener<N
     }
 
     private void nodeRemoved(final InstanceIdentifier<?> key) {
-        Preconditions.checkNotNull(key);
-        LOG.info("Netconf event source [{}] is removing...", key.toString());
-        NetconfEventSourceRegistration nesr = registrationMap.remove(key);
+        LOG.info("Netconf event source [{}] is removing...", key);
+        NetconfEventSourceRegistration nesr = registrationMap.remove(requireNonNull(key));
         if (nesr != null) {
             nesr.close();
         }

@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +51,7 @@ class ConnectionNotificationTopicRegistration extends NotificationTopicRegistrat
                                             final DOMNotificationListener domNotificationListener) {
         super(NotificationSourceType.ConnectionStatusChange, sourceName,
                 EVENT_SOURCE_STATUS_PATH.getLastComponent().getNamespace().toString());
-        this.domNotificationListener = Preconditions.checkNotNull(domNotificationListener);
+        this.domNotificationListener = requireNonNull(domNotificationListener);
         LOG.info("Connection notification source has been initialized.");
         setActive(true);
         setReplaySupported(false);
