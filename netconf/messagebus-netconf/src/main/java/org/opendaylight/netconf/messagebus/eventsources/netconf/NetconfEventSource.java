@@ -8,8 +8,8 @@
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
 import static com.google.common.util.concurrent.Futures.immediateFuture;
+import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -106,8 +106,8 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
                               final NetconfEventSourceMount mount,
                               final DOMNotificationPublishService publishService) {
         this.mount = mount;
-        this.urnPrefixToStreamMap = Preconditions.checkNotNull(streamMap);
-        this.domPublish = Preconditions.checkNotNull(publishService);
+        this.urnPrefixToStreamMap = requireNonNull(streamMap);
+        this.domPublish = requireNonNull(publishService);
         this.initializeNotificationTopicRegistrationList();
 
         LOG.info("NetconfEventSource [{}] created.", mount.getNodeId());
@@ -169,7 +169,7 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
     private synchronized ListenableFuture<RpcResult<JoinTopicOutput>> registerTopic(
             final TopicId topicId,
             final List<SchemaPath> notificationsToSubscribe) {
-        Preconditions.checkNotNull(notificationsToSubscribe);
+        requireNonNull(notificationsToSubscribe);
         LOG.debug("Join topic {} - register", topicId);
         JoinTopicStatus joinTopicStatus = JoinTopicStatus.Down;
 

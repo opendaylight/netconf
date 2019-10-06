@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.yanglib.impl;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.io.ByteStreams;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.IOException;
@@ -32,12 +32,11 @@ public class YangLibServiceImpl implements YangLibService {
     private final SchemaRepository schemaRepository;
 
     public YangLibServiceImpl(final SchemaRepository schemaRepository) {
-        this.schemaRepository = schemaRepository;
+        this.schemaRepository = requireNonNull(schemaRepository);
     }
 
     @Override
     public String getSchema(final String name, final String revision) {
-        Preconditions.checkNotNull(schemaRepository, "Schema repository is not initialized");
         LOG.debug("Attempting load for schema source {}:{}", name, revision);
         final SourceIdentifier sourceId = RevisionSourceIdentifier.create(name,
             revision.isEmpty() ? null : Revision.of(revision));

@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.ssh;
 
-import com.google.common.base.Preconditions;
+import static java.util.Objects.requireNonNull;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -122,9 +123,8 @@ public class RemoteNetconfCommand implements AsyncCommand, SessionAware {
             } else {
                 LOG.warn("Unable to establish internal connection to netconf server for client: {}",
                         getClientAddress());
-                Preconditions.checkNotNull(callback, "Exit callback must be set");
-                callback.onExit(1, "Unable to establish internal connection to netconf server for client: "
-                        + getClientAddress());
+                requireNonNull(callback, "Exit callback must be set").onExit(1,
+                    "Unable to establish internal connection to netconf server for client: " + getClientAddress());
             }
         });
     }
