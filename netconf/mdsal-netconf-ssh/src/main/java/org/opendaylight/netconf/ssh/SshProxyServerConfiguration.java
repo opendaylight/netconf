@@ -5,10 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.ssh;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Objects.requireNonNull;
+
 import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
 import java.util.Optional;
@@ -27,12 +28,12 @@ public final class SshProxyServerConfiguration {
     SshProxyServerConfiguration(final InetSocketAddress bindingAddress, final LocalAddress localAddress,
                                 final AuthProvider authenticator, final PublickeyAuthenticator publickeyAuthenticator,
                                 final KeyPairProvider keyPairProvider, final int idleTimeout) {
-        this.bindingAddress = Preconditions.checkNotNull(bindingAddress);
-        this.localAddress = Preconditions.checkNotNull(localAddress);
-        this.authenticator = Preconditions.checkNotNull(authenticator);
-        this.keyPairProvider = Preconditions.checkNotNull(keyPairProvider);
+        this.bindingAddress = requireNonNull(bindingAddress);
+        this.localAddress = requireNonNull(localAddress);
+        this.authenticator = requireNonNull(authenticator);
+        this.keyPairProvider = requireNonNull(keyPairProvider);
         // Idle timeout cannot be disabled in the sshd by using =< 0 value
-        Preconditions.checkArgument(idleTimeout > 0, "Idle timeout has to be > 0");
+        checkArgument(idleTimeout > 0, "Idle timeout has to be > 0");
         this.idleTimeout = idleTimeout;
         this.publickeyAuthenticator = Optional.ofNullable(publickeyAuthenticator);
     }

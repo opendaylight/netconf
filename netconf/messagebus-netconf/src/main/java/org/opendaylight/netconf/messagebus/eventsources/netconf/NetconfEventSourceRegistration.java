@@ -7,7 +7,9 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
 import java.util.Optional;
 import org.opendaylight.controller.messagebus.spi.EventSourceRegistration;
@@ -47,9 +49,9 @@ public final class NetconfEventSourceRegistration implements AutoCloseable {
 
     public static NetconfEventSourceRegistration create(final InstanceIdentifier<?> instanceIdent, final Node node,
                                                         final NetconfEventSourceManager netconfEventSourceManager) {
-        Preconditions.checkNotNull(instanceIdent);
-        Preconditions.checkNotNull(node);
-        Preconditions.checkNotNull(netconfEventSourceManager);
+        requireNonNull(instanceIdent);
+        requireNonNull(node);
+        requireNonNull(netconfEventSourceManager);
         if (!isEventSource(node)) {
             return null;
         }
@@ -110,8 +112,8 @@ public final class NetconfEventSourceRegistration implements AutoCloseable {
     }
 
     private void changeStatus(final ConnectionStatus newStatus) {
-        Preconditions.checkNotNull(newStatus);
-        Preconditions.checkState(this.currentNetconfConnStatus != null);
+        requireNonNull(newStatus);
+        checkState(this.currentNetconfConnStatus != null);
         if (!checkConnectionStatusType(newStatus)) {
             throw new IllegalStateException("Unknown new Netconf Connection Status");
         }
