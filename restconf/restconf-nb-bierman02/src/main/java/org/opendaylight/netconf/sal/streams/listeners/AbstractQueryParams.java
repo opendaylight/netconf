@@ -7,8 +7,9 @@
  */
 package org.opendaylight.netconf.sal.streams.listeners;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 import java.io.StringReader;
 import java.time.Instant;
 import java.util.Optional;
@@ -74,7 +75,7 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     @SuppressWarnings("checkstyle:hiddenField")
     public void setQueryParams(final Instant start, final Optional<Instant> stop, final Optional<String> filter,
                                final boolean leafNodesOnly) {
-        this.start = Preconditions.checkNotNull(start);
+        this.start = requireNonNull(start);
         this.stop = stop.orElse(null);
         this.filter = filter.orElse(null);
         this.leafNodesOnly = leafNodesOnly;
