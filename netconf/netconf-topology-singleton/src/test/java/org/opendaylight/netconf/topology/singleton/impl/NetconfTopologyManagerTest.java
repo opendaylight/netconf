@@ -82,7 +82,7 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 public class NetconfTopologyManagerTest {
-    private static final int ACTOR_RESPONSE_WAIT_TIME = 10;
+    private static final Uint16 ACTOR_RESPONSE_WAIT_TIME = Uint16.valueOf(10);
     private static final String TOPOLOGY_ID = "topologyID";
 
     private NetconfTopologyManager netconfTopologyManager;

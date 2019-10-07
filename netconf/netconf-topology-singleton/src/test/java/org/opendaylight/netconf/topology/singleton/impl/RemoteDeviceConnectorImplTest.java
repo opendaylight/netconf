@@ -63,6 +63,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import scala.concurrent.duration.Duration;
 
 public class RemoteDeviceConnectorImplTest {
@@ -143,8 +144,8 @@ public class RemoteDeviceConnectorImplTest {
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(1000L)
-                .setBetweenAttemptsTimeoutMillis(100)
+                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
+                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
                 .setSchemaless(false)
                 .setTcpOnly(false)
                 .setCredentials(credentials)
@@ -178,12 +179,12 @@ public class RemoteDeviceConnectorImplTest {
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(1000L)
-                .setBetweenAttemptsTimeoutMillis(100)
+                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
+                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
                 .setSchemaless(false)
                 .setTcpOnly(false)
                 .setCredentials(credentials)
-                .setKeepaliveDelay(1L)
+                .setKeepaliveDelay(Uint32.ONE)
                 .build();
 
         final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(NetconfNode.class, netconfNode).build();
@@ -206,8 +207,8 @@ public class RemoteDeviceConnectorImplTest {
         final Host host = new Host(new IpAddress(new Ipv4Address("127.0.0.1")));
         final PortNumber portNumber = new PortNumber(Uint16.valueOf(9999));
         final NetconfNode testingNode = new NetconfNodeBuilder()
-                .setConnectionTimeoutMillis(1000L)
-                .setDefaultRequestTimeoutMillis(2000L)
+                .setConnectionTimeoutMillis(Uint32.valueOf(1000))
+                .setDefaultRequestTimeoutMillis(Uint32.valueOf(2000))
                 .setHost(host)
                 .setPort(portNumber)
                 .setCredentials(new LoginPasswordBuilder()

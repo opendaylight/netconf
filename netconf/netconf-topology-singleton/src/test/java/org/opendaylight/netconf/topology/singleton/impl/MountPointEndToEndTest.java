@@ -133,6 +133,7 @@ import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcError.ErrorType;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -592,13 +593,13 @@ public class MountPointEndToEndTest {
         final NetconfNode netconfNode = new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(Uint16.valueOf(1234)))
-                .setActorResponseWaitTime(10)
+                .setActorResponseWaitTime(Uint16.valueOf(10))
                 .setTcpOnly(Boolean.TRUE)
                 .setSchemaless(Boolean.FALSE)
-                .setKeepaliveDelay(0L)
-                .setConnectionTimeoutMillis(5000L)
-                .setDefaultRequestTimeoutMillis(5000L)
-                .setMaxConnectionAttempts(1L)
+                .setKeepaliveDelay(Uint32.ZERO)
+                .setConnectionTimeoutMillis(Uint32.valueOf(5000))
+                .setDefaultRequestTimeoutMillis(Uint32.valueOf(5000))
+                .setMaxConnectionAttempts(Uint32.ONE)
                 .setCredentials(new LoginPwUnencryptedBuilder().setLoginPasswordUnencrypted(
                         new LoginPasswordUnencryptedBuilder().setUsername("user").setPassword("pass").build()).build())
                 .setSchemaCacheDirectory(cacheDir)
