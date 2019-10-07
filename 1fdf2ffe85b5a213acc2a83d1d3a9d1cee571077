@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8f396deb_e42a1055",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/utils/parser/YangInstanceIdentifierDeserializerTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2019-10-07T14:52:54Z",
+      "side": 1,
+      "message": "This is not valid, as \u0027choice\u0027 is not a \u0027data node\u0027 as per RFC7951, hence it is supposed to be invisible here, just as it is https://tools.ietf.org/html/rfc7950#section-7.9.5",
+      "range": {
+        "startLine": 156,
+        "startChar": 51,
+        "endLine": 156,
+        "endChar": 65
+      },
+      "revId": "1fdf2ffe85b5a213acc2a83d1d3a9d1cee571077",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
