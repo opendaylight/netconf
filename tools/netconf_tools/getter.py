@@ -53,7 +53,7 @@ def parse_arguments():
                         help='Username for ODL Restconf authentication')
     parser.add_argument('--password', default='admin',
                         help='Password for ODL Restconf authentication')
-    parser.add_argument('--scope', default='sdn',
+    parser.add_argument('--scope',
                         help='Scope for ODL Restconf authentication')
     parser.add_argument('--count', type=int,
                         help='Count of devices to query')
