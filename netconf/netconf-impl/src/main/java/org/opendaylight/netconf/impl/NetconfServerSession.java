@@ -5,10 +5,10 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.net.InetAddresses;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -75,7 +75,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
 
     @Override
     protected void sessionUp() {
-        Preconditions.checkState(loginTime == null, "Session is already up");
+        checkState(loginTime == null, "Session is already up");
         this.loginTime = Instant.now().atZone(ZoneId.systemDefault());
         super.sessionUp();
     }
@@ -118,7 +118,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
     public Session toManagementSession() {
         SessionBuilder builder = new SessionBuilder();
 
-        builder.setSessionId(getSessionId());
+        builder.setSessionId(Uint32.valueOf(getSessionId()));
         IpAddress address;
         InetAddress address1 = InetAddresses.forString(header.getAddress());
         if (address1 instanceof Inet4Address) {
@@ -128,17 +128,17 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
         }
         builder.setSourceHost(new Host(address));
 
-        Preconditions.checkState(DateAndTime.PATTERN_CONSTANTS.size() == 1);
+        checkState(DateAndTime.PATTERN_CONSTANTS.size() == 1);
         String formattedDateTime = DATE_FORMATTER.format(loginTime);
 
         Matcher matcher = DATE_TIME_PATTERN.matcher(formattedDateTime);
-        Preconditions.checkState(matcher.matches(), "Formatted datetime %s does not match pattern %s",
+        checkState(matcher.matches(), "Formatted datetime %s does not match pattern %s",
                 formattedDateTime, DATE_TIME_PATTERN);
         builder.setLoginTime(new DateAndTime(formattedDateTime));
 
-        builder.setInBadRpcs(new ZeroBasedCounter32(inRpcFail));
-        builder.setInRpcs(new ZeroBasedCounter32(inRpcSuccess));
-        builder.setOutRpcErrors(new ZeroBasedCounter32(outRpcError));
+        builder.setInBadRpcs(new ZeroBasedCounter32(Uint32.valueOf(inRpcFail)));
+        builder.setInRpcs(new ZeroBasedCounter32(Uint32.valueOf(inRpcSuccess)));
+        builder.setOutRpcErrors(new ZeroBasedCounter32(Uint32.valueOf(outRpcError)));
 
         builder.setUsername(header.getUserName());
         builder.setTransport(getTransportForString(header.getTransport()));
