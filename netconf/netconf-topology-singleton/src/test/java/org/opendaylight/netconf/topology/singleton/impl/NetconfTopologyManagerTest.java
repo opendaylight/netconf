@@ -82,7 +82,7 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.Uint16;
 
 public class NetconfTopologyManagerTest {
-    private static final int ACTOR_RESPONSE_WAIT_TIME = 10;
+    private static final Uint16 ACTOR_RESPONSE_WAIT_TIME = Uint16.valueOf(10);
     private static final String TOPOLOGY_ID = "topologyID";
 
     private NetconfTopologyManager netconfTopologyManager;
@@ -135,7 +135,7 @@ public class NetconfTopologyManagerTest {
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
                 final DeviceActionFactory deviceActionFactory) {
-                assertEquals(ACTOR_RESPONSE_WAIT_TIME, actorResponseWaitTime.duration().toSeconds());
+                assertEquals(ACTOR_RESPONSE_WAIT_TIME.toJava(), actorResponseWaitTime.duration().toSeconds());
                 return Objects.requireNonNull(mockContextMap.get(setup.getInstanceIdentifier()),
                         "No mock context for " + setup.getInstanceIdentifier()).apply(setup);
             }

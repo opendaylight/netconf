@@ -75,7 +75,7 @@ public class SessionNotificationProducerTest {
 
     @Test
     public void testOnDataChangedSessionCreated() throws Exception {
-        final Session session = createSession(1);
+        final Session session = createSession(Uint32.ONE);
         final DataTreeModification<Session> treeChange = getTreeModification(session, ModificationType.WRITE);
         publisher.onDataTreeChanged(Collections.singleton(treeChange));
         ArgumentCaptor<NetconfSessionStart> captor = ArgumentCaptor.forClass(NetconfSessionStart.class);
@@ -90,8 +90,8 @@ public class SessionNotificationProducerTest {
     public void testOnDataChangedSessionUpdated() throws Exception {
         final DataTreeModification<Session> treeChange = mock(DataTreeModification.class);
         final DataObjectModification<Session> changeObject = mock(DataObjectModification.class);
-        final Session sessionBefore = createSessionWithInRpcCount(1, 0);
-        final Session sessionAfter = createSessionWithInRpcCount(1, 1);
+        final Session sessionBefore = createSessionWithInRpcCount(Uint32.ONE, Uint32.ZERO);
+        final Session sessionAfter = createSessionWithInRpcCount(Uint32.ONE, Uint32.ONE);
         doReturn(sessionBefore).when(changeObject).getDataBefore();
         doReturn(sessionAfter).when(changeObject).getDataAfter();
         doReturn(ModificationType.WRITE).when(changeObject).getModificationType();
@@ -104,7 +104,7 @@ public class SessionNotificationProducerTest {
 
     @Test
     public void testOnDataChangedSessionDeleted() throws Exception {
-        final Session session = createSession(1);
+        final Session session = createSession(Uint32.ONE);
         final DataTreeModification<Session> data = getTreeModification(session, ModificationType.DELETE);
         publisher.onDataTreeChanged(Collections.singleton(data));
         ArgumentCaptor<NetconfSessionEnd> captor = ArgumentCaptor.forClass(NetconfSessionEnd.class);
@@ -115,16 +115,16 @@ public class SessionNotificationProducerTest {
         Assert.assertEquals(session.getUsername(), value.getUsername());
     }
 
-    private static Session createSession(final long id) {
-        return createSessionWithInRpcCount(id, 0);
+    private static Session createSession(final Uint32 id) {
+        return createSessionWithInRpcCount(id, Uint32.ZERO);
     }
 
-    private static Session createSessionWithInRpcCount(final long id, final long inRpc) {
+    private static Session createSessionWithInRpcCount(final Uint32 id, final Uint32 inRpc) {
         return new SessionBuilder()
                 .setSessionId(id)
                 .setSourceHost(HostBuilder.getDefaultInstance("0.0.0.0"))
                 .setUsername("user")
-                .setInRpcs(new ZeroBasedCounter32(Uint32.valueOf(inRpc)))
+                .setInRpcs(new ZeroBasedCounter32(inRpc))
                 .build();
     }
 

@@ -35,6 +35,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.Session;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.common.Uint32;
 
 public class MonitoringToMdsalWriterTest {
 
@@ -102,7 +103,7 @@ public class MonitoringToMdsalWriterTest {
     @Test
     public void testOnSessionStart() throws Exception {
         Session session = new SessionBuilder()
-                .setSessionId(1L)
+                .setSessionId(Uint32.ONE)
                 .build();
         final InstanceIdentifier<Session> id =
                 InstanceIdentifier.create(NetconfState.class)
@@ -118,7 +119,7 @@ public class MonitoringToMdsalWriterTest {
     @Test
     public void testOnSessionEnd() throws Exception {
         Session session = new SessionBuilder()
-                .setSessionId(1L)
+                .setSessionId(Uint32.ONE)
                 .build();
         final InstanceIdentifier<Session> id =
                 InstanceIdentifier.create(NetconfState.class)
@@ -134,10 +135,10 @@ public class MonitoringToMdsalWriterTest {
     @Test
     public void testOnSessionsUpdated() throws Exception {
         Session session1 = new SessionBuilder()
-                .setSessionId(1L)
+                .setSessionId(Uint32.ONE)
                 .build();
         Session session2 = new SessionBuilder()
-                .setSessionId(2L)
+                .setSessionId(Uint32.valueOf(2))
                 .build();
         List<Session> sessions = new ArrayList<>();
         sessions.add(session1);
