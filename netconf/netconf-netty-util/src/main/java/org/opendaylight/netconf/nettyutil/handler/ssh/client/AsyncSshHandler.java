@@ -51,10 +51,10 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
         DEFAULT_CLIENT = c;
     }
 
+    private final AtomicBoolean isDisconnected = new AtomicBoolean();
     private final AuthenticationHandler authenticationHandler;
     private final SshClient sshClient;
-    private final AtomicBoolean isDisconnected = new AtomicBoolean();
-    private Future<?> negotiationFuture;
+    private final Future<?> negotiationFuture;
 
     private AsyncSshHandlerReader sshReadAsyncListener;
     private AsyncSshHandlerWriter sshWriteAsyncHandler;
@@ -66,7 +66,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
 
     public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient,
             final Future<?> negotiationFuture) {
-        this(authenticationHandler, sshClient);
+        this.authenticationHandler = requireNonNull(authenticationHandler);
+        this.sshClient = requireNonNull(sshClient);
         this.negotiationFuture = negotiationFuture;
     }
 
@@ -76,10 +77,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      * @param authenticationHandler authentication handler
      * @param sshClient             started SshClient
      */
-    public AsyncSshHandler(final AuthenticationHandler authenticationHandler,
-                           final SshClient sshClient) {
-        this.authenticationHandler = requireNonNull(authenticationHandler);
-        this.sshClient = requireNonNull(sshClient);
+    public AsyncSshHandler(final AuthenticationHandler authenticationHandler, final SshClient sshClient) {
+        this(authenticationHandler, sshClient, null);
     }
 
     public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler) {
