@@ -668,6 +668,11 @@ public final class ReadDataTransactionUtil {
             mapValueToBuilder(((LeafSetNode<Object>) configDataNode).getValue(),
                     ((LeafSetNode<Object>) stateDataNode).getValue(), builder);
             return builder.build();
+        } else if (configDataNode instanceof LeafSetEntryNode) {
+            final NormalizedNodeBuilder<YangInstanceIdentifier.NodeWithValue, Object, LeafSetEntryNode<Object>>
+                    builder = Builders.leafSetEntryBuilder().withNodeIdentifier(((LeafSetEntryNode<?>) configDataNode)
+                    .getIdentifier()).withValue(configDataNode.getValue());
+            return builder.build();
         } else if (configDataNode instanceof UnkeyedListNode) {
             final CollectionNodeBuilder<UnkeyedListEntryNode, UnkeyedListNode> builder = Builders
                     .unkeyedListBuilder().withNodeIdentifier(((UnkeyedListNode) configDataNode).getIdentifier());
