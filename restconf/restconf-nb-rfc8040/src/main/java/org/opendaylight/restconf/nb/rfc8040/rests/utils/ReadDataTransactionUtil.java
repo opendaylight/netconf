@@ -64,6 +64,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeAttrBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeContainerBuilder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
@@ -667,6 +668,11 @@ public final class ReadDataTransactionUtil {
 
             mapValueToBuilder(((LeafSetNode<Object>) configDataNode).getValue(),
                     ((LeafSetNode<Object>) stateDataNode).getValue(), builder);
+            return builder.build();
+        } else if (configDataNode instanceof LeafSetEntryNode) {
+            final NormalizedNodeAttrBuilder<YangInstanceIdentifier.NodeWithValue, Object, LeafSetEntryNode<Object>>
+                    builder = Builders.leafSetEntryBuilder().withNodeIdentifier(((LeafSetEntryNode<?>) configDataNode)
+                    .getIdentifier()).withValue(configDataNode.getValue());
             return builder.build();
         } else if (configDataNode instanceof UnkeyedListNode) {
             final CollectionNodeBuilder<UnkeyedListEntryNode, UnkeyedListNode> builder = Builders
