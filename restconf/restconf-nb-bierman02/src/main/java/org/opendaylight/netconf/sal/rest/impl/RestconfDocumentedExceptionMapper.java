@@ -277,6 +277,12 @@ public class RestconfDocumentedExceptionMapper implements ExceptionMapper<Restco
         }
 
         try {
+            streamWriter.close();
+        } catch (IOException e) {
+            LOG.warn("Failed to close stream writer", e);
+        }
+
+        try {
             return outStream.toString(StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             // Shouldn't happen
