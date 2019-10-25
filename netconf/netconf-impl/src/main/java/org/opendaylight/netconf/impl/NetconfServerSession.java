@@ -143,7 +143,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
         builder.setUsername(header.getUserName());
         builder.setTransport(getTransportForString(header.getTransport()));
 
-        builder.setOutNotifications(new ZeroBasedCounter32(outNotification));
+        builder.setOutNotifications(new ZeroBasedCounter32(Uint32.valueOf(outNotification)));
 
         builder.withKey(new SessionKey(Uint32.valueOf(getSessionId())));
 

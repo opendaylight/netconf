@@ -197,7 +197,7 @@ public class MountPointEndToEndTest {
     private TransactionChain slaveTxChain;
 
     private final EventExecutor eventExecutor = GlobalEventExecutor.INSTANCE;
-    private final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(0).build();
+    private final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(Uint16.ZERO).build();
     private SchemaContext deviceSchemaContext;
     private YangModuleInfo topModuleInfo;
     private SchemaPath putTopRpcSchemaPath;
