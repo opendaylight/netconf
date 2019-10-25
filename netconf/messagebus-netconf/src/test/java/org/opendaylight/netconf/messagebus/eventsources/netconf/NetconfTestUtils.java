@@ -7,10 +7,10 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
-import com.google.common.base.Optional;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
@@ -22,7 +22,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilities;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilitiesBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapability;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.available.capabilities.AvailableCapabilityBuilder;
@@ -46,47 +45,38 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
 
 public final class NetconfTestUtils {
-
     public static final String NOTIFICATION_CAPABILITY_PREFIX = "(urn:ietf:params:xml:ns:netconf:notification";
 
     private NetconfTestUtils() {
+
     }
 
     public static Node getNetconfNode(final String nodeIdent, final String hostName, final ConnectionStatus cs,
                                       final String notificationCapabilityPrefix) {
-
-        DomainName dn = new DomainName(hostName);
-        Host host = new Host(dn);
-
         List<AvailableCapability> avCapList = new ArrayList<>();
         avCapList.add(new AvailableCapabilityBuilder().setCapability(notificationCapabilityPrefix
                 + "_availableCapabilityString1").build());
-        AvailableCapabilities avCaps = new AvailableCapabilitiesBuilder().setAvailableCapability(avCapList).build();
-        NetconfNode nn = new NetconfNodeBuilder().setConnectionStatus(cs).setHost(host).setAvailableCapabilities(avCaps)
+
+        return new NodeBuilder()
+                .withKey(new NodeKey(new NodeId(nodeIdent)))
+                .addAugmentation(NetconfNode.class, new NetconfNodeBuilder()
+                    .setConnectionStatus(cs)
+                    .setHost(new Host(new DomainName(hostName)))
+                    .setAvailableCapabilities(new AvailableCapabilitiesBuilder()
+                        .setAvailableCapability(avCapList)
+                        .build())
+                    .build())
                 .build();
-
-        NodeId nodeId = new NodeId(nodeIdent);
-        NodeKey nk = new NodeKey(nodeId);
-        NodeBuilder nb = new NodeBuilder();
-        nb.withKey(nk);
-
-        nb.addAugmentation(NetconfNode.class, nn);
-        return nb.build();
     }
 
     public static Node getNode(final String nodeIdent) {
-        NodeId nodeId = new NodeId(nodeIdent);
-        NodeKey nk = new NodeKey(nodeId);
-        NodeBuilder nb = new NodeBuilder();
-        nb.withKey(nk);
-        return nb.build();
+        return new NodeBuilder().withKey(new NodeKey(new NodeId(nodeIdent))).build();
     }
 
     public static InstanceIdentifier<Node> getInstanceIdentifier(final Node node) {
-        TopologyKey netconfTopologyKey = new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName()));
-        InstanceIdentifier<Node> nodeII = InstanceIdentifier.create(NetworkTopology.class)
-                .child(Topology.class, netconfTopologyKey).child(Node.class, node.key());
-        return nodeII;
+        return InstanceIdentifier.create(NetworkTopology.class)
+                .child(Topology.class, new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())))
+                .child(Node.class, node.key());
     }
 
     public static Optional<Streams> getAvailableStream(final String name, final boolean replaySupport) {
