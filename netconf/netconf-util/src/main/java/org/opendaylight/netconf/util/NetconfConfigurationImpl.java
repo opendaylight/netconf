@@ -63,7 +63,7 @@ public class NetconfConfigurationImpl implements NetconfConfiguration, ManagedSe
                 sshServerAddress,
                 (String) dictionaryConfig.get(SSH_PK_PATH_PROP));
 
-        LOG.debug("CSS netconf server configuration was updated: {}", dictionaryConfig.toString());
+        LOG.debug("CSS netconf server configuration was updated: {}", dictionaryConfig);
     }
 
     @Override
