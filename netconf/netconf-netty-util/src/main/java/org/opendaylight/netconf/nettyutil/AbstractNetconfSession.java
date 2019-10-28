@@ -88,7 +88,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession,L extends 
     }
 
     protected void endOfInput() {
-        LOG.debug("Session {} end of input detected while session was in state {}", toString(), isUp() ? "up"
+        LOG.debug("Session {} end of input detected while session was in state {}", this, isUp() ? "up"
                 : "initialized");
         if (isUp()) {
             this.sessionListener.onSessionDown(thisInstance(),
@@ -97,7 +97,7 @@ public abstract class AbstractNetconfSession<S extends NetconfSession,L extends 
     }
 
     protected void sessionUp() {
-        LOG.debug("Session {} up", toString());
+        LOG.debug("Session {} up", this);
         sessionListener.onSessionUp(thisInstance());
         this.up = true;
     }

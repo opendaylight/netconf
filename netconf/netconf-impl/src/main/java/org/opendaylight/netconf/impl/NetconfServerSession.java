@@ -70,7 +70,7 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
         super(sessionListener, channel, sessionId);
         this.header = header;
         this.sessionListener = sessionListener;
-        LOG.debug("Session {} created", toString());
+        LOG.debug("Session {} created", this);
     }
 
     @Override
