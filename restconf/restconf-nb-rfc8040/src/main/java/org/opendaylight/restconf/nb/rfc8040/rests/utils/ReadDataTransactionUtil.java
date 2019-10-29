@@ -66,6 +66,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContaine
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.NormalizedNodeContainerBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafSetEntryNodeBuilder;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
@@ -654,6 +655,11 @@ public final class ReadDataTransactionUtil {
             return builder.build();
         } else if (configDataNode instanceof LeafNode) {
             return ImmutableNodes.leafNode(configDataNode.getNodeType(), configDataNode.getValue());
+        } else if (configDataNode instanceof LeafSetEntryNode) {
+            return new ImmutableLeafSetEntryNodeBuilder<>()
+                    .withNodeIdentifier(((LeafSetEntryNode<?>) configDataNode).getIdentifier())
+                    .withValue(configDataNode.getValue())
+                    .build();
         } else if (configDataNode instanceof OrderedLeafSetNode) {
             final ListNodeBuilder<Object, LeafSetEntryNode<Object>> builder = Builders
                 .orderedLeafSetBuilder().withNodeIdentifier(((OrderedLeafSetNode<?>) configDataNode).getIdentifier());
