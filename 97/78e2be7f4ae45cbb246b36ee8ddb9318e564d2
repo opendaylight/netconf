@@ -1,0 +1,7 @@
+Code-Review+2: Robert Varga <nite@hq.sk>
+Verified+1: Robert Varga <nite@hq.sk>
+Submitted-by: Robert Varga <nite@hq.sk>
+Submitted-at: Wed, 30 Oct 2019 14:43:52 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/85267
+Project: netconf
+Branch: refs/heads/stable/neon
