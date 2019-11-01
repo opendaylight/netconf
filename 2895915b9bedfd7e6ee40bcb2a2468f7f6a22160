@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_bcbc9b07",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-07-26T08:40:31Z",
+      "side": 1,
+      "message": "Although this soulution is fine for Beryllium, since we have java8 as minimum version in Boron I would make use of the stream api, parallelStream might provide even better improvement.",
+      "range": {
+        "startLine": 433,
+        "startChar": 12,
+        "endLine": 444,
+        "endChar": 14
+      },
+      "revId": "2895915b9bedfd7e6ee40bcb2a2468f7f6a22160",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
