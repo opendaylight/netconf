@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_149c6d0e",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/NetconfMessageTransformer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5297
+      },
+      "writtenOn": "2019-11-01T19:12:04Z",
+      "side": 1,
+      "message": "this can be final",
+      "revId": "9fd0193471c8ef8f57d45c27e97e101bef8a8c36",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_0706fd1c",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/NetconfMessageTransformer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 5297
+      },
+      "writtenOn": "2019-11-01T19:12:04Z",
+      "side": 1,
+      "message": "This can extract a method to build the date format string.",
+      "revId": "9fd0193471c8ef8f57d45c27e97e101bef8a8c36",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_54154547",
+        "filename": "opendaylight/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/NetconfMessageTransformer.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 5297
+      },
+      "writtenOn": "2019-11-01T19:12:04Z",
+      "side": 1,
+      "message": "Why remove the \"final\" and the \"@Override\"?",
+      "revId": "9fd0193471c8ef8f57d45c27e97e101bef8a8c36",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
