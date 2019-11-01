@@ -22,6 +22,30 @@
       "revId": "2895915b9bedfd7e6ee40bcb2a2468f7f6a22160",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_4dd02bf6",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 5297
+      },
+      "writtenOn": "2019-11-01T19:12:04Z",
+      "side": 1,
+      "message": "A good suggestion.\n\nReally should make use of the stream api.\n\nDone",
+      "parentUuid": "9a561d44_bcbc9b07",
+      "range": {
+        "startLine": 433,
+        "startChar": 12,
+        "endLine": 444,
+        "endChar": 14
+      },
+      "revId": "2895915b9bedfd7e6ee40bcb2a2468f7f6a22160",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
