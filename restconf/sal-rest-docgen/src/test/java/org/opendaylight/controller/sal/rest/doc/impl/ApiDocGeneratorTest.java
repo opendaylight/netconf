@@ -27,6 +27,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGeneratorDraftO2;
+import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Api;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Operation;
@@ -73,7 +74,7 @@ public class ApiDocGeneratorTest {
             if (m.getQNameModule().getNamespace().toString().equals(NAMESPACE)
                     && m.getQNameModule().getRevision().equals(DATE)) {
                 final ApiDeclaration doc = this.generator.getSwaggerDocSpec(m, "http://localhost:8080/restconf", "",
-                        this.schemaContext);
+                        this.schemaContext, URIType.DRAFT02);
                 validateToaster(doc);
                 validateTosterDocContainsModulePrefixes(doc);
                 validateSwaggerModules(doc);
@@ -235,7 +236,7 @@ public class ApiDocGeneratorTest {
             if (m.getQNameModule().getNamespace().toString().equals(NAMESPACE_2)
                     && m.getQNameModule().getRevision().equals(REVISION_2)) {
                 final ApiDeclaration doc = this.generator.getSwaggerDocSpec(m, "http://localhost:8080/restconf", "",
-                        this.schemaContext);
+                        this.schemaContext, URIType.DRAFT02);
                 assertNotNull(doc);
 
                 // testing bugs.opendaylight.org bug 1290. UnionType model type.
@@ -254,7 +255,7 @@ public class ApiDocGeneratorTest {
             if (m.getQNameModule().getNamespace().toString().equals(NAMESPACE_2)
                     && m.getQNameModule().getRevision().equals(REVISION_2)) {
                 final ApiDeclaration doc = this.generator.getSwaggerDocSpec(m, "http://localhost:8080/restconf", "",
-                        this.schemaContext);
+                        this.schemaContext, URIType.DRAFT02);
                 assertNotNull(doc);
 
                 final ObjectNode models = doc.getModels();
@@ -325,7 +326,7 @@ public class ApiDocGeneratorTest {
     public void testGetResourceListing() throws Exception {
         final UriInfo info = this.helper.createMockUriInfo(HTTP_HOST);
 
-        final ResourceList resourceListing = this.generator.getResourceListing(info);
+        final ResourceList resourceListing = this.generator.getResourceListing(info, URIType.DRAFT02);
 
         Resource toaster = null;
         Resource toaster2 = null;

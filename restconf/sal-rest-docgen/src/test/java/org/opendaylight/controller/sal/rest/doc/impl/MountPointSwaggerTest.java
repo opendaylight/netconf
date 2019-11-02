@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorDraft02;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Api;
@@ -73,7 +74,7 @@ public class MountPointSwaggerTest {
     public void testGetResourceListBadIid() throws Exception {
         final UriInfo mockInfo = this.helper.createMockUriInfo(HTTP_URL);
 
-        assertEquals(null, this.swagger.getResourceList(mockInfo, 1L));
+        assertEquals(null, this.swagger.getResourceList(mockInfo, 1L, URIType.DRAFT02));
     }
 
     @Test()
@@ -96,7 +97,7 @@ public class MountPointSwaggerTest {
         final UriInfo mockInfo = this.helper.createMockUriInfo(HTTP_URL);
         this.swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of
                                                  // mount points
-        final ResourceList resourceList = this.swagger.getResourceList(mockInfo, 1L);
+        final ResourceList resourceList = this.swagger.getResourceList(mockInfo, 1L, URIType.DRAFT02);
 
         Resource dataStoreResource = null;
         for (final Resource r : resourceList.getApis()) {
@@ -113,7 +114,8 @@ public class MountPointSwaggerTest {
         this.swagger.onMountPointCreated(INSTANCE_ID); // add this ID into the list of
                                                  // mount points
 
-        final ApiDeclaration mountPointApi = this.swagger.getMountPointApi(mockInfo, 1L, "Datastores", "-");
+        final ApiDeclaration mountPointApi = this.swagger.getMountPointApi(mockInfo, 1L, "Datastores", "-",
+            URIType.DRAFT02);
         assertNotNull("failed to find Datastore API", mountPointApi);
         final List<Api> apis = mountPointApi.getApis();
         assertEquals("Unexpected api list size", 3, apis.size());
