@@ -25,6 +25,8 @@ import java.util.regex.Pattern;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Post;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
+import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.AnydataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
@@ -38,6 +40,7 @@ import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.MandatoryAware;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 import org.opendaylight.yangtools.yang.model.api.PathExpression;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -136,51 +139,82 @@ public class ModelGenerator {
             if (childNode instanceof ContainerSchemaNode || childNode instanceof ListSchemaNode) {
                 processDataNodeContainer((DataNodeContainer) childNode, moduleName, models, true, schemaContext);
                 processDataNodeContainer((DataNodeContainer) childNode, moduleName, models, false, schemaContext);
+                processActionNodeContainer(childNode, moduleName, models, schemaContext);
             }
         }
     }
 
     /**
-     * Process the RPCs for a Module Spits out a file each of the name
-     * {@code <rpcName>-input.json and <rpcName>-output.json}
-     * for each RPC that contains input & output elements.
+     * Process the Actions Swagger UI.
      *
-     * @param module module
+     * @param DataSchemaNode childNode
+     * @param String         moduleName
+     * @param ObjectNode     models
+     * @param SchemaContext  schemaContext
      * @throws IOException if I/O operation fails
      */
-    private void processRPCs(final Module module, final ObjectNode models,
-                             final SchemaContext schemaContext) throws IOException {
-        final Set<RpcDefinition> rpcs = module.getRpcs();
+    private void processActionNodeContainer(final DataSchemaNode childNode, final String moduleName,
+        final ObjectNode models, final SchemaContext schemaContext) throws IOException {
+        for (ActionDefinition actionDef : ((ActionNodeContainer) childNode).getActions()) {
+            processOperations(actionDef, moduleName, models, schemaContext);
+        }
+    }
+
+    /**
+     * Process the RPCs for Swagger UI.
+     *
+     * @param Module        module
+     * @param ObjectNode    models
+     * @param SchemaContext schemaContext
+     * @throws IOException if I/O operation fails
+     */
+    private void processRPCs(final Module module, final ObjectNode models, final SchemaContext schemaContext)
+        throws IOException {
         final String moduleName = module.getName();
-        for (final RpcDefinition rpc : rpcs) {
-            final ContainerSchemaNode input = rpc.getInput();
-            if (!input.getChildNodes().isEmpty()) {
-                final ObjectNode properties =
-                        processChildren(input.getChildNodes(), moduleName, models, true, schemaContext);
+        for (final RpcDefinition rpcDefinition : module.getRpcs()) {
+            processOperations(rpcDefinition, moduleName, models, schemaContext);
+        }
+    }
 
-                final String filename = "(" + rpc.getQName().getLocalName() + ")input";
-                final ObjectNode childSchema = getSchemaTemplate();
-                childSchema.put(TYPE_KEY, OBJECT_TYPE);
-                childSchema.set(PROPERTIES_KEY, properties);
-                childSchema.put(ID_KEY, filename);
-                models.set(filename, childSchema);
+    /**
+     * Process the Operations for a Module Spits out a file each of the name {@code <operationName>-input.json and
+     * <oprationName>-output.json} for each Operation that contains input & output elements.
+     *
+     * @param OperationDefinition operationDef
+     * @param String              moduleName
+     * @param ObjectNode          models
+     * @param SchemaContext       schemaContext
+     * @throws IOException if I/O operation fails
+     */
+    private void processOperations(final OperationDefinition operationDef, final String moduleName,
+        final ObjectNode models, final SchemaContext schemaContext) throws IOException {
+        final ContainerSchemaNode input = operationDef.getInput();
+        if (!input.getChildNodes().isEmpty()) {
+            final ObjectNode properties =
+                processChildren(input.getChildNodes(), moduleName, models, true, schemaContext);
 
-                processTopData(filename, models, input);
-            }
+            final String filename = "(" + operationDef.getQName().getLocalName() + ")input";
+            final ObjectNode childSchema = getSchemaTemplate();
+            childSchema.put(TYPE_KEY, OBJECT_TYPE);
+            childSchema.set(PROPERTIES_KEY, properties);
+            childSchema.put(ID_KEY, filename);
+            models.set(filename, childSchema);
 
-            final ContainerSchemaNode output = rpc.getOutput();
-            if (!output.getChildNodes().isEmpty()) {
-                final ObjectNode properties =
-                        processChildren(output.getChildNodes(), moduleName, models, true, schemaContext);
-                final String filename = "(" + rpc.getQName().getLocalName() + ")output";
-                final ObjectNode childSchema = getSchemaTemplate();
-                childSchema.put(TYPE_KEY, OBJECT_TYPE);
-                childSchema.set(PROPERTIES_KEY, properties);
-                childSchema.put(ID_KEY, filename);
-                models.set(filename, childSchema);
+            processTopData(filename, models, input);
+        }
 
-                processTopData(filename, models, output);
-            }
+        final ContainerSchemaNode output = operationDef.getOutput();
+        if (!output.getChildNodes().isEmpty()) {
+            final ObjectNode properties =
+                processChildren(output.getChildNodes(), moduleName, models, true, schemaContext);
+            final String filename = "(" + operationDef.getQName().getLocalName() + ")output";
+            final ObjectNode childSchema = getSchemaTemplate();
+            childSchema.put(TYPE_KEY, OBJECT_TYPE);
+            childSchema.set(PROPERTIES_KEY, properties);
+            childSchema.put(ID_KEY, filename);
+            models.set(filename, childSchema);
+
+            processTopData(filename, models, output);
         }
     }
 

@@ -24,6 +24,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Api;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
@@ -100,11 +101,12 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         return swaggerGenerator.generateUrlPrefixFromInstanceID(key, modName) + "yang-ext:mount";
     }
 
-    public ResourceList getResourceList(final UriInfo uriInfo, final Long id) {
-        return getResourceList(uriInfo, id, 0, true);
+    public ResourceList getResourceList(final UriInfo uriInfo, final Long id, final URIType uriType) {
+        return getResourceList(uriInfo, id, 0, true, uriType);
     }
 
-    public ResourceList getResourceList(final UriInfo uriInfo, final Long id, final int pageNum, boolean all) {
+    public ResourceList getResourceList(final UriInfo uriInfo, final Long id, final int pageNum, boolean all,
+        final URIType uriType) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         if (iid == null) {
             return null; // indicating not found.
@@ -119,7 +121,8 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         dataStores.setPath(swaggerGenerator.generatePath(uriInfo, DATASTORES_LABEL, DATASTORES_REVISION));
         resources.add(dataStores);
         final String urlPrefix = getYangMountUrl(iid);
-        final ResourceList list = swaggerGenerator.getResourceListing(uriInfo, context, urlPrefix, pageNum, all);
+        final ResourceList list = swaggerGenerator
+            .getResourceListing(uriInfo, context, urlPrefix, pageNum, all, uriType);
         resources.addAll(list.getApis());
         list.setApis(resources);
         return list;
@@ -152,7 +155,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     }
 
     public ApiDeclaration getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
-            final String revision) {
+        final String revision, final URIType uriType) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final SchemaContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
@@ -163,7 +166,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         if (DATASTORES_LABEL.equals(module) && DATASTORES_REVISION.equals(revision)) {
             return generateDataStoreApiDoc(uriInfo, urlPrefix);
         }
-        return swaggerGenerator.getApiDeclaration(module, revision, uriInfo, context, urlPrefix);
+        return swaggerGenerator.getApiDeclaration(module, revision, uriInfo, context, urlPrefix, uriType);
     }
 
     private ApiDeclaration generateDataStoreApiDoc(final UriInfo uriInfo, final String context) {

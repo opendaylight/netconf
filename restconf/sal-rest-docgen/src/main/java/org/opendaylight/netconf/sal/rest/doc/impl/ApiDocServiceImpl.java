@@ -40,6 +40,8 @@ public class ApiDocServiceImpl implements ApiDocService {
     private static final String TOTAL_PAGES = "totalPages";
     private static final String PAGE_NUM = "pageNum";
 
+    public enum URIType { RFC8040, DRAFT02 }
+
     private final MountPointSwagger mountPointSwaggerDraft02;
     private final MountPointSwagger mountPointSwaggerRFC8040;
     private final ApiDocGeneratorDraftO2 apiDocGeneratorDraft02;
@@ -64,10 +66,10 @@ public class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getRootDoc(final UriInfo uriInfo) {
         final ResourceList rootDoc;
-        if (isNew(uriInfo)) {
-            rootDoc = apiDocGeneratorRFC8040.getResourceListing(uriInfo);
+        if (isNew(uriInfo).equals(URIType.RFC8040)) {
+            rootDoc = apiDocGeneratorRFC8040.getResourceListing(uriInfo, URIType.RFC8040);
         } else {
-            rootDoc = apiDocGeneratorDraft02.getResourceListing(uriInfo);
+            rootDoc = apiDocGeneratorDraft02.getResourceListing(uriInfo, URIType.DRAFT02);
         }
 
         return Response.ok(rootDoc).build();
@@ -79,10 +81,10 @@ public class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getDocByModule(final String module, final String revision, final UriInfo uriInfo) {
         final ApiDeclaration doc;
-        if (isNew(uriInfo)) {
-            doc = apiDocGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo);
+        if (isNew(uriInfo).equals(URIType.RFC8040)) {
+            doc = apiDocGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, URIType.RFC8040);
         } else {
-            doc = apiDocGeneratorDraft02.getApiDeclaration(module, revision, uriInfo);
+            doc = apiDocGeneratorDraft02.getApiDeclaration(module, revision, uriInfo, URIType.DRAFT02);
         }
 
         return Response.ok(doc).build();
@@ -99,7 +101,7 @@ public class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getListOfMounts(final UriInfo uriInfo) {
         final MountPointSwagger mountPointSwagger;
-        if (isNew(uriInfo)) {
+        if (isNew(uriInfo).equals(URIType.RFC8040)) {
             mountPointSwagger = mountPointSwaggerRFC8040;
         } else {
             mountPointSwagger = mountPointSwaggerDraft02;
@@ -115,10 +117,12 @@ public class ApiDocServiceImpl implements ApiDocService {
         final ResourceList resourceList;
 
         if (uriInfo.getQueryParameters().getFirst(TOTAL_PAGES) != null) {
-            if (isNew(uriInfo)) {
-                resourceList = mountPointSwaggerRFC8040.getResourceList(uriInfo, Long.parseLong(instanceNum));
+            if (isNew(uriInfo).equals(URIType.RFC8040)) {
+                resourceList = mountPointSwaggerRFC8040.getResourceList(uriInfo, Long.parseLong(instanceNum),
+                    URIType.RFC8040);
             } else {
-                resourceList = mountPointSwaggerDraft02.getResourceList(uriInfo, Long.parseLong(instanceNum));
+                resourceList = mountPointSwaggerDraft02.getResourceList(uriInfo, Long.parseLong(instanceNum),
+                    URIType.DRAFT02);
             }
             int size = resourceList.getApis().size();
             return Response.ok(size % DEFAULT_PAGESIZE == 0 ? size / DEFAULT_PAGESIZE
@@ -127,12 +131,12 @@ public class ApiDocServiceImpl implements ApiDocService {
 
         final int pageNum = Integer.parseInt(uriInfo.getQueryParameters().getFirst(PAGE_NUM));
 
-        if (isNew(uriInfo)) {
+        if (isNew(uriInfo).equals(URIType.RFC8040)) {
             resourceList = mountPointSwaggerRFC8040.getResourceList(uriInfo, Long.parseLong(instanceNum), pageNum,
-                    false);
+                false, URIType.RFC8040);
         } else {
             resourceList = mountPointSwaggerDraft02.getResourceList(uriInfo, Long.parseLong(instanceNum), pageNum,
-                    false);
+                false, URIType.DRAFT02);
         }
         return Response.ok(resourceList).build();
     }
@@ -141,15 +145,20 @@ public class ApiDocServiceImpl implements ApiDocService {
     public synchronized Response getMountDocByModule(final String instanceNum, final String module,
             final String revision, final UriInfo uriInfo) {
         final ApiDeclaration api;
-        if (isNew(uriInfo)) {
-            api = mountPointSwaggerRFC8040.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision);
+        if (isNew(uriInfo).equals(URIType.RFC8040)) {
+            api = mountPointSwaggerRFC8040
+                .getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision, URIType.RFC8040);
         } else {
-            api = mountPointSwaggerDraft02.getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision);
+            api = mountPointSwaggerDraft02
+                .getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision, URIType.DRAFT02);
         }
         return Response.ok(api).build();
     }
 
-    private static boolean isNew(final UriInfo uriInfo) {
-        return uriInfo.getBaseUri().toString().contains("/18/");
+    private static URIType isNew(final UriInfo uriInfo) {
+        if (uriInfo.getBaseUri().toString().contains("/18/")) {
+            return URIType.RFC8040;
+        }
+        return URIType.DRAFT02;
     }
 }

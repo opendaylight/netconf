@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.function.Function;
 import javax.ws.rs.core.UriInfo;
 import org.apache.maven.project.MavenProject;
+import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGeneratorDraft02;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
@@ -84,7 +85,7 @@ public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
             mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
             // Write resource listing to JS file
-            ResourceList resourceList = super.getResourceListing(null, context, "");
+            ResourceList resourceList = super.getResourceListing(null, context, "", URIType.DRAFT02);
             String resourceListJson = mapper.writeValueAsString(resourceList);
             resourceListJson = resourceListJson.replace("\'", "\\\'").replace("\\n", "\\\\n");
             bufferedWriter.write("function getSpec() {\n\treturn \'" + resourceListJson + "\';\n}\n\n");
@@ -95,7 +96,8 @@ public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
                 int revisionIndex = resource.getPath().indexOf('(');
                 String name = resource.getPath().substring(0, revisionIndex);
                 String revision = resource.getPath().substring(revisionIndex + 1, resource.getPath().length() - 1);
-                ApiDeclaration apiDeclaration = super.getApiDeclaration(name, revision, null, context, "");
+                ApiDeclaration apiDeclaration = super.getApiDeclaration(name, revision, null, context, "",
+                    URIType.DRAFT02);
                 String json = mapper.writeValueAsString(apiDeclaration);
                 // Manually insert models because org.json.JSONObject cannot be serialized by ObjectMapper
                 json = json.replace(
