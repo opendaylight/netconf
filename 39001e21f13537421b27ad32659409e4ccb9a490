@@ -19,6 +19,69 @@
     },
     {
       "key": {
+        "uuid": "6258a790_ec2a9490",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2017-12-11T14:22:15Z",
+      "side": 1,
+      "message": "can you create NetconfReconnectingClientConfigurationBuilder before and add authHandler only if its SSH or TCP ?\nexample:\nNetconfReconnectingClientConfigurationBuilder builder \u003d NetconfReconnectingClientConfigurationBuilder.create();\n        if (node.isTcpOnly() || node.getProtocol() \u003d\u003d Protocol.SSH) {\n            builder.withAuthHandler(getHandlerFromCredentials(node.getCredentials()));\n        }\n        return builder.withAddress(socketAddress)\n                .withConnectionTimeoutMillis(clientConnectionTimeoutMillis)\n                .withReconnectStrategy(strategy)\n                .withProtocol(node.isTcpOnly() ? NetconfClientConfiguration.NetconfClientProtocol.TCP :\n                        NetconfClientConfiguration.NetconfClientProtocol.valueOf(node.getProtocol().name()))\n                .withConnectStrategyFactory(sf)\n                .withSessionListener(listener)\n                .build();",
+      "range": {
+        "startLine": 449,
+        "startChar": 7,
+        "endLine": 463,
+        "endChar": 25
+      },
+      "revId": "39001e21f13537421b27ad32659409e4ccb9a490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fd98be3e_8c8ec314",
+        "filename": "netconf/netconf-util/src/test/java/org/opendaylight/netconf/util/NetconfSslContextFactoryTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2017-12-11T14:22:15Z",
+      "side": 1,
+      "message": "remove new line between groups",
+      "revId": "39001e21f13537421b27ad32659409e4ccb9a490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b9a56dab_4f89a0e8",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2017-12-11T14:22:15Z",
+      "side": 1,
+      "message": "remove tab, please",
+      "range": {
+        "startLine": 84,
+        "startChar": 11,
+        "endLine": 84,
+        "endChar": 13
+      },
+      "revId": "39001e21f13537421b27ad32659409e4ccb9a490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6be8ca46_70e502c2",
         "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
         "patchSetId": 4
