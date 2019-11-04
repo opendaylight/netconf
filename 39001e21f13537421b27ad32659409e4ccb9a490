@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "29d76cb7_466f8255",
+        "filename": "netconf/netconf-client/src/main/java/org/opendaylight/netconf/client/TlsClientChannelInitializer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2017-12-11T14:22:15Z",
+      "side": 1,
+      "message": "remove new line between groups",
+      "revId": "39001e21f13537421b27ad32659409e4ccb9a490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6be8ca46_70e502c2",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2017-12-11T14:22:15Z",
+      "side": 1,
+      "message": "remove tab, please",
+      "range": {
+        "startLine": 85,
+        "startChar": 12,
+        "endLine": 85,
+        "endChar": 13
+      },
+      "revId": "39001e21f13537421b27ad32659409e4ccb9a490",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
