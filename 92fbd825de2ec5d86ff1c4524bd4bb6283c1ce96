@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba51214e_ffc32188",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/odl-sal-netconf-connector-cfg.yang",
+        "patchSetId": 15
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-06-16T09:51:39Z",
+      "side": 1,
+      "message": "still have the range for the config subsystem cfg model",
+      "range": {
+        "startLine": 68,
+        "startChar": 20,
+        "endLine": 68,
+        "endChar": 35
+      },
+      "revId": "92fbd825de2ec5d86ff1c4524bd4bb6283c1ce96",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_3fbe3900",
+        "filename": "netconf/tools/netconf-cli/src/main/java/org/opendaylight/netconf/cli/NetconfDeviceConnectionManager.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-06-16T09:51:39Z",
+      "side": 1,
+      "message": "whitespace",
+      "range": {
+        "startLine": 96,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 8
+      },
+      "revId": "92fbd825de2ec5d86ff1c4524bd4bb6283c1ce96",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
