@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_50a03090",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "ClusteredNetconfDevice extends this class and because of that it has to be protected.",
+      "parentUuid": "fa57193c_b173a4b0",
+      "range": {
+        "startLine": 101,
+        "startChar": 4,
+        "endLine": 101,
+        "endChar": 14
+      },
+      "revId": "594e0fa7a4b3db3054e9b4d0ba6edc15b6c330d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_0374bbcd",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDeviceBuilder.java",
         "patchSetId": 5
