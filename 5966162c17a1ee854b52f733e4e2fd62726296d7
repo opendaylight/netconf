@@ -48,6 +48,54 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_77231fbd",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_243b239e",
+      "range": {
+        "startLine": 360,
+        "startChar": 8,
+        "endLine": 360,
+        "endChar": 69
+      },
+      "revId": "5966162c17a1ee854b52f733e4e2fd62726296d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_d72e4ba4",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_04653fb4",
+      "range": {
+        "startLine": 360,
+        "startChar": 8,
+        "endLine": 360,
+        "endChar": 69
+      },
+      "revId": "5966162c17a1ee854b52f733e4e2fd62726296d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_84c2cf82",
         "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
         "patchSetId": 3
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_577c1b72",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_84c2cf82",
+      "range": {
+        "startLine": 369,
+        "startChar": 4,
+        "endLine": 369,
+        "endChar": 16
+      },
+      "revId": "5966162c17a1ee854b52f733e4e2fd62726296d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_e4bd9b03",
         "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
         "patchSetId": 3
@@ -82,6 +154,30 @@
       "writtenOn": "2017-03-03T07:59:18Z",
       "side": 1,
       "message": "do you need synchronized here?",
+      "range": {
+        "startLine": 376,
+        "startChar": 4,
+        "endLine": 376,
+        "endChar": 16
+      },
+      "revId": "5966162c17a1ee854b52f733e4e2fd62726296d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_f788af72",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_e4bd9b03",
       "range": {
         "startLine": 376,
         "startChar": 4,
