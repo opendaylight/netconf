@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_92cc9b37",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-25T20:48:15Z",
+      "side": 1,
+      "message": "I know this has nothing to do with this patch, but along with moving this function, do you think we can enhance the precondition message to include something like:\nexpected childElements 2, actual childElements childElements.size()\n\nHaving the excepted childElements could help.\nI\u0027m telling you this because I faced this issue in the past :)",
+      "range": {
+        "startLine": 335,
+        "startChar": 64,
+        "endLine": 335,
+        "endChar": 126
+      },
+      "revId": "de962bc0d6291e0fda361cbdb8c9cf19d9853ddb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
