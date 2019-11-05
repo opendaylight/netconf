@@ -56,6 +56,23 @@
     },
     {
       "key": {
+        "uuid": "da01753e_9f143f45",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/ReadTransactionActor.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "line",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da01753e_3fe27303",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/ReadTransactionActor.java",
         "patchSetId": 16
@@ -68,6 +85,23 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "da01753e_7f0fdb2e",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_7f0fdb2e",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/ReadTransactionActor.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "line",
       "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -92,6 +126,23 @@
     },
     {
       "key": {
+        "uuid": "da01753e_ff510b0f",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/ProxyReadTransaction.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "line",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da01753e_7fe35b05",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/ProxyReadTransaction.java",
         "patchSetId": 16
@@ -104,6 +155,23 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "da01753e_bf3023e9",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_bf3023e9",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/ProxyReadTransaction.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "line",
       "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -128,6 +196,23 @@
     },
     {
       "key": {
+        "uuid": "da01753e_7f3d1bbb",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/ProxyWriteTransaction.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "line",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da01753e_bfedc3f1",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/ProxyWriteTransaction.java",
         "patchSetId": 16
@@ -140,6 +225,23 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "da01753e_3f5c3325",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_3f5c3325",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/ProxyWriteTransaction.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "line",
       "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -164,6 +266,23 @@
     },
     {
       "key": {
+        "uuid": "da01753e_9f427f3c",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/ProxyWriteTransaction.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "line",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da01753e_ffbe2bd3",
         "filename": "netconf/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/actors/ReadTransactionActorTest.java",
         "patchSetId": 16
@@ -176,6 +295,23 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "da01753e_9f69dfc0",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_9f69dfc0",
+        "filename": "netconf/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/actors/ReadTransactionActorTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "null, Boolean.TRUE",
       "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -200,6 +336,23 @@
     },
     {
       "key": {
+        "uuid": "da01753e_bf5e6310",
+        "filename": "netconf/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/actors/WriteTransactionActorTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "JavaTestKit.shutdownActorSystem(system, null, Boolean.TRUE);\n+ remove trailing line",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da01753e_3fb9d3e9",
         "filename": "netconf/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/tx/ProxyReadTransactionTest.java",
         "patchSetId": 16
@@ -212,6 +365,23 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "da01753e_ff9f4bb2",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_ff9f4bb2",
+        "filename": "netconf/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/tx/ProxyReadTransactionTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "null, Boolean.TRUE",
       "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -236,6 +406,23 @@
     },
     {
       "key": {
+        "uuid": "da01753e_5fa7770c",
+        "filename": "netconf/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/tx/ProxyWriteTransactionTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "null, TRUE",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da01753e_7fca3b6f",
         "filename": "netconf/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/tx/ReadOnlyTransactionTest.java",
         "patchSetId": 16
@@ -254,6 +441,23 @@
     },
     {
       "key": {
+        "uuid": "da01753e_3faa73d4",
+        "filename": "netconf/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/tx/ReadOnlyTransactionTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "null, TRUE",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da01753e_bfc4a35f",
         "filename": "netconf/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/tx/WriteOnlyTransactionTest.java",
         "patchSetId": 16
@@ -266,6 +470,23 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "da01753e_9fb0bf44",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_9fb0bf44",
+        "filename": "netconf/netconf-topology-singleton/src/test/java/org/opendaylight/netconf/topology/singleton/impl/tx/WriteOnlyTransactionTest.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "null, TRUE",
       "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
