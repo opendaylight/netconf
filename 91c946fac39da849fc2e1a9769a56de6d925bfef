@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_40319fa1",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/PATCHJsonBodyWriter.java",
+        "patchSetId": 47
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-08-02T14:13:24Z",
+      "side": 1,
+      "message": "TODO should be implemented in case of new restconf",
+      "range": {
+        "startLine": 107,
+        "startChar": 12,
+        "endLine": 107,
+        "endChar": 84
+      },
+      "revId": "91c946fac39da849fc2e1a9769a56de6d925bfef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_a026b366",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/PATCHXmlBodyWriter.java",
+        "patchSetId": 47
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-08-02T14:13:24Z",
+      "side": 1,
+      "message": "TODO should be implemented in case of new restconf",
+      "range": {
+        "startLine": 121,
+        "startChar": 11,
+        "endLine": 121,
+        "endChar": 54
+      },
+      "revId": "91c946fac39da849fc2e1a9769a56de6d925bfef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
