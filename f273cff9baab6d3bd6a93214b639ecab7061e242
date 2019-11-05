@@ -22,6 +22,30 @@
       "revId": "f273cff9baab6d3bd6a93214b639ecab7061e242",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_34933f5c",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "After discussion with Jakub Morvay and Rudolf Brisuda I came to conclusion that 10 seconds is too much. He used 10 seconds because he wasn`t sure what number to use. 5 seconds should be planty for master to process request and send response back. If for some reason someone needs more he will be able to set it after this patch is merged. But if you want me to change it back to 10 seconds I`ll do that.",
+      "parentUuid": "fafc7978_b40bafd4",
+      "range": {
+        "startLine": 152,
+        "startChar": 20,
+        "endLine": 152,
+        "endChar": 29
+      },
+      "revId": "f273cff9baab6d3bd6a93214b639ecab7061e242",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
