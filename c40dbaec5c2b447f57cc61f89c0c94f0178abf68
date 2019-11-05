@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_8f08a92e",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPATCHBodyReader.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-07-18T13:02:21Z",
+      "side": 1,
+      "message": "info: solves different bug",
+      "range": {
+        "startLine": 295,
+        "startChar": 10,
+        "endLine": 314,
+        "endChar": 13
+      },
+      "revId": "c40dbaec5c2b447f57cc61f89c0c94f0178abf68",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
