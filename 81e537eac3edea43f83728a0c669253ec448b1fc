@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_9b68e888",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPATCHBodyReader.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-20T13:57:30Z",
+      "side": 1,
+      "message": "switch inside a switch, please refactor into a separate method with a meaningful name",
+      "range": {
+        "startLine": 135,
+        "startChar": 20,
+        "endLine": 157,
+        "endChar": 21
+      },
+      "revId": "81e537eac3edea43f83728a0c669253ec448b1fc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_de9feeb2",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPATCHBodyReader.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-20T13:57:30Z",
+      "side": 1,
+      "message": "always make inner classes static unless you need to keep a reference to the parent class",
+      "range": {
+        "startLine": 349,
+        "startChar": 4,
+        "endLine": 349,
+        "endChar": 34
+      },
+      "revId": "81e537eac3edea43f83728a0c669253ec448b1fc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_be631adb",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonToPATCHBodyReader.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-20T13:57:30Z",
+      "side": 1,
+      "message": "would be a lot better to have these as private and have getters and setters for these",
+      "range": {
+        "startLine": 350,
+        "startChar": 8,
+        "endLine": 354,
+        "endChar": 28
+      },
+      "revId": "81e537eac3edea43f83728a0c669253ec448b1fc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
