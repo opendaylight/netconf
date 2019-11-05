@@ -22,6 +22,30 @@
       "revId": "e0a183e91b0e5e2c7b586de1ab5d6bfa6f2c02f0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_a8ce48b2",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallhomeStatusReporter.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba068154_e8aa10d1",
+      "range": {
+        "startLine": 187,
+        "startChar": 16,
+        "endLine": 187,
+        "endChar": 30
+      },
+      "revId": "e0a183e91b0e5e2c7b586de1ab5d6bfa6f2c02f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
