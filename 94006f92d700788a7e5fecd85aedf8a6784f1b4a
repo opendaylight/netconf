@@ -85,6 +85,52 @@
     },
     {
       "key": {
+        "uuid": "da01753e_94270612",
+        "filename": "netconf/netconf-topology-singleton/src/main/yang/netconf-clustered-topology-config.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Type should be smaller than uint16. I don`t think that someone is going to need such a long timeout.",
+      "range": {
+        "startLine": 16,
+        "startChar": 12,
+        "endLine": 16,
+        "endChar": 24
+      },
+      "revId": "94006f92d700788a7e5fecd85aedf8a6784f1b4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_54375e4e",
+        "filename": "netconf/netconf-topology-singleton/src/main/yang/netconf-clustered-topology-config.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "I think that it would be smarter to either set default value to some number (maybe 5 or 10 seconds), or it should always have automatic cancellation turned on without an option of turning it off (this will prevent of locking datastore forever if something goes wrong with the transaction).",
+      "range": {
+        "startLine": 17,
+        "startChar": 12,
+        "endLine": 17,
+        "endChar": 22
+      },
+      "revId": "94006f92d700788a7e5fecd85aedf8a6784f1b4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da01753e_745a6251",
         "filename": "netconf/netconf-topology-singleton/src/main/yang/netconf-clustered-topology-config.yang",
         "patchSetId": 3
@@ -97,6 +143,29 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "da01753e_343a9a36",
+      "range": {
+        "startLine": 18,
+        "startChar": 89,
+        "endLine": 18,
+        "endChar": 102
+      },
+      "revId": "94006f92d700788a7e5fecd85aedf8a6784f1b4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_343a9a36",
+        "filename": "netconf/netconf-topology-singleton/src/main/yang/netconf-clustered-topology-config.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "This should go on new line",
       "range": {
         "startLine": 18,
         "startChar": 89,
