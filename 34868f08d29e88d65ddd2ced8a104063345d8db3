@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_9f73ffe6",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ModelGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 517,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-05-02T13:20:11Z",
+      "side": 1,
+      "message": "method with QName input and Module return type?",
+      "range": {
+        "startLine": 515,
+        "startChar": 11,
+        "endLine": 517,
+        "endChar": 102
+      },
+      "revId": "34868f08d29e88d65ddd2ced8a104063345d8db3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
