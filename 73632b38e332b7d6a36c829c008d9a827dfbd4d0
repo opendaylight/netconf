@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_1d7212e5",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/WriteTransactionActor.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-04-21T13:23:31Z",
+      "side": 1,
+      "message": "I think we should issue at least a log here",
+      "revId": "73632b38e332b7d6a36c829c008d9a827dfbd4d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
