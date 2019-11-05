@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_e8aa10d1",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallhomeStatusReporter.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-05-18T06:47:33Z",
+      "side": 1,
+      "message": "this should be logged",
+      "range": {
+        "startLine": 187,
+        "startChar": 16,
+        "endLine": 187,
+        "endChar": 30
+      },
+      "revId": "e0a183e91b0e5e2c7b586de1ab5d6bfa6f2c02f0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
