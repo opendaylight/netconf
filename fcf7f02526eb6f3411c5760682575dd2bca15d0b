@@ -16,6 +16,24 @@
       "revId": "fcf7f02526eb6f3411c5760682575dd2bca15d0b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_b1e82be3",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/services/impl/RestconfDataServiceImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 0,
+      "message": "Because identifier is not used anywhere in this function and so it can be set to null.",
+      "parentUuid": "7a6b29fe_11547ffd",
+      "revId": "fcf7f02526eb6f3411c5760682575dd2bca15d0b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
