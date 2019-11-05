@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a4c51b2_a2f51acd",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/NetconfMessageTransformer.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-29T11:57:01Z",
+      "side": 1,
+      "message": "formatting",
+      "range": {
+        "startLine": 182,
+        "startChar": 8,
+        "endLine": 188,
+        "endChar": 9
+      },
+      "revId": "76760d011e6293536af58fb6ee298ae965f09850",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
