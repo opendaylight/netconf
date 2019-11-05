@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "da01753e_f5a67ec0",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da01753e_ea1df974",
+      "range": {
+        "startLine": 48,
+        "startChar": 23,
+        "endLine": 48,
+        "endChar": 25
+      },
+      "revId": "e4853d598ed6340e169879ac73be3ee6bcd2687d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da01753e_ca063520",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
         "patchSetId": 9
@@ -36,6 +60,30 @@
       "writtenOn": "2017-04-12T07:42:50Z",
       "side": 1,
       "message": "close is called, when node is deleted from config data storee. Maybe slave actor should be stopped too.",
+      "range": {
+        "startLine": 98,
+        "startChar": 8,
+        "endLine": 98,
+        "endChar": 36
+      },
+      "revId": "e4853d598ed6340e169879ac73be3ee6bcd2687d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_d5db7a19",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da01753e_ca063520",
       "range": {
         "startLine": 98,
         "startChar": 8,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "da01753e_55acaaa0",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da01753e_ea369902",
+      "range": {
+        "startLine": 145,
+        "startChar": 62,
+        "endLine": 145,
+        "endChar": 75
+      },
+      "revId": "e4853d598ed6340e169879ac73be3ee6bcd2687d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da01753e_ca93d5f8",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/RefreshActor.java",
         "patchSetId": 9
@@ -82,6 +154,30 @@
       "writtenOn": "2017-04-12T07:42:50Z",
       "side": 1,
       "message": "I think this should have more accurate name, something like RefreshSlaveActor",
+      "range": {
+        "startLine": 18,
+        "startChar": 13,
+        "endLine": 18,
+        "endChar": 25
+      },
+      "revId": "e4853d598ed6340e169879ac73be3ee6bcd2687d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_35b126f9",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/RefreshActor.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da01753e_ca93d5f8",
       "range": {
         "startLine": 18,
         "startChar": 13,
