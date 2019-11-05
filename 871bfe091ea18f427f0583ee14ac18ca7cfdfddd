@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_eb19e622",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 530,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-03T16:15:54Z",
+      "side": 1,
+      "message": "I let also Restconf guys to review this patch.\n\nBut I find this error reporting approach somewhat strange. You can have a list of errors and if just one of them is of TRANSPORT error type and RESOURCE_DENIED error tag you just wrap this error in RestconfDocumentedExpception and throw. But what about other possible errors in that list?\n\nOn the other hand this kind of error will be in that list alone, at least for now.\n\nSo if Restconf guys are OK with this I will submit this patch.",
+      "revId": "871bfe091ea18f427f0583ee14ac18ca7cfdfddd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
