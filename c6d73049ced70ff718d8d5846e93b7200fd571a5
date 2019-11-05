@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_0ff3f973",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-07-18T12:45:03Z",
+      "side": 1,
+      "message": "I would place this code directly to checkItemExists() method.",
+      "range": {
+        "startLine": 388,
+        "startChar": 12,
+        "endLine": 394,
+        "endChar": 13
+      },
+      "revId": "c6d73049ced70ff718d8d5846e93b7200fd571a5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_6fea7576",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-07-18T12:45:03Z",
+      "side": 1,
+      "message": "I would place this code directly to checkItemDoesNotExists() method",
+      "range": {
+        "startLine": 396,
+        "startChar": 12,
+        "endLine": 402,
+        "endChar": 13
+      },
+      "revId": "c6d73049ced70ff718d8d5846e93b7200fd571a5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
