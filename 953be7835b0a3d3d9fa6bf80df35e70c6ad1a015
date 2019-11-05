@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_8f353fdd",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlNormalizedNodeBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-05-19T13:13:24Z",
+      "side": 1,
+      "message": "no longer accurate. Please make the code defensive by making \u0027parsed\u0027 final and adding another else branch which logs a warning and sets it to null...",
+      "range": {
+        "startLine": 166,
+        "startChar": 57,
+        "endLine": 166,
+        "endChar": 76
+      },
+      "revId": "953be7835b0a3d3d9fa6bf80df35e70c6ad1a015",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
