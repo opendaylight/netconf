@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_b40bafd4",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-topology.yang",
+        "patchSetId": 9
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-03-07T12:59:02Z",
+      "side": 1,
+      "message": "Why did you change the default value from 10 seconds to 5?",
+      "range": {
+        "startLine": 152,
+        "startChar": 20,
+        "endLine": 152,
+        "endChar": 29
+      },
+      "revId": "f273cff9baab6d3bd6a93214b639ecab7061e242",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
