@@ -22,6 +22,80 @@
       "revId": "ea0c4822444d0522ec4f7972f3b1144f094c6be8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_c815984a",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/netconf/sal/restconf/impl/InstanceIdentifierCodecImplTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "new YangInstanceIdentifier.NodeWithValue\u003c\u003e(leafList, \"instance\"))",
+      "range": {
+        "startLine": 42,
+        "startChar": 26,
+        "endLine": 42,
+        "endChar": 62
+      },
+      "revId": "ea0c4822444d0522ec4f7972f3b1144f094c6be8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_5b62f4d8",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/netconf/sal/restconf/impl/InstanceIdentifierCodecImplTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "can be done in @Before method",
+      "revId": "ea0c4822444d0522ec4f7972f3b1144f094c6be8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_1b687cb9",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/netconf/sal/restconf/impl/InstanceIdentifierCodecImplTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "can be done in @Before method",
+      "revId": "ea0c4822444d0522ec4f7972f3b1144f094c6be8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_fb62e0d7",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/netconf/sal/restconf/impl/InstanceIdentifierCodecImplTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "can be done in @Before method",
+      "revId": "ea0c4822444d0522ec4f7972f3b1144f094c6be8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
