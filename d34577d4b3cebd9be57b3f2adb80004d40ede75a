@@ -16,6 +16,24 @@
       "revId": "d34577d4b3cebd9be57b3f2adb80004d40ede75a",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_0a63e7b1",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlToPATCHBodyReader.java",
+        "patchSetId": 42
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a561d44_0f4f7993",
+      "revId": "d34577d4b3cebd9be57b3f2adb80004d40ede75a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
