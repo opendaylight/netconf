@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_eaba4f09",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/TransactionUtil.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_aaab37d5",
+      "range": {
+        "startLine": 101,
+        "startChar": 44,
+        "endLine": 101,
+        "endChar": 68
+      },
+      "revId": "02452e84793a0de58afdb959bbeec197270fe182",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_0ab98b2e",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/TransactionUtil.java",
         "patchSetId": 46
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_4a3703b1",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/TransactionUtil.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_0ab98b2e",
+      "range": {
+        "startLine": 123,
+        "startChar": 45,
+        "endLine": 123,
+        "endChar": 68
+      },
+      "revId": "02452e84793a0de58afdb959bbeec197270fe182",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_eab52f32",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/patch/Draft11JsonToPATCHBodyReader.java",
         "patchSetId": 46
@@ -59,6 +107,30 @@
       "writtenOn": "2016-08-01T14:58:12Z",
       "side": 1,
       "message": "new file - 2016 ... please check other files too",
+      "range": {
+        "startLine": 2,
+        "startChar": 20,
+        "endLine": 2,
+        "endChar": 22
+      },
+      "revId": "02452e84793a0de58afdb959bbeec197270fe182",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_aa47b71c",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/patch/Draft11JsonToPATCHBodyReader.java",
+        "patchSetId": 46
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_eab52f32",
       "range": {
         "startLine": 2,
         "startChar": 20,
