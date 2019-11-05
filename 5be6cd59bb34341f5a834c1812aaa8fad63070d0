@@ -1,0 +1,91 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_b876883d",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-03-28T16:46:15Z",
+      "side": 1,
+      "message": "too long line",
+      "range": {
+        "startLine": 198,
+        "startChar": 16,
+        "endLine": 198,
+        "endChar": 124
+      },
+      "revId": "5be6cd59bb34341f5a834c1812aaa8fad63070d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_d8942c46",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/Bug8084.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-03-28T16:46:15Z",
+      "side": 1,
+      "message": "too long line",
+      "range": {
+        "startLine": 39,
+        "startChar": 8,
+        "endLine": 39,
+        "endChar": 133
+      },
+      "revId": "5be6cd59bb34341f5a834c1812aaa8fad63070d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_78854006",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/Bug8084.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-03-28T16:46:15Z",
+      "side": 1,
+      "message": "Maybe, but better safe than sorry :)",
+      "parentUuid": "fafc7978_38ec5829",
+      "range": {
+        "startLine": 49,
+        "startChar": 7,
+        "endLine": 52,
+        "endChar": 100
+      },
+      "revId": "5be6cd59bb34341f5a834c1812aaa8fad63070d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_58a15ca8",
+        "filename": "netconf/mdsal-netconf-connector/src/test/resources/filter/f14.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-03-28T16:46:15Z",
+      "side": 1,
+      "message": "I think this file should have different name to make clear distinction between resources used by parametric FilterContentValidatorTest and resources used by other tests.",
+      "revId": "5be6cd59bb34341f5a834c1812aaa8fad63070d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
