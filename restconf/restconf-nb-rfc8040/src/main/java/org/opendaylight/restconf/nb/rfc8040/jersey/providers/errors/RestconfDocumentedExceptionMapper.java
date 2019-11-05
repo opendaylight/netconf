@@ -186,12 +186,10 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     private String serializeErrorsContainerToJson(final ContainerNode errorsContainer) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              OutputStreamWriter streamStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
-             StreamWriterWithDisabledValidation jsonStreamWriter = new JsonStreamWriterWithDisabledValidation(
-                     RestconfModule.ERROR_INFO_QNAME, streamStreamWriter, ERRORS_GROUPING_PATH,
-                     RestconfModule.URI_MODULE, schemaContextHandler);
-             NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(jsonStreamWriter)
         ) {
-            return writeNormalizedNode(errorsContainer, outputStream, nnWriter);
+            return writeNormalizedNode(errorsContainer, outputStream, new JsonStreamWriterWithDisabledValidation(
+                RestconfModule.ERROR_INFO_QNAME, streamStreamWriter, ERRORS_GROUPING_PATH,
+                RestconfModule.URI_MODULE, schemaContextHandler));
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output JSON writers", e);
         }
@@ -204,22 +202,18 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
      * @return XML representation of the errors container.
      */
     private String serializeErrorsContainerToXml(final ContainerNode errorsContainer) {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-             StreamWriterWithDisabledValidation streamWriter = new XmlStreamWriterWithDisabledValidation(
-                     RestconfModule.ERROR_INFO_QNAME, outputStream, ERRORS_GROUPING_PATH, schemaContextHandler);
-             NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(streamWriter)
-        ) {
-            return writeNormalizedNode(errorsContainer, outputStream, nnWriter);
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            return writeNormalizedNode(errorsContainer, outputStream, new XmlStreamWriterWithDisabledValidation(
+                RestconfModule.ERROR_INFO_QNAME, outputStream, ERRORS_GROUPING_PATH, schemaContextHandler));
         } catch (IOException e) {
             throw new IllegalStateException("Cannot close some of the output XML writers", e);
         }
     }
 
     private static String writeNormalizedNode(final NormalizedNode<?, ?> errorsContainer,
-            final ByteArrayOutputStream outputStream, final NormalizedNodeWriter nnWriter) {
-        try {
+            final ByteArrayOutputStream outputStream, final StreamWriterWithDisabledValidation streamWriter) {
+        try (NormalizedNodeWriter nnWriter = NormalizedNodeWriter.forStreamWriter(streamWriter)) {
             nnWriter.write(errorsContainer);
-            nnWriter.flush();
         } catch (IOException e) {
             throw new IllegalStateException("Cannot write error response body", e);
         }
