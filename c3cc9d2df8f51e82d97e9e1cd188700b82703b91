@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_244e1470",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-04T13:07:18Z",
+      "side": 1,
+      "message": "Could have just said this in one sentence with something like:\n\nChange naming in testtool payload template\n\nIt also immediately shows what the patch is about whereas with the former I wouldn\u0027t know what the patch was about without actually looking at the source code.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 30
+      },
+      "revId": "c3cc9d2df8f51e82d97e9e1cd188700b82703b91",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
