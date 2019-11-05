@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da5c1566_c2081330",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/validation/RestconfValidation.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "empty identifier also does not start with correct prefix",
+      "revId": "2918e5439fe30ad794984706a3b2570225699f62",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
