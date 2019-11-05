@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_4e06e521",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-22T08:15:07Z",
+      "side": 1,
+      "message": "As this code replaces tcp-only preference in config, maybe it would be better to have placeholder in config-template.xml named {TCP_ONLY}. Then it would make more sense to write !ssh value to it.\n\n\u003ctcp-only xmlns\u003d\"urn:opendaylight:netconf-node-topology\"\u003e{SSH}\u003c/tcp-only\u003e",
+      "range": {
+        "startLine": 308,
+        "startChar": 8,
+        "endLine": 310,
+        "endChar": 9
+      },
+      "revId": "3d5f64df28df682b5b9c4bf13e4b5f2d806d6a64",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
