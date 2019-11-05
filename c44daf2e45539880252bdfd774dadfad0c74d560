@@ -22,6 +22,30 @@
       "revId": "c44daf2e45539880252bdfd774dadfad0c74d560",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_c5137f0b",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/handlers/SchemaContextHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "reworked",
+      "parentUuid": "fafc7978_d4afb792",
+      "range": {
+        "startLine": 82,
+        "startChar": 16,
+        "endLine": 82,
+        "endChar": 18
+      },
+      "revId": "c44daf2e45539880252bdfd774dadfad0c74d560",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
