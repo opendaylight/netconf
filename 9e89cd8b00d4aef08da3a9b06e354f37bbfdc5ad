@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a494da4_1006d220",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-04-13T13:02:46Z",
+      "side": 1,
+      "message": "seems like you have reintroduced old code that was changed while rebasing your code ontop of master, doesn\u0027t seem like you need to change anything here",
+      "range": {
+        "startLine": 393,
+        "startChar": 8,
+        "endLine": 451,
+        "endChar": 9
+      },
+      "revId": "9e89cd8b00d4aef08da3a9b06e354f37bbfdc5ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a494da4_a4a52306",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-04-13T13:02:46Z",
+      "side": 1,
+      "message": "You cannot just return null, returning a null should never be an option unless the caller expects it. Return a failed future here instead.",
+      "range": {
+        "startLine": 321,
+        "startChar": 12,
+        "endLine": 321,
+        "endChar": 24
+      },
+      "revId": "9e89cd8b00d4aef08da3a9b06e354f37bbfdc5ad",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
