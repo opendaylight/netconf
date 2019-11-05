@@ -20,6 +20,23 @@
     },
     {
       "key": {
+        "uuid": "9a561d44_7c532de2",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "organize your imports as described in https://wiki.opendaylight.org/view/OpenDaylight_Controller:Developing_With_Intellij#Import_ordering",
+      "revId": "310481e355150c904e30b1e726e2164b4971da55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a561d44_397b7d7c",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
         "patchSetId": 1
@@ -32,6 +49,23 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "9a561d44_5c50e9d3",
+      "revId": "310481e355150c904e30b1e726e2164b4971da55",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_5c50e9d3",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "this can be final",
       "revId": "310481e355150c904e30b1e726e2164b4971da55",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
