@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_c1a85add",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/NetconfProxyDOMTransaction.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-01T13:52:59Z",
+      "side": 1,
+      "message": "I think this can be on previous line.",
+      "revId": "9c8d38a5e046a222c9cba30e488509162cb9555f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_81a2d2fa",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/NetconfProxyDOMTransaction.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-01T13:52:59Z",
+      "side": 1,
+      "message": "this can be on previous line",
+      "revId": "9c8d38a5e046a222c9cba30e488509162cb9555f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_41462a50",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-01T13:52:59Z",
+      "side": 1,
+      "message": "no need for a new line",
+      "revId": "9c8d38a5e046a222c9cba30e488509162cb9555f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_415d8a14",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 531,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-01T13:52:59Z",
+      "side": 1,
+      "message": "What if error\u0027s error list has more than one error?",
+      "revId": "9c8d38a5e046a222c9cba30e488509162cb9555f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_a139d6a5",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-01T14:00:32Z",
+      "side": 1,
+      "message": "Yeah, and also \u0026\u0026 operator should be at line beginning, I guess",
+      "revId": "9c8d38a5e046a222c9cba30e488509162cb9555f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_817bf28a",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 534,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-01T13:52:59Z",
+      "side": 1,
+      "message": "Put closing ) parentheses and opening { on previous line",
+      "revId": "9c8d38a5e046a222c9cba30e488509162cb9555f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
