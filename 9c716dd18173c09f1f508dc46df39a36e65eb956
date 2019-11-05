@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_440cf342",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/handlers/Handler.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "maybe : throw new UnsupportedOperationException(\"update\") should be fine as default",
+      "revId": "9c716dd18173c09f1f508dc46df39a36e65eb956",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_77be0301",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/DeleteDataTransactionUtilTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "this.readWrite.exists() should be enough",
+      "revId": "9c716dd18173c09f1f508dc46df39a36e65eb956",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_57bb070e",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/DeleteDataTransactionUtilTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "this.readWrite.exists() should be enough",
+      "revId": "9c716dd18173c09f1f508dc46df39a36e65eb956",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
