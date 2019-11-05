@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_90c12831",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlToPATCHBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "no, it should be target - its done the same way in POST request",
+      "parentUuid": "fa57193c_5f5e8346",
+      "range": {
+        "startLine": 149,
+        "startChar": 50,
+        "endLine": 149,
+        "endChar": 60
+      },
+      "revId": "7cc768b56aee16bf36ea86a276b5e6fdc1deb6a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_3f5bcf55",
         "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlToPATCHBodyReader.java",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2016-04-29T08:39:13Z",
       "side": 1,
       "message": "this is supposed to be schemaNode",
+      "range": {
+        "startLine": 152,
+        "startChar": 68,
+        "endLine": 152,
+        "endChar": 78
+      },
+      "revId": "7cc768b56aee16bf36ea86a276b5e6fdc1deb6a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_f0dd0416",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlToPATCHBodyReader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "no, it should be target - its done the same way in POST request",
+      "parentUuid": "fa57193c_3f5bcf55",
       "range": {
         "startLine": 152,
         "startChar": 68,
