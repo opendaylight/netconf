@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_b8906bed",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Main.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-05-15T11:28:48Z",
+      "side": 1,
+      "message": "Can be method reference",
+      "range": {
+        "startLine": 264,
+        "startChar": 83,
+        "endLine": 264,
+        "endChar": 117
+      },
+      "revId": "dd548a143633fe22692b519602b4345a906729ed",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
