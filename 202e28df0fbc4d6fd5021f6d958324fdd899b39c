@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_3812bbb1",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/restconf/impl/test/MultipleEqualNamesForDataNodesTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-05-15T10:40:56Z",
+      "side": 1,
+      "message": "Could be deleted?",
+      "range": {
+        "startLine": 18,
+        "startChar": 13,
+        "endLine": 18,
+        "endChar": 47
+      },
+      "revId": "202e28df0fbc4d6fd5021f6d958324fdd899b39c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
