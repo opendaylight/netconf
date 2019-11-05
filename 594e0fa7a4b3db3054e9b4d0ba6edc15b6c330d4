@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_a3bcef6d",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/pipeline/ClusteredNetconfDevice.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-26T14:33:43Z",
+      "side": 1,
+      "message": "please format correctly, with a space after the \",\"",
+      "range": {
+        "startLine": 65,
+        "startChar": 14,
+        "endLine": 65,
+        "endChar": 76
+      },
+      "revId": "594e0fa7a4b3db3054e9b4d0ba6edc15b6c330d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_0374bbcd",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDeviceBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-26T14:33:43Z",
+      "side": 1,
+      "message": "private final",
+      "range": {
+        "startLine": 19,
+        "startChar": 4,
+        "endLine": 19,
+        "endChar": 17
+      },
+      "revId": "594e0fa7a4b3db3054e9b4d0ba6edc15b6c330d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_6381378f",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDeviceBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-26T14:33:43Z",
+      "side": 1,
+      "message": "I\u0027m not against this, but as it is a builder, shouldn\u0027t we let this value settable as the others?",
+      "range": {
+        "startLine": 25,
+        "startChar": 32,
+        "endLine": 25,
+        "endChar": 70
+      },
+      "revId": "594e0fa7a4b3db3054e9b4d0ba6edc15b6c330d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_a34a2f81",
+        "filename": "netconf/tools/netconf-cli/src/main/java/org/opendaylight/netconf/cli/NetconfDeviceConnectionManager.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-26T14:33:43Z",
+      "side": 1,
+      "message": "maybe this could be hold in its own variable, for a better readability",
+      "range": {
+        "startLine": 88,
+        "startChar": 39,
+        "endLine": 88,
+        "endChar": 134
+      },
+      "revId": "594e0fa7a4b3db3054e9b4d0ba6edc15b6c330d4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
