@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_7ade71de",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-03-02T08:52:50Z",
+      "side": 1,
+      "message": "If you remove BASE_NETCONF_CTX_WITH_NOTIFICATIONS, connector is not able to register to notification stream before schema context is resolved. Please see line 138. \nYou can try to create mount point with following payload to check this.\n\n{\n  \"node\": {\n    \"node-id\": \"device1\",\n    \"netconf-node-topology:host\": \"0.0.0.0\",\n    \"netconf-node-topology:port\": \"17830\",\n    \"netconf-node-topology:username\":\"admin\",\n    \"netconf-node-topology:password\":\"admin\",\n    \"netconf-node-topology:tcp-only\":\"false\",\n    \"netconf-node-topology:keepalive-delay\": \"0\",\n    \"netconf-node-topology:reconnect-on-changed-schema\": \"true\"\n  }\n}",
+      "range": {
+        "startLine": 105,
+        "startChar": 4,
+        "endLine": 109,
+        "endChar": 5
+      },
+      "revId": "de589991f1eedc830e70ea1587f0afd2ad0fb774",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_babd7904",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 457,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-03-02T07:57:45Z",
+      "side": 1,
+      "message": "Could be constant in NetconfMessageTransformUtil",
+      "range": {
+        "startLine": 457,
+        "startChar": 28,
+        "endLine": 457,
+        "endChar": 122
+      },
+      "revId": "de589991f1eedc830e70ea1587f0afd2ad0fb774",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
