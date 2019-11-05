@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_752fe088",
+        "filename": "netconf/netconf-artifacts/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2017-04-26T13:29:53Z",
+      "side": 1,
+      "message": "What is this for?\nI do not see it as prohibited in wiki [0], but in my experience it causes problems in form of missing dependencies.\n\n[0] https://wiki.opendaylight.org/view/Karaf_4_migration#Step_4:_define_the_new_features_repository",
+      "range": {
+        "startLine": 301,
+        "startChar": 23,
+        "endLine": 301,
+        "endChar": 30
+      },
+      "revId": "3ff660d57a83b6e450785cfe3fd0c2a9f002c0dc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
