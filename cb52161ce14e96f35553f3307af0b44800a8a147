@@ -1,0 +1,39 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_c665a246",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-05-10T11:57:05Z",
+      "side": 1,
+      "message": "Do we need to create slave actor with specific name?",
+      "revId": "cb52161ce14e96f35553f3307af0b44800a8a147",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_a6fcde3f",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 19
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-05-10T12:12:34Z",
+      "side": 1,
+      "message": "Cool then. I would prefer we let akka to generate name for our slave actor. We can log this name right after actor creation.",
+      "parentUuid": "ba068154_c6cc8238",
+      "revId": "cb52161ce14e96f35553f3307af0b44800a8a147",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
