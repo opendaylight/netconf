@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "da01753e_f6b4d5f3",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-04-10T12:40:31Z",
+      "side": 1,
+      "message": "I think, that this should be used only in database stuff.",
+      "range": {
+        "startLine": 14,
+        "startChar": 7,
+        "endLine": 14,
+        "endChar": 25
+      },
+      "revId": "0de09213570982ed779cbece9c57ed8ff2cd9846",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da01753e_f6ab3587",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
         "patchSetId": 6
