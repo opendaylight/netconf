@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_cbb86213",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-03T15:57:56Z",
+      "side": 1,
+      "message": "How exactly does this approach fix this bug?\n\nYou just preregister two notification related schema sources to default schema repository (I think second one does not have even right source identifier). However, if these two capabilities are not reported by device (in hello message or in netconf monitoring), these two schemas will not be added to schema context, even if device advertises urn:ietf:params:netconf:capability:notification:1.0 capability, so notifications won\u0027t work anyway.",
+      "revId": "a94a4a694c38bae0e11c081b0fb538de4d06a335",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_a63d53c6",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-03T19:27:20Z",
+      "side": 1,
+      "message": "Sorry I missed this one.\n\nSo you are actually adding notification related yang schemas to device schema context (at least notifications yang model, I think you are missing ietf-netconf-notifications model).\n\nBut I think with this approach, device notification related models will be ignored and preregistered models from cache directory will be used every time, even if device has these models (because it\u0027s cheaper to get sources from cache directory than downloading sources from device). And I think we don\u0027t want to ignore models from device. They may have some device specific changes etc.",
+      "revId": "a94a4a694c38bae0e11c081b0fb538de4d06a335",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
