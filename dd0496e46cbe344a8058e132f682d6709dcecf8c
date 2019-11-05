@@ -20,6 +20,23 @@
     },
     {
       "key": {
+        "uuid": "da01753e_1f016f05",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfNodeActor.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Leave comment -\u003e master",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da01753e_ffd74b21",
         "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfNodeActor.java",
         "patchSetId": 16
@@ -32,6 +49,23 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "da01753e_ff03cb0a",
+      "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_ff03cb0a",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/actors/NetconfNodeActor.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Leave comment -\u003e master",
       "revId": "dd0496e46cbe344a8058e132f682d6709dcecf8c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
