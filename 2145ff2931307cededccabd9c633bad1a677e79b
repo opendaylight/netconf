@@ -1,0 +1,58 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_45ba1624",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/test/resources/instanceidentifier/xml/xmlPATCHdataAbsoluteTargetPath.xml",
+        "patchSetId": 36
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a561d44_5fc5da59",
+      "revId": "2145ff2931307cededccabd9c633bad1a677e79b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_25b56231",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/test/resources/instanceidentifier/xml/xmlPATCHdataMissingValue.xml",
+        "patchSetId": 36
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a561d44_9fa652c0",
+      "revId": "2145ff2931307cededccabd9c633bad1a677e79b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_85838e55",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/test/resources/instanceidentifier/xml/xmlPATCHdataNotAllowedValue.xml",
+        "patchSetId": 36
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a561d44_ffab0e87",
+      "revId": "2145ff2931307cededccabd9c633bad1a677e79b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
