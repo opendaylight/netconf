@@ -2,6 +2,115 @@
   "comments": [
     {
       "key": {
+        "uuid": "9a3d3df0_6649a330",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Main.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-04T13:16:13Z",
+      "side": 1,
+      "message": "import reordering again.. please set up your IDE\u0027s import ordering according to the code style on the wiki",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 0
+      },
+      "revId": "74903147153f3ad188a6a8705b1a5408d12294d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_d53821d5",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Main.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-04T13:16:13Z",
+      "side": 1,
+      "message": "Doesn\u0027t make sense to include a check for editContent since we provide a default. controllerDestination check should be enough, since when present we want to do the automatic configuration.",
+      "range": {
+        "startLine": 57,
+        "startChar": 16,
+        "endLine": 57,
+        "endChar": 46
+      },
+      "revId": "74903147153f3ad188a6a8705b1a5408d12294d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_e6ef731c",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Main.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-04T13:16:13Z",
+      "side": 1,
+      "message": "We should also probably provide a way to override this timeout as an argument. Otherwise when we\u0027re hammering the controller we might hit this timeout and the request will timeout.\n\nAlso you should run through the list of futures from invokeAll() and block untill all of them complete, and log all failures including CancellationException since we can hit the timeout.",
+      "range": {
+        "startLine": 65,
+        "startChar": 54,
+        "endLine": 65,
+        "endChar": 56
+      },
+      "revId": "74903147153f3ad188a6a8705b1a5408d12294d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_66c24386",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Main.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-04T13:16:13Z",
+      "side": 1,
+      "message": "unnecessary",
+      "revId": "74903147153f3ad188a6a8705b1a5408d12294d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_552d3194",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-04T13:16:13Z",
+      "side": 1,
+      "message": "please configure your IDE import ordering according to: https://wiki.opendaylight.org/view/GettingStarted:_Eclipse_Setup#Import_ordering and use it. This applies to all other classes in this patch in which you touched imports.",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 31
+      },
+      "revId": "74903147153f3ad188a6a8705b1a5408d12294d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a3d3df0_b51e3d5d",
         "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
         "patchSetId": 4
