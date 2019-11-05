@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_01edd4c3",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-05-10T14:34:19Z",
+      "side": 1,
+      "message": "You don\u0027t need this anymore",
+      "revId": "59bf24018478f8e769ac1c51bdb9f8b63ab119b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_e1041080",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-05-10T14:34:19Z",
+      "side": 1,
+      "message": "Sending PoisonPill to\n\nAlso toString() is redundant\n\nYou can add also RemoteDeviceId to all logs so we can see to what device are these logs relevant.",
+      "revId": "59bf24018478f8e769ac1c51bdb9f8b63ab119b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba068154_21ff3869",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-05-10T14:34:19Z",
+      "side": 1,
+      "message": "just id is enough and just slaveActorRef is enough\n\nAlso debug level should be enough",
+      "revId": "59bf24018478f8e769ac1c51bdb9f8b63ab119b8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
