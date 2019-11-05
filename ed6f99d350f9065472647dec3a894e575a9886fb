@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_bf9fd902",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-04-05T10:56:53Z",
+      "side": 1,
+      "message": "Please add description, why this should work",
+      "revId": "ed6f99d350f9065472647dec3a894e575a9886fb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
