@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_12f7685a",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/RemoteDeviceConnectorImpl.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_67bc34dd",
+      "revId": "b1f4282e668e62d536b0a716f5be43fd30453fbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_b3e2f42c",
         "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
         "patchSetId": 15
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_529c500f",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Sorry. My plugin did this automaticly. Done.",
+      "parentUuid": "fafc7978_b3e2f42c",
+      "revId": "b1f4282e668e62d536b0a716f5be43fd30453fbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_87ae7896",
         "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
         "patchSetId": 15
@@ -47,6 +83,24 @@
       "writtenOn": "2017-02-27T08:59:59Z",
       "side": 1,
       "message": "Can you please reformulate this error message?",
+      "revId": "b1f4282e668e62d536b0a716f5be43fd30453fbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_b29dbc0c",
+        "filename": "netconf/netconf-topology/src/main/java/org/opendaylight/netconf/topology/AbstractNetconfTopology.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_87ae7896",
       "revId": "b1f4282e668e62d536b0a716f5be43fd30453fbd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
