@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a4c51b2_02f20e9a",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/Main.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-29T12:42:38Z",
+      "side": 1,
+      "message": "I think there\u0027s some confusion on what the params.threadAmount does. It should only be used as the threads for the automatic configuration through restconf not for the underlying netty and mina threadpools, there has to be another argument for these. You cannot have a single argument for both these things as they are something completely different.",
+      "range": {
+        "startLine": 56,
+        "startChar": 89,
+        "endLine": 56,
+        "endChar": 108
+      },
+      "revId": "bdf545e2d20b010ded9abb26e6aaba75b98e703d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
