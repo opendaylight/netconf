@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a4c51b2_8f3105ef",
+        "filename": "netconf/netconf-topology/src/main/yang/clustered-netconf-topology.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-04-08T07:24:37Z",
+      "side": 1,
+      "message": "missing a space",
+      "range": {
+        "startLine": 41,
+        "startChar": 36,
+        "endLine": 41,
+        "endChar": 38
+      },
+      "revId": "6acbd50ad6d687e9f37932161962491be1d090b3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_8f48e55c",
+        "filename": "netconf/netconf-topology/src/main/yang/clustered-netconf-topology.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-04-08T07:24:37Z",
+      "side": 1,
+      "message": "range 1..max; or does 0 have a special meaning?",
+      "revId": "6acbd50ad6d687e9f37932161962491be1d090b3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_af4b2158",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-04-08T07:24:37Z",
+      "side": 1,
+      "message": "Preconditions.checkArgument(rpcMessageLimit \u003e 0);",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 56
+      },
+      "revId": "6acbd50ad6d687e9f37932161962491be1d090b3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
