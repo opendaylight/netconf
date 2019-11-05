@@ -20,6 +20,23 @@
     },
     {
       "key": {
+        "uuid": "da01753e_1414b69e",
+        "filename": "netconf/netconf-topology-singleton/src/main/resources/org/opendaylight/blueprint/netconf-topology-singleton.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "\u003c---",
+      "revId": "94006f92d700788a7e5fecd85aedf8a6784f1b4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da01753e_945f0641",
         "filename": "netconf/netconf-topology-singleton/src/main/yang/netconf-clustered-topology-config.yang",
         "patchSetId": 3
@@ -32,6 +49,30 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "da01753e_147b16f6",
+      "range": {
+        "startLine": 16,
+        "startChar": 12,
+        "endLine": 16,
+        "endChar": 24
+      },
+      "revId": "94006f92d700788a7e5fecd85aedf8a6784f1b4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_147b16f6",
+        "filename": "netconf/netconf-topology-singleton/src/main/yang/netconf-clustered-topology-config.yang",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "I think it is ok",
+      "parentUuid": "da01753e_94270612",
       "range": {
         "startLine": 16,
         "startChar": 12,
