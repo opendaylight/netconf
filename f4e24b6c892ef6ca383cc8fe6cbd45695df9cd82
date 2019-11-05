@@ -16,6 +16,24 @@
       "revId": "f4e24b6c892ef6ca383cc8fe6cbd45695df9cd82",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_c24f4c91",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "I thought that hashcode would be different every time. After testing it turned out it has the same one. Changed it to Timestamp which should differ\nDone.",
+      "parentUuid": "da01753e_a2904896",
+      "revId": "f4e24b6c892ef6ca383cc8fe6cbd45695df9cd82",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
