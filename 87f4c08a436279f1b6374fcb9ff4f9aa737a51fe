@@ -35,6 +35,41 @@
       "revId": "87f4c08a436279f1b6374fcb9ff4f9aa737a51fe",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_22c2cf52",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/jersey/providers/JsonToPATCHBodyReader.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "yes\n\nbut here you have two changes and there is only one",
+      "parentUuid": "fafc7978_82bd7bda",
+      "revId": "87f4c08a436279f1b6374fcb9ff4f9aa737a51fe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_a0ea3f71",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/jersey/providers/JsonToPATCHBodyReader.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "please add this also to old class implementation",
+      "revId": "87f4c08a436279f1b6374fcb9ff4f9aa737a51fe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
