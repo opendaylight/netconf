@@ -20,6 +20,23 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_e0ce0759",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfStateSchemas.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "you can use RemoteYangSchema::getQName",
+      "revId": "1bc7096c8fdb99d1326a5ca052d4812f4f777044",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_730833da",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfStateSchemas.java",
         "patchSetId": 6
@@ -32,6 +49,23 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "fafc7978_40f1d393",
+      "revId": "1bc7096c8fdb99d1326a5ca052d4812f4f777044",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_40f1d393",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfStateSchemas.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "final",
       "revId": "1bc7096c8fdb99d1326a5ca052d4812f4f777044",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -56,6 +90,23 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_00298be5",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfStateSchemas.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Optional.absent() is enough",
+      "revId": "1bc7096c8fdb99d1326a5ca052d4812f4f777044",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_136607bb",
         "filename": "netconf/sal-netconf-connector/src/test/resources/netconf-state.schemas.payload.xml",
         "patchSetId": 6
@@ -68,6 +119,41 @@
       "side": 1,
       "message": "this needs to be real schemas, otherwise it fails somewhere else, so i removed the namespace from another 2 schemas",
       "parentUuid": "fafc7978_e023a702",
+      "revId": "1bc7096c8fdb99d1326a5ca052d4812f4f777044",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_40055312",
+        "filename": "netconf/sal-netconf-connector/src/test/resources/netconf-state.schemas.payload.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "i think one more schema here",
+      "parentUuid": "fafc7978_e023a702",
+      "revId": "1bc7096c8fdb99d1326a5ca052d4812f4f777044",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_e023a702",
+        "filename": "netconf/sal-netconf-connector/src/test/resources/netconf-state.schemas.payload.xml",
+        "patchSetId": 6
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "maybe betetr add one more?\n\ni dont know",
       "revId": "1bc7096c8fdb99d1326a5ca052d4812f4f777044",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
