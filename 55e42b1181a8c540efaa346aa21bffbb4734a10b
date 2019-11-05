@@ -115,6 +115,30 @@
       "revId": "55e42b1181a8c540efaa346aa21bffbb4734a10b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_cf94bd46",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "yes you are correct. It s another bug I ve done long time ago and I just created separated patch for that and deleted it from here. thank you.",
+      "parentUuid": "fa57193c_0f1a3517",
+      "range": {
+        "startLine": 309,
+        "startChar": 125,
+        "endLine": 309,
+        "endChar": 129
+      },
+      "revId": "55e42b1181a8c540efaa346aa21bffbb4734a10b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
