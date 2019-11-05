@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_d4afb792",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/handlers/SchemaContextHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2017-02-16T15:14:59Z",
+      "side": 1,
+      "message": "Perhaps this comment about ignoring should not be written inside the branch which throws. Move the comment just before line 89?",
+      "range": {
+        "startLine": 82,
+        "startChar": 16,
+        "endLine": 82,
+        "endChar": 18
+      },
+      "revId": "c44daf2e45539880252bdfd774dadfad0c74d560",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
