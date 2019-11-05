@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da5c1566_d3b579ce",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "This file will be removed from this patch.\nIt is part of https://git.opendaylight.org/gerrit/#/c/39769/",
+      "revId": "f90a55d5d42ba753a84b37bad6d644d1e4ddd2ab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da5c1566_b3b605db",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 419,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "This is bug or feature?",
+      "revId": "f90a55d5d42ba753a84b37bad6d644d1e4ddd2ab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
