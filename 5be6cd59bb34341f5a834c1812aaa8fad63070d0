@@ -72,6 +72,29 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_38ec5829",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/Bug8084.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Not sure if these are not redundant",
+      "range": {
+        "startLine": 49,
+        "startChar": 7,
+        "endLine": 52,
+        "endChar": 100
+      },
+      "revId": "5be6cd59bb34341f5a834c1812aaa8fad63070d0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_58a15ca8",
         "filename": "netconf/mdsal-netconf-connector/src/test/resources/filter/f14.xml",
         "patchSetId": 2
