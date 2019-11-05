@@ -22,6 +22,30 @@
       "revId": "e95dcf13b6b1c442ef9a0fa69533cb2ee6eed38c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_2bbfa062",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/handlers/SchemaContextHandler.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "transaction chain is reseted here: https://git.opendaylight.org/gerrit/#/c/52199/",
+      "parentUuid": "fafc7978_44401c07",
+      "range": {
+        "startLine": 87,
+        "startChar": 18,
+        "endLine": 87,
+        "endChar": 24
+      },
+      "revId": "e95dcf13b6b1c442ef9a0fa69533cb2ee6eed38c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
