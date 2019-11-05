@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_6c96f54d",
+        "filename": "netconf/netconf-topology/src/main/yang/clustered-netconf-topology.yang",
+        "patchSetId": 14
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-23T10:44:19Z",
+      "side": 1,
+      "message": "zero should be used if we wanted to turn this feature off",
+      "range": {
+        "startLine": 43,
+        "startChar": 26,
+        "endLine": 43,
+        "endChar": 33
+      },
+      "revId": "9557aee4025277fc086630ed7c31679833333943",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_2cad1d9d",
+        "filename": "netconf/netconf-topology/src/main/yang/clustered-netconf-topology.yang",
+        "patchSetId": 14
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-23T10:44:19Z",
+      "side": 1,
+      "message": "this should go into the netconf-node-topology model instead so you could change this setting on connector basis instead of the whole topology",
+      "range": {
+        "startLine": 41,
+        "startChar": 12,
+        "endLine": 47,
+        "endChar": 13
+      },
+      "revId": "9557aee4025277fc086630ed7c31679833333943",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_0cb019f3",
+        "filename": "netconf/netconf-topology/src/main/yang/netconf-topology.yang",
+        "patchSetId": 14
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-23T10:44:19Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 43,
+        "startChar": 12,
+        "endLine": 49,
+        "endChar": 13
+      },
+      "revId": "9557aee4025277fc086630ed7c31679833333943",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_0cb939e9",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-23T10:44:19Z",
+      "side": 1,
+      "message": "I don\u0027t think that failing all messages one the limit is reached is a good idea. There should be a mechanism for queing these and sending them once some messages pass.",
+      "range": {
+        "startLine": 315,
+        "startChar": 7,
+        "endLine": 321,
+        "endChar": 9
+      },
+      "revId": "9557aee4025277fc086630ed7c31679833333943",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_6ccf1580",
+        "filename": "netconf/tools/netconf-cli/src/main/java/org/opendaylight/netconf/cli/NetconfDeviceConnectionManager.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-23T10:44:19Z",
+      "side": 1,
+      "message": "whitespace",
+      "range": {
+        "startLine": 96,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 16
+      },
+      "revId": "9557aee4025277fc086630ed7c31679833333943",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
