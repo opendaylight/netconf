@@ -1,0 +1,94 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_1ff5dded",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/CreateStreamUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_3349fb8b",
+      "range": {
+        "startLine": 54,
+        "startChar": 31,
+        "endLine": 54,
+        "endChar": 90
+      },
+      "revId": "dadbce37dd8aa7ffc6dc797b802fe271fd7f8dfc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_dfea450e",
+        "filename": "restconf/sal-rest-connector/src/test/resources/streams/sal-remote@2014-01-14.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_935f2f41",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 3,
+        "endChar": 1
+      },
+      "revId": "dadbce37dd8aa7ffc6dc797b802fe271fd7f8dfc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_bfedc927",
+        "filename": "restconf/sal-rest-connector/src/test/resources/streams/sal-remote@2014-01-14.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_735a5351",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 4
+      },
+      "revId": "dadbce37dd8aa7ffc6dc797b802fe271fd7f8dfc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_7f8cd17f",
+        "filename": "restconf/sal-rest-connector/src/test/resources/streams/toaster.yang",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_d359a75b",
+      "revId": "dadbce37dd8aa7ffc6dc797b802fe271fd7f8dfc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
