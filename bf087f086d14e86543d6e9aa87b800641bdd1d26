@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_304b155b",
+        "filename": "netconf/netconf-topology/src/main/yang/clustered-netconf-topology.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Yes, at least that`s how I understood it. I should have create a limit of concurrent messages and if the limit was reached the next rpc should fast fail.",
+      "parentUuid": "fa57193c_2f3c5993",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 13
+      },
+      "revId": "bf087f086d14e86543d6e9aa87b800641bdd1d26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_6f465125",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
         "patchSetId": 7
@@ -36,6 +60,30 @@
       "writtenOn": "2016-04-19T13:08:16Z",
       "side": 1,
       "message": "As fine as this change is, I believe it should have been done in a separated patch.\n\nAlso, maybe the comment could mentioned the reason for the method to be recursive.",
+      "range": {
+        "startLine": 375,
+        "startChar": 24,
+        "endLine": 375,
+        "endChar": 33
+      },
+      "revId": "bf087f086d14e86543d6e9aa87b800641bdd1d26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_50520914",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "I am sorry this change was not suppose to be here at all. I accidently added here another commit. thank you",
+      "parentUuid": "fa57193c_6f465125",
       "range": {
         "startLine": 375,
         "startChar": 24,
