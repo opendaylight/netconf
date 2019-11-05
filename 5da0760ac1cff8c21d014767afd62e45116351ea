@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_ea19ab7a",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ModelGenerator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-05-02T13:43:26Z",
+      "side": 1,
+      "message": "declare module in front of IF statement",
+      "range": {
+        "startLine": 514,
+        "startChar": 12,
+        "endLine": 514,
+        "endChar": 31
+      },
+      "revId": "5da0760ac1cff8c21d014767afd62e45116351ea",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
