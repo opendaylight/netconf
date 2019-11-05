@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_6e3e16dc",
+        "filename": "netconf/mdsal-netconf-connector/src/test/java/org/opendaylight/netconf/mdsal/connector/ops/get/Bug8084.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5719
+      },
+      "writtenOn": "2017-03-29T08:30:23Z",
+      "side": 1,
+      "message": "What about identityrefs?",
+      "range": {
+        "startLine": 52,
+        "startChar": 8,
+        "endLine": 62,
+        "endChar": 75
+      },
+      "revId": "3fa6f844a419980b7aca63511d86f1db50a19c46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
