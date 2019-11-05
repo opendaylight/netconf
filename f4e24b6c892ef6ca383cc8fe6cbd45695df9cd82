@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_a2904896",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfNodeManager.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-04-10T09:04:54Z",
+      "side": 1,
+      "message": "How is this guaranteed to change during different invocations of createActorRef method?",
+      "revId": "f4e24b6c892ef6ca383cc8fe6cbd45695df9cd82",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
