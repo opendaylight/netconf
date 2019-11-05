@@ -46,6 +46,30 @@
       "revId": "c5477a5b96ffd86a80956c10506f9377d884a698",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_5002936f",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/handlers/SchemaContextHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "SchemaContextHandler is created with transactionChainHandler from RestConnectorProvider, so this.transactionChjainHandler and RestconnectorProvider.transactionChainHandler are the same objects.\n\nRestConnectorProvider.resetTransactionChainForAdapaters updates only transaction chains inside handler.",
+      "parentUuid": "fafc7978_25399241",
+      "range": {
+        "startLine": 99,
+        "startChar": 12,
+        "endLine": 99,
+        "endChar": 67
+      },
+      "revId": "c5477a5b96ffd86a80956c10506f9377d884a698",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
