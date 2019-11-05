@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_90c20983",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 530,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-03T13:55:12Z",
+      "side": 1,
+      "message": "Please remove this",
+      "revId": "1fb7b89e8955223ca0fef911a4594963ae05a66e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
