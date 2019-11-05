@@ -1,0 +1,109 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_5501b6ad",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierDeserializerTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a561d44_750cbaed",
+      "revId": "50f56c154267824f6f02e58ef5ff20e7d3c88caa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_750cbaed",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierDeserializerTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "remove this test",
+      "revId": "50f56c154267824f6f02e58ef5ff20e7d3c88caa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_3567e2b8",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "rename test method",
+      "revId": "50f56c154267824f6f02e58ef5ff20e7d3c88caa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_35fec2ae",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a561d44_3567e2b8",
+      "revId": "50f56c154267824f6f02e58ef5ff20e7d3c88caa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_952eae41",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a561d44_556a5681",
+      "revId": "50f56c154267824f6f02e58ef5ff20e7d3c88caa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_556a5681",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "rename test method",
+      "revId": "50f56c154267824f6f02e58ef5ff20e7d3c88caa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
