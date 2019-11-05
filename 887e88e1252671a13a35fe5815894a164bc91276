@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_c425610b",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_09fca43d",
+      "revId": "887e88e1252671a13a35fe5815894a164bc91276",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_e9004004",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
         "patchSetId": 10
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-29T11:54:51Z",
       "side": 1,
       "message": "Please add a comment here why we are doing this. Also we should add logs, so the user can see that we are adding our models to schema context",
+      "revId": "887e88e1252671a13a35fe5815894a164bc91276",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_a4201df9",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_e9004004",
       "revId": "887e88e1252671a13a35fe5815894a164bc91276",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_042009f6",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_09e5c4a7",
+      "revId": "887e88e1252671a13a35fe5815894a164bc91276",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_647115a8",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
         "patchSetId": 10
@@ -64,6 +118,24 @@
       "writtenOn": "2017-03-29T11:54:51Z",
       "side": 1,
       "message": "You can have just one ModuleInfoBackedContext for all YangModuleInfos you need. Also you can add them all at once with ModuleInfoBackedContext#addModuleInfos method",
+      "revId": "887e88e1252671a13a35fe5815894a164bc91276",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_e41a25c5",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_647115a8",
       "revId": "887e88e1252671a13a35fe5815894a164bc91276",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
