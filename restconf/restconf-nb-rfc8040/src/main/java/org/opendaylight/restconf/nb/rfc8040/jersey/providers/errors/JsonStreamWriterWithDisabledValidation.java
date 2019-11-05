@@ -66,9 +66,4 @@ final class JsonStreamWriterWithDisabledValidation extends StreamWriterWithDisab
     void endNodeWithDisabledValidation() {
         // nope
     }
-
-    @Override
-    public void close() throws IOException {
-        jsonWriter.close();
-    }
 }
