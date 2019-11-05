@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_2f3c5993",
+        "filename": "netconf/netconf-topology/src/main/yang/clustered-netconf-topology.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-19T13:08:16Z",
+      "side": 1,
+      "message": "does it means we\u0027re capable of processing concurrent requests for a same netconf device? at the same time?\n\nI thought I understood differently a while back.",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 13
+      },
+      "revId": "bf087f086d14e86543d6e9aa87b800641bdd1d26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_6f465125",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-19T13:08:16Z",
+      "side": 1,
+      "message": "As fine as this change is, I believe it should have been done in a separated patch.\n\nAlso, maybe the comment could mentioned the reason for the method to be recursive.",
+      "range": {
+        "startLine": 375,
+        "startChar": 24,
+        "endLine": 375,
+        "endChar": 33
+      },
+      "revId": "bf087f086d14e86543d6e9aa87b800641bdd1d26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_ef51c1d9",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-19T13:08:16Z",
+      "side": 1,
+      "message": "I think this should be done in the NetconfConnectorModule, along with all the other Preconditions.",
+      "range": {
+        "startLine": 87,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 5
+      },
+      "revId": "bf087f086d14e86543d6e9aa87b800641bdd1d26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_ef68a189",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicator.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-19T13:08:16Z",
+      "side": 1,
+      "message": "shouldn\u0027t it be a NetconfDocumentedException or some Exception of the sort?\n\nIn the log and in the trowable, it could be nice to have the NetconfId and the rpcMessageLimit.",
+      "range": {
+        "startLine": 321,
+        "startChar": 53,
+        "endLine": 321,
+        "endChar": 62
+      },
+      "revId": "bf087f086d14e86543d6e9aa87b800641bdd1d26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_6f1491f5",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/listener/NetconfDeviceCommunicatorTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-19T13:08:16Z",
+      "side": 1,
+      "message": "I think you shouldn\u0027t use a capital letter for the first character",
+      "range": {
+        "startLine": 104,
+        "startChar": 107,
+        "endLine": 104,
+        "endChar": 108
+      },
+      "revId": "bf087f086d14e86543d6e9aa87b800641bdd1d26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_4f2c2d4b",
+        "filename": "netconf/tools/netconf-cli/src/main/java/org/opendaylight/netconf/cli/NetconfDeviceConnectionManager.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-19T13:08:16Z",
+      "side": 1,
+      "message": "is it fine using hard-coded value here? Maybe at least it could be defined in a constant",
+      "range": {
+        "startLine": 88,
+        "startChar": 66,
+        "endLine": 88,
+        "endChar": 69
+      },
+      "revId": "bf087f086d14e86543d6e9aa87b800641bdd1d26",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
