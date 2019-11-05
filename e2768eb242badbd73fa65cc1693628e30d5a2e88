@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_fc7325af",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/PATCHEditOperation.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-04-28T11:30:39Z",
+      "side": 1,
+      "message": "see merged code\nBrokerFacade.java, lines 170 - 195",
+      "parentUuid": "fa57193c_bc79ad95",
+      "range": {
+        "startLine": 20,
+        "startChar": 13,
+        "endLine": 20,
+        "endChar": 21
+      },
+      "revId": "e2768eb242badbd73fa65cc1693628e30d5a2e88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_8b1a996c",
         "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/PATCHEditOperation.java",
         "patchSetId": 9
