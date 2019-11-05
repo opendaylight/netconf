@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_3de7f8ad",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/handlers/SchemaContextHandler.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_bd4c88c9",
+      "revId": "b1a477511b2b464b37ba10eaf93fa26818aa8783",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_9d49c4b9",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/handlers/SchemaContextHandler.java",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2017-02-21T13:03:32Z",
       "side": 1,
       "message": "cluster",
+      "revId": "b1a477511b2b464b37ba10eaf93fa26818aa8783",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_1decb48e",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/handlers/SchemaContextHandler.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_9d49c4b9",
       "revId": "b1a477511b2b464b37ba10eaf93fa26818aa8783",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
