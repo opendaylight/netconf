@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_e5b88e2c",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/NetconfTopologyContext.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2017-03-21T15:51:22Z",
+      "side": 1,
+      "message": "Do we want to set this to null after stopping?",
+      "range": {
+        "startLine": 168,
+        "startChar": 12,
+        "endLine": 168,
+        "endChar": 33
+      },
+      "revId": "5118ef40f4ac4cf64a2613c3b01cb90752b72071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_c5b58a32",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceSalProvider.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2017-03-21T15:51:22Z",
+      "side": 1,
+      "message": "Do we want to set this to null after closing?",
+      "range": {
+        "startLine": 118,
+        "startChar": 12,
+        "endLine": 118,
+        "endChar": 19
+      },
+      "revId": "5118ef40f4ac4cf64a2613c3b01cb90752b72071",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
