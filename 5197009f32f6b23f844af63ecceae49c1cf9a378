@@ -20,6 +20,57 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_3f01606a",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/PatchDataTransactionUtilTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "this is also constant",
+      "revId": "5197009f32f6b23f844af63ecceae49c1cf9a378",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_7f3d982a",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/PatchDataTransactionUtilTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "you dont need this, see global schema",
+      "revId": "5197009f32f6b23f844af63ecceae49c1cf9a378",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_9ffb5478",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/PatchDataTransactionUtilTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "max 120 chars in one line, everywhere",
+      "revId": "5197009f32f6b23f844af63ecceae49c1cf9a378",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_9250580c",
         "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/PatchDataTransactionUtilTest.java",
         "patchSetId": 5
@@ -32,6 +83,57 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "7a6b29fe_ff1888d4",
+      "revId": "5197009f32f6b23f844af63ecceae49c1cf9a378",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_ff1888d4",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/PatchDataTransactionUtilTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "prepare condition before concrete test case,\nthis is difficult to understand",
+      "revId": "5197009f32f6b23f844af63ecceae49c1cf9a378",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_5f0c1c94",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/PatchDataTransactionUtilTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "please, check if merge is called only for lists and not for containers etc. \u003d\u003d\u003e check methods invoked on transaction",
+      "revId": "5197009f32f6b23f844af63ecceae49c1cf9a378",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3f0fa089",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/PatchDataTransactionUtilTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "try to add some negative test, too",
       "revId": "5197009f32f6b23f844af63ecceae49c1cf9a378",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
