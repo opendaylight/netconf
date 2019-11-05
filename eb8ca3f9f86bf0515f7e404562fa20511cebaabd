@@ -16,6 +16,24 @@
       "revId": "eb8ca3f9f86bf0515f7e404562fa20511cebaabd",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_3a828894",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/StringModuleInstanceIdentifierCodec.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "fixed, now its final class",
+      "parentUuid": "fa57193c_3a78c8f1",
+      "revId": "eb8ca3f9f86bf0515f7e404562fa20511cebaabd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
