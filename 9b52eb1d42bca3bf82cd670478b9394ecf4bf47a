@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_91e4cdac",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-11T12:44:54Z",
+      "side": 1,
+      "message": "Also a minor issue but worth mentioning. Commit messages should be written in present simple tense. Think of it more in terms of what the patch will do when it\u0027s applied instead of what you have done in the patch.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 25
+      },
+      "revId": "9b52eb1d42bca3bf82cd670478b9394ecf4bf47a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_b166314f",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-11T12:43:00Z",
+      "side": 1,
+      "message": "brace style again..",
+      "range": {
+        "startLine": 112,
+        "startChar": 60,
+        "endLine": 113,
+        "endChar": 5
+      },
+      "revId": "9b52eb1d42bca3bf82cd670478b9394ecf4bf47a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
