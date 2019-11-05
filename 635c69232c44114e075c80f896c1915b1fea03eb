@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_a51cf614",
+        "filename": "netconf/mdsal-netconf-connector/src/main/java/org/opendaylight/netconf/mdsal/connector/ops/get/FilterContentValidator.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-04-03T07:08:33Z",
+      "side": 1,
+      "message": "This parameter isn\u0027t request document but operation result, which is empty document at this place, as filter validation is executed before actual read and reply creation. Maybe something like filterContent.getDomElement().getOwnerDocument() could work.",
+      "range": {
+        "startLine": 212,
+        "startChar": 93,
+        "endLine": 212,
+        "endChar": 96
+      },
+      "revId": "635c69232c44114e075c80f896c1915b1fea03eb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
