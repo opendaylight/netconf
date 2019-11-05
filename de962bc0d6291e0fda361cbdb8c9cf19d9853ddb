@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "fa57193c_1d69c18b",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/NetconfMessageTransformer.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-25T08:17:24Z",
+      "side": 1,
+      "message": "You can use Collections.max() method",
+      "range": {
+        "startLine": 179,
+        "startChar": 8,
+        "endLine": 187,
+        "endChar": 26
+      },
+      "revId": "de962bc0d6291e0fda361cbdb8c9cf19d9853ddb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_92cc9b37",
         "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
         "patchSetId": 6
@@ -18,6 +41,52 @@
         "startChar": 64,
         "endLine": 335,
         "endChar": 126
+      },
+      "revId": "de962bc0d6291e0fda361cbdb8c9cf19d9853ddb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_fd716d78",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDeviceTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-25T08:17:24Z",
+      "side": 1,
+      "message": "formatting",
+      "range": {
+        "startLine": 208,
+        "startChar": 101,
+        "endLine": 208,
+        "endChar": 117
+      },
+      "revId": "de962bc0d6291e0fda361cbdb8c9cf19d9853ddb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_bd5895fb",
+        "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/NetconfToNotificationTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2016-04-25T08:17:24Z",
+      "side": 1,
+      "message": "formatting",
+      "range": {
+        "startLine": 59,
+        "startChar": 8,
+        "endLine": 65,
+        "endChar": 9
       },
       "revId": "de962bc0d6291e0fda361cbdb8c9cf19d9853ddb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
