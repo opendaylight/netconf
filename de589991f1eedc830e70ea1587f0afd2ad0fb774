@@ -45,6 +45,29 @@
       "revId": "de589991f1eedc830e70ea1587f0afd2ad0fb774",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_7afb1179",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 457,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-03-02T08:38:17Z",
+      "side": 1,
+      "message": "This isn\u0027t correct. urn:ietf:params:netconf:capability:notification:1.0 determines whether device supports notifications.",
+      "range": {
+        "startLine": 457,
+        "startChar": 41,
+        "endLine": 457,
+        "endChar": 120
+      },
+      "revId": "de589991f1eedc830e70ea1587f0afd2ad0fb774",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
