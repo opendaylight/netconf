@@ -1,0 +1,28 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_a94de5c6",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/PostDataTransactionUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_a91fa5b6",
+      "range": {
+        "startLine": 103,
+        "startChar": 19,
+        "endLine": 117,
+        "endChar": 63
+      },
+      "revId": "039e73b4162df0912d7c6eaeb4773a0db8a72e61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
