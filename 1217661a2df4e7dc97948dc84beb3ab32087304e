@@ -1,0 +1,28 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_7fb7d586",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfStreamsServiceTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Ok, it will be catched in try-catch and error type, error tag and error status code will be verified",
+      "parentUuid": "fa57193c_599671f1",
+      "range": {
+        "startLine": 91,
+        "startChar": 10,
+        "endLine": 91,
+        "endChar": 54
+      },
+      "revId": "1217661a2df4e7dc97948dc84beb3ab32087304e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
