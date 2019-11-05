@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba068154_79fe3b6d",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/LibraryModulesSchemas.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-05-02T06:36:53Z",
+      "side": 1,
+      "message": "You should create docBuilder via UntrustedXML.newDocumentBuilder().",
+      "range": {
+        "startLine": 329,
+        "startChar": 47,
+        "endLine": 329,
+        "endChar": 79
+      },
+      "revId": "e6b30f4a749d701f87f7083257d2fae9a5394b34",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
