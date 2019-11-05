@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_2a872763",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/DeleteDataTransactionUtil.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-08-01T14:59:20Z",
+      "side": 1,
+      "message": "pass type of operation for util method - see previous patch comments",
+      "range": {
+        "startLine": 54,
+        "startChar": 24,
+        "endLine": 54,
+        "endChar": 38
+      },
+      "revId": "4533b584189b1fc2b34c7471717aacbd07db0ef5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_6a811f4a",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/PostDataTransactionUtil.java",
+        "patchSetId": 18
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-08-01T14:59:59Z",
+      "side": 1,
+      "message": "pass type of operation",
+      "range": {
+        "startLine": 139,
+        "startChar": 24,
+        "endLine": 139,
+        "endChar": 46
+      },
+      "revId": "4533b584189b1fc2b34c7471717aacbd07db0ef5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
