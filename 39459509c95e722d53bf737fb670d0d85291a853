@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a494da4_3a792894",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-04-25T13:13:27Z",
+      "side": 1,
+      "message": "Iterator instead of passing a list and tracking a class field id seems better to me",
+      "range": {
+        "startLine": 360,
+        "startChar": 4,
+        "endLine": 383,
+        "endChar": 5
+      },
+      "revId": "39459509c95e722d53bf737fb670d0d85291a853",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
