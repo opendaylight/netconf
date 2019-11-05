@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_c15a2a29",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/PatchDataTransactionUtilTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Missing copyright",
+      "revId": "5af06635a2f8335db6dd46c955e825a93b5b7519",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
