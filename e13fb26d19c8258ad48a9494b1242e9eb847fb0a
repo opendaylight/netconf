@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_b721dfb6",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-04-20T09:07:39Z",
+      "side": 1,
+      "message": "remove",
+      "revId": "e13fb26d19c8258ad48a9494b1242e9eb847fb0a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_172feba2",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-04-20T09:07:39Z",
+      "side": 1,
+      "message": "do we really need to do this context initializing?\nWouldn\u0027t just the LoggerFactory.getLogger(\"results\") below be enough?",
+      "range": {
+        "startLine": 138,
+        "startChar": 8,
+        "endLine": 150,
+        "endChar": 9
+      },
+      "revId": "e13fb26d19c8258ad48a9494b1242e9eb847fb0a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_973bfbea",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/ScaleUtil.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-04-20T09:07:39Z",
+      "side": 1,
+      "message": "formatting",
+      "range": {
+        "startLine": 142,
+        "startChar": 7,
+        "endLine": 150,
+        "endChar": 9
+      },
+      "revId": "e13fb26d19c8258ad48a9494b1242e9eb847fb0a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
