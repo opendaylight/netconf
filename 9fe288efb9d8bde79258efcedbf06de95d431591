@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a42497e_e44a8eab",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-17T10:27:50Z",
+      "side": 1,
+      "message": "remove this, first line needs to say something more than clean up, i.e Add PasswordCredentialAuth interface",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 8
+      },
+      "revId": "9fe288efb9d8bde79258efcedbf06de95d431591",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a42497e_84d10ad0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-17T10:27:50Z",
+      "side": 1,
+      "message": "Line length.\n\nAlso you dont need to list all the changes you did in a class just the generic overview of what this acomplishes.\nFor example with the above comment as the first line something like:\n\"Prevents warnings during compilation since CredentialAuth is generic.\"\nshould be enough.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 46
+      },
+      "revId": "9fe288efb9d8bde79258efcedbf06de95d431591",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
