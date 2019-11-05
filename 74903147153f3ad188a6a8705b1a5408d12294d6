@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a3d3df0_b51e3d5d",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-04T13:16:13Z",
+      "side": 1,
+      "message": "This needs to be a file without a default value. During validation you will load the default template you have in resources if there\u0027s no edit-content present. You can then load the string from the file into a string you would actually use in the actual generation of the payloads.",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 30
+      },
+      "revId": "74903147153f3ad188a6a8705b1a5408d12294d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_f53ba5ce",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-04T13:16:13Z",
+      "side": 1,
+      "message": "This needs a better description. Needs to say what actually happens when this argument is present.",
+      "range": {
+        "startLine": 131,
+        "startChar": 22,
+        "endLine": 131,
+        "endChar": 98
+      },
+      "revId": "74903147153f3ad188a6a8705b1a5408d12294d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_952339a6",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-04T13:16:13Z",
+      "side": 1,
+      "message": "This bit doesn\u0027t make sense, if you are actually providing a name then you cannot get this File as a resource as it isn\u0027t included in the jar. You should change this whole section as described above.",
+      "range": {
+        "startLine": 231,
+        "startChar": 8,
+        "endLine": 234,
+        "endChar": 9
+      },
+      "revId": "74903147153f3ad188a6a8705b1a5408d12294d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_5a09cc2a",
+        "filename": "netconf/tools/netconf-testtool/src/main/resources/config-template.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-07T09:29:50Z",
+      "side": 1,
+      "message": "this also should be inline with the existing config tempalate so it should be {PORT}-sim-device",
+      "range": {
+        "startLine": 2,
+        "startChar": 13,
+        "endLine": 2,
+        "endChar": 29
+      },
+      "revId": "74903147153f3ad188a6a8705b1a5408d12294d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a3d3df0_a6b8cb11",
+        "filename": "netconf/tools/netconf-testtool/src/main/resources/config-template.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-04T13:16:13Z",
+      "side": 1,
+      "message": "still have whitespace here",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 0
+      },
+      "revId": "74903147153f3ad188a6a8705b1a5408d12294d6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
