@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_b6aa8982",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDevice.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-08T17:51:41Z",
+      "side": 1,
+      "message": "I think we have to check here each capability independently.\n\nThat is, we check if device supports ietf-netconf-notifications model. If not we can add it to schema context.\n\nSimilarly for other two models.\n\nIn that way we can always favor device provided models over our models.",
+      "revId": "84e34573ac452b10d250ad6c65be5b014f52c51e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
