@@ -1,0 +1,51 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_bc79ad95",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/PATCHEditOperation.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2016-04-28T11:20:51Z",
+      "side": 1,
+      "message": "Looking at https://tools.ietf.org/html/draft-ietf-netconf-yang-patch-08#section-2.5\nthe behavior of delete and remove differs on whether attempt to delete non-existing data resource leads to an error or not.\nIs that honored by this implementation? If not, is the difference documented somewhere?",
+      "range": {
+        "startLine": 20,
+        "startChar": 13,
+        "endLine": 20,
+        "endChar": 21
+      },
+      "revId": "e2768eb242badbd73fa65cc1693628e30d5a2e88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_8b1a996c",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/PATCHEditOperation.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2016-05-02T10:28:39Z",
+      "side": 1,
+      "message": "I see, so \"delete\" here probably means \"deleteDataWithinTransaction\" is used there.\nBy the way, INSERT, MOVE and MERGE do not seem to be implemented there.",
+      "parentUuid": "fa57193c_fc7325af",
+      "range": {
+        "startLine": 20,
+        "startChar": 13,
+        "endLine": 20,
+        "endChar": 21
+      },
+      "revId": "e2768eb242badbd73fa65cc1693628e30d5a2e88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
