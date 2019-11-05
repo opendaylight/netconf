@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_44401c07",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/handlers/SchemaContextHandler.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2017-02-22T17:11:18Z",
+      "side": 1,
+      "message": "Turns out ignoring one failed transaction (for line 64) is not enough, because the following transaction (for line 69) is allocated on the same transaction chain, and that chain is failed, so we get ISE from line 83 (because DOMBrokerTransactionChain.java:73).\n\nIs there a good way to un-fail the transaction chain here? We probably need to create new transaction chain (hopefully rebased on what the other member has written), but transactionChainHandler does not store information on how to properly create the next transaction chain.",
+      "range": {
+        "startLine": 87,
+        "startChar": 18,
+        "endLine": 87,
+        "endChar": 24
+      },
+      "revId": "e95dcf13b6b1c442ef9a0fa69533cb2ee6eed38c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
