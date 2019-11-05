@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a42497e_c453126b",
+        "filename": "netconf/tools/netconf-testtool/src/main/resources/config-template.xml",
+        "patchSetId": 8
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-17T10:22:54Z",
+      "side": 1,
+      "message": "Seems to work fine for ssh but with tcp devices you are not overriding this value in the template so we get incorrect configuration. Change this so this corresponds to the value --ssh argument has.",
+      "range": {
+        "startLine": 7,
+        "startChar": 61,
+        "endLine": 7,
+        "endChar": 66
+      },
+      "revId": "e92b360e38a873211b4128bda09c288f2bc6c5ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
