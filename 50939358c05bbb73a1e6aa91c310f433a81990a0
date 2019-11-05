@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_a7ae1c7f",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "That is true but also you will see the warning. In catch it will call the HandlePotentialLeapSecond method which will call RFC3339_DATE_PARSER with same time -1 second with miliseconds. So if time is 23:59:60.4587, it will call the RFC3339_DATE_PARSER with time 23:59:59.4587 and than it will handel the rounding with the warrning. The warrning can also be seen in test.",
+      "parentUuid": "fafc7978_8744b81b",
+      "revId": "50939358c05bbb73a1e6aa91c310f433a81990a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_27534ce3",
         "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
         "patchSetId": 13
@@ -72,6 +90,42 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_59027bb4",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "You are right ZonedDateTime.parse() will do the thing just right and no ZonedDateTime.ofInstant is needed later. Also parseUnresolved is not needed. Done.",
+      "parentUuid": "fafc7978_65cd1766",
+      "revId": "50939358c05bbb73a1e6aa91c310f433a81990a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_473810ef",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Because in LocalDateTime we don`t have needed zoneOffset.",
+      "parentUuid": "fafc7978_27534ce3",
+      "revId": "50939358c05bbb73a1e6aa91c310f433a81990a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_276a2c81",
         "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
         "patchSetId": 13
@@ -101,6 +155,42 @@
       "side": 1,
       "message": "Yeah I know, I meant, that you can add a short comment, that will clarify it a little bit",
       "parentUuid": "fafc7978_c7008036",
+      "revId": "50939358c05bbb73a1e6aa91c310f433a81990a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_c7008036",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "It will create a string from the value that was cut. Few examples -\u003e\n1.123456 -\u003e Value that was cut 456\n1.123005 -\u003e Value that was cut 005\n1.123075 -\u003e Value that was cut 075\n1.123750 -\u003e Value that was cut 75\n1.123800 -\u003e Value that was cut 8",
+      "parentUuid": "fafc7978_276a2c81",
+      "revId": "50939358c05bbb73a1e6aa91c310f433a81990a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_39fdf7b1",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_a5c37f36",
       "revId": "50939358c05bbb73a1e6aa91c310f433a81990a0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
