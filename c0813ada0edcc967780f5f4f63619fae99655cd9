@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a4c51b2_223c6a93",
+        "filename": "netconf/abstract-topology/src/main/java/org/opendaylight/netconf/topology/util/BaseTopologyManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-29T11:35:24Z",
+      "side": 1,
+      "message": "unless needed otherwise all these pathCreator instantiations should be final",
+      "revId": "c0813ada0edcc967780f5f4f63619fae99655cd9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_4237f6b0",
+        "filename": "netconf/netconf-util/src/main/java/org/opendaylight/netconf/util/NetconfTopologyPathCreator.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-03-29T11:35:24Z",
+      "side": 1,
+      "message": "when doing constants the convention is to split the individual words with _, this is really hard to read",
+      "range": {
+        "startLine": 13,
+        "startChar": 31,
+        "endLine": 13,
+        "endChar": 61
+      },
+      "revId": "c0813ada0edcc967780f5f4f63619fae99655cd9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
