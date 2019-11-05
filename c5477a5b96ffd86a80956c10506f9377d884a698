@@ -1,0 +1,51 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_25399241",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/handlers/SchemaContextHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2017-02-23T12:26:20Z",
+      "side": 1,
+      "message": "This resets RestConnectorProvider.transactionChainHandler, but line 80 is using this.transactionChainHandler.\nI think we should make sure (in line 50) the two handler references are identical.",
+      "range": {
+        "startLine": 99,
+        "startChar": 12,
+        "endLine": 99,
+        "endChar": 67
+      },
+      "revId": "c5477a5b96ffd86a80956c10506f9377d884a698",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_6bc9a8ab",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/handlers/SchemaContextHandler.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2017-02-24T09:14:34Z",
+      "side": 1,
+      "message": "So it would be possible to use RestconnectorProvider.transactionChainHandler in line 80 and add TODOs to remove this.transactionChainHandler altogether in next API change?\nOr even better, give TransactionChainHandler ability to reset its transaction chain.\n\nI guess it is up to committers to decide how strictly should the code follow the dependency injection pattern.",
+      "parentUuid": "fafc7978_5002936f",
+      "range": {
+        "startLine": 99,
+        "startChar": 12,
+        "endLine": 99,
+        "endChar": 67
+      },
+      "revId": "c5477a5b96ffd86a80956c10506f9377d884a698",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
