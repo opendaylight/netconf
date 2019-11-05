@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_30cd6686",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/impl/tx/ProxyReadWriteTransaction.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-04-26T16:37:49Z",
+      "side": 1,
+      "message": "You should use consistent naming for these in all classes. Stick to delegate or adapter.",
+      "range": {
+        "startLine": 33,
+        "startChar": 4,
+        "endLine": 34,
+        "endChar": 54
+      },
+      "revId": "20e8a56ec84bf1ee24f7e4a575ef5002b63bed54",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_d08a1a1a",
+        "filename": "netconf/netconf-topology-singleton/src/main/java/org/opendaylight/netconf/topology/singleton/messages/transactions/NewReadWriteTransactionReply.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5460
+      },
+      "writtenOn": "2017-04-26T16:37:49Z",
+      "side": 1,
+      "message": "implements Serializable",
+      "range": {
+        "startLine": 13,
+        "startChar": 13,
+        "endLine": 13,
+        "endChar": 41
+      },
+      "revId": "20e8a56ec84bf1ee24f7e4a575ef5002b63bed54",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
