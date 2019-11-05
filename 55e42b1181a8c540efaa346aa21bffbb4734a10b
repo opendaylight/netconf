@@ -1,0 +1,120 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_afd98985",
+        "filename": "netconf/netconf-client/src/test/java/org/opendaylight/netconf/client/NetconfClientSessionNegotiatorTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-19T12:55:59Z",
+      "side": 1,
+      "message": "feels weird to have capital letter for function name, is that a common practice for some case?",
+      "range": {
+        "startLine": 141,
+        "startChar": 32,
+        "endLine": 141,
+        "endChar": 33
+      },
+      "revId": "55e42b1181a8c540efaa346aa21bffbb4734a10b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_6ff811e6",
+        "filename": "netconf/netconf-client/src/test/java/org/opendaylight/netconf/client/NetconfClientSessionNegotiatorTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-19T12:55:59Z",
+      "side": 1,
+      "message": "you could use the function you defined above instead of redoing it hear",
+      "range": {
+        "startLine": 149,
+        "startChar": 8,
+        "endLine": 151,
+        "endChar": 65
+      },
+      "revId": "55e42b1181a8c540efaa346aa21bffbb4734a10b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_4fd0ad53",
+        "filename": "netconf/netconf-client/src/test/java/org/opendaylight/netconf/client/NetconfClientSessionNegotiatorTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-19T12:55:59Z",
+      "side": 1,
+      "message": "the numbering is a bit confusing, cachedS1 for helloMessage2 and cacheds2 for helloMessage1\n\nIt is fine but a bit confusing. \n\nAlso a comment message saying that helloMessage2 and helloMessage3 are the same but with capabilities in a different order could help.",
+      "range": {
+        "startLine": 210,
+        "startChar": 27,
+        "endLine": 212,
+        "endChar": 34
+      },
+      "revId": "55e42b1181a8c540efaa346aa21bffbb4734a10b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_2fd57943",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-19T12:55:59Z",
+      "side": 1,
+      "message": "why using the negation here?",
+      "range": {
+        "startLine": 309,
+        "startChar": 125,
+        "endLine": 309,
+        "endChar": 129
+      },
+      "revId": "55e42b1181a8c540efaa346aa21bffbb4734a10b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_0f1a3517",
+        "filename": "netconf/tools/netconf-testtool/src/main/java/org/opendaylight/netconf/test/tool/TesttoolParameters.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-19T13:10:26Z",
+      "side": 1,
+      "message": "I believe you\u0027ve done this change in a separated patch: https://git.opendaylight.org/gerrit/#/c/37810/",
+      "parentUuid": "fa57193c_2fd57943",
+      "range": {
+        "startLine": 309,
+        "startChar": 125,
+        "endLine": 309,
+        "endChar": 129
+      },
+      "revId": "55e42b1181a8c540efaa346aa21bffbb4734a10b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
