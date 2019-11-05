@@ -1,0 +1,76 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_76359045",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_5687b40f",
+      "range": {
+        "startLine": 236,
+        "startChar": 12,
+        "endLine": 237,
+        "endChar": 92
+      },
+      "revId": "16ea2079e26d15fc55e1d410e027744dd7de1978",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_f6f1a096",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_f6ac008f",
+      "range": {
+        "startLine": 249,
+        "startChar": 44,
+        "endLine": 249,
+        "endChar": 53
+      },
+      "revId": "16ea2079e26d15fc55e1d410e027744dd7de1978",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_16309c55",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7a6b29fe_569e9457",
+      "range": {
+        "startLine": 250,
+        "startChar": 16,
+        "endLine": 251,
+        "endChar": 106
+      },
+      "revId": "16ea2079e26d15fc55e1d410e027744dd7de1978",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
