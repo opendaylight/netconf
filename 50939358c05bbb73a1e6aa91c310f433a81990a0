@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_25994f6e",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-06T23:09:59Z",
+      "side": 1,
+      "message": "Yeah, sorry, I have missed that.",
+      "parentUuid": "fafc7978_a7ae1c7f",
+      "revId": "50939358c05bbb73a1e6aa91c310f433a81990a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_27534ce3",
         "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
         "patchSetId": 13
@@ -30,6 +48,24 @@
       "writtenOn": "2017-02-27T08:31:18Z",
       "side": 1,
       "message": "Why do we need parseUnresolved method and not just already parsed localDateTime?",
+      "revId": "50939358c05bbb73a1e6aa91c310f433a81990a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_65cd1766",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-06T23:09:59Z",
+      "side": 1,
+      "message": "Cannot we change that LocalDateTime to ZonedOffsetTime then?\n\nAlso I think you don\u0027t need parseUnresolved method here, just parse should be fine",
+      "parentUuid": "fafc7978_473810ef",
       "revId": "50939358c05bbb73a1e6aa91c310f433a81990a0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
