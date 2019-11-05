@@ -120,6 +120,29 @@
     },
     {
       "key": {
+        "uuid": "9a561d44_8f5a694e",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 912,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "checkedGet() would be better probably.",
+      "range": {
+        "startLine": 912,
+        "startChar": 79,
+        "endLine": 912,
+        "endChar": 84
+      },
+      "revId": "c6d73049ced70ff718d8d5846e93b7200fd571a5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a561d44_0a9ac713",
         "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
         "patchSetId": 17
@@ -132,6 +155,29 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "9a561d44_ef59655b",
+      "range": {
+        "startLine": 914,
+        "startChar": 67,
+        "endLine": 914,
+        "endChar": 72
+      },
+      "revId": "c6d73049ced70ff718d8d5846e93b7200fd571a5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_ef59655b",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 914,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Same as above.",
       "range": {
         "startLine": 914,
         "startChar": 67,
