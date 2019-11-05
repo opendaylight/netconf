@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_8744b81b",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-02-27T08:31:18Z",
+      "side": 1,
+      "message": "In case of leap second, this statement will throw DateTimeParseException, so you will not see this warning about rounding to milliseconds",
+      "revId": "50939358c05bbb73a1e6aa91c310f433a81990a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_27534ce3",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-02-27T08:31:18Z",
+      "side": 1,
+      "message": "Why do we need parseUnresolved method and not just already parsed localDateTime?",
+      "revId": "50939358c05bbb73a1e6aa91c310f433a81990a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_276a2c81",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-02-27T08:31:18Z",
+      "side": 1,
+      "message": "Can you please explain following logic in more detail?",
+      "revId": "50939358c05bbb73a1e6aa91c310f433a81990a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_a5c37f36",
+        "filename": "netconf/netconf-notifications-api/src/main/java/org/opendaylight/netconf/notifications/NetconfNotification.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-06T23:09:59Z",
+      "side": 1,
+      "message": "Yeah I know, I meant, that you can add a short comment, that will clarify it a little bit",
+      "parentUuid": "fafc7978_c7008036",
+      "revId": "50939358c05bbb73a1e6aa91c310f433a81990a0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
