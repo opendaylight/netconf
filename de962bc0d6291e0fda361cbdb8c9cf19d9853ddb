@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_b04eecbf",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/util/NetconfMessageTransformUtil.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2019-11-05T22:01:08Z",
+      "side": 1,
+      "message": "Of course I can add it there. :)",
+      "parentUuid": "fa57193c_92cc9b37",
+      "range": {
+        "startLine": 335,
+        "startChar": 64,
+        "endLine": 335,
+        "endChar": 126
+      },
+      "revId": "de962bc0d6291e0fda361cbdb8c9cf19d9853ddb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_fd716d78",
         "filename": "netconf/sal-netconf-connector/src/test/java/org/opendaylight/netconf/sal/connect/netconf/NetconfDeviceTest.java",
         "patchSetId": 6
