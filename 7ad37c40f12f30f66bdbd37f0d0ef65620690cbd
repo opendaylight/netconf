@@ -1,0 +1,393 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a4c51b2_59eec48c",
+        "filename": "netconf/netconf-console/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "Please remove if you\u0027re not doing any unit tests",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 17
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_39f3f874",
+        "filename": "netconf/netconf-console/src/main/config/maven-metadata-local.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "please remove this file, and/or udpate the .gitignore",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 11
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_999fac03",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfConnectDeviceCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "final (apply in other classes)",
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_79a46057",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfConnectDeviceCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "final (apply in other classes)",
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_599524e3",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfConnectDeviceCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "maybe some sanity check on the given values to make sure they are fine. Something like Preconditions.checkNotNull and/or even better something that\u0027s validate the IP address\n\nsame goes for all commands",
+      "range": {
+        "startLine": 61,
+        "startChar": 21,
+        "endLine": 61,
+        "endChar": 30
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_399ad814",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfConnectDeviceCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "refer to the logs if failed (check logs) or something lke that.\n\nsame goes for all commands",
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_19939cfb",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfListDevicesCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "@NonNull final",
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_59bc046d",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfListDevicesCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "final",
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_f98fd0ca",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfListDevicesCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "store this in a var within the loop instead of getting each each time",
+      "range": {
+        "startLine": 47,
+        "startChar": 38,
+        "endLine": 47,
+        "endChar": 61
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_99b68c89",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "final",
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_d9af742a",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "final",
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_19aa7c19",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "final",
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_396818f5",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "!Strings.isNullOrEmpty(availableCapability) instead of availableCapability !\u003d null \u0026\u0026 availableCapability !\u003d \"\"",
+      "range": {
+        "startLine": 78,
+        "startChar": 16,
+        "endLine": 78,
+        "endChar": 72
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_394f7894",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/impl/NetconfConsoleProviderImpl.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "please split this class into multiple classes holding methods that deal with the same thing",
+      "range": {
+        "startLine": 50,
+        "startChar": 13,
+        "endLine": 50,
+        "endChar": 39
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_d97654d8",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/impl/NetconfConsoleProviderImpl.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "final",
+      "range": {
+        "startLine": 62,
+        "startChar": 4,
+        "endLine": 64,
+        "endChar": 21
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_9944cc75",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "IidFactory make more sense to me",
+      "range": {
+        "startLine": 21,
+        "startChar": 13,
+        "endLine": 21,
+        "endChar": 32
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_7949008b",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "netconfNodeIid",
+      "range": {
+        "startLine": 23,
+        "startChar": 43,
+        "endLine": 23,
+        "endChar": 64
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_b95a684e",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "use getNetconfTopologyIid instead of redefining this here",
+      "range": {
+        "startLine": 24,
+        "startChar": 15,
+        "endLine": 25,
+        "endChar": 109
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_d95db44a",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-03-30T23:27:35Z",
+      "side": 1,
+      "message": "topologyNetconfIid",
+      "range": {
+        "startLine": 30,
+        "startChar": 53,
+        "endLine": 30,
+        "endChar": 74
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
