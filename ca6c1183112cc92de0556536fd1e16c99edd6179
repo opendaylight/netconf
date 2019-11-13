@@ -88,6 +88,54 @@
     },
     {
       "key": {
+        "uuid": "3a4c51b2_ced165cf",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a4c51b2_ee1c2116",
+      "range": {
+        "startLine": 51,
+        "startChar": 20,
+        "endLine": 51,
+        "endChar": 42
+      },
+      "revId": "ca6c1183112cc92de0556536fd1e16c99edd6179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_310028aa",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Actually it is needed here since port is an optional argument and it is allowed to be null. We validate only if someone provided port value.\n\nFor connect/disconnect port is mandatory.",
+      "parentUuid": "3a4c51b2_ee1c2116",
+      "range": {
+        "startLine": 51,
+        "startChar": 20,
+        "endLine": 51,
+        "endChar": 42
+      },
+      "revId": "ca6c1183112cc92de0556536fd1e16c99edd6179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a4c51b2_4e1a7518",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
         "patchSetId": 5
@@ -99,6 +147,30 @@
       "writtenOn": "2016-04-01T12:48:43Z",
       "side": 1,
       "message": "same comment as previous, please log the given port and address",
+      "range": {
+        "startLine": 52,
+        "startChar": 27,
+        "endLine": 52,
+        "endChar": 48
+      },
+      "revId": "ca6c1183112cc92de0556536fd1e16c99edd6179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_aed699c3",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a4c51b2_4e1a7518",
       "range": {
         "startLine": 52,
         "startChar": 27,
@@ -134,6 +206,30 @@
     },
     {
       "key": {
+        "uuid": "3a4c51b2_6ecc9136",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "available capabilities are multi-valued. \nShow device table has 5 columns. Line 70 is how row is added. \n\nFirst row has: data for all the columns, however after first row all other columns except the capabilities column are empty. Thats why 2nd/3rd and so on capabilities are formatted differently. Did not want to explain a lot as its just the way data is formatted to display, thats why put a one line, I can add some more if it is not very clear.",
+      "parentUuid": "3a4c51b2_eee38103",
+      "range": {
+        "startLine": 82,
+        "startChar": 12,
+        "endLine": 82,
+        "endChar": 75
+      },
+      "revId": "ca6c1183112cc92de0556536fd1e16c99edd6179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a4c51b2_2eee09ed",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
         "patchSetId": 5
@@ -145,6 +241,30 @@
       "writtenOn": "2016-04-01T12:48:43Z",
       "side": 1,
       "message": "why not having this class constructor private, having only static method.\nAs it\u0027s a utility class I think it make more sense not to instantiate it.\nFor the DB, just pass it as an argument to the methods that need it.",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 5
+      },
+      "revId": "ca6c1183112cc92de0556536fd1e16c99edd6179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_4e771503",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Yeah i did that way earlier, but i was passing DB to 3 out of 6 methods so made it a class variable instead. I can change it back to make this one a static class.",
+      "parentUuid": "3a4c51b2_2eee09ed",
       "range": {
         "startLine": 40,
         "startChar": 0,
@@ -174,6 +294,24 @@
     },
     {
       "key": {
+        "uuid": "3a4c51b2_8ec75d12",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a4c51b2_8ebabddf",
+      "revId": "ca6c1183112cc92de0556536fd1e16c99edd6179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a4c51b2_ceb4c5f4",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
         "patchSetId": 5
@@ -185,6 +323,30 @@
       "writtenOn": "2016-04-01T12:48:43Z",
       "side": 1,
       "message": "maybe this could be move to its own method, something like isNodePresent() or something alike.\nSo you can reuse it in the method above as well.\n\nif (isNodesPresent()) {\n   // process\n} else {\n   // LOG that no node could have been retrieved\n}",
+      "range": {
+        "startLine": 76,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 9
+      },
+      "revId": "ca6c1183112cc92de0556536fd1e16c99edd6179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_8e60fd36",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a4c51b2_ceb4c5f4",
       "range": {
         "startLine": 76,
         "startChar": 0,
@@ -220,6 +382,30 @@
     },
     {
       "key": {
+        "uuid": "3a4c51b2_6e65b144",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a4c51b2_8e88fd23",
+      "range": {
+        "startLine": 96,
+        "startChar": 26,
+        "endLine": 96,
+        "endChar": 37
+      },
+      "revId": "ca6c1183112cc92de0556536fd1e16c99edd6179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a4c51b2_eeca616d",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
         "patchSetId": 5
@@ -237,6 +423,24 @@
     },
     {
       "key": {
+        "uuid": "3a4c51b2_ae5fb971",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a4c51b2_eeca616d",
+      "revId": "ca6c1183112cc92de0556536fd1e16c99edd6179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a4c51b2_4e9f1560",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
         "patchSetId": 5
@@ -248,6 +452,30 @@
       "writtenOn": "2016-04-01T12:48:43Z",
       "side": 1,
       "message": "why not toNetconfConnectorPayload instead of connectDeviceNetconfPayload",
+      "range": {
+        "startLine": 134,
+        "startChar": 18,
+        "endLine": 134,
+        "endChar": 45
+      },
+      "revId": "ca6c1183112cc92de0556536fd1e16c99edd6179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_ee50a160",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a4c51b2_4e9f1560",
       "range": {
         "startLine": 134,
         "startChar": 18,
@@ -283,6 +511,30 @@
     },
     {
       "key": {
+        "uuid": "3a4c51b2_2e4ba9b1",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "I use it to validate that connect-device was successful by waiting for DEFAULT_TIMEOUT_MILLIS to check if operational datastore has the device.",
+      "parentUuid": "3a4c51b2_0ea34d9f",
+      "range": {
+        "startLine": 153,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 5
+      },
+      "revId": "ca6c1183112cc92de0556536fd1e16c99edd6179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a4c51b2_8e8f5d23",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
         "patchSetId": 5
@@ -294,6 +546,30 @@
       "writtenOn": "2016-04-01T12:48:43Z",
       "side": 1,
       "message": "I think we would rather like asynchronous transaction, e.g. not blocking transaction. Doing so will require the transaction to be execute from the method that needs it, and using Futures.addCallback() you can add a callback to react on the completeness of the transaction. Either it succeed, so you can do your thing, either it fails, log the failure.\n\nHere is an example: https://github.com/opendaylight/netconf/blob/master/netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/sal/NetconfDeviceDatastoreAdapter.java#l115l132",
+      "range": {
+        "startLine": 178,
+        "startChar": 25,
+        "endLine": 178,
+        "endChar": 47
+      },
+      "revId": "ca6c1183112cc92de0556536fd1e16c99edd6179",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_4ee555a7",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "ok i\u0027ll rework the code to make it asynchronous",
+      "parentUuid": "3a4c51b2_8e8f5d23",
       "range": {
         "startLine": 178,
         "startChar": 25,
