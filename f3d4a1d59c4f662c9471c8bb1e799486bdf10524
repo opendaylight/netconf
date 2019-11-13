@@ -22,6 +22,30 @@
       "revId": "f3d4a1d59c4f662c9471c8bb1e799486bdf10524",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_a4dd0d17",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/impl/NetconfConsoleProviderImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "This is very good to know! Thanks Alexis.\nI\u0027ll rework the delete implementation based on this",
+      "parentUuid": "3a4c51b2_6ec80675",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 115,
+        "endChar": 21
+      },
+      "revId": "f3d4a1d59c4f662c9471c8bb1e799486bdf10524",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
