@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_994b052b",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/api/NetconfCommands.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-06T11:21:37Z",
+      "side": 1,
+      "message": "this seems to be copypasted from the above, this one uses device id",
+      "range": {
+        "startLine": 36,
+        "startChar": 38,
+        "endLine": 37,
+        "endChar": 77
+      },
+      "revId": "ec824ade2bca6835573e28b899eb20239e30bf52",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_7948b12d",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/api/NetconfCommands.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-06T11:21:37Z",
+      "side": 1,
+      "message": "disconnect based on id should also be possible",
+      "range": {
+        "startLine": 56,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 65
+      },
+      "revId": "ec824ade2bca6835573e28b899eb20239e30bf52",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_195ff5e6",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/impl/NetconfCommandsImpl.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-06T11:21:37Z",
+      "side": 1,
+      "message": "User should also be able to provide device id in case he doesn\u0027t want randomly generated one.",
+      "range": {
+        "startLine": 127,
+        "startChar": 8,
+        "endLine": 127,
+        "endChar": 82
+      },
+      "revId": "ec824ade2bca6835573e28b899eb20239e30bf52",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
