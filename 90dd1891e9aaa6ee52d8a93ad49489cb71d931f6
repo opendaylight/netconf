@@ -26,6 +26,29 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_052cb846",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfConnectDeviceCommand.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "No need to add these checks since these arguments are already marked as required in the Options annotation so is taken care of by that.. connectype could be optional argument.",
+      "range": {
+        "startLine": 72,
+        "startChar": 7,
+        "endLine": 76,
+        "endChar": 124
+      },
+      "revId": "90dd1891e9aaa6ee52d8a93ad49489cb71d931f6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_2510dc00",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
         "patchSetId": 11
@@ -85,6 +108,29 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "fa57193c_e5d38436",
+      "range": {
+        "startLine": 128,
+        "startChar": 36,
+        "endLine": 128,
+        "endChar": 165
+      },
+      "revId": "90dd1891e9aaa6ee52d8a93ad49489cb71d931f6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_e5d38436",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/impl/NetconfCommandsImpl.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "This will be a problem if the node IP/port is updated in which case the ID will not be unique and re-adding a netconf node with old IP/port will be an issue. Please use UUID for nodeId as done previously: UUID.randomUUID().toString().replace(\"-\", \"\");",
       "range": {
         "startLine": 128,
         "startChar": 36,
