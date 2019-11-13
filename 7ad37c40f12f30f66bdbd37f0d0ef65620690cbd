@@ -128,6 +128,30 @@
     },
     {
       "key": {
+        "uuid": "3a4c51b2_b2b0bdde",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfConnectDeviceCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "checkNotNull is not needed since Option annotation enforces required \u003d true wherever necessary and so its taken take of that way.\n\nYeah I could valildate the IP and port",
+      "parentUuid": "3a4c51b2_599524e3",
+      "range": {
+        "startLine": 61,
+        "startChar": 21,
+        "endLine": 61,
+        "endChar": 30
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a4c51b2_399ad814",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfConnectDeviceCommand.java",
         "patchSetId": 4
@@ -145,6 +169,24 @@
     },
     {
       "key": {
+        "uuid": "3a4c51b2_f2c9a55b",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfConnectDeviceCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a4c51b2_399ad814",
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a4c51b2_d98814c9",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfListDevicesCommand.java",
         "patchSetId": 4
@@ -156,6 +198,30 @@
       "writtenOn": "2016-03-30T23:27:35Z",
       "side": 1,
       "message": "those should be held in a constant class",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 58
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_2dc8d273",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfListDevicesCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a4c51b2_d98814c9",
       "range": {
         "startLine": 21,
         "startChar": 0,
@@ -384,6 +450,30 @@
     },
     {
       "key": {
+        "uuid": "3a4c51b2_0dc5165b",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a4c51b2_396818f5",
+      "range": {
+        "startLine": 78,
+        "startChar": 16,
+        "endLine": 78,
+        "endChar": 72
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a4c51b2_996dec07",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
         "patchSetId": 4
@@ -395,6 +485,30 @@
       "writtenOn": "2016-03-30T23:27:35Z",
       "side": 1,
       "message": "this is not easy to understand.. create a private method that return a boolean with an explicit name, that does this check",
+      "range": {
+        "startLine": 79,
+        "startChar": 23,
+        "endLine": 79,
+        "endChar": 95
+      },
+      "revId": "7ad37c40f12f30f66bdbd37f0d0ef65620690cbd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_6da13aa9",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a4c51b2_996dec07",
       "range": {
         "startLine": 79,
         "startChar": 23,
