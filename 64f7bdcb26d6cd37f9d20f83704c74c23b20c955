@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_b750bf5f",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfCommandUtils.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-04-20T08:37:53Z",
+      "side": 1,
+      "message": "we should be able to keep this a static final constant.",
+      "range": {
+        "startLine": 28,
+        "startChar": 8,
+        "endLine": 32,
+        "endChar": 61
+      },
+      "revId": "64f7bdcb26d6cd37f9d20f83704c74c23b20c955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_97d13bd0",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-04-20T08:37:53Z",
+      "side": 1,
+      "message": "I think we should also be able to do this command with the device Id.",
+      "range": {
+        "startLine": 34,
+        "startChar": 4,
+        "endLine": 46,
+        "endChar": 30
+      },
+      "revId": "64f7bdcb26d6cd37f9d20f83704c74c23b20c955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_f7f8774b",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/impl/NetconfConsoleProviderImpl.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-04-20T08:37:53Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 122,
+        "startChar": 47,
+        "endLine": 122,
+        "endChar": 56
+      },
+      "revId": "64f7bdcb26d6cd37f9d20f83704c74c23b20c955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_5795e3e2",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-04-20T08:37:53Z",
+      "side": 1,
+      "message": "Why use the config subsystem for this? Using topology configuration where you just write into md-sal seems a lot cleaner to me.",
+      "range": {
+        "startLine": 104,
+        "startChar": 4,
+        "endLine": 130,
+        "endChar": 5
+      },
+      "revId": "64f7bdcb26d6cd37f9d20f83704c74c23b20c955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_379aef14",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfIidFactory.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-04-20T08:37:53Z",
+      "side": 1,
+      "message": "You can keep this around as a constant instead of recreating it on each call.",
+      "range": {
+        "startLine": 28,
+        "startChar": 8,
+        "endLine": 30,
+        "endChar": 25
+      },
+      "revId": "64f7bdcb26d6cd37f9d20f83704c74c23b20c955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
