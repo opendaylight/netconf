@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "fa57193c_577963fb",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/api/NetconfConsoleProvider.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-04-20T08:37:53Z",
+      "side": 1,
+      "message": "missing space",
+      "range": {
+        "startLine": 24,
+        "startChar": 54,
+        "endLine": 24,
+        "endChar": 62
+      },
+      "revId": "64f7bdcb26d6cd37f9d20f83704c74c23b20c955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_b750bf5f",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfCommandUtils.java",
         "patchSetId": 10
