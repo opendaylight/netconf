@@ -2,6 +2,30 @@
   "comments": [
     {
       "key": {
+        "uuid": "fa57193c_45e4f00c",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfConnectDeviceCommand.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-29T16:31:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_052cb846",
+      "range": {
+        "startLine": 72,
+        "startChar": 7,
+        "endLine": 76,
+        "endChar": 124
+      },
+      "revId": "90dd1891e9aaa6ee52d8a93ad49489cb71d931f6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_2510dc00",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
         "patchSetId": 11
@@ -18,6 +42,54 @@
         "startChar": 44,
         "endLine": 55,
         "endChar": 46
+      },
+      "revId": "90dd1891e9aaa6ee52d8a93ad49489cb71d931f6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_65e77413",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-29T16:31:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_2510dc00",
+      "range": {
+        "startLine": 55,
+        "startChar": 44,
+        "endLine": 55,
+        "endChar": 46
+      },
+      "revId": "90dd1891e9aaa6ee52d8a93ad49489cb71d931f6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_05e31808",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/impl/NetconfCommandsImpl.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-29T16:31:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_e5d38436",
+      "range": {
+        "startLine": 128,
+        "startChar": 36,
+        "endLine": 128,
+        "endChar": 165
       },
       "revId": "90dd1891e9aaa6ee52d8a93ad49489cb71d931f6",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
