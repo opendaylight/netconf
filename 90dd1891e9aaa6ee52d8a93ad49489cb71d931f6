@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_2510dc00",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-04-29T15:50:49Z",
+      "side": 1,
+      "message": "You can just use || here since \u0026\u0026 would let you through with just ip or port",
+      "range": {
+        "startLine": 55,
+        "startChar": 44,
+        "endLine": 55,
+        "endChar": 46
+      },
+      "revId": "90dd1891e9aaa6ee52d8a93ad49489cb71d931f6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
