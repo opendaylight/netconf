@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_481a5d18",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/api/NetconfConsoleProvider.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_577963fb",
+      "range": {
+        "startLine": 24,
+        "startChar": 54,
+        "endLine": 24,
+        "endChar": 62
+      },
+      "revId": "64f7bdcb26d6cd37f9d20f83704c74c23b20c955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_b750bf5f",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfCommandUtils.java",
         "patchSetId": 10
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_281729ef",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfCommandUtils.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Sure",
+      "parentUuid": "fa57193c_b750bf5f",
+      "range": {
+        "startLine": 28,
+        "startChar": 8,
+        "endLine": 32,
+        "endChar": 61
+      },
+      "revId": "64f7bdcb26d6cd37f9d20f83704c74c23b20c955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_97d13bd0",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
         "patchSetId": 10
@@ -59,6 +107,30 @@
       "writtenOn": "2016-04-20T08:37:53Z",
       "side": 1,
       "message": "I think we should also be able to do this command with the device Id.",
+      "range": {
+        "startLine": 34,
+        "startChar": 4,
+        "endLine": 46,
+        "endChar": 30
+      },
+      "revId": "64f7bdcb26d6cd37f9d20f83704c74c23b20c955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_68d80154",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/commands/NetconfShowDeviceCommand.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Yeah device Id can also be used.. i will make changes accordingly",
+      "parentUuid": "fa57193c_97d13bd0",
       "range": {
         "startLine": 34,
         "startChar": 4,
@@ -117,6 +189,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_08cea583",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfConsoleUtils.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Okay, I was not aware that I could configure netconf-connector via topology .. will change this",
+      "parentUuid": "fa57193c_5795e3e2",
+      "range": {
+        "startLine": 104,
+        "startChar": 4,
+        "endLine": 130,
+        "endChar": 5
+      },
+      "revId": "64f7bdcb26d6cd37f9d20f83704c74c23b20c955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_379aef14",
         "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfIidFactory.java",
         "patchSetId": 10
@@ -128,6 +224,30 @@
       "writtenOn": "2016-04-20T08:37:53Z",
       "side": 1,
       "message": "You can keep this around as a constant instead of recreating it on each call.",
+      "range": {
+        "startLine": 28,
+        "startChar": 8,
+        "endLine": 30,
+        "endChar": 25
+      },
+      "revId": "64f7bdcb26d6cd37f9d20f83704c74c23b20c955",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_e8ca516d",
+        "filename": "netconf/netconf-console/src/main/java/org/opendaylight/netconf/console/utils/NetconfIidFactory.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5153
+      },
+      "writtenOn": "2019-11-13T21:42:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa57193c_379aef14",
       "range": {
         "startLine": 28,
         "startChar": 8,
