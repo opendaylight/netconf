@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_641667f3",
+        "filename": "features/netconf-connector/features-netconf-connector/src/main/features/features.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-20T19:52:47Z",
+      "side": 1,
+      "message": "Maybe we can provide also a karaf4 feature?",
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_c4d2b333",
+        "filename": "netconf/callhome-protocol/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-20T19:52:47Z",
+      "side": 1,
+      "message": "We don\u0027t need config-parent",
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_04dddb42",
+        "filename": "netconf/callhome-provider/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-20T19:52:47Z",
+      "side": 1,
+      "message": "Config parent is not neccessarry",
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_e4e1b7ff",
+        "filename": "restconf/models/ietf-yang-library/src/main/java/org/opendaylight/yang/gen/v1/urn/ietf/params/xml/ns/yang/ietf/yang/library/rev160621/module/list/CommonLeafsRevisionBuilder.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-03-20T19:52:47Z",
+      "side": 1,
+      "message": "Not needed for this patch",
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
