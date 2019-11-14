@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_51778b02",
+        "filename": "features/netconf-connector/features-netconf-connector/src/main/features/features.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-27T13:40:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_641667f3",
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_1a225601",
         "filename": "netconf/callhome-model/pom.xml",
         "patchSetId": 13
@@ -77,6 +95,24 @@
       "writtenOn": "2017-03-20T19:52:47Z",
       "side": 1,
       "message": "We don\u0027t need config-parent",
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_9160d336",
+        "filename": "netconf/callhome-protocol/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-27T13:40:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_c4d2b333",
       "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
@@ -805,6 +841,24 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_1154e352",
+        "filename": "netconf/callhome-provider/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-27T13:40:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_04dddb42",
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_bfb5f932",
         "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeAuthProviderImpl.java",
         "patchSetId": 13
@@ -982,6 +1036,30 @@
       "side": 1,
       "message": "Is this in another patch? I don\u0027t see them being called by anything that\u0027s outside of this package, in this patch that is.",
       "parentUuid": "fafc7978_a69b2971",
+      "range": {
+        "startLine": 29,
+        "startChar": 6,
+        "endLine": 29,
+        "endChar": 33
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_f14e7fc1",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountSessionContext.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-27T13:40:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_2d09d42c",
       "range": {
         "startLine": 29,
         "startChar": 6,
@@ -1182,6 +1260,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_344915b8",
+        "filename": "netconf/callhome-provider/src/test/java/org/opendaylight/netconf/callhome/mount/CallHomeMountDispatcherTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-27T13:40:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_bf5179da",
+      "range": {
+        "startLine": 92,
+        "startChar": 8,
+        "endLine": 92,
+        "endChar": 91
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_9f4ab525",
         "filename": "netconf/callhome-provider/src/test/java/org/opendaylight/netconf/callhome/mount/CallHomeMountDispatcherTest.java",
         "patchSetId": 13
@@ -1205,6 +1307,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_94c72112",
+        "filename": "netconf/callhome-provider/src/test/java/org/opendaylight/netconf/callhome/mount/CallHomeMountDispatcherTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-27T13:40:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_9f4ab525",
+      "range": {
+        "startLine": 111,
+        "startChar": 8,
+        "endLine": 115,
+        "endChar": 95
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_3f2bc931",
         "filename": "netconf/callhome-provider/src/test/java/org/opendaylight/netconf/callhome/mount/CallHomeMountDispatcherTest.java",
         "patchSetId": 13
@@ -1216,6 +1342,30 @@
       "writtenOn": "2017-03-21T13:47:12Z",
       "side": 1,
       "message": "not a fan of this, more meaningful test would be nice",
+      "range": {
+        "startLine": 118,
+        "startChar": 4,
+        "endLine": 121,
+        "endChar": 5
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_74ca7d1b",
+        "filename": "netconf/callhome-provider/src/test/java/org/opendaylight/netconf/callhome/mount/CallHomeMountDispatcherTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-27T13:40:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_3f2bc931",
       "range": {
         "startLine": 118,
         "startChar": 4,
