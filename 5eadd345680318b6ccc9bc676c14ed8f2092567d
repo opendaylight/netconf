@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_dce1e0d1",
+        "filename": "netconf/callhome-model/pom.xml",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T19:54:20Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "5eadd345680318b6ccc9bc676c14ed8f2092567d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
