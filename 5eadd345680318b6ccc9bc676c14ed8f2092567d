@@ -16,6 +16,52 @@
       "revId": "5eadd345680318b6ccc9bc676c14ed8f2092567d",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_d2670724",
+        "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorizationTest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-03-23T10:01:31Z",
+      "side": 1,
+      "message": "i missed the formating in this one.",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 1
+      },
+      "revId": "5eadd345680318b6ccc9bc676c14ed8f2092567d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_b280838c",
+        "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServerTest.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2017-03-23T10:01:31Z",
+      "side": 1,
+      "message": "formating",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 183,
+        "endChar": 1
+      },
+      "revId": "5eadd345680318b6ccc9bc676c14ed8f2092567d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
