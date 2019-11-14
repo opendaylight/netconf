@@ -483,6 +483,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_1ca621ae",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-03-07T17:52:08Z",
+      "side": 1,
+      "message": "Agreed, even without the string it is enough to locate the line from the NPE.",
+      "parentUuid": "fafc7978_6b121663",
+      "range": {
+        "startLine": 54,
+        "startChar": 71,
+        "endLine": 54,
+        "endChar": 86
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_3df06690",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
         "patchSetId": 5
@@ -541,6 +565,30 @@
       "side": 1,
       "message": "Ya, not the best design. However a fix would be to do an *instance of* check and then throw an exception asking for the expected class instead. To me this is a marginal change over the current behavior of throwing a class cast exception.",
       "parentUuid": "fafc7978_1deda2b7",
+      "range": {
+        "startLine": 59,
+        "startChar": 26,
+        "endLine": 59,
+        "endChar": 45
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_5cac298c",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-03-07T17:52:08Z",
+      "side": 1,
+      "message": "This is actually checked in Precondition above, so it\u0027s fine.",
+      "parentUuid": "fafc7978_e61c7b6c",
       "range": {
         "startLine": 59,
         "startChar": 26,
