@@ -42,6 +42,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_86c38589",
+        "filename": "netconf/callhome-model/pom.xml",
+        "patchSetId": 13
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_1a225601",
+      "range": {
+        "startLine": 26,
+        "startChar": 8,
+        "endLine": 37,
+        "endChar": 21
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_c4d2b333",
         "filename": "netconf/callhome-protocol/pom.xml",
         "patchSetId": 13
@@ -82,6 +106,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_66c0217d",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/AuthorizedKeysDecoder.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_9cf7638c",
+      "range": {
+        "startLine": 93,
+        "startChar": 117,
+        "endLine": 94,
+        "endChar": 5
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_7cf43f87",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorization.java",
         "patchSetId": 13
@@ -93,6 +141,30 @@
       "writtenOn": "2017-03-21T13:47:12Z",
       "side": 1,
       "message": "incoming",
+      "range": {
+        "startLine": 21,
+        "startChar": 29,
+        "endLine": 21,
+        "endChar": 38
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_c6bd8d04",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorization.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_7cf43f87",
       "range": {
         "startLine": 21,
         "startChar": 29,
@@ -128,6 +200,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_a6ba0908",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_fc7dcfe8",
+      "range": {
+        "startLine": 88,
+        "startChar": 15,
+        "endLine": 99,
+        "endChar": 9
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_9c6c8338",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
         "patchSetId": 13
@@ -139,6 +235,30 @@
       "writtenOn": "2017-03-21T13:47:12Z",
       "side": 1,
       "message": "why are these 4 methods protected? doesnt seem like they are actually overriden anywhere.",
+      "range": {
+        "startLine": 102,
+        "startChar": 4,
+        "endLine": 102,
+        "endChar": 13
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_063795b1",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_9c6c8338",
       "range": {
         "startLine": 102,
         "startChar": 4,
@@ -174,6 +294,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_e63b719a",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_5c833bcc",
+      "range": {
+        "startLine": 110,
+        "startChar": 16,
+        "endLine": 116,
+        "endChar": 17
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_7c69df24",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
         "patchSetId": 13
@@ -185,6 +329,30 @@
       "writtenOn": "2017-03-21T13:47:12Z",
       "side": 1,
       "message": "package-private",
+      "range": {
+        "startLine": 171,
+        "startChar": 8,
+        "endLine": 171,
+        "endChar": 14
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_26461924",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_7c69df24",
       "range": {
         "startLine": 171,
         "startChar": 8,
@@ -220,6 +388,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_6647811e",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_dc4d6bc6",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 31,
+        "endChar": 6
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_bc4a27aa",
         "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
         "patchSetId": 13
@@ -231,6 +423,30 @@
       "writtenOn": "2017-03-21T13:47:12Z",
       "side": 1,
       "message": "same here",
+      "range": {
+        "startLine": 45,
+        "startChar": 4,
+        "endLine": 45,
+        "endChar": 10
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_c6546dcc",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_bc4a27aa",
       "range": {
         "startLine": 45,
         "startChar": 4,
@@ -266,6 +482,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_065e75e9",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_3ced978c",
+      "range": {
+        "startLine": 108,
+        "startChar": 4,
+        "endLine": 119,
+        "endChar": 5
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_3c72b7e5",
         "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/AuthorizedKeysDecoderTest.java",
         "patchSetId": 13
@@ -277,6 +517,30 @@
       "writtenOn": "2017-03-21T13:47:12Z",
       "side": 1,
       "message": "please use the same bracket formatting as in the rest of the codebase",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 38
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_e66251ac",
+        "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/AuthorizedKeysDecoderTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_3c72b7e5",
       "range": {
         "startLine": 21,
         "startChar": 0,
@@ -312,6 +576,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_2603b974",
+        "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorizationTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_bc7d07b4",
+      "range": {
+        "startLine": 49,
+        "startChar": 4,
+        "endLine": 49,
+        "endChar": 11
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_1c4a5383",
         "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorizationTest.java",
         "patchSetId": 13
@@ -323,6 +611,30 @@
       "writtenOn": "2017-03-21T13:47:12Z",
       "side": 1,
       "message": "same",
+      "range": {
+        "startLine": 65,
+        "startChar": 4,
+        "endLine": 65,
+        "endChar": 11
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_86f7058c",
+        "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorizationTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_1c4a5383",
       "range": {
         "startLine": 65,
         "startChar": 4,
@@ -358,6 +670,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_e609b1de",
+        "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannelTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "(See comment on next test file)",
+      "parentUuid": "fafc7978_dc572b25",
+      "range": {
+        "startLine": 38,
+        "startChar": 4,
+        "endLine": 40,
+        "endChar": 33
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_7c21dfb3",
         "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServerTest.java",
         "patchSetId": 13
@@ -381,6 +717,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_46587dfa",
+        "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServerTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_7c21dfb3",
+      "range": {
+        "startLine": 42,
+        "startChar": 32,
+        "endLine": 42,
+        "endChar": 35
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_5c3b3beb",
         "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServerTest.java",
         "patchSetId": 13
@@ -392,6 +752,30 @@
       "writtenOn": "2017-03-21T13:47:12Z",
       "side": 1,
       "message": "private?",
+      "range": {
+        "startLine": 44,
+        "startChar": 4,
+        "endLine": 51,
+        "endChar": 35
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_8671c579",
+        "filename": "netconf/callhome-protocol/src/test/java/org/opendaylight/netconf/callhome/protocol/NetconfCallHomeServerTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "We never put access specifications on JUnit test classes. I have actually never seen code that does this. The down side is that the code is a bit more noisy plus it might imply to a reader that the test class is meant to be derived from.",
+      "parentUuid": "fafc7978_5c3b3beb",
       "range": {
         "startLine": 44,
         "startChar": 4,
@@ -444,6 +828,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_86942545",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeAuthProviderImpl.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "I agree. Some of the code was done by different authors (which accounts for the style). I strongly prefer to NOT use final on parameters and local variables, as it makes the code noisier with little benefit. I have cleaned up this file. I will commit to review the use of this in the call home code (on the next patch). Hopefully this resolves the issue for now.",
+      "parentUuid": "fafc7978_bfb5f932",
+      "range": {
+        "startLine": 63,
+        "startChar": 8,
+        "endLine": 65,
+        "endChar": 37
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_df1f1db6",
         "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountDispatcher.java",
         "patchSetId": 13
@@ -455,6 +863,30 @@
       "writtenOn": "2017-03-21T13:47:12Z",
       "side": 1,
       "message": "Why is this here? You are calling the constructor of Object.",
+      "range": {
+        "startLine": 67,
+        "startChar": 8,
+        "endLine": 67,
+        "endChar": 16
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_86f8a5c5",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountDispatcher.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_df1f1db6",
       "range": {
         "startLine": 67,
         "startChar": 8,
@@ -490,6 +922,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_a69b2971",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountSessionContext.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "For all of the other comments like this you are right. For this one though, they are correct. There is another package that invokes these methods, hence package-private is not an option.",
+      "parentUuid": "fafc7978_1fe9a51a",
+      "range": {
+        "startLine": 29,
+        "startChar": 6,
+        "endLine": 29,
+        "endChar": 33
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_5ff32d0a",
         "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountSessionManager.java",
         "patchSetId": 13
@@ -501,6 +957,30 @@
       "writtenOn": "2017-03-21T13:47:12Z",
       "side": 1,
       "message": "lambda",
+      "range": {
+        "startLine": 43,
+        "startChar": 110,
+        "endLine": 51,
+        "endChar": 9
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_e6d7f121",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeMountSessionManager.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_5ff32d0a",
       "range": {
         "startLine": 43,
         "startChar": 110,
@@ -536,6 +1016,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_06d31539",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeTopology.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_9fdc7576",
+      "range": {
+        "startLine": 39,
+        "startChar": 4,
+        "endLine": 41,
+        "endChar": 5
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_df543dcc",
         "filename": "netconf/callhome-provider/src/test/java/org/opendaylight/netconf/callhome/mount/CallHomeMountDispatcherTest.java",
         "patchSetId": 13
@@ -547,6 +1051,30 @@
       "writtenOn": "2017-03-21T13:47:12Z",
       "side": 1,
       "message": "method naming in the whole class.. first letter is supposed to be lowercase.",
+      "range": {
+        "startLine": 37,
+        "startChar": 13,
+        "endLine": 37,
+        "endChar": 40
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_c6ac6d8f",
+        "filename": "netconf/callhome-provider/src/test/java/org/opendaylight/netconf/callhome/mount/CallHomeMountDispatcherTest.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Off-topic comment: I do notice that there are accessors on this test class, so I stand corrected from a previous reply that I made.\n\nI completely agree that method names normally begin with a lower case. However we have an exception for individual test methods in JUnit test classes. We want the method name to read like a sentence. This is by design. You\u0027ll see that the support methods are all lower case. But the test method names are not.",
+      "parentUuid": "fafc7978_df543dcc",
       "range": {
         "startLine": 37,
         "startChar": 13,
@@ -651,6 +1179,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_66f5c1ca",
+        "filename": "netconf/callhome-provider/src/test/java/org/opendaylight/netconf/callhome/mount/CallHomeMountSessionContextText.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_dff0bdcb",
+      "range": {
+        "startLine": 66,
+        "startChar": 28,
+        "endLine": 77,
+        "endChar": 17
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_1fba45e1",
         "filename": "netconf/callhome-provider/src/test/java/org/opendaylight/netconf/callhome/mount/CallHomeMountSessionContextText.java",
         "patchSetId": 13
@@ -662,6 +1214,30 @@
       "writtenOn": "2017-03-21T13:47:12Z",
       "side": 1,
       "message": "lambda",
+      "range": {
+        "startLine": 90,
+        "startChar": 28,
+        "endLine": 100,
+        "endChar": 17
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_c602adb3",
+        "filename": "netconf/callhome-provider/src/test/java/org/opendaylight/netconf/callhome/mount/CallHomeMountSessionContextText.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_1fba45e1",
       "range": {
         "startLine": 90,
         "startChar": 28,
@@ -697,6 +1273,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_a6ffa9a9",
+        "filename": "netconf/callhome-provider/src/test/java/org/opendaylight/netconf/callhome/mount/CallHomeMountSessionContextText.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_ffbe61d3",
+      "range": {
+        "startLine": 114,
+        "startChar": 28,
+        "endLine": 124,
+        "endChar": 17
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_3fb909ea",
         "filename": "netconf/callhome-provider/src/test/java/org/opendaylight/netconf/callhome/mount/CallHomeMountSessionContextText.java",
         "patchSetId": 13
@@ -708,6 +1308,30 @@
       "writtenOn": "2017-03-21T13:47:12Z",
       "side": 1,
       "message": "lambda",
+      "range": {
+        "startLine": 137,
+        "startChar": 28,
+        "endLine": 147,
+        "endChar": 17
+      },
+      "revId": "d160960ec4b7853996fcf29002e4586d1f186769",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_062cb549",
+        "filename": "netconf/callhome-provider/src/test/java/org/opendaylight/netconf/callhome/mount/CallHomeMountSessionContextText.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2017-03-22T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_3fb909ea",
       "range": {
         "startLine": 137,
         "startChar": 28,
