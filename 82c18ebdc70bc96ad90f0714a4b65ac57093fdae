@@ -1,0 +1,475 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_9db352e8",
+        "filename": "features/netconf-connector/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "Use the version specified by odlparent.  Do not redefine your own.",
+      "range": {
+        "startLine": 33,
+        "startChar": 6,
+        "endLine": 33,
+        "endChar": 63
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_ddc83a57",
+        "filename": "netconf/callhome-model/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "get rid of tab characters.",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 9
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_1dbf62ab",
+        "filename": "netconf/callhome-model/src/main/yang/odl-netconf-callhome-server.yang",
+        "patchSetId": 5
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 24,
+        "startChar": 46,
+        "endLine": 24,
+        "endChar": 61
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_7ddf8e0d",
+        "filename": "netconf/callhome-model/src/main/yang/odl-netconf-callhome-server.yang",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 30,
+        "startChar": 46,
+        "endLine": 30,
+        "endChar": 62
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_9dea32aa",
+        "filename": "netconf/callhome-protocol/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "Please remove this.",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 3
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_fdd25efe",
+        "filename": "netconf/callhome-protocol/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "Please remove this dead space.",
+      "range": {
+        "startLine": 53,
+        "startChar": 17,
+        "endLine": 53,
+        "endChar": 21
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_ddcf9a54",
+        "filename": "netconf/callhome-protocol/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "Please remove this dead space.",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 4
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_1dd642f1",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/AuthorizedKeysDecoder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "Likely.  We can consider moving it later.",
+      "range": {
+        "startLine": 30,
+        "startChar": 3,
+        "endLine": 30,
+        "endChar": 56
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_7d066e87",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/AuthorizedKeysDecoder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "This seems very hardcoded and not terribly configurable...",
+      "range": {
+        "startLine": 73,
+        "startChar": 81,
+        "endLine": 73,
+        "endChar": 92
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_bdfc5673",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeAuthorization.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "I\u0027d prefer to see this as \"transient\" in case this is ever made Serializable.",
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_ddf67a8e",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "Not the best error message I\u0027ve ever seen :).",
+      "range": {
+        "startLine": 54,
+        "startChar": 71,
+        "endLine": 54,
+        "endChar": 86
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_3df06690",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "same...",
+      "range": {
+        "startLine": 58,
+        "startChar": 59,
+        "endLine": 58,
+        "endChar": 68
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_1deda2b7",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "type check?",
+      "range": {
+        "startLine": 59,
+        "startChar": 26,
+        "endLine": 59,
+        "endChar": 45
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_5d328a5f",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "I have an aversion to magic strings.",
+      "range": {
+        "startLine": 77,
+        "startChar": 83,
+        "endLine": 77,
+        "endChar": 92
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_9d38723e",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "improve message.",
+      "range": {
+        "startLine": 171,
+        "startChar": 69,
+        "endLine": 171,
+        "endChar": 81
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_fd409ea6",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "improve message",
+      "range": {
+        "startLine": 172,
+        "startChar": 84,
+        "endLine": 172,
+        "endChar": 101
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_dd3dda2c",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/CallHomeSessionContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "\"exist\", so",
+      "range": {
+        "startLine": 193,
+        "startChar": 57,
+        "endLine": 193,
+        "endChar": 63
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_5d19ead5",
+        "filename": "netconf/callhome-provider/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "dead space.",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 8
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_9d0fd287",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomeAuthProviderImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "space",
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_1da80276",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/IetfZeroTouchCallHomeServerProvider.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "File.SEPARATOR",
+      "range": {
+        "startLine": 35,
+        "startChar": 42,
+        "endLine": 35,
+        "endChar": 43
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_7d7b0ef5",
+        "filename": "netconf/callhome-provider/src/main/resources/org/opendaylight/blueprint/callhome-topology.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 3635
+      },
+      "writtenOn": "2017-03-02T03:44:39Z",
+      "side": 1,
+      "message": "If you are creating your own schema repository, wouldn\u0027t it make sense to call it something like callhome-schema-repository?",
+      "range": {
+        "startLine": 32,
+        "startChar": 8,
+        "endLine": 32,
+        "endChar": 57
+      },
+      "revId": "82c18ebdc70bc96ad90f0714a4b65ac57093fdae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
