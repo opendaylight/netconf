@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_410f782e",
+        "filename": "restconf/sal-rest-connector/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2016-07-20T10:08:41Z",
+      "side": 1,
+      "message": "Is this version needed? Odlparent defines version 20131018\nand further downgrate is planned due to license.\nhttps://wiki.opendaylight.org/view/Weather#Downgrade_to_org.json_20090211",
+      "range": {
+        "startLine": 151,
+        "startChar": 15,
+        "endLine": 151,
+        "endChar": 23
+      },
+      "revId": "6947f1284c66b0ad3941e58131eee557c0e752ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_8119907b",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 2046
+      },
+      "writtenOn": "2016-07-20T10:08:41Z",
+      "side": 1,
+      "message": "Why was this moved?",
+      "range": {
+        "startLine": 66,
+        "startChar": 7,
+        "endLine": 66,
+        "endChar": 9
+      },
+      "revId": "6947f1284c66b0ad3941e58131eee557c0e752ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
