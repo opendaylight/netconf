@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_c630bba0",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-02-14T08:49:58Z",
+      "side": 1,
+      "message": "use at many places, define constant, same for othere strings here",
+      "range": {
+        "startLine": 267,
+        "startChar": 17,
+        "endLine": 267,
+        "endChar": 23
+      },
+      "revId": "693e5b30fa0c60ccf278b3d6679a467a28388c31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_e62dff47",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-02-14T08:49:58Z",
+      "side": 1,
+      "message": "Behind the scenes this is translated to:\n\nString s \u003d new StringBuilder(s1).append(s2).append(s3).append(4).toString();\n\nyou should use append() everywhere.",
+      "range": {
+        "startLine": 268,
+        "startChar": 23,
+        "endLine": 268,
+        "endChar": 64
+      },
+      "revId": "693e5b30fa0c60ccf278b3d6679a467a28388c31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
