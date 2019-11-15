@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_ab0fc12d",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/FutureCallbackTx.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-27T14:35:43Z",
+      "side": 1,
+      "message": "final?",
+      "revId": "9859cf0d768119040ebc072d0391d5f64072aa93",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_0b1d0d67",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/FutureCallbackTx.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-27T14:35:43Z",
+      "side": 1,
+      "message": "private constructor missing",
+      "revId": "9859cf0d768119040ebc072d0391d5f64072aa93",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_cb3955da",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/FutureDataFactory.java",
+        "patchSetId": 28
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-27T14:35:43Z",
+      "side": 1,
+      "message": "getData()",
+      "range": {
+        "startLine": 20,
+        "startChar": 32,
+        "endLine": 20,
+        "endChar": 40
+      },
+      "revId": "9859cf0d768119040ebc072d0391d5f64072aa93",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
