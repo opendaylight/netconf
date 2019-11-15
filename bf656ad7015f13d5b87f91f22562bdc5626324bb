@@ -1,0 +1,165 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_fe5cb527",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/api/RestconfService.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2016-11-04T13:25:45Z",
+      "side": 1,
+      "message": "max line length exceeded",
+      "range": {
+        "startLine": 213,
+        "startChar": 3,
+        "endLine": 216,
+        "endChar": 38
+      },
+      "revId": "bf656ad7015f13d5b87f91f22562bdc5626324bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_9e4b0159",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/NormalizedNodeJsonBodyWriter.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2016-11-07T13:25:12Z",
+      "side": 1,
+      "message": "max line length exceeded",
+      "range": {
+        "startLine": 62,
+        "startChar": 3,
+        "endLine": 73,
+        "endChar": 9
+      },
+      "revId": "bf656ad7015f13d5b87f91f22562bdc5626324bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_7e48a55b",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/NormalizedNodeXmlBodyWriter.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2016-11-07T13:25:12Z",
+      "side": 1,
+      "message": "max line length exceeded",
+      "range": {
+        "startLine": 73,
+        "startChar": 1,
+        "endLine": 79,
+        "endChar": 9
+      },
+      "revId": "bf656ad7015f13d5b87f91f22562bdc5626324bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_de74599e",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/RestconfCompositeWrapper.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2016-11-07T13:25:12Z",
+      "side": 1,
+      "message": "max line length exceeded",
+      "range": {
+        "startLine": 112,
+        "startChar": 4,
+        "endLine": 126,
+        "endChar": 1
+      },
+      "revId": "bf656ad7015f13d5b87f91f22562bdc5626324bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_1e6ff1c6",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/NormalizedNodeContext.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2016-11-07T13:25:12Z",
+      "side": 1,
+      "message": "max line length exceeded",
+      "range": {
+        "startLine": 22,
+        "startChar": 4,
+        "endLine": 24,
+        "endChar": 31
+      },
+      "revId": "bf656ad7015f13d5b87f91f22562bdc5626324bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_fe7315af",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 1046,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2016-11-07T13:25:12Z",
+      "side": 1,
+      "message": "max line length exceeded",
+      "range": {
+        "startLine": 1042,
+        "startChar": 13,
+        "endLine": 1046,
+        "endChar": 112
+      },
+      "revId": "bf656ad7015f13d5b87f91f22562bdc5626324bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_5e6849ba",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/StatisticsRestconfServiceWrapper.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2016-11-07T13:25:12Z",
+      "side": 1,
+      "message": "max line length exceeded",
+      "range": {
+        "startLine": 78,
+        "startChar": 4,
+        "endLine": 82,
+        "endChar": 5
+      },
+      "revId": "bf656ad7015f13d5b87f91f22562bdc5626324bb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
