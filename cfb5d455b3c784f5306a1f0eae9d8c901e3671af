@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_4c16aca8",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/base/services/api/RestconfService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-20T14:30:46Z",
+      "side": 1,
+      "message": "?",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 3
+      },
+      "revId": "cfb5d455b3c784f5306a1f0eae9d8c901e3671af",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_6c13a8b8",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/base/services/api/RestconfService.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-20T14:30:46Z",
+      "side": 1,
+      "message": "better javadoc",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 3
+      },
+      "revId": "cfb5d455b3c784f5306a1f0eae9d8c901e3671af",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
