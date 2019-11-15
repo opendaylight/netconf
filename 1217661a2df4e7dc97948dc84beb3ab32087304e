@@ -23,6 +23,29 @@
       "revId": "1217661a2df4e7dc97948dc84beb3ab32087304e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_599671f1",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfStreamsServiceTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "Do you really want to ecpected this exception ? Is it better to catch the exception in try catch block and test parts of the exception like error type of the exception for example, isn\u0027t it ?",
+      "range": {
+        "startLine": 91,
+        "startChar": 10,
+        "endLine": 91,
+        "endChar": 54
+      },
+      "revId": "1217661a2df4e7dc97948dc84beb3ab32087304e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
