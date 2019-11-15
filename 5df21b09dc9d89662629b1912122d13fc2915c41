@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_281a896e",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/api/services/ServicesWrapper.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T11:56:31Z",
+      "side": 1,
+      "message": "all service wrapper or draft09 services wraper ?",
+      "range": {
+        "startLine": 24,
+        "startChar": 17,
+        "endLine": 24,
+        "endChar": 32
+      },
+      "revId": "5df21b09dc9d89662629b1912122d13fc2915c41",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_e80ff12c",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/RestconfConstants.java",
+        "patchSetId": 21
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T11:56:31Z",
+      "side": 1,
+      "message": "final ?",
+      "range": {
+        "startLine": 19,
+        "startChar": 17,
+        "endLine": 19,
+        "endChar": 18
+      },
+      "revId": "5df21b09dc9d89662629b1912122d13fc2915c41",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
