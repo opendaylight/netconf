@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1f61a0_bf317dee",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/rest/impl/test/providers/TestXmlBodyReader.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5139
+      },
+      "writtenOn": "2017-08-10T09:39:42Z",
+      "side": 1,
+      "message": "the name of this field was causing checkstyle violations in my local build, consider better name or removing if it is not used",
+      "range": {
+        "startLine": 90,
+        "startChar": 28,
+        "endLine": 90,
+        "endChar": 43
+      },
+      "revId": "c3e0c9ee6b04bbb9c6c9d5633f1cd04c89885f46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_1f4ec96f",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/rest/impl/test/providers/TestXmlBodyReader.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5139
+      },
+      "writtenOn": "2017-08-10T09:39:42Z",
+      "side": 1,
+      "message": "missing default: is also causing checkstyle violations, please add the default cause.",
+      "range": {
+        "startLine": 100,
+        "startChar": 12,
+        "endLine": 100,
+        "endChar": 18
+      },
+      "revId": "c3e0c9ee6b04bbb9c6c9d5633f1cd04c89885f46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_5f584132",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/jersey/providers/XmlBodyReaderTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5139
+      },
+      "writtenOn": "2017-08-10T09:39:42Z",
+      "side": 1,
+      "message": "consider removing or renaming. this is causing checkstyle violations.",
+      "range": {
+        "startLine": 92,
+        "startChar": 28,
+        "endLine": 92,
+        "endChar": 43
+      },
+      "revId": "c3e0c9ee6b04bbb9c6c9d5633f1cd04c89885f46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_9f41193c",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/jersey/providers/XmlBodyReaderTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5139
+      },
+      "writtenOn": "2017-08-10T09:39:42Z",
+      "side": 1,
+      "message": "add default cause please.",
+      "range": {
+        "startLine": 102,
+        "startChar": 12,
+        "endLine": 102,
+        "endChar": 18
+      },
+      "revId": "c3e0c9ee6b04bbb9c6c9d5633f1cd04c89885f46",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
