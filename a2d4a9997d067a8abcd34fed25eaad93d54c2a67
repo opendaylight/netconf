@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_fdde2e10",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/RestconfWrapperProvidersTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-04-21T12:39:32Z",
+      "side": 1,
+      "message": "PORT",
+      "range": {
+        "startLine": 31,
+        "startChar": 29,
+        "endLine": 31,
+        "endChar": 33
+      },
+      "revId": "a2d4a9997d067a8abcd34fed25eaad93d54c2a67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_9da9e27d",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/RestconfWrapperProvidersTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-04-21T12:39:32Z",
+      "side": 1,
+      "message": "static",
+      "revId": "a2d4a9997d067a8abcd34fed25eaad93d54c2a67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_bdae6683",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/RestconfWrapperProvidersTest.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-04-21T12:39:32Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 80,
+        "startChar": 24,
+        "endLine": 80,
+        "endChar": 39
+      },
+      "revId": "a2d4a9997d067a8abcd34fed25eaad93d54c2a67",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
