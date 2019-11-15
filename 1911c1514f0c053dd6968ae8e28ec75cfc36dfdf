@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_d381e74b",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/md/sal/rest/schema/SchemaExportContentYangBodyWriter.java",
+        "patchSetId": 34
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-05-03T09:26:02Z",
+      "side": 1,
+      "message": "this is not going to work with new model API, source value is set to null in effective module stmt",
+      "range": {
+        "startLine": 45,
+        "startChar": 7,
+        "endLine": 45,
+        "endChar": 48
+      },
+      "revId": "1911c1514f0c053dd6968ae8e28ec75cfc36dfdf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
