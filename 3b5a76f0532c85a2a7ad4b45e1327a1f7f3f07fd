@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_6c5f28e6",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 748,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-20T14:10:36Z",
+      "side": 1,
+      "message": "say either:\n- for data deletion\nor\n- to delete data\n\n2 places",
+      "revId": "3b5a76f0532c85a2a7ad4b45e1327a1f7f3f07fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_6c0608d0",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/NotificationListenerAdapter.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 546,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-20T14:10:36Z",
+      "side": 1,
+      "message": "grammar",
+      "revId": "3b5a76f0532c85a2a7ad4b45e1327a1f7f3f07fd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
