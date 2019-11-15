@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_59d51142",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/common/references/SchemaContextRef.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-02T14:27:58Z",
+      "side": 1,
+      "message": "any usage? who is calling this?",
+      "range": {
+        "startLine": 162,
+        "startChar": 3,
+        "endLine": 162,
+        "endChar": 36
+      },
+      "revId": "dbdd8c5fc24e80df36698feda4c9842ca08ed8a3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_79828d53",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/handlers/SchemaContextHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-02T14:27:58Z",
+      "side": 1,
+      "message": "Problem occured while putting data to DS",
+      "range": {
+        "startLine": 64,
+        "startChar": 51,
+        "endLine": 64,
+        "endChar": 75
+      },
+      "revId": "dbdd8c5fc24e80df36698feda4c9842ca08ed8a3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_d992c19e",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/handlers/SchemaContextHandler.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-02T14:27:58Z",
+      "side": 1,
+      "message": "check usage. Any at all?",
+      "range": {
+        "startLine": 74,
+        "startChar": 4,
+        "endLine": 74,
+        "endChar": 42
+      },
+      "revId": "dbdd8c5fc24e80df36698feda4c9842ca08ed8a3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
