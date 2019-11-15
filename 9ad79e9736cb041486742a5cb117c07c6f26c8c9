@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba51214e_34cadb4f",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/services/impl/RestconfDataServiceImpl.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-16T13:51:25Z",
+      "side": 1,
+      "message": "same issue as post and put",
+      "range": {
+        "startLine": 126,
+        "startChar": 13,
+        "endLine": 126,
+        "endChar": 112
+      },
+      "revId": "9ad79e9736cb041486742a5cb117c07c6f26c8c9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_b4dd4b17",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/services/impl/RestconfDataServiceImpl.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-16T13:51:25Z",
+      "side": 1,
+      "message": "FIXME unsupported yet",
+      "range": {
+        "startLine": 142,
+        "startChar": 8,
+        "endLine": 143,
+        "endChar": 20
+      },
+      "revId": "9ad79e9736cb041486742a5cb117c07c6f26c8c9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
