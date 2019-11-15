@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1f61a0_b5291c39",
+        "filename": "restconf/restconf-nb-bierman02/src/main/java/org/opendaylight/restconf/Rfc8040.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-09-12T21:19:28Z",
+      "side": 1,
+      "message": "@deprecated",
+      "range": {
+        "startLine": 18,
+        "startChar": 3,
+        "endLine": 18,
+        "endChar": 21
+      },
+      "revId": "8aa88051ddfe793159c3b0e7194a3cd88576f097",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
