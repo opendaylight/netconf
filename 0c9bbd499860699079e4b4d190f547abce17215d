@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_9613c4b7",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/utils/schema/context/RestconfSchemaUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "can u test data too please ?",
+      "revId": "0c9bbd499860699079e4b4d190f547abce17215d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
