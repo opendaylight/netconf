@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_97020db2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "please, improve commit message",
+      "revId": "c534de0ab7e46cddd580e1ed3ade256de9c9d2d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3724d90b",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/rest/impl/InstanceIdentifierTypeLeafTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "this test case does not test added functionality",
+      "revId": "c534de0ab7e46cddd580e1ed3ade256de9c9d2d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_f70ee18a",
+        "filename": "restconf/sal-rest-connector/src/test/resources/instanceidentifier/iid-value.yang",
+        "patchSetId": 8
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "remove this blank",
+      "revId": "c534de0ab7e46cddd580e1ed3ade256de9c9d2d7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
