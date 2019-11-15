@@ -2,6 +2,144 @@
   "comments": [
     {
       "key": {
+        "uuid": "3a65312a_3e10ed4d",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/RestconfCompositeWrapper.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2016-11-04T13:23:04Z",
+      "side": 1,
+      "message": "max line length exceeded",
+      "range": {
+        "startLine": 62,
+        "startChar": 74,
+        "endLine": 62,
+        "endChar": 129
+      },
+      "revId": "353564f321e792317d9e7527a2878cfbb8447a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_be2b5d81",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2016-11-07T13:21:55Z",
+      "side": 1,
+      "message": "max line length exceeded",
+      "range": {
+        "startLine": 155,
+        "startChar": 82,
+        "endLine": 156,
+        "endChar": 112
+      },
+      "revId": "353564f321e792317d9e7527a2878cfbb8447a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_1e21b19f",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2016-11-07T13:21:55Z",
+      "side": 1,
+      "message": "max line length exceeded",
+      "range": {
+        "startLine": 117,
+        "startChar": 81,
+        "endLine": 117,
+        "endChar": 112
+      },
+      "revId": "353564f321e792317d9e7527a2878cfbb8447a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_fe25d5ab",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/Notificator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2016-11-07T13:21:55Z",
+      "side": 1,
+      "message": "max line length exceeded",
+      "range": {
+        "startLine": 80,
+        "startChar": 56,
+        "endLine": 82,
+        "endChar": 91
+      },
+      "revId": "353564f321e792317d9e7527a2878cfbb8447a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_3e374de5",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/CreateStreamUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2016-11-07T13:21:55Z",
+      "side": 1,
+      "message": "max line length exceeded",
+      "range": {
+        "startLine": 117,
+        "startChar": 3,
+        "endLine": 120,
+        "endChar": 5
+      },
+      "revId": "353564f321e792317d9e7527a2878cfbb8447a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_be523d11",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/RestconfStreamsConstants.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2016-11-07T13:21:55Z",
+      "side": 1,
+      "message": "max line length exceeded",
+      "range": {
+        "startLine": 64,
+        "startChar": 8,
+        "endLine": 75,
+        "endChar": 5
+      },
+      "revId": "353564f321e792317d9e7527a2878cfbb8447a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a65312a_1e589131",
         "filename": "restconf/sal-rest-connector/src/main/yang/sal-remote-augment.yang",
         "patchSetId": 4
