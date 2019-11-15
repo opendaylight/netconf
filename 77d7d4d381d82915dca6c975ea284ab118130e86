@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a4c51b2_46ceca5b",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/api/connector/RestSchemaController.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T15:37:38Z",
+      "side": 1,
+      "message": "is it correct place?",
+      "revId": "77d7d4d381d82915dca6c975ea284ab118130e86",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_a6db4e1a",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/api/connector/RestSchemaController.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T15:37:38Z",
+      "side": 1,
+      "message": "should it be static?",
+      "revId": "77d7d4d381d82915dca6c975ea284ab118130e86",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_e6043680",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/api/connector/RestSchemaController.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T15:37:38Z",
+      "side": 1,
+      "message": "should it be static ?",
+      "revId": "77d7d4d381d82915dca6c975ea284ab118130e86",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_c6093a97",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/api/connector/RestSchemaController.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T15:37:38Z",
+      "side": 1,
+      "message": "why here ?",
+      "revId": "77d7d4d381d82915dca6c975ea284ab118130e86",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
