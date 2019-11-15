@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a4c51b2_06ee8288",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/connector/RestSchemaControllerImpl.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T16:08:24Z",
+      "side": 1,
+      "message": "Do we really need \"stupid\" copy old Controller - please refactor it",
+      "revId": "c0fb03c890b789a5a398ca3db093fe780caf8a27",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_26845ed3",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/connector/RestSchemaControllerImpl.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T16:08:24Z",
+      "side": 1,
+      "message": "find better place for all constants",
+      "revId": "c0fb03c890b789a5a398ca3db093fe780caf8a27",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_867452fe",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/connector/RestSchemaControllerImpl.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T16:08:24Z",
+      "side": 1,
+      "message": "find a way to create globalSchema read (inst. lock free and not volatile)",
+      "range": {
+        "startLine": 83,
+        "startChar": 21,
+        "endLine": 83,
+        "endChar": 34
+      },
+      "revId": "c0fb03c890b789a5a398ca3db093fe780caf8a27",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_6654a654",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/connector/RestSchemaControllerImpl.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T16:08:24Z",
+      "side": 1,
+      "message": "why ? it has same lifecycle as globalSchema",
+      "range": {
+        "startLine": 84,
+        "startChar": 12,
+        "endLine": 84,
+        "endChar": 20
+      },
+      "revId": "c0fb03c890b789a5a398ca3db093fe780caf8a27",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_6602e63f",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/RestSchemaControllerUtil.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T16:08:24Z",
+      "side": 1,
+      "message": "again mountpoint static ... och",
+      "revId": "c0fb03c890b789a5a398ca3db093fe780caf8a27",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
