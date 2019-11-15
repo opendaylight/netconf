@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_3296354d",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-16T15:07:10Z",
+      "side": 1,
+      "message": "please add message",
+      "revId": "2f9df7c450cb2830bbecb70c0a75319d5e76ec64",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_b2a245ac",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-16T15:07:10Z",
+      "side": 1,
+      "message": "copy paste issue?",
+      "range": {
+        "startLine": 687,
+        "startChar": 63,
+        "endLine": 687,
+        "endChar": 101
+      },
+      "revId": "2f9df7c450cb2830bbecb70c0a75319d5e76ec64",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_32e8f5e1",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/services/impl/RestconfDataServiceImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-16T15:07:10Z",
+      "side": 1,
+      "message": "this seems to be copy paste issue...",
+      "range": {
+        "startLine": 89,
+        "startChar": 63,
+        "endLine": 89,
+        "endChar": 100
+      },
+      "revId": "2f9df7c450cb2830bbecb70c0a75319d5e76ec64",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_72a0ad9f",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-16T15:07:10Z",
+      "side": 1,
+      "message": "add Javadoc to new public methods...",
+      "revId": "2f9df7c450cb2830bbecb70c0a75319d5e76ec64",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
