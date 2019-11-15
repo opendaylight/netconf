@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_51894fc9",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/NormalizedNodeXmlBodyWriter.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-05-03T14:37:56Z",
+      "side": 1,
+      "message": "I think this should be moved back to its original place to respect the alphabetical order",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 50
+      },
+      "revId": "f6f00fb5d33a4da3285dfd6ed2fec2591c93f4c6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
