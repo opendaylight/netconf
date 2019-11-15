@@ -45,6 +45,75 @@
       "revId": "693e5b30fa0c60ccf278b3d6679a467a28388c31",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_062be330",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointSwagger.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-02-14T08:49:58Z",
+      "side": 1,
+      "message": "\u0027\u003d\u0027",
+      "range": {
+        "startLine": 96,
+        "startChar": 40,
+        "endLine": 96,
+        "endChar": 43
+      },
+      "revId": "693e5b30fa0c60ccf278b3d6679a467a28388c31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_461ccb13",
+        "filename": "restconf/sal-rest-docgen/src/main/resources/17/explorer/index.html",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-02-14T08:49:58Z",
+      "side": 1,
+      "message": "whitespaces, tabs",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 1
+      },
+      "revId": "693e5b30fa0c60ccf278b3d6679a467a28388c31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_e6d4df21",
+        "filename": "restconf/sal-rest-docgen/src/main/resources/17/explorer/lib/odl/list_mounts.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-02-14T08:49:58Z",
+      "side": 1,
+      "message": "trailing whitespace \u0026 tabs",
+      "range": {
+        "startLine": 14,
+        "startChar": 75,
+        "endLine": 14,
+        "endChar": 76
+      },
+      "revId": "693e5b30fa0c60ccf278b3d6679a467a28388c31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
