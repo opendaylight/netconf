@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_1948b95a",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/Draft18.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-02T14:04:32Z",
+      "side": 1,
+      "message": "Order, final first:\n\nClass ( static) variables\n\nFirst the public class variables, then the protected, then package level (no access modifier), and then the private.\n\n\nInstance variables\n\nFirst public, then protected, then package level (no access modifier), and then private.",
+      "revId": "4264060d9833a87c00a41fe3fa37f092b440d6fb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
