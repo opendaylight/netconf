@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_64a1fa46",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierSerializerTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "add more test for more types of schema node\nExample: container only, container with leaf etc..",
+      "range": {
+        "startLine": 26,
+        "startChar": 13,
+        "endLine": 26,
+        "endChar": 49
+      },
+      "revId": "1e9b56f4f5417fe8749fa492085e332e2017aa75",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
