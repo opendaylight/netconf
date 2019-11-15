@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a245df4_99242761",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/RestConnectorProvider.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-11-12T17:26:01Z",
+      "side": 1,
+      "message": "two public constructors with an optional content: please use static factory methods instead.\n\nPlease add a FIXME: to refactor this class and its users to interact via builder pattern, where individual services are injected and then the provider is created.",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 5
+      },
+      "revId": "cab531265938d4bc8816710eacf63c65407d744d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_592e2f44",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/RestConnectorProvider.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-11-12T17:26:01Z",
+      "side": 1,
+      "message": "public API, add javadoc. Thread safety needs to be documented, as transactionChainHandler is a static field being initialized from an instance method.",
+      "range": {
+        "startLine": 169,
+        "startChar": 0,
+        "endLine": 171,
+        "endChar": 5
+      },
+      "revId": "cab531265938d4bc8816710eacf63c65407d744d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_39337bac",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/RestConnectorProvider.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-11-12T17:26:01Z",
+      "side": 1,
+      "message": "is there a reason this should be non-final?",
+      "range": {
+        "startLine": 173,
+        "startChar": 0,
+        "endLine": 175,
+        "endChar": 5
+      },
+      "revId": "cab531265938d4bc8816710eacf63c65407d744d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a245df4_79297336",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/services/simple/api/UpdateHandlers.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-11-12T17:26:01Z",
+      "side": 1,
+      "message": "public interface: needs to be documented.\n\nWhat are thread safety expectations on use? Can updateHandlers be invoked from two threads at the same time?\n\nIs really a no-op update the right thing here?\nIs this intended to be a @FunctionalInterface?",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 1
+      },
+      "revId": "cab531265938d4bc8816710eacf63c65407d744d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
