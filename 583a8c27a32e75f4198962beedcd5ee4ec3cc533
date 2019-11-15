@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_ae5a2b4e",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-10-27T10:27:33Z",
+      "side": 1,
+      "message": "why?",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 46
+      },
+      "revId": "583a8c27a32e75f4198962beedcd5ee4ec3cc533",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
