@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "da01753e_43e654e9",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/config/yang/sal/restconf/service/JSONRestconfServiceModuleTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da01753e_3c3d53bc",
+      "revId": "055ca7bd2905b782d630a99684aedc6ce0f6eb3b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da01753e_9c4c3f72",
         "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/config/yang/sal/restconf/service/JSONRestconfServiceModuleTest.java",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2019-11-05T21:57:10Z",
       "side": 1,
       "message": "createInstanceTest",
+      "revId": "055ca7bd2905b782d630a99684aedc6ce0f6eb3b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_63d0b8f6",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/config/yang/sal/restconf/service/JSONRestconfServiceModuleTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da01753e_9c4c3f72",
       "revId": "055ca7bd2905b782d630a99684aedc6ce0f6eb3b",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
