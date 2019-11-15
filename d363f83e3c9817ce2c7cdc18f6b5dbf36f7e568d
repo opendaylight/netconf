@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_204f5094",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/RestConnectorProvider.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-27T14:29:23Z",
+      "side": 1,
+      "message": "finish the line...",
+      "revId": "d363f83e3c9817ce2c7cdc18f6b5dbf36f7e568d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_c05db44a",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-27T14:29:23Z",
+      "side": 1,
+      "message": "one empty line missing",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 44
+      },
+      "revId": "d363f83e3c9817ce2c7cdc18f6b5dbf36f7e568d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
