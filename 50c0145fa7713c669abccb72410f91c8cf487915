@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a4c51b2_8673b24c",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/api/Draft09.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T15:19:25Z",
+      "side": 1,
+      "message": "add jdoc ... whole class (why where ...etc.) + every interface description",
+      "revId": "50c0145fa7713c669abccb72410f91c8cf487915",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
