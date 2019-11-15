@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1f61a0_5d061b87",
+        "filename": "restconf/restconf-artifacts/pom.xml",
+        "patchSetId": 8
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-09-07T12:39:03Z",
+      "side": 1,
+      "message": "replace it with bierman-02",
+      "range": {
+        "startLine": 50,
+        "startChar": 10,
+        "endLine": 54,
+        "endChar": 25
+      },
+      "revId": "1185cc036d049f1d8f4ddeb05e4dfc5e6c27e966",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
