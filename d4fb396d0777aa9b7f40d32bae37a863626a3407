@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_de9f235e",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfOperationsServiceTest.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-05-06T07:57:57Z",
+      "side": 1,
+      "message": "Why do we need empty class ?",
+      "revId": "d4fb396d0777aa9b7f40d32bae37a863626a3407",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_1e899b26",
         "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfSchemaServiceTest.java",
         "patchSetId": 43
