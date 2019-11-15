@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9a561d44_21ad249d",
+        "filename": "restconf/sal-rest-connector/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "no, it is not needed (probably)",
+      "parentUuid": "9a561d44_410f782e",
+      "range": {
+        "startLine": 151,
+        "startChar": 15,
+        "endLine": 151,
+        "endChar": 23
+      },
+      "revId": "6947f1284c66b0ad3941e58131eee557c0e752ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a561d44_8119907b",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
         "patchSetId": 7
@@ -36,6 +60,30 @@
       "writtenOn": "2016-07-20T10:08:41Z",
       "side": 1,
       "message": "Why was this moved?",
+      "range": {
+        "startLine": 66,
+        "startChar": 7,
+        "endLine": 66,
+        "endChar": 9
+      },
+      "revId": "6947f1284c66b0ad3941e58131eee557c0e752ba",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_61fa7cbe",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "now it is sorted alphabetically",
+      "parentUuid": "9a561d44_8119907b",
       "range": {
         "startLine": 66,
         "startChar": 7,
