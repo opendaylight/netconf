@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_f7e81612",
+        "filename": "opendaylight/restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/NotificationListenerAdapter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 6140
+      },
+      "writtenOn": "2016-08-18T16:08:18Z",
+      "side": 1,
+      "message": "I keep getting exception at this line\n\njava.lang.UnsupportedOperationException: Augmentation node has no QName",
+      "revId": "a0dafeb7d17119e0bc5db398ea6c5f1d3da66f30",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
