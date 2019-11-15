@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9a561d44_262d0c96",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/ContainerSchemaNodeImpl.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a561d44_a906241b",
+      "revId": "d1df8c6b8d164f2b9a8e407baf618b5b65452b99",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a561d44_c901d806",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
         "patchSetId": 4
@@ -30,6 +48,30 @@
       "writtenOn": "2016-07-25T09:37:08Z",
       "side": 1,
       "message": "I would rather change it to pre-Beryllium, not many people know what \"old parser\" is",
+      "range": {
+        "startLine": 317,
+        "startChar": 74,
+        "endLine": 318,
+        "endChar": 18
+      },
+      "revId": "d1df8c6b8d164f2b9a8e407baf618b5b65452b99",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_464f606b",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a561d44_c901d806",
       "range": {
         "startLine": 317,
         "startChar": 74,
