@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a494da4_da0be429",
+        "filename": "docs/restconf/restconf.adoc",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-13T11:53:28Z",
+      "side": 1,
+      "message": "please use svg\n... restconf.adoc ...\ninclude::draft09.plantuml[]\n\n... draft09.plantuml ...\n[\"plantuml\", \"draft09\", \"svg\"]\n\n------------\n@startuml\nclass Draft09\nclass MediaTypes\nclass RestconfModule\n\nDraft09 \u003c|-- MediaTypes\nDraft09 \u003c|-- RestconfModule\n@enduml\n------------",
+      "range": {
+        "startLine": 41,
+        "startChar": 23,
+        "endLine": 41,
+        "endChar": 26
+      },
+      "revId": "df20cfeead92e1d799d5522aee22aab767b76403",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
