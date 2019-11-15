@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a4c51b2_a6586e57",
+        "filename": "restconf/sal-rest-connector-config/src/main/resources/initial/10-odl-restconf-conn.xml",
+        "patchSetId": 15
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T16:54:31Z",
+      "side": 1,
+      "message": "2014 ? where is it copy from ?",
+      "range": {
+        "startLine": 3,
+        "startChar": 14,
+        "endLine": 3,
+        "endChar": 18
+      },
+      "revId": "6155ecf9d931b6be9153585a67573bd876ce0ad0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_8655721f",
+        "filename": "restconf/sal-rest-connector/src/main/yang/odl-rest-connector.yang",
+        "patchSetId": 15
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T16:54:31Z",
+      "side": 1,
+      "message": "remove empty spaces",
+      "revId": "6155ecf9d931b6be9153585a67573bd876ce0ad0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
