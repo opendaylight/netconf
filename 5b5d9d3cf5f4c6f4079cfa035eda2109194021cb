@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_99aa09d3",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/JsonNormalizedNodeBodyReader.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-08-04T12:17:53Z",
+      "side": 1,
+      "message": "duplicate",
+      "range": {
+        "startLine": 56,
+        "startChar": 61,
+        "endLine": 56,
+        "endChar": 109
+      },
+      "revId": "5b5d9d3cf5f4c6f4079cfa035eda2109194021cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_39901595",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/XmlNormalizedNodeBodyReader.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-08-04T12:17:53Z",
+      "side": 1,
+      "message": "delete it",
+      "range": {
+        "startLine": 60,
+        "startChar": 59,
+        "endLine": 60,
+        "endChar": 106
+      },
+      "revId": "5b5d9d3cf5f4c6f4079cfa035eda2109194021cb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
