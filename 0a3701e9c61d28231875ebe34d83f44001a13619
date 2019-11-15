@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a42497e_780e2136",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/AbstractRestconfServices.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-03-18T13:54:33Z",
+      "side": 1,
+      "message": "it might not be abstract class eventually",
+      "range": {
+        "startLine": 18,
+        "startChar": 7,
+        "endLine": 18,
+        "endChar": 15
+      },
+      "revId": "0a3701e9c61d28231875ebe34d83f44001a13619",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a42497e_ed02710a",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/RestconfOperationsServiceImpl.java",
+        "patchSetId": 16
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-03-18T13:54:33Z",
+      "side": 1,
+      "message": "implement \nhttps://bugs.opendaylight.org/show_bug.cgi?id\u003d5553",
+      "revId": "0a3701e9c61d28231875ebe34d83f44001a13619",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
