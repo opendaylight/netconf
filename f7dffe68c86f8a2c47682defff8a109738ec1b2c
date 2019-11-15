@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_cbd44022",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-08-24T13:28:54Z",
+      "side": 1,
+      "message": "missing catch(Exception e)",
+      "revId": "f7dffe68c86f8a2c47682defff8a109738ec1b2c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
