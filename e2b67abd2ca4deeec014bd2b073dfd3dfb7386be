@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_948560af",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/streams/listeners/NotificationListenerTest.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-24T14:12:03Z",
+      "side": 1,
+      "message": "import static?",
+      "range": {
+        "startLine": 76,
+        "startChar": 6,
+        "endLine": 79,
+        "endChar": 77
+      },
+      "revId": "e2b67abd2ca4deeec014bd2b073dfd3dfb7386be",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_54a46856",
+        "filename": "restconf/sal-rest-connector/src/test/resources/notifications/notifi-module.yang",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-24T14:12:03Z",
+      "side": 1,
+      "message": "if you can keep single white space in front of curly brackets, that would be really nice...",
+      "range": {
+        "startLine": 8,
+        "startChar": 4,
+        "endLine": 48,
+        "endChar": 5
+      },
+      "revId": "e2b67abd2ca4deeec014bd2b073dfd3dfb7386be",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
