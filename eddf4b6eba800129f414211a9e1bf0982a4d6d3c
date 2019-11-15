@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a494da4_3a364804",
+        "filename": "features/restconf/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-13T11:49:11Z",
+      "side": 1,
+      "message": "remove empty spaces",
+      "range": {
+        "startLine": 186,
+        "startChar": 0,
+        "endLine": 186,
+        "endChar": 4
+      },
+      "revId": "eddf4b6eba800129f414211a9e1bf0982a4d6d3c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a494da4_9a3b1ceb",
+        "filename": "features/restconf/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-13T11:49:11Z",
+      "side": 1,
+      "message": "why we would like to define exact version here ?",
+      "range": {
+        "startLine": 190,
+        "startChar": 15,
+        "endLine": 190,
+        "endChar": 29
+      },
+      "revId": "eddf4b6eba800129f414211a9e1bf0982a4d6d3c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
