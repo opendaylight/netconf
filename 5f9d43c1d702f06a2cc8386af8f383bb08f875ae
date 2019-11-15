@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_3a07281e",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "if one of the list keys is missing then next identifier is parsed as missing key value",
+      "range": {
+        "startLine": 89,
+        "startChar": 8,
+        "endLine": 89,
+        "endChar": 53
+      },
+      "revId": "5f9d43c1d702f06a2cc8386af8f383bb08f875ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
