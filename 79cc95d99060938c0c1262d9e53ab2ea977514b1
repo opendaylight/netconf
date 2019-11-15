@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_39f29d6f",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/RestConnectorProviderTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "can u import it via imports ?",
+      "range": {
+        "startLine": 19,
+        "startChar": 10,
+        "endLine": 19,
+        "endChar": 29
+      },
+      "revId": "79cc95d99060938c0c1262d9e53ab2ea977514b1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
