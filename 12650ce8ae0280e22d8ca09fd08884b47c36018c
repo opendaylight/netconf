@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_659f5ab5",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-07-11T07:19:14Z",
+      "side": 1,
+      "message": "Please remove all commented out code.",
+      "range": {
+        "startLine": 492,
+        "startChar": 0,
+        "endLine": 497,
+        "endChar": 12
+      },
+      "revId": "12650ce8ae0280e22d8ca09fd08884b47c36018c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_c5a62610",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 1043,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-07-11T07:19:14Z",
+      "side": 1,
+      "message": "unsupported operation exception or null ?",
+      "range": {
+        "startLine": 1043,
+        "startChar": 15,
+        "endLine": 1043,
+        "endChar": 19
+      },
+      "revId": "12650ce8ae0280e22d8ca09fd08884b47c36018c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
