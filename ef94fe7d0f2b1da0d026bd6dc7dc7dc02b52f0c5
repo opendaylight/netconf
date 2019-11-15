@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_024c9241",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfModulesServiceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "Make a serious tests, please. Test data in restconf module for example. Not only restconf module.",
+      "revId": "ef94fe7d0f2b1da0d026bd6dc7dc7dc02b52f0c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_d01707a2",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfModulesServiceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "checkout https://git.opendaylight.org/gerrit/#/c/38501/3/restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfModulesServiceTest.java and fill it with next tests",
+      "range": {
+        "startLine": 30,
+        "startChar": 13,
+        "endLine": 30,
+        "endChar": 39
+      },
+      "revId": "ef94fe7d0f2b1da0d026bd6dc7dc7dc02b52f0c5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
