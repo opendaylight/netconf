@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_0172a0e4",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-07-20T16:16:18Z",
+      "side": 1,
+      "message": "? sorry why do we want to log empty msg?",
+      "range": {
+        "startLine": 398,
+        "startChar": 39,
+        "endLine": 398,
+        "endChar": 42
+      },
+      "revId": "5a4cd5a2c1a5f97f088290ab4b8e2f777ad90b9f",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
