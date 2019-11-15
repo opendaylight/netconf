@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a42497e_181d5d67",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/connector/RestSchemaControllerImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-03-18T13:58:09Z",
+      "side": 1,
+      "message": "we need to solve this one",
+      "range": {
+        "startLine": 97,
+        "startChar": 11,
+        "endLine": 97,
+        "endChar": 49
+      },
+      "revId": "fd74f61af90f10b00bdba4a2b4a30a09405e6a93",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
