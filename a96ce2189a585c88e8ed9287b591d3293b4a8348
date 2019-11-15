@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_ee30a7ea",
+        "filename": "restconf/models/ietf-restconf-20160316/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-18T19:35:30Z",
+      "side": 1,
+      "message": "please fix indentation",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 19
+      },
+      "revId": "a96ce2189a585c88e8ed9287b591d3293b4a8348",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_4e4d5372",
+        "filename": "restconf/models/ietf-restconf-monitoring-20160316/pom.xml",
+        "patchSetId": 7
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-18T19:35:30Z",
+      "side": 1,
+      "message": "please fix identation",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 19
+      },
+      "revId": "a96ce2189a585c88e8ed9287b591d3293b4a8348",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
