@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1f61a0_df3e8d8b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-09-05T09:34:53Z",
+      "side": 1,
+      "message": "Actually, I would like to see \u0027restconf-connector\u0027 split and renamed to:\n- restconf-nb-bierman02\n- restconf-nb-rfc8040",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 31
+      },
+      "revId": "6150ae62aae0d6b5a9292d9a7767299f893f731b",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
