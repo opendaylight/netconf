@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_f28357ca",
+        "filename": "restconf/models/ietf-restconf-monitoring-20160316/src/main/yang/ietf-restconf-monitoring@2016-03-16.yang",
+        "patchSetId": 13
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-25T20:35:15Z",
+      "side": 1,
+      "message": "I can\u0027t remember what is our actual policy regarding revision-date of import in yang files. Should we specified the revision or not?",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 44
+      },
+      "revId": "d7f6dec8d9c022653a0ed96393047e4cfacedb36",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
