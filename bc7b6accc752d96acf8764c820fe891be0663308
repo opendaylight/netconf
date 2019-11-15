@@ -1,0 +1,280 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba51214e_61114cac",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "make constant from this, please",
+      "range": {
+        "startLine": 57,
+        "startChar": 75,
+        "endLine": 57,
+        "endChar": 76
+      },
+      "revId": "bc7b6accc752d96acf8764c820fe891be0663308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_e11c3cc4",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "add while on new line and add parenthesis to if, please",
+      "range": {
+        "startLine": 61,
+        "startChar": 8,
+        "endLine": 61,
+        "endChar": 67
+      },
+      "revId": "bc7b6accc752d96acf8764c820fe891be0663308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_e14a7cab",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "make constant for this, please",
+      "range": {
+        "startLine": 256,
+        "startChar": 24,
+        "endLine": 256,
+        "endChar": 25
+      },
+      "revId": "bc7b6accc752d96acf8764c820fe891be0663308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_61d66cc7",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "make constant for this, please",
+      "range": {
+        "startLine": 257,
+        "startChar": 86,
+        "endLine": 257,
+        "endChar": 87
+      },
+      "revId": "bc7b6accc752d96acf8764c820fe891be0663308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_e1e1dc9b",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "make constant for this, please",
+      "range": {
+        "startLine": 257,
+        "startChar": 97,
+        "endLine": 257,
+        "endChar": 99
+      },
+      "revId": "bc7b6accc752d96acf8764c820fe891be0663308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_c1dad8e8",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "make constant for this, please",
+      "range": {
+        "startLine": 257,
+        "startChar": 93,
+        "endLine": 257,
+        "endChar": 94
+      },
+      "revId": "bc7b6accc752d96acf8764c820fe891be0663308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_4cff1f02",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "this happen only once. can you do it before for ?",
+      "range": {
+        "startLine": 71,
+        "startChar": 12,
+        "endLine": 72,
+        "endChar": 79
+      },
+      "revId": "bc7b6accc752d96acf8764c820fe891be0663308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_a121a4b6",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "make constant for this, please",
+      "range": {
+        "startLine": 72,
+        "startChar": 28,
+        "endLine": 72,
+        "endChar": 31
+      },
+      "revId": "bc7b6accc752d96acf8764c820fe891be0663308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_e12b9c92",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "make constant for this, please",
+      "range": {
+        "startLine": 72,
+        "startChar": 74,
+        "endLine": 72,
+        "endChar": 77
+      },
+      "revId": "bc7b6accc752d96acf8764c820fe891be0663308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_211d9474",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "make constant for this, please",
+      "range": {
+        "startLine": 74,
+        "startChar": 74,
+        "endLine": 74,
+        "endChar": 77
+      },
+      "revId": "bc7b6accc752d96acf8764c820fe891be0663308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_41188884",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "make constant for this, please",
+      "range": {
+        "startLine": 74,
+        "startChar": 28,
+        "endLine": 74,
+        "endChar": 31
+      },
+      "revId": "bc7b6accc752d96acf8764c820fe891be0663308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_8112a060",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "make constant for this, please",
+      "range": {
+        "startLine": 76,
+        "startChar": 28,
+        "endLine": 76,
+        "endChar": 31
+      },
+      "revId": "bc7b6accc752d96acf8764c820fe891be0663308",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
