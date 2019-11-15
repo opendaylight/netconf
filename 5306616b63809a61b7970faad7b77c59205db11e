@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_20a55153",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-11T14:31:39Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 130,
+        "startChar": 76,
+        "endLine": 130,
+        "endChar": 77
+      },
+      "revId": "5306616b63809a61b7970faad7b77c59205db11e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_e0c199e5",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/NotificationListenerAdapter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-11T14:31:39Z",
+      "side": 1,
+      "message": "possible reuse of method body?",
+      "range": {
+        "startLine": 104,
+        "startChar": 8,
+        "endLine": 104,
+        "endChar": 36
+      },
+      "revId": "5306616b63809a61b7970faad7b77c59205db11e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_2041d15a",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/CreateStreamUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-11T14:31:39Z",
+      "side": 1,
+      "message": "add Javadoc description",
+      "revId": "5306616b63809a61b7970faad7b77c59205db11e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
