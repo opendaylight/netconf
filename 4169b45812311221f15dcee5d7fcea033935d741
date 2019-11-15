@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a4c51b2_263c5ee2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T16:55:48Z",
+      "side": 1,
+      "message": "why we wish to remove it? (missing information about aaa relationship)",
+      "revId": "4169b45812311221f15dcee5d7fcea033935d741",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
