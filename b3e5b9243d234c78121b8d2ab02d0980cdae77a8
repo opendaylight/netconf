@@ -22,6 +22,29 @@
       "revId": "b3e5b9243d234c78121b8d2ab02d0980cdae77a8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba1f61a0_c510d003",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 933,
+      "author": {
+        "id": 5702
+      },
+      "writtenOn": "2019-11-14T20:25:08Z",
+      "side": 1,
+      "message": "I think this is unnecessary complicated and ineffective.\nBinary type in yang (https://tools.ietf.org/html/rfc6020#section-9.8) is sequence of octets, so in java its byte array. I do believe that binary type will be always represented in NN as byte[] so why not just simply compare those two arrays?\n\nit can llok something like this: \n\n            if (leafType instanceof BinaryTypeDefinition) {\n                if (!Arrays.equals((byte[])uriKeyValue, (byte[])dataKeyValue)) {\n                    throwKeyErr(keyDefinition, uriKeyValue, dataKeyValue);\n                }\n            } else {\n                if (!uriKeyValue.equals(dataKeyValue)) {\n                    throwKeyErr(keyDefinition, uriKeyValue, dataKeyValue);\n                }\n            }",
+      "range": {
+        "startLine": 909,
+        "startChar": 0,
+        "endLine": 933,
+        "endChar": 5
+      },
+      "revId": "b3e5b9243d234c78121b8d2ab02d0980cdae77a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
