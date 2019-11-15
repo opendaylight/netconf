@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_313e0a29",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/services/impl/RestconfDataServiceImpl.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-02-20T10:01:15Z",
+      "side": 1,
+      "message": "static import?",
+      "range": {
+        "startLine": 129,
+        "startChar": 39,
+        "endLine": 129,
+        "endChar": 63
+      },
+      "revId": "1ce6cdc284726d6213677231867c48af65756ffc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_b1195ad9",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 646,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-02-20T10:01:15Z",
+      "side": 1,
+      "message": "static import?",
+      "range": {
+        "startLine": 646,
+        "startChar": 32,
+        "endLine": 646,
+        "endChar": 56
+      },
+      "revId": "1ce6cdc284726d6213677231867c48af65756ffc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
