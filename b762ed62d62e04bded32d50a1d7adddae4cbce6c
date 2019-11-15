@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_056c5907",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/md/sal/rest/common/TestRestconfUtils.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-01-09T13:06:38Z",
+      "side": 1,
+      "message": "we might want to call it directly from YangParserTestUtils everywhere...",
+      "range": {
+        "startLine": 175,
+        "startChar": 4,
+        "endLine": 182,
+        "endChar": 63
+      },
+      "revId": "b762ed62d62e04bded32d50a1d7adddae4cbce6c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
