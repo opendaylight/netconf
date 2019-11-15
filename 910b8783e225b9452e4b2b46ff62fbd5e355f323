@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_44add39b",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 540
+      },
+      "writtenOn": "2016-07-18T22:25:03Z",
+      "side": 1,
+      "message": "You\u0027ll have to flip the conditions or you\u0027ll get NPE.",
+      "revId": "910b8783e225b9452e4b2b46ff62fbd5e355f323",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
