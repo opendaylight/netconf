@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba51214e_34f81b7c",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/RestconfInvokeOperationsUtil.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-16T13:58:07Z",
+      "side": 1,
+      "message": "better formatting please, here and other places",
+      "range": {
+        "startLine": 52,
+        "startChar": 12,
+        "endLine": 53,
+        "endChar": 39
+      },
+      "revId": "9e46dfdad330b9046076b1c90f89a48facaef2e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_b42b8bea",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/RestconfInvokeOperationsUtil.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-16T13:58:07Z",
+      "side": 1,
+      "message": "info or warn, debug is silent in production",
+      "range": {
+        "startLine": 102,
+        "startChar": 16,
+        "endLine": 102,
+        "endChar": 22
+      },
+      "revId": "9e46dfdad330b9046076b1c90f89a48facaef2e4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
