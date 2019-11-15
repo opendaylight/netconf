@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da5c1566_774e07c3",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ModelGenerator.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-08T09:24:11Z",
+      "side": 1,
+      "message": "I\u0027m just curious... having new concepts of DerivedTypes/RestrictedTypes in place, is this method complete and equivalent to old one or priority here is to get rid of deprecated class? Thanks for clarification.",
+      "revId": "9943b1b98e781bb7489bc176fb647a4ac1efb90d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
