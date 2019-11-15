@@ -26,6 +26,29 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_9ce32d05",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/PatchDataTransactionUtil.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "Can you add this on new line, please ?",
+      "range": {
+        "startLine": 44,
+        "startChar": 40,
+        "endLine": 44,
+        "endChar": 93
+      },
+      "revId": "e95846ee9cdae2909a19fd2b565fea82a1dee5b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_ff54d3cb",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/TransactionUtil.java",
         "patchSetId": 44
@@ -38,6 +61,29 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "7a6b29fe_3cddb915",
+      "range": {
+        "startLine": 99,
+        "startChar": 17,
+        "endLine": 99,
+        "endChar": 42
+      },
+      "revId": "e95846ee9cdae2909a19fd2b565fea82a1dee5b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_3cddb915",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/TransactionUtil.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "remove get, please, add callback",
       "range": {
         "startLine": 99,
         "startChar": 17,
@@ -74,6 +120,29 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_7ce731e5",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/TransactionUtil.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "remove get, please, add callback",
+      "range": {
+        "startLine": 122,
+        "startChar": 36,
+        "endLine": 122,
+        "endChar": 39
+      },
+      "revId": "e95846ee9cdae2909a19fd2b565fea82a1dee5b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_9c85edaf",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/patch/Draft11AbstractIdentifierAwareJaxRsProvider.java",
         "patchSetId": 44
@@ -86,6 +155,29 @@
       "side": 1,
       "message": "On line 34 there is a difference from old restconf.",
       "parentUuid": "7a6b29fe_dcd765ec",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 1
+      },
+      "revId": "e95846ee9cdae2909a19fd2b565fea82a1dee5b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_dcd765ec",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/patch/Draft11AbstractIdentifierAwareJaxRsProvider.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "is this same like original class from old restconf ? why do you replace it if you don\u0027t change anything ?",
       "range": {
         "startLine": 1,
         "startChar": 0,
@@ -122,6 +214,29 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_3c04997d",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/patch/Draft11JsonToPATCHBodyReader.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "is this same like original class from old restconf ? why do you replace it if you don\u0027t change anything ?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 452,
+        "endChar": 1
+      },
+      "revId": "e95846ee9cdae2909a19fd2b565fea82a1dee5b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_9c5a0d4f",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/patch/Draft11PATCHJsonBodyWriter.java",
         "patchSetId": 44
@@ -134,6 +249,29 @@
       "side": 1,
       "message": "Done, removed",
       "parentUuid": "7a6b29fe_5c035573",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 114,
+        "endChar": 1
+      },
+      "revId": "e95846ee9cdae2909a19fd2b565fea82a1dee5b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_5c035573",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/patch/Draft11PATCHJsonBodyWriter.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "is this same like original class from old restconf ? why do you replace it if you don\u0027t change anything ?",
       "range": {
         "startLine": 1,
         "startChar": 0,
@@ -170,6 +308,29 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_bcf7098c",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/patch/Draft11PATCHXmlBodyWriter.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "is this same like original class from old restconf ? why do you replace it if you don\u0027t change anything ?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 125,
+        "endChar": 1
+      },
+      "revId": "e95846ee9cdae2909a19fd2b565fea82a1dee5b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_3c31390c",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/patch/Draft11StringModuleInstanceIdentifierCodec.java",
         "patchSetId": 44
@@ -182,6 +343,29 @@
       "side": 1,
       "message": "It is a copy to preserve protected access modifier, I do not want to make it public.",
       "parentUuid": "7a6b29fe_fc4861ce",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 59,
+        "endChar": 1
+      },
+      "revId": "e95846ee9cdae2909a19fd2b565fea82a1dee5b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_fc4861ce",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/patch/Draft11StringModuleInstanceIdentifierCodec.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "is this same like original class from old restconf ? why do you replace it if you don\u0027t change anything ?",
       "range": {
         "startLine": 1,
         "startChar": 0,
@@ -218,6 +402,29 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_3c12d9b4",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/patch/Draft11XmlToPATCHBodyReader.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "is this same like original class from old restconf ? why do you replace it if you don\u0027t change anything ?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 308,
+        "endChar": 1
+      },
+      "revId": "e95846ee9cdae2909a19fd2b565fea82a1dee5b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_5f2b4730",
         "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/rest/impl/test/providers/Draft11AbstractBodyReaderTest.java",
         "patchSetId": 44
@@ -230,6 +437,29 @@
       "side": 1,
       "message": "this is test for classes which extend Draft11AbstractIdentifierAwareJaxRsProvider not AbstractIdentifierAwareJaxRsProvider (different URIs)",
       "parentUuid": "7a6b29fe_5c8875e7",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 1
+      },
+      "revId": "e95846ee9cdae2909a19fd2b565fea82a1dee5b0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_5c8875e7",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/rest/impl/test/providers/Draft11AbstractBodyReaderTest.java",
+        "patchSetId": 44
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "is this same like original class from old restconf ? why do you replace it if you don\u0027t change anything ?",
       "range": {
         "startLine": 1,
         "startChar": 0,
