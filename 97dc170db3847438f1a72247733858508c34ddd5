@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_110d1791",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/Draft11ServicesWrapperImpl.java",
+        "patchSetId": 49
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-05-03T14:34:31Z",
+      "side": 1,
+      "message": "Can we also get a module using its revision date?",
+      "range": {
+        "startLine": 25,
+        "startChar": 13,
+        "endLine": 25,
+        "endChar": 39
+      },
+      "revId": "97dc170db3847438f1a72247733858508c34ddd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
