@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba51214e_f40ce396",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/services/impl/RestconfInvokeOperationsServiceImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-16T14:02:58Z",
+      "side": 1,
+      "message": "incorrect IF routing",
+      "range": {
+        "startLine": 48,
+        "startChar": 8,
+        "endLine": 58,
+        "endChar": 9
+      },
+      "revId": "08f0cf315d5ed2ab5eb19a0dc3bfee80d5fd38df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_d411dfad",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/streams/CreateStreamUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-16T14:02:58Z",
+      "side": 1,
+      "message": "private constructor missing",
+      "revId": "08f0cf315d5ed2ab5eb19a0dc3bfee80d5fd38df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
