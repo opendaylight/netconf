@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_1ea23bae",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfModulesServiceTest.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-05-06T07:57:57Z",
+      "side": 1,
+      "message": "why do you need own runner. I prefere to use MockitoAnnotations.initMocks(this);",
+      "revId": "d4fb396d0777aa9b7f40d32bae37a863626a3407",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_fea667c0",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfModulesServiceTest.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-05-06T07:57:57Z",
+      "side": 1,
+      "message": "TODO ?",
+      "revId": "d4fb396d0777aa9b7f40d32bae37a863626a3407",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_1e899b26",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfSchemaServiceTest.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-05-06T07:57:57Z",
+      "side": 1,
+      "message": "Please remove MockitoJUnitRunner. You can use MockitoAnnotations.initMocks(this) instead.",
+      "revId": "d4fb396d0777aa9b7f40d32bae37a863626a3407",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_5e831304",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfSchemaServiceTest.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-05-06T07:57:57Z",
+      "side": 1,
+      "message": "I\u0027d expect some Rest Exception here. Is it correct ?",
+      "revId": "d4fb396d0777aa9b7f40d32bae37a863626a3407",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_de76033e",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfStreamsServiceTest.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-05-06T07:57:57Z",
+      "side": 1,
+      "message": "Use default JUnit runner please.",
+      "revId": "d4fb396d0777aa9b7f40d32bae37a863626a3407",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_be734f4c",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-05-06T07:57:57Z",
+      "side": 1,
+      "message": "I\u0027m missing a test here.",
+      "revId": "d4fb396d0777aa9b7f40d32bae37a863626a3407",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_1e907b42",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 43
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-05-06T07:57:57Z",
+      "side": 1,
+      "message": "WHAT? Are you kidding me?",
+      "revId": "d4fb396d0777aa9b7f40d32bae37a863626a3407",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
