@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_5352f7dd",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/RestConnectorProvider.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-05-03T09:34:06Z",
+      "side": 1,
+      "message": "typo?",
+      "range": {
+        "startLine": 40,
+        "startChar": 21,
+        "endLine": 40,
+        "endChar": 27
+      },
+      "revId": "76447f515d62a56a57d4b93a5267582c7c242bb2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
