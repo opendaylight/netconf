@@ -23,6 +23,29 @@
       "revId": "039e73b4162df0912d7c6eaeb4773a0db8a72e61",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_a91fa5b6",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/PostDataTransactionUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "Is it possible to makes only one IF from this ?\nI mean:\n..else if(data instanceof AugmntNode || data instanceof ChoiceNode || ...){...}\nBcs both lines in if for true are same for this lines",
+      "range": {
+        "startLine": 103,
+        "startChar": 19,
+        "endLine": 117,
+        "endChar": 63
+      },
+      "revId": "039e73b4162df0912d7c6eaeb4773a0db8a72e61",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
