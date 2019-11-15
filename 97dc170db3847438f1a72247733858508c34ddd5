@@ -22,6 +22,29 @@
       "revId": "97dc170db3847438f1a72247733858508c34ddd5",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_c74bdaae",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/parser/ParserIdentifier.java",
+        "patchSetId": 49
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "if MOUNT should be at the end of string then moduleNameAndRevisin will be empty",
+      "range": {
+        "startLine": 53,
+        "startChar": 40,
+        "endLine": 53,
+        "endChar": 55
+      },
+      "revId": "97dc170db3847438f1a72247733858508c34ddd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
