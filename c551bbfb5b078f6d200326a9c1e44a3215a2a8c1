@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1f61a0_7b7a0478",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/resources/xml-to-cnsn/identityref/yang-augments/identityref-module.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-09-08T10:38:33Z",
+      "side": 1,
+      "message": "please get rid of trailing white spaces all around\n\nsrc/test/resources of restconf-nb-rfc8040",
+      "revId": "c551bbfb5b078f6d200326a9c1e44a3215a2a8c1",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
