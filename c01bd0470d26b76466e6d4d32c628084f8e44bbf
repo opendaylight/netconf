@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_1931d9ec",
+        "filename": "restconf/models/ietf-yang-library/src/main/java/org/opendaylight/yang/gen/v1/urn/ietf/params/xml/ns/yang/ietf/yang/library/rev160621/module/list/CommonLeafsRevisionBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-02T13:59:42Z",
+      "side": 1,
+      "message": "return new Revision(defaultValue);",
+      "range": {
+        "startLine": 17,
+        "startChar": 8,
+        "endLine": 17,
+        "endChar": 81
+      },
+      "revId": "c01bd0470d26b76466e6d4d32c628084f8e44bbf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_995cc927",
+        "filename": "restconf/sal-rest-connector/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-02T13:59:42Z",
+      "side": 1,
+      "message": "it shouldn\u0027t be here, I guess...",
+      "range": {
+        "startLine": 129,
+        "startChar": 5,
+        "endLine": 129,
+        "endChar": 39
+      },
+      "revId": "c01bd0470d26b76466e6d4d32c628084f8e44bbf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
