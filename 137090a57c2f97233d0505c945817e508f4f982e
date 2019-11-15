@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_17934fa4",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/transaction/TransactionVarsWrapper.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "transaction chain",
+      "revId": "137090a57c2f97233d0505c945817e508f4f982e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_37964b95",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/transaction/TransactionVarsWrapper.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "getTransactionChain()",
+      "revId": "137090a57c2f97233d0505c945817e508f4f982e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_f7f33308",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "what for is this? javadoc missing",
+      "revId": "137090a57c2f97233d0505c945817e508f4f982e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_f7ca13a0",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/DeleteDataTransactionUtilTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "transactionChain",
+      "revId": "137090a57c2f97233d0505c945817e508f4f982e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_b7d09b54",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/DeleteDataTransactionUtilTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "this.readWrite.exists() should be enough",
+      "revId": "137090a57c2f97233d0505c945817e508f4f982e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_97d59f45",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/DeleteDataTransactionUtilTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 8144
+      },
+      "writtenOn": "2019-11-05T21:57:10Z",
+      "side": 1,
+      "message": "this.readWrite.exists() should be enough",
+      "revId": "137090a57c2f97233d0505c945817e508f4f982e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
