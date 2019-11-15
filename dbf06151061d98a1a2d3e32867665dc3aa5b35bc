@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da01753e_9c355fdc",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/config/yang/md/sal/rest/connector/RestConnectorModuleTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-04-24T06:57:19Z",
+      "side": 1,
+      "message": "@Before ?",
+      "revId": "dbf06151061d98a1a2d3e32867665dc3aa5b35bc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
