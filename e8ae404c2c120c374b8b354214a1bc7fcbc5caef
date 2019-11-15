@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_05a4a0a4",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 1192,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-14T14:46:51Z",
+      "side": 1,
+      "message": "rename to setQueryParams()",
+      "revId": "e8ae404c2c120c374b8b354214a1bc7fcbc5caef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_c5b74885",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/ListenerAdapter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-14T14:46:51Z",
+      "side": 1,
+      "message": "rename to parseFilterParam()",
+      "range": {
+        "startLine": 179,
+        "startChar": 20,
+        "endLine": 179,
+        "endChar": 31
+      },
+      "revId": "e8ae404c2c120c374b8b354214a1bc7fcbc5caef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_65c0f4e0",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/NotificationListenerAdapter.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-14T14:46:51Z",
+      "side": 1,
+      "message": "rename to clarify setter",
+      "range": {
+        "startLine": 476,
+        "startChar": 16,
+        "endLine": 476,
+        "endChar": 27
+      },
+      "revId": "e8ae404c2c120c374b8b354214a1bc7fcbc5caef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_e58404b3",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/SubscribeToStreamUtil.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-14T14:46:51Z",
+      "side": 1,
+      "message": "rename to setQueryParams()",
+      "revId": "e8ae404c2c120c374b8b354214a1bc7fcbc5caef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_654e3498",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/restconf/impl/test/ExpressionParserTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-14T14:46:51Z",
+      "side": 1,
+      "message": "delete it",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 3
+      },
+      "revId": "e8ae404c2c120c374b8b354214a1bc7fcbc5caef",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
