@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_2f873963",
+        "filename": "restconf/models/pom.xml",
+        "patchSetId": 10
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-19T12:45:11Z",
+      "side": 1,
+      "message": "you\u0027re missing a copyright header",
+      "revId": "83b7742242d50fc34d00ce1b15f5a22504dca864",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
