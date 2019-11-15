@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba51214e_34549b53",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/services/impl/RestconfStreamsSubscriptionServiceImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-16T14:10:56Z",
+      "side": 1,
+      "message": "info or warn, debug is silent in production",
+      "range": {
+        "startLine": 57,
+        "startChar": 11,
+        "endLine": 57,
+        "endChar": 27
+      },
+      "revId": "9515d0ced601fdedafb3ec0dc995e73288b1da10",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_14519762",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/services/impl/RestconfStreamsSubscriptionServiceImpl.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-16T14:10:56Z",
+      "side": 1,
+      "message": "missing log",
+      "revId": "9515d0ced601fdedafb3ec0dc995e73288b1da10",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_544b0fb0",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/streams/SubscribeToStreamUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-16T14:10:56Z",
+      "side": 1,
+      "message": "final",
+      "revId": "9515d0ced601fdedafb3ec0dc995e73288b1da10",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_94cc8737",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/streams/SubscribeToStreamUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-16T14:10:56Z",
+      "side": 1,
+      "message": "private constructor",
+      "revId": "9515d0ced601fdedafb3ec0dc995e73288b1da10",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
