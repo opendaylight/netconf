@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "fa57193c_621abf6f",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/Draft11ServicesWrapperImpl.java",
+        "patchSetId": 49
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "Sorry, but what are you mean with this ?",
+      "parentUuid": "fa57193c_110d1791",
+      "range": {
+        "startLine": 25,
+        "startChar": 13,
+        "endLine": 25,
+        "endChar": 39
+      },
+      "revId": "97dc170db3847438f1a72247733858508c34ddd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_c74bdaae",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/parser/ParserIdentifier.java",
         "patchSetId": 49
@@ -36,6 +60,30 @@
       "writtenOn": "2019-11-05T21:57:10Z",
       "side": 1,
       "message": "if MOUNT should be at the end of string then moduleNameAndRevisin will be empty",
+      "range": {
+        "startLine": 53,
+        "startChar": 40,
+        "endLine": 53,
+        "endChar": 55
+      },
+      "revId": "97dc170db3847438f1a72247733858508c34ddd5",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_6745ae6f",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/parser/ParserIdentifier.java",
+        "patchSetId": 49
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "No, mark for mount point is at the end of the mount point and then continue name and revision of module.\nFor example:\n/restconf/modules/module/..mount point path../yang-ext:mount/..name of module from modules of mount point schema context../..module revision",
+      "parentUuid": "fa57193c_c74bdaae",
       "range": {
         "startLine": 53,
         "startChar": 40,
