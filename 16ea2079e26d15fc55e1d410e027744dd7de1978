@@ -26,6 +26,29 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_5687b40f",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "why are you creating new exception here ? This should be in callback like parameter in onFailure method. In this case, it is \"throwable\" variable. With use of this, you miss exception on submit failed.",
+      "range": {
+        "startLine": 236,
+        "startChar": 12,
+        "endLine": 237,
+        "endChar": 92
+      },
+      "revId": "16ea2079e26d15fc55e1d410e027744dd7de1978",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_f6f1a096",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
         "patchSetId": 15
@@ -50,6 +73,29 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_f6ac008f",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "why u don\u0027t use this exception from submit operation ?",
+      "range": {
+        "startLine": 249,
+        "startChar": 44,
+        "endLine": 249,
+        "endChar": 53
+      },
+      "revId": "16ea2079e26d15fc55e1d410e027744dd7de1978",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_16309c55",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
         "patchSetId": 15
@@ -62,6 +108,29 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "7a6b29fe_569e9457",
+      "range": {
+        "startLine": 250,
+        "startChar": 16,
+        "endLine": 251,
+        "endChar": 106
+      },
+      "revId": "16ea2079e26d15fc55e1d410e027744dd7de1978",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_569e9457",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/BrokerFacade.java",
+        "patchSetId": 15
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "Why are you using errors (RestconfDocumentedException) here ? If there are errors, you don\u0027t need to use submit operation.",
       "range": {
         "startLine": 250,
         "startChar": 16,
