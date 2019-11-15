@@ -22,6 +22,30 @@
       "revId": "a73ff47041b0a9329f466cbb530802ab84dc0c39",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da01753e_63e6f816",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/RestconfWrapperProvidersTest.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "this is test for initialization of RestconfWrapperProviders",
+      "parentUuid": "da01753e_1c596f36",
+      "range": {
+        "startLine": 35,
+        "startChar": 7,
+        "endLine": 36,
+        "endChar": 27
+      },
+      "revId": "a73ff47041b0a9329f466cbb530802ab84dc0c39",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
