@@ -39,6 +39,29 @@
       "revId": "08f0cf315d5ed2ab5eb19a0dc3bfee80d5fd38df",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_7b171ea4",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/streams/CreateStreamUtil.java",
+        "patchSetId": 7
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2019-11-15T19:18:24Z",
+      "side": 1,
+      "message": "return ? why are we using CheckedFuture?",
+      "range": {
+        "startLine": 104,
+        "startChar": 8,
+        "endLine": 104,
+        "endChar": 48
+      },
+      "revId": "08f0cf315d5ed2ab5eb19a0dc3bfee80d5fd38df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
