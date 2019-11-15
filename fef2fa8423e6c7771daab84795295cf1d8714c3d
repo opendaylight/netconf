@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "fa57193c_f0796bfd",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfSchemaServiceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "fix it please :)",
+      "range": {
+        "startLine": 71,
+        "startChar": 23,
+        "endLine": 71,
+        "endChar": 27
+      },
+      "revId": "fef2fa8423e6c7771daab84795295cf1d8714c3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fa57193c_d0654746",
         "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfSchemaServiceTest.java",
         "patchSetId": 1
@@ -13,6 +36,30 @@
       "writtenOn": "2019-11-05T21:57:10Z",
       "side": 1,
       "message": "this test should catch exception",
+      "range": {
+        "startLine": 74,
+        "startChar": 16,
+        "endLine": 74,
+        "endChar": 36
+      },
+      "revId": "fef2fa8423e6c7771daab84795295cf1d8714c3d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_c510e403",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/services/RestconfSchemaServiceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "it is ok for now",
+      "parentUuid": "fa57193c_d0654746",
       "range": {
         "startLine": 74,
         "startChar": 16,
