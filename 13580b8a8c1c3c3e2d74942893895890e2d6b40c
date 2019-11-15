@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_c65bcb2c",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/api/JSONRestconfService.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-15T15:19:41Z",
+      "side": 1,
+      "message": "let\u0027s deprecate it",
+      "revId": "13580b8a8c1c3c3e2d74942893895890e2d6b40c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_2669dfbe",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/JSONRestconfServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-15T15:19:41Z",
+      "side": 1,
+      "message": "let\u0027s deprecate it",
+      "revId": "13580b8a8c1c3c3e2d74942893895890e2d6b40c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_66bab724",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/restconf/impl/test/JSONRestconfServiceImplTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-15T15:19:41Z",
+      "side": 1,
+      "message": "let\u0027s deprecate it",
+      "revId": "13580b8a8c1c3c3e2d74942893895890e2d6b40c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a65312a_46305be8",
+        "filename": "restconf/sal-rest-connector/src/test/resources/ordered/by/user/ordered-by-user-example.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-11-15T15:19:41Z",
+      "side": 1,
+      "message": "?",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 12
+      },
+      "revId": "13580b8a8c1c3c3e2d74942893895890e2d6b40c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
