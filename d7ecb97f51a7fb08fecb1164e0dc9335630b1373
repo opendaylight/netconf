@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_b0f25398",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/impl/schema/context/SchemaContextHandlerTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "Ur use it only in onGlobalContextUpdateTest(). Do u need it init here ?",
+      "range": {
+        "startLine": 42,
+        "startChar": 8,
+        "endLine": 42,
+        "endChar": 75
+      },
+      "revId": "d7ecb97f51a7fb08fecb1164e0dc9335630b1373",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
