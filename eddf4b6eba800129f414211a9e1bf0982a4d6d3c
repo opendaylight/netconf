@@ -45,6 +45,29 @@
       "revId": "eddf4b6eba800129f414211a9e1bf0982a4d6d3c",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a494da4_faed00f1",
+        "filename": "restconf/models/ietf-restconf-20160316/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-04-13T09:25:30Z",
+      "side": 1,
+      "message": "any reason to have a different version in these model bundles than the rest of restconf?",
+      "range": {
+        "startLine": 22,
+        "startChar": 13,
+        "endLine": 22,
+        "endChar": 27
+      },
+      "revId": "eddf4b6eba800129f414211a9e1bf0982a4d6d3c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
