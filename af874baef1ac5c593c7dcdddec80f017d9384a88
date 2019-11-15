@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_c901613b",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierDeserializerTest.java",
+        "patchSetId": 12
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-10-27T13:37:17Z",
+      "side": 1,
+      "message": "let\u0027s leave this for now, but I suggest to use \n@Test(expected \u003d IllegalArgumentException.class) in future use",
+      "range": {
+        "startLine": 378,
+        "startChar": 8,
+        "endLine": 378,
+        "endChar": 59
+      },
+      "revId": "af874baef1ac5c593c7dcdddec80f017d9384a88",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
