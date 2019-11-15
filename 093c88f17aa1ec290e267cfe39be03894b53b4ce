@@ -1,0 +1,199 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_f582fd50",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierSerializerBuilder.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-05-10T08:04:30Z",
+      "side": 1,
+      "message": "if (i \u003d\u003d 0)",
+      "range": {
+        "startLine": 63,
+        "startChar": 11,
+        "endLine": 63,
+        "endChar": 21
+      },
+      "revId": "093c88f17aa1ec290e267cfe39be03894b53b4ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_356f55c7",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/RestconfApplicationService.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-05-10T08:04:30Z",
+      "side": 1,
+      "message": "redundant",
+      "range": {
+        "startLine": 29,
+        "startChar": 4,
+        "endLine": 29,
+        "endChar": 10
+      },
+      "revId": "093c88f17aa1ec290e267cfe39be03894b53b4ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_7568adba",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/RestconfApplicationService.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-05-10T08:04:30Z",
+      "side": 1,
+      "message": "redundant",
+      "range": {
+        "startLine": 37,
+        "startChar": 4,
+        "endLine": 37,
+        "endChar": 10
+      },
+      "revId": "093c88f17aa1ec290e267cfe39be03894b53b4ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_f59b1dc7",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/Draft11ServicesWrapperImpl.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-05-10T08:04:30Z",
+      "side": 1,
+      "message": "please change Ser to Service",
+      "range": {
+        "startLine": 43,
+        "startChar": 13,
+        "endLine": 43,
+        "endChar": 28
+      },
+      "revId": "093c88f17aa1ec290e267cfe39be03894b53b4ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_75af0de4",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/SchemaContextRef.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-05-10T08:04:30Z",
+      "side": 1,
+      "message": "not used here?",
+      "range": {
+        "startLine": 31,
+        "startChar": 3,
+        "endLine": 31,
+        "endChar": 54
+      },
+      "revId": "093c88f17aa1ec290e267cfe39be03894b53b4ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_75138d5c",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierSerializerBuilderTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-05-10T08:04:30Z",
+      "side": 1,
+      "message": "do you really need this?",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 34
+      },
+      "revId": "093c88f17aa1ec290e267cfe39be03894b53b4ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_753a6dce",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierSerializerBuilderTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-05-10T08:04:30Z",
+      "side": 1,
+      "message": "name of variable should be more appropriate",
+      "range": {
+        "startLine": 39,
+        "startChar": 37,
+        "endLine": 39,
+        "endChar": 43
+      },
+      "revId": "093c88f17aa1ec290e267cfe39be03894b53b4ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_553769e3",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierSerializerBuilderTest.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-05-10T08:04:30Z",
+      "side": 1,
+      "message": "for Ivan: please cover more scenarios by JUnits",
+      "revId": "093c88f17aa1ec290e267cfe39be03894b53b4ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_953101ef",
+        "filename": "restconf/sal-rest-connector/src/test/resources/restconf/parser/list-test.yang",
+        "patchSetId": 10
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-05-10T08:04:30Z",
+      "side": 1,
+      "message": "trailing white-space?",
+      "revId": "093c88f17aa1ec290e267cfe39be03894b53b4ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
