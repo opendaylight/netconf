@@ -87,6 +87,24 @@
     },
     {
       "key": {
+        "uuid": "7a6b29fe_30f651d8",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/DeleteDataTransactionUtilTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "nop, because there was change in TransactionVarsWrapper where you create this object with transaction chain, that\u0027s mean, that in next context of this test (delete operation and next case for deleteDataNegativeTest) you are getting transaction chain in DeleteDataTransactionUtil and then from this chain you are calling method for newRead/Write/ReadWrite transaction and after that you are checking if data exists. So, you have to prepare path of mock objects for chain -\u003e specific transaction -\u003e exist or you get NPE from this test",
+      "parentUuid": "7a6b29fe_b7d09b54",
+      "revId": "137090a57c2f97233d0505c945817e508f4f982e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a6b29fe_97d59f45",
         "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/restful/utils/DeleteDataTransactionUtilTest.java",
         "patchSetId": 4
