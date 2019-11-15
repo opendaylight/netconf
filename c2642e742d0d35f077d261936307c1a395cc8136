@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_9dd5c045",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/RestconfModulesServiceImpl.java",
+        "patchSetId": 41
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-05-02T14:33:26Z",
+      "side": 1,
+      "message": "please remove empty space in jdoc",
+      "range": {
+        "startLine": 51,
+        "startChar": 6,
+        "endLine": 51,
+        "endChar": 7
+      },
+      "revId": "c2642e742d0d35f077d261936307c1a395cc8136",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
