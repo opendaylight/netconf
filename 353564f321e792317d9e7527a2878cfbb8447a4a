@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a65312a_1e589131",
+        "filename": "restconf/sal-rest-connector/src/main/yang/sal-remote-augment.yang",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 6295
+      },
+      "writtenOn": "2016-11-07T13:21:55Z",
+      "side": 1,
+      "message": "max line length exceeded",
+      "range": {
+        "startLine": 9,
+        "startChar": 1,
+        "endLine": 10,
+        "endChar": 112
+      },
+      "revId": "353564f321e792317d9e7527a2878cfbb8447a4a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
