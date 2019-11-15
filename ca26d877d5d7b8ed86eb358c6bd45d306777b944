@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_1dac1ba0",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 1215,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-08-05T14:16:19Z",
+      "side": 1,
+      "message": "this is supposed to be deleted, not just annotated.",
+      "range": {
+        "startLine": 1212,
+        "startChar": 3,
+        "endLine": 1215,
+        "endChar": 5
+      },
+      "revId": "ca26d877d5d7b8ed86eb358c6bd45d306777b944",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
