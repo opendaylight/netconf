@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_d6841cd6",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "do u can add this to import ?",
+      "range": {
+        "startLine": 121,
+        "startChar": 8,
+        "endLine": 121,
+        "endChar": 56
+      },
+      "revId": "25736dc9fe50730afb73eb8fb25ccbc29720e5fe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
