@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3a4c51b2_0604c279",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/RestconfModulesServiceImpl.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T15:54:14Z",
+      "side": 1,
+      "message": "Hm ... could we create some RestconfModuleProvider or some RestModuleFactory/facade ? ... I guess, this approach is little bit strange.",
+      "range": {
+        "startLine": 54,
+        "startChar": 48,
+        "endLine": 54,
+        "endChar": 61
+      },
+      "revId": "96c57fcf4c9ba2e4021ce09b51f3272b3c0c0c66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a4c51b2_26361e53",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/RestconfModulesServiceImpl.java",
+        "patchSetId": 29
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-07T15:54:14Z",
+      "side": 1,
+      "message": "simplify (found possibility to code reuse here: )\nhttps://git.opendaylight.org/gerrit/#/c/18521/3/opendaylight/md-sal/sal-rest-connector/src/main/java/org/opendaylight/controller/md/sal/rest/service/RestconfServiceImpl.java",
+      "revId": "96c57fcf4c9ba2e4021ce09b51f3272b3c0c0c66",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
