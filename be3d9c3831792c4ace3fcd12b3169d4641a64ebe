@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_9f672025",
+        "filename": "restconf/sal-rest-docgen/src/main/resources/18/explorer/index.html",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-01-05T09:04:38Z",
+      "side": 1,
+      "message": "trailing white-spaces \u0026 tabs",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 1
+      },
+      "revId": "be3d9c3831792c4ace3fcd12b3169d4641a64ebe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_df7198e1",
+        "filename": "restconf/sal-rest-docgen/src/main/resources/18/explorer/lib/odl/list_mounts.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-01-05T09:04:38Z",
+      "side": 1,
+      "message": "trailing white-spaces \u0026 tabs",
+      "range": {
+        "startLine": 14,
+        "startChar": 75,
+        "endLine": 14,
+        "endChar": 76
+      },
+      "revId": "be3d9c3831792c4ace3fcd12b3169d4641a64ebe",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
