@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_57592659",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierDeserializer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-12T08:56:38Z",
+      "side": 1,
+      "message": "This has gotten quite long and hard to follow. I think this would introduce a couple of sonar issues just because of the complexity, you should refactor this into a couple of smaller methods which would help with readability.",
+      "range": {
+        "startLine": 51,
+        "startChar": 4,
+        "endLine": 136,
+        "endChar": 5
+      },
+      "revId": "b5c4bbdc9cbaaa8e36506082383ae7e645c4d097",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_37547220",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierSerializer.java",
+        "patchSetId": 13
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2016-05-12T08:56:38Z",
+      "side": 1,
+      "message": "Not as long as the previous one but still could benefit from a bit of refactoring.",
+      "range": {
+        "startLine": 45,
+        "startChar": 3,
+        "endLine": 95,
+        "endChar": 5
+      },
+      "revId": "b5c4bbdc9cbaaa8e36506082383ae7e645c4d097",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
