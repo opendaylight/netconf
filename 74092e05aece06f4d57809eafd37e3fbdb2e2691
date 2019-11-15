@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_d01d4775",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/utils/mapping/RestconfMappingNodeUtilTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "Please make a serious tests - test data in restconf module.\nAdd jdoc, please.",
+      "revId": "74092e05aece06f4d57809eafd37e3fbdb2e2691",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
