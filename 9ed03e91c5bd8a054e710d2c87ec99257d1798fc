@@ -22,6 +22,30 @@
       "revId": "9ed03e91c5bd8a054e710d2c87ec99257d1798fc",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_30b28094",
+        "filename": "restconf/sal-rest-docgen/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "I add jackson and json to export package because single feature test started fail after upgrade of jackson in odlparent (https://git.opendaylight.org/gerrit/#/c/38268/) with error message about missing these two packages. Without this, I wasn\u0027t able to install feature odl-mdsal-apidocs (part of feature odl-restconf-all)",
+      "parentUuid": "fa57193c_0140da54",
+      "range": {
+        "startLine": 126,
+        "startChar": 12,
+        "endLine": 129,
+        "endChar": 29
+      },
+      "revId": "9ed03e91c5bd8a054e710d2c87ec99257d1798fc",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
