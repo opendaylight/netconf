@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a6b29fe_bd940738",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/rest/impl/NormalizedNodeJsonBodyWriter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-08-05T14:33:28Z",
+      "side": 1,
+      "message": "not really needed, it creates commit noise",
+      "revId": "bf40a094d8f33c529398ad569bcd5d2961593ada",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
