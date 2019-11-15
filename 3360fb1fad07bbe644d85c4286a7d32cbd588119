@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba51214e_d1a45159",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/RestConnectorProvider.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2019-11-15T19:18:24Z",
+      "side": 1,
+      "message": "is it system exception ? I\u0027ll prefere warning or info -\u003e please try to think about a importantcy log for system administrator",
+      "range": {
+        "startLine": 47,
+        "startChar": 16,
+        "endLine": 47,
+        "endChar": 21
+      },
+      "revId": "3360fb1fad07bbe644d85c4286a7d32cbd588119",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_919ad912",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/RestConnectorProvider.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2019-11-15T19:18:24Z",
+      "side": 1,
+      "message": "why do we throw new exception -\u003e please transform it to Restconf if you realy need some exception.",
+      "revId": "3360fb1fad07bbe644d85c4286a7d32cbd588119",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_91c139e7",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/RestConnectorProvider.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2019-11-15T19:18:24Z",
+      "side": 1,
+      "message": "introduce an exception state better",
+      "revId": "3360fb1fad07bbe644d85c4286a7d32cbd588119",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_f1b6b589",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/RestConnectorProvider.java",
+        "patchSetId": 20
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2019-11-15T19:18:24Z",
+      "side": 1,
+      "message": "please move logging to start metod",
+      "revId": "3360fb1fad07bbe644d85c4286a7d32cbd588119",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
