@@ -1,0 +1,388 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_0b4b3f2c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 36
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "please describle better your impl. target and problem scope",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 24
+      },
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_e85a514f",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/ControllerContext.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "check saveAction in your IDE (alphabetical order please)",
+      "range": {
+        "startLine": 63,
+        "startChar": 7,
+        "endLine": 63,
+        "endChar": 10
+      },
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_a8405957",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/RestconfModulesServiceImpl.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "jdoc",
+      "range": {
+        "startLine": 48,
+        "startChar": 11,
+        "endLine": 48,
+        "endChar": 37
+      },
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_282c49ab",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/RestconfModulesServiceImpl.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "I\u0027ve seen somewher Draf11 ...",
+      "range": {
+        "startLine": 120,
+        "startChar": 16,
+        "endLine": 120,
+        "endChar": 23
+      },
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_0b417f39",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/RestconfOperationsServiceImpl.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "? jdoc",
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_ab5cd326",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/RestconfOperationsServiceImpl.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "please throw UnsupportedOperationException(\" Service is not implemented yet for Draft11 \") or RestconfDocumentedException with similar msg",
+      "range": {
+        "startLine": 25,
+        "startChar": 15,
+        "endLine": 25,
+        "endChar": 19
+      },
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_cb6e67c9",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/RestconfSchemaServiceImpl.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "? jdoc",
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_8b9bcfc8",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/RestconfSchemaServiceImpl.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "I hope it could be alone private static method",
+      "range": {
+        "startLine": 37,
+        "startChar": 8,
+        "endLine": 63,
+        "endChar": 9
+      },
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_6ba0fbf4",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/RestconfSchemaServiceImpl.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "static",
+      "range": {
+        "startLine": 66,
+        "startChar": 17,
+        "endLine": 66,
+        "endChar": 36
+      },
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_cba5c705",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/RestconfSchemaServiceImpl.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "static",
+      "range": {
+        "startLine": 76,
+        "startChar": 19,
+        "endLine": 76,
+        "endChar": 39
+      },
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_2b8d637c",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/SchemaContextRef.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "please specifie your target of use for this class. (e.g. Object holds a hard reference for the SchemaContext and we would like to use for Rest Req/Resp processing)",
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_6b875b62",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/SchemaContextRef.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "final class - I guess, you don\u0027t wish to overwrite any from your methods inside.",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 5
+      },
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_2bb6033e",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/SchemaContextRef.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "private ?",
+      "range": {
+        "startLine": 26,
+        "startChar": 4,
+        "endLine": 26,
+        "endChar": 50
+      },
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_4b909795",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/impl/services/SchemaContextRef.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "remove it please",
+      "range": {
+        "startLine": 113,
+        "startChar": 6,
+        "endLine": 113,
+        "endChar": 7
+      },
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_abf853e6",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/RestconfConstants.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "IDE safeaction (alphabetic order please)",
+      "range": {
+        "startLine": 11,
+        "startChar": 7,
+        "endLine": 11,
+        "endChar": 10
+      },
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_0bddff70",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/mapping/RestconfMappingNodeConstants.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "jdoc",
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_ebd9ab84",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/parser/ParserIdentifier.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "jdoc",
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_ab469321",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/schema/context/RestconfSchemaUtil.java",
+        "patchSetId": 36
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-04-21T16:19:40Z",
+      "side": 1,
+      "message": "RestconfException ?",
+      "range": {
+        "startLine": 103,
+        "startChar": 18,
+        "endLine": 103,
+        "endChar": 38
+      },
+      "revId": "9d22a90d214393631905c216df6f674ffbe025df",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
