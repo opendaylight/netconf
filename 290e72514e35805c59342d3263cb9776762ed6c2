@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_ee08952f",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/services/impl/RestconfModulesServiceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-02T13:40:28Z",
+      "side": 1,
+      "message": "unused import?",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 79
+      },
+      "revId": "290e72514e35805c59342d3263cb9776762ed6c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_2e03ad10",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/services/impl/RestconfModulesServiceTestUtils.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-02T13:40:28Z",
+      "side": 1,
+      "message": "unused import?",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 79
+      },
+      "revId": "290e72514e35805c59342d3263cb9776762ed6c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_6e1da573",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/services/impl/RestconfOperationsServiceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-02T13:40:28Z",
+      "side": 1,
+      "message": "unused import?",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 82
+      },
+      "revId": "290e72514e35805c59342d3263cb9776762ed6c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_8e180186",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/rest/services/impl/RestconfStreamsServiceTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-02T13:40:28Z",
+      "side": 1,
+      "message": "unused import?",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 79
+      },
+      "revId": "290e72514e35805c59342d3263cb9776762ed6c2",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
