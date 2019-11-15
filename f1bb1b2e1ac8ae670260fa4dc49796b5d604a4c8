@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_f17223e4",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/RestConnectorProvider.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-05-03T14:46:58Z",
+      "side": 1,
+      "message": "maybe we should make sure it\u0027s not null using preconditions",
+      "range": {
+        "startLine": 37,
+        "startChar": 80,
+        "endLine": 37,
+        "endChar": 87
+      },
+      "revId": "f1bb1b2e1ac8ae670260fa4dc49796b5d604a4c8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_31749bce",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/rest/RestconfApplicationService.java",
+        "patchSetId": 27
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-05-03T14:46:58Z",
+      "side": 1,
+      "message": "please add javadoc as this is an API",
+      "revId": "f1bb1b2e1ac8ae670260fa4dc49796b5d604a4c8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
