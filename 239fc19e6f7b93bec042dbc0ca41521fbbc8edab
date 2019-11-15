@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_4294cae1",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/utils/validation/RestconfValidationTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "jdoc",
+      "revId": "239fc19e6f7b93bec042dbc0ca41521fbbc8edab",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
