@@ -62,6 +62,69 @@
       "revId": "d2be9a35621d9323595e4dc5ca415f6e704015cf",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_9b8f9223",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/PostDataTransactionUtil.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2019-11-15T19:18:24Z",
+      "side": 1,
+      "message": "you want to return CheckedFuture and here you send RestconfException directly",
+      "revId": "d2be9a35621d9323595e4dc5ca415f6e704015cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_bbb9b6eb",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/PostDataTransactionUtil.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2019-11-15T19:18:24Z",
+      "side": 1,
+      "message": "are you sure ? merge is very expensive operation",
+      "range": {
+        "startLine": 108,
+        "startChar": 20,
+        "endLine": 108,
+        "endChar": 25
+      },
+      "revId": "d2be9a35621d9323595e4dc5ca415f6e704015cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_1bd1c2fb",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/parser/ParserIdentifier.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2019-11-15T19:18:24Z",
+      "side": 1,
+      "message": "bad metod name",
+      "range": {
+        "startLine": 74,
+        "startChar": 25,
+        "endLine": 74,
+        "endChar": 33
+      },
+      "revId": "d2be9a35621d9323595e4dc5ca415f6e704015cf",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
