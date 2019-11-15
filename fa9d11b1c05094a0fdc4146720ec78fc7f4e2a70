@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba51214e_74dbb31b",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/services/impl/RestconfInvokeOperationsServiceImpl.java",
+        "patchSetId": 14
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-16T13:52:03Z",
+      "side": 1,
+      "message": "FIXME unsupported yet or implement me",
+      "range": {
+        "startLine": 18,
+        "startChar": 8,
+        "endLine": 18,
+        "endChar": 35
+      },
+      "revId": "fa9d11b1c05094a0fdc4146720ec78fc7f4e2a70",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
