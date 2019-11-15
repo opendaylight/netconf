@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_3ec5448e",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/services/impl/RestconfDataServiceImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_bb3826a1",
+      "range": {
+        "startLine": 126,
+        "startChar": 32,
+        "endLine": 126,
+        "endChar": 89
+      },
+      "revId": "fa52faf77dfdf7390172757ec0b7a9212822e570",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_1b6e9296",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/ReadDataTransactionUtil.java",
         "patchSetId": 5
@@ -36,6 +60,30 @@
       "writtenOn": "2017-02-16T09:18:20Z",
       "side": 1,
       "message": "RestconfStreamConstants",
+      "range": {
+        "startLine": 645,
+        "startChar": 32,
+        "endLine": 645,
+        "endChar": 81
+      },
+      "revId": "fa52faf77dfdf7390172757ec0b7a9212822e570",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_1ec0407b",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/ReadDataTransactionUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_1b6e9296",
       "range": {
         "startLine": 645,
         "startChar": 32,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "fafc7978_7ebfccfb",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/SubscribeToStreamUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_7b1b5e1b",
+      "range": {
+        "startLine": 100,
+        "startChar": 65,
+        "endLine": 100,
+        "endChar": 70
+      },
+      "revId": "fa52faf77dfdf7390172757ec0b7a9212822e570",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fafc7978_9bd72223",
         "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/SubscribeToStreamUtil.java",
         "patchSetId": 5
@@ -82,6 +154,30 @@
       "writtenOn": "2017-02-16T09:18:20Z",
       "side": 1,
       "message": "duplicate code?",
+      "range": {
+        "startLine": 135,
+        "startChar": 7,
+        "endLine": 141,
+        "endChar": 9
+      },
+      "revId": "fa52faf77dfdf7390172757ec0b7a9212822e570",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fafc7978_be3814a1",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/utils/SubscribeToStreamUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fafc7978_9bd72223",
       "range": {
         "startLine": 135,
         "startChar": 7,
