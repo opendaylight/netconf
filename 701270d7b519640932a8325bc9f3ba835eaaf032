@@ -1,0 +1,51 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba51214e_f8734613",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 659,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-06-14T14:41:54Z",
+      "side": 1,
+      "message": "This will not work correctly in face of concurrent access, as it is two transactions, leading to classing TOCTOE race.\n\nFurthermore it will force a full read of data, which is going to suck performance-wise due to need to transfer the data.\n\nYou need to allocate a transaction, perform an exist check on it and perform a put on the same transaction.",
+      "range": {
+        "startLine": 659,
+        "startChar": 29,
+        "endLine": 659,
+        "endChar": 62
+      },
+      "revId": "701270d7b519640932a8325bc9f3ba835eaaf032",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_184efac1",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 659,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2016-06-14T14:42:57Z",
+      "side": 1,
+      "message": "that should read \u0027classic TOCTOU\u0027",
+      "parentUuid": "ba51214e_f8734613",
+      "range": {
+        "startLine": 659,
+        "startChar": 29,
+        "endLine": 659,
+        "endChar": 62
+      },
+      "revId": "701270d7b519640932a8325bc9f3ba835eaaf032",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
