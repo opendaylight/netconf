@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a494da4_4d90bb95",
+        "filename": "restconf/models/ietf-restconf-20160316/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-14T20:34:58Z",
+      "side": 1,
+      "message": "please remove tabs",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 1
+      },
+      "revId": "d62026b135e13c69dca5f5549267ad9ced339ffb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a494da4_2d8d6f7c",
+        "filename": "restconf/models/ietf-restconf-20160316/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-14T20:34:58Z",
+      "side": 1,
+      "message": "this seems useless",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 19
+      },
+      "revId": "d62026b135e13c69dca5f5549267ad9ced339ffb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a494da4_8de9231d",
+        "filename": "restconf/models/ietf-restconf-monitoring-20160316/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-14T20:34:58Z",
+      "side": 1,
+      "message": "please remove tabs",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 1
+      },
+      "revId": "d62026b135e13c69dca5f5549267ad9ced339ffb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a494da4_cdf32b09",
+        "filename": "restconf/models/ietf-restconf-monitoring-20160316/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-14T20:34:58Z",
+      "side": 1,
+      "message": "this seems useless",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 21
+      },
+      "revId": "d62026b135e13c69dca5f5549267ad9ced339ffb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a494da4_6dee5724",
+        "filename": "restconf/models/ietf-restconf-monitoring-20160316/pom.xml",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 3675
+      },
+      "writtenOn": "2016-04-14T20:34:58Z",
+      "side": 1,
+      "message": "this seems useless",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 21
+      },
+      "revId": "d62026b135e13c69dca5f5549267ad9ced339ffb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
