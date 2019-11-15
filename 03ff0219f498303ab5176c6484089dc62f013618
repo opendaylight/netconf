@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da5c1566_771a8718",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/restconf/impl/nn/to/xml/test/NnToXmlTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-08T08:53:03Z",
+      "side": 1,
+      "message": "can you explain meaning of this change?",
+      "range": {
+        "startLine": 204,
+        "startChar": 8,
+        "endLine": 207,
+        "endChar": 88
+      },
+      "revId": "03ff0219f498303ab5176c6484089dc62f013618",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da5c1566_d72b932e",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/restconf/impl/nn/to/xml/test/NnToXmlTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-06-08T08:53:03Z",
+      "side": 1,
+      "message": "formatting",
+      "range": {
+        "startLine": 295,
+        "startChar": 0,
+        "endLine": 298,
+        "endChar": 19
+      },
+      "revId": "03ff0219f498303ab5176c6484089dc62f013618",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
