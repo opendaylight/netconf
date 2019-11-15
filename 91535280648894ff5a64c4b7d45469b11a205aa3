@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_f3d99184",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/mapping/RestconfMappingNodeUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 494,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-06T14:48:26Z",
+      "side": 1,
+      "message": "getChildOfCont()",
+      "range": {
+        "startLine": 494,
+        "startChar": 34,
+        "endLine": 494,
+        "endChar": 48
+      },
+      "revId": "91535280648894ff5a64c4b7d45469b11a205aa3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_53e7a540",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/mapping/RestconfMappingNodeUtil.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-12-06T14:48:26Z",
+      "side": 1,
+      "message": "allow one empty space in sentence...",
+      "revId": "91535280648894ff5a64c4b7d45469b11a205aa3",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
