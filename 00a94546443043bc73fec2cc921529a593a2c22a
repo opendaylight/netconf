@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a561d44_fd5e64e8",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/ContainerSchemaNodeImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-07-08T13:40:53Z",
+      "side": 1,
+      "message": "add javadoc, otherwise nobody except you and me knows why is this suspiciously called class here ... applies also to other schema node classes in this patch",
+      "revId": "00a94546443043bc73fec2cc921529a593a2c22a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a561d44_bd6cec9d",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-07-08T13:40:53Z",
+      "side": 1,
+      "message": "also add javadoc, this is very special case only for restconf use (since moment of old Yang parser and old yang model API removal)",
+      "revId": "00a94546443043bc73fec2cc921529a593a2c22a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
