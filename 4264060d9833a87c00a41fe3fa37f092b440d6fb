@@ -16,6 +16,29 @@
       "revId": "4264060d9833a87c00a41fe3fa37f092b440d6fb",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_7a79dbfb",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/Draft18.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "In this case, I have to initialize variables before line 139.",
+      "range": {
+        "startLine": 127,
+        "startChar": 8,
+        "endLine": 137,
+        "endChar": 9
+      },
+      "revId": "4264060d9833a87c00a41fe3fa37f092b440d6fb",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
