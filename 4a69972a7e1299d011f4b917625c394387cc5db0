@@ -22,6 +22,30 @@
       "revId": "4a69972a7e1299d011f4b917625c394387cc5db0",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_c8266d68",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/RestSchemaControllerUtil.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "This util class will be removed in next patch.",
+      "parentUuid": "fa57193c_086865b9",
+      "range": {
+        "startLine": 30,
+        "startChar": 31,
+        "endLine": 30,
+        "endChar": 36
+      },
+      "revId": "4a69972a7e1299d011f4b917625c394387cc5db0",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
