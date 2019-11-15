@@ -23,6 +23,29 @@
       "revId": "5f6e5b52e6d93a4a413e5472d95682a60be075ae",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a6b29fe_2f804045",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/streams/listeners/NotificationListenerAdapter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "this urn should be for RESTconf \"urn:ietf:params:xml:ns:yang:ietf-restconf\"",
+      "range": {
+        "startLine": 203,
+        "startChar": 65,
+        "endLine": 203,
+        "endChar": 112
+      },
+      "revId": "5f6e5b52e6d93a4a413e5472d95682a60be075ae",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
