@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba51214e_f457c300",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/services/impl/RestconfDataServiceImpl.java",
+        "patchSetId": 22
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-06-16T13:03:05Z",
+      "side": 1,
+      "message": "we don\u0027t wish to call checkedGet ANYMORE",
+      "revId": "bdf78e37a114e094fd03e3e4908e0a54264a08dd",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
