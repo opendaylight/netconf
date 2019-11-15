@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba1f61a0_fa35aedb",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/netconf/sal/restconf/impl/RestconfImpl.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 919,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2017-08-15T14:33:56Z",
+      "side": 1,
+      "message": "-1 again. this entire check of type def is completely unneeded. Objects.deepEquals() handles normal and arrays as expected.",
+      "range": {
+        "startLine": 909,
+        "startChar": 0,
+        "endLine": 919,
+        "endChar": 13
+      },
+      "revId": "4a4c16c9d33008ff3763f523061f25c908772def",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
