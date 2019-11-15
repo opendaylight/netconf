@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a622d24_784deb3d",
+        "filename": "restconf/sal-rest-connector/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-01-10T09:16:40Z",
+      "side": 0,
+      "message": "I can see you are still using this dependency, so maybe this can remain here",
+      "revId": "3c03dd6d9a59a737293cad70062b5a0a7bd8e4a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_d83ebf8b",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/controller/sal/rest/impl/test/providers/TestJsonBodyReader.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-01-10T09:16:40Z",
+      "side": 0,
+      "message": "Single blank line separating static and non-static imports should be mandatory. You remove this blank line also in other files in this patch set.",
+      "revId": "3c03dd6d9a59a737293cad70062b5a0a7bd8e4a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a622d24_f860dba6",
+        "filename": "restconf/sal-rest-docgen/pom.xml",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 4580
+      },
+      "writtenOn": "2017-01-10T09:16:40Z",
+      "side": 0,
+      "message": "You are using org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException in your org.opendaylight.controller.sal.rest.doc.impl.DocGenTestHelper test.",
+      "revId": "3c03dd6d9a59a737293cad70062b5a0a7bd8e4a8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
