@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba51214e_315e6d46",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/services/impl/RestconfDataServiceImpl.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-06-16T12:49:47Z",
+      "side": 1,
+      "message": "UnsupportedOperationException with FIXME",
+      "range": {
+        "startLine": 58,
+        "startChar": 8,
+        "endLine": 59,
+        "endChar": 20
+      },
+      "revId": "d6a7e72356a4c68611ce2588e047599e7760be62",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba51214e_5155e11b",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/restful/transaction/TransactionNode.java",
+        "patchSetId": 25
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 994
+      },
+      "writtenOn": "2016-06-16T12:49:47Z",
+      "side": 1,
+      "message": "Is it represent only delegation wrapper ?",
+      "revId": "d6a7e72356a4c68611ce2588e047599e7760be62",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
