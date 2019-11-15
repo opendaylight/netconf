@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba51214e_9f178551",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/parser/builder/YangInstanceIdentifierDeserializerTest.java",
+        "patchSetId": 23
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 7786
+      },
+      "writtenOn": "2019-11-15T23:09:16Z",
+      "side": 1,
+      "message": "why are you use this 2 times?",
+      "range": {
+        "startLine": 135,
+        "startChar": 8,
+        "endLine": 140,
+        "endChar": 33
+      },
+      "revId": "ecc4ac82160f462b3dff085bea1d8b1fe7ddc62a",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
