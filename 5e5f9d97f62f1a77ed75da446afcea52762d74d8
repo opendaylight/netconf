@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fafc7978_e64e9f6e",
+        "filename": "restconf/sal-rest-connector/src/test/java/org/opendaylight/restconf/utils/parser/ParserIdentifierTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2017-02-14T07:35:24Z",
+      "side": 1,
+      "message": "make sure this is cleaned up to YangParserTestUtils in Carbon master codebase",
+      "range": {
+        "startLine": 105,
+        "startChar": 36,
+        "endLine": 105,
+        "endChar": 94
+      },
+      "revId": "5e5f9d97f62f1a77ed75da446afcea52762d74d8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
