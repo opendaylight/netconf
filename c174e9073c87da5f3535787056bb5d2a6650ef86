@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa57193c_13acffec",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/validation/RestconfValidation.java",
+        "patchSetId": 47
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-05-03T09:17:19Z",
+      "side": 1,
+      "message": "please refactor to\nvalidateAndGetRevision(final Iterator\u003cString\u003e revisionDate)",
+      "range": {
+        "startLine": 36,
+        "startChar": 23,
+        "endLine": 36,
+        "endChar": 79
+      },
+      "revId": "c174e9073c87da5f3535787056bb5d2a6650ef86",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57193c_73b9fb2d",
+        "filename": "restconf/sal-rest-connector/src/main/java/org/opendaylight/restconf/utils/validation/RestconfValidation.java",
+        "patchSetId": 47
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 2682
+      },
+      "writtenOn": "2016-05-03T09:17:19Z",
+      "side": 1,
+      "message": "please rename to\nvalidateAndGetModuleName(final Iterator\u003cString\u003e moduleName)",
+      "range": {
+        "startLine": 53,
+        "startChar": 25,
+        "endLine": 53,
+        "endChar": 83
+      },
+      "revId": "c174e9073c87da5f3535787056bb5d2a6650ef86",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    }
+  ]
+}
