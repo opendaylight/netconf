@@ -179,10 +179,8 @@ public final class YangInstanceIdentifierDeserializer {
                     schemaNode);
         }
         decoded = RestCodec.from(typedef, null, schemaContext).deserialize(value);
-        if (decoded == null) {
-            if (baseType instanceof IdentityrefTypeDefinition) {
-                decoded = toQName(value, schemaNode, schemaContext);
-            }
+        if (decoded == null && typedef instanceof IdentityrefTypeDefinition) {
+            decoded = toIdentityrefQName(value, schemaNode);
         }
         return decoded;
     }
@@ -383,12 +381,18 @@ public final class YangInstanceIdentifierDeserializer {
         return parsedPrefix.toString();
     }
 
-    private static Object toQName(final String value, final DataSchemaNode schemaNode,
-            final SchemaContext schemaContext) {
+    private QName toIdentityrefQName(final String value, final DataSchemaNode schemaNode) {
         final String moduleName = toModuleName(value);
         final String nodeName = toNodeName(value);
-        final Module module = schemaContext.findModules(moduleName).iterator().next();
-        for (final IdentitySchemaNode identitySchemaNode : module.getIdentities()) {
+        final Iterator<? extends Module> modulesIterator = schemaContext.findModules(moduleName).iterator();
+        if (!modulesIterator.hasNext()) {
+            throw new RestconfDocumentedException(String.format("Cannot decode value '%s' for identityref type "
+                    + "in %s. Make sure reserved characters such as comma, single-quote, double-quote, colon,"
+                    + " double-quote, space, and forward slash (,'\":\" /) are percent-encoded,"
+                    + " for example ':' is '%%3A'", value, current.getIdentifier().getNodeType()),
+                    ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT);
+        }
+        for (final IdentitySchemaNode identitySchemaNode : modulesIterator.next().getIdentities()) {
             final QName qName = identitySchemaNode.getQName();
             if (qName.getLocalName().equals(nodeName)) {
                 return qName;
