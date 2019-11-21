@@ -8,6 +8,10 @@ module deserializer-test-included {
       "Initial revision.";
   }
 
+  identity root-identity {
+    description "Test root identity.";
+  }
+
   list augmented-list {
     key list-key;
 
@@ -17,6 +21,28 @@ module deserializer-test-included {
 
     leaf list-value {
       type string;
+    }
+  }
+
+  container refs {
+    list list-with-identityref {
+      key "id";
+
+      leaf id {
+        type leafref {
+          path "../../ref";
+        }
+      }
+
+      leaf foo {
+        type empty;
+      }
+    }
+
+    leaf ref {
+      type identityref {
+        base "root-identity";
+      }
     }
   }
 }
