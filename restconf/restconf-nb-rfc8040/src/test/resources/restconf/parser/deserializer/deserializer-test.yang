@@ -10,6 +10,10 @@ module deserializer-test {
       "Initial revision.";
   }
 
+  identity derived-identity {
+    base "dti:root-identity";
+  }
+
   container contA {
     leaf-list leaf-list-A {
       type string;

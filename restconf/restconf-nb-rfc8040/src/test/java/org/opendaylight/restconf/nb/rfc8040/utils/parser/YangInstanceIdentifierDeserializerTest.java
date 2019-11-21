@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,6 +26,7 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.common.Uint8;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
@@ -562,5 +564,39 @@ public class YangInstanceIdentifierDeserializerTest {
         // augmented leaf
         assertEquals("Not expected path argument", new AugmentationIdentifier(Sets.newHashSet(child)), iterator.next());
         assertEquals("Not expected path argument", NodeIdentifier.create(child), iterator.next());
+    }
+
+    /**
+     * Deserialization of path that contains list entry with key which value is described by leaflef to identityref.
+     */
+    @Test
+    public void deserializePathWithIdentityrefKeyValueTest() {
+        final Iterable<PathArgument> pathArgs = YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+                "refs/list-with-identityref=deserializer-test%3Aderived-identity/foo");
+        assertEquals(4, Iterables.size(pathArgs));
+        final Iterator<PathArgument> pathArgsIterator = pathArgs.iterator();
+
+        assertEquals("refs", pathArgsIterator.next().getNodeType().getLocalName());
+        assertEquals("list-with-identityref", pathArgsIterator.next().getNodeType().getLocalName());
+
+        final PathArgument listEntryArg = pathArgsIterator.next();
+        assertTrue(listEntryArg instanceof NodeIdentifierWithPredicates);
+        assertEquals("list-with-identityref", listEntryArg.getNodeType().getLocalName());
+        final Set<QName> keys = ((NodeIdentifierWithPredicates) listEntryArg).keySet();
+        assertEquals(1, keys.size());
+        assertEquals("id", keys.iterator().next().getLocalName());
+        final Object keyValue = ((NodeIdentifierWithPredicates) listEntryArg).values().iterator().next();
+        assertEquals(QName.create("deserializer:test", "derived-identity", Revision.of("2016-06-06")), keyValue);
+
+        assertEquals("foo", pathArgsIterator.next().getNodeType().getLocalName());
+    }
+
+    /**
+     * Identityref key value is not encoded correctly - ':' character must be encoded as '%3A'.
+     */
+    @Test
+    public void deserializePathWithInvalidIdentityrefKeyValueTest() {
+        assertThrows(RestconfDocumentedException.class, () -> YangInstanceIdentifierDeserializer.create(SCHEMA_CONTEXT,
+                "refs/list-with-identityref=deserializer-test:derived-identity/foo"));
     }
 }
