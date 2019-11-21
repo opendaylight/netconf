@@ -16,6 +16,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
@@ -180,8 +181,16 @@ public final class YangInstanceIdentifierDeserializer {
         }
         decoded = RestCodec.from(typedef, null, schemaContext).deserialize(value);
         if (decoded == null) {
-            if (baseType instanceof IdentityrefTypeDefinition) {
-                decoded = toQName(value, schemaNode, schemaContext);
+            if (typedef instanceof IdentityrefTypeDefinition) {
+                try {
+                    decoded = toQName(value, schemaNode, schemaContext);
+                } catch (NoSuchElementException e) {
+                    throw new RestconfDocumentedException(String.format("Cannot decode value '%s' for identityref type "
+                            + "in %s. Make sure reserved characters such as comma, single-quote, double-quote, colon,"
+                            + " double-quote, space, and forward slash (,'\":\" /) are percent-encoded,"
+                            + " for example ':' is '%%3A'", value, current.getIdentifier().getNodeType()),
+                            ErrorType.PROTOCOL, ErrorTag.BAD_ELEMENT, e);
+                }
             }
         }
         return decoded;
