@@ -1,0 +1,8 @@
+Verified+1: jenkins-releng <jenkins-releng@opendaylight.org>
+Code-Review+1: Balaji Varadaraju <bvaradar@luminanetworks.com>
+Code-Review+2: Robert Varga <nite@hq.sk>
+Submitted-by: Robert Varga <nite@hq.sk>
+Submitted-at: Tue, 26 Nov 2019 17:34:40 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/85872
+Project: netconf
+Branch: refs/heads/stable/neon
