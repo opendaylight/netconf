@@ -1,0 +1,7 @@
+Code-Review+2: Robert Varga <nite@hq.sk>
+Verified+1: Robert Varga <nite@hq.sk>
+Submitted-by: Robert Varga <nite@hq.sk>
+Submitted-at: Mon, 16 Dec 2019 19:03:29 +0000
+Reviewed-on: https://git.opendaylight.org/gerrit/c/netconf/+/86387
+Project: netconf
+Branch: refs/heads/stable/sodium
