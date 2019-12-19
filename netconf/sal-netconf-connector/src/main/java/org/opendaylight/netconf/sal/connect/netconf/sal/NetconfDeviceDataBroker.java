@@ -27,7 +27,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteRunningTx;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 
 public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBroker {
 
@@ -39,10 +39,10 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
 
     private boolean isLockAllowed = true;
 
-    public NetconfDeviceDataBroker(final RemoteDeviceId id, final SchemaContext schemaContext,
+    public NetconfDeviceDataBroker(final RemoteDeviceId id, final MountPointContext mountContext,
                                    final DOMRpcService rpc, final NetconfSessionPreferences netconfSessionPreferences) {
         this.id = id;
-        this.netconfOps = new NetconfBaseOps(rpc, schemaContext);
+        this.netconfOps = new NetconfBaseOps(rpc, mountContext);
         // get specific attributes from netconf preferences and get rid of it
         // no need to keep the entire preferences object, its quite big with all the capability QNames
         candidateSupported = netconfSessionPreferences.isCandidateSupported();
@@ -86,7 +86,7 @@ public final class NetconfDeviceDataBroker implements PingPongMergingDOMDataBrok
         return ImmutableClassToInstanceMap.of();
     }
 
-    void setLockAllowed(boolean isLockAllowedOrig) {
+    void setLockAllowed(final boolean isLockAllowedOrig) {
         this.isLockAllowed = isLockAllowedOrig;
     }
 
