@@ -22,8 +22,10 @@ import org.opendaylight.netconf.api.DocumentedException;
 import org.opendaylight.netconf.api.xml.XmlElement;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.rfc7952.data.api.NormalizedMetadata;
 import org.opendaylight.yangtools.rfc7952.data.util.NormalizedMetadataWriter;
+import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -160,16 +162,25 @@ public final class NetconfUtil {
         }
     }
 
-    // FIXME: document this interface contract. Does it support RFC8528/RFC8542? How?
-    public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final SchemaContext schemaContext,
+    public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final MountPointContext mountContext,
             final DOMSource value) throws XMLStreamException, URISyntaxException, IOException, SAXException {
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
-        final XmlCodecFactory codecs = XmlCodecFactory.create(schemaContext);
-        final ContainerSchemaNode dataRead = new NodeContainerProxy(NETCONF_DATA_QNAME, schemaContext.getChildNodes());
+        final XmlCodecFactory codecs = XmlCodecFactory.create(mountContext);
+
+        // FIXME: we probably need to propagate MountPointContext here and not just the child nodes
+        final ContainerSchemaNode dataRead = new NodeContainerProxy(NETCONF_DATA_QNAME,
+            mountContext.getSchemaContext().getChildNodes());
         try (XmlParserStream xmlParserStream = XmlParserStream.create(writer, codecs, dataRead)) {
             xmlParserStream.traverse(value);
         }
         return resultHolder;
+    }
+
+
+    // FIXME: document this interface contract. Does it support RFC8528/RFC8542? How?
+    public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final SchemaContext schemaContext,
+            final DOMSource value) throws XMLStreamException, URISyntaxException, IOException, SAXException {
+        return transformDOMSourceToNormalizedNode(new EmptyMountPointContext(schemaContext), value);
     }
 }
