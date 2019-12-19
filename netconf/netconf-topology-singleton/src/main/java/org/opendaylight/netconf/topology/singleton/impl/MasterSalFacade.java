@@ -33,7 +33,6 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.messages.CreateInitialMasterActorData;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.util.SchemaContextUtil;
@@ -51,7 +50,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     private final ActorRef masterActorRef;
     private final ActorSystem actorSystem;
 
-    private SchemaContext currentSchemaContext = null;
+    private MountPointContext currentMountContext = null;
     private NetconfSessionPreferences netconfSessionPreferences = null;
     private DOMRpcService deviceRpc = null;
     private DOMDataBroker deviceDataBroker = null;
@@ -84,7 +83,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     public void onDeviceConnected(final MountPointContext mountContext,
                                   final NetconfSessionPreferences sessionPreferences,
                                   final DOMRpcService domRpcService) {
-        this.currentSchemaContext = mountContext.getSchemaContext();
+        this.currentMountContext = mountContext;
         this.netconfSessionPreferences = sessionPreferences;
         this.deviceRpc = domRpcService;
 
@@ -92,7 +91,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
         registerMasterMountPoint();
 
-        sendInitialDataToActor().onComplete(new OnComplete<Object>() {
+        sendInitialDataToActor().onComplete(new OnComplete<>() {
             @Override
             public void onComplete(final Throwable failure, final Object success) {
                 if (failure == null) {
@@ -132,7 +131,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
 
     private void registerMasterMountPoint() {
         requireNonNull(id);
-        requireNonNull(currentSchemaContext, "Device has no remote schema context yet. Probably not fully connected.");
+        requireNonNull(currentMountContext, "Device has no remote schema context yet. Probably not fully connected.");
         requireNonNull(netconfSessionPreferences, "Device has no capabilities yet. Probably not fully connected.");
 
         final NetconfDeviceNotificationService notificationService = new NetconfDeviceNotificationService();
@@ -142,17 +141,17 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
         // on leader node would be same as on follower node
         final ProxyDOMDataBroker proxyDataBroker = new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(),
             actorResponseWaitTime);
-        salProvider.getMountInstance().onTopologyDeviceConnected(currentSchemaContext,
+        salProvider.getMountInstance().onTopologyDeviceConnected(currentMountContext.getSchemaContext(),
             proxyDataBroker, deviceRpc, notificationService, deviceAction);
     }
 
     protected DOMDataBroker newDeviceDataBroker() {
-        return new NetconfDeviceDataBroker(id, currentSchemaContext, deviceRpc, netconfSessionPreferences);
+        return new NetconfDeviceDataBroker(id, currentMountContext, deviceRpc, netconfSessionPreferences);
     }
 
     private Future<Object> sendInitialDataToActor() {
         final List<SourceIdentifier> sourceIdentifiers =
-                SchemaContextUtil.getConstituentModuleIdentifiers(currentSchemaContext).stream()
+                SchemaContextUtil.getConstituentModuleIdentifiers(currentMountContext.getSchemaContext()).stream()
                 .map(mi -> RevisionSourceIdentifier.create(mi.getName(), mi.getRevision()))
                 .collect(Collectors.toList());
 

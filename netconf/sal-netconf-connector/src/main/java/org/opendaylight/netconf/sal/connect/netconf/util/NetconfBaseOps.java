@@ -47,6 +47,8 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade.Keepa
 import org.opendaylight.netconf.sal.connect.netconf.sal.SchemalessNetconfDeviceRpc;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.copy.config.input.target.ConfigTarget;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.get.config.input.source.ConfigSource;
+import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
+import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -68,18 +70,23 @@ public final class NetconfBaseOps {
     private static final NodeIdentifier CONFIG_TARGET_NODEID = NodeIdentifier.create(ConfigTarget.QNAME);
 
     private final DOMRpcService rpc;
-    private final SchemaContext schemaContext;
+    private final MountPointContext mountContext;
     private final RpcStructureTransformer transformer;
 
+    @Deprecated
     public NetconfBaseOps(final DOMRpcService rpc, final SchemaContext schemaContext) {
+        this(rpc, new EmptyMountPointContext(schemaContext));
+    }
+
+    public NetconfBaseOps(final DOMRpcService rpc, final MountPointContext mountContext) {
         this.rpc = rpc;
-        this.schemaContext = schemaContext;
+        this.mountContext = mountContext;
 
         if (rpc instanceof KeepaliveDOMRpcService
                 && ((KeepaliveDOMRpcService) rpc).getDeviceRpc() instanceof SchemalessNetconfDeviceRpc) {
             this.transformer = new SchemalessRpcStructureTransformer();
         } else {
-            this.transformer = new NetconfRpcStructureTransformer(schemaContext);
+            this.transformer = new NetconfRpcStructureTransformer(mountContext);
         }
     }
 
@@ -235,7 +242,8 @@ public final class NetconfBaseOps {
         requireNonNull(callback);
 
         final ListenableFuture<DOMRpcResult> future = rpc.invokeRpc(NETCONF_GET_PATH, isFilterPresent(filterPath)
-            ? NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID, toFilterStructure(filterPath.get(), schemaContext))
+            ? NetconfMessageTransformUtil.wrap(NETCONF_GET_NODEID,
+                toFilterStructure(filterPath.get(), mountContext.getSchemaContext()))
                     : NetconfMessageTransformUtil.GET_RPC_CONTENT);
         Futures.addCallback(future, callback, MoreExecutors.directExecutor());
         return future;
