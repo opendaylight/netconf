@@ -11,6 +11,7 @@ package org.opendaylight.netconf.impl;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.opendaylight.netconf.api.DocumentedException;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
@@ -105,6 +106,11 @@ public class NetconfServerSessionListener implements NetconfSessionListener<Netc
             monitoringSessionListener.onSessionEvent(SessionEvent.outRpcError(session));
             SendErrorExceptionUtil.sendErrorMessage(session, e, netconfMessage);
         }
+    }
+
+    @Override
+    public void processMalformedRpc(final String messageId, final NetconfDocumentedException cause) {
+        LOG.warn("Received malformed RPC request from NETCONF client; message-id: {}.", messageId, cause);
     }
 
     public void onNotification(final NetconfServerSession session, final NetconfNotification notification) {
