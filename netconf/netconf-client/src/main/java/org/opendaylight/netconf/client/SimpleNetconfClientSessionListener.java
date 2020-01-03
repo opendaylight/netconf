@@ -16,6 +16,7 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.Holding;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.slf4j.Logger;
@@ -98,6 +99,19 @@ public class SimpleNetconfClientSessionListener implements NetconfClientSessionL
             dispatchRequest();
         } else {
             LOG.info("Ignoring unsolicited message {}", message);
+        }
+    }
+
+    @Override
+    public void processMalformedRpc(final String messageId, final NetconfDocumentedException cause) {
+        LOG.debug("Received malformed message with message-id: {}", messageId);
+        final RequestEntry e = requests.poll();
+        if (e != null) {
+            LOG.warn("Malformed message with known message-id {} caused dropping of the matched request {}.",
+                    messageId, e.request, cause);
+            e.promise.setFailure(cause);
+        } else {
+            LOG.warn("Ignoring unsolicited malformed message with message-id: {}", messageId);
         }
     }
 

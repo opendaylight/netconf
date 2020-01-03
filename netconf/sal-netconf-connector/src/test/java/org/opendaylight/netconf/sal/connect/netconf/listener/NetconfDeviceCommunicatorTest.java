@@ -51,6 +51,8 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.netconf.api.NetconfChunkException;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
@@ -501,6 +503,58 @@ public class NetconfDeviceCommunicatorTest {
         ByteArrayInputStream bis = new ByteArrayInputStream(xmlStr.getBytes());
         Document doc = UntrustedXML.newDocumentBuilder().parse(bis);
         return new NetconfMessage(doc);
+    }
+
+    @Test
+    public void testProcessingOfTwoMalformedMessage() throws Exception {
+        final String requestMessageId1 = UUID.randomUUID().toString();
+        final String requestMessageId2 = UUID.randomUUID().toString();
+
+        setupSession();
+        final ListenableFuture<RpcResult<NetconfMessage>> requestFuture1 = sendRequest(requestMessageId1, false);
+        final ListenableFuture<RpcResult<NetconfMessage>> requestFuture2 = sendRequest(requestMessageId2, false);
+
+        final NetconfDocumentedException exceptionMsg10 = NetconfChunkException.create(
+                "<rpc message-id=\"10\">".getBytes(), "Unexpected bytes");
+        communicator.processMalformedRpc(requestMessageId1, exceptionMsg10);
+        requestFuture1.get();
+
+        final NetconfDocumentedException exceptionMsg20 = NetconfChunkException.create(
+                "<rpc message-id=\"20\">".getBytes(), "Unexpected bytes");
+        communicator.processMalformedRpc(requestMessageId2, exceptionMsg20);
+        requestFuture2.get();
+    }
+
+    @Test
+    public void testProcessingOfOneMalformedMessageThatCancelsTwoRequests() throws Exception {
+        final String requestMessageId1 = UUID.randomUUID().toString();
+        final String requestMessageId2 = UUID.randomUUID().toString();
+
+        setupSession();
+        final ListenableFuture<RpcResult<NetconfMessage>> requestFuture1 = sendRequest(requestMessageId1, false);
+        final ListenableFuture<RpcResult<NetconfMessage>> requestFuture2 = sendRequest(requestMessageId2, false);
+
+        final NetconfDocumentedException exceptionMsg20 = NetconfChunkException.create(
+                "<rpc message-id=\"20\">".getBytes(), "Unexpected bytes");
+        communicator.processMalformedRpc(requestMessageId2, exceptionMsg20);
+        requestFuture1.get();
+        requestFuture2.get();
+    }
+
+    @Test
+    public void testProcessingOfMalformedMessageWithUnknownId() throws Exception {
+        final String requestMessageId1 = UUID.randomUUID().toString();
+        final String requestMessageId2 = UUID.randomUUID().toString();
+
+        setupSession();
+        final ListenableFuture<RpcResult<NetconfMessage>> requestFuture1 = sendRequest(requestMessageId1, false);
+        final ListenableFuture<RpcResult<NetconfMessage>> requestFuture2 = sendRequest(requestMessageId2, false);
+
+        final NetconfDocumentedException exceptionMsg30 = NetconfChunkException.create(
+                "<rpc message-id=\"30\">".getBytes(), "Unexpected bytes");
+        communicator.processMalformedRpc("30", exceptionMsg30);
+        requestFuture1.get();
+        requestFuture2.get();
     }
 
     private static NetconfMessage createErrorResponseMessage(final String messageID) throws Exception {

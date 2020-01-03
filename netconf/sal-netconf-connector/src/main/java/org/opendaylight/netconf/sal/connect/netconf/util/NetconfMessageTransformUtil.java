@@ -244,22 +244,49 @@ public final class NetconfMessageTransformUtil {
                 .build();
     }
 
+    /**
+     * Verification if message-id in the NETCONF request equals to message-id in the NETCONF reply.
+     *
+     * @param input  body of the NETCONF request
+     * @param output body of the NETCONF reply
+     * @throws NetconfDocumentedException request-reply message-id mismatch
+     */
     public static void checkValidReply(final NetconfMessage input, final NetconfMessage output)
             throws NetconfDocumentedException {
         final String inputMsgId = input.getDocument().getDocumentElement().getAttribute(MESSAGE_ID_ATTR);
         final String outputMsgId = output.getDocument().getDocumentElement().getAttribute(MESSAGE_ID_ATTR);
 
         if (!inputMsgId.equals(outputMsgId)) {
-            final Map<String, String> errorInfo = ImmutableMap.<String, String>builder()
-                    .put("actual-message-id", outputMsgId)
-                    .put("expected-message-id", inputMsgId)
-                    .build();
-
-            throw new NetconfDocumentedException("Response message contained unknown \"message-id\"",
-                    null, NetconfDocumentedException.ErrorType.PROTOCOL,
-                    NetconfDocumentedException.ErrorTag.BAD_ATTRIBUTE,
-                    NetconfDocumentedException.ErrorSeverity.ERROR, errorInfo);
+            throw createExceptionInvalidMessageIds(inputMsgId, outputMsgId);
         }
+    }
+
+    /**
+     * Verification if message-id in the NETCONF request equals to provided message-id from the NETCONF reply.
+     *
+     * @param request        body of the NETCONF request
+     * @param replyMessageId reply message-id
+     * @throws NetconfDocumentedException request-reply message-id mismatch
+     */
+    public static void checkValidReply(final NetconfMessage request, final String replyMessageId)
+            throws NetconfDocumentedException {
+        final String requestMsgId = request.getDocument().getDocumentElement().getAttribute(MESSAGE_ID_ATTR);
+        if (!replyMessageId.equals(requestMsgId)) {
+            throw createExceptionInvalidMessageIds(replyMessageId, requestMsgId);
+        }
+    }
+
+    private static NetconfDocumentedException createExceptionInvalidMessageIds(final String requestMsgId,
+                                                                               final String replyMsgId) {
+        final Map<String, String> errorInfo = ImmutableMap.<String, String>builder()
+                .put("actual-message-id", replyMsgId)
+                .put("expected-message-id", requestMsgId)
+                .build();
+
+        return new NetconfDocumentedException("Response message contained unknown \"message-id\"",
+                null, NetconfDocumentedException.ErrorType.PROTOCOL,
+                NetconfDocumentedException.ErrorTag.BAD_ATTRIBUTE,
+                NetconfDocumentedException.ErrorSeverity.ERROR, errorInfo);
     }
 
     public static void checkSuccessReply(final NetconfMessage output) throws NetconfDocumentedException {

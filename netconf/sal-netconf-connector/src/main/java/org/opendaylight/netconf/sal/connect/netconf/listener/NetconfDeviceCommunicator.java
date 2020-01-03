@@ -271,7 +271,82 @@ public class NetconfDeviceCommunicator
     }
 
     private void processMessage(final NetconfMessage message) {
-        Request request = null;
+        final Request request = getNextRequest();
+        if (request == null) {
+            LOG.warn("{}: Ignoring unsolicited message {}", id, msgToS(message));
+            return;
+        }
+
+        if (message instanceof FailedNetconfMessage) {
+            request.future.set(NetconfMessageTransformUtil.toRpcResult((FailedNetconfMessage) message));
+            return;
+        }
+
+        LOG.debug("{}: Message received {}", id, message);
+
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("{}: Matched request: {} to response: {}", id, msgToS(request.request), msgToS(message));
+        }
+
+        try {
+            NetconfMessageTransformUtil.checkValidReply(request.request, message);
+        } catch (final NetconfDocumentedException e) {
+            LOG.warn("{}: Request/Reply message-id mismatch, request: {}, response: {}",
+                    id, msgToS(request.request), msgToS(message), e);
+
+            request.future.set(RpcResultBuilder.<NetconfMessage>failed()
+                    .withRpcError(NetconfMessageTransformUtil.toRpcError(e)).build());
+
+            //recursively processing message to eventually find matching request
+            processMessage(message);
+
+            return;
+        }
+
+        try {
+            NetconfMessageTransformUtil.checkSuccessReply(message);
+        } catch (final NetconfDocumentedException e) {
+            LOG.warn("{}: Error reply from remote device, request: {}, response: {}",
+                    id, msgToS(request.request), msgToS(message), e);
+
+            request.future.set(RpcResultBuilder.<NetconfMessage>failed()
+                    .withRpcError(NetconfMessageTransformUtil.toRpcError(e)).build());
+            return;
+        }
+
+        request.future.set(RpcResultBuilder.success(message).build());
+    }
+
+    @Override
+    public void processMalformedRpc(final String messageId, final NetconfDocumentedException cause) {
+        final Request queuedRequest = getNextRequest();
+        if (queuedRequest == null) {
+            LOG.warn("{}: Ignoring unsolicited malformed message with message-id {}", id, messageId);
+            return;
+        }
+
+        LOG.debug("{}: Received malformed message with message-id: {}", id, messageId);
+        try {
+            NetconfMessageTransformUtil.checkValidReply(queuedRequest.request, messageId);
+        } catch (NetconfDocumentedException e) {
+            LOG.warn("{}: Invalid malformed request-reply match, reply message contains different message-id, "
+                            + "malformed message-id: {}, response:\n{}\nSkipping this message and trying "
+                            + "to find match against next queued request.",
+                    id, messageId, msgToS(queuedRequest.request), e);
+            queuedRequest.future.set(RpcResultBuilder.<NetconfMessage>failed()
+                    .withRpcError(NetconfMessageTransformUtil.toRpcError(e)).build());
+            processMalformedRpc(messageId, cause);
+            return;
+        }
+
+        LOG.warn("{}: Malformed message with known message-id {} causes dropping of the matched request {}",
+                id, messageId, msgToS(queuedRequest.request), cause);
+        queuedRequest.future.set(RpcResultBuilder.<NetconfMessage>failed()
+                .withRpcError(NetconfMessageTransformUtil.toRpcError(cause)).build());
+    }
+
+    private Request getNextRequest() {
+        Request request;
         sessionLock.lock();
 
         try {
@@ -285,57 +360,11 @@ public class NetconfDeviceCommunicator
                 }
             } else {
                 request = null;
-                LOG.warn("{}: Ignoring unsolicited message {}", id,
-                        msgToS(message));
             }
         } finally {
             sessionLock.unlock();
         }
-
-        if (request != null) {
-
-            if (FailedNetconfMessage.class.isInstance(message)) {
-                request.future.set(NetconfMessageTransformUtil.toRpcResult((FailedNetconfMessage) message));
-                return;
-            }
-
-            LOG.debug("{}: Message received {}", id, message);
-
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("{}: Matched request: {} to response: {}", id, msgToS(request.request), msgToS(message));
-            }
-
-            try {
-                NetconfMessageTransformUtil.checkValidReply(request.request, message);
-            } catch (final NetconfDocumentedException e) {
-                LOG.warn(
-                        "{}: Invalid request-reply match,"
-                                + "reply message contains different message-id, request: {}, response: {}",
-                        id, msgToS(request.request), msgToS(message), e);
-
-                request.future.set(RpcResultBuilder.<NetconfMessage>failed()
-                        .withRpcError(NetconfMessageTransformUtil.toRpcError(e)).build());
-
-                //recursively processing message to eventually find matching request
-                processMessage(message);
-
-                return;
-            }
-
-            try {
-                NetconfMessageTransformUtil.checkSuccessReply(message);
-            } catch (final NetconfDocumentedException e) {
-                LOG.warn(
-                        "{}: Error reply from remote device, request: {}, response: {}",
-                        id, msgToS(request.request), msgToS(message), e);
-
-                request.future.set(RpcResultBuilder.<NetconfMessage>failed()
-                        .withRpcError(NetconfMessageTransformUtil.toRpcError(e)).build());
-                return;
-            }
-
-            request.future.set(RpcResultBuilder.success(message).build());
-        }
+        return request;
     }
 
     private static String msgToS(final NetconfMessage msg) {
