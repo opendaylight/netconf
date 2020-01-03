@@ -12,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 import com.google.common.base.MoreObjects;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.util.concurrent.Promise;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
@@ -118,6 +119,11 @@ class CallHomeMountSessionContext {
             @Override
             public void onMessage(final NetconfClientSession session, final NetconfMessage message) {
                 delegate.onMessage(session, message);
+            }
+
+            @Override
+            public void processMalformedRpc(final String messageId, final NetconfDocumentedException cause) {
+                delegate.processMalformedRpc(messageId, cause);
             }
         };
     }

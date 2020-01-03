@@ -39,4 +39,12 @@ public interface NetconfSessionListener<S extends NetconfSession> {
      * @param message Protocol message
      */
     void onMessage(S session, NetconfMessage message);
+
+    /**
+     * Processing of malformed NETCONF RPC that contains clearly recognizable 'message-id' attribute.
+     *
+     * @param messageId Parsed message ID.
+     * @param cause     Cause of the failure.
+     */
+    void processMalformedRpc(String messageId, NetconfDocumentedException cause);
 }
