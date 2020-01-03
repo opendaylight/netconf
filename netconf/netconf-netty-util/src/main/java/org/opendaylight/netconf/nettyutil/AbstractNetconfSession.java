@@ -14,8 +14,13 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.MessageToByteEncoder;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.opendaylight.netconf.api.NetconfChunkException;
+import org.opendaylight.netconf.api.NetconfDocumentedException;
 import org.opendaylight.netconf.api.NetconfExiSession;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSession;
@@ -35,6 +40,11 @@ public abstract class AbstractNetconfSession<S extends NetconfSession,L extends 
         extends SimpleChannelInboundHandler<Object> implements NetconfSession, NetconfExiSession {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractNetconfSession.class);
+    private static final String MESSAGE_ID_GROUP = "messageId";
+    private static final Pattern RPC_REPLY_HEADER_WITH_MESSAGE_ID = Pattern.compile(
+            ".*?^<rpc.*?message-id=\"(?<" + MESSAGE_ID_GROUP + ">.+?)\"[^<]*>.*?",
+            Pattern.MULTILINE | Pattern.DOTALL);
+
     private final L sessionListener;
     private final long sessionId;
     private boolean up = false;
@@ -100,6 +110,29 @@ public abstract class AbstractNetconfSession<S extends NetconfSession,L extends 
         LOG.debug("Session {} up", this);
         sessionListener.onSessionUp(thisInstance());
         this.up = true;
+    }
+
+    @Override
+    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable throwable) {
+        if (throwable instanceof DecoderException) {
+            final Throwable cause = throwable.getCause();
+            if (cause instanceof NetconfChunkException) {
+                final String chunkPart = ((NetconfChunkException) cause).getBufferedBytes();
+                final Matcher matcher = RPC_REPLY_HEADER_WITH_MESSAGE_ID.matcher(chunkPart);
+                if (matcher.matches()) {
+                    final String messageId = matcher.group(MESSAGE_ID_GROUP);
+                    sessionListener.processMalformedRpc(messageId, (NetconfDocumentedException) cause);
+                    return;
+                }
+                LOG.warn("NETCONF chunk aggregator failed with the unrecognizable buffered message "
+                        + "- message-id cannot be recognized in corrupted RPC:\n{}", chunkPart, cause);
+                return;
+            }
+        }
+
+        // propagation of unknown exception to the next handler in NETCONF pipeline
+        LOG.warn("Unknown exception has been thrown in NETCONF channel pipeline.", throwable);
+        ctx.fireExceptionCaught(throwable);
     }
 
     @Override
