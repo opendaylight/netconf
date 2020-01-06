@@ -58,6 +58,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.xpath.api.YangExpr;
 
 /**
  * Provides base operations for netconf e.g. get, get-config, edit-config, (un)lock, commit etc.
@@ -202,10 +203,22 @@ public final class NetconfBaseOps {
         return extractData(filterPath, configRunning);
     }
 
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getConfigRunningData(
+            final FutureCallback<DOMRpcResult> callback, final YangExpr xpathFilter) {
+        // todo: implementation
+        return Futures.immediateFuture(Optional.empty());
+    }
+
     public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(final FutureCallback<DOMRpcResult> callback,
                                                                     final Optional<YangInstanceIdentifier> filterPath) {
         final ListenableFuture<DOMRpcResult> configRunning = get(callback, filterPath);
         return extractData(filterPath, configRunning);
+    }
+
+    public ListenableFuture<Optional<NormalizedNode<?, ?>>> getData(final FutureCallback<DOMRpcResult> callback,
+                                                                    final YangExpr filterPath) {
+        // todo: implementation
+        return Futures.immediateFuture(Optional.empty());
     }
 
     private ListenableFuture<Optional<NormalizedNode<?, ?>>> extractData(

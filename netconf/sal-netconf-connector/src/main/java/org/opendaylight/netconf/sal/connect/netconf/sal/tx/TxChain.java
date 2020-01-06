@@ -115,7 +115,7 @@ public class TxChain implements DOMTransactionChain, TxListener {
     /**
      * Checks, if chain isn't closed and if there is no not submitted write transaction waiting.
      */
-    private void checkOperationPermitted() {
+    void checkOperationPermitted() {
         if (closed) {
             throw new DOMTransactionChainClosedException("Transaction chain was closed");
         }

@@ -137,6 +137,10 @@ public final class NetconfSessionPreferences {
                         NetconfMessageTransformUtil.IETF_NETCONF_MONITORING.getNamespace().toString());
     }
 
+    public boolean isXPathSupported() {
+        return containsNonModuleCapability(NetconfMessageTransformUtil.NETCONF_XPATH_URI.toString());
+    }
+
     /**
      * Merge module-based list of capabilities with current list of module-based capabilities.
      *

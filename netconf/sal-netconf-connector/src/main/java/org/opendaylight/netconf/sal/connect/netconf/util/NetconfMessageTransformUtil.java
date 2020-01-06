@@ -183,6 +183,9 @@ public final class NetconfMessageTransformUtil {
     public static final URI NETCONF_RUNNING_WRITABLE_URI = URI
             .create("urn:ietf:params:netconf:capability:writable-running:1.0");
 
+    public static final URI NETCONF_XPATH_URI = URI
+            .create("urn:ietf:params:netconf:capability:xpath:1.0");
+
     public static final QName NETCONF_LOCK_QNAME = QName.create(NETCONF_QNAME, "lock").intern();
     public static final NodeIdentifier NETCONF_LOCK_NODEID = NodeIdentifier.create(NETCONF_LOCK_QNAME);
     public static final SchemaPath NETCONF_LOCK_PATH = toPath(NETCONF_LOCK_QNAME);
