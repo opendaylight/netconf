@@ -21,7 +21,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
 public class ReadWriteTx implements DOMDataTreeReadWriteTransaction {
 
-    private final DOMDataTreeReadTransaction delegateReadTx;
+    final DOMDataTreeReadTransaction delegateReadTx;
     private final DOMDataTreeWriteTransaction delegateWriteTx;
 
     public ReadWriteTx(final DOMDataTreeReadTransaction delegateReadTx,
