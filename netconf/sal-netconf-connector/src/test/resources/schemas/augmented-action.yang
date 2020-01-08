@@ -1,0 +1,12 @@
+module augmented-action {
+  yang-version 1.1;
+  namespace "urn:example:augmented-action";
+  prefix "augaction";
+
+  import example-server-farm { prefix sfarm; revision-date 2018-08-07; }
+
+  augment "/sfarm:device/sfarm:interface" {
+    action disable {
+    }
+  }
+}

@@ -100,6 +100,8 @@ public class NetconfMessageTransformerTest {
 
     private static final String URN_EXAMPLE_CONFLICT = "urn:example:conflict";
 
+    private static final String URN_EXAMPLE_AUGMENTED_ACTION = "urn:example:augmented-action";
+
     private static final QName SERVER_QNAME =
             QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "server");
     private static final QName RESET_QNAME = QName.create(SERVER_QNAME, "reset");
@@ -119,6 +121,10 @@ public class NetconfMessageTransformerTest {
     private static final QName ENABLE_QNAME = QName.create(INTERFACE_QNAME, "enable");
     private static final SchemaPath ENABLE_INTERFACE_PATH =
             SchemaPath.create(true, DEVICE_QNAME, INTERFACE_QNAME, ENABLE_QNAME);
+
+    private static final QName DISABLE_QNAME = QName.create(URN_EXAMPLE_AUGMENTED_ACTION, "disable");
+    private static final SchemaPath DISABLE_INTERFACE_PATH =
+            SchemaPath.create(true, DEVICE_QNAME, INTERFACE_QNAME, DISABLE_QNAME);
 
     private static final QName BOX_OUT_QNAME =
             QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "box-out");
@@ -158,7 +164,7 @@ public class NetconfMessageTransformerTest {
 
         ACTION_SCHEMA = YangParserTestUtils.parseYangResources(NetconfMessageTransformerTest.class,
             "/schemas/example-server-farm.yang","/schemas/example-server-farm-2.yang",
-            "/schemas/conflicting-actions.yang");
+            "/schemas/conflicting-actions.yang", "/schemas/augmented-action.yang");
     }
 
     @AfterClass
@@ -467,6 +473,7 @@ public class NetconfMessageTransformerTest {
         schemaPaths.add(XYZZY_FOO_PATH);
         schemaPaths.add(XYZZY_BAR_PATH);
         schemaPaths.add(CHOICE_ACTION_PATH);
+        schemaPaths.add(DISABLE_INTERFACE_PATH);
 
         List<ActionDefinition> actions = NetconfMessageTransformer.getActions(ACTION_SCHEMA);
         assertEquals(schemaPaths.size(), actions.size());
@@ -541,7 +548,7 @@ public class NetconfMessageTransformerTest {
         checkNode(childBoxIn, "box-in", "box-in", URN_EXAMPLE_SERVER_FARM);
 
         Node action = childBoxIn.getFirstChild();
-        checkNode(action, null, OPEN_QNAME.getLocalName(), null);
+        checkNode(action, OPEN_QNAME.getLocalName(), OPEN_QNAME.getLocalName(), OPEN_QNAME.getNamespace().toString());
     }
 
     @Test
@@ -574,7 +581,8 @@ public class NetconfMessageTransformerTest {
         assertEquals(childTest.getNodeValue(), "test");
 
         Node action = childInterface.getLastChild();
-        checkNode(action, null, ENABLE_QNAME.getLocalName(), null);
+        checkNode(action, ENABLE_QNAME.getLocalName(), ENABLE_QNAME.getLocalName(),
+                ENABLE_QNAME.getNamespace().toString());
     }
 
     @Test
@@ -622,7 +630,8 @@ public class NetconfMessageTransformerTest {
 
         Node childKillAction = childApplication.getLastChild();
         checkNode(childApplication, "application", "application", URN_EXAMPLE_SERVER_FARM_2);
-        checkNode(childKillAction, null, KILL_QNAME.getLocalName(), null);
+        checkNode(childKillAction, KILL_QNAME.getLocalName(), KILL_QNAME.getLocalName(),
+                KILL_QNAME.getNamespace().toString());
     }
 
     @Test
@@ -658,7 +667,8 @@ public class NetconfMessageTransformerTest {
         assertEquals(childTest.getNodeValue(), "test");
 
         Node action = childBar.getLastChild();
-        checkNode(action, null, XYZZY_QNAME.getLocalName(), null);
+        checkNode(action, XYZZY_QNAME.getLocalName(), XYZZY_QNAME.getLocalName(),
+                XYZZY_QNAME.getNamespace().toString());
     }
 
     @Test
@@ -679,7 +689,8 @@ public class NetconfMessageTransformerTest {
         checkNode(childBar, "foo", "foo", URN_EXAMPLE_CONFLICT);
 
         Node action = childBar.getLastChild();
-        checkNode(action, null, XYZZY_QNAME.getLocalName(), null);
+        checkNode(action, XYZZY_QNAME.getLocalName(), XYZZY_QNAME.getLocalName(),
+                XYZZY_QNAME.getNamespace().toString());
     }
 
     @Test
@@ -699,7 +710,42 @@ public class NetconfMessageTransformerTest {
         checkNode(childChoiceCont, "choice-cont", "choice-cont", URN_EXAMPLE_CONFLICT);
 
         Node action = childChoiceCont.getLastChild();
-        checkNode(action, null, CHOICE_ACTION_QNAME.getLocalName(), null);
+        checkNode(action, CHOICE_ACTION_QNAME.getLocalName(), CHOICE_ACTION_QNAME.getLocalName(),
+                CHOICE_ACTION_QNAME.getNamespace().toString());
+    }
+
+    @Test
+    public void toAugmentedActionRequestListInContainerTest() {
+        QName nameQname = QName.create(INTERFACE_QNAME, "name");
+
+        List<PathArgument> nodeIdentifiers = new ArrayList<>();
+        nodeIdentifiers.add(NodeIdentifier.create(DEVICE_QNAME));
+        nodeIdentifiers.add(NodeIdentifier.create(INTERFACE_QNAME));
+        nodeIdentifiers.add(NodeIdentifierWithPredicates.of(INTERFACE_QNAME, nameQname, "test"));
+
+        DOMDataTreeIdentifier domDataTreeIdentifier = prepareDataTreeId(nodeIdentifiers);
+
+        NormalizedNode<?, ?> payload = initEmptyInputAction(INTERFACE_QNAME);
+        NetconfMessage actionRequest = actionNetconfMessageTransformer.toActionRequest(
+                DISABLE_INTERFACE_PATH, domDataTreeIdentifier, payload);
+
+        Node childAction = checkBasePartOfActionRequest(actionRequest);
+
+        Node childDevice = childAction.getFirstChild();
+        checkNode(childDevice, "device", "device", URN_EXAMPLE_SERVER_FARM);
+
+        Node childInterface = childDevice.getFirstChild();
+        checkNode(childInterface, "interface", "interface", URN_EXAMPLE_SERVER_FARM);
+
+        Node childName = childInterface.getFirstChild();
+        checkNode(childName, "name", "name", nameQname.getNamespace().toString());
+
+        Node childTest = childName.getFirstChild();
+        assertEquals(childTest.getNodeValue(), "test");
+
+        Node action = childInterface.getLastChild();
+        checkNode(action, DISABLE_QNAME.getLocalName(), DISABLE_QNAME.getLocalName(),
+                DISABLE_QNAME.getNamespace().toString());
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -721,7 +767,8 @@ public class NetconfMessageTransformerTest {
 
     private static void checkAction(final QName actionQname, final Node action , final String inputLocalName,
             final String inputNodeName, final String inputValue) {
-        checkNode(action, null, actionQname.getLocalName(), null);
+        checkNode(action, actionQname.getLocalName(), actionQname.getLocalName(),
+                actionQname.getNamespace().toString());
 
         Node childResetAt = action.getFirstChild();
         checkNode(childResetAt, inputLocalName, inputNodeName, actionQname.getNamespace().toString());

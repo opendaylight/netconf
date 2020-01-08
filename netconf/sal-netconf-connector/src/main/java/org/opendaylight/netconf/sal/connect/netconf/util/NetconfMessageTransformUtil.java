@@ -457,7 +457,7 @@ public final class NetconfMessageTransformUtil {
 
     public static DOMResult prepareDomResultForActionRequest(final DataSchemaContextTree dataSchemaContextTree,
             final DOMDataTreeIdentifier domDataTreeIdentifier, final SchemaPath actionSchemaPath,
-            final MessageCounter counter, final String action) {
+            final MessageCounter counter, final QName action) {
         final Document document = XmlUtil.newDocument();
         final Element rpcNS =
                 document.createElementNS(NETCONF_RPC_QNAME.getNamespace().toString(), NETCONF_RPC_QNAME.getLocalName());
@@ -469,7 +469,8 @@ public final class NetconfMessageTransformUtil {
         final Element actionData = prepareActionData(rootSchemaContextNode, actionNS,
                 domDataTreeIdentifier.getRootIdentifier().getPathArguments().iterator(), document);
 
-        final Element specificActionElement = document.createElement(action);
+        final Element specificActionElement =
+                document.createElementNS(action.getNamespace().toString(), action.getLocalName());
         actionData.appendChild(specificActionElement);
         rpcNS.appendChild(actionNS);
         document.appendChild(rpcNS);
