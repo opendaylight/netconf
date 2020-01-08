@@ -238,7 +238,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         if (inputDef.getChildNodes().isEmpty()) {
             return new NetconfMessage(NetconfMessageTransformUtil.prepareDomResultForActionRequest(contextTree,
                 domDataTreeIdentifier, action, counter,
-                actionDef.getQName().getLocalName()).getNode().getOwnerDocument());
+                actionDef.getQName()).getNode().getOwnerDocument());
         }
 
         Preconditions.checkNotNull(payload, "Transforming an action with input: %s, payload cannot be null", action);
@@ -247,7 +247,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
         // Set the path to the input of action for the node stream writer
         final DOMResult result = NetconfMessageTransformUtil.prepareDomResultForActionRequest(contextTree,
-            domDataTreeIdentifier, inputDef.getPath(), counter, actionDef.getQName().getLocalName());
+            domDataTreeIdentifier, inputDef.getPath(), counter, actionDef.getQName());
 
         try {
             NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result, inputDef.getPath(),
