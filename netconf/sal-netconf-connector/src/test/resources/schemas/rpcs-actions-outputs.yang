@@ -1,0 +1,30 @@
+module rpcs-actions-outputs {
+  yang-version 1.1;
+  namespace "urn:example:rpcs-actions-outputs";
+  prefix "rao";
+
+  import example-server-farm { prefix sfarm; revision-date 2018-08-07; }
+
+  augment "/sfarm:device/sfarm:interface" {
+    action check-with-output {
+      output {
+        leaf not-mandatory-message {
+          type string;
+        }
+      }
+    }
+    action check-without-output {
+    }
+  }
+
+  rpc rpc-with-output {
+    output {
+      leaf not-mandatory-message {
+        type string;
+      }
+    }
+  }
+
+  rpc rpc-without-output {
+  }
+}
