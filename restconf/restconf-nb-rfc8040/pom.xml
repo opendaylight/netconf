@@ -126,7 +126,7 @@
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20131018</version>
+      <version>2013.0.9</version>
     </dependency>
 
     <dependency>
