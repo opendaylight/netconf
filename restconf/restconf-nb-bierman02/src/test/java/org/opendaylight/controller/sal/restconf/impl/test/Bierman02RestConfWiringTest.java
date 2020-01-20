@@ -7,7 +7,7 @@
  */
 package org.opendaylight.controller.sal.restconf.impl.test;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import com.google.inject.AbstractModule;
 import java.io.IOException;
@@ -22,7 +22,6 @@ import org.opendaylight.aaa.web.testutils.WebTestModule;
 import org.opendaylight.controller.sal.restconf.impl.test.incubate.InMemoryMdsalModule;
 import org.opendaylight.infrautils.inject.guice.testutils.AnnotationsModule;
 import org.opendaylight.infrautils.inject.guice.testutils.GuiceRule;
-import org.opendaylight.infrautils.testutils.LogRule;
 import org.opendaylight.netconf.sal.restconf.api.RestConfConfig;
 import org.opendaylight.netconf.sal.restconf.impl.Bierman02RestConfWiring;
 
@@ -42,8 +41,6 @@ public class Bierman02RestConfWiringTest {
         }
     }
 
-    public @Rule LogRule logRule = new LogRule();
-
     public @Rule GuiceRule guice = new GuiceRule(TestModule.class,
             InMemoryMdsalModule.class, WebTestModule.class, AnnotationsModule.class);
 
@@ -52,6 +49,6 @@ public class Bierman02RestConfWiringTest {
 
     @Test
     public void testWiring() throws IOException, InterruptedException, URISyntaxException {
-        assertThat(webClient.request("GET", "/restconf/modules/").statusCode()).isEqualTo(200);
+        assertEquals(200, webClient.request("GET", "/restconf/modules/").statusCode());
     }
 }

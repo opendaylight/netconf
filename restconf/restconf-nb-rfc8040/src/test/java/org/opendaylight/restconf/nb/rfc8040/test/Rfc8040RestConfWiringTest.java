@@ -7,7 +7,7 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.test;
 
-import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
@@ -26,7 +26,6 @@ import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.util.ScheduledThreadPoolWrapper;
 import org.opendaylight.infrautils.inject.guice.testutils.AnnotationsModule;
 import org.opendaylight.infrautils.inject.guice.testutils.GuiceRule;
-import org.opendaylight.infrautils.testutils.LogRule;
 import org.opendaylight.restconf.nb.rfc8040.RestconfApplication;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040RestConfWiring;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
@@ -70,8 +69,6 @@ public class Rfc8040RestConfWiringTest {
         }
     }
 
-    public @Rule LogRule logRule = new LogRule();
-
     public @Rule GuiceRule guice = new GuiceRule(TestModule.class,
             InMemoryMdsalModule.class, WebTestModule.class, AnnotationsModule.class);
 
@@ -84,6 +81,6 @@ public class Rfc8040RestConfWiringTest {
     @Test
     public void testWiring() throws IOException, InterruptedException, URISyntaxException {
         schemaContextHandler.onGlobalContextUpdated(schemaContextProvider.getSchemaContext());
-        assertThat(webClient.request("GET", "/rests/yang-library-version").statusCode()).isEqualTo(200);
+        assertEquals(200, webClient.request("GET", "/rests/yang-library-version").statusCode());
     }
 }
