@@ -191,11 +191,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.opendaylight.infrautils</groupId>
-      <artifactId>infrautils-testutils</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>ietf-restconf</artifactId>
       <scope>test</scope>
