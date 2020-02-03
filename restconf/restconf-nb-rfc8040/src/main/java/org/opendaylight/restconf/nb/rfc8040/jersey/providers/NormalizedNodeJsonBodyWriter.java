@@ -177,7 +177,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
             return schema.getQName().getNamespace();
         }
         // For top-level elements we always want to use namespace prefix, hence use a null initial namespace
-        if (depth == null || depth == 0 || schema instanceof SchemaContext) {
+        if (depth == null || depth > 0 || schema instanceof SchemaContext) {
             return null;
         }
         return schema instanceof DataSchemaNode && !((DataSchemaNode)schema).isAugmenting()
