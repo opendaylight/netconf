@@ -42,10 +42,8 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JSONNormalizedNodeStreamW
 import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
-import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
@@ -167,21 +165,17 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         final JSONCodecFactory codecs = getCodecFactory(context);
 
         final NormalizedNodeStreamWriter streamWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(
-                codecs, path, initialNamespaceFor(schema, depth), jsonWriter);
+                codecs, path, initialNamespaceFor(schema), jsonWriter);
 
         return ParameterAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth, fields);
     }
 
-    private static URI initialNamespaceFor(final SchemaNode schema, final Integer depth) {
+    private static URI initialNamespaceFor(final SchemaNode schema) {
         if (schema instanceof RpcDefinition) {
             return schema.getQName().getNamespace();
         }
         // For top-level elements we always want to use namespace prefix, hence use a null initial namespace
-        if (depth == null || depth == 0 || schema instanceof SchemaContext) {
-            return null;
-        }
-        return schema instanceof DataSchemaNode && !((DataSchemaNode)schema).isAugmenting()
-                ? schema.getQName().getNamespace() : null;
+        return null;
     }
 
     private static JsonWriter createJsonWriter(final OutputStream entityStream, final boolean prettyPrint) {
