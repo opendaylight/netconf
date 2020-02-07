@@ -16,6 +16,7 @@ import java.security.PublicKey;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataObjectModification.ModificationType;
@@ -61,12 +62,14 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
     private final ListenerRegistration<DeviceOp> deviceOpReg;
 
     private final CallhomeStatusReporter statusReporter;
+    private final AAAEncryptionService encryptionService;
 
-    CallHomeAuthProviderImpl(final DataBroker broker) {
+    CallHomeAuthProviderImpl(final DataBroker broker, final AAAEncryptionService encryptionService) {
         configReg = broker.registerDataTreeChangeListener(GLOBAL, globalConfig);
         deviceReg = broker.registerDataTreeChangeListener(ALLOWED_DEVICES, deviceConfig);
         deviceOpReg = broker.registerDataTreeChangeListener(ALLOWED_OP_DEVICES, deviceOp);
         statusReporter = new CallhomeStatusReporter(broker);
+        this.encryptionService = encryptionService;
     }
 
     @Override
@@ -104,7 +107,7 @@ public class CallHomeAuthProviderImpl implements CallHomeAuthorizationProvider, 
 
         Builder authBuilder = CallHomeAuthorization.serverAccepted(sessionName, credentials.getUsername());
         for (String password : credentials.getPasswords()) {
-            authBuilder.addPassword(password);
+            authBuilder.addPassword(encryptionService.decrypt(password));
         }
         return authBuilder.build();
     }
