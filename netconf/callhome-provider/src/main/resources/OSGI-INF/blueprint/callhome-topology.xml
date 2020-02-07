@@ -35,6 +35,7 @@
           destroy-method="close" >
         <argument ref="dataBroker" />
         <argument ref="callhomeDispatcher" />
+        <argument ref="encryptionService" />
         <property name="port" value="6666" />
     </bean>
 
