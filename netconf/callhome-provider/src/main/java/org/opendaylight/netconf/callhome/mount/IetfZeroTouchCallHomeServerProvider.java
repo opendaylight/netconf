@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+
+import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
@@ -55,6 +57,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
     private final DataBroker dataBroker;
     private final CallHomeMountDispatcher mountDispacher;
     private final CallHomeAuthProviderImpl authProvider;
+    private final AAAEncryptionService encryptionService;
 
     protected NetconfCallHomeServer server;
 
@@ -65,10 +68,11 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
     private final CallhomeStatusReporter statusReporter;
 
     public IetfZeroTouchCallHomeServerProvider(final DataBroker dataBroker,
-            final CallHomeMountDispatcher mountDispacher) {
+            final CallHomeMountDispatcher mountDispacher, final AAAEncryptionService encryptionService) {
         this.dataBroker = dataBroker;
         this.mountDispacher = mountDispacher;
-        this.authProvider = new CallHomeAuthProviderImpl(dataBroker);
+        this.encryptionService = encryptionService;
+        this.authProvider = new CallHomeAuthProviderImpl(dataBroker, encryptionService);
         this.statusReporter = new CallhomeStatusReporter(dataBroker);
     }
 
@@ -80,6 +84,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
             listenerReg = dataBroker.registerDataTreeChangeListener(
                 DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, ALL_DEVICES), this);
             LOG.info("Initialization complete for {}", APPNAME);
+            new CallHomePwEncryption(dataBroker, encryptionService);
         } catch (IOException | Configuration.ConfigurationException e) {
             LOG.error("Unable to successfully initialize", e);
         }
@@ -97,7 +102,7 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
     }
 
     private CallHomeAuthorizationProvider getCallHomeAuthorization() {
-        return new CallHomeAuthProviderImpl(dataBroker);
+        return new CallHomeAuthProviderImpl(dataBroker, encryptionService);
     }
 
     private void initializeServer() throws IOException {
