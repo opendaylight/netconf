@@ -16,6 +16,7 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ClientChannel;
@@ -101,7 +102,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
     private void startSsh(final ChannelHandlerContext ctx, final SocketAddress address) throws IOException {
         LOG.debug("Starting SSH to {} on channel: {}", address, ctx.channel());
 
-        final ConnectFuture sshConnectionFuture = sshClient.connect(authenticationHandler.getUsername(), address);
+        final ConnectFuture sshConnectionFuture = sshClient.connect(authenticationHandler.getUsername(), address)
+               .verify(ctx.channel().config().getConnectTimeoutMillis(), TimeUnit.MILLISECONDS);
         sshConnectionFuture.addListener(future -> {
             if (future.isConnected()) {
                 handleSshSessionCreated(future, ctx);

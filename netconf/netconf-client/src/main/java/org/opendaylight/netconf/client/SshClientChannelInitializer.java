@@ -39,5 +39,6 @@ final class SshClientChannelInitializer extends AbstractChannelInitializer<Netco
                                                final Promise<NetconfClientSession> promise) {
         ch.pipeline().addAfter(NETCONF_MESSAGE_DECODER, AbstractChannelInitializer.NETCONF_SESSION_NEGOTIATOR,
                 negotiatorFactory.getSessionNegotiator(() -> sessionListener, ch, promise));
+        ch.config().setConnectTimeoutMillis((int)negotiatorFactory.getConnectionTimeoutMillis());
     }
 }
