@@ -42,4 +42,10 @@ public interface CallHomeProtocolSessionContext {
      * @return Version string provided by remote server.
      */
     String getRemoteServerVersion();
+
+    /** For deleting session if there another callhome session with
+     *  the same ssh host key.
+     */
+
+    void deleteSessionOnDuplicateSshKey();
 }
