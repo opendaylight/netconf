@@ -94,6 +94,12 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         };
     }
 
+    @Override
+    public void terminate() {
+        sshSession.close(false);
+        removeSelf();
+    }
+
     private void channelOpenFailed(final Throwable throwable) {
         LOG.error("Unable to open netconf subsystem, disconnecting.", throwable);
         sshSession.close(false);

@@ -7,55 +7,65 @@
  */
 package org.opendaylight.netconf.callhome.mount;
 
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.PublicKey;
-import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.callhome.mount.CallHomeMountSessionContext.CloseCallback;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CallHomeMountSessionManager implements CallHomeMountSessionContext.CloseCallback {
+    private static final Logger LOG = LoggerFactory.getLogger(CallHomeMountSessionManager.class);
 
     private final ConcurrentMap<SocketAddress, CallHomeMountSessionContext> contextByAddress =
         new ConcurrentHashMap<>();
-    private final Multimap<PublicKey, CallHomeMountSessionContext> contextByPublicKey = MultimapBuilder.hashKeys()
-        .hashSetValues().build();
+    private final ConcurrentMap<PublicKey, CallHomeMountSessionContext> contextByPublicKey = new ConcurrentHashMap<>();
 
-    public @Nullable CallHomeMountSessionContext getByAddress(InetSocketAddress remoteAddr) {
+    @Nullable CallHomeMountSessionContext getByAddress(final InetSocketAddress remoteAddr) {
         return contextByAddress.get(remoteAddr);
     }
 
+    CallHomeMountSessionContext createSession(final CallHomeProtocolSessionContext session,
+            final CallHomeChannelActivator activator, final CloseCallback onCloseHandler) {
+        final CallHomeMountSessionContext deviceContext = new CallHomeMountSessionContext(session.getSessionName(),
+            session, activator, devCtxt -> onClosed(devCtxt, onCloseHandler));
 
-    public @NonNull Collection<CallHomeMountSessionContext> getByPublicKey(PublicKey publicKey) {
-        return contextByPublicKey.get(publicKey);
-    }
+        final PublicKey remoteKey = session.getRemoteServerKey();
+        final CallHomeMountSessionContext existing = contextByPublicKey.putIfAbsent(remoteKey, deviceContext);
+        if (existing != null) {
+            // Check if the sshkey of the incoming netconf server is present. If present return null, else store the
+            // session. The sshkey is the uniqueness of the callhome sessions not the uniqueid/devicename.
+            LOG.error("SSH Host Key {} is associated with existing session {}, closing session {}", remoteKey, existing,
+                session);
+            session.terminate();
+            return null;
+        }
 
-    CallHomeMountSessionContext createSession(CallHomeProtocolSessionContext session,
-                                              CallHomeChannelActivator activator, final CloseCallback onCloseHandler) {
-
-        String name = session.getSessionName();
-        CallHomeMountSessionContext deviceContext = new CallHomeMountSessionContext(name,
-                session, activator, devCtxt -> {
-            CallHomeMountSessionManager.this.onClosed(devCtxt);
-            onCloseHandler.onClosed(devCtxt);
-        });
-
-        contextByAddress.put(deviceContext.getRemoteAddress(), deviceContext);
-        contextByPublicKey.put(deviceContext.getRemoteServerKey(), deviceContext);
-
+        final InetSocketAddress remoteAddress = session.getRemoteAddress();
+        final CallHomeMountSessionContext prev = contextByAddress.put(remoteAddress, deviceContext);
+        if (prev != null) {
+            LOG.warn("Remote {} replaced context {} with {}", remoteAddress, prev, deviceContext);
+        }
         return deviceContext;
     }
 
     @Override
-    public synchronized void onClosed(CallHomeMountSessionContext deviceContext) {
-        contextByAddress.remove(deviceContext.getRemoteAddress());
-        contextByPublicKey.remove(deviceContext.getRemoteServerKey(), deviceContext);
+    public void onClosed(final CallHomeMountSessionContext deviceContext) {
+        final CallHomeProtocolSessionContext session = deviceContext.getProtocol();
+        contextByAddress.remove(session.getRemoteAddress(), deviceContext);
+        contextByPublicKey.remove(session.getRemoteServerKey(), deviceContext);
+    }
+
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
+            justification = "https://github.com/spotbugs/spotbugs/issues/811")
+    private void onClosed(final CallHomeMountSessionContext deviceContext, final CloseCallback onCloseHandler) {
+        onClosed(deviceContext);
+        onCloseHandler.onClosed(deviceContext);
     }
 }
