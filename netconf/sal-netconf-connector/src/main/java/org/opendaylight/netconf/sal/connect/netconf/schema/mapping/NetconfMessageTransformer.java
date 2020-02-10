@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
@@ -311,13 +312,19 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
 
     private NormalizedNode<?, ?> parseResult(final NetconfMessage message,
             final OperationDefinition operationDefinition) {
+        Optional<XmlElement> okResponseElement = XmlElement.fromDomDocument(message.getDocument())
+                .getOnlyChildElementWithSameNamespaceOptionally("ok");
         if (operationDefinition.getOutput().getChildNodes().isEmpty()) {
-            Preconditions.checkArgument(XmlElement.fromDomDocument(
-                message.getDocument()).getOnlyChildElementWithSameNamespaceOptionally("ok").isPresent(),
+            Preconditions.checkArgument(okResponseElement.isPresent(),
                 "Unexpected content in response of rpc: %s, %s", operationDefinition.getQName(), message);
             return null;
         } else {
-            final Element element = message.getDocument().getDocumentElement();
+            if (okResponseElement.isPresent()) {
+                LOG.debug("Received response <ok/> for RPC with defined Output");
+                return null;
+            }
+
+            Element element = message.getDocument().getDocumentElement();
             try {
                 final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
                 final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
