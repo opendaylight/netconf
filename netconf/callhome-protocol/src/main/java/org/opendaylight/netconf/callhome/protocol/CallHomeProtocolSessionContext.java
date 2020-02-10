@@ -42,4 +42,9 @@ public interface CallHomeProtocolSessionContext {
      * @return Version string provided by remote server.
      */
     String getRemoteServerVersion();
+
+    /**
+     * Terminate this session.
+     */
+    void terminate();
 }
