@@ -29,6 +29,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
@@ -36,6 +37,7 @@ import io.netty.channel.DefaultChannelPromise;
 import io.netty.channel.EventLoop;
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.concurrent.TimeUnit;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelSubsystem;
 import org.apache.sshd.client.channel.ClientChannel;
@@ -76,6 +78,8 @@ public class AsyncSshHandlerTest {
     private SocketAddress localAddress;
     @Mock
     private EventLoop eventLoop;
+    @Mock
+    private ChannelConfig channelConfig;
 
     private AsyncSshHandler asyncSshHandler;
 
@@ -166,6 +170,9 @@ public class AsyncSshHandlerTest {
             }
         }, MoreExecutors.directExecutor());
         doReturn(connectFuture).when(sshClient).connect("usr", remoteAddress);
+        doReturn(channelConfig).when(channel).config();
+        doReturn(1).when(channelConfig).getConnectTimeoutMillis();
+        doReturn(connectFuture).when(connectFuture).verify(1,TimeUnit.MILLISECONDS);
     }
 
     @Test
