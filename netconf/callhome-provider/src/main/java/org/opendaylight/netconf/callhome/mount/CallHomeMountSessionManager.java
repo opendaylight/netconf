@@ -20,9 +20,12 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.callhome.mount.CallHomeMountSessionContext.CloseCallback;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
 import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CallHomeMountSessionManager implements CallHomeMountSessionContext.CloseCallback {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CallHomeMountSessionManager.class);
     private final ConcurrentMap<SocketAddress, CallHomeMountSessionContext> contextByAddress =
         new ConcurrentHashMap<>();
     private final Multimap<PublicKey, CallHomeMountSessionContext> contextByPublicKey = MultimapBuilder.hashKeys()
@@ -47,10 +50,21 @@ public class CallHomeMountSessionManager implements CallHomeMountSessionContext.
             onCloseHandler.onClosed(devCtxt);
         });
 
-        contextByAddress.put(deviceContext.getRemoteAddress(), deviceContext);
-        contextByPublicKey.put(deviceContext.getRemoteServerKey(), deviceContext);
 
-        return deviceContext;
+        /*check if the sshkey of the incoming netconf server is present.
+         * If present return null,
+         * else store the session.
+         * The sshkey is the uniqueness of the callhome sessions not the
+         * uniqueid/devicename.
+         */
+        if (! contextByPublicKey.containsKey(deviceContext.getRemoteServerKey())) {
+            contextByPublicKey.put(deviceContext.getRemoteServerKey(), deviceContext);
+            contextByAddress.put(deviceContext.getRemoteAddress(), deviceContext);
+            return deviceContext;
+        }
+        else {
+            return null;
+        }
     }
 
     @Override

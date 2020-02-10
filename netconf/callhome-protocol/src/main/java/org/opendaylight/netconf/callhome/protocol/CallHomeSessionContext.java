@@ -94,6 +94,13 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         };
     }
 
+    @Override
+    public void deleteSessionOnDuplicateSshKey() {
+        LOG.error("There is a callhome session with the same ssh host key");
+        sshSession.close(false);
+        removeSelf();
+    }
+
     private void channelOpenFailed(final Throwable throwable) {
         LOG.error("Unable to open netconf subsystem, disconnecting.", throwable);
         sshSession.close(false);
