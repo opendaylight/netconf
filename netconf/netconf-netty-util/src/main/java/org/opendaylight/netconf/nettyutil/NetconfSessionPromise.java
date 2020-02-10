@@ -13,7 +13,6 @@ import static java.util.Objects.requireNonNull;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelOption;
 import io.netty.util.concurrent.DefaultPromise;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
@@ -53,7 +52,6 @@ final class NetconfSessionPromise<S extends NetconfSession> extends DefaultPromi
             if (this.address.isUnresolved()) {
                 this.address = new InetSocketAddress(this.address.getHostName(), this.address.getPort());
             }
-            this.bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, timeout);
             final ChannelFuture connectFuture = this.bootstrap.connect(this.address);
             // Add listener that attempts reconnect by invoking this method again.
             connectFuture.addListener(new BootstrapConnectListener());
