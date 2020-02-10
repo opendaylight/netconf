@@ -61,8 +61,8 @@ module netconf-node-optional {
         }
     }
 
-    augment "/nt:network-topology/nt:topology/nt:node/" {
-        when "../../nt:topology-types/topology-netconf";
+    augment "/nt:network-topology/nt:topology/nt:node" {
+        when "../nt:topology-types/*[./topology-netconf]";
         ext:augment-identifier "netconf-node-augmented-optional";
         uses netconf-node-augmented-optional-fields;
     }
