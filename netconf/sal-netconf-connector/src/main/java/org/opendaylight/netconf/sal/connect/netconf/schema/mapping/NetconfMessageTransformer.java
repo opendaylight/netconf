@@ -42,6 +42,7 @@ import org.opendaylight.mdsal.dom.spi.SimpleDOMActionResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.MissingNameSpaceException;
 import org.opendaylight.netconf.api.xml.XmlElement;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
@@ -317,8 +318,10 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 "Unexpected content in response of rpc: %s, %s", operationDefinition.getQName(), message);
             return null;
         } else {
-            final Element element = message.getDocument().getDocumentElement();
+            Element element = XmlUtil.newDocument().getDocumentElement();
             try {
+                element = XmlUtil.readXmlToDocument(XmlUtil.toString(message.getDocument())
+                        .replaceAll("<ok/>","")).getDocumentElement();
                 final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
                 final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
                 final XmlParserStream xmlParser = XmlParserStream.create(writer, mountContext,
