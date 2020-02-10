@@ -102,6 +102,10 @@ public class NetconfClientSessionNegotiatorFactory
         this.clientCapabilities = capabilities;
     }
 
+    public long getConnectionTimeoutMillis() {
+        return connectionTimeoutMillis;
+    }
+
     @Override
     public NetconfClientSessionNegotiator getSessionNegotiator(
             final NetconfSessionListenerFactory<NetconfClientSessionListener> sessionListenerFactory,
