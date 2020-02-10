@@ -291,7 +291,7 @@ module netconf-node-topology {
         }
 
         container pass-through {
-            when "../connection-status = connected";
+            when "../connection-status = 'connected'";
             description
                 "When the underlying node is connected, its NETCONF context
                 is available verbatim under this container through the
@@ -359,7 +359,7 @@ module netconf-node-topology {
     }
 
     augment "/nt:network-topology/nt:topology/nt:node" {
-        when "../../nt:topology-types/topology-netconf";
+        when "../nt:topology-types/*[./topology-netconf]";
         ext:augment-identifier "netconf-node";
 
         uses netconf-node-fields;
