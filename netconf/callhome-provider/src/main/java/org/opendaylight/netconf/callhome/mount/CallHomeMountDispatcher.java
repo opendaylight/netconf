@@ -110,10 +110,12 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
                                          final CallHomeChannelActivator activator) {
         final CallHomeMountSessionContext deviceContext =
                 getSessionManager().createSession(session, activator, onCloseHandler);
-        final NodeId nodeId = deviceContext.getId();
-        final Node configNode = deviceContext.getConfigNode();
-        LOG.info("Provisioning fake config {}", configNode);
-        topology.connectNode(nodeId, configNode);
+        if (deviceContext != null) {
+            final NodeId nodeId = deviceContext.getId();
+            final Node configNode = deviceContext.getConfigNode();
+            LOG.info("Provisioning fake config {}", configNode);
+            topology.connectNode(nodeId, configNode);
+        }
     }
 
     public CallHomeMountSessionManager getSessionManager() {

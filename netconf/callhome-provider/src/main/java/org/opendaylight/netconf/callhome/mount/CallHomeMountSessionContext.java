@@ -9,10 +9,9 @@ package org.opendaylight.netconf.callhome.mount;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.common.base.MoreObjects;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.util.concurrent.Promise;
-import java.net.InetSocketAddress;
-import java.security.PublicKey;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
 import org.opendaylight.netconf.callhome.protocol.CallHomeChannelActivator;
@@ -27,8 +26,10 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 
+// Non-final to allow mocking
 class CallHomeMountSessionContext {
-    public interface CloseCallback {
+    @FunctionalInterface
+    interface CloseCallback {
         void onClosed(CallHomeMountSessionContext deviceContext);
     }
 
@@ -49,27 +50,32 @@ class CallHomeMountSessionContext {
         this.onClose = requireNonNull(callback, "callback");
     }
 
+    CallHomeProtocolSessionContext getProtocol() {
+        return protocol;
+    }
+
     NodeId getId() {
         return nodeId;
     }
 
-    public ContextKey getContextKey() {
+    ContextKey getContextKey() {
         return key;
     }
 
     Node getConfigNode() {
-        NodeBuilder builder = new NodeBuilder();
-        return builder.setNodeId(getId()).addAugmentation(NetconfNode.class, configNetconfNode()).build();
-    }
-
-    private NetconfNode configNetconfNode() {
-        NetconfNodeBuilder node = new NetconfNodeBuilder();
-        node.setHost(new Host(key.getIpAddress()));
-        node.setPort(key.getPort());
-        node.setTcpOnly(Boolean.FALSE);
-        node.setCredentials(new LoginPasswordBuilder().setUsername("ommited").setPassword("ommited").build());
-        node.setSchemaless(Boolean.FALSE);
-        return node.build();
+        return new NodeBuilder()
+                .setNodeId(getId())
+                .addAugmentation(NetconfNode.class, new NetconfNodeBuilder()
+                    .setHost(new Host(key.getIpAddress()))
+                    .setPort(key.getPort())
+                    .setTcpOnly(Boolean.FALSE)
+                    .setCredentials(new LoginPasswordBuilder()
+                        .setUsername("ommited")
+                        .setPassword("ommited")
+                        .build())
+                    .setSchemaless(Boolean.FALSE)
+                    .build())
+                .build();
     }
 
     @SuppressWarnings("unchecked")
@@ -77,7 +83,14 @@ class CallHomeMountSessionContext {
         return (Promise<V>) activator.activate(wrap(sessionListener));
     }
 
-    @SuppressWarnings("deprecation")
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("address", protocol.getRemoteAddress())
+                .add("hostKey", protocol.getRemoteServerKey())
+                .toString();
+    }
+
     private NetconfClientSessionListener wrap(final NetconfClientSessionListener delegate) {
         return new NetconfClientSessionListener() {
             @Override
@@ -114,13 +127,5 @@ class CallHomeMountSessionContext {
             justification = "https://github.com/spotbugs/spotbugs/issues/811")
     private void removeSelf() {
         onClose.onClosed(this);
-    }
-
-    InetSocketAddress getRemoteAddress() {
-        return protocol.getRemoteAddress();
-    }
-
-    PublicKey getRemoteServerKey() {
-        return protocol.getRemoteServerKey();
     }
 }
