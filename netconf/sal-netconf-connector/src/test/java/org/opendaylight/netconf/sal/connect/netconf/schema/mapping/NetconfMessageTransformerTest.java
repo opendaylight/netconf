@@ -102,6 +102,8 @@ public class NetconfMessageTransformerTest {
 
     private static final String URN_EXAMPLE_AUGMENTED_ACTION = "urn:example:augmented-action";
 
+    private static final String URN_EXAMPLE_RPCS_ACTIONS_OUTPUTS = "urn:example:rpcs-actions-outputs";
+
     private static final QName SERVER_QNAME =
             QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "server");
     private static final QName RESET_QNAME = QName.create(SERVER_QNAME, "reset");
@@ -125,6 +127,19 @@ public class NetconfMessageTransformerTest {
     private static final QName DISABLE_QNAME = QName.create(URN_EXAMPLE_AUGMENTED_ACTION, "disable");
     private static final SchemaPath DISABLE_INTERFACE_PATH =
             SchemaPath.create(true, DEVICE_QNAME, INTERFACE_QNAME, DISABLE_QNAME);
+
+    private static final QName CHECK_WITH_OUTPUT_QNAME =
+            QName.create(URN_EXAMPLE_RPCS_ACTIONS_OUTPUTS, "check-with-output");
+    private static final SchemaPath CHECK_WITH_OUTPUT_INTERFACE_PATH =
+            SchemaPath.create(true, DEVICE_QNAME, INTERFACE_QNAME, CHECK_WITH_OUTPUT_QNAME);
+    private static final QName CHECK_WITHOUT_OUTPUT_QNAME =
+            QName.create(URN_EXAMPLE_RPCS_ACTIONS_OUTPUTS, "check-without-output");
+    private static final SchemaPath CHECK_WITHOUT_OUTPUT_INTERFACE_PATH =
+            SchemaPath.create(true, DEVICE_QNAME, INTERFACE_QNAME, CHECK_WITHOUT_OUTPUT_QNAME);
+    private static final QName RPC_WITH_OUTPUT_QNAME =
+            QName.create(URN_EXAMPLE_RPCS_ACTIONS_OUTPUTS, "rpc-with-output");
+    private static final QName RPC_WITHOUT_OUTPUT_QNAME =
+            QName.create(URN_EXAMPLE_RPCS_ACTIONS_OUTPUTS, "rpc-without-output");
 
     private static final QName BOX_OUT_QNAME =
             QName.create(URN_EXAMPLE_SERVER_FARM, REVISION_EXAMPLE_SERVER_FARM, "box-out");
@@ -164,7 +179,8 @@ public class NetconfMessageTransformerTest {
 
         ACTION_SCHEMA = YangParserTestUtils.parseYangResources(NetconfMessageTransformerTest.class,
             "/schemas/example-server-farm.yang","/schemas/example-server-farm-2.yang",
-            "/schemas/conflicting-actions.yang", "/schemas/augmented-action.yang");
+            "/schemas/conflicting-actions.yang", "/schemas/augmented-action.yang",
+            "/schemas/rpcs-actions-outputs.yang");
     }
 
     @AfterClass
@@ -214,6 +230,26 @@ public class NetconfMessageTransformerTest {
         final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
 
         transformer.toRpcResult(new NetconfMessage(XmlUtil.readXmlToDocument(result)), toPath(NETCONF_LOCK_QNAME));
+    }
+
+    @Test
+    public void testRpcEmptyBodyWithOutputDefinedSchemaResult() throws Exception {
+        final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
+
+        DOMRpcResult domRpcResult = actionNetconfMessageTransformer
+                .toRpcResult(new NetconfMessage(XmlUtil.readXmlToDocument(result)),
+                        toPath(RPC_WITH_OUTPUT_QNAME));
+        assertNotNull(domRpcResult);
+    }
+
+    @Test
+    public void testRpcEmptyBodyWithoutOutputDefinedSchemaResult() throws Exception {
+        final String result = "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\"><ok/></rpc-reply>";
+
+        DOMRpcResult domRpcResult = actionNetconfMessageTransformer
+                .toRpcResult(new NetconfMessage(XmlUtil.readXmlToDocument(result)),
+                        toPath(RPC_WITHOUT_OUTPUT_QNAME));
+        assertNotNull(domRpcResult);
     }
 
     @Test
@@ -474,6 +510,8 @@ public class NetconfMessageTransformerTest {
         schemaPaths.add(XYZZY_BAR_PATH);
         schemaPaths.add(CHOICE_ACTION_PATH);
         schemaPaths.add(DISABLE_INTERFACE_PATH);
+        schemaPaths.add(CHECK_WITH_OUTPUT_INTERFACE_PATH);
+        schemaPaths.add(CHECK_WITHOUT_OUTPUT_INTERFACE_PATH);
 
         List<ActionDefinition> actions = NetconfMessageTransformer.getActions(ACTION_SCHEMA);
         assertEquals(schemaPaths.size(), actions.size());
@@ -763,6 +801,30 @@ public class NetconfMessageTransformerTest {
         assertNotNull(containerNode);
         LeafNode<String> leaf = (LeafNode) containerNode.getValue().iterator().next();
         assertEquals("now", leaf.getValue());
+    }
+
+    @Test
+    public void toActionEmptyBodyWithOutputDefinedResultTest() throws Exception {
+        NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
+                "<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
+                + "<ok/>"
+                + "</rpc-reply>"));
+        DOMActionResult actionResult =
+                actionNetconfMessageTransformer.toActionResult(CHECK_WITH_OUTPUT_INTERFACE_PATH, message);
+        assertNotNull(actionResult);
+        assertTrue(actionResult.getOutput().isEmpty());
+    }
+
+    @Test
+    public void toActionEmptyBodyWithoutOutputDefinedResultTest() throws Exception {
+        NetconfMessage message = new NetconfMessage(XmlUtil.readXmlToDocument(
+                "<rpc-reply message-id=\"101\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\">"
+                + "<ok/>"
+                + "</rpc-reply>"));
+        DOMActionResult actionResult =
+                actionNetconfMessageTransformer.toActionResult(CHECK_WITHOUT_OUTPUT_INTERFACE_PATH, message);
+        assertNotNull(actionResult);
+        assertTrue(actionResult.getOutput().isEmpty());
     }
 
     private static void checkAction(final QName actionQname, final Node action , final String inputLocalName,
