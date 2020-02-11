@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "002ea13b_8b72b665",
+        "filename": "netconf/sal-netconf-connector/src/main/java/org/opendaylight/netconf/sal/connect/netconf/schema/mapping/NetconfMessageTransformer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-02-11T16:31:51Z",
+      "side": 1,
+      "message": "Hmm, this will hurt performance quite a bit, as we are bounding the document through XML. Note we are already performing a check for \"ok\" above.\n\nHow about acquiring the optional outside at the beginning of the method and just returning null if it is present? The if()/checkArgument() would be inverted at top of the Element declaration then...",
+      "range": {
+        "startLine": 323,
+        "startChar": 26,
+        "endLine": 324,
+        "endChar": 70
+      },
+      "revId": "a032ca183938e94db7e0aefe36981603bcf1ec4c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
