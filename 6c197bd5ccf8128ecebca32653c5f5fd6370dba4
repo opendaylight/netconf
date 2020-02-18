@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e1fc1fc1_87d89f18",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomePwEncryption.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2020-02-18T06:31:28Z",
+      "side": 1,
+      "message": "Could these be local variables instead of class members?",
+      "revId": "6c197bd5ccf8128ecebca32653c5f5fd6370dba4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "35d28ff6_ea545d22",
+        "filename": "netconf/callhome-provider/src/main/java/org/opendaylight/netconf/callhome/mount/CallHomePwEncryption.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2020-02-18T06:31:28Z",
+      "side": 1,
+      "message": "Can you see and reuse the common code instead of duplicating?",
+      "revId": "6c197bd5ccf8128ecebca32653c5f5fd6370dba4",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
