@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -234,15 +235,19 @@ public final class StressClient {
         final NetconfClientDispatcherImpl netconfClientDispatcher;
         if (params.exi) {
             if (params.legacyFraming) {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacyExi(nioGroup, nioGroup, timer);
+                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacyExi(nioGroup, nioGroup, timer,
+                        Optional.empty());
             } else {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createChunkedExi(nioGroup, nioGroup, timer);
+                netconfClientDispatcher = ConfigurableClientDispatcher.createChunkedExi(nioGroup, nioGroup, timer,
+                        Optional.empty());
             }
         } else {
             if (params.legacyFraming) {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacy(nioGroup, nioGroup, timer);
+                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacy(nioGroup, nioGroup, timer,
+                        Optional.empty());
             } else {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createChunked(nioGroup, nioGroup, timer);
+                netconfClientDispatcher = ConfigurableClientDispatcher.createChunked(nioGroup, nioGroup, timer,
+                        Optional.empty());
             }
         }
         return netconfClientDispatcher;

@@ -16,6 +16,7 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ClientChannel;
@@ -94,8 +95,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      * @return                      {@code AsyncSshHandler}
      */
     public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler,
-            final Future<?> negotiationFuture) {
-        return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT, negotiationFuture);
+            final Future<?> negotiationFuture, final Optional<SshClient> sshClient) {
+        return new AsyncSshHandler(authenticationHandler, sshClient.orElse(DEFAULT_CLIENT), negotiationFuture);
     }
 
     private void startSsh(final ChannelHandlerContext ctx, final SocketAddress address) throws IOException {
