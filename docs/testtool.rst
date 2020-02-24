@@ -24,8 +24,8 @@ from the NETCONF codebase in OpenDaylight.
 
 .. tip::
 
-    Download testtool from OpenDaylight Nexus at:
-    https://nexus.opendaylight.org/content/repositories/public/org/opendaylight/netconf/netconf-testtool/1.1.0-Boron/
+    Download the Sodium SR2 testtool from OpenDaylight Nexus at:
+    https://nexus.opendaylight.org/content/repositories/public/org/opendaylight/netconf/netconf-testtool/1.7.2/
 
 **Nexus contains 3 executable tools:**
 
@@ -74,9 +74,9 @@ Downloading testtool
 ^^^^^^^^^^^^^^^^^^^^
 
 Netconf-testtool is now part of default maven build profile for
-controller and can be also downloaded from nexus. The executable jar for
-testtool can be found at:
-`nexus-artifacts <https://nexus.opendaylight.org/content/repositories/public/org/opendaylight/netconf/netconf-testtool/1.1.0-Boron/>`__
+controller and can be also downloaded from nexus. The executable jars for
+testtool can be found by release at this parent directory:
+`nexus-artifacts <https://nexus.opendaylight.org/content/repositories/public/org/opendaylight/netconf/netconf-testtool/>`__
 
 Running testtool
 ^^^^^^^^^^^^^^^^
