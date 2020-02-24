@@ -234,15 +234,17 @@ public final class StressClient {
         final NetconfClientDispatcherImpl netconfClientDispatcher;
         if (params.exi) {
             if (params.legacyFraming) {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacyExi(nioGroup, nioGroup, timer);
+                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacyExi(nioGroup, nioGroup, timer,
+                        null);
             } else {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createChunkedExi(nioGroup, nioGroup, timer);
+                netconfClientDispatcher = ConfigurableClientDispatcher.createChunkedExi(nioGroup, nioGroup, timer,
+                        null);
             }
         } else {
             if (params.legacyFraming) {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacy(nioGroup, nioGroup, timer);
+                netconfClientDispatcher = ConfigurableClientDispatcher.createLegacy(nioGroup, nioGroup, timer, null);
             } else {
-                netconfClientDispatcher = ConfigurableClientDispatcher.createChunked(nioGroup, nioGroup, timer);
+                netconfClientDispatcher = ConfigurableClientDispatcher.createChunked(nioGroup, nioGroup, timer, null);
             }
         }
         return netconfClientDispatcher;
