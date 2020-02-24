@@ -9,3 +9,4 @@ NetConf
 
    developer-guide
    user-guide
+   testtool
