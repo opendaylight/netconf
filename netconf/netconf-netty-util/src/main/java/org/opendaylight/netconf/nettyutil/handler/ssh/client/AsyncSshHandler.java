@@ -22,6 +22,7 @@ import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.ConnectFuture;
 import org.apache.sshd.client.session.ClientSession;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,8 +95,13 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
      * @return                      {@code AsyncSshHandler}
      */
     public static AsyncSshHandler createForNetconfSubsystem(final AuthenticationHandler authenticationHandler,
-            final Future<?> negotiationFuture) {
-        return new AsyncSshHandler(authenticationHandler, DEFAULT_CLIENT, negotiationFuture);
+            final Future<?> negotiationFuture, @Nullable final SshClient sshClient) {
+        SshClient client = DEFAULT_CLIENT;
+        if (sshClient != null) {
+            client = sshClient;
+        }
+
+        return new AsyncSshHandler(authenticationHandler, client, negotiationFuture);
     }
 
     private void startSsh(final ChannelHandlerContext ctx, final SocketAddress address) throws IOException {
