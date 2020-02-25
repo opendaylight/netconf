@@ -620,8 +620,7 @@ Preconditions:
 
 -  Netopeer is up and running in docker
 
-Now just follow the chapter: `Spawning
-netconf-connector <#_spawning_additional_netconf_connectors_while_the_controller_is_running>`__.
+Now just follow the section: `Spawning new NETCONF connectors`_.
 In the payload change the:
 
 -  name, e.g., to netopeer
@@ -751,10 +750,8 @@ Mounting the MD-SAL’s NETCONF server
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To perform this operation, just spawn a new netconf-connector as
-described in `Spawning
-netconf-connector <#_spawning_additional_netconf_connectors_while_the_controller_is_running>`__.
-Just change the ip to "127.0.0.1" port to "2830" and its name to
-"controller-mdsal".
+described in `Spawning new NETCONF connectors`_. Just change the ip to
+"127.0.0.1" port to "2830" and its name to "controller-mdsal".
 
 Now the MD-SAL’s datastore can be read over RESTCONF via NETCONF by
 invoking:
