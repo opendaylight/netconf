@@ -66,6 +66,8 @@ public final class OperationBuilder {
             this.parentName = parentName;
             spec = new Operation();
             spec.setType(parentName + CONFIG + nodeName + TOP);
+//            final String refName = parentName + CONFIG + nodeName + TOP;
+//            spec.setResponses(ImmutableList.of(new Response(200).setSchemaWithRef(refName)));
             spec.setNotes(description);
             spec.setConsumes(CONSUMES_PUT_POST);
         }

@@ -8,12 +8,16 @@
 package org.opendaylight.netconf.sal.rest.doc.impl;
 
 import static org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.DEFAULT_PAGESIZE;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.NewOperationBuilder.*;
 import static org.opendaylight.netconf.sal.rest.doc.util.RestDocgenUtil.resolvePathArgumentsName;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
+
 import java.io.IOException;
 import java.net.URI;
 import java.time.format.DateTimeParseException;
@@ -21,39 +25,38 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import javax.ws.rs.core.UriInfo;
+
+import com.google.common.collect.ImmutableList;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder;
-import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Delete;
-import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Get;
-import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Post;
-import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Put;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Api;
-import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
+import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Operation;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Parameter;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
+import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +66,7 @@ public abstract class BaseYangSwaggerGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(BaseYangSwaggerGenerator.class);
 
     protected static final String API_VERSION = "1.0.0";
-    protected static final String SWAGGER_VERSION = "1.2";
+    protected static final String SWAGGER_VERSION = "2.0";
 
     static final String MODULE_NAME_SUFFIX = "_module";
     private final ModelGenerator jsonConverter = new ModelGenerator();
@@ -88,7 +91,7 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     public ResourceList getResourceListing(final UriInfo uriInfo, final SchemaContext schemaContext,
-        final String context, final URIType uriType) {
+                                           final String context, final URIType uriType) {
         return getResourceListing(uriInfo, schemaContext, context, 0, true, uriType);
     }
 
@@ -96,7 +99,7 @@ public abstract class BaseYangSwaggerGenerator {
      * Return list of modules converted to swagger compliant resource list.
      */
     public ResourceList getResourceListing(final UriInfo uriInfo, final SchemaContext schemaContext,
-        final String context, final int pageNum, boolean all, final URIType uriType) {
+                                           final String context, final int pageNum, boolean all, final URIType uriType) {
 
         final ResourceList resourceList = createResourceList();
 
@@ -112,8 +115,8 @@ public abstract class BaseYangSwaggerGenerator {
             final String revisionString = module.getQNameModule().getRevision().map(Revision::toString).orElse(null);
 
             LOG.debug("Working on [{},{}]...", module.getName(), revisionString);
-            final ApiDeclaration doc =
-                getApiDeclaration(module.getName(), revisionString, uriInfo, schemaContext, context, uriType);
+            final SwaggerObject doc =
+                    getApiDeclaration(module.getName(), revisionString, uriInfo, schemaContext, context, uriType);
             if (doc != null) {
                 count++;
                 if (count >= start && count < end || all) {
@@ -147,15 +150,15 @@ public abstract class BaseYangSwaggerGenerator {
         return uri.toASCIIString();
     }
 
-    public ApiDeclaration getApiDeclaration(final String module, final String revision, final UriInfo uriInfo,
-        final URIType uriType) {
+    public SwaggerObject getApiDeclaration(final String module, final String revision, final UriInfo uriInfo,
+                                           final URIType uriType) {
         final SchemaContext schemaContext = schemaService.getGlobalContext();
         Preconditions.checkState(schemaContext != null);
         return getApiDeclaration(module, revision, uriInfo, schemaContext, "", uriType);
     }
 
-    public ApiDeclaration getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
-        final SchemaContext schemaContext, final String context, final URIType uriType) {
+    public SwaggerObject getApiDeclaration(final String moduleName, final String revision, final UriInfo uriInfo,
+                                           final SchemaContext schemaContext, final String context, final URIType uriType) {
         final Optional<Revision> rev;
 
         try {
@@ -166,16 +169,18 @@ public abstract class BaseYangSwaggerGenerator {
 
         final Module module = schemaContext.findModule(moduleName, rev).orElse(null);
         Preconditions.checkArgument(module != null,
-            "Could not find module by name,revision: " + moduleName + "," + revision);
+                "Could not find module by name,revision: " + moduleName + "," + revision);
 
         return getApiDeclaration(module, uriInfo, context, schemaContext, uriType);
     }
 
-    public ApiDeclaration getApiDeclaration(final Module module, final UriInfo uriInfo,
-        final String context, final SchemaContext schemaContext, final URIType uriType) {
+    public SwaggerObject getApiDeclaration(final Module module, final UriInfo uriInfo,
+                                           final String context, final SchemaContext schemaContext, final URIType uriType) {
+        final String schema = createSchemaFromUriInfo(uriInfo);
+        final String host = createHostFromUriInfo(uriInfo);
         final String basePath = createBasePathFromUriInfo(uriInfo);
 
-        final ApiDeclaration doc = getSwaggerDocSpec(module, basePath, context, schemaContext, uriType);
+        final SwaggerObject doc = getSwaggerDocSpec(module, schema, host, basePath, context, schemaContext, uriType);
         if (doc != null) {
             return doc;
         }
@@ -183,22 +188,44 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     public String createBasePathFromUriInfo(final UriInfo uriInfo) {
+        return "/";
+    }
+
+    public String createHostFromUriInfo(final UriInfo uriInfo) {
         String portPart = "";
         final int port = uriInfo.getBaseUri().getPort();
         if (port != -1) {
             portPart = ":" + port;
         }
-        final String basePath =
-            new StringBuilder(uriInfo.getBaseUri().getScheme()).append("://").append(uriInfo.getBaseUri().getHost())
-                .append(portPart).toString();
-        return basePath;
+        final String host =
+                uriInfo.getBaseUri().getHost() + portPart;
+        return host;
     }
 
-    public ApiDeclaration getSwaggerDocSpec(final Module module, final String basePath, final String context,
-        final SchemaContext schemaContext, final URIType uriType) {
-        final ApiDeclaration doc = createApiDeclaration(basePath);
+    public String createSchemaFromUriInfo(final UriInfo uriInfo) {
+        return uriInfo.getBaseUri().getScheme();
+    }
 
-        final List<Api> apis = new ArrayList<>();
+
+    public SwaggerObject getSwaggerDocSpec(final Module module, final String schema, final String host,
+                                           final String basePath, final String context,
+                                           final SchemaContext schemaContext, final URIType uriType) {
+        final SwaggerObject doc = createSwaggerObject(schema, host, basePath);
+        final HashMap<QName, String> definitionNames =  new HashMap<>();
+
+        ObjectNode models;
+
+        try {
+            models = this.jsonConverter.convertToJsonSchema(module, schemaContext, definitionNames);
+            doc.setDefinitions(models);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Document: {}", this.mapper.writeValueAsString(doc));
+            }
+        } catch (IOException e) {
+            LOG.error("Exception occured in ModelGenerator", e);
+        }
+
+        final ObjectNode paths = JsonNodeFactory.instance.objectNode();
         boolean hasAddRootPostLink = false;
 
         final Collection<DataSchemaNode> dataSchemaNodes = module.getChildNodes();
@@ -207,7 +234,7 @@ public abstract class BaseYangSwaggerGenerator {
             if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
                 LOG.debug("Is Configuration node [{}] [{}]", node.isConfiguration(), node.getQName().getLocalName());
 
-                List<Parameter> pathParams = new ArrayList<>();
+                ArrayNode pathParams = JsonNodeFactory.instance.arrayNode();
                 String resourcePath;
 
                 /*
@@ -215,7 +242,7 @@ public abstract class BaseYangSwaggerGenerator {
                  * GET/PUT/POST/DELETE config are added for this node.
                  */
                 if (node.isConfiguration()) { // This node's config statement is
-                                              // true.
+                    // true.
                     resourcePath = getDataStorePath("config", context);
 
                     /*
@@ -225,65 +252,52 @@ public abstract class BaseYangSwaggerGenerator {
                      */
                     if (!hasAddRootPostLink) {
                         LOG.debug("Has added root post link for module {}", module.getName());
-                        addRootPostLink(module, (DataNodeContainer) node, pathParams, resourcePath, "config", apis);
+                        addRootPostLink(module, (DataNodeContainer) node, pathParams, resourcePath, "config", paths);
 
                         hasAddRootPostLink = true;
                     }
 
-                    addApis(node, apis, resourcePath, pathParams, schemaContext, true, module.getName(), "config",
-                        uriType);
+                    addApis(node, paths, resourcePath, pathParams, schemaContext, true, module.getName(), "config",
+                            uriType);
                 }
-                pathParams = new ArrayList<>();
+                pathParams = JsonNodeFactory.instance.arrayNode();
                 resourcePath = getDataStorePath("operational", context);
 
-                addApis(node, apis, resourcePath, pathParams, schemaContext, false, module.getName(), "operational",
-                    uriType);
+                addApis(node, paths, resourcePath, pathParams, schemaContext, false, module.getName(), "operational",
+                        uriType);
             }
         }
 
-        final Set<RpcDefinition> rpcs = module.getRpcs();
-        for (final RpcDefinition rpcDefinition : rpcs) {
-            final String resourcePath;
-            resourcePath = getDataStorePath("operations", context);
-            addOperations(rpcDefinition, apis, resourcePath, schemaContext);
-        }
+//        final Set<RpcDefinition> rpcs = module.getRpcs();
+//        for (final RpcDefinition rpcDefinition : rpcs) {
+//            final String resourcePath;
+//            resourcePath = getDataStorePath("operations", context);
+//            addOperations(rpcDefinition, apis, resourcePath, schemaContext);
+//        }
 
-        LOG.debug("Number of APIs found [{}]", apis.size());
+        LOG.debug("Number of APIs found [{}]", paths.size());
 
-        if (!apis.isEmpty()) {
-            doc.setApis(apis);
-            ObjectNode models = null;
-
-            try {
-                models = this.jsonConverter.convertToJsonSchema(module, schemaContext);
-                doc.setModels(models);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Document: {}", this.mapper.writeValueAsString(doc));
-                }
-            } catch (IOException e) {
-                LOG.error("Exception occured in ModelGenerator", e);
-            }
+            doc.setPaths(paths);
 
             return doc;
-        }
-        return null;
     }
 
     private void addRootPostLink(final Module module, final DataNodeContainer node,
-        final List<Parameter> pathParams, final String resourcePath, final String dataStore, final List<Api> apis) {
+                                 final ArrayNode pathParams, final String resourcePath, final String dataStore, final ObjectNode paths) {
         if (containsListOrContainer(module.getChildNodes())) {
-            final Api apiForRootPostUri = new Api();
-            apiForRootPostUri.setPath(resourcePath.concat(getContent(dataStore)));
-            apiForRootPostUri.setOperations(operationPost(module.getName() + MODULE_NAME_SUFFIX,
-                module.getDescription().orElse(null), module, pathParams, true, ""));
-            apis.add(apiForRootPostUri);
+            ObjectNode post = JsonNodeFactory.instance.objectNode();
+            post.set("post", operationPost(module.getName() + MODULE_NAME_SUFFIX,
+                    module.getDescription().orElse(""), module, pathParams, true, ""));
+            paths.set(resourcePath.concat(getContent(dataStore)), post);
         }
     }
 
-    public ApiDeclaration createApiDeclaration(final String basePath) {
-        final ApiDeclaration doc = new ApiDeclaration();
+    public SwaggerObject createSwaggerObject(final String schema, final String host, final String basePath) {
+        final SwaggerObject doc = new SwaggerObject();
         doc.setApiVersion(API_VERSION);
-        doc.setSwaggerVersion(SWAGGER_VERSION);
+        doc.setSwagger(SWAGGER_VERSION);
+        doc.setSchemes(ImmutableList.of(schema));
+        doc.setHost(host);
         doc.setBasePath(basePath);
         doc.setProduces(Arrays.asList("application/json", "application/xml"));
         return doc;
@@ -295,37 +309,36 @@ public abstract class BaseYangSwaggerGenerator {
         return module + "(" + revision + ")";
     }
 
-    private void addApis(final DataSchemaNode node, final List<Api> apis, final String parentPath,
-        final List<Parameter> parentPathParams, final SchemaContext schemaContext, final boolean addConfigApi,
-        final String parentName, final String dataStore, final URIType uriType) {
-        final Api api = new Api();
-        final List<Parameter> pathParams = new ArrayList<>(parentPathParams);
-
+    private void addApis(final DataSchemaNode node, final ObjectNode paths, final String parentPath,
+                         final ArrayNode parentPathParams, final SchemaContext schemaContext, final boolean addConfigApi,
+                         final String parentName, final String dataStore, final URIType uriType) {
+        final ArrayNode pathParams = JsonUtil.copy(parentPathParams);
         final String resourcePath = parentPath + "/" + createPath(node, pathParams, schemaContext);
         LOG.debug("Adding path: [{}]", resourcePath);
-        api.setPath(resourcePath.concat(getContent(dataStore)));
 
         Iterable<DataSchemaNode> childSchemaNodes = Collections.emptySet();
         if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
             final DataNodeContainer dataNodeContainer = (DataNodeContainer) node;
             childSchemaNodes = dataNodeContainer.getChildNodes();
         }
-        api.setOperations(operation(node, pathParams, addConfigApi, childSchemaNodes, parentName));
-        apis.add(api);
+        ObjectNode path = JsonNodeFactory.instance.objectNode();
+        path.setAll(operations(node, pathParams, addConfigApi, childSchemaNodes, parentName));
+        paths.set(resourcePath.concat(getContent(dataStore)), path);
 
-        if (uriType.equals(URIType.RFC8040)) {
-            ((ActionNodeContainer) node).getActions().forEach((actionDef -> {
-                addOperations(actionDef, apis, resourcePath, schemaContext);
-            }));
-        }
+
+//        if (uriType.equals(URIType.RFC8040)) {
+//            ((ActionNodeContainer) node).getActions().forEach((actionDef -> {
+//                addOperations(actionDef, apis, resourcePath, schemaContext);
+//            }));
+//        }
 
         for (final DataSchemaNode childNode : childSchemaNodes) {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
                 // keep config and operation attributes separate.
                 if (childNode.isConfiguration() == addConfigApi) {
                     final String newParent = parentName + "/" + node.getQName().getLocalName();
-                    addApis(childNode, apis, resourcePath, pathParams, schemaContext, addConfigApi, newParent,
-                        dataStore, uriType);
+                    addApis(childNode, paths, resourcePath, pathParams, schemaContext, addConfigApi, newParent,
+                            dataStore, uriType);
                 }
             }
         }
@@ -342,44 +355,40 @@ public abstract class BaseYangSwaggerGenerator {
         return false;
     }
 
-    private static List<Operation> operation(final DataSchemaNode node, final List<Parameter> pathParams,
-            final boolean isConfig, final Iterable<DataSchemaNode> childSchemaNodes, final String parentName) {
-        final List<Operation> operations = new ArrayList<>();
+    private static Map<String, ObjectNode> operations(final DataSchemaNode node, final ArrayNode pathParams,
+                                                      final boolean isConfig, final Iterable<DataSchemaNode> childSchemaNodes, final String parentName) {
+        final Map<String, ObjectNode> operations = new HashMap<>();
 
-        final Get getBuilder = new Get(node, isConfig);
-        operations.add(getBuilder.pathParams(pathParams).build());
+        ObjectNode get = buildGet(node, isConfig, pathParams);
+        operations.put("get", get);
 
         if (isConfig) {
-            final Put putBuilder = new Put(node.getQName().getLocalName(), node.getDescription().orElse(null),
-                parentName);
-            operations.add(putBuilder.pathParams(pathParams).build());
+            ObjectNode put = buildPut(node.getQName().getLocalName(), node.getDescription().orElse(""),
+                    parentName, pathParams);
+            operations.put("put", put);
 
-            final Delete deleteBuilder = new Delete(node);
-            operations.add(deleteBuilder.pathParams(pathParams).build());
+            ObjectNode delete = buildDelete(node, pathParams);
+            operations.put("delete", delete);
 
             if (containsListOrContainer(childSchemaNodes)) {
-                operations.addAll(operationPost(node.getQName().getLocalName(), node.getDescription().orElse(null),
+                operations.put("post", operationPost(node.getQName().getLocalName(), node.getDescription().orElse(""),
                         (DataNodeContainer) node, pathParams, isConfig, parentName + "/"));
             }
         }
         return operations;
     }
 
-    private static List<Operation> operationPost(final String name, final String description,
-            final DataNodeContainer dataNodeContainer, final List<Parameter> pathParams, final boolean isConfig,
-            final String parentName) {
-        final List<Operation> operations = new ArrayList<>();
-        if (isConfig) {
-            final Post postBuilder = new Post(name, parentName + name, description, dataNodeContainer);
-            operations.add(postBuilder.pathParams(pathParams).build());
-        }
-        return operations;
+    private static ObjectNode operationPost(final String name, final String description,
+                                            final DataNodeContainer dataNodeContainer, final ArrayNode pathParams, final boolean isConfig,
+                                            final String parentName) {
+        final ObjectNode post = buildPost(name, parentName + name, description, dataNodeContainer, pathParams);
+        return post;
     }
 
     protected abstract ListPathBuilder newListPathBuilder();
 
-    private String createPath(final DataSchemaNode schemaNode, final List<Parameter> pathParams,
-            final SchemaContext schemaContext) {
+    private String createPath(final DataSchemaNode schemaNode, final ArrayNode pathParams,
+                              final SchemaContext schemaContext) {
         final StringBuilder path = new StringBuilder();
         final String localName = resolvePathArgumentsName(schemaNode, schemaContext);
         path.append(localName);
@@ -392,14 +401,14 @@ public abstract class BaseYangSwaggerGenerator {
 
                 path.append(pathParamIdentifier);
 
-                final Parameter pathParam = new Parameter();
-                pathParam.setName(listKey.getLocalName());
+                ObjectNode pathParam = JsonNodeFactory.instance.objectNode();
+                pathParam.put("name", listKey.getLocalName());
 
                 ((DataNodeContainer) schemaNode).findDataChildByName(listKey).flatMap(DataSchemaNode::getDescription)
-                    .ifPresent(pathParam::setDescription);
+                        .ifPresent(desc -> pathParam.put("description", desc));
 
-                pathParam.setType("string");
-                pathParam.setParamType("path");
+                pathParam.put("type", "string");
+                pathParam.put("in", "path");
 
                 pathParams.add(pathParam);
             }
@@ -408,7 +417,7 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     protected void addOperations(final OperationDefinition operDef, final List<Api> apis, final String parentPath,
-        final SchemaContext schemaContext) {
+                                 final SchemaContext schemaContext) {
         final Api operationApi = new Api();
         final String resourcePath = parentPath + "/" + resolvePathArgumentsName(operDef, schemaContext);
         operationApi.setPath(resourcePath);
@@ -466,7 +475,7 @@ public abstract class BaseYangSwaggerGenerator {
         }
         for (final PathArgument arg : key.getPathArguments()) {
             final String name = arg.getNodeType().getLocalName();
-            if (arg instanceof YangInstanceIdentifier.NodeIdentifierWithPredicates) {
+            if (arg instanceof NodeIdentifierWithPredicates) {
                 final NodeIdentifierWithPredicates nodeId = (NodeIdentifierWithPredicates) arg;
                 for (final Entry<QName, Object> entry : nodeId.entrySet()) {
                     appendPathKeyValue(builder, entry.getValue());

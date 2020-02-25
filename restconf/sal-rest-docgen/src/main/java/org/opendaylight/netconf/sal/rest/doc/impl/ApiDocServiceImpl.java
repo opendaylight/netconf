@@ -16,7 +16,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
-import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
+import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.MountPointInstance;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
 
@@ -80,7 +80,7 @@ public class ApiDocServiceImpl implements ApiDocService {
      */
     @Override
     public synchronized Response getDocByModule(final String module, final String revision, final UriInfo uriInfo) {
-        final ApiDeclaration doc;
+        final SwaggerObject doc;
         if (isNew(uriInfo).equals(URIType.RFC8040)) {
             doc = apiDocGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, URIType.RFC8040);
         } else {
@@ -144,7 +144,7 @@ public class ApiDocServiceImpl implements ApiDocService {
     @Override
     public synchronized Response getMountDocByModule(final String instanceNum, final String module,
             final String revision, final UriInfo uriInfo) {
-        final ApiDeclaration api;
+        final SwaggerObject api;
         if (isNew(uriInfo).equals(URIType.RFC8040)) {
             api = mountPointSwaggerRFC8040
                 .getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision, URIType.RFC8040);

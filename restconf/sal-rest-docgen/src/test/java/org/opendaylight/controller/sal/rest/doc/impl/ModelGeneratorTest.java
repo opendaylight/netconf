@@ -45,7 +45,7 @@ public class ModelGeneratorTest {
             if (m.getQNameModule().getNamespace().toString().equals(NAMESPACE)
                     && m.getQNameModule().getRevision().equals(REVISION)) {
 
-                final ObjectNode jsonObject = generator.convertToJsonSchema(m, this.schemaContext);
+                final ObjectNode jsonObject = generator.convertToJsonSchema(m, this.schemaContext, definitionNames);
                 Assert.assertNotNull(jsonObject);
             }
         }

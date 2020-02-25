@@ -1,0 +1,93 @@
+module binary-operations {
+
+    yang-version 1.1;
+
+    description
+        "This module used for performing binary operations on integers.";
+
+     namespace "tag:lighty.io.2020:lighty:binary:operations";
+        prefix "bo";
+
+    revision "2020-01-20" {
+            description
+                "Second revision";
+    }
+
+
+    container inp {
+        uses ab-pair;
+        description "Input of binary operation";
+    }
+
+    container res {
+        leaf out-c {
+            type int32;
+        }
+        description "Result of binary operation";
+    }
+
+    grouping ab-pair{
+        leaf oper-a {
+            type int16;
+        }
+        leaf oper-b {
+            type int16;
+        }
+
+        leaf toasterToastType {
+                  type identityref {
+                    base bo:bagel;
+        }
+     }
+    }
+
+    rpc save-input {
+        input {
+            uses ab-pair;
+        }
+        description
+            "Save input parameters to inp container";
+    }
+
+    identity bread {
+          description "Wonder bread.";
+        }
+
+    identity waffle {
+      base bread;
+      description "Frozen waffle.";
+    }
+
+    identity bagel {
+      base bread;
+      description "Frozen bagel.";
+    }
+
+    identity brown {
+      base bagel;
+      description "Hash browned potatos.";
+    }
+
+    container cont{
+        leaf nn {
+         type union {
+            type boolean;
+             type int16;
+         }
+        }
+         leaf nnv {
+             type union {
+                type int32;
+                type int16;
+             }
+        }
+        leaf fdd {
+            type union {
+                type int32;
+                type string;
+            }
+        }
+      }
+
+ }
+
