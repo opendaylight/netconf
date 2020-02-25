@@ -27,7 +27,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Api;
-import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
+import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Operation;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
@@ -154,8 +154,8 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         return context;
     }
 
-    public ApiDeclaration getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
-        final String revision, final URIType uriType) {
+    public SwaggerObject getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
+                                          final String revision, final URIType uriType) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final SchemaContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
@@ -169,17 +169,20 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         return swaggerGenerator.getApiDeclaration(module, revision, uriInfo, context, urlPrefix, uriType);
     }
 
-    private ApiDeclaration generateDataStoreApiDoc(final UriInfo uriInfo, final String context) {
-        final List<Api> apis = new LinkedList<>();
-        apis.add(createGetApi("config", "Queries the config (startup) datastore on the mounted hosted.", context));
-        apis.add(createGetApi("operational", "Queries the operational (running) datastore on the mounted hosted.",
-                context));
-        apis.add(createGetApi("operations", "Queries the available operations (RPC calls) on the mounted hosted.",
-                context));
-
-        final ApiDeclaration declaration = swaggerGenerator.createApiDeclaration(
+    private SwaggerObject generateDataStoreApiDoc(final UriInfo uriInfo, final String context) {
+        //TODO mountPoint
+//        final List<Api> apis = new LinkedList<>();
+//        apis.add(createGetApi("config", "Queries the config (startup) datastore on the mounted hosted.", context));
+//        apis.add(createGetApi("operational", "Queries the operational (running) datastore on the mounted hosted.",
+//                context));
+//        apis.add(createGetApi("operations", "Queries the available operations (RPC calls) on the mounted hosted.",
+//                context));
+//
+        final SwaggerObject declaration = swaggerGenerator.createSwaggerObject(
+                swaggerGenerator.createSchemaFromUriInfo(uriInfo),
+                swaggerGenerator.createHostFromUriInfo(uriInfo),
                 swaggerGenerator.createBasePathFromUriInfo(uriInfo));
-        declaration.setApis(apis);
+//        declaration.setApis(apis);
         return declaration;
 
     }
