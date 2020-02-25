@@ -600,7 +600,7 @@ following steps:
 
    ::
 
-       docker run -rm -t -p 1831:830 dockeruser/netopeer
+       docker run --rm -t -p 1831:830 dockeruser/netopeer
 
 3. Verify netopeer is running by invoking (netopeer should send its
    HELLO message right away:
