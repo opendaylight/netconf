@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Inocybe Technologies and others.  All rights reserved.
+ * Copyright (c) 2020 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -36,17 +36,6 @@ public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGen
             return "/" + basePath + "/data" + context;
         }
         return "/" + basePath + "/operations" + context;
-    }
-
-    @Override
-    public String getContent(final String dataStore) {
-        if ("operational".contains(dataStore)) {
-            return "?content=nonconfig";
-        } else if ("config".contains(dataStore)) {
-            return "?content=config";
-        } else {
-            return "";
-        }
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, 2015 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2020 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -11,15 +11,17 @@ package org.opendaylight.controller.sal.rest.doc.impl;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Preconditions;
 import java.sql.Date;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.opendaylight.netconf.sal.rest.doc.impl.ModelGenerator;
+import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionGenerator;
+import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 
-public class ModelGeneratorTest {
+public class SwaggerObjectTest {
 
     private static final String NAMESPACE = "urn:opendaylight:groupbasedpolicy:opflex";
     private static final String STRING_DATE = "2014-05-28";
@@ -39,13 +41,14 @@ public class ModelGeneratorTest {
 
         Preconditions.checkArgument(this.helper.getModules() != null, "No modules found");
 
-        final ModelGenerator generator = new ModelGenerator();
+        final DefinitionGenerator generator = new DefinitionGenerator();
 
         for (final Module m : this.helper.getModules()) {
             if (m.getQNameModule().getNamespace().toString().equals(NAMESPACE)
                     && m.getQNameModule().getRevision().equals(REVISION)) {
 
-                final ObjectNode jsonObject = generator.convertToJsonSchema(m, this.schemaContext);
+                final ObjectNode jsonObject = generator.convertToJsonSchema(m, this.schemaContext,
+                        new DefinitionNames());
                 Assert.assertNotNull(jsonObject);
             }
         }

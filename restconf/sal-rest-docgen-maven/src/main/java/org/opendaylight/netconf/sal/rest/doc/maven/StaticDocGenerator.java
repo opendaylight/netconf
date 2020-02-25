@@ -25,7 +25,7 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.maven.project.MavenProject;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGeneratorDraft02;
-import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
+import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -96,12 +96,12 @@ public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
                 int revisionIndex = resource.getPath().indexOf('(');
                 String name = resource.getPath().substring(0, revisionIndex);
                 String revision = resource.getPath().substring(revisionIndex + 1, resource.getPath().length() - 1);
-                ApiDeclaration apiDeclaration = super.getApiDeclaration(name, revision, null, context, "",
+                SwaggerObject swaggerObject = super.getApiDeclaration(name, revision, null, context, "",
                     URIType.DRAFT02);
-                String json = mapper.writeValueAsString(apiDeclaration);
+                String json = mapper.writeValueAsString(swaggerObject);
                 // Manually insert models because org.json.JSONObject cannot be serialized by ObjectMapper
                 json = json.replace(
-                        "\"models\":{}", "\"models\":" + apiDeclaration.getModels().toString().replace("\\\"", "\""));
+                        "\"models\":{}", "\"models\":" + swaggerObject.getDefinitions().toString().replace("\\\"", "\""));
                 // Escape single quotes and new lines
                 json = json.replace("\'", "\\\'").replace("\\n", "\\\\n");
                 bufferedWriter.write("\t\tcase \"" + name + "(" + revision + ")\": return \'" + json + "\';\n");
