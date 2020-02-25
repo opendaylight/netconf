@@ -88,4 +88,12 @@ public class Operation {
     public void setResponseMessages(List<ResponseMessage> responseMessages) {
         this.responseMessages = responseMessages;
     }
+
+//    public List<Response> getResponses() {
+//        return responses;
+//    }
+//
+//    public void setResponses(List<Response> responses) {
+//        this.responses = responses;
+//    }
 }

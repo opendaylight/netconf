@@ -17,11 +17,13 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.mifmif.common.regex.Generex;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Post;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -29,6 +31,7 @@ import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.AnydataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.CaseSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
@@ -94,9 +97,13 @@ public class ModelGenerator {
     private static final String OBJECT_TYPE = "object";
     private static final String ARRAY_TYPE = "array";
     private static final String ENUM = "enum";
-    private static final String ID_KEY = "id";
+    private static final String TITLE_KEY = "title";
     private static final String SUB_TYPES_KEY = "subTypes";
     private static final String UNIQUE_EMPTY_IDENTIFIER = "unique_empty_identifier";
+    private static final String DEFAULT_KEY = "default";
+    private static final String FORMAT_KEY = "format";
+    private static final String STRING_TYPE = "string";
+    private static final String BOOLEAN_TYPE = "boolean";
 
     private Module topLevelModule;
 
@@ -154,7 +161,7 @@ public class ModelGenerator {
      * @throws IOException if I/O operation fails
      */
     private void processActionNodeContainer(final DataSchemaNode childNode, final String moduleName,
-        final ObjectNode models, final SchemaContext schemaContext) throws IOException {
+                                            final ObjectNode models, final SchemaContext schemaContext) throws IOException {
         for (ActionDefinition actionDef : ((ActionNodeContainer) childNode).getActions()) {
             processOperations(actionDef, moduleName, models, schemaContext);
         }
@@ -169,7 +176,7 @@ public class ModelGenerator {
      * @throws IOException if I/O operation fails
      */
     private void processRPCs(final Module module, final ObjectNode models, final SchemaContext schemaContext)
-        throws IOException {
+            throws IOException {
         final String moduleName = module.getName();
         for (final RpcDefinition rpcDefinition : module.getRpcs()) {
             processOperations(rpcDefinition, moduleName, models, schemaContext);
@@ -187,17 +194,17 @@ public class ModelGenerator {
      * @throws IOException if I/O operation fails
      */
     private void processOperations(final OperationDefinition operationDef, final String moduleName,
-        final ObjectNode models, final SchemaContext schemaContext) throws IOException {
+                                   final ObjectNode models, final SchemaContext schemaContext) throws IOException {
         final ContainerSchemaNode input = operationDef.getInput();
         if (!input.getChildNodes().isEmpty()) {
             final ObjectNode properties =
-                processChildren(input.getChildNodes(), moduleName, models, true, schemaContext);
+                    processChildren(input.getChildNodes(), moduleName, models, true, schemaContext);
 
             final String filename = "(" + operationDef.getQName().getLocalName() + ")input";
-            final ObjectNode childSchema = getSchemaTemplate();
+            final ObjectNode childSchema = JsonNodeFactory.instance.objectNode();
             childSchema.put(TYPE_KEY, OBJECT_TYPE);
             childSchema.set(PROPERTIES_KEY, properties);
-            childSchema.put(ID_KEY, filename);
+            childSchema.put(TITLE_KEY, filename);
             models.set(filename, childSchema);
 
             processTopData(filename, models, input);
@@ -206,12 +213,12 @@ public class ModelGenerator {
         final ContainerSchemaNode output = operationDef.getOutput();
         if (!output.getChildNodes().isEmpty()) {
             final ObjectNode properties =
-                processChildren(output.getChildNodes(), moduleName, models, true, schemaContext);
+                    processChildren(output.getChildNodes(), moduleName, models, true, schemaContext);
             final String filename = "(" + operationDef.getQName().getLocalName() + ")output";
-            final ObjectNode childSchema = getSchemaTemplate();
+            final ObjectNode childSchema = JsonNodeFactory.instance.objectNode();
             childSchema.put(TYPE_KEY, OBJECT_TYPE);
             childSchema.set(PROPERTIES_KEY, properties);
-            childSchema.put(ID_KEY, filename);
+            childSchema.put(TITLE_KEY, filename);
             models.set(filename, childSchema);
 
             processTopData(filename, models, output);
@@ -219,20 +226,25 @@ public class ModelGenerator {
     }
 
     private ObjectNode processTopData(final String filename, final ObjectNode models, final SchemaNode schemaNode) {
-        final ObjectNode items = JsonNodeFactory.instance.objectNode();
 
-        items.put(REF_KEY, filename);
         final ObjectNode dataNodeProperties = JsonNodeFactory.instance.objectNode();
+        if (schemaNode instanceof ListSchemaNode) {
+            dataNodeProperties.put(TYPE_KEY, ARRAY_TYPE);
+            final ObjectNode items = JsonNodeFactory.instance.objectNode();
+            items.put(REF_KEY, filename);
+            dataNodeProperties.set(ITEMS_KEY, items);
+        } else {
+            dataNodeProperties.put(REF_KEY, filename);
+        }
         dataNodeProperties.put(TYPE_KEY, schemaNode instanceof ListSchemaNode ? ARRAY_TYPE : OBJECT_TYPE);
-        dataNodeProperties.set(ITEMS_KEY, items);
 
         putIfNonNull(dataNodeProperties, DESCRIPTION_KEY, schemaNode.getDescription().orElse(null));
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         properties.set(topLevelModule.getName() + ":" + schemaNode.getQName().getLocalName(), dataNodeProperties);
-        final ObjectNode finalChildSchema = getSchemaTemplate();
+        final ObjectNode finalChildSchema = JsonNodeFactory.instance.objectNode();
         finalChildSchema.put(TYPE_KEY, OBJECT_TYPE);
         finalChildSchema.set(PROPERTIES_KEY, properties);
-        finalChildSchema.put(ID_KEY, filename + OperationBuilder.TOP);
+        finalChildSchema.put(TITLE_KEY, filename + OperationBuilder.TOP);
         models.set(filename + OperationBuilder.TOP, finalChildSchema);
 
         return dataNodeProperties;
@@ -255,7 +267,7 @@ public class ModelGenerator {
             final String identityName = idNode.getQName().getLocalName();
             LOG.debug("Processing Identity: {}", identityName);
 
-            identityObj.put(ID_KEY, identityName);
+            identityObj.put(TITLE_KEY, identityName);
             putIfNonNull(identityObj, DESCRIPTION_KEY, idNode.getDescription().orElse(null));
 
             final ObjectNode props = JsonNodeFactory.instance.objectNode();
@@ -299,11 +311,11 @@ public class ModelGenerator {
             final String nodeName = parentName + (isConfig ? OperationBuilder.CONFIG : OperationBuilder.OPERATIONAL)
                     + localName;
 
-            final ObjectNode childSchema = getSchemaTemplate();
+            final ObjectNode childSchema = JsonNodeFactory.instance.objectNode();
             childSchema.put(TYPE_KEY, OBJECT_TYPE);
             childSchema.set(PROPERTIES_KEY, properties);
 
-            childSchema.put(ID_KEY, nodeName);
+            childSchema.put(TITLE_KEY, nodeName);
             models.set(nodeName, childSchema);
 
             if (isConfig) {
@@ -319,23 +331,29 @@ public class ModelGenerator {
     private static void createConcreteModelForPost(final ObjectNode models, final String localName,
                                                    final JsonNode properties) {
         final String nodePostName = OperationBuilder.CONFIG + localName + Post.METHOD_NAME;
-        final ObjectNode postSchema = getSchemaTemplate();
+        final ObjectNode postSchema = JsonNodeFactory.instance.objectNode();
         postSchema.put(TYPE_KEY, OBJECT_TYPE);
-        postSchema.put(ID_KEY, nodePostName);
+        postSchema.put(TITLE_KEY, nodePostName);
         postSchema.set(PROPERTIES_KEY, properties);
         models.set(nodePostName, postSchema);
     }
 
     private JsonNode createPropertiesForPost(final DataNodeContainer dataNodeContainer,
-                                               final SchemaContext schemaContext, final String parentName) {
+                                             final SchemaContext schemaContext, final String parentName) {
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         for (final DataSchemaNode childNode : dataNodeContainer.getChildNodes()) {
             if (childNode instanceof ListSchemaNode || childNode instanceof ContainerSchemaNode) {
-                final ObjectNode items = JsonNodeFactory.instance.objectNode();
-                items.put(REF_KEY, parentName + "(config)" + childNode.getQName().getLocalName());
+                final String ref = parentName + "(config)" + childNode.getQName().getLocalName();
                 final ObjectNode property = JsonNodeFactory.instance.objectNode();
-                property.put(TYPE_KEY, childNode instanceof ListSchemaNode ? ARRAY_TYPE : OBJECT_TYPE);
-                property.set(ITEMS_KEY, items);
+                if (childNode instanceof ListSchemaNode) {
+                    final ObjectNode items = JsonNodeFactory.instance.objectNode();
+                    items.put(REF_KEY, ref);
+                    property.put(TYPE_KEY, ARRAY_TYPE);
+                    property.set(ITEMS_KEY, items);
+                } else {
+                    property.put(REF_KEY, ref);
+                }
+
                 properties.set(childNode.getQName().getLocalName(), property);
             } else if (childNode instanceof LeafSchemaNode) {
                 final ObjectNode property = processLeafNode((LeafSchemaNode) childNode, schemaContext);
@@ -367,9 +385,8 @@ public class ModelGenerator {
                     property = processLeafListNode((LeafListSchemaNode) node, schemaContext);
 
                 } else if (node instanceof ChoiceSchemaNode) {
-                    if (((ChoiceSchemaNode) node).getCases().values().iterator().hasNext()) {
-                        processChoiceNode(((ChoiceSchemaNode) node).getCases().values().iterator().next()
-                            .getChildNodes(), parentName, models, schemaContext, isConfig, properties);
+                    for (CaseSchemaNode variant : ((ChoiceSchemaNode) node).getCases().values()) {
+                        processChoiceNode(variant.getChildNodes(), parentName, models, schemaContext, isConfig, properties);
                     }
                     continue;
 
@@ -386,7 +403,7 @@ public class ModelGenerator {
                 } else {
                     throw new IllegalArgumentException("Unknown DataSchemaNode type: " + node.getClass());
                 }
-                putIfNonNull(property, DESCRIPTION_KEY, node.getDescription().orElse(null));
+                putIfNonNull(property, DESCRIPTION_KEY, node.getDescription().orElse(""));
                 properties.set(topLevelModule.getName() + ":" + name, property);
             }
         }
@@ -423,7 +440,7 @@ public class ModelGenerator {
     private void processChoiceNode(
             final Iterable<DataSchemaNode> nodes, final String moduleName, final ObjectNode models,
             final SchemaContext schemaContext, final boolean isConfig, final ObjectNode properties)
-           throws IOException {
+            throws IOException {
         for (final DataSchemaNode node : nodes) {
             final String name = resolveNodesName(node, topLevelModule, schemaContext);
             final ObjectNode property;
@@ -439,9 +456,8 @@ public class ModelGenerator {
                 property = processLeafListNode((LeafListSchemaNode) node, schemaContext);
 
             } else if (node instanceof ChoiceSchemaNode) {
-                if (((ChoiceSchemaNode) node).getCases().values().iterator().hasNext()) {
-                    processChoiceNode(((ChoiceSchemaNode) node).getCases().values().iterator().next().getChildNodes(),
-                            moduleName, models, schemaContext, isConfig, properties);
+                for (CaseSchemaNode variant : ((ChoiceSchemaNode) node).getCases().values()) {
+                    processChoiceNode(variant.getChildNodes(), moduleName, models, schemaContext, isConfig, properties);
                 }
                 continue;
 
@@ -485,7 +501,7 @@ public class ModelGenerator {
 
         final String leafDescription = leafNode.getDescription().orElse(null);
         putIfNonNull(property, DESCRIPTION_KEY, leafDescription);
-        processMandatory(leafNode, property);
+//        processMandatory(leafNode, property);
         processTypeDef(leafNode.getType(), leafNode, property, schemaContext);
 
         return property;
@@ -494,12 +510,13 @@ public class ModelGenerator {
     private static ObjectNode processAnydataNode(final AnydataSchemaNode leafNode) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
-        final String leafDescription = leafNode.getDescription().orElse(null);
+        final String leafDescription = leafNode.getDescription().orElse("");
         putIfNonNull(property, DESCRIPTION_KEY, leafDescription);
 
         processMandatory(leafNode, property);
         final String localName = leafNode.getQName().getLocalName();
-        property.put(TYPE_KEY, "example of anydata " + localName);
+        setDefaultValue(property, String.format("<%s> ... </%s>", localName, localName));
+        property.put(TYPE_KEY, STRING_TYPE);
 
         return property;
     }
@@ -507,12 +524,13 @@ public class ModelGenerator {
     private static ObjectNode processAnyXMLNode(final AnyxmlSchemaNode leafNode) {
         final ObjectNode property = JsonNodeFactory.instance.objectNode();
 
-        final String leafDescription = leafNode.getDescription().orElse(null);
+        final String leafDescription = leafNode.getDescription().orElse("");
         putIfNonNull(property, DESCRIPTION_KEY, leafDescription);
 
         processMandatory(leafNode, property);
         final String localName = leafNode.getQName().getLocalName();
-        property.put(TYPE_KEY, "example of anyxml " + localName);
+        setDefaultValue(property, String.format("<%s> ... </%s>", localName, localName));
+        property.put(TYPE_KEY, STRING_TYPE);
 
         return property;
     }
@@ -520,7 +538,7 @@ public class ModelGenerator {
     private String processTypeDef(final TypeDefinition<?> leafTypeDef, final DataSchemaNode node,
                                   final ObjectNode property, final SchemaContext schemaContext) {
         final String jsonType;
-        if (leafTypeDef.getDefaultValue() == null) {
+        if (leafTypeDef.getDefaultValue().isEmpty()) {
             if (leafTypeDef instanceof BinaryTypeDefinition) {
                 jsonType = processBinaryType(property);
 
@@ -532,8 +550,7 @@ public class ModelGenerator {
 
             } else if (leafTypeDef instanceof IdentityrefTypeDefinition) {
                 final String name = topLevelModule.getName();
-                jsonType = name + ":" + ((IdentityrefTypeDefinition) leafTypeDef).getIdentities().iterator().next()
-                        .getQName().getLocalName();
+                jsonType = processIdentityRefType((IdentityrefTypeDefinition) leafTypeDef, name);
 
             } else if (leafTypeDef instanceof StringTypeDefinition) {
                 jsonType = processStringType(leafTypeDef, property, node.getQName().getLocalName());
@@ -542,29 +559,34 @@ public class ModelGenerator {
                 jsonType = processUnionType((UnionTypeDefinition) leafTypeDef, property, schemaContext, node);
 
             } else if (leafTypeDef instanceof EmptyTypeDefinition) {
-                jsonType = UNIQUE_EMPTY_IDENTIFIER;
-
+                jsonType = STRING_TYPE;
+                setDefaultValue(property, UNIQUE_EMPTY_IDENTIFIER);
             } else if (leafTypeDef instanceof LeafrefTypeDefinition) {
                 return processLeafRef(node, property, schemaContext, leafTypeDef);
 
             } else if (leafTypeDef instanceof BooleanTypeDefinition) {
-                jsonType = "true";
-
+                jsonType = BOOLEAN_TYPE;
+                setDefaultValue(property, "true");
             } else if (leafTypeDef instanceof RangeRestrictedTypeDefinition) {
                 final Number maybeLower = ((RangeRestrictedTypeDefinition<?, ?>) leafTypeDef).getRangeConstraint()
                         .map(RangeConstraint::getAllowedRanges).map(RangeSet::span).map(Range::lowerEndpoint)
                         .orElse(null);
-                jsonType = String.valueOf(maybeLower);
-
+                jsonType = "number";
+                setDefaultValue(property, String.valueOf(maybeLower));
             } else {
                 jsonType = OBJECT_TYPE;
-
             }
         } else {
-            jsonType = String.valueOf(leafTypeDef.getDefaultValue());
+            jsonType = STRING_TYPE;
+            setDefaultValue(property, String.valueOf(leafTypeDef.getDefaultValue()));
         }
         putIfNonNull(property, TYPE_KEY, jsonType);
         return jsonType;
+    }
+
+    private String processIdentityRefType(IdentityrefTypeDefinition leafTypeDef, String name) {
+        return name + ":" + leafTypeDef.getIdentities().iterator().next()
+                .getQName().getLocalName();
     }
 
     private String processLeafRef(final DataSchemaNode node, final ObjectNode property,
@@ -593,10 +615,9 @@ public class ModelGenerator {
     }
 
     private static String processBinaryType(final ObjectNode property) {
-        final ObjectNode media = JsonNodeFactory.instance.objectNode();
-        media.put(BINARY_ENCODING_KEY, BASE_64);
-        property.set(MEDIA_KEY, media);
-        return "bin1 bin2";
+        property.put(FORMAT_KEY, "byte");
+        setDefaultValue(property, "bin1 bin2");
+        return STRING_TYPE;
     }
 
     private static String processEnumType(final EnumTypeDefinition enumLeafType,
@@ -608,7 +629,8 @@ public class ModelGenerator {
         }
 
         property.set(ENUM, enumNames);
-        return enumLeafType.getValues().iterator().next().getName();
+        setDefaultValue(property, enumLeafType.getValues().iterator().next().getName());
+        return STRING_TYPE;
     }
 
     private static String processBitsType(final BitsTypeDefinition bitsType,
@@ -621,8 +643,8 @@ public class ModelGenerator {
             enumNames.add(new TextNode(bit.getName()));
         }
         property.set(ENUM, enumNames);
-
-        return enumNames.iterator().next() + " " + enumNames.get(enumNames.size() - 1);
+        property.put(DEFAULT_KEY, enumNames.iterator().next() + " " + enumNames.get(enumNames.size() - 1));
+        return STRING_TYPE;
     }
 
     private static String processStringType(final TypeDefinition<?> stringType,
@@ -645,10 +667,11 @@ public class ModelGenerator {
             String regex = pattern.getJavaPatternString();
             regex = regex.substring(1, regex.length() - 1);
             final Generex generex = new Generex(regex);
-            return generex.random();
+            setDefaultValue(property, generex.random());
         } else {
-            return "Some " + nodeName;
+            setDefaultValue(property, "Some " + nodeName);
         }
+        return STRING_TYPE;
     }
 
     private String processUnionType(final UnionTypeDefinition unionType, final ObjectNode property,
@@ -658,17 +681,8 @@ public class ModelGenerator {
             unionNames.add(processTypeDef(typeDef, node, property, schemaContext));
         }
         property.set(ENUM, unionNames);
-        return unionNames.iterator().next().asText();
-    }
-
-    /**
-     * Helper method to generate a pre-filled JSON schema object.
-     */
-    private static ObjectNode getSchemaTemplate() {
-        final ObjectNode schemaJSON = JsonNodeFactory.instance.objectNode();
-        schemaJSON.put(SCHEMA_KEY, SCHEMA_URL);
-
-        return schemaJSON;
+        setDefaultValue(property, unionNames.iterator().next().asText());
+        return STRING_TYPE;
     }
 
     private static void putIfNonNull(final ObjectNode property, final String key, final Number number) {
@@ -693,4 +707,7 @@ public class ModelGenerator {
         }
     }
 
+    private static void setDefaultValue(ObjectNode property, String value) {
+        property.put(DEFAULT_KEY, value);
+    }
 }
