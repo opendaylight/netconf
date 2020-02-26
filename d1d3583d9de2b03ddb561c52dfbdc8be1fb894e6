@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fb1b4adc_382c9600",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ModelGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-02-26T10:52:48Z",
+      "side": 1,
+      "message": "These are not used any more. you may remove them. Also why don t we use them anymore? Not sure what they were for. One more thing that would be nice. Since we have so many static variables here it would be nice to have them in alphabetical order. I know there were not like that before. You could sort them when you ll be cleaning up the code.",
+      "range": {
+        "startLine": 87,
+        "startChar": 4,
+        "endLine": 88,
+        "endChar": 55
+      },
+      "revId": "d1d3583d9de2b03ddb561c52dfbdc8be1fb894e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b9455c06_a3f37cc1",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ModelGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-02-26T10:52:48Z",
+      "side": 1,
+      "message": "you always rewrite this on line 239 to something else based on ternary condition either remove here or on line 239.",
+      "range": {
+        "startLine": 232,
+        "startChar": 0,
+        "endLine": 232,
+        "endChar": 1
+      },
+      "revId": "d1d3583d9de2b03ddb561c52dfbdc8be1fb894e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b7465457_0e71fb00",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/NewOperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-02-26T10:52:48Z",
+      "side": 1,
+      "message": "fix copyright \n/*\n * Copyright (c) 2020 PANTHEON.tech, s.r.o. and others.  All rights reserved.\n *\n * This program and the accompanying materials are made available under the\n * terms of the Eclipse Public License v1.0 which accompanies this distribution,\n * and is available at http://www.eclipse.org/legal/epl-v10.html\n */",
+      "revId": "d1d3583d9de2b03ddb561c52dfbdc8be1fb894e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d102cfd6_34f9ae4c",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/NewOperationBuilder.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-02-26T10:52:48Z",
+      "side": 1,
+      "message": "odl code style is different then default. set up your environment to use this https://wiki-archive.opendaylight.org/view/GettingStarted:_Eclipse_Setup#Import_ordering",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 35
+      },
+      "revId": "d1d3583d9de2b03ddb561c52dfbdc8be1fb894e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1df2ded6_65ca2d3d",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/swagger/Response.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-02-26T10:52:48Z",
+      "side": 1,
+      "message": "fix copyright as mentioned before since this is new file",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 3
+      },
+      "revId": "d1d3583d9de2b03ddb561c52dfbdc8be1fb894e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2211604e_75c1e37b",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/swagger/SwaggerObject.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-02-26T10:52:48Z",
+      "side": 1,
+      "message": "same as before",
+      "range": {
+        "startLine": 1,
+        "startChar": 1,
+        "endLine": 6,
+        "endChar": 7
+      },
+      "revId": "d1d3583d9de2b03ddb561c52dfbdc8be1fb894e6",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
