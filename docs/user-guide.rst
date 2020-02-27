@@ -101,7 +101,8 @@ This guide focuses on using RESTCONF.
      which is related to `draft-bierman-netconf-restconf-02
      <https://tools.ietf.org/html/draft-bierman-netconf-restconf-02>`__.
 
-
+    Examples in the `Spawning new NETCONF connectors`_ section include both bierman02 and rfc8040
+    formats
 
 
 Default configuration
@@ -394,12 +395,27 @@ Preconditions
 Spawning new NETCONF connectors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To create a new NETCONF connector you need to send the following request
+To create a new NETCONF connector you need to send the following PUT request
 to RESTCONF:
 
-::
+.. list-table::
+   :widths: 1 5
 
-    PUT http://localhost:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/new-netconf-device
+   * - bierman02
+     - http://localhost:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/new-netconf-device
+   * - rfc8040
+     - http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device
+
+You could use the same body to create the new  NETCONF connector with a POST
+without specifying the node in the URL:
+
+.. list-table::
+   :widths: 1 5
+
+   * - bierman02
+     - http://localhost:8181/restconf/config/network-topology:network-topology/topology/topology-netconf
+   * - rfc8040
+     - http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf
 
 Headers:
 
@@ -436,17 +452,66 @@ Reconfiguring an existing connector
 
 The steps to reconfigure an existing connector are exactly the same as
 when spawning a new connector. The old connection will be disconnected
-and a new connector with the new configuration will be created.
+and a new connector with the new configuration will be created. This needs
+to be done with a PUT request because the node already exists. A POST
+request will fail for that reason.
+
+Additionally, a PATCH request can be used to modify an existing
+configuration. Currently, only yang-patch (`RFC-8072 <https://tools.ietf.org/html/rfc8072>`__)
+is supported. The URL would be the same as the above PUT examples.
+Using JSON for the body, the headers needed for the request would
+be:
+
+Headers:
+
+-  Accept: application/yang.patch-status+json
+
+-  Content-Type: application/yang.patch+json
+
+Example JSON payload to modify the password entry:
+
+::
+
+    {
+      "ietf-restconf:yang-patch" : {
+        "patch-id" : "0",
+        "edit" : [
+          {
+            "edit-id" : "edit1",
+            "operation" : "merge",
+            "target" : "",
+            "value" : {
+             "node": [
+                {
+                 "node-id": "new-netconf-device",
+                 "netconf-node-topology:password" : "newpassword"
+                }
+             ]
+            }
+         }
+        ]
+      }
+    }
+
 
 Deleting an existing connector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To remove an already configured NETCONF connector you need to send the
-following:
+To remove an already configured NETCONF connector you need to send a
+DELETE request to the same PUT request URL that was used to create the
+device:
 
-::
+.. list-table::
+   :widths: 1 5
 
-    DELETE http://localhost:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/new-netconf-device
+   * - bierman02
+     - http://localhost:8181/restconf/config/network-topology:network-topology/topology/topology-netconf/node/new-netconf-device
+   * - rfc8040
+     - http://localhost:8181/rests/data/network-topology:network-topology/topology=topology-netconf/node=new-netconf-device
+
+.. note::
+
+    No body is needed to delete the node/device
 
 Connecting to a device supporting only NETCONF 1.0
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
