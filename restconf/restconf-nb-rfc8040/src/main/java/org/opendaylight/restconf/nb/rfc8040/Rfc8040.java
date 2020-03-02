@@ -30,6 +30,21 @@ public final class Rfc8040 {
     }
 
     /**
+     * Constants used for query parameter recognition in RFC8040-compliant URLs.
+     */
+    public interface Query {
+        String CONTENT = "content";
+        String DEPTH = "depth";
+        String FIELDS = "fields";
+        String FILTER = "filter";
+        String INSERT = "insert";
+        String POINT = "point";
+        String START_TIME = "start-time";
+        String STOP_TIME = "stop-time";
+        String WITH_DEFAULTS = "with-defaults";
+    }
+
+    /**
      * Set of application specific media types to identify each of the available
      * resource types.
      */
@@ -40,8 +55,8 @@ public final class Rfc8040 {
         }
 
         public static final String DATA = "application/yang-data";
-        public static final String PATCH = "application/yang.patch";
-        public static final String PATCH_STATUS = "application/yang.patch-status";
+        public static final String YANG_PATCH = "application/yang.patch";
+        public static final String YANG_PATCH_STATUS = "application/yang.patch-status";
         public static final String YIN = "application/yin";
         public static final String YANG = "application/yang";
     }
