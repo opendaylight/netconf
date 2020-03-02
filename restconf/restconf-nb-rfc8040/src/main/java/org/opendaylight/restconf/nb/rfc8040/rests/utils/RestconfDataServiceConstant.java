@@ -55,6 +55,18 @@ public final class RestconfDataServiceConstant {
     }
 
     /**
+     * Common for PostData and PutData.
+     */
+    public static final class PostPutQueryParameters {
+        public static final String INSERT = "insert";
+        public static final String POINT = "point";
+
+        private PostPutQueryParameters() {
+            // Hidden on purpose
+        }
+    }
+
+    /**
      * Constants for data to put.
      *
      */
