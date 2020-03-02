@@ -62,7 +62,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 @Provider
-@Consumes({Rfc8040.MediaTypes.PATCH + RestconfConstants.XML})
+@Consumes({Rfc8040.MediaTypes.YANG_PATCH + RestconfConstants.XML})
 public class XmlToPatchBodyReader extends AbstractToPatchBodyReader {
     private static final Logger LOG = LoggerFactory.getLogger(XmlToPatchBodyReader.class);
     private static final Splitter SLASH_SPLITTER = Splitter.on('/');
