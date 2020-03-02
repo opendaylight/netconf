@@ -8,6 +8,8 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.INSERT;
+import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.POINT;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.CREATE_NOTIFICATION_STREAM;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_ACCESS_PATH_PART;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_LOCATION_PATH_PART;
@@ -24,6 +26,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -46,6 +49,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSu
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
@@ -53,6 +57,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConst
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfInvokeOperationsUtil;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yangtools.concepts.Immutable;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
@@ -69,6 +74,15 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/")
 public class RestconfDataServiceImpl implements RestconfDataService {
+    private static final class QueryParams implements Immutable {
+        final @Nullable String point;
+        final @Nullable String insert;
+
+        QueryParams(final @Nullable String insert, final @Nullable String point) {
+            this.insert = insert;
+            this.point = point;
+        }
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDataServiceImpl.class);
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MMM-dd HH:mm:ss");
@@ -196,38 +210,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response putData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
         requireNonNull(payload);
 
-        boolean insertUsed = false;
-        boolean pointUsed = false;
-        String insert = null;
-        String point = null;
-
-        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            switch (entry.getKey()) {
-                case "insert":
-                    if (!insertUsed) {
-                        insertUsed = true;
-                        insert = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Insert parameter can be used only once.",
-                                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
-                    }
-                    break;
-                case "point":
-                    if (!pointUsed) {
-                        pointUsed = true;
-                        point = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Point parameter can be used only once.",
-                                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
-                    }
-                    break;
-                default:
-                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey(),
-                            RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
-            }
-        }
-
-        checkQueryParams(insertUsed, pointUsed, insert);
+        final QueryParams checkedParms = checkQueryParameters(uriInfo);
 
         final InstanceIdentifierContext<? extends SchemaNode> iid = payload
                 .getInstanceIdentifierContext();
@@ -249,7 +232,43 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 payload.getInstanceIdentifierContext(), mountPoint, localTransactionChainHandler);
-        return PutDataTransactionUtil.putData(payload, ref, transactionNode, insert, point);
+        return PutDataTransactionUtil.putData(payload, ref, transactionNode, checkedParms.insert, checkedParms.point);
+    }
+
+    private static QueryParams checkQueryParameters(final UriInfo uriInfo) {
+        boolean insertUsed = false;
+        boolean pointUsed = false;
+        String insert = null;
+        String point = null;
+
+        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
+            switch (entry.getKey()) {
+                case INSERT:
+                    if (!insertUsed) {
+                        insertUsed = true;
+                        insert = entry.getValue().get(0);
+                    } else {
+                        throw new RestconfDocumentedException("Insert parameter can be used only once.",
+                                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+                    }
+                    break;
+                case POINT:
+                    if (!pointUsed) {
+                        pointUsed = true;
+                        point = entry.getValue().get(0);
+                    } else {
+                        throw new RestconfDocumentedException("Point parameter can be used only once.",
+                                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+                    }
+                    break;
+                default:
+                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey(),
+                            RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
+            }
+        }
+
+        checkQueryParams(insertUsed, pointUsed, insert);
+        return new QueryParams(insert, point);
     }
 
     private static void checkQueryParams(final boolean insertUsed, final boolean pointUsed, final String insert) {
@@ -275,38 +294,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         if (payload.getInstanceIdentifierContext().getSchemaNode() instanceof ActionDefinition) {
             return invokeAction(payload, uriInfo);
         }
-        boolean insertUsed = false;
-        boolean pointUsed = false;
-        String insert = null;
-        String point = null;
 
-        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            switch (entry.getKey()) {
-                case "insert":
-                    if (!insertUsed) {
-                        insertUsed = true;
-                        insert = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Insert parameter can be used only once.",
-                                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
-                    }
-                    break;
-                case "point":
-                    if (!pointUsed) {
-                        pointUsed = true;
-                        point = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Point parameter can be used only once.",
-                                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
-                    }
-                    break;
-                default:
-                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey(),
-                            RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
-            }
-        }
-
-        checkQueryParams(insertUsed, pointUsed, insert);
+        final QueryParams checkedParms = checkQueryParameters(uriInfo);
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final TransactionChainHandler localTransactionChainHandler;
@@ -320,7 +309,8 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         }
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 payload.getInstanceIdentifierContext(), mountPoint, localTransactionChainHandler);
-        return PostDataTransactionUtil.postData(uriInfo, payload, transactionNode, ref, insert, point);
+        return PostDataTransactionUtil.postData(uriInfo, payload, transactionNode, ref, checkedParms.insert,
+            checkedParms.point);
     }
 
     @Override
@@ -365,6 +355,34 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 context.getInstanceIdentifierContext(), mountPoint, localTransactionChainHandler);
 
         return PatchDataTransactionUtil.patchData(context, transactionNode, ref);
+    }
+
+    @Override
+    public Response patchData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+        requireNonNull(payload);
+
+        final InstanceIdentifierContext<? extends SchemaNode> iid = payload
+                .getInstanceIdentifierContext();
+
+        PutDataTransactionUtil.validInputData(iid.getSchemaNode(), payload);
+        PutDataTransactionUtil.validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
+        PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
+
+        final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
+        final TransactionChainHandler localTransactionChainHandler;
+        final SchemaContextRef ref;
+        if (mountPoint == null) {
+            localTransactionChainHandler = this.transactionChainHandler;
+            ref = new SchemaContextRef(this.schemaContextHandler.get());
+        } else {
+            localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
+            ref = new SchemaContextRef(mountPoint.getSchemaContext());
+        }
+
+        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
+                payload.getInstanceIdentifierContext(), mountPoint, localTransactionChainHandler);
+
+        return PlainPatchDataTransactionUtil.patchData(payload, transactionNode, ref);
     }
 
     /**
