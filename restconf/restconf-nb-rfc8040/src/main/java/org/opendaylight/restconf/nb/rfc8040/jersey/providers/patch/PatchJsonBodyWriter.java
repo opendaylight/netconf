@@ -31,7 +31,7 @@ import org.opendaylight.yangtools.yang.data.codec.gson.JsonWriterFactory;
 
 
 @Provider
-@Produces({ Rfc8040.MediaTypes.PATCH_STATUS + RestconfConstants.JSON })
+@Produces({ Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.JSON })
 public class PatchJsonBodyWriter implements MessageBodyWriter<PatchStatusContext> {
 
     @Override
