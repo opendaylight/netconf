@@ -61,9 +61,9 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
     @VisibleForTesting
     static final MediaType YANG_DATA_XML_TYPE = MediaType.valueOf(MediaTypes.DATA + RestconfConstants.XML);
     @VisibleForTesting
-    static final MediaType YANG_PATCH_JSON_TYPE = MediaType.valueOf(MediaTypes.PATCH + RestconfConstants.JSON);
+    static final MediaType YANG_PATCH_JSON_TYPE = MediaType.valueOf(MediaTypes.YANG_PATCH + RestconfConstants.JSON);
     @VisibleForTesting
-    static final MediaType YANG_PATCH_XML_TYPE = MediaType.valueOf(MediaTypes.PATCH + RestconfConstants.XML);
+    static final MediaType YANG_PATCH_XML_TYPE = MediaType.valueOf(MediaTypes.YANG_PATCH + RestconfConstants.XML);
 
     private static final Logger LOG = LoggerFactory.getLogger(RestconfDocumentedExceptionMapper.class);
     private static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_JSON_TYPE;

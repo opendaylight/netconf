@@ -16,7 +16,9 @@ import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsCo
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import javax.ws.rs.Path;
@@ -46,6 +48,7 @@ import org.opendaylight.restconf.nb.rfc8040.rests.services.api.RestconfStreamsSu
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.DeleteDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PatchDataTransactionUtil;
+import org.opendaylight.restconf.nb.rfc8040.rests.utils.PlainPatchDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PostDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.PutDataTransactionUtil;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.ReadDataTransactionUtil;
@@ -157,6 +160,34 @@ public class RestconfDataServiceImpl implements RestconfDataService {
     public Response putData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
         requireNonNull(payload);
 
+        final Map<String,String> checkedParms = checkQueryParameters(uriInfo);
+
+        final InstanceIdentifierContext<? extends SchemaNode> iid = payload
+                .getInstanceIdentifierContext();
+
+        PutDataTransactionUtil.validInputData(iid.getSchemaNode(), payload);
+        PutDataTransactionUtil.validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
+        PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
+
+        final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
+        final TransactionChainHandler localTransactionChainHandler;
+        final SchemaContextRef ref;
+        if (mountPoint == null) {
+            localTransactionChainHandler = this.transactionChainHandler;
+            ref = new SchemaContextRef(this.schemaContextHandler.get());
+        } else {
+            localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
+            ref = new SchemaContextRef(mountPoint.getSchemaContext());
+        }
+
+        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
+                payload.getInstanceIdentifierContext(), mountPoint, localTransactionChainHandler);
+        final String insert = checkedParms.get("insert"); // null ok
+        final String point = checkedParms.get("point"); // null ok
+        return PutDataTransactionUtil.putData(payload, ref, transactionNode, insert, point);
+    }
+
+    private static Map<String,String> checkQueryParameters(final UriInfo uriInfo) {
         boolean insertUsed = false;
         boolean pointUsed = false;
         String insert = null;
@@ -190,27 +221,14 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
         checkQueryParams(insertUsed, pointUsed, insert);
 
-        final InstanceIdentifierContext<? extends SchemaNode> iid = payload
-                .getInstanceIdentifierContext();
-
-        PutDataTransactionUtil.validInputData(iid.getSchemaNode(), payload);
-        PutDataTransactionUtil.validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
-        PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
-
-        final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final TransactionChainHandler localTransactionChainHandler;
-        final SchemaContextRef ref;
-        if (mountPoint == null) {
-            localTransactionChainHandler = this.transactionChainHandler;
-            ref = new SchemaContextRef(this.schemaContextHandler.get());
-        } else {
-            localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
-            ref = new SchemaContextRef(mountPoint.getSchemaContext());
+        Map<String,String> results = new HashMap<>();
+        if (insert != null) {
+            results.put("insert", insert);
         }
-
-        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
-                payload.getInstanceIdentifierContext(), mountPoint, localTransactionChainHandler);
-        return PutDataTransactionUtil.putData(payload, ref, transactionNode, insert, point);
+        if (point != null) {
+            results.put("point", point);
+        }
+        return results;
     }
 
     private static void checkQueryParams(final boolean insertUsed, final boolean pointUsed, final String insert) {
@@ -236,38 +254,10 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         if (payload.getInstanceIdentifierContext().getSchemaNode() instanceof ActionDefinition) {
             return invokeAction(payload, uriInfo);
         }
-        boolean insertUsed = false;
-        boolean pointUsed = false;
-        String insert = null;
-        String point = null;
 
-        for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
-            switch (entry.getKey()) {
-                case "insert":
-                    if (!insertUsed) {
-                        insertUsed = true;
-                        insert = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Insert parameter can be used only once.",
-                                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
-                    }
-                    break;
-                case "point":
-                    if (!pointUsed) {
-                        pointUsed = true;
-                        point = entry.getValue().iterator().next();
-                    } else {
-                        throw new RestconfDocumentedException("Point parameter can be used only once.",
-                                RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
-                    }
-                    break;
-                default:
-                    throw new RestconfDocumentedException("Bad parameter for post: " + entry.getKey(),
-                            RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ELEMENT);
-            }
-        }
-
-        checkQueryParams(insertUsed, pointUsed, insert);
+        Map<String,String> checkedParms = checkQueryParameters(uriInfo);
+        String insert = checkedParms.get("insert"); // null ok
+        String point = checkedParms.get("point"); // null ok
 
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
@@ -306,6 +296,34 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
                 context.getInstanceIdentifierContext(), mountPoint, getTransactionChainHandler(mountPoint));
         return PatchDataTransactionUtil.patchData(context, transactionNode, getSchemaContext(mountPoint));
+    }
+
+    @Override
+    public Response patchData(String identifier, NormalizedNodeContext payload, UriInfo uriInfo) {
+        requireNonNull(payload);
+
+        final InstanceIdentifierContext<? extends SchemaNode> iid = payload
+                .getInstanceIdentifierContext();
+
+        PutDataTransactionUtil.validInputData(iid.getSchemaNode(), payload);
+        PutDataTransactionUtil.validTopLevelNodeName(iid.getInstanceIdentifier(), payload);
+        PutDataTransactionUtil.validateListKeysEqualityInPayloadAndUri(payload);
+
+        final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
+        final TransactionChainHandler localTransactionChainHandler;
+        final SchemaContextRef ref;
+        if (mountPoint == null) {
+            localTransactionChainHandler = this.transactionChainHandler;
+            ref = new SchemaContextRef(this.schemaContextHandler.get());
+        } else {
+            localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
+            ref = new SchemaContextRef(mountPoint.getSchemaContext());
+        }
+
+        final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
+                payload.getInstanceIdentifierContext(), mountPoint, localTransactionChainHandler);
+
+        return PlainPatchDataTransactionUtil.patchData(payload, transactionNode, ref);
     }
 
     private TransactionChainHandler getTransactionChainHandler(final DOMMountPoint mountPoint) {
