@@ -146,6 +146,11 @@ public final class ServicesWrapper implements BaseServicesWrapper, TransactionSe
     }
 
     @Override
+    public Response patchData(final String identifier, final NormalizedNodeContext payload, final UriInfo uriInfo) {
+        return this.delegRestconfDataService.patchData(identifier, payload, uriInfo);
+    }
+
+    @Override
     public NormalizedNodeContext invokeRpc(final String identifier, final NormalizedNodeContext payload,
             final UriInfo uriInfo) {
         return this.delegRestconfInvokeOpsService.invokeRpc(identifier, payload, uriInfo);

@@ -30,6 +30,26 @@ public final class Rfc8040 {
     }
 
     /**
+     * Constants used for query parameter recognition in RFC8040-compliant URLs, as specified in
+     * <a href="https://tools.ietf.org/html/rfc8040#section-4.8">RFC8040 section 4.8</a>.
+     */
+    public static final class QueryParameterNames {
+        public static final String CONTENT = "content";
+        public static final String DEPTH = "depth";
+        public static final String FIELDS = "fields";
+        public static final String FILTER = "filter";
+        public static final String INSERT = "insert";
+        public static final String POINT = "point";
+        public static final String START_TIME = "start-time";
+        public static final String STOP_TIME = "stop-time";
+        public static final String WITH_DEFAULTS = "with-defaults";
+
+        private QueryParameterNames() {
+            // Hidden on purpose
+        }
+    }
+
+    /**
      * Set of application specific media types to identify each of the available
      * resource types.
      */
@@ -40,8 +60,8 @@ public final class Rfc8040 {
         }
 
         public static final String DATA = "application/yang-data";
-        public static final String PATCH = "application/yang.patch";
-        public static final String PATCH_STATUS = "application/yang.patch-status";
+        public static final String YANG_PATCH = "application/yang.patch";
+        public static final String YANG_PATCH_STATUS = "application/yang.patch-status";
         public static final String YIN = "application/yin";
         public static final String YANG = "application/yang";
     }
