@@ -30,7 +30,7 @@ import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 
 @Provider
-@Produces({ Rfc8040.MediaTypes.PATCH_STATUS + RestconfConstants.XML })
+@Produces({ Rfc8040.MediaTypes.YANG_PATCH_STATUS + RestconfConstants.XML })
 public class PatchXmlBodyWriter implements MessageBodyWriter<PatchStatusContext> {
 
     private static final XMLOutputFactory XML_FACTORY;
