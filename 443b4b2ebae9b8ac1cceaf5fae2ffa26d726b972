@@ -34,6 +34,24 @@
       "revId": "443b4b2ebae9b8ac1cceaf5fae2ffa26d726b972",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2fde21c6_01182f30",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 797
+      },
+      "writtenOn": "2020-03-03T01:30:51Z",
+      "side": 1,
+      "message": "Since you are addressing RFC8040 documentation, this some time back doc addition was done in the wrong place IMO, is should have been in the netconf-connector-configuration-with-md-sal section: https://git.opendaylight.org/gerrit/c/netconf/+/83611/2/docs/user-guide.rst\nAnyway you can fix this in another patch if you want.",
+      "parentUuid": "0accedd2_907adb02",
+      "revId": "443b4b2ebae9b8ac1cceaf5fae2ffa26d726b972",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
