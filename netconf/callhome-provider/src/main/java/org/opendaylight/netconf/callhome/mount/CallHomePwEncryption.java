@@ -51,9 +51,6 @@ public class CallHomePwEncryption {
     private static final DataTreeIdentifier<Device> ALLOWED_DEVICES =
             DataTreeIdentifier.create(LogicalDatastoreType.CONFIGURATION, ALLOWED_DEVICES_PATH);
 
-    private final GlobalConfig globalConfig = new GlobalConfig();
-    private final DeviceConfig deviceConfig = new DeviceConfig();
-
     private final ListenerRegistration<GlobalConfig> configReg;
     private final ListenerRegistration<DeviceConfig> deviceReg;
 
@@ -63,8 +60,8 @@ public class CallHomePwEncryption {
     CallHomePwEncryption(final DataBroker dataBroker, final AAAEncryptionService encryptionService) {
         this.dataBroker = dataBroker;
         this.encryptionService = encryptionService;
-        configReg = dataBroker.registerDataTreeChangeListener(GLOBAL_CREDENTIAL, globalConfig);
-        deviceReg = dataBroker.registerDataTreeChangeListener(ALLOWED_DEVICES, deviceConfig);
+        configReg = dataBroker.registerDataTreeChangeListener(GLOBAL_CREDENTIAL, new GlobalConfig());
+        deviceReg = dataBroker.registerDataTreeChangeListener(ALLOWED_DEVICES, new DeviceConfig());
     }
 
     public void close() {
@@ -72,7 +69,48 @@ public class CallHomePwEncryption {
         deviceReg.close();
     }
 
-    private class GlobalConfig implements DataTreeChangeListener<Credentials> {
+    abstract class CheckEncryption {
+
+        public boolean isEncrypted(String input) {
+            return !(input.equals(encryptionService.decrypt(input)));
+        }
+
+        public List<String> handleCredentialChange(List<String> newpasswords) {
+            if (!(newpasswords.isEmpty()) && newpasswords != null) {
+                List<String> toBeEncrypted = new ArrayList<>();
+                for (String s : newpasswords) {
+                    if (!(isEncrypted(s))) {
+                        toBeEncrypted.add(s);
+                    }
+                }
+                if (!(toBeEncrypted.isEmpty())) {
+                    return encryptPassword(toBeEncrypted);
+                } else {
+                    LOG.debug("Password is already encrypted .");
+                }
+            } else {
+                LOG.warn("Input password list is empty or null");
+            }
+            return null;
+        }
+
+        private List<String> encryptPassword(final List<String> passwords) {
+            List<String> encryptedPasswords = new ArrayList<>();
+            if (passwords != null && !passwords.isEmpty()) {
+                passwords.stream().forEach(s -> encryptedPasswords.add(encryptionService.encrypt(s)));
+            }
+            return encryptedPasswords;
+        }
+
+        public Credentials withEncryptedPassword(final Credentials configGlobal,
+                final List<String> encryptedPasswords) {
+            return new CredentialsBuilder()
+                    .setUsername(configGlobal.getUsername())
+                    .setPasswords(encryptedPasswords).build();
+        }
+    }
+
+    private class GlobalConfig extends CheckEncryption implements DataTreeChangeListener<Credentials> {
 
         @Override
         public void onDataTreeChanged(final Collection<DataTreeModification<Credentials>> mods) {
@@ -82,7 +120,11 @@ public class CallHomePwEncryption {
                 switch (modType) {
                     case SUBTREE_MODIFIED:
                     case WRITE:
-                        handleCredentialChange(globalMod);
+                        List<String> encryptedPasswords = handleCredentialChange(
+                                globalMod.getDataAfter().getPasswords());
+                        if (encryptedPasswords != null && !(encryptedPasswords.isEmpty())) {
+                            setGlobalPassword(encryptedPasswords);
+                        }
                         break;
                     case DELETE:
                         LOG.debug("Global password config deleted");
@@ -92,37 +134,6 @@ public class CallHomePwEncryption {
                 }
             }
         }
-
-        private void handleCredentialChange(DataObjectModification<Credentials> globalMod) {
-            final List<String> newpasswords = globalMod.getDataAfter().getPasswords();
-            if (!(newpasswords.isEmpty()) && newpasswords != null) {
-                List<String> toBeEncrypted = new ArrayList<>();
-                for (String s : newpasswords) {
-                    if (!(isEncrypted(s))) {
-                        toBeEncrypted.add(s);
-                    }
-                }
-                if (!(toBeEncrypted.isEmpty())) {
-                    encryptPassword(toBeEncrypted);
-                } else {
-                    LOG.debug("Password is already encrypted .");
-                }
-            } else {
-                LOG.warn("Input password list is empty or null");
-            }
-        }
-
-        private boolean isEncrypted(String input) {
-            return !(input.equals(encryptionService.decrypt(input)));
-        }
-
-        private void encryptPassword(final List<String> passwords) {
-            List<String> encryptedPasswords = new ArrayList<>();
-            passwords.stream().forEach(s -> encryptedPasswords.add(encryptionService.encrypt(s)));
-            LOG.info("Password encrypted successfully");
-            setGlobalPassword(encryptedPasswords);
-        }
-
 
         private void setGlobalPassword(final List<String> encryptedPasswords) {
             try (ReadTransaction configTx = dataBroker.newReadOnlyTransaction()) {
@@ -142,13 +153,6 @@ public class CallHomePwEncryption {
             } catch (InterruptedException | ExecutionException e) {
                 return;
             }
-        }
-
-        private Credentials withEncryptedPassword(final Credentials configGlobal,
-                final List<String> encryptedPasswords) {
-            return new CredentialsBuilder()
-                    .setUsername(configGlobal.getUsername())
-                    .setPasswords(encryptedPasswords).build();
         }
 
         private void writeGlobal(final Credentials global) {
@@ -172,7 +176,7 @@ public class CallHomePwEncryption {
         }
     }
 
-    private class DeviceConfig implements DataTreeChangeListener<Device> {
+    private class DeviceConfig extends CheckEncryption implements DataTreeChangeListener<Device> {
 
         @Override
         public void onDataTreeChanged(final Collection<DataTreeModification<Device>> mods) {
@@ -182,7 +186,11 @@ public class CallHomePwEncryption {
                 switch (modType) {
                     case SUBTREE_MODIFIED:
                     case WRITE:
-                        handleCredentialChange(deviceMod);
+                        List<String> encryptedPasswords = handleCredentialChange(
+                                deviceMod.getDataAfter().getCredentials().getPasswords());
+                        if (encryptedPasswords != null && !(encryptedPasswords.isEmpty())) {
+                            setDevicePassword(deviceMod.getDataAfter().key(), encryptedPasswords);
+                        }
                         break;
                     case DELETE:
                         LOG.debug("Device config deleted");
@@ -191,38 +199,6 @@ public class CallHomePwEncryption {
                         throw new IllegalStateException("Unhandled modification type " + modType);
                 }
             }
-        }
-
-        private void handleCredentialChange(DataObjectModification<Device> deviceMod) {
-            final List<String> newpasswords = deviceMod.getDataAfter().getCredentials().getPasswords();
-            if (!(newpasswords.isEmpty()) && newpasswords != null) {
-                List<String> toBeEncrypted = new ArrayList<>();
-                for (String s : newpasswords) {
-                    if (!(isEncrypted(s))) {
-                        toBeEncrypted.add(s);
-                    }
-                }
-                if (!(toBeEncrypted.isEmpty())) {
-                    List<String> encryptedPasswords = encryptPassword(toBeEncrypted);
-                    setDevicePassword(deviceMod.getDataAfter().key(), encryptedPasswords);
-                } else {
-                    LOG.debug("Password is already encrypted .");
-                }
-            } else {
-                LOG.warn("Input password list is empty");
-            }
-        }
-
-        private boolean isEncrypted(String input) {
-            return !(input.equals(encryptionService.decrypt(input)));
-        }
-
-        private List<String> encryptPassword(final List<String> passwords) {
-            List<String> encryptedPasswords = new ArrayList<>();
-            if (passwords != null && !passwords.isEmpty()) {
-                passwords.stream().forEach(s -> encryptedPasswords.add(encryptionService.encrypt(s)));
-            }
-            return encryptedPasswords;
         }
 
         private void setDevicePassword(final DeviceKey deviceKey, final List<String> encryptedPasswords) {
@@ -234,7 +210,10 @@ public class CallHomePwEncryption {
                 if (device == null) {
                     LOG.warn("No corresponding device config found - exiting for {}", deviceKey.toString());
                 } else {
-                    Device modifiedDevice = withEncryptedPassword(device, encryptedPasswords);
+                    Credentials credentials = withEncryptedPassword(device.getCredentials(), encryptedPasswords);
+                    Device modifiedDevice = new DeviceBuilder().setUniqueId(device.getUniqueId())
+                                                 .setSshHostKey(device.getSshHostKey())
+                                                 .setCredentials(credentials).build();
                     if (modifiedDevice == null) {
                         return;
                     }
@@ -250,16 +229,6 @@ public class CallHomePwEncryption {
             return InstanceIdentifier.create(NetconfCallhomeServer.class)
                     .child(AllowedDevices.class)
                     .child(Device.class, deviceKey);
-        }
-
-        private Device withEncryptedPassword(final Device configDevice,
-                final List<String> encryptedPasswords) {
-            Credentials credentials = new CredentialsBuilder()
-                    .setUsername(configDevice.getCredentials().getUsername())
-                    .setPasswords(encryptedPasswords).build();
-            return new DeviceBuilder().setUniqueId(configDevice.getUniqueId())
-                        .setSshHostKey(configDevice.getSshHostKey())
-                        .setCredentials(credentials).build();
         }
 
         private void writeDevice(final InstanceIdentifier<Device> deviceIID, final Device device) {
