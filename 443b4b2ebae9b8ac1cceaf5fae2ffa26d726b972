@@ -52,6 +52,24 @@
       "revId": "443b4b2ebae9b8ac1cceaf5fae2ffa26d726b972",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a598acd4_9e139553",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-03-03T01:39:32Z",
+      "side": 1,
+      "message": "yeah, I\u0027ll address it as a different review",
+      "parentUuid": "2fde21c6_01182f30",
+      "revId": "443b4b2ebae9b8ac1cceaf5fae2ffa26d726b972",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
