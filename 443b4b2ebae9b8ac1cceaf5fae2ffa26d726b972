@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fd243f7e_77c3d734",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 797
+      },
+      "writtenOn": "2020-03-03T01:18:13Z",
+      "side": 1,
+      "message": "Jamo, I think the entire netconf-connector-configuration is deprecated (i.e. not working anymore) in favor of netconf-connector-configuration-with-md-sal which is the standard way to configure netconf devices nowadays. Can you double-check and if so remove the entire section?",
+      "revId": "443b4b2ebae9b8ac1cceaf5fae2ffa26d726b972",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
