@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f39aedcd_c7fb3235",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-optional.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-03-03T16:10:22Z",
+      "side": 1,
+      "message": "I do not believe this change is correct -- note now RFC8346 does the equivalent:\n\n     augment \"/nw:networks/nw:network/nw:node\" {\n       when \"../nw:network-types/l3t:l3-unicast-topology\" {\n         description\n           \"Augmentation parameters apply only for networks with\n           L3 Unicast topology\";\n       }\n       description\n           \"L3 Unicast node-level attributes \";\n       uses l3-node-attributes;\n     }",
+      "range": {
+        "startLine": 65,
+        "startChar": 35,
+        "endLine": 65,
+        "endChar": 56
+      },
+      "revId": "0ac67ebdb45ffeb757ff3fc46d570780d634eca9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
