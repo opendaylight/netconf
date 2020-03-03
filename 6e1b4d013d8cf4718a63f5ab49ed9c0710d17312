@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d03cb51d_953c9e87",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/NormalizedNodeJsonBodyWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-03-03T14:25:16Z",
+      "side": 1,
+      "message": "this does not match the comment above and moreover makes the code below unreachable (lest depth \u003d\u003d -1)",
+      "range": {
+        "startLine": 180,
+        "startChar": 29,
+        "endLine": 180,
+        "endChar": 39
+      },
+      "revId": "6e1b4d013d8cf4718a63f5ab49ed9c0710d17312",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
