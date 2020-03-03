@@ -16,6 +16,24 @@
       "revId": "443b4b2ebae9b8ac1cceaf5fae2ffa26d726b972",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0accedd2_907adb02",
+        "filename": "docs/user-guide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-03-03T01:21:44Z",
+      "side": 1,
+      "message": "yes, I was going to look in to that next, but it has nothing to do with this patch. is this patch\nok by you so far?",
+      "parentUuid": "fd243f7e_77c3d734",
+      "revId": "443b4b2ebae9b8ac1cceaf5fae2ffa26d726b972",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
