@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "582f8385_4d685485",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-03-04T23:59:08Z",
+      "side": 1,
+      "message": "put blank line between summary and body of commit msg\n\nalso, add a line above Signed-off-by with:\n\nJIRA: NETCONF-657",
+      "revId": "06973b4cdf4c109ebe8f73c49a8ff6a21e973e31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "105eb9ad_ebfaf14e",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataServiceImpl.java",
         "patchSetId": 2
@@ -13,6 +30,24 @@
       "writtenOn": "2020-03-04T23:27:39Z",
       "side": 1,
       "message": "I am not sure but looks like code is deleted from the postData method as per the diff screen. Is that true?",
+      "revId": "06973b4cdf4c109ebe8f73c49a8ff6a21e973e31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb1b404e_c7b051d5",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-03-04T23:59:08Z",
+      "side": 1,
+      "message": "looks like that to me as well",
+      "parentUuid": "105eb9ad_ebfaf14e",
       "revId": "06973b4cdf4c109ebe8f73c49a8ff6a21e973e31",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": false
