@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "105eb9ad_ebfaf14e",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2020-03-04T23:27:39Z",
+      "side": 1,
+      "message": "I am not sure but looks like code is deleted from the postData method as per the diff screen. Is that true?",
+      "revId": "06973b4cdf4c109ebe8f73c49a8ff6a21e973e31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4779dd12_41288644",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/PlainPatchDataTransactionUtil.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 2833
+      },
+      "writtenOn": "2020-03-04T23:27:39Z",
+      "side": 1,
+      "message": "Generally ensureparentsbymerge has created issues on netconf devices though it works with the MDSAL data store. WIth that said this is not unique to patch but I see all over. In beirman specs  we had fixed this not to do for NETCONF devices. This is something to care about for the future.",
+      "revId": "06973b4cdf4c109ebe8f73c49a8ff6a21e973e31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
