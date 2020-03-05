@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fbbb94dc_7e39058a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-03-05T16:05:02Z",
+      "side": 1,
+      "message": "don\u0027t forget the JIRA line",
+      "parentUuid": "582f8385_4d685485",
+      "revId": "06973b4cdf4c109ebe8f73c49a8ff6a21e973e31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "105eb9ad_ebfaf14e",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataServiceImpl.java",
         "patchSetId": 2
