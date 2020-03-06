@@ -9,6 +9,7 @@ The tool receives and logs data from specified URI"""
 # and is available at http://www.eclipse.org/legal/epl-v10.html
 
 import argparse
+import base64
 import logging
 from websocket import create_connection
 
@@ -27,6 +28,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--uri", default="ws://127.0.0.1:8185/", help="URI to connect")
     parser.add_argument("--count", type=int, default=1, help="Number of messages to receive")
+    parser.add_argument("--credentials", default="admin:admin", help="Basic authorization username:password")
     parser.add_argument("--logfile", default="wsreceiver.log", help="Log file name")
     parser.add_argument("--debug", dest="loglevel", action="store_const",
                         const=logging.DEBUG, default=logging.INFO, help="Log level")
@@ -37,17 +39,24 @@ def parse_arguments():
 class WSReceiver(object):
     """Class which receives web socket messages."""
 
-    def __init__(self, uri):
+    def __init__(self, uri, credentials):
         """Initialise and connect to URI.
 
         Arguments:
             :uri: uri to connect to
+            :credentials: user:password used in Basic Auth Header
         Returns:
             None
         """
         self.uri = uri
+        self.credentials = credentials
+        auth_string = base64.b64encode(credentials.encode('ascii'))
+        self.headers = {
+            'Authorization': 'Basic ' + auth_string.decode('ascii')
+        }
+
         logger.info("Connecting to: %s", self.uri)
-        self.ws = create_connection(self.uri)
+        self.ws = create_connection(self.uri, header=self.headers)
 
     def close(self):
         """Close the connection.
@@ -84,7 +93,7 @@ if __name__ == "__main__":
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
     logger.setLevel(args.loglevel)
-    receiver = WSReceiver(args.uri)
+    receiver = WSReceiver(args.uri, args.credentials)
     remains = args.count
     logger.info("Expected %d message(s)", remains)
     while remains:
