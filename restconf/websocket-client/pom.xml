@@ -26,8 +26,6 @@
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-client</artifactId>
-            <!-- FIXME: remove this with odlparent-5.0.5+ -->
-            <version>9.4.12.v20180830</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.argparse4j</groupId>
