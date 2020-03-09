@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "1735191c_1a25ba43",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataServiceImpl.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 3861
+      },
+      "writtenOn": "2020-03-09T21:53:30Z",
+      "side": 1,
+      "message": "Not true. That code block was repeated character for character again in this file and I made it common code now. \n\nIt is much easier to see this if you change the diff in the UI by clicking the yellow \"Show X common lines\"\n\nNotice the old \"checkQueryParameters(insertUsed, pointUsed, insert)\" is now \"checkQueryParameters(uriInfo)\". I overloaded the name since it is another (better) form of the same functionality (and calls the original too).",
+      "parentUuid": "fb1b404e_c7b051d5",
+      "revId": "06973b4cdf4c109ebe8f73c49a8ff6a21e973e31",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4779dd12_41288644",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/PlainPatchDataTransactionUtil.java",
         "patchSetId": 2
