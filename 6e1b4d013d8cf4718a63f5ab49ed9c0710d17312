@@ -22,6 +22,30 @@
       "revId": "6e1b4d013d8cf4718a63f5ab49ed9c0710d17312",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "43908cae_b86a88dc",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/NormalizedNodeJsonBodyWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 6888
+      },
+      "writtenOn": "2020-03-09T03:59:34Z",
+      "side": 1,
+      "message": "The depth parameter must be an integer between 1 and 65535, you can see this check in method:ReadDataTransactionUtil.parseParams(), when it is -1, it causes error. And I think this code should be \"depth \u003e 0\", because depth \u003d\u003d 0 also causes error.",
+      "parentUuid": "d03cb51d_953c9e87",
+      "range": {
+        "startLine": 180,
+        "startChar": 29,
+        "endLine": 180,
+        "endChar": 39
+      },
+      "revId": "6e1b4d013d8cf4718a63f5ab49ed9c0710d17312",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
