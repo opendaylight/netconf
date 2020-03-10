@@ -19,7 +19,7 @@
   <artifactId>sal-netconf-connector</artifactId>
 
   <!-- Preserve version from mdsal -->
-  <version>1.10.3-SNAPSHOT</version>
+  <version>1.7.4-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <dependencies>

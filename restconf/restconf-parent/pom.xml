@@ -11,13 +11,13 @@
   <parent>
     <groupId>org.opendaylight.mdsal</groupId>
     <artifactId>binding-parent</artifactId>
-    <version>4.0.11</version>
+    <version>0.12.4-SNAPSHOT</version>
     <relativePath/>
   </parent>
 
   <groupId>org.opendaylight.netconf</groupId>
   <artifactId>restconf-parent</artifactId>
-  <version>1.10.3-SNAPSHOT</version>
+  <version>1.7.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <dependencyManagement>
@@ -39,7 +39,7 @@
       <dependency>
         <groupId>org.opendaylight.controller</groupId>
         <artifactId>mdsal-artifacts</artifactId>
-        <version>1.10.3-SNAPSHOT</version>
+        <version>1.7.4-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -60,7 +60,7 @@
       <dependency>
         <groupId>org.opendaylight.controller</groupId>
         <artifactId>config-artifacts</artifactId>
-        <version>0.11.3-SNAPSHOT</version>
+        <version>0.8.4-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
