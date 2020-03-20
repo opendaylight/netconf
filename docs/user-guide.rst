@@ -571,7 +571,7 @@ developers can be found in the developers guide or in the official
 tutorial application **ncmount** that can be found in the coretutorials
 project:
 
--  https://github.com/opendaylight/coretutorials/tree/stable/beryllum/ncmount
+-  https://github.com/opendaylight/coretutorials/tree/master/ncmount
 
 Reading data from the device
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
