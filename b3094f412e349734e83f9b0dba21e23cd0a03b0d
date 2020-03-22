@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b0b6dd3b_2cbfc1a6",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/NormalizedNodeJsonBodyWriter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-03-22T18:34:14Z",
+      "side": 1,
+      "message": "depth section of the rfc8040 spec is below. looking at this line I\u0027m wondering\nwhat we are catching here. how would depth ever be null to start with? Can\nrequest come that creates that? Also, what happens if depth is exactly 0?\nfinally, in the section below it seems we need to allow for \"unbounded\" as well\nas check against a max value of 65535.\n\n\n\n4.8.2.  The \"depth\" Query Parameter\n\n   The \"depth\" query parameter is used to limit the depth of subtrees\n   returned by the server.  Data nodes with a \"depth\" value greater than\n   the \"depth\" parameter are not returned in a response for a GET\n   method.\n\n   The requested data node has a depth level of \"1\".  If the \"fields\"\n   parameter (Section 4.8.3) is used to select descendant data nodes,\n   then these nodes and all of their ancestor nodes have a \"depth\" value\n   of \"1\".  (This has the effect of including the nodes specified by the\n   fields, even if the \"depth\" value is less than the actual depth level\n   of the specified fields.)  Any other child node has a \"depth\" value\n   that is 1 greater than its parent.\n\n   The value of the \"depth\" parameter is either an integer between 1 and\n   65535 or the string \"unbounded\".  \"unbounded\" is the default.\n\n   This parameter is only allowed for GET methods on API, datastore, and\n   data resources.  A \"400 Bad Request\" status-line is returned if used\n   for other methods or resource types.\n\n\n\n\n\n\nBierman, et al.              Standards Track                   [Page 54]\n \nRFC 8040                        RESTCONF                    January 2017\n\n\n   By default, the server will include all sub-resources within a\n   retrieved resource that have the same resource type as the requested\n   resource.  The exception is the datastore resource.  If this resource\n   type is retrieved, then by default the datastore and all child data\n   resources are returned.\n\n   If the \"depth\" query parameter URI is listed in the \"capability\"\n   leaf-list defined in Section 9.3, then the server supports the\n   \"depth\" query parameter.",
+      "revId": "b3094f412e349734e83f9b0dba21e23cd0a03b0d",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
