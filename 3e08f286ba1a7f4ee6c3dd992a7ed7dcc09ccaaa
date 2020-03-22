@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3f975263_4ebfca0d",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataServiceImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-03-22T18:47:39Z",
+      "side": 1,
+      "message": "got an example I can look at to fix this?",
+      "parentUuid": "e862a0fa_ff5fbaaa",
+      "range": {
+        "startLine": 185,
+        "startChar": 47,
+        "endLine": 185,
+        "endChar": 55
+      },
+      "revId": "3e08f286ba1a7f4ee6c3dd992a7ed7dcc09ccaaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "348c09a6_fdaf034b",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataServiceImpl.java",
         "patchSetId": 5
@@ -36,6 +60,30 @@
       "writtenOn": "2020-03-09T10:51:13Z",
       "side": 1,
       "message": "This is too Pythonic. Please create a proper DTO, so that this construct has a nominal form:\n\nprivate static final class QueryParams implements Immutable {\n    final @Nullable String insert;\n    final @Nulalble String point;\n}",
+      "range": {
+        "startLine": 224,
+        "startChar": 8,
+        "endLine": 224,
+        "endChar": 53
+      },
+      "revId": "3e08f286ba1a7f4ee6c3dd992a7ed7dcc09ccaaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d6c0e07e_a1f78ec7",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/impl/RestconfDataServiceImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-03-22T18:47:39Z",
+      "side": 1,
+      "message": "I\u0027m not java-dev enough to know what to do here, but I can follow and learn from some example if you point me.",
+      "parentUuid": "348c09a6_fdaf034b",
       "range": {
         "startLine": 224,
         "startChar": 8,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "a3d303a1_75108409",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/PlainPatchDataTransactionUtil.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-03-22T18:47:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d539222c_8d554dd1",
+      "range": {
+        "startLine": 72,
+        "startChar": 18,
+        "endLine": 72,
+        "endChar": 38
+      },
+      "revId": "3e08f286ba1a7f4ee6c3dd992a7ed7dcc09ccaaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "337e5399_530c08cc",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/services/wrapper/ServicesWrapper.java",
         "patchSetId": 5
@@ -91,6 +163,30 @@
       "revId": "3e08f286ba1a7f4ee6c3dd992a7ed7dcc09ccaaa",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f72db91e_15981e6d",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/services/wrapper/ServicesWrapper.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-03-22T18:47:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "337e5399_530c08cc",
+      "range": {
+        "startLine": 149,
+        "startChar": 30,
+        "endLine": 149,
+        "endChar": 47
+      },
+      "revId": "3e08f286ba1a7f4ee6c3dd992a7ed7dcc09ccaaa",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
