@@ -8,6 +8,8 @@
 package org.opendaylight.netconf.sal.connect.netconf;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollectionOf;
 import static org.mockito.ArgumentMatchers.eq;
@@ -32,10 +34,13 @@ import com.google.common.util.concurrent.SettableFuture;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -409,6 +414,130 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .forEach(entry -> assertEquals("Builded 'AvailableCapability' schemas should match input capabilities.",
                         moduleBasedCaps.get(
                                 QName.create(entry.getCapability())).getName(), entry.getCapabilityOrigin().getName()));
+    }
+
+    @Test
+    public void testNetconfDeviceNotificationsModelNotPresentWithCapability() throws Exception {
+        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final NetconfDeviceCommunicator listener = getListener();
+        final SchemaContextFactory schemaContextProviderFactory = getSchemaFactory();
+
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(
+                getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+        final NetconfDevice device = new NetconfDeviceBuilder()
+                .setSchemaResourcesDTO(schemaResourcesDTO)
+                .setGlobalProcessingExecutor(getExecutor())
+                .setId(getId())
+                .setSalFacade(facade)
+                .build();
+        final NetconfDevice netconfSpy = Mockito.spy(device);
+
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(false,
+                Lists.newArrayList(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0));
+
+        netconfSpy.onRemoteSessionUp(sessionCaps, listener);
+
+        final ArgumentCaptor<NetconfSessionPreferences> argument =
+                ArgumentCaptor.forClass(NetconfSessionPreferences.class);
+        verify(facade, timeout(5000)).onDeviceConnected(any(MountPointContext.class), argument.capture(),
+                any(DOMRpcService.class), isNull());
+
+        List<String> notificationModulesName = Arrays.asList(
+                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                        .$YangModuleInfoImpl.getInstance().getName().toString(),
+                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                        .$YangModuleInfoImpl.getInstance().getName().toString());
+
+        final Set<AvailableCapability> resolvedCapabilities = argument.getValue().getNetconfDeviceCapabilities()
+                .getResolvedCapabilities();
+
+        assertEquals(2, resolvedCapabilities.size());
+        assertTrue(resolvedCapabilities.stream().anyMatch(entry -> notificationModulesName
+                .contains(entry.getCapability())));
+    }
+
+    @Test
+    public void testNetconfDeviceNotificationsCapabilityIsNotPresent() throws Exception {
+        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final NetconfDeviceCommunicator listener = getListener();
+        final SchemaContextFactory schemaContextProviderFactory = getSchemaFactory();
+
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(
+                getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+        final NetconfDevice device = new NetconfDeviceBuilder()
+                .setSchemaResourcesDTO(schemaResourcesDTO)
+                .setGlobalProcessingExecutor(getExecutor())
+                .setId(getId())
+                .setSalFacade(facade)
+                .build();
+        final NetconfDevice netconfSpy = Mockito.spy(device);
+
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(false,
+                Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
+
+        netconfSpy.onRemoteSessionUp(sessionCaps, listener);
+
+        final ArgumentCaptor<NetconfSessionPreferences> argument =
+                ArgumentCaptor.forClass(NetconfSessionPreferences.class);
+        verify(facade, timeout(5000)).onDeviceConnected(any(MountPointContext.class), argument.capture(),
+                any(DOMRpcService.class), isNull());
+        final NetconfDeviceCapabilities netconfDeviceCaps = argument.getValue().getNetconfDeviceCapabilities();
+
+        List<String> notificationModulesName = Arrays.asList(
+                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                        .$YangModuleInfoImpl.getInstance().getName().toString(),
+                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                        .$YangModuleInfoImpl.getInstance().getName().toString());
+
+        assertFalse(netconfDeviceCaps.getResolvedCapabilities().stream().anyMatch(entry -> notificationModulesName
+                .contains(entry.getCapability())));
+    }
+
+    @Test
+    public void testNetconfDeviceNotificationsModelIsPresent() throws Exception {
+        final RemoteDeviceHandler<NetconfSessionPreferences> facade = getFacade();
+        final NetconfDeviceCommunicator listener = getListener();
+        final SchemaContextFactory schemaContextProviderFactory = getSchemaFactory();
+
+        final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice.SchemaResourcesDTO(
+                getSchemaRegistry(), getSchemaRepository(), schemaContextProviderFactory, STATE_SCHEMAS_RESOLVER);
+        final NetconfDevice device = new NetconfDeviceBuilder()
+                .setSchemaResourcesDTO(schemaResourcesDTO)
+                .setGlobalProcessingExecutor(getExecutor())
+                .setId(getId())
+                .setSalFacade(facade)
+                .build();
+        final NetconfDevice netconfSpy = Mockito.spy(device);
+
+        final NetconfSessionPreferences sessionCaps = getSessionCaps(false, Collections.emptyList());
+
+        final Map<QName, AvailableCapability.CapabilityOrigin> moduleBasedCaps = new HashMap<>();
+        moduleBasedCaps.put(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                        .$YangModuleInfoImpl.getInstance().getName(),
+                AvailableCapability.CapabilityOrigin.DeviceAdvertised);
+        moduleBasedCaps.put(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                        .$YangModuleInfoImpl.getInstance().getName(),
+                AvailableCapability.CapabilityOrigin.DeviceAdvertised);
+
+
+        netconfSpy.onRemoteSessionUp(sessionCaps.replaceModuleCaps(moduleBasedCaps), listener);
+
+        final ArgumentCaptor<NetconfSessionPreferences> argument =
+                ArgumentCaptor.forClass(NetconfSessionPreferences.class);
+        verify(facade, timeout(5000)).onDeviceConnected(any(MountPointContext.class), argument.capture(),
+                any(DOMRpcService.class), isNull());
+        final Set<AvailableCapability> resolvedCapabilities = argument.getValue().getNetconfDeviceCapabilities()
+                .getResolvedCapabilities();
+
+        List<String> notificationModulesName = Arrays.asList(
+                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                        .$YangModuleInfoImpl.getInstance().getName().toString(),
+                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                        .$YangModuleInfoImpl.getInstance().getName().toString());
+
+        assertEquals(2, resolvedCapabilities.size());
+        assertTrue(resolvedCapabilities.stream().anyMatch(entry -> notificationModulesName
+                .contains(entry.getCapability())));
     }
 
     private static SchemaContextFactory getSchemaFactory() throws Exception {
