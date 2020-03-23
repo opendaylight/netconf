@@ -23,6 +23,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -36,6 +37,7 @@ import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.MessageTransformer;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemasResolver;
@@ -441,6 +443,19 @@ public class NetconfDevice
             this.deviceSources = deviceSources;
             this.remoteSessionCapabilities = remoteSessionCapabilities;
             this.capabilities = remoteSessionCapabilities.getNetconfDeviceCapabilities();
+
+            // If device supports notifications and does not contain necessary modules, add them automatically
+            if (remoteSessionCapabilities.containsNonModuleCapability(
+                    XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0)) {
+                deviceSources.getRequiredSourcesQName().addAll(
+                        Arrays.asList(
+                                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714
+                                        .$YangModuleInfoImpl.getInstance().getName(),
+                                org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715
+                                        .$YangModuleInfoImpl.getInstance().getName()
+                        )
+                );
+            }
 
             requiredSources = deviceSources.getRequiredSources();
             final Collection<SourceIdentifier> missingSources = filterMissingSources(requiredSources);
