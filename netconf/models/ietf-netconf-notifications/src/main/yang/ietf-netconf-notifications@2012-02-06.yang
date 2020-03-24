@@ -159,6 +159,8 @@ module ietf-netconf-notifications {
          The server MAY report entries in this list for
          changes not made by a NETCONF session (e.g., CLI).";
 
+      key operation;
+
       leaf target {
         type instance-identifier;
         description
