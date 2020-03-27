@@ -92,7 +92,9 @@ class _BasicReusingSession(object):
         if username:
             self.session.auth = (username, password)  # May work with non-string values
         else:
-            self.session.auth = None  # Supports "no authentication mode" as in odl-restconf-noauth
+            self.session.auth = (
+                None  # Supports "no authentication mode" as in odl-restconf-noauth
+            )
 
     def robust_method(self, method, uri, **kwargs):
         """Try method once using session credentials. Return last response."""
@@ -109,7 +111,9 @@ class _BasicClosingSession(object):
         if username:
             self.auth = (username, password)  # May work with non-string values
         else:
-            self.auth = None  # Supports "no authentication mode" as in odl-restconf-noauth
+            self.auth = (
+                None  # Supports "no authentication mode" as in odl-restconf-noauth
+            )
         self.session = None
 
     def robust_method(self, method, uri, **kwargs):
@@ -144,7 +148,9 @@ class _TokenReusingSession(object):
         if self.session:
             self.session.close()
         self.session = requests.Session()
-        resp = self.session.post(self.auth_url, data=self.auth_data, headers=self.auth_header)
+        resp = self.session.post(
+            self.auth_url, data=self.auth_data, headers=self.auth_header
+        )
         resp_obj = json.loads(resp.text)
         try:
             token = resp_obj["access_token"]
@@ -191,7 +197,9 @@ class _TokenClosingSession(object):
         if self.session:
             self.session.close()
         self.session = requests.Session()
-        resp = self.session.post(self.auth_url, data=self.auth_data, headers=self.auth_header)
+        resp = self.session.post(
+            self.auth_url, data=self.auth_data, headers=self.auth_header
+        )
         resp_obj = json.loads(resp.text)
         try:
             token = resp_obj["access_token"]

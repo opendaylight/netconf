@@ -27,11 +27,23 @@ def parse_arguments():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--uri", default="ws://127.0.0.1:8185/", help="URI to connect")
-    parser.add_argument("--count", type=int, default=1, help="Number of messages to receive")
-    parser.add_argument("--credentials", default="admin:admin", help="Basic authorization username:password")
+    parser.add_argument(
+        "--count", type=int, default=1, help="Number of messages to receive"
+    )
+    parser.add_argument(
+        "--credentials",
+        default="admin:admin",
+        help="Basic authorization username:password",
+    )
     parser.add_argument("--logfile", default="wsreceiver.log", help="Log file name")
-    parser.add_argument("--debug", dest="loglevel", action="store_const",
-                        const=logging.DEBUG, default=logging.INFO, help="Log level")
+    parser.add_argument(
+        "--debug",
+        dest="loglevel",
+        action="store_const",
+        const=logging.DEBUG,
+        default=logging.INFO,
+        help="Log level",
+    )
     args = parser.parse_args()
     return args
 
@@ -50,10 +62,8 @@ class WSReceiver(object):
         """
         self.uri = uri
         self.credentials = credentials
-        auth_string = base64.b64encode(credentials.encode('ascii'))
-        self.headers = {
-            'Authorization': 'Basic ' + auth_string.decode('ascii')
-        }
+        auth_string = base64.b64encode(credentials.encode("ascii"))
+        self.headers = {"Authorization": "Basic " + auth_string.decode("ascii")}
 
         logger.info("Connecting to: %s", self.uri)
         self.ws = create_connection(self.uri, header=self.headers)
