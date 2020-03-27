@@ -152,7 +152,6 @@ class _TokenReusingSession(object):
             raise RuntimeError("Parse failed: " + resp.text)
         self.token = token
         # TODO: Use logging so that callers could see token refreshes.
-        # print "DEBUG: token:", token
         # We keep self.session to use for the following restconf requests.
 
     def oneshot_method(self, method, uri, **kwargs):
@@ -200,7 +199,6 @@ class _TokenClosingSession(object):
             raise RuntimeError("Parse failed: " + resp.text)
         self.token = token
         # TODO: Use logging so that callers could see token refreshes.
-        # print "DEBUG: token:", token
         # We keep self.session to use for the following restconf requests.
 
     def oneshot_method(self, method, uri, **kwargs):
