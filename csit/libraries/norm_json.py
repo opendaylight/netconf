@@ -7,6 +7,7 @@
 
 import collections as _collections
 import jmespath
+
 try:
     import simplejson as _json
 except ImportError:  # Python2.7 calls it json.
@@ -62,7 +63,9 @@ class _Hsfod(_collections.OrderedDict):
         sup = super(_Hsfod, self)  # possibly something else than OrderedDict
         sup.__init__(items_sorted)
         # Repr string is used for sorting, keys are more important than values.
-        self.__repr = '{' + repr(list(self.keys())) + ':' + repr(list(self.values())) + '}'
+        self.__repr = (
+            "{" + repr(list(self.keys())) + ":" + repr(list(self.values())) + "}"
+        )
         self.__hash = hash(self.__repr)
 
     def __repr__(self):
@@ -113,8 +116,8 @@ def dumps_indented(obj, indent=1):
     Also, allows to use something different from RequestsLibrary.To_Json
 
     """
-    pretty_json = _json.dumps(obj, separators=(',', ': '), indent=indent)
-    return pretty_json + '\n'  # to avoid diff "no newline" warning line
+    pretty_json = _json.dumps(obj, separators=(",", ": "), indent=indent)
+    return pretty_json + "\n"  # to avoid diff "no newline" warning line
 
 
 def sort_bits(obj, keys_with_bits=[]):
@@ -167,7 +170,9 @@ def hide_volatile(obj, keys_with_volatiles=[]):
             # Unicode is not str and vice versa, isinstance has to check for both.
             # Luckily, "in" recognizes equivalent strings in different encodings.
             # Type "bytes" is added for Python 3 compatibility.
-            if key in keys_with_volatiles and isinstance(value, (str, bytes, int, bool)):
+            if key in keys_with_volatiles and isinstance(
+                value, (str, bytes, int, bool)
+            ):
                 obj[key] = "*"
             else:
                 hide_volatile(value, keys_with_volatiles)
@@ -178,7 +183,14 @@ def hide_volatile(obj, keys_with_volatiles=[]):
     return obj
 
 
-def normalize_json_text(text, strict=False, indent=1, keys_with_bits=[], keys_with_volatiles=[], jmes_path=None):
+def normalize_json_text(
+    text,
+    strict=False,
+    indent=1,
+    keys_with_bits=[],
+    keys_with_volatiles=[],
+    jmes_path=None,
+):
     """
     Attempt to return sorted indented JSON string.
 
@@ -208,7 +220,7 @@ def normalize_json_text(text, strict=False, indent=1, keys_with_bits=[], keys_wi
         if strict:
             raise err
         else:
-            return str(err) + '\n' + text
+            return str(err) + "\n" + text
     if keys_with_bits:
         sort_bits(object_decoded, keys_with_bits)
     if keys_with_volatiles:

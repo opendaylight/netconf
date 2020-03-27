@@ -45,36 +45,54 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
 
     # Netconf and Restconf related arguments.
-    parser.add_argument('--odladdress', default='127.0.0.1',
-                        help='IP address of ODL Restconf to be used')
-    parser.add_argument('--restconfport', default='8181',
-                        help='Port on which ODL Restconf to be used')
-    parser.add_argument('--user', default='admin',
-                        help='Username for ODL Restconf authentication')
-    parser.add_argument('--password', default='admin',
-                        help='Password for ODL Restconf authentication')
-    parser.add_argument('--scope',
-                        help='Scope for ODL Restconf authentication')
-    parser.add_argument('--count', type=int,
-                        help='Count of devices to query')
-    parser.add_argument('--name',
-                        help='Name of device without the ID suffix')
-    parser.add_argument('--reuse', default='True', type=str2bool,
-                        help='Should single requests session be re-used')
+    parser.add_argument(
+        "--odladdress",
+        default="127.0.0.1",
+        help="IP address of ODL Restconf to be used",
+    )
+    parser.add_argument(
+        "--restconfport", default="8181", help="Port on which ODL Restconf to be used"
+    )
+    parser.add_argument(
+        "--user", default="admin", help="Username for ODL Restconf authentication"
+    )
+    parser.add_argument(
+        "--password", default="admin", help="Password for ODL Restconf authentication"
+    )
+    parser.add_argument("--scope", help="Scope for ODL Restconf authentication")
+    parser.add_argument("--count", type=int, help="Count of devices to query")
+    parser.add_argument("--name", help="Name of device without the ID suffix")
+    parser.add_argument(
+        "--reuse",
+        default="True",
+        type=str2bool,
+        help="Should single requests session be re-used",
+    )
 
     # Work related arguments.
-    parser.add_argument('--workers', default='1', type=int,
-                        help='number of blocking http threads to use')
-    parser.add_argument('--timeout', default='300', type=float,
-                        help='timeout in seconds for all jobs to complete')
-    parser.add_argument('--refresh', default='0.1', type=float,
-                        help='seconds to sleep in main thread if nothing to do')
+    parser.add_argument(
+        "--workers",
+        default="1",
+        type=int,
+        help="number of blocking http threads to use",
+    )
+    parser.add_argument(
+        "--timeout",
+        default="300",
+        type=float,
+        help="timeout in seconds for all jobs to complete",
+    )
+    parser.add_argument(
+        "--refresh",
+        default="0.1",
+        type=float,
+        help="seconds to sleep in main thread if nothing to do",
+    )
 
     return parser.parse_args()  # arguments are read
 
 
 class TRequestWithResponse(object):
-
     def __init__(self, uri, kwargs):
         self.uri = uri
         self.kwargs = kwargs
@@ -98,7 +116,9 @@ def queued_send(session, queue_messages):
         except IndexError:  # nothing more to send
             break
         start = time.time()
-        response = AuthStandalone.Get_Using_Session(session, request.uri, **request.kwargs)
+        response = AuthStandalone.Get_Using_Session(
+            session, request.uri, **request.kwargs
+        )
         stop = time.time()
         status = int(response.status_code)
         content = repr(response.content)
@@ -115,7 +135,7 @@ def collect_results(request_list, response_queue):
 
 def watch_for_timeout(timeout, response_queue):
     time.sleep(timeout)
-    response_queue.append((None, 'Time is up!'))
+    response_queue.append((None, "Time is up!"))
 
 
 def run_thread(thread_target, *thread_args):
@@ -129,11 +149,11 @@ def run_thread(thread_target, *thread_args):
 args = parse_arguments()
 
 # Construct the work for the workers.
-url_start = 'config/network-topology:network-topology/'
+url_start = "config/network-topology:network-topology/"
 url_start += "topology/topology-netconf/node/"
 url_start += args.name + "-"
 url_end = "/yang-ext:mount"
-headers = {'Content-Type': 'application/xml', "Accept": "application/xml"}
+headers = {"Content-Type": "application/xml", "Accept": "application/xml"}
 kwargs = {"headers": headers}
 requests = []
 for device_number in range(args.count):
@@ -154,7 +174,9 @@ for request in requests:
 # Spawn the workers, giving each a queue.
 threads = []
 for queue_messages in list_q_msg:
-    session = AuthStandalone.Init_Session(args.odladdress, args.user, args.password, args.scope, args.reuse)
+    session = AuthStandalone.Init_Session(
+        args.odladdress, args.user, args.password, args.scope, args.reuse
+    )
     thread = run_thread(queued_send, session, queue_messages)
     threads.append(thread)
 
