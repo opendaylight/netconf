@@ -129,7 +129,7 @@ def main():
     def handle_sigint(received_signal, frame):  # This is a closure as it refers to the counter.
         """Upon SIGINT, print counter contents and exit gracefully."""
         signal.signal(signal.SIGINT, signal.SIG_DFL)
-        print sorted_repr(counter)
+        print(sorted_repr(counter))
         sys.exit(0)
 
     signal.signal(signal.SIGINT, handle_sigint)
