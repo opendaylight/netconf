@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "deae51fd_9a87d89c",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocServiceImpl.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 0,
+      "message": "remove an empty line. set your developers tools import optimization to following guidelines:\nhttps://wiki-archive.opendaylight.org/view/GettingStarted:_Eclipse_Setup#Import_ordering",
+      "revId": "70d17768b76721b64d0c9740e35a9c9e2e0640e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "53def73d_ff94ed50",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 0,
+      "message": "private",
+      "revId": "70d17768b76721b64d0c9740e35a9c9e2e0640e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c6e381c9_52384354",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 0,
+      "message": "private",
+      "revId": "70d17768b76721b64d0c9740e35a9c9e2e0640e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8d0bd523_98b6fdd6",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGeneratorRFC8040.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 0,
+      "message": "Explain how is this implemented right now",
+      "range": {
+        "startLine": 42,
+        "startChar": 7,
+        "endLine": 50,
+        "endChar": 5
+      },
+      "revId": "70d17768b76721b64d0c9740e35a9c9e2e0640e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bbf9226b_00fb317a",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/swagger/ApiDeclaration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 0,
+      "message": "I believe that we will need this as well but needs to be upgraded",
+      "revId": "70d17768b76721b64d0c9740e35a9c9e2e0640e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c1149736_a8ab6bba",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/controller/sal/rest/doc/impl/SwaggerObjectTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 0,
+      "message": "empty line",
+      "revId": "70d17768b76721b64d0c9740e35a9c9e2e0640e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}

@@ -1,0 +1,1111 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "23fef17f_ad2611dd",
+        "filename": "restconf/restconf-common-models/src/main/yang/binary-operations@2020-01-20.yang",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "remove this file. Or explain why is this module necessary for this patch to work.",
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "abe4c0f2_9559e1c8",
+        "filename": "restconf/restconf-common-models/src/main/yang/ietf-inet-types@2013-07-15.yang",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as above",
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e2954274_712ab82d",
+        "filename": "restconf/restconf-common-models/src/main/yang/toaster.yang",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as above",
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6e9b4afc_3417e959",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "You can not just replace the existing copyright notice. Keep the old one",
+      "range": {
+        "startLine": 1,
+        "startChar": 2,
+        "endLine": 2,
+        "endChar": 42
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "50b71a00_7c94ccac",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "Again remove the gap",
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9b6c5e50_13100ff5",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "make private",
+      "range": {
+        "startLine": 73,
+        "startChar": 4,
+        "endLine": 74,
+        "endChar": 58
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "57acdc95_b5665584",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "Declare constant and replace usage",
+      "range": {
+        "startLine": 196,
+        "startChar": 4,
+        "endLine": 198,
+        "endChar": 5
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "110c6965_9c65d84b",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "return instead of assigning to host",
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "50c0d218_e63f205d",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 439,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "return Collections.emptySortedSet()",
+      "range": {
+        "startLine": 439,
+        "startChar": 23,
+        "endLine": 439,
+        "endChar": 30
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "10e7664e_230e3b8d",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "private",
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "55460c92_40e6a2c8",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGeneratorDraft02.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "Do not overwrite",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 2,
+        "endChar": 3
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9ef6102e_03287703",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGeneratorRFC8040.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "do not overwrite",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 2,
+        "endChar": 3
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fefe0eb5_453a165a",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "Create static string variable this is used on multiple places",
+      "range": {
+        "startLine": 137,
+        "startChar": 67,
+        "endLine": 137,
+        "endChar": 76
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "41dcb150_f75d3d17",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "Isn t this variable redundant?",
+      "range": {
+        "startLine": 157,
+        "startChar": 0,
+        "endLine": 157,
+        "endChar": 1
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "db85da76_1f1121a1",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 599,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "remove this method and use:\n\nprocessTypeDef(SchemaContextUtil.getBaseTypeForLeafRef((LeafrefTypeDefinition) leafTypeDef, schemaContext, node),node, property, schemaContext, definitions, definitionNames);\n\ninstead in here",
+      "range": {
+        "startLine": 599,
+        "startChar": 19,
+        "endLine": 599,
+        "endChar": 108
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "75ee123c_c0bb7111",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 748,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "use isEmpty() instead",
+      "range": {
+        "startLine": 748,
+        "startChar": 15,
+        "endLine": 748,
+        "endChar": 45
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "017390a8_b2352b95",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionNames.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "not that this matter but try to keep an empty line after the class definition",
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "70a8b796_5fac5bc7",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionNames.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "package-private",
+      "range": {
+        "startLine": 35,
+        "startChar": 4,
+        "endLine": 35,
+        "endChar": 11
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8e44d501_cbc94905",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionNames.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 49,
+        "startChar": 4,
+        "endLine": 49,
+        "endChar": 11
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cf2ee1b3_f02b27ec",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionNames.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 57,
+        "startChar": 4,
+        "endLine": 57,
+        "endChar": 11
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b9d12fac_98bd8c0b",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/DefinitionNames.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "not that this matter but try to keep an empty line before class ending curly bracket",
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5e2ee76d_dfb00c34",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/jaxrs/JaxbContextResolver.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "I know that this was not your change but please call this class... This looks weird",
+      "range": {
+        "startLine": 30,
+        "startChar": 50,
+        "endLine": 30,
+        "endChar": 51
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f0a84e7a_7ec948be",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "many of these can be private",
+      "range": {
+        "startLine": 25,
+        "startChar": 4,
+        "endLine": 53,
+        "endChar": 52
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "899b498b_898b1b94",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "Don t come up with your own variables if they exist\nHttpMethod.POST",
+      "range": {
+        "startLine": 68,
+        "startChar": 35,
+        "endLine": 68,
+        "endChar": 40
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "07a80f66_5a7437c8",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "Response.Status.CREATED.getReasonPhrase()\n\nDo not use your own text for well known texts. same goes for 201 number. get it from Response class in javax.ws.rs-api",
+      "range": {
+        "startLine": 84,
+        "startChar": 46,
+        "endLine": 84,
+        "endChar": 53
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e6278f61_2dc570b6",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 85,
+        "startChar": 23,
+        "endLine": 85,
+        "endChar": 26
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "17a2b639_4c6de603",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "Don t come up with your own variables if they exist\nHttpMethod.GET",
+      "range": {
+        "startLine": 96,
+        "startChar": 35,
+        "endLine": 96,
+        "endChar": 39
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b82720a8_a8ea64ed",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 108,
+        "startChar": 41,
+        "endLine": 108,
+        "endChar": 43
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9e4ccd03_9d7a1bd9",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 110,
+        "startChar": 23,
+        "endLine": 110,
+        "endChar": 26
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fff74b9c_305e217e",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "Don t come up with your own variables if they exist\nHttpMethod.PUT",
+      "range": {
+        "startLine": 138,
+        "startChar": 35,
+        "endLine": 138,
+        "endChar": 39
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "15b6d173_f6d7ba91",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 152,
+        "startChar": 46,
+        "endLine": 152,
+        "endChar": 53
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cc930895_e3189256",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 153,
+        "startChar": 23,
+        "endLine": 153,
+        "endChar": 26
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f9071712_6f9d4bf7",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 155,
+        "startChar": 46,
+        "endLine": 155,
+        "endChar": 53
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "64fd87dd_f9cdb526",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 156,
+        "startChar": 23,
+        "endLine": 156,
+        "endChar": 26
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1f33efef_0f8d19f3",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "Don t come up with your own variables if they exist\nHttpMethod.DELETE",
+      "range": {
+        "startLine": 165,
+        "startChar": 31,
+        "endLine": 165,
+        "endChar": 38
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "675cb4f5_f47968f2",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 173,
+        "startChar": 23,
+        "endLine": 173,
+        "endChar": 26
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "80acd5be_c5b2cf0d",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 215,
+        "startChar": 27,
+        "endLine": 215,
+        "endChar": 30
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e6339d93_0ed583b8",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as above",
+      "range": {
+        "startLine": 217,
+        "startChar": 27,
+        "endLine": 217,
+        "endChar": 30
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "087766d0_f8401601",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointSwagger.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "Do not rewrite",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 2,
+        "endChar": 3
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4f3f3c6a_f084923f",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointSwagger.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "use mountPoint.isEmpty() instead",
+      "range": {
+        "startLine": 148,
+        "startChar": 12,
+        "endLine": 148,
+        "endChar": 35
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f94493e1_8bfb4717",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointSwagger.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "you can return this instead of storing it to variable",
+      "range": {
+        "startLine": 152,
+        "startChar": 0,
+        "endLine": 152,
+        "endChar": 3
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "19a5b202_60700a66",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointSwagger.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "Same as before",
+      "range": {
+        "startLine": 196,
+        "startChar": 22,
+        "endLine": 196,
+        "endChar": 25
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "90ee30cc_a96fe672",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointSwagger.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "Same as before",
+      "range": {
+        "startLine": 198,
+        "startChar": 41,
+        "endLine": 198,
+        "endChar": 45
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c24895d0_8b84e2cf",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointSwagger.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as before",
+      "range": {
+        "startLine": 200,
+        "startChar": 41,
+        "endLine": 200,
+        "endChar": 43
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4b23a9bb_b326883f",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointSwagger.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "same as before",
+      "range": {
+        "startLine": 202,
+        "startChar": 23,
+        "endLine": 202,
+        "endChar": 26
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4513a266_03f3af8b",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/controller/sal/rest/doc/impl/ApiDocGeneratorTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "do not rewrite",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 2,
+        "endChar": 3
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "29aebee5_c1bccb77",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/controller/sal/rest/doc/impl/ApiDocGeneratorTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "extra empty line",
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "196f967c_7d83fca5",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/controller/sal/rest/doc/impl/MountPointSwaggerTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "Do not rewrite",
+      "range": {
+        "startLine": 2,
+        "startChar": 22,
+        "endLine": 2,
+        "endChar": 30
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "42bc40e7_aa395c53",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/controller/sal/rest/doc/impl/SwaggerObjectTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "do not rewrite",
+      "range": {
+        "startLine": 2,
+        "startChar": 0,
+        "endLine": 2,
+        "endChar": 3
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "188e0721_de13a4ea",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/controller/sal/rest/doc/impl/SwaggerObjectTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "remove empty line",
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c9b69730_5ec875ec",
+        "filename": "restconf/sal-rest-docgen/src/test/java/org/opendaylight/controller/sal/rest/doc/impl/SwaggerObjectTest.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-03-31T12:49:11Z",
+      "side": 1,
+      "message": "al empty line before",
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
