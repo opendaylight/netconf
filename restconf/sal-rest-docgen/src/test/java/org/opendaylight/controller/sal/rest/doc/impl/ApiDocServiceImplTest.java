@@ -21,6 +21,7 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
+import org.opendaylight.netconf.sal.rest.doc.impl.AllModulesDocGenerator;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGeneratorDraftO2;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocGeneratorRFC8040;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl;
@@ -36,7 +37,6 @@ public class ApiDocServiceImplTest {
             .node(QName.create("", "nodes"))
             .node(QName.create("", "node"))
             .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
-    private static final String INSTANCE_URL = "/nodes/node/123/";
     private DocGenTestHelper helper;
     private ApiDocService apiDocService;
 
@@ -55,22 +55,25 @@ public class ApiDocServiceImplTest {
 
         final DOMMountPointService service = mock(DOMMountPointService.class);
         when(service.getMountPoint(INSTANCE_ID)).thenReturn(Optional.of(mountPoint));
-        MountPointSwaggerGeneratorDraft02 swagger =
+        final MountPointSwaggerGeneratorDraft02 mountPointDraft02 =
                 new MountPointSwaggerGeneratorDraft02(schemaService, service);
-        swagger.getMountPointSwagger().onMountPointCreated(INSTANCE_ID);
-        this.apiDocService = new ApiDocServiceImpl(
-                swagger,
-                new MountPointSwaggerGeneratorRFC8040(schemaService, service),
-                new ApiDocGeneratorDraftO2(schemaService),
-                new ApiDocGeneratorRFC8040(schemaService));
+        final MountPointSwaggerGeneratorRFC8040 mountPointRFC8040 =
+                new MountPointSwaggerGeneratorRFC8040(schemaService, service);
+        final ApiDocGeneratorDraftO2 apiDocGeneratorDraftO2 = new ApiDocGeneratorDraftO2(schemaService);
+        final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040 = new ApiDocGeneratorRFC8040(schemaService);
+        mountPointDraft02.getMountPointSwagger().onMountPointCreated(INSTANCE_ID);
+        final AllModulesDocGenerator allModulesDocGenerator = new AllModulesDocGenerator(apiDocGeneratorDraftO2,
+                apiDocGeneratorRFC8040);
+        this.apiDocService = new ApiDocServiceImpl(mountPointDraft02, mountPointRFC8040, apiDocGeneratorDraftO2,
+                apiDocGeneratorRFC8040, allModulesDocGenerator);
     }
 
     @Test
     public void getListOfMounts() throws java.net.URISyntaxException, JsonProcessingException {
         final UriInfo mockInfo = this.helper.createMockUriInfo(HTTP_URL);
         // simulate the behavior of JacksonJaxbJsonProvider
-        ObjectMapper mapper = new ObjectMapper();
-        String result = mapper.writer().writeValueAsString(
+        final ObjectMapper mapper = new ObjectMapper();
+        final String result = mapper.writer().writeValueAsString(
                 apiDocService.getListOfMounts(mockInfo).getEntity());
         Assert.assertEquals("[{\"instance\":\"/nodes/node/123/\",\"id\":1}]", result);
     }
