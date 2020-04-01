@@ -31,22 +31,23 @@ public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGen
     }
 
     @Override
-    public String getDataStorePath(final String dataStore, final String context) {
-        if ("config".contains(dataStore) || "operational".contains(dataStore)) {
+    public String getResourcePath(final String resourceType, final String context) {
+        if (isData(resourceType)) {
             return "/" + basePath + "/data" + context;
         }
         return "/" + basePath + "/operations" + context;
     }
 
     @Override
-    public String getContent(final String dataStore) {
-        if ("operational".contains(dataStore)) {
-            return "?content=nonconfig";
-        } else if ("config".contains(dataStore)) {
-            return "?content=config";
-        } else {
-            return "";
+    public String getResourcePathPart(String resourceType) {
+        if (isData(resourceType)) {
+            return "data";
         }
+        return "operations";
+    }
+
+    private boolean isData(String dataStore) {
+        return "config".contains(dataStore) || "operational".contains(dataStore);
     }
 
     @Override
@@ -55,8 +56,8 @@ public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGen
             private String prefix = "=";
 
             @Override
-            public String nextParamIdentifier(String key) {
-                String str = prefix + "{" + key + "}";
+            public String nextParamIdentifier(final String key) {
+                final String str = prefix + "{" + key + "}";
                 prefix = ",";
                 return str;
             }
@@ -64,7 +65,7 @@ public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGen
     }
 
     @Override
-    protected void appendPathKeyValue(StringBuilder builder, Object value) {
+    protected void appendPathKeyValue(final StringBuilder builder, final Object value) {
         builder.deleteCharAt(builder.length() - 1).append("=").append(value).append('/');
     }
 }

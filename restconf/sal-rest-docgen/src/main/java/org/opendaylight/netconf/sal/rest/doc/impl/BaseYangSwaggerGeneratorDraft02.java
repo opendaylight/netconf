@@ -31,13 +31,13 @@ public abstract class BaseYangSwaggerGeneratorDraft02 extends BaseYangSwaggerGen
     }
 
     @Override
-    public String getDataStorePath(final String dataStore, final String context) {
-        return "/" + basePath + "/" + dataStore + context;
+    public String getResourcePath(final String resourceType, final String context) {
+        return "/" + basePath + "/" + resourceType + context;
     }
 
     @Override
-    public String getContent(final String dataStore) {
-        return "";
+    public String getResourcePathPart(final String resourceType) {
+        return resourceType;
     }
 
     @Override
@@ -46,7 +46,7 @@ public abstract class BaseYangSwaggerGeneratorDraft02 extends BaseYangSwaggerGen
     }
 
     @Override
-    protected void appendPathKeyValue(StringBuilder builder, Object value) {
+    protected void appendPathKeyValue(final StringBuilder builder, final Object value) {
         builder.append(value).append('/');
     }
 }
