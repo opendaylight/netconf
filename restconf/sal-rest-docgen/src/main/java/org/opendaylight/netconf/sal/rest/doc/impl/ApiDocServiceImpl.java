@@ -10,15 +10,14 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
-import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
 import org.opendaylight.netconf.sal.rest.doc.swagger.MountPointInstance;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
+import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
+
 
 /**
  * This service generates swagger (See
@@ -47,9 +46,10 @@ public class ApiDocServiceImpl implements ApiDocService {
     private final ApiDocGeneratorDraftO2 apiDocGeneratorDraft02;
     private final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040;
 
-    public ApiDocServiceImpl(MountPointSwaggerGeneratorDraft02 mountPointSwaggerGeneratorDraft02,
-            MountPointSwaggerGeneratorRFC8040 mountPointSwaggerGeneratorRFC8040,
-            ApiDocGeneratorDraftO2 apiDocGeneratorDraft02, ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040) {
+    public ApiDocServiceImpl(final MountPointSwaggerGeneratorDraft02 mountPointSwaggerGeneratorDraft02,
+                             final MountPointSwaggerGeneratorRFC8040 mountPointSwaggerGeneratorRFC8040,
+                             final ApiDocGeneratorDraftO2 apiDocGeneratorDraft02,
+                             final ApiDocGeneratorRFC8040 apiDocGeneratorRFC8040) {
         this.mountPointSwaggerDraft02 =
                 Objects.requireNonNull(mountPointSwaggerGeneratorDraft02).getMountPointSwagger();
         this.mountPointSwaggerRFC8040 =
@@ -80,7 +80,7 @@ public class ApiDocServiceImpl implements ApiDocService {
      */
     @Override
     public synchronized Response getDocByModule(final String module, final String revision, final UriInfo uriInfo) {
-        final ApiDeclaration doc;
+        final SwaggerObject doc;
         if (isNew(uriInfo).equals(URIType.RFC8040)) {
             doc = apiDocGeneratorRFC8040.getApiDeclaration(module, revision, uriInfo, URIType.RFC8040);
         } else {
@@ -119,12 +119,12 @@ public class ApiDocServiceImpl implements ApiDocService {
         if (uriInfo.getQueryParameters().getFirst(TOTAL_PAGES) != null) {
             if (isNew(uriInfo).equals(URIType.RFC8040)) {
                 resourceList = mountPointSwaggerRFC8040.getResourceList(uriInfo, Long.parseLong(instanceNum),
-                    URIType.RFC8040);
+                        URIType.RFC8040);
             } else {
                 resourceList = mountPointSwaggerDraft02.getResourceList(uriInfo, Long.parseLong(instanceNum),
-                    URIType.DRAFT02);
+                        URIType.DRAFT02);
             }
-            int size = resourceList.getApis().size();
+            final int size = resourceList.getApis().size();
             return Response.ok(size % DEFAULT_PAGESIZE == 0 ? size / DEFAULT_PAGESIZE
                     : size / DEFAULT_PAGESIZE + 1).build();
         }
@@ -133,24 +133,24 @@ public class ApiDocServiceImpl implements ApiDocService {
 
         if (isNew(uriInfo).equals(URIType.RFC8040)) {
             resourceList = mountPointSwaggerRFC8040.getResourceList(uriInfo, Long.parseLong(instanceNum), pageNum,
-                false, URIType.RFC8040);
+                    false, URIType.RFC8040);
         } else {
             resourceList = mountPointSwaggerDraft02.getResourceList(uriInfo, Long.parseLong(instanceNum), pageNum,
-                false, URIType.DRAFT02);
+                    false, URIType.DRAFT02);
         }
         return Response.ok(resourceList).build();
     }
 
     @Override
     public synchronized Response getMountDocByModule(final String instanceNum, final String module,
-            final String revision, final UriInfo uriInfo) {
-        final ApiDeclaration api;
+                                                     final String revision, final UriInfo uriInfo) {
+        final SwaggerObject api;
         if (isNew(uriInfo).equals(URIType.RFC8040)) {
             api = mountPointSwaggerRFC8040
-                .getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision, URIType.RFC8040);
+                    .getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision, URIType.RFC8040);
         } else {
             api = mountPointSwaggerDraft02
-                .getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision, URIType.DRAFT02);
+                    .getMountPointApi(uriInfo, Long.parseLong(instanceNum), module, revision, URIType.DRAFT02);
         }
         return Response.ok(api).build();
     }

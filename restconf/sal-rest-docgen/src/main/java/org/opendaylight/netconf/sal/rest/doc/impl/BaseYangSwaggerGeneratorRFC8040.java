@@ -39,24 +39,13 @@ public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGen
     }
 
     @Override
-    public String getContent(final String dataStore) {
-        if ("operational".contains(dataStore)) {
-            return "?content=nonconfig";
-        } else if ("config".contains(dataStore)) {
-            return "?content=config";
-        } else {
-            return "";
-        }
-    }
-
-    @Override
     protected ListPathBuilder newListPathBuilder() {
         return new ListPathBuilder() {
             private String prefix = "=";
 
             @Override
-            public String nextParamIdentifier(String key) {
-                String str = prefix + "{" + key + "}";
+            public String nextParamIdentifier(final String key) {
+                final String str = prefix + "{" + key + "}";
                 prefix = ",";
                 return str;
             }
@@ -64,7 +53,7 @@ public abstract class BaseYangSwaggerGeneratorRFC8040 extends BaseYangSwaggerGen
     }
 
     @Override
-    protected void appendPathKeyValue(StringBuilder builder, Object value) {
+    protected void appendPathKeyValue(final StringBuilder builder, final Object value) {
         builder.deleteCharAt(builder.length() - 1).append("=").append(value).append('/');
     }
 }

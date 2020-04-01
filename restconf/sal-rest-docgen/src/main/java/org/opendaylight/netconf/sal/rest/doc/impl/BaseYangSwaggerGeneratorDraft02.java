@@ -36,17 +36,12 @@ public abstract class BaseYangSwaggerGeneratorDraft02 extends BaseYangSwaggerGen
     }
 
     @Override
-    public String getContent(final String dataStore) {
-        return "";
-    }
-
-    @Override
     protected ListPathBuilder newListPathBuilder() {
         return key -> "/{" + key + "}";
     }
 
     @Override
-    protected void appendPathKeyValue(StringBuilder builder, Object value) {
+    protected void appendPathKeyValue(final StringBuilder builder, final Object value) {
         builder.append(value).append('/');
     }
 }
