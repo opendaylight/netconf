@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Brocade Communications Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2020 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
@@ -9,35 +9,47 @@ package org.opendaylight.netconf.sal.rest.doc.mountpoints;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
+import static org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator.BASE_PATH;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.DESCRIPTION_KEY;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.RESPONSES_KEY;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.SUMMARY_KEY;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.SUMMARY_SEPARATOR;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.TAGS_KEY;
+import static org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.buildTagsValue;
+import static org.opendaylight.netconf.sal.rest.doc.util.JsonUtil.addFields;
 
-import java.util.Collections;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.mdsal.dom.api.DOMMountPointListener;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGenerator;
-import org.opendaylight.netconf.sal.rest.doc.swagger.Api;
-import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
-import org.opendaylight.netconf.sal.rest.doc.swagger.Operation;
-import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
-import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
+import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
+import org.opendaylight.netconf.sal.rest.doc.swagger.CommonApiObject;
+import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MountPointSwagger.class);
 
     private static final String DATASTORES_REVISION = "-";
     private static final String DATASTORES_LABEL = "Datastores";
@@ -56,7 +68,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     private ListenerRegistration<DOMMountPointListener> registration;
 
     public MountPointSwagger(final DOMSchemaService globalSchema, final DOMMountPointService mountService,
-            final BaseYangSwaggerGenerator swaggerGenerator) {
+                             final BaseYangSwaggerGenerator swaggerGenerator) {
         this.globalSchema = requireNonNull(globalSchema);
         this.mountService = requireNonNull(mountService);
         this.swaggerGenerator = requireNonNull(swaggerGenerator);
@@ -101,33 +113,6 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
         return swaggerGenerator.generateUrlPrefixFromInstanceID(key, modName) + "yang-ext:mount";
     }
 
-    public ResourceList getResourceList(final UriInfo uriInfo, final Long id, final URIType uriType) {
-        return getResourceList(uriInfo, id, 0, true, uriType);
-    }
-
-    public ResourceList getResourceList(final UriInfo uriInfo, final Long id, final int pageNum, boolean all,
-        final URIType uriType) {
-        final YangInstanceIdentifier iid = getInstanceId(id);
-        if (iid == null) {
-            return null; // indicating not found.
-        }
-        final SchemaContext context = getSchemaContext(iid);
-        if (context == null) {
-            return swaggerGenerator.createResourceList();
-        }
-        final List<Resource> resources = new LinkedList<>();
-        final Resource dataStores = new Resource();
-        dataStores.setDescription("Provides methods for accessing the data stores.");
-        dataStores.setPath(swaggerGenerator.generatePath(uriInfo, DATASTORES_LABEL, DATASTORES_REVISION));
-        resources.add(dataStores);
-        final String urlPrefix = getYangMountUrl(iid);
-        final ResourceList list = swaggerGenerator
-            .getResourceListing(uriInfo, context, urlPrefix, pageNum, all, uriType);
-        resources.addAll(list.getApis());
-        list.setApis(resources);
-        return list;
-    }
-
     private YangInstanceIdentifier getInstanceId(final Long id) {
         final YangInstanceIdentifier instanceId;
         synchronized (this.lock) {
@@ -143,64 +128,103 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
 
         checkState(mountService != null);
         final Optional<DOMMountPoint> mountPoint = this.mountService.getMountPoint(id);
-        if (!mountPoint.isPresent()) {
+        if (mountPoint.isEmpty()) {
             return null;
         }
 
         final SchemaContext context = mountPoint.get().getSchemaContext();
-        if (context == null) {
-            return null;
-        }
         return context;
     }
 
-    public ApiDeclaration getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
-        final String revision, final URIType uriType) {
+    public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final String module,
+                                            final String revision, final URIType uriType, final OAversion oaversion) {
         final YangInstanceIdentifier iid = getInstanceId(id);
         final SchemaContext context = getSchemaContext(iid);
         final String urlPrefix = getYangMountUrl(iid);
+        final String deviceName  = extractDeviceName(iid);
+
         if (context == null) {
             return null;
         }
 
         if (DATASTORES_LABEL.equals(module) && DATASTORES_REVISION.equals(revision)) {
-            return generateDataStoreApiDoc(uriInfo, urlPrefix);
+            return generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
         }
-        return swaggerGenerator.getApiDeclaration(module, revision, uriInfo, context, urlPrefix, uriType);
+        final SwaggerObject swaggerObject = swaggerGenerator.getApiDeclaration(module, revision, uriInfo, context,
+                urlPrefix, uriType, oaversion);
+        return BaseYangSwaggerGenerator.getAppropriateDoc(swaggerObject, oaversion);
     }
 
-    private ApiDeclaration generateDataStoreApiDoc(final UriInfo uriInfo, final String context) {
-        final List<Api> apis = new LinkedList<>();
-        apis.add(createGetApi("config", "Queries the config (startup) datastore on the mounted hosted.", context));
-        apis.add(createGetApi("operational", "Queries the operational (running) datastore on the mounted hosted.",
-                context));
-        apis.add(createGetApi("operations", "Queries the available operations (RPC calls) on the mounted hosted.",
-                context));
+    public CommonApiObject getMountPointApi(final UriInfo uriInfo, final Long id, final URIType uriType,
+                                            final OAversion oaversion) {
+        final YangInstanceIdentifier iid = getInstanceId(id);
+        final SchemaContext context = getSchemaContext(iid);
+        final String urlPrefix = getYangMountUrl(iid);
+        final String deviceName  = extractDeviceName(iid);
 
-        final ApiDeclaration declaration = swaggerGenerator.createApiDeclaration(
-                swaggerGenerator.createBasePathFromUriInfo(uriInfo));
-        declaration.setApis(apis);
+        if (context == null) {
+            return null;
+        }
+        final DefinitionNames definitionNames = new DefinitionNames();
+        final SwaggerObject swaggerObject = swaggerGenerator.getAllModulesDoc(uriInfo, context, Optional.of(deviceName),
+                urlPrefix, definitionNames, uriType, oaversion);
+
+        final SwaggerObject doc = generateDataStoreApiDoc(uriInfo, urlPrefix, deviceName);
+        addFields(doc.getPaths() ,swaggerObject.getPaths().fields());
+        addFields(doc.getDefinitions() ,swaggerObject.getDefinitions().fields());
+        doc.getInfo().setTitle(swaggerObject.getInfo().getTitle());
+
+        return BaseYangSwaggerGenerator.getAppropriateDoc(doc, oaversion);
+    }
+
+    private static String extractDeviceName(final YangInstanceIdentifier iid) {
+        return ((YangInstanceIdentifier.NodeIdentifierWithPredicates.Singleton)iid.getLastPathArgument())
+                .values().getElement().toString();
+    }
+
+    private SwaggerObject generateDataStoreApiDoc(final UriInfo uriInfo, final String context,
+                                                  final String deviceName) {
+        final SwaggerObject declaration = swaggerGenerator.createSwaggerObject(
+                swaggerGenerator.createSchemaFromUriInfo(uriInfo),
+                swaggerGenerator.createHostFromUriInfo(uriInfo),
+                BASE_PATH,
+                context);
+
+        final ObjectNode pathsObject = JsonNodeFactory.instance.objectNode();
+        createGetPathItem("config", "Queries the config (startup) datastore on the mounted hosted.",
+                context, deviceName, pathsObject);
+        createGetPathItem("operational", "Queries the operational (running) datastore on the mounted hosted.",
+                context, deviceName, pathsObject);
+        createGetPathItem("operations", "Queries the available operations (RPC calls) on the mounted hosted.",
+                context, deviceName, pathsObject);
+
+        declaration.setPaths(pathsObject);
+        declaration.setDefinitions(JsonNodeFactory.instance.objectNode());
+
         return declaration;
-
     }
 
-    private Api createGetApi(final String datastore, final String note, final String context) {
-        final Operation getConfig = new Operation();
-        getConfig.setMethod("GET");
-        getConfig.setNickname("GET " + datastore);
-        getConfig.setNotes(note);
-
-        final Api api = new Api();
-        api.setPath(swaggerGenerator.getDataStorePath(datastore, context).concat(
-                swaggerGenerator.getContent(datastore)));
-        api.setOperations(Collections.singletonList(getConfig));
-
-        return api;
+    private void createGetPathItem(final String resourceType, final String description, final String context,
+                                   final String deviceName, final ObjectNode pathsObject) {
+        final ObjectNode pathItem = JsonNodeFactory.instance.objectNode();
+        final ObjectNode operationObject = JsonNodeFactory.instance.objectNode();
+        pathItem.set("get", operationObject);
+        operationObject.put(DESCRIPTION_KEY, description);
+        operationObject.put(SUMMARY_KEY, HttpMethod.GET + SUMMARY_SEPARATOR + deviceName + SUMMARY_SEPARATOR
+                + swaggerGenerator.getResourcePathPart(resourceType));
+        operationObject.set(TAGS_KEY, buildTagsValue(Optional.of(deviceName), "GET root"));
+        final ObjectNode okResponse = JsonNodeFactory.instance.objectNode();
+        okResponse.put(DESCRIPTION_KEY, Response.Status.OK.getReasonPhrase());
+        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
+        responses.set(String.valueOf(Response.Status.OK.getStatusCode()), okResponse);
+        operationObject.set(RESPONSES_KEY, responses);
+        pathsObject.set(swaggerGenerator.getResourcePath(resourceType, context), pathItem);
     }
 
     @Override
     public void onMountPointCreated(final YangInstanceIdentifier path) {
         synchronized (this.lock) {
+            LOG.debug("Mount point {} created", path);
             final Long idLong = this.idKey.incrementAndGet();
             this.instanceIdToLongId.put(path, idLong);
             this.longIdToInstanceId.put(idLong, path);
@@ -210,6 +234,7 @@ public class MountPointSwagger implements DOMMountPointListener, AutoCloseable {
     @Override
     public void onMountPointRemoved(final YangInstanceIdentifier path) {
         synchronized (this.lock) {
+            LOG.debug("Mount point {} removed", path);
             final Long id = this.instanceIdToLongId.remove(path);
             this.longIdToInstanceId.remove(id);
         }
