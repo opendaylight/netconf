@@ -30,11 +30,12 @@ public class WebInitializer {
             Application webApp) throws ServletException {
         WebContextBuilder webContextBuilder = WebContext.builder().contextPath("apidoc").supportsSessions(true)
             .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
-                    .addUrlPattern("/apis/*").addUrlPattern("/18/apis/*").build())
+                    .addUrlPattern("/swagger2/apis/*").addUrlPattern("/swagger2/18/apis/*")
+                    .addUrlPattern("/openapi3/apis/*").addUrlPattern("/openapi3/18/apis/*").build())
             .addResource(ResourceDetails.builder().name("/explorer").build())
             .addResource(ResourceDetails.builder().name("/18/explorer").build());
 
-        webContextSecurer.requireAuthentication(webContextBuilder, "/apis/*", "/18/apis/*");
+        webContextSecurer.requireAuthentication(webContextBuilder, "/swagger2/*", "/openapi3/*");
 
         registration = webServer.registerWebContext(webContextBuilder.build());
     }
