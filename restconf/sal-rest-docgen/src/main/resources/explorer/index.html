@@ -1,125 +1,124 @@
+<!-- HTML for static distribution bundle build -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>RestConf Documentation</title>
-<link href='//fonts.googleapis.com/css?family=Droid+Sans:400,700'
-	rel='stylesheet' type='text/css' />
-<link href='css/highlight.default.css' media='screen' rel='stylesheet'
-	type='text/css' />
-<link href='css/screen.css' media='screen' rel='stylesheet'
-	type='text/css' />
-<link rel="stylesheet" type="text/css" href="static/opendaylight.css">
-<link rel="stylesheet" type="text/css"
-	href="css/ui-lightness/jquery-ui-1.10.4.custom.min.css">
-<link rel="stylesheet" type="text/css" href="css/simplePagination.css">
+  <meta charset="UTF-8">
+  <title>Swagger UI</title>
+  <link rel="stylesheet" type="text/css" href="./css/swagger-ui.css" >
+  <link rel="icon" type="image/png" href="./images/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="./images/favicon-16x16.png" sizes="16x16" />
+  <style>
+      html
+      {
+        box-sizing: border-box;
+        overflow: -moz-scrollbars-vertical;
+        overflow-y: scroll;
+      }
 
-<script type="text/javascript" src="lib/shred.bundle.js"></script>
-<script src='lib/jquery-1.8.0.min.js' type='text/javascript'></script>
-<script src='lib/jquery-ui-1.11.0.min.js' type="text/javascript"></script>
-<script src='lib/jquery.slideto.min.js' type='text/javascript'></script>
-<script src='lib/jquery.wiggle.min.js' type='text/javascript'></script>
-<script src='lib/jquery.ba-bbq.min.js' type='text/javascript'></script>
-<script src='lib/handlebars-1.0.0.js' type='text/javascript'></script>
-<script src='lib/underscore-min.js' type='text/javascript'></script>
-<script src='lib/backbone-min.js' type='text/javascript'></script>
-<script src='lib/swagger.js' type='text/javascript'></script>
-<script src='swagger-ui.js' type='text/javascript'></script>
-<script src='lib/odl/list_mounts.js' type='text/javascript'></script>
-<script src='lib/highlight.7.3.pack.js' type='text/javascript'></script>
-<script src='lib/odl/swagger.js' type='text/javascript'></script>
-<script src='lib/odl/page.js' type='text/javascript'></script>
-<script src='lib/jquery.simplePagination.js' type='text/javascript'></script>
+      *,
+      *:before,
+      *:after
+      {
+        box-sizing: inherit;
+      }
 
-<script type="text/javascript">
-	
-	//reloads the swagger UI documentation for the specified mount.
-	var loadMount = function(mountIndex, pageNum, mountPath) {
-		$("#message").empty();
-		$("#message").append( "<p>Loading...</p>" );
-		loadSwagger("/apidoc/apis/mounts/" + mountIndex + "?pageNum=" + pageNum,
-				"swagger-ui-container", mountIndex, mountPath);
-		loadPagination("/apidoc/apis/mounts/", mountIndex, mountPath, "swagger-ui-container");
-		$("#message").empty();
-		$("#message").append( "<h2><b>Showing mount points for " + mountPath + "</b></h2>");
-	}
+      body
+      {
+        margin:0;
+        background: #fafafa;
+      }
 
-	//clears the swagger UI and adds text prompting use to select a mount point.
-    var selectAMount = function(string) {
-        $("#swagger-ui-container").empty();
-        $("#message").empty();
-        $("#message").append("<p>Select a mount point.</p>");
-    }
-    
-	//loads the root swagger documenation (which comes from RestConf)
-	var loadRootSwagger = function() {
-		$("#message").empty();
-		loadSwagger("/apidoc/apis", "swagger-ui-container");
-	}
-
-	//main method to initialize the mount list / swagger docs / tabs on page load
-	$(function() {
-		$("#tabs").tabs();
-
-		loadMountList($("#mountlist"));
-
-		loadRootSwagger();
-	});
-
-</script>
+      topbar-wrapper img {
+        content:url('images/logo_small.png');
+      }
+    </style>
 </head>
 
 <body>
-	<div>
-		<!-- style="background-color: #FCA000;" -->
-		<div class="swagger-ui-wrap ui-tabs">
-			<table>
-				<tr>
-					<td><img src="images/logo_small.png" /></td>
-					<td><h1 width="100%">OpenDaylight RestConf API
-							Documentation</h1></td>
-				</tr>
-			</table>
-		</div>
-	</div>
+<div id="swagger-ui"></div>
 
-	<div class="navbar-inner">
-		<div class="brand"></div>
-	</div>
+<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+<script src="./js/swagger-ui-bundle.js"> </script>
+<script>
+    window.onload = function() {
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.open("GET", "http://localhost:8181/apidoc/openapi3/18/apis/mounts", false);
+      xmlHttp.send( null );
+      var swagger_urls = [{url: "http://localhost:8181/apidoc/openapi3/18/apis/single", name: "OpenAPI3.0 RFC 8040 controller"},
+                          {url: "http://localhost:8181/apidoc/openapi3/apis/single", name: "OpenAPI3.0 draft02 controller"}];
+      var base_url_rfc = document.URL.split('/apidoc')[0] + '/apidoc/openapi3/18/apis/mounts/';
+      var base_url_draft = document.URL.split('/apidoc')[0] + '/apidoc/openapi3/apis/mounts/';
+      var devices = JSON.parse(xmlHttp.responseText);
+      for (var i =0; i < devices.length; i++) {
+        var device_name = devices[i]['instance'].split('node=')[1].replace('/', '');
+        var dveice_id = devices[i]['id'];
+        var dict = {
+          url: base_url_rfc + dveice_id,
+          name: "OpenAPI3.0 RFC " + device_name,
+        };
+        swagger_urls.push(dict);
+        var dict = {
+          uri: base_url_draft + dveice_id,
+          name: "OpenAPI3.0 draft02 " + device_name,
+        };
+        swagger_urls.push(dict);
+      }
 
-    <!--  defines the div shells which represent the jquery tabs -->
-	<div id="tabs" class="swagger-ui-wrap">
-		<ul>
-			<li><a href="#Controller" onclick="loadRootSwagger()">Controller
-					Resources</a></li>
-			<li><a href="#Mounts" onclick="selectAMount()">Mounted
-					Resources</a></li>
-		</ul>
+      // Begin Swagger UI call region
+      const ui = SwaggerUIBundle({
+        urls: swagger_urls,
+        dom_id: '#swagger-ui',
+        docExpansion: 'none',
+        deepLinking: true,
+        onComplete: function(swaggerApi, swaggerUi){
+	      var wrappers = document.getElementsByClassName('wrapper');
+	      for(var i = 0; i < wrappers.length; i++) {
+            if (wrappers[i].innerText === "Schemas") {
+              wrappers[i].remove();
+              break;
+            }
+          }
+          var topbar = document.getElementsByClassName('topbar-wrapper');
+          var node2 = document.createElement("H2");
+          var node = document.createElement("IMG");
+          node.height = 40;
+          node.src = 'images/logo_small.png';
+          node2.innerText = "OpenDaylight RestConf API Documentation";
+          node2.prepend(node);
+          topbar[0].children[0].remove();
+          topbar[0].prepend(node2);
+          node.style = "padding-right: 18px;";
+          topbar[0].children[0].style="color:white; display: contents;";
 
-		<div id="Controller">
-			<div>
-				<h3>Below are the list of APIs supported by the Controller.</h3>
-			</div>
-		</div>
-		<div id="Mounts">
-			<div>
-				<h3>Mount Points - Select an API below for details on available
-					queries.</h3>
-			</div>
-			<div id="mountlist"></div>
-		</div>
-	</div>
-	
-	<div class="swagger-ui-wrap"><hr/></div>
-	
-	<!-- messages -->
-	<div id="message" class="swagger-ui-wrap"></div>
-	
-	<!-- the swagger is always loaded in this div -->
-	<div id="swagger-ui-container" class="swagger-ui-wrap"></div>
-	<div class="pagination-holder clearfix">
-		<div id="light-pagination" class="pagination light-theme simple-pagination"></div>
-	</div>
-	<div id="message-bar" class="swagger-ui-wrap">&nbsp;</div>
+          var modules = document.getElementsByClassName('opblock-tag-section')
+          for(var i = 0; i < modules.length; i++) {
+            var innerText = modules[i].getElementsByTagName('a')[0].innerText;
+            var arrayInnerText = innerText.split(' ')
+            if (arrayInnerText.length > 0) {
+              modules[i].getElementsByTagName('a')[0].innerText = arrayInnerText[arrayInnerText.length - 1];
+            }
+          }
+        },
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout"
+      })
+      // End Swagger UI call region
+
+      window.ui = ui
+
+    }
+
+  </script>
+<script src="./js/swagger-ui-standalone-preset.js"> </script>
 </body>
-
 </html>
+
+
+
+
