@@ -17,7 +17,8 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
  */
 public abstract class BaseYangSwaggerGeneratorDraft02 extends BaseYangSwaggerGenerator {
 
-    protected static final String DEFAULT_BASE_PATH = "restconf";
+    private static final String PATH_VERSION = "draft02";
+    private static final String DEFAULT_BASE_PATH = "restconf";
     private final String basePath;
 
     protected BaseYangSwaggerGeneratorDraft02(final Optional<DOMSchemaService> schemaService) {
@@ -31,13 +32,18 @@ public abstract class BaseYangSwaggerGeneratorDraft02 extends BaseYangSwaggerGen
     }
 
     @Override
-    public String getDataStorePath(final String dataStore, final String context) {
-        return "/" + basePath + "/" + dataStore + context;
+    protected String getPathVersion() {
+        return PATH_VERSION;
     }
 
     @Override
-    public String getContent(final String dataStore) {
-        return "";
+    public String getResourcePath(final String resourceType, final String context) {
+        return "/" + basePath + "/" + resourceType + context;
+    }
+
+    @Override
+    public String getResourcePathPart(final String resourceType) {
+        return resourceType;
     }
 
     @Override
@@ -46,7 +52,7 @@ public abstract class BaseYangSwaggerGeneratorDraft02 extends BaseYangSwaggerGen
     }
 
     @Override
-    protected void appendPathKeyValue(StringBuilder builder, Object value) {
+    protected void appendPathKeyValue(final StringBuilder builder, final Object value) {
         builder.append(value).append('/');
     }
 }
