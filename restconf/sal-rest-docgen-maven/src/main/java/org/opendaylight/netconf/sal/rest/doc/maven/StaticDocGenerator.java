@@ -23,11 +23,12 @@ import java.util.Set;
 import java.util.function.Function;
 import javax.ws.rs.core.UriInfo;
 import org.apache.maven.project.MavenProject;
+import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl;
 import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
 import org.opendaylight.netconf.sal.rest.doc.impl.BaseYangSwaggerGeneratorDraft02;
-import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
+import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang2sources.spi.BasicCodeGenerator;
@@ -54,7 +55,7 @@ public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
     public Collection<File> generateSources(final EffectiveModelContext context, final File outputBaseDir,
             final Set<Module> currentModules, final Function<Module, Optional<String>> moduleResourcePathResolver)
                     throws IOException {
-        List<File> result = new ArrayList<>();
+        final List<File> result = new ArrayList<>();
 
         // Create Base Directory
         final File outputDir;
@@ -69,44 +70,47 @@ public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
         }
 
         // Create Resources directory
-        File resourcesDir = new File(outputDir, "resources");
+        final File resourcesDir = new File(outputDir, "resources");
         if (!resourcesDir.mkdirs()) {
             throw new IOException("Could not create directory " + resourcesDir);
         }
 
         // Create JS file
-        File resourcesJsFile = new File(outputDir, "resources.js");
+        final File resourcesJsFile = new File(outputDir, "resources.js");
         if (!resourcesJsFile.createNewFile()) {
             LOG.info("File {} already exists.", resourcesJsFile);
         }
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(resourcesJsFile))) {
-            ObjectMapper mapper = new ObjectMapper();
+            final ObjectMapper mapper = new ObjectMapper();
             mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
             // Write resource listing to JS file
-            ResourceList resourceList = super.getResourceListing(null, context, "", URIType.DRAFT02);
+            final ResourceList resourceList = super.getResourceListing(null, context, "", URIType.DRAFT02,
+                    ApiDocServiceImpl.OAversion.V2_0);
             String resourceListJson = mapper.writeValueAsString(resourceList);
             resourceListJson = resourceListJson.replace("\'", "\\\'").replace("\\n", "\\\\n");
             bufferedWriter.write("function getSpec() {\n\treturn \'" + resourceListJson + "\';\n}\n\n");
 
             // Write resources/APIs to JS file and to disk
             bufferedWriter.write("function jsonFor(resource) {\n\tswitch(resource) {\n");
-            for (Resource resource : resourceList.getApis()) {
-                int revisionIndex = resource.getPath().indexOf('(');
-                String name = resource.getPath().substring(0, revisionIndex);
-                String revision = resource.getPath().substring(revisionIndex + 1, resource.getPath().length() - 1);
-                ApiDeclaration apiDeclaration = super.getApiDeclaration(name, revision, null, context, "",
-                    URIType.DRAFT02);
-                String json = mapper.writeValueAsString(apiDeclaration);
+            for (final Resource resource : resourceList.getApis()) {
+                final int revisionIndex = resource.getPath().indexOf('(');
+                final String name = resource.getPath().substring(0, revisionIndex);
+                final String revision =
+                        resource.getPath().substring(revisionIndex + 1, resource.getPath().length() - 1);
+                final SwaggerObject swaggerObject = super.getApiDeclaration(name, revision, null, context, "",
+                    URIType.DRAFT02, ApiDocServiceImpl.OAversion.V2_0);
+                String json = mapper.writeValueAsString(swaggerObject);
                 // Manually insert models because org.json.JSONObject cannot be serialized by ObjectMapper
                 json = json.replace(
-                        "\"models\":{}", "\"models\":" + apiDeclaration.getModels().toString().replace("\\\"", "\""));
+                        "\"models\":{}", "\"models\":"
+                                + swaggerObject.getDefinitions().toString().replace("\\\"", "\""));
                 // Escape single quotes and new lines
                 json = json.replace("\'", "\\\'").replace("\\n", "\\\\n");
                 bufferedWriter.write("\t\tcase \"" + name + "(" + revision + ")\": return \'" + json + "\';\n");
 
-                File resourceFile = new File(resourcesDir, name + "(" + revision + ").json");
+                final File resourceFile = new File(resourcesDir, name + "(" + revision + ").json");
 
                 try (BufferedWriter resourceFileWriter = new BufferedWriter(new FileWriter(resourceFile))) {
                     resourceFileWriter.write(json);
@@ -127,14 +131,6 @@ public class StaticDocGenerator extends BaseYangSwaggerGeneratorDraft02
             return name + "(" + revision + ")";
         }
         return super.generatePath(uriInfo, name, revision);
-    }
-
-    @Override
-    public String createBasePathFromUriInfo(final UriInfo uriInfo) {
-        if (uriInfo == null) {
-            return DEFAULT_BASE_PATH;
-        }
-        return super.createBasePathFromUriInfo(uriInfo);
     }
 
     @Override

@@ -24,14 +24,10 @@ import javax.ws.rs.core.Response;
 @Path("/")
 public interface ApiDocService {
 
-    /**
-     * Generates index document for Swagger UI. This document lists out all
-     * modules with link to get APIs for each module. The API for each module is
-     * served by <code> getDocByModule()</code> method.
-     */
     @GET
+    @Path("/single")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getRootDoc(@Context javax.ws.rs.core.UriInfo uriInfo);
+    Response getAllModulesDoc(@Context javax.ws.rs.core.UriInfo uriInfo);
 
     /**
      * Generates Swagger compliant document listing APIs for module.
@@ -40,7 +36,7 @@ public interface ApiDocService {
     @Path("/{module}({revision})")
     @Produces(MediaType.APPLICATION_JSON)
     Response getDocByModule(@PathParam("module") String module,
-            @PathParam("revision") String revision, @Context javax.ws.rs.core.UriInfo uriInfo);
+                            @PathParam("revision") String revision, @Context javax.ws.rs.core.UriInfo uriInfo);
 
     /**
      * Redirects to embedded swagger ui.
@@ -60,12 +56,6 @@ public interface ApiDocService {
     @Produces(MediaType.APPLICATION_JSON)
     Response getListOfMounts(@Context javax.ws.rs.core.UriInfo uriInfo);
 
-    @GET
-    @Path("/mounts/{instance}")
-    @Produces(MediaType.APPLICATION_JSON)
-    Response getMountRootDoc(@PathParam("instance") String instanceNum,
-            @Context javax.ws.rs.core.UriInfo uriInfo);
-
     /**
      * Generates Swagger compliant document listing APIs for module.
      */
@@ -73,7 +63,7 @@ public interface ApiDocService {
     @Path("/mounts/{instance}/{module}({revision})")
     @Produces(MediaType.APPLICATION_JSON)
     Response getMountDocByModule(@PathParam("instance") String instanceNum,
-            @PathParam("module") String module, @PathParam("revision") String revision,
-            @Context javax.ws.rs.core.UriInfo uriInfo);
+                                 @PathParam("module") String module, @PathParam("revision") String revision,
+                                 @Context javax.ws.rs.core.UriInfo uriInfo);
 
 }
