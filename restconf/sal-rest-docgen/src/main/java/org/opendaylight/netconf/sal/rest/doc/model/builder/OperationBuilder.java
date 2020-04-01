@@ -1,148 +1,311 @@
 /*
- * Copyright (c) 2014 Cisco Systems, Inc. and others.  All rights reserved.
+ * Copyright (c) 2020 PANTHEON.tech, s.r.o. and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
+
 package org.opendaylight.netconf.sal.rest.doc.model.builder;
 
+import static org.opendaylight.netconf.sal.rest.doc.impl.DefinitionGenerator.INPUT_SUFFIX;
+import static org.opendaylight.netconf.sal.rest.doc.impl.DefinitionGenerator.OUTPUT_SUFFIX;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
 import java.util.List;
-import org.opendaylight.netconf.sal.rest.doc.swagger.Operation;
-import org.opendaylight.netconf.sal.rest.doc.swagger.Parameter;
+import java.util.Optional;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl;
+import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.OAversion;
+import org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl.URIType;
+import org.opendaylight.netconf.sal.rest.doc.impl.DefinitionNames;
+import org.opendaylight.netconf.sal.rest.doc.util.JsonUtil;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.OperationDefinition;
 
 public final class OperationBuilder {
+    public static final String BODY = "body";
+    public static final String CONFIG = "_config";
+    public static final String CONFIG_QUERY_PARAM = "config";
+    public static final String CONSUMES_KEY = "consumes";
+    public static final String CONTENT_KEY = "content";
+    public static final String COMPONENTS_PREFIX = "#/components/schemas/";
+    public static final String DEFINITIONS_PREFIX = "#/definitions/";
+    public static final String DESCRIPTION_KEY = "description";
+    public static final String IN_KEY = "in";
+    public static final String INPUT_KEY = "input";
+    public static final String NAME_KEY = "name";
+    public static final String NONCONFIG_QUERY_PARAM = "nonconfig";
+    public static final String PARAMETERS_KEY = "parameters";
+    public static final String POST_SUFFIX = "_post";
+    public static final String PROPERTIES_KEY = "properties";
+    public static final String REF_KEY = "$ref";
+    public static final String REQUEST_BODY_KEY = "requestBody";
+    public static final String RESPONSES_KEY = "responses";
+    public static final String SCHEMA_KEY = "schema";
+    public static final String SUMMARY_KEY = "summary";
+    public static final String SUMMARY_SEPARATOR = " - ";
+    public static final String TAGS_KEY = "tags";
+    public static final String TOP = "_TOP";
+    private static final String CONTENT = "content";
+    private static final ArrayNode CONSUMES_PUT_POST;
+    private static final String ENUM_KEY = "enum";
+    private static final List<String> MIME_TYPES = ImmutableList.of(MediaType.APPLICATION_XML,
+            MediaType.APPLICATION_JSON);
+    private static final String OBJECT = "object";
+    private static final String REQUIRED_KEY = "required";
+    private static final String STRING = "string";
+    private static final String TYPE_KEY = "type";
+    private static final String QUERY = "query";
 
-    public static final String OPERATIONAL = "(operational)";
-    public static final String CONFIG = "(config)";
-    public static final String TOP = "-TOP";
-
-    public static final List<String> CONSUMES_PUT_POST = ImmutableList.of("application/json", "application/xml");
+    static {
+        CONSUMES_PUT_POST = JsonNodeFactory.instance.arrayNode();
+        for (final String mimeType : MIME_TYPES) {
+            CONSUMES_PUT_POST.add(mimeType);
+        }
+    }
 
     private OperationBuilder() {
 
     }
 
-    public static class Get {
+    public static ObjectNode buildPost(final String nodeName, final String moduleName,
+                                       final Optional<String> deviceName, final String description,
+                                       final String defName, final ArrayNode pathParams, final OAversion oaversion) {
+        final ObjectNode value = JsonNodeFactory.instance.objectNode();
+        value.put(DESCRIPTION_KEY, description);
+        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.POST, moduleName, deviceName, nodeName));
+        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        final ArrayNode parameters = JsonUtil.copy(pathParams);
+        final ObjectNode ref = JsonNodeFactory.instance.objectNode();
+        ref.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
+        insertRequestBodyParameter(parameters, value, ref, nodeName + CONFIG, oaversion);
+        value.set(PARAMETERS_KEY, parameters);
 
-        protected Operation spec;
-        protected DataSchemaNode schemaNode;
-        private static final String METHOD_NAME = "GET";
+        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
+        responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
+                buildResponse(Response.Status.CREATED.getReasonPhrase(), Optional.empty(), oaversion));
 
-        public Get(final DataSchemaNode node, final boolean isConfig) {
-            this.schemaNode = node;
-            spec = new Operation();
-            spec.setMethod(METHOD_NAME);
-            spec.setNickname(METHOD_NAME + "-" + node.getQName().getLocalName());
-            spec.setType((isConfig ? CONFIG : OPERATIONAL) + node.getQName().getLocalName());
-            spec.setNotes(node.getDescription().orElse(null));
-        }
-
-        public Get pathParams(final List<Parameter> params) {
-            final List<Parameter> pathParameters = new ArrayList<>(params);
-            spec.setParameters(pathParameters);
-            return this;
-        }
-
-        public Operation build() {
-            return spec;
-        }
+        value.set(RESPONSES_KEY, responses);
+        setConsumesIfNeeded(value, oaversion);
+        return value;
     }
 
-    public static class Put {
-        protected Operation spec;
-        protected String nodeName;
-        protected String parentName;
-        private static final String METHOD_NAME = "PUT";
+    public static ObjectNode buildGet(final DataSchemaNode node, final String moduleName,
+                                      final Optional<String> deviceName, final ArrayNode pathParams,
+                                      final String defName, final boolean isConfig,
+                                      final URIType uriType, final OAversion oaversion) {
+        final ObjectNode value = JsonNodeFactory.instance.objectNode();
+        value.put(DESCRIPTION_KEY, node.getDescription().orElse(""));
+        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.GET, moduleName, deviceName,
+                node.getQName().getLocalName()));
+        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        final ArrayNode parameters = JsonUtil.copy(pathParams);
 
-        public Put(final String nodeName, final String description, final String parentName) {
-            this.nodeName = nodeName;
-            this.parentName = parentName;
-            spec = new Operation();
-            spec.setType(parentName + CONFIG + nodeName + TOP);
-            spec.setNotes(description);
-            spec.setConsumes(CONSUMES_PUT_POST);
-        }
+        addQueryParameters(parameters, isConfig, uriType, oaversion);
 
-        public Put pathParams(final List<Parameter> params) {
-            final List<Parameter> parameters = new ArrayList<>(params);
-            final Parameter payload = new Parameter();
-            payload.setParamType("body");
-            payload.setType(parentName + CONFIG + nodeName + TOP);
-            payload.setName(CONFIG + nodeName);
-            parameters.add(payload);
-            spec.setParameters(parameters);
-            return this;
-        }
+        value.set(PARAMETERS_KEY, parameters);
 
-        public Operation build() {
-            spec.setMethod(METHOD_NAME);
-            spec.setNickname(METHOD_NAME + "-" + nodeName);
-            return spec;
-        }
+        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
+        final ObjectNode schema = JsonNodeFactory.instance.objectNode();
+        schema.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
+        responses.set(String.valueOf(Response.Status.OK.getStatusCode()),
+                buildResponse(Response.Status.OK.getReasonPhrase(), Optional.of(schema), oaversion));
+
+        value.set(RESPONSES_KEY, responses);
+        return value;
     }
 
-    public static final class Post extends Put {
-
-        public static final String METHOD_NAME = "POST";
-        private final DataNodeContainer dataNodeContainer;
-
-        public Post(final String nodeName, final String parentName, final String description,
-                    final DataNodeContainer dataNodeContainer) {
-            super(nodeName, description, parentName.replace("_module", ""));
-            this.dataNodeContainer = dataNodeContainer;
-            spec.setType(CONFIG + nodeName + METHOD_NAME);
-            spec.setConsumes(CONSUMES_PUT_POST);
-        }
-
-        @Override
-        public Operation build() {
-            spec.setMethod(METHOD_NAME);
-            spec.setNickname(METHOD_NAME + "-" + nodeName);
-            return spec;
-        }
-
-        @Override
-        public Put pathParams(final List<Parameter> params) {
-            final List<Parameter> parameters = new ArrayList<>(params);
-            for (final DataSchemaNode node : dataNodeContainer.getChildNodes()) {
-                if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
-                    final Parameter payload = new Parameter();
-                    payload.setParamType("body");
-                    payload.setType(parentName + CONFIG + node.getQName().getLocalName() + TOP);
-                    payload.setName("**" + CONFIG + node.getQName().getLocalName());
-                    parameters.add(payload);
-                }
+    private static void addQueryParameters(final ArrayNode parameters, final boolean isConfig,
+                                           final ApiDocServiceImpl.URIType uriType, final OAversion oaversion) {
+        if (uriType.equals(ApiDocServiceImpl.URIType.RFC8040)) {
+            final ObjectNode contentParam = JsonNodeFactory.instance.objectNode();
+            final ArrayNode cases = JsonNodeFactory.instance.arrayNode();
+            cases.add(NONCONFIG_QUERY_PARAM);
+            if (isConfig) {
+                cases.add(CONFIG_QUERY_PARAM);
+            } else {
+                contentParam.put(REQUIRED_KEY, true);
             }
-            spec.setParameters(parameters);
-            return this;
-        }
+            contentParam.put(IN_KEY, QUERY);
+            contentParam.put(NAME_KEY, CONTENT);
 
-        public Post summary(final String summary) {
-            spec.setSummary(summary);
-            return this;
+            final ObjectNode typeParent = getTypeParentNode(contentParam, oaversion);
+            typeParent.put(TYPE_KEY, STRING);
+            typeParent.set(ENUM_KEY, cases);
+
+            parameters.add(contentParam);
         }
     }
 
-    public static final class Delete extends Get {
-        private static final String METHOD_NAME = "DELETE";
+    public static ObjectNode buildPut(final String nodeName, final String moduleName, final Optional<String> deviceName,
+                                      final String description, final String defName, final ArrayNode pathParams,
+                                      final OAversion oaversion) {
+        final ObjectNode value = JsonNodeFactory.instance.objectNode();
+        value.put(DESCRIPTION_KEY, description);
+        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.PUT, moduleName, deviceName, nodeName));
+        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        final ObjectNode ref = JsonNodeFactory.instance.objectNode();
+        ref.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
+        final ArrayNode parameters = JsonUtil.copy(pathParams);
+        insertRequestBodyParameter(parameters, value, ref, nodeName + CONFIG, oaversion);
+        value.set(PARAMETERS_KEY, parameters);
 
-        public Delete(final DataSchemaNode node) {
-            super(node, false);
-        }
+        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
+        responses.set(String.valueOf(Response.Status.CREATED.getStatusCode()),
+                buildResponse(Response.Status.CREATED.getReasonPhrase(), Optional.empty(), oaversion));
+        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
+                buildResponse("Updated", Optional.empty(), oaversion));
 
-        @Override
-        public Operation build() {
-            spec.setMethod(METHOD_NAME);
-            spec.setNickname(METHOD_NAME + "-" + schemaNode.getQName().getLocalName());
-            spec.setType(null);
-            return spec;
+        value.set(RESPONSES_KEY, responses);
+        setConsumesIfNeeded(value, oaversion);
+        return value;
+    }
+
+    public static ObjectNode buildDelete(final DataSchemaNode node, final String moduleName,
+                                         final Optional<String> deviceName, final ArrayNode pathParams,
+                                         final OAversion oaversion) {
+        final ObjectNode value = JsonNodeFactory.instance.objectNode();
+        value.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.DELETE, moduleName, deviceName,
+                node.getQName().getLocalName()));
+        value.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        value.put(DESCRIPTION_KEY, node.getDescription().orElse(""));
+        final ArrayNode parameters = JsonUtil.copy(pathParams);
+        value.set(PARAMETERS_KEY, parameters);
+
+        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
+        responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()),
+                buildResponse("Deleted", Optional.empty(), oaversion));
+
+        value.set(RESPONSES_KEY, responses);
+        return value;
+    }
+
+    public static ObjectNode buildPostOperation(final OperationDefinition operDef, final String moduleName,
+                                                final Optional<String> deviceName, final String parentName,
+                                                final DefinitionNames definitionNames, final OAversion oaversion) {
+        final ObjectNode postOperation = JsonNodeFactory.instance.objectNode();
+        final ArrayNode parameters = JsonNodeFactory.instance.arrayNode();
+        final ObjectNode schemaRequest = JsonNodeFactory.instance.objectNode();
+        final String operName = operDef.getQName().getLocalName();
+
+        final ContainerSchemaNode input = operDef.getInput();
+        final ContainerSchemaNode output = operDef.getOutput();
+        if (!input.getChildNodes().isEmpty()) {
+            final String defName = parentName + "_" + operName + INPUT_SUFFIX + TOP
+                    + definitionNames.getDiscriminator(input);
+            schemaRequest.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
+        } else {
+            final ObjectNode properties = JsonNodeFactory.instance.objectNode();
+            properties.set(INPUT_KEY, JsonNodeFactory.instance.objectNode());
+            schemaRequest.put(TYPE_KEY, OBJECT);
+            schemaRequest.set(PROPERTIES_KEY, properties);
         }
+        insertRequestBodyParameter(parameters, postOperation, schemaRequest, operName + INPUT_SUFFIX, oaversion);
+        setConsumesIfNeeded(postOperation, oaversion);
+        postOperation.set(PARAMETERS_KEY, parameters);
+        final ObjectNode responses = JsonNodeFactory.instance.objectNode();
+        final String description = String.format("RPC %s success", operName);
+
+        if (!output.getChildNodes().isEmpty()) {
+            final ObjectNode schema = JsonNodeFactory.instance.objectNode();
+            final String defName = parentName + "_" + operName + OUTPUT_SUFFIX + TOP
+                    + definitionNames.getDiscriminator(output);
+            schema.put(REF_KEY, getAppropriateModelPrefix(oaversion) + defName);
+            responses.set(String.valueOf(Response.Status.OK.getStatusCode()), buildResponse(description,
+                    Optional.of(schema), oaversion));
+        } else {
+            responses.set(String.valueOf(Response.Status.NO_CONTENT.getStatusCode()), buildResponse(description,
+                    Optional.empty(), oaversion));
+        }
+        postOperation.set(RESPONSES_KEY, responses);
+        postOperation.put(DESCRIPTION_KEY, operDef.getDescription().orElse(""));
+        postOperation.put(SUMMARY_KEY, buildSummaryValue(HttpMethod.POST, moduleName, deviceName, operName));
+        postOperation.set(TAGS_KEY, buildTagsValue(deviceName, moduleName));
+        return postOperation;
+    }
+
+    private static void insertRequestBodyParameter(final ArrayNode parameters, final ObjectNode operation,
+                                                   final ObjectNode schema, final String name,
+                                                   final OAversion oaversion) {
+        final ObjectNode payload = JsonNodeFactory.instance.objectNode();
+        if (oaversion.equals(OAversion.V3_0)) {
+            final ObjectNode content = JsonNodeFactory.instance.objectNode();
+            final ObjectNode body = JsonNodeFactory.instance.objectNode();
+            for (final String mimeType : MIME_TYPES) {
+                content.set(mimeType, body);
+            }
+            body.set(SCHEMA_KEY, schema);
+            payload.set(CONTENT_KEY, content);
+            payload.put(DESCRIPTION_KEY, name);
+            operation.set(REQUEST_BODY_KEY, payload);
+        } else {
+            payload.put(IN_KEY, BODY);
+            payload.put(NAME_KEY, name);
+            payload.set(SCHEMA_KEY, schema);
+            parameters.add(payload);
+        }
+    }
+
+    public static ObjectNode buildResponse(final String description, final Optional<ObjectNode> schema,
+                                           final OAversion oaversion) {
+        final ObjectNode response = JsonNodeFactory.instance.objectNode();
+
+        if (schema.isPresent()) {
+            final ObjectNode schemaValue = schema.get();
+            if (oaversion.equals(OAversion.V3_0)) {
+                final ObjectNode content = JsonNodeFactory.instance.objectNode();
+                final ObjectNode body = JsonNodeFactory.instance.objectNode();
+                for (final String mimeType : MIME_TYPES) {
+                    content.set(mimeType, body);
+                }
+                body.set(SCHEMA_KEY, schemaValue);
+                response.set(CONTENT_KEY, content);
+            } else {
+                response.set(SCHEMA_KEY, schemaValue);
+            }
+        }
+        response.put(DESCRIPTION_KEY, description);
+        return response;
+    }
+
+    private static void setConsumesIfNeeded(final ObjectNode operation, final OAversion oaversion) {
+        if (oaversion.equals(OAversion.V2_0)) {
+            operation.set(CONSUMES_KEY, CONSUMES_PUT_POST);
+        }
+    }
+
+    private static String buildSummaryValue(final String httpMethod, final String moduleName,
+                                            final Optional<String> deviceName, final String nodeName) {
+        return httpMethod + SUMMARY_SEPARATOR + (deviceName.map(s -> s + SUMMARY_SEPARATOR).orElse(""))
+                + moduleName + SUMMARY_SEPARATOR + nodeName;
+    }
+
+    public static ArrayNode buildTagsValue(final Optional<String> deviceName, final String moduleName) {
+        final ArrayNode tagsValue = JsonNodeFactory.instance.arrayNode();
+        tagsValue.add((deviceName.map(s -> "mounted " + s).orElse("controller")) + " " + moduleName);
+        return tagsValue;
+    }
+
+    public static String getAppropriateModelPrefix(final OAversion oaversion) {
+        if (oaversion.equals(OAversion.V3_0)) {
+            return COMPONENTS_PREFIX;
+        }
+        return DEFINITIONS_PREFIX;
+    }
+
+    public static ObjectNode getTypeParentNode(final ObjectNode parameter, final OAversion oaversion) {
+        if (oaversion.equals(OAversion.V3_0)) {
+            final ObjectNode schema = JsonNodeFactory.instance.objectNode();
+            parameter.set(SCHEMA_KEY, schema);
+            return schema;
+        }
+        return parameter;
     }
 }
