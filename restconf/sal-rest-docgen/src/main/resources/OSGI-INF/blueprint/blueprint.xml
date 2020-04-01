@@ -37,11 +37,17 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         <argument ref="schemaService" />
     </bean>
 
+    <bean id="allModulesDoc" class="org.opendaylight.netconf.sal.rest.doc.impl.AllModulesDocGenerator">
+        <argument ref="apiDocDraftO2" />
+        <argument ref="apiDocRFC8040" />
+    </bean>
+
     <bean id="apiDocService" class="org.opendaylight.netconf.sal.rest.doc.impl.ApiDocServiceImpl">
         <argument ref="mountPointDraft02" />
         <argument ref="mountPointRFC8040" />
         <argument ref="apiDocDraftO2" />
         <argument ref="apiDocRFC8040" />
+        <argument ref="allModulesDoc" />
     </bean>
 
     <bean id="apiDocApplication" class="org.opendaylight.netconf.sal.rest.doc.jaxrs.ApiDocApplication">
