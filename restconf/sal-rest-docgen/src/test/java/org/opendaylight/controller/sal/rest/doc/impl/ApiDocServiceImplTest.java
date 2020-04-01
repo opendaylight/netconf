@@ -36,7 +36,6 @@ public class ApiDocServiceImplTest {
             .node(QName.create("", "nodes"))
             .node(QName.create("", "node"))
             .nodeWithKey(QName.create("", "node"), QName.create("", "id"), "123").build();
-    private static final String INSTANCE_URL = "/nodes/node/123/";
     private DocGenTestHelper helper;
     private ApiDocService apiDocService;
 
