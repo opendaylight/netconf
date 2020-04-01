@@ -13,7 +13,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
-import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;
+import org.opendaylight.netconf.sal.rest.doc.swagger.SwaggerObject;
 
 @Provider
 @Consumes(MediaType.APPLICATION_JSON)
@@ -28,7 +28,7 @@ public class JaxbContextResolver implements ContextResolver<ObjectMapper> {
 
     @Override
     public ObjectMapper getContext(final Class<?> klass) {
-        if (ApiDeclaration.class.isAssignableFrom(klass)) {
+        if (SwaggerObject.class.isAssignableFrom(klass)) {
             return ctx;
         }
 
