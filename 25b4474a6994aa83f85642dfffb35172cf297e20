@@ -460,6 +460,30 @@
     },
     {
       "key": {
+        "uuid": "1f2140c1_0969b4bf",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/jaxrs/JaxbContextResolver.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8664
+      },
+      "writtenOn": "2020-04-02T09:04:03Z",
+      "side": 1,
+      "message": "Maybe I don\u0027t get you but class is keyword,so typo is necessary.",
+      "parentUuid": "5e2ee76d_dfb00c34",
+      "range": {
+        "startLine": 30,
+        "startChar": 50,
+        "endLine": 30,
+        "endChar": 51
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f0a84e7a_7ec948be",
         "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
         "patchSetId": 5
@@ -713,6 +737,30 @@
     },
     {
       "key": {
+        "uuid": "da381f38_bddd3d46",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 8664
+      },
+      "writtenOn": "2020-04-02T09:04:03Z",
+      "side": 1,
+      "message": "Updated is not HTTP status",
+      "parentUuid": "f9071712_6f9d4bf7",
+      "range": {
+        "startLine": 155,
+        "startChar": 46,
+        "endLine": 155,
+        "endChar": 53
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "64fd87dd_f9cdb526",
         "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
         "patchSetId": 5
@@ -908,6 +956,30 @@
       "writtenOn": "2020-03-31T12:49:11Z",
       "side": 1,
       "message": "Same as before",
+      "range": {
+        "startLine": 196,
+        "startChar": 22,
+        "endLine": 196,
+        "endChar": 25
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6975cdd1_78eeec45",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointSwagger.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 8664
+      },
+      "writtenOn": "2020-04-02T09:04:03Z",
+      "side": 1,
+      "message": "Should I use HttpMethod.GET.toLowerCase here?",
+      "parentUuid": "19a5b202_60700a66",
       "range": {
         "startLine": 196,
         "startChar": 22,
