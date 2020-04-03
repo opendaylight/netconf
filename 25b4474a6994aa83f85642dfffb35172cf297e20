@@ -484,6 +484,30 @@
     },
     {
       "key": {
+        "uuid": "e0f790d2_1f80471e",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/jaxrs/JaxbContextResolver.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-04-03T10:39:25Z",
+      "side": 1,
+      "message": "my bad",
+      "parentUuid": "1f2140c1_0969b4bf",
+      "range": {
+        "startLine": 30,
+        "startChar": 50,
+        "endLine": 30,
+        "endChar": 51
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f0a84e7a_7ec948be",
         "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
         "patchSetId": 5
@@ -761,6 +785,30 @@
     },
     {
       "key": {
+        "uuid": "f6f36287_e16fa0e8",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-04-03T10:39:25Z",
+      "side": 1,
+      "message": "Sorry this happens when I am copping myself",
+      "parentUuid": "da381f38_bddd3d46",
+      "range": {
+        "startLine": 155,
+        "startChar": 46,
+        "endLine": 155,
+        "endChar": 53
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "64fd87dd_f9cdb526",
         "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/model/builder/OperationBuilder.java",
         "patchSetId": 5
@@ -980,6 +1028,30 @@
       "side": 1,
       "message": "Should I use HttpMethod.GET.toLowerCase here?",
       "parentUuid": "19a5b202_60700a66",
+      "range": {
+        "startLine": 196,
+        "startChar": 22,
+        "endLine": 196,
+        "endChar": 25
+      },
+      "revId": "25b4474a6994aa83f85642dfffb35172cf297e20",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1c363676_095cd024",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointSwagger.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-04-03T10:39:25Z",
+      "side": 1,
+      "message": "would it be wrong to have all these uppercase? Will it make something not working?",
+      "parentUuid": "6975cdd1_78eeec45",
       "range": {
         "startLine": 196,
         "startChar": 22,

@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "d468f656_0cb3f7ac",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-04-03T10:39:25Z",
+      "side": 0,
+      "message": "Ack",
+      "parentUuid": "34f53fec_1ae29a12",
+      "revId": "70d17768b76721b64d0c9740e35a9c9e2e0640e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c6e381c9_52384354",
         "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/BaseYangSwaggerGenerator.java",
         "patchSetId": 5
@@ -150,6 +168,24 @@
       "revId": "70d17768b76721b64d0c9740e35a9c9e2e0640e8",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "22e6143a_1edb18d9",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/swagger/ApiDeclaration.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-04-03T10:39:25Z",
+      "side": 0,
+      "message": "Ack",
+      "parentUuid": "d02d9ef9_4a6f37d5",
+      "revId": "70d17768b76721b64d0c9740e35a9c9e2e0640e8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     },
     {
       "key": {
