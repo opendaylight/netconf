@@ -10,7 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.rests.services.impl;
 import static java.util.Objects.requireNonNull;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.INSERT;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfDataServiceConstant.PostPutQueryParameters.POINT;
-import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.CREATE_NOTIFICATION_STREAM;
+import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.NOTIFICATION_STREAM;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_ACCESS_PATH_PART;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_LOCATION_PATH_PART;
 import static org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants.STREAM_PATH;
@@ -143,7 +143,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
                 && identifier.contains(STREAM_LOCATION_PATH_PART)) {
             final String value = (String) node.getValue();
             final String streamName = value.substring(
-                    value.indexOf(CREATE_NOTIFICATION_STREAM + RestconfConstants.SLASH));
+                    value.indexOf(NOTIFICATION_STREAM + RestconfConstants.SLASH));
             this.delegRestconfSubscrService.subscribeToStream(streamName, uriInfo);
         }
         if (node == null) {
