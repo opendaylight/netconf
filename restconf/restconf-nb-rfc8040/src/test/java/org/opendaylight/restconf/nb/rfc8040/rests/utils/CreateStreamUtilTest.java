@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
-import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
@@ -85,9 +84,8 @@ public class CreateStreamUtilTest {
         final Module rpcModule = schema.findModules("sal-remote").iterator().next();
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), rpcName);
         final QName rpcInputQName = QName.create(rpcModule.getQNameModule(), inputOutput);
-        final Set<RpcDefinition> setRpcs = rpcModule.getRpcs();
         ContainerSchemaNode rpcInputSchemaNode = null;
-        for (final RpcDefinition rpc : setRpcs) {
+        for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
                 rpcInputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcInputQName);
                 break;
