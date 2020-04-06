@@ -49,7 +49,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
+import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMActionResult;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -59,7 +59,7 @@ import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYa
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.util.NetconfUtil;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Schemas;
@@ -84,7 +84,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Node;
@@ -160,23 +160,17 @@ public class NetconfMessageTransformerTest {
     private static final SchemaPath CHOICE_ACTION_PATH =
             SchemaPath.create(true, CONFLICT_CHOICE_QNAME, CHOICE_CONT_QNAME, CHOICE_CONT_QNAME, CHOICE_ACTION_QNAME);
 
-    private static SchemaContext PARTIAL_SCHEMA;
-    private static SchemaContext SCHEMA;
-    private static SchemaContext ACTION_SCHEMA;
+    private static EffectiveModelContext PARTIAL_SCHEMA;
+    private static EffectiveModelContext SCHEMA;
+    private static EffectiveModelContext ACTION_SCHEMA;
 
     private NetconfMessageTransformer actionNetconfMessageTransformer;
     private NetconfMessageTransformer netconfMessageTransformer;
 
     @BeforeClass
     public static void beforeClass() {
-        final ModuleInfoBackedContext context = ModuleInfoBackedContext.create();
-        context.addModuleInfos(Collections.singleton(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf
-            .netconf.monitoring.rev101004.$YangModuleInfoImpl.getInstance()));
-        PARTIAL_SCHEMA = context.tryToCreateSchemaContext().get();
-
-        context.addModuleInfos(Collections.singleton($YangModuleInfoImpl.getInstance()));
-        SCHEMA = context.tryToCreateSchemaContext().get();
-
+        PARTIAL_SCHEMA = BindingRuntimeHelpers.createEffectiveModel(NetconfState.class);
+        SCHEMA = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfService.class, NetconfState.class);
         ACTION_SCHEMA = YangParserTestUtils.parseYangResources(NetconfMessageTransformerTest.class,
             "/schemas/example-server-farm.yang","/schemas/example-server-farm-2.yang",
             "/schemas/conflicting-actions.yang", "/schemas/augmented-action.yang",
@@ -483,7 +477,7 @@ public class NetconfMessageTransformerTest {
                 + "</rpc>");
     }
 
-    private static NetconfMessageTransformer getTransformer(final SchemaContext schema) {
+    private static NetconfMessageTransformer getTransformer(final EffectiveModelContext schema) {
         return new NetconfMessageTransformer(new EmptyMountPointContext(schema), true);
     }
 

@@ -19,12 +19,12 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.XmlBodyReaderTest;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class XmlPatchBodyReaderTest extends AbstractBodyReaderTest {
 
     private final XmlToPatchBodyReader xmlToPatchBodyReader;
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     public XmlPatchBodyReaderTest() throws Exception {
         super(schemaContext);

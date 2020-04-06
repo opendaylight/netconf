@@ -7,7 +7,6 @@
  */
 package org.opendaylight.restconf.common.util;
 
-import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.eclipse.jdt.annotation.NonNull;
@@ -24,7 +23,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContaine
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.util.SimpleSchemaContext;
 
 
 public final class OperationsResourceUtils {
@@ -53,12 +51,13 @@ public final class OperationsResourceUtils {
         modules.add(new OperationsRestconfModule(operatationsSchema));
 
         // Now build the operations container and combine it with the context
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> operationsBuilder = Builders.containerBuilder();
+        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> operationsBuilder =
+                Builders.containerBuilder(operatationsSchema);
         for (final OperationsLeafSchemaNode leaf : rpcLeafSchemas) {
             operationsBuilder.withChild(ImmutableNodes.leafNode(leaf.getQName(), Empty.getInstance()));
         }
 
         return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, operatationsSchema, mountPoint,
-                SimpleSchemaContext.forModules(ImmutableSet.copyOf(modules))), operationsBuilder.build());
+                new OperationsEffectiveModuleContext(modules)), operationsBuilder.build());
     }
 }

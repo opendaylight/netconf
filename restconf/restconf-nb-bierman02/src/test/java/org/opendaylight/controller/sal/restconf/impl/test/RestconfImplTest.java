@@ -63,9 +63,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
@@ -75,7 +74,7 @@ import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
  */
 public class RestconfImplTest {
 
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     private final BrokerFacade brokerFacade = mock(BrokerFacade.class);
     private final ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
@@ -84,8 +83,6 @@ public class RestconfImplTest {
     @BeforeClass
     public static void init() throws FileNotFoundException, ReactorException {
         schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
-        final Set<Module> allModules = schemaContext.getModules();
-        assertNotNull(allModules);
     }
 
     @AfterClass

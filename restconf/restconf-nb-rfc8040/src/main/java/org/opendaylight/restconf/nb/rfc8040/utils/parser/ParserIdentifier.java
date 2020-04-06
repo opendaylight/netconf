@@ -37,6 +37,7 @@ import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.ActionNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -75,10 +76,8 @@ public final class ParserIdentifier {
      *           - mount point service
      * @return {@link InstanceIdentifierContext}
      */
-    public static InstanceIdentifierContext<?> toInstanceIdentifier(
-            final String identifier,
-            final SchemaContext schemaContext,
-            final Optional<DOMMountPointService> mountPointService) {
+    public static InstanceIdentifierContext<?> toInstanceIdentifier(final String identifier,
+            final EffectiveModelContext schemaContext, final Optional<DOMMountPointService> mountPointService) {
         if (identifier == null || !identifier.contains(RestconfConstants.MOUNT)) {
             return createIIdContext(schemaContext, identifier, null);
         }
@@ -93,7 +92,7 @@ public final class ParserIdentifier {
                 .orElseThrow(() -> new RestconfDocumentedException("Mount point does not exist.",
                     ErrorType.PROTOCOL, ErrorTag.DATA_MISSING));
 
-        final SchemaContext mountSchemaContext = mountPoint.getSchemaContext();
+        final EffectiveModelContext mountSchemaContext = mountPoint.getEffectiveModelContext();
         final String pathId = pathsIt.next().replaceFirst("/", "");
         return createIIdContext(mountSchemaContext, pathId, mountPoint);
     }
@@ -108,8 +107,8 @@ public final class ParserIdentifier {
      * @return {@link InstanceIdentifierContext}
      * @throws RestconfDocumentedException if the path cannot be resolved
      */
-    private static InstanceIdentifierContext<?> createIIdContext(final SchemaContext schemaContext, final String url,
-            final @Nullable DOMMountPoint mountPoint) {
+    private static InstanceIdentifierContext<?> createIIdContext(final EffectiveModelContext schemaContext,
+            final String url, final @Nullable DOMMountPoint mountPoint) {
         final YangInstanceIdentifier urlPath = IdentifierCodec.deserialize(url, schemaContext);
         return new InstanceIdentifierContext<>(urlPath, getPathSchema(schemaContext, urlPath), mountPoint,
                 schemaContext);
@@ -224,14 +223,14 @@ public final class ParserIdentifier {
      * {@link SchemaExportContext}.
      *
      * @param schemaContext
-     *             {@link SchemaContext}
+     *             {@link EffectiveModelContext}
      * @param identifier
      *             path parameter
      * @param domMountPointService
      *             {@link DOMMountPointService}
      * @return {@link SchemaExportContext}
      */
-    public static SchemaExportContext toSchemaExportContextFromIdentifier(final SchemaContext schemaContext,
+    public static SchemaExportContext toSchemaExportContextFromIdentifier(final EffectiveModelContext schemaContext,
             final String identifier, final DOMMountPointService domMountPointService,
             final DOMYangTextSourceProvider sourceProvider) {
         final Iterable<String> pathComponents = RestconfConstants.SLASH_SPLITTER.split(identifier);
