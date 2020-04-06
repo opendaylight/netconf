@@ -19,7 +19,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.controller.md.sal.common.impl.util.compat.DataNormalizationException;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
@@ -42,7 +41,7 @@ public class ReadOnlyTxTest {
     private NormalizedNode<?, ?> mockedNode;
 
     @Before
-    public void setUp() throws DataNormalizationException {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult(mockedNode))).when(rpc)
                 .invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
