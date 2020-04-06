@@ -9,9 +9,9 @@ package org.opendaylight.restconf.nb.rfc8040.references;
 
 import java.lang.ref.SoftReference;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
-import java.util.Set;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -50,25 +50,23 @@ public final class SchemaContextRef {
     }
 
     /**
-     * Get all modules like {@link Set} of {@link Module} from
-     * {@link SchemaContext}.
+     * Get all modules like {@link Collection} of {@link Module} from {@link SchemaContext}.
      *
-     * @return {@link Set} of {@link Module}
+     * @return {@link Collection} of {@link Module}
      */
-    public Set<Module> getModules() {
+    public Collection<? extends Module> getModules() {
         return get().getModules();
     }
 
     /**
-     * Get all modules like {@link Set} of {@link Module} from
-     * {@link SchemaContext} of {@link DOMMountPoint}.
+     * Get all modules like {@link Collection} of {@link Module} from {@link SchemaContext} of {@link DOMMountPoint}.
      *
      * @param mountPoint
      *             mount point
      *
-     * @return {@link Set} of {@link Module}
+     * @return {@link Collection} of {@link Module}
      */
-    public Set<Module> getModules(final DOMMountPoint mountPoint) {
+    public static Collection<? extends Module> getModules(final DOMMountPoint mountPoint) {
         final SchemaContext schemaContext = mountPoint == null ? null : mountPoint.getSchemaContext();
         return schemaContext == null ? null : schemaContext.getModules();
     }

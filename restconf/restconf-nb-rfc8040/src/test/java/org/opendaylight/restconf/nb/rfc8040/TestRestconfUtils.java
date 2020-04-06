@@ -109,8 +109,7 @@ public final class TestRestconfUtils {
         final String schemaNodeName = iiContext.getSchemaNode().getQName().getLocalName();
 
         if (!schemaNodeName.equalsIgnoreCase(docRootElm)) {
-            final Collection<DataSchemaNode> children = ((DataNodeContainer) schemaNode).getChildNodes();
-            for (final DataSchemaNode child : children) {
+            for (final DataSchemaNode child : ((DataNodeContainer) schemaNode).getChildNodes()) {
                 if (child.getQName().getLocalName().equalsIgnoreCase(docRootElm)) {
                     schemaNode = child;
                     break;

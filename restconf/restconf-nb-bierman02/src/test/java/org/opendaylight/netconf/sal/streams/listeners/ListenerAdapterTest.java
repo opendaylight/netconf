@@ -137,13 +137,13 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
         InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
                 .child(MyList1.class, new MyList1Key("Althea"));
-        writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
+        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
         writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_CREATE));
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
         builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
-        writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
+        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
         writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_UPDATE));
 
@@ -166,13 +166,13 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
         InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
                 .child(MyList1.class, new MyList1Key("Althea"));
-        writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
+        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
         writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_CREATE));
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
         builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
-        writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
+        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
         writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_UPDATE));
 

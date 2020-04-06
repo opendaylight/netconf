@@ -12,11 +12,11 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Collections2;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
@@ -126,9 +126,10 @@ public class NetconfEventSourceMountTest {
 
     @Test
     public void testGetAvailableStreams() throws Exception {
-        final List<Stream> availableStreams = mount.getAvailableStreams();
+        final Collection<Stream> availableStreams = mount.getAvailableStreams();
         Assert.assertEquals(2, availableStreams.size());
-        final List<String> streamNames = Lists.transform(availableStreams, input -> input.getName().getValue());
+        final Collection<String> streamNames = Collections2.transform(availableStreams,
+            input -> input.getName().getValue());
         streamNames.contains(STREAM_1);
         streamNames.contains(STREAM_2);
     }
