@@ -9,13 +9,14 @@ package org.opendaylight.netconf.topology.spi;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
+import org.opendaylight.yangtools.yang.model.parser.api.YangParserFactory;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 
 public class SharedSchemaRepositoryProvider implements SchemaRepositoryProvider {
     private final @NonNull SharedSchemaRepository schemaRepository;
 
-    public SharedSchemaRepositoryProvider(final String moduleName) {
-        schemaRepository = new SharedSchemaRepository(moduleName);
+    public SharedSchemaRepositoryProvider(final String moduleName, final YangParserFactory parserFactory) {
+        schemaRepository = new SharedSchemaRepository(moduleName, parserFactory);
     }
 
     @Override

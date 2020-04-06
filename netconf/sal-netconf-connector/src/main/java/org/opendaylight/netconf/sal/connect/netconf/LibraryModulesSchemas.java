@@ -42,7 +42,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
 import org.eclipse.jdt.annotation.Nullable;
-import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
+import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
@@ -69,7 +69,7 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.slf4j.Logger;
@@ -87,14 +87,8 @@ public final class LibraryModulesSchemas implements NetconfDeviceSchemas {
 
     private static final Logger LOG = LoggerFactory.getLogger(LibraryModulesSchemas.class);
     private static final Pattern DATE_PATTERN = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})");
-    private static final SchemaContext LIBRARY_CONTEXT;
-
-    static {
-        final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        moduleInfoBackedContext.registerModuleInfo(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang
-                .library.rev160621.$YangModuleInfoImpl.getInstance());
-        LIBRARY_CONTEXT = moduleInfoBackedContext.tryToCreateSchemaContext().get();
-    }
+    private static final EffectiveModelContext LIBRARY_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(
+        ModulesState.class);
 
     private static final NodeIdentifier MODULES_STATE_NID = NodeIdentifier.create(ModulesState.QNAME);
     private static final NodeIdentifier MODULE_NID = NodeIdentifier.create(Module.QNAME);

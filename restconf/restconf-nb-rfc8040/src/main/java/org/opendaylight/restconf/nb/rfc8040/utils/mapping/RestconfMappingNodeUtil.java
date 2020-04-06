@@ -13,8 +13,8 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
@@ -75,8 +75,8 @@ public final class RestconfMappingNodeUtil {
      * @return mapped data as {@link NormalizedNode}
      */
     public static NormalizedNode<NodeIdentifier, Collection<DataContainerChild<? extends PathArgument, ?>>>
-            mapModulesByIetfYangLibraryYang(final Set<Module> modules, final Module ietfYangLibraryModule,
-                    final SchemaContext context, final String moduleSetId) {
+            mapModulesByIetfYangLibraryYang(final Collection<? extends Module> modules,
+                    final Module ietfYangLibraryModule, final SchemaContext context, final String moduleSetId) {
         final DataSchemaNode modulesStateSch =
                 ietfYangLibraryModule.getDataChildByName(IetfYangLibrary.MODUELS_STATE_CONT_QNAME);
         final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> modulesStateBuilder =
@@ -196,7 +196,8 @@ public final class RestconfMappingNodeUtil {
         for (final Deviation deviation : module.getDeviations()) {
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> deviationEntryNode =
                     Builders.mapEntryBuilder((ListSchemaNode) deviationsSchema);
-            final QName lastComponent = deviation.getTargetPath().getLastComponent();
+            final List<QName> ids = deviation.getTargetPath().getNodeIdentifiers();
+            final QName lastComponent = ids.get(ids.size() - 1);
             addCommonLeafs(context.findModule(lastComponent.getModule()).get(), deviationEntryNode,
                 ietfYangLibraryModule);
             deviations.withChild(deviationEntryNode.build());
@@ -218,7 +219,7 @@ public final class RestconfMappingNodeUtil {
      */
     private static void addFeatureLeafList(final QName qnameOfFeaturesLeafList,
             final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> mapEntryBuilder,
-            final Set<FeatureDefinition> features, final Module ietfYangLibraryModule) {
+            final Collection<? extends FeatureDefinition> features, final Module ietfYangLibraryModule) {
         final DataSchemaNode schemaNode =
                 findSchemaInListOfModulesSchema(qnameOfFeaturesLeafList, ietfYangLibraryModule);
         final ListNodeBuilder<Object, LeafSetEntryNode<Object>> leafSetBuilder =
@@ -454,8 +455,8 @@ public final class RestconfMappingNodeUtil {
      */
     @SuppressWarnings("rawtypes")
     public static NormalizedNode mapYangNotificationStreamByIetfRestconfMonitoring(final QName notifiQName,
-            final Set<NotificationDefinition> notifications, final Instant start, final String outputType,
-            final URI uri, final Module monitoringModule, final boolean existParent) {
+            final Collection<? extends NotificationDefinition> notifications, final Instant start,
+            final String outputType, final URI uri, final Module monitoringModule, final boolean existParent) {
         for (final NotificationDefinition notificationDefinition : notifications) {
             if (notificationDefinition.getQName().equals(notifiQName)) {
                 final DataSchemaNode streamListSchema = ((ContainerSchemaNode) ((ContainerSchemaNode) monitoringModule

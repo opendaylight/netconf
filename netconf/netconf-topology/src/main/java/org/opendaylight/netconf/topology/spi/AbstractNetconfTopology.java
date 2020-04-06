@@ -82,7 +82,6 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev15
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactoryConfiguration;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -208,7 +207,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected final String topologyId;
     protected SchemaSourceRegistry schemaRegistry = DEFAULT_SCHEMA_REPOSITORY;
     protected SchemaRepository schemaRepository = DEFAULT_SCHEMA_REPOSITORY;
-    protected SchemaContextFactory schemaContextFactory = DEFAULT_SCHEMA_CONTEXT_FACTORY;
+    protected EffectiveModelContextFactory schemaContextFactory = DEFAULT_SCHEMA_CONTEXT_FACTORY;
     protected String privateKeyPath;
     protected String privateKeyPassphrase;
     protected final AAAEncryptionService encryptionService;
@@ -239,7 +238,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.schemaRegistry = schemaRegistry;
     }
 
-    public void setSchemaContextFactory(final SchemaContextFactory schemaContextFactory) {
+    public void setSchemaContextFactory(final EffectiveModelContextFactory schemaContextFactory) {
         this.schemaContextFactory = schemaContextFactory;
     }
 
