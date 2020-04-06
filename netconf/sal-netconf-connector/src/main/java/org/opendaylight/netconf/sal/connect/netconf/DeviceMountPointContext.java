@@ -30,14 +30,15 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.util.AbstractSchemaContextProvider;
+import org.opendaylight.yangtools.yang.model.util.AbstractEffectiveModelContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // TODO: this should really come from rfc8528-data-util
-final class DeviceMountPointContext extends AbstractSchemaContextProvider implements Immutable, MountPointContext {
+final class DeviceMountPointContext extends AbstractEffectiveModelContextProvider implements Immutable,
+        MountPointContext {
     private static final Logger LOG = LoggerFactory.getLogger(DeviceMountPointContext.class);
     private static final NodeIdentifier MOUNT_POINT = NodeIdentifier.create(
         QName.create(SchemaMountConstants.RFC8528_MODULE, "mount-point").intern());
@@ -58,7 +59,7 @@ final class DeviceMountPointContext extends AbstractSchemaContextProvider implem
 
     private final ImmutableMap<MountPointIdentifier, NetconfMountPointContextFactory> mountPoints;
 
-    private DeviceMountPointContext(final SchemaContext schemaContext,
+    private DeviceMountPointContext(final EffectiveModelContext schemaContext,
             final Map<MountPointIdentifier, NetconfMountPointContextFactory> mountPoints) {
         super(schemaContext);
         this.mountPoints = ImmutableMap.copyOf(mountPoints);
@@ -71,7 +72,7 @@ final class DeviceMountPointContext extends AbstractSchemaContextProvider implem
             return emptyContext;
         }
 
-        final SchemaContext schemaContext = emptyContext.getSchemaContext();
+        final EffectiveModelContext schemaContext = emptyContext.getEffectiveModelContext();
         final DataContainerChild<?, ?> mountPoint = optMountPoint.get();
         checkArgument(mountPoint instanceof MapNode, "mount-point list %s is not a MapNode", mountPoint);
 
@@ -83,7 +84,7 @@ final class DeviceMountPointContext extends AbstractSchemaContextProvider implem
                 checkArgument(value instanceof String, "Unexpected module leaf value %s", value);
                 return (String) value;
             }).orElseThrow(() -> new IllegalArgumentException("Mount module missing in " + entry));
-            final Iterator<Module> it = schemaContext.findModules(moduleName).iterator();
+            final Iterator<? extends Module> it = schemaContext.findModules(moduleName).iterator();
             checkArgument(it.hasNext(), "Failed to find a module named %s", moduleName);
             final QNameModule module = it.next().getQNameModule();
 

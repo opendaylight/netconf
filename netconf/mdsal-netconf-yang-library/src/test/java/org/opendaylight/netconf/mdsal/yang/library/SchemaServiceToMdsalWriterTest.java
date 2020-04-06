@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -37,8 +37,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class SchemaServiceToMdsalWriterTest {
@@ -63,14 +63,14 @@ public class SchemaServiceToMdsalWriterTest {
         doNothing().when(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
         doReturn(emptyFluentFuture()).when(writeTransaction).commit();
         when(schemaService.registerSchemaContextListener(any())).thenReturn(
-                new ListenerRegistration<SchemaContextListener>() {
+                new ListenerRegistration<EffectiveModelContextListener>() {
                     @Override
                     public void close() {
 
                     }
 
                     @Override
-                    public SchemaContextListener getInstance() {
+                    public EffectiveModelContextListener getInstance() {
                         return null;
                     }
                 });
@@ -81,28 +81,31 @@ public class SchemaServiceToMdsalWriterTest {
     public void testOnGlobalContextUpdated() throws Exception {
         schemaServiceToMdsalWriter.start();
 
-        schemaServiceToMdsalWriter.onGlobalContextUpdated(getSchema());
+        schemaServiceToMdsalWriter.onModelContextUpdated(getSchema());
         verify(writeTransaction).put(eq(LogicalDatastoreType.OPERATIONAL),
                 eq(MODULES_STATE_INSTANCE_IDENTIFIER), eq(createTestModuleState()));
     }
 
-    private static SchemaContext getSchema() {
+    private static EffectiveModelContext getSchema() {
         return YangParserTestUtils.parseYangResources(SchemaServiceToMdsalWriterTest.class, "/test-module.yang",
             "/test-submodule.yang");
     }
 
     private static ModulesState createTestModuleState() {
-        Submodule sub = new SubmoduleBuilder().setName(new YangIdentifier("test-submodule"))
+        Submodule sub = new SubmoduleBuilder()
+                .setName(new YangIdentifier("test-submodule"))
                 .setRevision(RevisionUtils.emptyRevision())
                 .build();
 
         Module module = new ModuleBuilder().setName(new YangIdentifier("test-module"))
                 .setNamespace(new Uri("test:namespace"))
                 .setRevision(new Revision(new RevisionIdentifier("2013-07-22")))
-                .setSubmodule(ImmutableList.of(sub))
+                .setSubmodule(ImmutableMap.of(sub.key(), sub))
                 .setConformanceType(Module.ConformanceType.Implement)
                 .build();
-        return new ModulesStateBuilder().setModuleSetId("0")
-                .setModule(ImmutableList.of(module)).build();
+        return new ModulesStateBuilder()
+                .setModuleSetId("0")
+                .setModule(ImmutableMap.of(module.key(), module))
+                .build();
     }
 }

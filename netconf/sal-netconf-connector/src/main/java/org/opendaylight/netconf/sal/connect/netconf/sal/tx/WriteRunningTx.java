@@ -109,8 +109,8 @@ public class WriteRunningTx extends AbstractWriteTx {
             this.defaultOperation = defaultOperation;
         }
 
-        ListenableFuture<DOMRpcResult> execute(final RemoteDeviceId id, final NetconfBaseOps netOps,
-                                               final boolean rollbackSupport) {
+        ListenableFuture<? extends DOMRpcResult> execute(final RemoteDeviceId id, final NetconfBaseOps netOps,
+                                                         final boolean rollbackSupport) {
             final NetconfRpcFutureCallback editConfigCallback = new NetconfRpcFutureCallback("Edit running", id);
             if (defaultOperation.isPresent()) {
                 return netOps.editConfigRunning(editConfigCallback, editStructure, defaultOperation.get(),
