@@ -42,6 +42,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -84,7 +85,8 @@ public final class TestRestconfUtils {
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public static SchemaContext loadSchemaContext(final String yangPath, final SchemaContext schemaContext) {
+    public static EffectiveModelContext loadSchemaContext(final String yangPath,
+            final EffectiveModelContext schemaContext) {
         try {
             Preconditions.checkArgument(yangPath != null, "Path can not be null.");
             Preconditions.checkArgument(!yangPath.isEmpty(), "Path can not be empty.");
@@ -141,8 +143,7 @@ public final class TestRestconfUtils {
         final String schemaNodeName = iiContext.getSchemaNode().getQName().getLocalName();
 
         if (!schemaNodeName.equalsIgnoreCase(docRootElm)) {
-            final Collection<DataSchemaNode> children = ((DataNodeContainer) schemaNode).getChildNodes();
-            for (final DataSchemaNode child : children) {
+            for (final DataSchemaNode child : ((DataNodeContainer) schemaNode).getChildNodes()) {
                 if (child.getQName().getLocalName().equalsIgnoreCase(docRootElm)) {
                     schemaNode = child;
                     break;

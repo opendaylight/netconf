@@ -141,7 +141,7 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
         // on leader node would be same as on follower node
         final ProxyDOMDataBroker proxyDataBroker = new ProxyDOMDataBroker(id, masterActorRef, actorSystem.dispatcher(),
             actorResponseWaitTime);
-        salProvider.getMountInstance().onTopologyDeviceConnected(currentMountContext.getSchemaContext(),
+        salProvider.getMountInstance().onTopologyDeviceConnected(currentMountContext.getEffectiveModelContext(),
             proxyDataBroker, deviceRpc, notificationService, deviceAction);
     }
 
@@ -150,8 +150,8 @@ class MasterSalFacade implements AutoCloseable, RemoteDeviceHandler<NetconfSessi
     }
 
     private Future<Object> sendInitialDataToActor() {
-        final List<SourceIdentifier> sourceIdentifiers =
-                SchemaContextUtil.getConstituentModuleIdentifiers(currentMountContext.getSchemaContext()).stream()
+        final List<SourceIdentifier> sourceIdentifiers = SchemaContextUtil.getConstituentModuleIdentifiers(
+            currentMountContext.getEffectiveModelContext()).stream()
                 .map(mi -> RevisionSourceIdentifier.create(mi.getName(), mi.getRevision()))
                 .collect(Collectors.toList());
 

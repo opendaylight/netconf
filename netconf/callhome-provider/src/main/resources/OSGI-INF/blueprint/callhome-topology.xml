@@ -27,9 +27,12 @@
                interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
     <reference id="deviceActionFactory"
                interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
+    <reference id="parserFactory"
+               interface="org.opendaylight.yangtools.yang.model.parser.api.YangParserFactory"/>
 
     <bean id="schemaRepository" class="org.opendaylight.netconf.topology.spi.SharedSchemaRepositoryProvider">
         <argument value="callhome-topology-schemas"/>
+        <argument ref="parserFactory"/>
     </bean>
 
     <bean id="callhomeProvider" class="org.opendaylight.netconf.callhome.mount.IetfZeroTouchCallHomeServerProvider"

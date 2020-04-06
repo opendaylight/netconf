@@ -187,7 +187,8 @@ public class BrokerFacadeTest {
         final DOMRpcResult expResult = mock(DOMRpcResult.class);
         doReturn(immediateFluentFuture(expResult)).when(this.mockRpcService).invokeRpc(this.type, this.dummyNode);
 
-        final ListenableFuture<DOMRpcResult> actualFuture = this.brokerFacade.invokeRpc(this.type, this.dummyNode);
+        final ListenableFuture<? extends DOMRpcResult> actualFuture = this.brokerFacade.invokeRpc(this.type,
+            this.dummyNode);
         assertNotNull("Future is null", actualFuture);
         final DOMRpcResult actualResult = actualFuture.get();
         assertSame("invokeRpc", expResult, actualResult);

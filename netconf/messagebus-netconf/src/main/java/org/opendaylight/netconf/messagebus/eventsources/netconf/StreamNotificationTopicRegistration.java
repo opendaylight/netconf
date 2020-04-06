@@ -62,7 +62,7 @@ class StreamNotificationTopicRegistration extends NotificationTopicRegistration 
     void activateNotificationSource() {
         if (!isActive()) {
             LOG.info("Stream {} is not active on node {}. Will subscribe.", this.getStreamName(), this.nodeId);
-            final ListenableFuture<DOMRpcResult> result = mountPoint.invokeCreateSubscription(stream);
+            final ListenableFuture<? extends DOMRpcResult> result = mountPoint.invokeCreateSubscription(stream);
             try {
                 result.get();
                 setActive(true);
@@ -84,7 +84,7 @@ class StreamNotificationTopicRegistration extends NotificationTopicRegistration 
     void reActivateNotificationSource() {
         if (isActive()) {
             LOG.info("Stream {} is reactivating on node {}.", this.getStreamName(), this.nodeId);
-            final ListenableFuture<DOMRpcResult> result = mountPoint.invokeCreateSubscription(stream,
+            final ListenableFuture<? extends DOMRpcResult> result = mountPoint.invokeCreateSubscription(stream,
                 getLastEventTime());
             try {
                 result.get();

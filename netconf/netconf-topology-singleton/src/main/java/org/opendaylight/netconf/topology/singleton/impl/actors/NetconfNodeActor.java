@@ -63,7 +63,6 @@ import org.opendaylight.netconf.topology.singleton.messages.transactions.NewRead
 import org.opendaylight.netconf.topology.singleton.messages.transactions.NewWriteTransactionRequest;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
@@ -241,7 +240,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         LOG.debug("{}: invokeSlaveRpc for {}, input: {} on rpc service {}", id, schemaPath, normalizedNodeMessage,
                 deviceRpc);
 
-        final ListenableFuture<DOMRpcResult> rpcResult = deviceRpc.invokeRpc(schemaPath,
+        final ListenableFuture<? extends DOMRpcResult> rpcResult = deviceRpc.invokeRpc(schemaPath,
                 normalizedNodeMessage != null ? normalizedNodeMessage.getNode() : null);
 
         Futures.addCallback(rpcResult, new FutureCallback<DOMRpcResult>() {
@@ -346,9 +345,9 @@ public class NetconfNodeActor extends AbstractUntypedActor {
             final SlaveSalFacade localSlaveSalManager, final ActorRef masterReference, final int tries) {
         final ListenableFuture<EffectiveModelContext> schemaContextFuture =
                 schemaContextFactory.createEffectiveModelContext(sourceIdentifiers);
-        Futures.addCallback(schemaContextFuture, new FutureCallback<SchemaContext>() {
+        Futures.addCallback(schemaContextFuture, new FutureCallback<EffectiveModelContext>() {
             @Override
-            public void onSuccess(final SchemaContext result) {
+            public void onSuccess(final EffectiveModelContext result) {
                 executeInSelf(() -> {
                     // Make sure the slaveSalManager instance hasn't changed since we initiated the schema context
                     // resolution.

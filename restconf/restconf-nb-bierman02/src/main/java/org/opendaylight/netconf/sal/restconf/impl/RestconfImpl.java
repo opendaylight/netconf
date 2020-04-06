@@ -19,6 +19,7 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URI;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -104,6 +105,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableCo
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.FeatureDefinition;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
@@ -196,10 +198,9 @@ public final class RestconfImpl implements RestconfService {
 
     @Override
     public NormalizedNodeContext getModules(final UriInfo uriInfo) {
-        final Set<Module> allModules = this.controllerContext.getAllModules();
-        final MapNode allModuleMap = makeModuleMapNode(allModules);
+        final MapNode allModuleMap = makeModuleMapNode(controllerContext.getAllModules());
 
-        final SchemaContext schemaContext = this.controllerContext.getGlobalSchema();
+        final EffectiveModelContext schemaContext = this.controllerContext.getGlobalSchema();
 
         final Module restconfModule = getRestconfModule();
         final DataSchemaNode modulesSchemaNode = this.controllerContext.getRestconfModuleRestConfSchemaNode(
@@ -230,8 +231,7 @@ public final class RestconfImpl implements RestconfService {
         final InstanceIdentifierContext<?> mountPointIdentifier =
                 this.controllerContext.toMountPointIdentifier(identifier);
         final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
-        final Set<Module> modules = this.controllerContext.getAllModules(mountPoint);
-        final MapNode mountPointModulesMap = makeModuleMapNode(modules);
+        final MapNode mountPointModulesMap = makeModuleMapNode(controllerContext.getAllModules(mountPoint));
 
         final Module restconfModule = getRestconfModule();
         final DataSchemaNode modulesSchemaNode = this.controllerContext.getRestconfModuleRestConfSchemaNode(
@@ -254,14 +254,14 @@ public final class RestconfImpl implements RestconfService {
         final Entry<String, Revision> nameRev = getModuleNameAndRevision(identifier);
         Module module = null;
         DOMMountPoint mountPoint = null;
-        final SchemaContext schemaContext;
+        final EffectiveModelContext schemaContext;
         if (identifier.contains(ControllerContext.MOUNT)) {
             final InstanceIdentifierContext<?> mountPointIdentifier =
                     this.controllerContext.toMountPointIdentifier(identifier);
             mountPoint = mountPointIdentifier.getMountPoint();
             module = this.controllerContext.findModuleByNameAndRevision(mountPoint, nameRev.getKey(),
                 nameRev.getValue());
-            schemaContext = mountPoint.getSchemaContext();
+            schemaContext = mountPoint.getEffectiveModelContext();
         } else {
             module = this.controllerContext.findModuleByNameAndRevision(nameRev.getKey(), nameRev.getValue());
             schemaContext = this.controllerContext.getGlobalSchema();
@@ -288,7 +288,7 @@ public final class RestconfImpl implements RestconfService {
 
     @Override
     public NormalizedNodeContext getAvailableStreams(final UriInfo uriInfo) {
-        final SchemaContext schemaContext = this.controllerContext.getGlobalSchema();
+        final EffectiveModelContext schemaContext = this.controllerContext.getGlobalSchema();
         final Set<String> availableStreams = Notificator.getStreamNames();
         final Module restconfModule = getRestconfModule();
         final DataSchemaNode streamSchemaNode = this.controllerContext
@@ -317,14 +317,13 @@ public final class RestconfImpl implements RestconfService {
 
     @Override
     public NormalizedNodeContext getOperations(final UriInfo uriInfo) {
-        final Set<Module> allModules = this.controllerContext.getAllModules();
-        return operationsFromModulesToNormalizedContext(allModules, null);
+        return operationsFromModulesToNormalizedContext(controllerContext.getAllModules(), null);
     }
 
     @Override
     public NormalizedNodeContext getOperations(final String identifier, final UriInfo uriInfo) {
-        Set<Module> modules = null;
-        DOMMountPoint mountPoint = null;
+        final Collection<? extends Module> modules;
+        final DOMMountPoint mountPoint;
         if (identifier.contains(ControllerContext.MOUNT)) {
             final InstanceIdentifierContext<?> mountPointIdentifier =
                     this.controllerContext.toMountPointIdentifier(identifier);
@@ -353,14 +352,14 @@ public final class RestconfImpl implements RestconfService {
      *            mount point, if in use otherwise null
      * @return {@link NormalizedNodeContext}
      */
-    private static NormalizedNodeContext operationsFromModulesToNormalizedContext(final Set<Module> modules,
-            final DOMMountPoint mountPoint) {
+    private static NormalizedNodeContext operationsFromModulesToNormalizedContext(
+            final Collection<? extends Module> modules, final DOMMountPoint mountPoint) {
 
         final Collection<Module> neededModules = new ArrayList<>(modules.size());
         final ArrayList<LeafSchemaNode> fakeRpcSchema = new ArrayList<>();
 
         for (final Module m : modules) {
-            final Set<RpcDefinition> rpcs = m.getRpcs();
+            final Collection<? extends RpcDefinition> rpcs = m.getRpcs();
             if (!rpcs.isEmpty()) {
                 neededModules.add(m);
 
@@ -381,7 +380,7 @@ public final class RestconfImpl implements RestconfService {
         neededModules.forEach(imp -> fakeModules.add(new FakeImportedModule(imp)));
         fakeModules.add(new FakeRestconfModule(neededModules, fakeCont));
 
-        final SchemaContext fakeSchemaCtx = SimpleSchemaContext.forModules(ImmutableSet.copyOf(fakeModules));
+        final EffectiveModelContext fakeSchemaCtx = SimpleSchemaContext.forModules(ImmutableSet.copyOf(fakeModules));
         final InstanceIdentifierContext<ContainerSchemaNode> instanceIdentifierContext =
                 new InstanceIdentifierContext<>(null, fakeCont, mountPoint, fakeSchemaCtx);
         return new NormalizedNodeContext(instanceIdentifierContext, containerBuilder.build());
@@ -440,9 +439,9 @@ public final class RestconfImpl implements RestconfService {
 
         final SchemaPath type = payload.getInstanceIdentifierContext().getSchemaNode().getPath();
         final URI namespace = payload.getInstanceIdentifierContext().getSchemaNode().getQName().getNamespace();
-        final ListenableFuture<DOMRpcResult> response;
+        final ListenableFuture<? extends DOMRpcResult> response;
         final DOMMountPoint mountPoint = payload.getInstanceIdentifierContext().getMountPoint();
-        final SchemaContext schemaContext;
+        final EffectiveModelContext schemaContext;
 
         if (mountPoint != null) {
             final Optional<DOMRpcService> mountRpcServices = mountPoint.getService(DOMRpcService.class);
@@ -450,7 +449,7 @@ public final class RestconfImpl implements RestconfService {
                 LOG.debug("Error: Rpc service is missing.");
                 throw new RestconfDocumentedException("Rpc service is missing.");
             }
-            schemaContext = mountPoint.getSchemaContext();
+            schemaContext = mountPoint.getEffectiveModelContext();
             response = mountRpcServices.get().invokeRpc(type, payload.getData());
         } else {
             if (namespace.toString().equals(SAL_REMOTE_NAMESPACE)) {
@@ -489,34 +488,35 @@ public final class RestconfImpl implements RestconfService {
         }
     }
 
+    @SuppressFBWarnings(value = "NP_LOAD_OF_KNOWN_NULL_VALUE",
+            justification = "Looks like a false positive, see below FIXME")
     private NormalizedNodeContext invokeRpc(final String identifier, final UriInfo uriInfo) {
-
-        DOMMountPoint mountPoint = null;
+        final DOMMountPoint mountPoint;
         final String identifierEncoded;
-        final SchemaContext schemaContext;
+        final EffectiveModelContext schemaContext;
         if (identifier.contains(ControllerContext.MOUNT)) {
             // mounted RPC call - look up mount instance.
             final InstanceIdentifierContext<?> mountPointId = this.controllerContext.toMountPointIdentifier(identifier);
             mountPoint = mountPointId.getMountPoint();
-            schemaContext = mountPoint.getSchemaContext();
+            schemaContext = mountPoint.getEffectiveModelContext();
             final int startOfRemoteRpcName =
                     identifier.lastIndexOf(ControllerContext.MOUNT) + ControllerContext.MOUNT.length() + 1;
             final String remoteRpcName = identifier.substring(startOfRemoteRpcName);
             identifierEncoded = remoteRpcName;
 
-        } else if (identifier.indexOf('/') != CHAR_NOT_FOUND) {
+        } else if (identifier.indexOf('/') == CHAR_NOT_FOUND) {
+            identifierEncoded = identifier;
+            mountPoint = null;
+            schemaContext = this.controllerContext.getGlobalSchema();
+        } else {
             LOG.debug("Identifier {} cannot contain slash character (/).", identifier);
             throw new RestconfDocumentedException(String.format("Identifier %n%s%ncan\'t contain slash character (/).%n"
                     + "If slash is part of identifier name then use %%2F placeholder.", identifier), ErrorType.PROTOCOL,
                 ErrorTag.INVALID_VALUE);
-        } else {
-            identifierEncoded = identifier;
-            schemaContext = this.controllerContext.getGlobalSchema();
         }
 
-        final String identifierDecoded = this.controllerContext.urlPathArgDecode(identifierEncoded);
-
-        RpcDefinition rpc;
+        final String identifierDecoded = ControllerContext.urlPathArgDecode(identifierEncoded);
+        final RpcDefinition rpc;
         if (mountPoint == null) {
             rpc = this.controllerContext.getRpcDefinition(identifierDecoded);
         } else {
@@ -534,7 +534,7 @@ public final class RestconfImpl implements RestconfService {
                     + " with an input section defined", ErrorType.RPC, ErrorTag.MISSING_ELEMENT);
         }
 
-        final ListenableFuture<DOMRpcResult> response;
+        final ListenableFuture<? extends DOMRpcResult> response;
         if (mountPoint != null) {
             final Optional<DOMRpcService> mountRpcServices = mountPoint.getService(DOMRpcService.class);
             if (!mountRpcServices.isPresent()) {
@@ -545,18 +545,24 @@ public final class RestconfImpl implements RestconfService {
             response = this.broker.invokeRpc(rpc.getPath(), null);
         }
 
-        final DOMRpcResult result = checkRpcResponse(response);
-
-        if (result.getResult() != null && ((ContainerNode) result.getResult()).getValue().isEmpty()) {
+        final NormalizedNode<?, ?> result = checkRpcResponse(response).getResult();
+        if (result != null && ((ContainerNode) result).getValue().isEmpty()) {
             throw new WebApplicationException(Response.Status.NO_CONTENT);
-        } else {
-            return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpc, mountPoint, schemaContext),
-                    result.getResult(), QueryParametersParser.parseWriterParameters(uriInfo));
         }
+
+        // FIXME: in reference to the above @SupressFBWarnings: "mountPoint" reference here trips up SpotBugs, as it
+        //        thinks it can only ever be null. Except it can very much be non-null. The core problem is the horrible
+        //        structure of this code where we have a sh*tload of checks for mountpoint above and all over the
+        //        codebase where all that difference should have been properly encapsulated.
+        //
+        //        This is legacy code, so if anybody cares to do that refactor, feel free to contribute, but I am not
+        //        doing that work.
+        return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, rpc, mountPoint, schemaContext), result,
+            QueryParametersParser.parseWriterParameters(uriInfo));
     }
 
     @SuppressWarnings("checkstyle:avoidHidingCauseException")
-    private static DOMRpcResult checkRpcResponse(final ListenableFuture<DOMRpcResult> response) {
+    private static DOMRpcResult checkRpcResponse(final ListenableFuture<? extends DOMRpcResult> response) {
         if (response == null) {
             return null;
         }
@@ -574,24 +580,22 @@ public final class RestconfImpl implements RestconfService {
         } catch (final ExecutionException e) {
             LOG.debug("Execution RpcError: ", e);
             Throwable cause = e.getCause();
-            if (cause != null) {
-                while (cause.getCause() != null) {
-                    cause = cause.getCause();
-                }
-
-                if (cause instanceof IllegalArgumentException) {
-                    throw new RestconfDocumentedException(cause.getMessage(), ErrorType.PROTOCOL,
-                            ErrorTag.INVALID_VALUE);
-                } else if (cause instanceof DOMRpcImplementationNotAvailableException) {
-                    throw new RestconfDocumentedException(cause.getMessage(), ErrorType.APPLICATION,
-                            ErrorTag.OPERATION_NOT_SUPPORTED);
-                }
+            if (cause == null) {
                 throw new RestconfDocumentedException("The operation encountered an unexpected error while executing.",
-                        cause);
-            } else {
-                throw new RestconfDocumentedException("The operation encountered an unexpected error while executing.",
-                        e);
+                    e);
             }
+            while (cause.getCause() != null) {
+                cause = cause.getCause();
+            }
+
+            if (cause instanceof IllegalArgumentException) {
+                throw new RestconfDocumentedException(cause.getMessage(), ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
+            } else if (cause instanceof DOMRpcImplementationNotAvailableException) {
+                throw new RestconfDocumentedException(cause.getMessage(), ErrorType.APPLICATION,
+                    ErrorTag.OPERATION_NOT_SUPPORTED);
+            }
+            throw new RestconfDocumentedException("The operation encountered an unexpected error while executing.",
+                cause);
         } catch (final CancellationException e) {
             final String errMsg = "The operation was cancelled while executing.";
             LOG.debug("Cancel RpcExecution: {}", errMsg, e);
@@ -1174,7 +1178,7 @@ public final class RestconfImpl implements RestconfService {
      */
     private InstanceIdentifierContext<?> prepareIIDSubsStreamOutput() {
         final QName qnameBase = QName.create("subscribe:to:notification", "2016-10-28", "notifi");
-        final SchemaContext schemaCtx = controllerContext.getGlobalSchema();
+        final EffectiveModelContext schemaCtx = controllerContext.getGlobalSchema();
         final DataSchemaNode location = ((ContainerSchemaNode) schemaCtx
                 .findModule(qnameBase.getModule()).orElse(null)
                 .getDataChildByName(qnameBase)).getDataChildByName(QName.create(qnameBase, "location"));
@@ -1394,7 +1398,7 @@ public final class RestconfImpl implements RestconfService {
         return result;
     }
 
-    private MapNode makeModuleMapNode(final Set<Module> modules) {
+    private MapNode makeModuleMapNode(final Collection<? extends Module> modules) {
         Preconditions.checkNotNull(modules);
         final Module restconfModule = getRestconfModule();
         final DataSchemaNode moduleSchemaNode = this.controllerContext
