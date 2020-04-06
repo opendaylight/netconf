@@ -94,8 +94,7 @@ public class FilterContentValidator {
      */
     private DataSchemaNode getRootDataSchemaNode(final Module module, final URI nameSpace, final String name)
             throws DocumentedException {
-        final Collection<DataSchemaNode> childNodes = module.getChildNodes();
-        for (final DataSchemaNode childNode : childNodes) {
+        for (final DataSchemaNode childNode : module.getChildNodes()) {
             final QName qName = childNode.getQName();
             if (qName.getNamespace().equals(nameSpace) && qName.getLocalName().equals(name)) {
                 return childNode;

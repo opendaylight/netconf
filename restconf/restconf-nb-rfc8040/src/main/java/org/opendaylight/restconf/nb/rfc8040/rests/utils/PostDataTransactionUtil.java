@@ -34,6 +34,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.OrderedLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
@@ -97,7 +98,7 @@ public final class PostDataTransactionUtil {
      */
     private static FluentFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
             final NormalizedNode<?, ?> data, final TransactionVarsWrapper transactionNode,
-            final SchemaContext schemaContext, final String insert, final String point) {
+            final EffectiveModelContext schemaContext, final String insert, final String point) {
         final DOMTransactionChain transactionChain = transactionNode.getTransactionChain();
         final DOMDataTreeReadWriteTransaction newReadWriteTransaction = transactionChain.newReadWriteTransaction();
         if (insert == null) {
@@ -220,7 +221,7 @@ public final class PostDataTransactionUtil {
 
     private static void insertWithPointLeafListPost(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
-            final SchemaContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
+            final EffectiveModelContext schemaContext, final String point, final OrderedLeafSetNode<?> readLeafList,
             final boolean before, final DOMTransactionChain transactionChain) {
         rwTransaction.delete(datastore, path.getParent().getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
@@ -255,7 +256,7 @@ public final class PostDataTransactionUtil {
 
     private static void insertWithPointListPost(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path, final NormalizedNode<?, ?> payload,
-            final SchemaContext schemaContext, final String point, final MapNode readList, final boolean before,
+            final EffectiveModelContext schemaContext, final String point, final MapNode readList, final boolean before,
             final DOMTransactionChain transactionChain) {
         rwTransaction.delete(datastore, path.getParent().getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =

@@ -9,11 +9,11 @@ package org.opendaylight.netconf.sal.connect.netconf;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public abstract class AbstractTestModelTest {
-    protected static SchemaContext SCHEMA_CONTEXT;
+    protected static EffectiveModelContext SCHEMA_CONTEXT;
 
     @BeforeClass
     public static void beforeClass() {

@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.sal.restconf.impl.nn.to.json.test;
 
 import static org.junit.Assert.assertTrue;
@@ -19,11 +18,11 @@ import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.controller.sal.rest.impl.test.providers.AbstractBodyReaderTest;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class NnJsonChoiceCaseTest extends AbstractBodyReaderTest {
 
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
     private final NormalizedNodeJsonBodyWriter jsonBodyWriter;
 
     public NnJsonChoiceCaseTest()  {

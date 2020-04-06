@@ -41,6 +41,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.stream.NormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.codec.xml.XMLStreamNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -109,7 +110,7 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
             final InstanceIdentifierContext<?> pathContext, NormalizedNode<?, ?> data, final Optional<Integer> depth)
             throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
-        final SchemaContext schemaCtx = pathContext.getSchemaContext();
+        final EffectiveModelContext schemaCtx = pathContext.getSchemaContext();
         if (SchemaPath.ROOT.equals(schemaPath)) {
             nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, schemaPath, depth);
             if (data instanceof DOMSourceAnyxmlNode) {
