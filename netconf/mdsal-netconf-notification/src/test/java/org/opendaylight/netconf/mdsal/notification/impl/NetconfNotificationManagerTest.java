@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.mdsal.notification.impl;
 
 import static org.junit.Assert.assertEquals;
@@ -24,10 +23,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.mdsal.binding.dom.codec.impl.DefaultBindingDOMCodecFactory;
+import org.opendaylight.mdsal.binding.generator.impl.DefaultBindingRuntimeGenerator;
+import org.opendaylight.netconf.mdsal.notification.impl.ops.NotificationsTransformUtil;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
@@ -38,17 +40,14 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.Stream;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChangeBuilder;
+import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 
+@RunWith(MockitoJUnitRunner.class)
 public class NetconfNotificationManagerTest {
 
     public static final String RFC3339_DATE_FORMAT_WITH_MILLIS_BLUEPRINT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
     @Mock
     private NetconfNotificationRegistry notificationRegistry;
-
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     public void testEventTime() throws Exception {
@@ -140,7 +139,7 @@ public class NetconfNotificationManagerTest {
 
     @Test
     public void testNotificationListeners() throws Exception {
-        final NetconfNotificationManager netconfNotificationManager = new NetconfNotificationManager();
+        final NetconfNotificationManager netconfNotificationManager = createManager();
         final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration =
                 netconfNotificationManager.registerBaseNotificationPublisher();
 
@@ -163,13 +162,12 @@ public class NetconfNotificationManagerTest {
 
     @Test
     public void testClose() throws Exception {
-        final NetconfNotificationManager netconfNotificationManager = new NetconfNotificationManager();
+        final NetconfNotificationManager netconfNotificationManager = createManager();
 
         final BaseNotificationPublisherRegistration baseNotificationPublisherRegistration =
                 netconfNotificationManager.registerBaseNotificationPublisher();
 
         final NetconfNotificationListener listener = mock(NetconfNotificationListener.class);
-        doNothing().when(listener).onNotification(any(StreamNameType.class), any(NetconfNotification.class));
 
         netconfNotificationManager
                 .registerNotificationListener(NetconfNotificationManager.BASE_NETCONF_STREAM.getName(), listener);
@@ -198,7 +196,7 @@ public class NetconfNotificationManagerTest {
 
     @Test
     public void testStreamListeners() throws Exception {
-        final NetconfNotificationManager netconfNotificationManager = new NetconfNotificationManager();
+        final NetconfNotificationManager netconfNotificationManager = createManager();
 
         final NetconfNotificationCollector.NetconfNotificationStreamListener streamListener =
                 mock(NetconfNotificationCollector.NetconfNotificationStreamListener.class);
@@ -216,5 +214,10 @@ public class NetconfNotificationManagerTest {
         baseNotificationPublisherRegistration.close();
 
         verify(streamListener).onStreamUnregistered(NetconfNotificationManager.BASE_STREAM_NAME);
+    }
+
+    private static NetconfNotificationManager createManager() {
+        return new NetconfNotificationManager(new NotificationsTransformUtil(new YangParserFactoryImpl(),
+            new DefaultBindingRuntimeGenerator(), new DefaultBindingDOMCodecFactory()));
     }
 }

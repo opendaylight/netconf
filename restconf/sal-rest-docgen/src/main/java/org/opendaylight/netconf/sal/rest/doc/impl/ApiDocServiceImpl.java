@@ -10,10 +10,8 @@ package org.opendaylight.netconf.sal.rest.doc.impl;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
 import org.opendaylight.netconf.sal.rest.doc.api.ApiDocService;
 import org.opendaylight.netconf.sal.rest.doc.mountpoints.MountPointSwagger;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ApiDeclaration;

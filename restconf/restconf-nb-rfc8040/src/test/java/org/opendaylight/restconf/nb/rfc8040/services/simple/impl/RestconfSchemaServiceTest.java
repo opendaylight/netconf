@@ -33,8 +33,8 @@ import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
@@ -61,11 +61,11 @@ public class RestconfSchemaServiceTest {
     private DOMYangTextSourceProvider sourceProvider;
 
     // schema context with modules
-    private SchemaContext schemaContext;
+    private EffectiveModelContext schemaContext;
     // schema context with modules behind mount point
-    private SchemaContext schemaContextBehindMountPoint;
+    private EffectiveModelContext schemaContextBehindMountPoint;
     // schema context with mount points
-    private SchemaContext schemaContextWithMountPoints;
+    private EffectiveModelContext schemaContextWithMountPoints;
 
     // mount point service
     private DOMMountPointService mountPointService;
@@ -218,7 +218,7 @@ public class RestconfSchemaServiceTest {
         when(this.mockContextHandler.get()).thenReturn(this.schemaContextWithMountPoints);
 
         // make test - call service on mount point with null schema context
-        this.thrown.expect(NullPointerException.class);
+        this.thrown.expect(IllegalStateException.class);
         // NULL_MOUNT_POINT contains null schema context
         this.schemaService.getSchema(NULL_MOUNT_POINT + TEST_MODULE_BEHIND_MOUNT_POINT);
     }

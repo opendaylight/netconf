@@ -13,6 +13,8 @@
     <reference id="dataBroker"
                interface="org.opendaylight.mdsal.binding.api.DataBroker"
                odl:type="default"/>
+    <reference id="domCodec"
+               interface="org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer" />
     <reference id="domMountPointService"
                interface="org.opendaylight.mdsal.dom.api.DOMMountPointService" />
     <reference id="domNotificationPublishService"
@@ -25,6 +27,7 @@
           init-method="initialize"
           destroy-method="close">
         <argument ref="dataBroker" />
+        <argument ref="domCodec" />
         <argument ref="domNotificationPublishService" />
         <argument ref="domMountPointService" />
         <argument ref="eventSourceRegistry" />

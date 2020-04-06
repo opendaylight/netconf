@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.sal.rest.impl.test.providers;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -19,12 +18,12 @@ import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.impl.JsonToPatchBodyReader;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class TestJsonPatchBodyReader extends AbstractBodyReaderTest {
 
     private final JsonToPatchBodyReader jsonToPatchBodyReader;
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     public TestJsonPatchBodyReader() {
         super(schemaContext, null);

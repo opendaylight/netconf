@@ -9,7 +9,7 @@ package org.opendaylight.restconf.common.context;
 
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 public class InstanceIdentifierContext<T extends SchemaNode> {
@@ -17,10 +17,10 @@ public class InstanceIdentifierContext<T extends SchemaNode> {
     private final YangInstanceIdentifier instanceIdentifier;
     private final T schemaNode;
     private final DOMMountPoint mountPoint;
-    private final SchemaContext schemaContext;
+    private final EffectiveModelContext schemaContext;
 
     public InstanceIdentifierContext(final YangInstanceIdentifier instanceIdentifier, final T schemaNode,
-            final DOMMountPoint mountPoint,final SchemaContext context) {
+            final DOMMountPoint mountPoint, final EffectiveModelContext context) {
         this.instanceIdentifier = instanceIdentifier;
         this.schemaNode = schemaNode;
         this.mountPoint = mountPoint;
@@ -39,7 +39,7 @@ public class InstanceIdentifierContext<T extends SchemaNode> {
         return mountPoint;
     }
 
-    public SchemaContext getSchemaContext() {
+    public EffectiveModelContext getSchemaContext() {
         return schemaContext;
     }
 }

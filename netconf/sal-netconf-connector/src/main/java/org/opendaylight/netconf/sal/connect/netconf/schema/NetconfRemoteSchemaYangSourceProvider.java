@@ -102,7 +102,7 @@ public final class NetconfRemoteSchemaYangSourceProvider implements SchemaSource
         final String moduleName = sourceIdentifier.getName();
 
         final Optional<String> revision = sourceIdentifier.getRevision().map(Revision::toString);
-        final NormalizedNode<?, ?> getSchemaRequest = createGetSchemaRequest(moduleName, revision);
+        final ContainerNode getSchemaRequest = createGetSchemaRequest(moduleName, revision);
         LOG.trace("{}: Loading YANG schema source for {}:{}", id, moduleName, revision);
         return Futures.transform(
             rpc.invokeRpc(SchemaPath.create(true, NetconfMessageTransformUtil.GET_SCHEMA_QNAME), getSchemaRequest),

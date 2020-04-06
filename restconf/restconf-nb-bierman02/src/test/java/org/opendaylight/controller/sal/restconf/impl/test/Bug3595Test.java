@@ -19,15 +19,15 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class Bug3595Test {
 
     private static final QName CONT_QNAME = QName.create("leafref:module", "2014-04-17", "cont");
     private static final QName LST_WITH_LFREF_KEY_QNAME = QName.create(CONT_QNAME, "lst-with-lfref-key");
     private static final QName LFREF_KEY_QNAME = QName.create(CONT_QNAME, "lfref-key");
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     private final ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
 

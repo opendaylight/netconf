@@ -68,7 +68,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorTag;
 import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -125,7 +125,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
     static XPathExpression ERROR_APP_TAG;
     static XPathExpression ERROR_INFO;
 
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     @BeforeClass
     public static void init() throws Exception {

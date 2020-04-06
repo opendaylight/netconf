@@ -26,13 +26,13 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class URITest {
 
-    private static SchemaContext schemaContext;
-    private static SchemaContext mountSchemaContext;
+    private static EffectiveModelContext schemaContext;
+    private static EffectiveModelContext mountSchemaContext;
 
     private final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
     private final ControllerContext controllerContext =

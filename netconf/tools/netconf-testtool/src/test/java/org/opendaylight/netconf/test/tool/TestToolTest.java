@@ -8,6 +8,7 @@
 
 package org.opendaylight.netconf.test.tool;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.xmlunit.assertj.XmlAssert.assertThat;
 
@@ -148,14 +149,14 @@ public class TestToolTest {
             + "</rpc>";
         Document docResponse = invokeRpc(TCP_SIMULATOR_CONFIG, getSchema);
         Set<YangResource> expectedYangResources = Configuration.DEFAULT_YANG_RESOURCES;
-        assert expectedYangResources.size() > 0;
+        assertEquals(4, expectedYangResources.size());
         assertThat(docResponse)
             .withNamespaceContext(PREFIX_2_URI)
             .valueByXPath("count(//base10:rpc-reply/base10:data/ncmon:netconf-state/ncmon:schemas/ncmon:schema)")
             .isEqualTo(expectedYangResources.size());
     }
 
-    private Document invokeRpc(Configuration simulatorConfig, String xmlRequest)
+    private Document invokeRpc(final Configuration simulatorConfig, final String xmlRequest)
         throws Exception {
         // GIVEN
         int localPort = launchSimulator(simulatorConfig);
@@ -185,7 +186,7 @@ public class TestToolTest {
      * @param configuration The simulator configuration.
      * @return The TCP port number to access the launched simulator.
      */
-    private int launchSimulator(Configuration configuration) {
+    private int launchSimulator(final Configuration configuration) {
         return CACHED_SIMULATORS.computeIfAbsent(configuration, cfg -> {
             NetconfDeviceSimulator simulator = new NetconfDeviceSimulator(cfg);
             simulator.start();
@@ -196,7 +197,7 @@ public class TestToolTest {
     }
 
     @SuppressWarnings("deprecation")
-    private static Configuration getSimulatorConfig(NetconfClientProtocol protocol, User user) {
+    private static Configuration getSimulatorConfig(final NetconfClientProtocol protocol, final User user) {
         return new ConfigurationBuilder()
             .setStartingPort(RANDOM_PORT)
             .setRpcConfigFile(CUSTOM_RPC_CONFIG)
@@ -206,9 +207,9 @@ public class TestToolTest {
     }
 
     @SuppressWarnings("deprecation")
-    private static NetconfClientConfiguration getClientConfig(String host, int port,
-                                                              Configuration simulatorConfig,
-                                                              NetconfClientSessionListener sessionListener) {
+    private static NetconfClientConfiguration getClientConfig(final String host, final int port,
+                                                              final Configuration simulatorConfig,
+                                                              final NetconfClientSessionListener sessionListener) {
         User user = ((InMemoryAuthenticationProvider) simulatorConfig.getAuthProvider()).user;
         return NetconfClientConfigurationBuilder.create()
             .withAddress(new InetSocketAddress(host, port))
@@ -224,7 +225,7 @@ public class TestToolTest {
         private final String username;
         private final String password;
 
-        private User(String username, String password) {
+        private User(final String username, final String password) {
             this.username = username;
             this.password = password;
         }
@@ -234,12 +235,12 @@ public class TestToolTest {
 
         private final User user;
 
-        private InMemoryAuthenticationProvider(User user) {
+        private InMemoryAuthenticationProvider(final User user) {
             this.user = user;
         }
 
         @Override
-        public boolean authenticated(String username, String password) {
+        public boolean authenticated(final String username, final String password) {
             return user.username.equals(username) && user.password.equals(password);
         }
     }

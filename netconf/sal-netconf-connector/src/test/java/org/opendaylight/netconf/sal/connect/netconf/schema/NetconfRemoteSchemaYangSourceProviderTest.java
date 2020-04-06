@@ -31,6 +31,7 @@ import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableAnyXmlNodeBuilder;
@@ -55,7 +56,7 @@ public class NetconfRemoteSchemaYangSourceProviderTest {
 
         final DOMRpcResult value = new DefaultDOMRpcResult(getNode(), Collections.emptySet());
         final FluentFuture<DOMRpcResult> response = FluentFutures.immediateFluentFuture(value);
-        doReturn(response).when(service).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        doReturn(response).when(service).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
 
         provider = new NetconfRemoteSchemaYangSourceProvider(
                 new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("localhost", 17830)), service);

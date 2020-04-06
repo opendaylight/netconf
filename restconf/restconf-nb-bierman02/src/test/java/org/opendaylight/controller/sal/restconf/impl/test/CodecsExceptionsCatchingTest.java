@@ -29,7 +29,6 @@ import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class CodecsExceptionsCatchingTest extends JerseyTest {
@@ -40,8 +39,8 @@ public class CodecsExceptionsCatchingTest extends JerseyTest {
     @Before
     public void init() throws FileNotFoundException, ReactorException {
         restConf = RestconfImpl.newInstance(mock(BrokerFacade.class), controllerContext);
-        final SchemaContext schemaContext = TestUtils.loadSchemaContext("/decoding-exception/yang");
-        controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
+        controllerContext = TestRestconfUtils.newControllerContext(TestUtils.loadSchemaContext(
+            "/decoding-exception/yang"));
     }
 
     @Override

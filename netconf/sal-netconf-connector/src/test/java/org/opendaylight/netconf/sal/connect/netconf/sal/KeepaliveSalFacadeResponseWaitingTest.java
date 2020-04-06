@@ -9,8 +9,8 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.mockito.Mockito.after;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps.getSourceNode;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_CONFIG_PATH;
@@ -91,11 +91,11 @@ public class KeepaliveSalFacadeResponseWaitingTest {
         //This settable future object will be never set to any value. The test wants to simulate waiting for the result
         //of the future object.
         final SettableFuture<DOMRpcResult> settableFuture = SettableFuture.create();
-        when(deviceRpc.invokeRpc(null, null)).thenReturn(settableFuture);
+        doReturn(settableFuture).when(deviceRpc).invokeRpc(null, null);
 
         //This settable future will be used to check the invokation of keepalive RPC. Should be never invoked.
         final SettableFuture<DOMRpcResult> keepaliveSettableFuture = SettableFuture.create();
-        when(deviceRpc.invokeRpc(NETCONF_GET_CONFIG_PATH, KEEPALIVE_PAYLOAD)).thenReturn(keepaliveSettableFuture);
+        doReturn(keepaliveSettableFuture).when(deviceRpc).invokeRpc(NETCONF_GET_CONFIG_PATH, KEEPALIVE_PAYLOAD);
         final DOMRpcResult keepaliveResult = new DefaultDOMRpcResult(Builders.containerBuilder().withNodeIdentifier(
                 new YangInstanceIdentifier.NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RUNNING_QNAME)).build());
         keepaliveSettableFuture.set(keepaliveResult);
