@@ -7,37 +7,34 @@
  */
 package org.opendaylight.netconf.mdsal.connector.ops;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.collect.ClassToInstanceMap;
 import com.google.common.collect.ImmutableClassToInstanceMap;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMSchemaServiceExtension;
 import org.opendaylight.yangtools.concepts.AbstractListenerRegistration;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 
 final class SchemaServiceStub implements DOMSchemaService {
-    private final SchemaContext schemaContext;
+    private final EffectiveModelContext schemaContext;
 
-    SchemaServiceStub(SchemaContext schemaContext) {
-        this.schemaContext = schemaContext;
+    SchemaServiceStub(final EffectiveModelContext schemaContext) {
+        this.schemaContext = requireNonNull(schemaContext);
     }
 
     @Override
-    public SchemaContext getSessionContext() {
+    public EffectiveModelContext getGlobalContext() {
         return schemaContext;
     }
 
     @Override
-    public SchemaContext getGlobalContext() {
-        return schemaContext;
-    }
-
-    @Override
-    public ListenerRegistration<SchemaContextListener> registerSchemaContextListener(
-        final SchemaContextListener listener) {
-        listener.onGlobalContextUpdated(getGlobalContext());
-        return new AbstractListenerRegistration<SchemaContextListener>(listener) {
+    public ListenerRegistration<EffectiveModelContextListener> registerSchemaContextListener(
+        final EffectiveModelContextListener listener) {
+        listener.onModelContextUpdated(schemaContext);
+        return new AbstractListenerRegistration<>(listener) {
             @Override
             protected void removeRegistration() {
                 // No-op

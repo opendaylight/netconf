@@ -56,10 +56,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -135,13 +135,13 @@ public class RuntimeRpcTest {
         }
     };
 
-    private static SchemaContext SCHEMA_CONTEXT = null;
+    private static EffectiveModelContext SCHEMA_CONTEXT = null;
     private CurrentSchemaContext currentSchemaContext = null;
 
     @Mock
     private DOMSchemaService schemaService;
     @Mock
-    private SchemaContextListener listener;
+    private EffectiveModelContextListener listener;
     @Mock
     private ListenerRegistration<?> registration;
     @Mock
@@ -165,9 +165,9 @@ public class RuntimeRpcTest {
         doReturn(null).when(schemaService).getGlobalContext();
         doReturn(null).when(schemaService).getSessionContext();
         doAnswer(invocationOnMock -> {
-            ((SchemaContextListener) invocationOnMock.getArguments()[0]).onGlobalContextUpdated(SCHEMA_CONTEXT);
+            ((EffectiveModelContextListener) invocationOnMock.getArguments()[0]).onModelContextUpdated(SCHEMA_CONTEXT);
             return registration;
-        }).when(schemaService).registerSchemaContextListener(any(SchemaContextListener.class));
+        }).when(schemaService).registerSchemaContextListener(any(EffectiveModelContextListener.class));
 
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);

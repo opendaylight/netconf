@@ -7,6 +7,10 @@
  */
 package org.opendaylight.netconf.impl.osgi;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -19,12 +23,12 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.netconf.api.capability.BasicCapability;
 import org.opendaylight.netconf.api.capability.Capability;
@@ -37,6 +41,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.sessions.SessionBuilder;
 import org.opendaylight.yangtools.yang.common.Uint32;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfSessionMonitoringServiceTest {
 
     private static final Session SESSION_1 = new SessionBuilder()
@@ -62,24 +67,18 @@ public class NetconfSessionMonitoringServiceTest {
     private NetconfSessionMonitoringService monitoringService;
 
     @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
+    public void setUp() {
         doReturn(SESSION_1).when(sessionMock1).toManagementSession();
         doReturn(SESSION_2).when(sessionMock2).toManagementSession();
         doNothing().when(listener).onSessionStarted(any());
         doNothing().when(listener).onSessionEnded(any());
-
-        doNothing().when(notificationPublisher).onCapabilityChanged(any());
-        doNothing().when(notificationPublisher).onSessionStarted(any());
-        doNothing().when(notificationPublisher).onSessionEnded(any());
 
         monitoringService = new NetconfSessionMonitoringService(Optional.empty(), 0);
         monitoringService.registerListener(listener);
     }
 
     @Test
-    public void testListeners() throws Exception {
+    public void testListeners() {
         monitoringService.onSessionUp(sessionMock1);
         HashSet<Capability> added = new HashSet<>();
         added.add(new BasicCapability("toAdd"));
@@ -88,38 +87,36 @@ public class NetconfSessionMonitoringServiceTest {
         verify(listener).onSessionEnded(any());
     }
 
-
     @Test
-    public void testClose() throws Exception {
+    public void testClose() {
         monitoringService.onSessionUp(sessionMock1);
-        Assert.assertFalse(monitoringService.getSessions().getSession().isEmpty());
+        assertEquals(1, monitoringService.getSessions().getSession().size());
         monitoringService.close();
-        Assert.assertTrue(monitoringService.getSessions().getSession().isEmpty());
+        assertNull(monitoringService.getSessions().getSession());
     }
 
-
     @Test
-    public void testOnSessionUpAndDown() throws Exception {
+    public void testOnSessionUpAndDown() {
         monitoringService.onSessionUp(sessionMock1);
         ArgumentCaptor<Session> sessionUpCaptor = ArgumentCaptor.forClass(Session.class);
         verify(listener).onSessionStarted(sessionUpCaptor.capture());
         final Session sesionUp = sessionUpCaptor.getValue();
-        Assert.assertEquals(SESSION_1.getSessionId(), sesionUp.getSessionId());
-        Assert.assertEquals(SESSION_1.getSourceHost(), sesionUp.getSourceHost());
-        Assert.assertEquals(SESSION_1.getUsername(), sesionUp.getUsername());
+        assertEquals(SESSION_1.getSessionId(), sesionUp.getSessionId());
+        assertEquals(SESSION_1.getSourceHost(), sesionUp.getSourceHost());
+        assertEquals(SESSION_1.getUsername(), sesionUp.getUsername());
 
         monitoringService.onSessionDown(sessionMock1);
         ArgumentCaptor<Session> sessionDownCaptor = ArgumentCaptor.forClass(Session.class);
         verify(listener).onSessionEnded(sessionDownCaptor.capture());
         final Session sessionDown = sessionDownCaptor.getValue();
-        Assert.assertEquals(SESSION_1.getSessionId(), sessionDown.getSessionId());
-        Assert.assertEquals(SESSION_1.getSourceHost(), sessionDown.getSourceHost());
-        Assert.assertEquals(SESSION_1.getUsername(), sessionDown.getUsername());
+        assertEquals(SESSION_1.getSessionId(), sessionDown.getSessionId());
+        assertEquals(SESSION_1.getSourceHost(), sessionDown.getSourceHost());
+        assertEquals(SESSION_1.getUsername(), sessionDown.getUsername());
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testListenerUpdateSession() throws Exception {
+    public void testListenerUpdateSession() {
         ScheduledThreadPool threadPool = mock(ScheduledThreadPool.class);
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
         doReturn(executor).when(threadPool).getExecutor();
@@ -132,8 +129,8 @@ public class NetconfSessionMonitoringServiceTest {
                 ArgumentCaptor.forClass(Collection.class);
         verify(listener, timeout(2000)).onSessionsUpdated(captor.capture());
         final Collection<Session> value = captor.getValue();
-        Assert.assertTrue(value.contains(SESSION_1));
-        Assert.assertFalse(value.contains(SESSION_2));
+        assertTrue(value.contains(SESSION_1));
+        assertFalse(value.contains(SESSION_2));
         monitoringService.close();
     }
 }
