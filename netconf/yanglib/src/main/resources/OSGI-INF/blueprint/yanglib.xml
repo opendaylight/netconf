@@ -17,24 +17,17 @@
   <reference id="webServer" interface="org.opendaylight.aaa.web.WebServer"/>
   <reference id="webContextSecurer" interface="org.opendaylight.aaa.web.WebContextSecurer"/>
   <reference id="servletSupport" interface="org.opendaylight.aaa.web.servlet.ServletSupport" />
-
-  <bean id="schemaRepository" class="org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository">
-    <argument value="yang-library"/>
-  </bean>
-
-  <bean id="yangLibService" class="org.opendaylight.yanglib.impl.YangLibServiceImpl">
-    <argument ref="schemaRepository"/>
-  </bean>
-
-  <bean id="yangLibRestApp" class="org.opendaylight.yanglib.impl.YangLibRestApp">
-    <argument ref="yangLibService"/>
-  </bean>
+  <reference id="parserFactory" interface="org.opendaylight.yangtools.yang.model.parser.api.YangParserFactory" />
 
   <bean id="yangLibProvider" class="org.opendaylight.yanglib.impl.YangLibProvider"
           init-method="init" destroy-method="close">
     <argument ref="yanglibConfig"/>
     <argument ref="dataBroker"/>
-    <argument ref="schemaRepository"/>
+    <argument ref="parserFactory"/>
+  </bean>
+
+  <bean id="yangLibRestApp" class="org.opendaylight.yanglib.impl.YangLibRestApp">
+    <argument ref="yangLibProvider"/>
   </bean>
 
   <bean id="webInitializer" class="org.opendaylight.yanglib.impl.WebInitializer"

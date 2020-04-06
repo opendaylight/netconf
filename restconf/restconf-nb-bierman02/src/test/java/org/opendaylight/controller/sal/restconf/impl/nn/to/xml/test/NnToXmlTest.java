@@ -26,6 +26,7 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.codec.TypeDefinitionAwareCodec;
@@ -34,8 +35,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContaine
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.type.BitsTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.EnumTypeDefinition;
@@ -50,7 +51,7 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     public ExpectedException thrown = ExpectedException.none();
 
     private final NormalizedNodeXmlBodyWriter xmlBodyWriter;
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     public NnToXmlTest() {
         super(schemaContext, null);
@@ -192,10 +193,10 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     public void nnAsYangBitsToXmlTest() throws Exception {
         final BitsTypeDefinition.Bit mockBit1 = Mockito.mock(BitsTypeDefinition.Bit.class);
         Mockito.when(mockBit1.getName()).thenReturn("one");
-        Mockito.when(mockBit1.getPosition()).thenReturn(1L);
+        Mockito.when(mockBit1.getPosition()).thenReturn(Uint32.ONE);
         final BitsTypeDefinition.Bit mockBit2 = Mockito.mock(BitsTypeDefinition.Bit.class);
         Mockito.when(mockBit2.getName()).thenReturn("two");
-        Mockito.when(mockBit2.getPosition()).thenReturn(2L);
+        Mockito.when(mockBit2.getPosition()).thenReturn(Uint32.TWO);
         final BitsTypeBuilder bitsTypeBuilder = BaseTypes.bitsTypeBuilder(Mockito.mock(SchemaPath.class));
         bitsTypeBuilder.addBit(mockBit1);
         bitsTypeBuilder.addBit(mockBit2);
@@ -245,10 +246,10 @@ public class NnToXmlTest extends AbstractBodyReaderTest {
     public void nnAsYangUnionToXmlTest() throws Exception {
         final BitsTypeDefinition.Bit mockBit1 = Mockito.mock(BitsTypeDefinition.Bit.class);
         Mockito.when(mockBit1.getName()).thenReturn("first");
-        Mockito.when(mockBit1.getPosition()).thenReturn(1L);
+        Mockito.when(mockBit1.getPosition()).thenReturn(Uint32.ONE);
         final BitsTypeDefinition.Bit mockBit2 = Mockito.mock(BitsTypeDefinition.Bit.class);
         Mockito.when(mockBit2.getName()).thenReturn("second");
-        Mockito.when(mockBit2.getPosition()).thenReturn(2L);
+        Mockito.when(mockBit2.getPosition()).thenReturn(Uint32.TWO);
 
         final BitsTypeBuilder bitsTypeBuilder = BaseTypes.bitsTypeBuilder(Mockito.mock(SchemaPath.class));
         bitsTypeBuilder.addBit(mockBit1);

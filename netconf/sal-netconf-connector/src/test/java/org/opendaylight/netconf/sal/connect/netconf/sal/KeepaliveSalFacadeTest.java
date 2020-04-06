@@ -39,7 +39,7 @@ import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
@@ -106,21 +106,21 @@ public class KeepaliveSalFacadeTest {
                 .when(deviceRpc).invokeRpc(any(SchemaPath.class), isNull());
 
         doReturn(FluentFutures.immediateFluentFuture(result))
-                .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+                .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
         verify(underlyingSalFacade).onDeviceConnected(
                 isNull(), isNull(), any(DOMRpcService.class), isNull());
 
-        verify(deviceRpc, timeout(15000).times(5)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        verify(deviceRpc, timeout(15000).times(5)).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
     }
 
     @Test
     public void testKeepaliveRpcFailure() {
 
         doReturn(FluentFutures.immediateFailedFluentFuture(new IllegalStateException("illegal-state")))
-                .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+                .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
@@ -128,7 +128,7 @@ public class KeepaliveSalFacadeTest {
 
         // Should disconnect the session
         verify(listener, timeout(15000).times(1)).disconnect();
-        verify(deviceRpc, times(1)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        verify(deviceRpc, times(1)).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
     }
 
     @Test
@@ -137,7 +137,7 @@ public class KeepaliveSalFacadeTest {
         final DOMRpcResult rpcSuccessWithError = new DefaultDOMRpcResult(mock(RpcError.class));
 
         doReturn(FluentFutures.immediateFluentFuture(rpcSuccessWithError))
-                .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+                .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
@@ -146,7 +146,7 @@ public class KeepaliveSalFacadeTest {
 
         // Shouldn't disconnect the session
         verify(listener, times(0)).disconnect();
-        verify(deviceRpc, timeout(15000).times(1)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        verify(deviceRpc, timeout(15000).times(1)).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
     }
 
     @Test
@@ -158,7 +158,7 @@ public class KeepaliveSalFacadeTest {
             }).when(underlyingSalFacade).onDeviceConnected(isNull(), isNull(), any(DOMRpcService.class), isNull());
 
         doReturn(FluentFutures.immediateFailedFluentFuture(new IllegalStateException("illegal-state")))
-                .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+                .when(deviceRpc).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
 
         keepaliveSalFacade =
                 new KeepaliveSalFacade(REMOTE_DEVICE_ID, underlyingSalFacade, executorServiceSpy, 100L, 1L);
@@ -166,7 +166,7 @@ public class KeepaliveSalFacadeTest {
 
         keepaliveSalFacade.onDeviceConnected(null, null, deviceRpc);
 
-        proxyRpc.invokeRpc(mock(SchemaPath.class), mock(NormalizedNode.class));
+        proxyRpc.invokeRpc(mock(SchemaPath.class), mock(ContainerNode.class));
 
         verify(listener, times(1)).disconnect();
     }

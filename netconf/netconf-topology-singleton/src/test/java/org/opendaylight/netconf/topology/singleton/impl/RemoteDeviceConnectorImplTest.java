@@ -64,6 +64,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 import scala.concurrent.duration.Duration;
 
 public class RemoteDeviceConnectorImplTest {
@@ -189,7 +190,8 @@ public class RemoteDeviceConnectorImplTest {
 
         final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(NetconfNode.class, netconfNode).build();
 
-        builder.setSchemaResourceDTO(new DefaultSchemaResourceManager().getSchemaResources(netconfNode, "foo"));
+        builder.setSchemaResourceDTO(new DefaultSchemaResourceManager(new YangParserFactoryImpl())
+            .getSchemaResources(netconfNode, "foo"));
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
                 new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, deviceActionFactory);

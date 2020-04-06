@@ -33,7 +33,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPrefe
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class NetconfDeviceSalFacadeTest {
 
@@ -90,7 +90,7 @@ public class NetconfDeviceSalFacadeTest {
 
     @Test
     public void testOnDeviceConnected() {
-        final SchemaContext schemaContext = mock(SchemaContext.class);
+        final EffectiveModelContext schemaContext = mock(EffectiveModelContext.class);
 
         final NetconfSessionPreferences netconfSessionPreferences =
                 NetconfSessionPreferences.fromStrings(getCapabilities());

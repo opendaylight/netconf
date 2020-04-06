@@ -34,8 +34,8 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.Operation;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Parameter;
 import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class ApiDocGeneratorTest {
 
@@ -47,7 +47,7 @@ public class ApiDocGeneratorTest {
     private static final Date REVISION_2 = Date.valueOf(STRING_DATE);
     private ApiDocGeneratorDraftO2 generator;
     private DocGenTestHelper helper;
-    private SchemaContext schemaContext;
+    private EffectiveModelContext schemaContext;
 
     @Before
     public void setUp() throws Exception {

@@ -188,7 +188,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             ref = new SchemaContextRef(this.schemaContextHandler.get());
         } else {
             localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
-            ref = new SchemaContextRef(mountPoint.getSchemaContext());
+            ref = new SchemaContextRef(mountPoint.getEffectiveModelContext());
         }
 
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
@@ -316,7 +316,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
             ref = new SchemaContextRef(this.schemaContextHandler.get());
         } else {
             localTransactionChainHandler = transactionChainOfMountPoint(mountPoint);
-            ref = new SchemaContextRef(mountPoint.getSchemaContext());
+            ref = new SchemaContextRef(mountPoint.getEffectiveModelContext());
         }
 
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(
@@ -331,7 +331,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
 
     private SchemaContextRef getSchemaContext(final DOMMountPoint mountPoint) {
         return mountPoint == null ? new SchemaContextRef(schemaContextHandler.get())
-                : new SchemaContextRef(mountPoint.getSchemaContext());
+                : new SchemaContextRef(mountPoint.getEffectiveModelContext());
     }
 
     /**
@@ -377,7 +377,7 @@ public class RestconfDataServiceImpl implements RestconfDataService {
         if (mountPoint != null) {
             response = RestconfInvokeOperationsUtil.invokeActionViaMountPoint(mountPoint, (ContainerNode) data,
                 schemaPath, yangIIdContext);
-            schemaContextRef = new SchemaContextRef(mountPoint.getSchemaContext());
+            schemaContextRef = new SchemaContextRef(mountPoint.getEffectiveModelContext());
         } else {
             response = RestconfInvokeOperationsUtil.invokeAction((ContainerNode) data, schemaPath,
                 this.actionServiceHandler, yangIIdContext);

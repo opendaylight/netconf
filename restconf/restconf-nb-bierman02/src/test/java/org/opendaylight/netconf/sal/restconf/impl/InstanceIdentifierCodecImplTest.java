@@ -20,11 +20,11 @@ import org.opendaylight.restconf.common.util.IdentityValuesDTO;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class InstanceIdentifierCodecImplTest {
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     private InstanceIdentifierCodecImpl instanceIdentifierDTO;
     private YangInstanceIdentifier instanceIdentifierBadNamespace;
