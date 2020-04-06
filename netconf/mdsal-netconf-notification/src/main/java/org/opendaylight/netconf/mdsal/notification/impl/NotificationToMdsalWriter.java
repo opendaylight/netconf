@@ -77,8 +77,7 @@ public final class NotificationToMdsalWriter implements AutoCloseable, NetconfNo
     public void onStreamRegistered(final Stream stream) {
         final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
 
-        final InstanceIdentifier<Stream> streamIdentifier = STREAMS.child(Stream.class, stream.key());
-        tx.merge(LogicalDatastoreType.OPERATIONAL, streamIdentifier, stream, true);
+        tx.merge(LogicalDatastoreType.OPERATIONAL, STREAMS.child(Stream.class, stream.key()), stream);
 
         try {
             tx.commit().get();

@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -74,11 +73,11 @@ public class RestconfMappingNodeUtilTest {
     @Mock private LeafSchemaNode leafReplayLog;
     @Mock private LeafSchemaNode leafEvents;
 
-    private static Set<Module> modules;
+    private static Collection<? extends Module> modules;
     private static SchemaContext schemaContext;
     private static SchemaContext schemaContextMonitoring;
 
-    private static Set<Module> modulesRest;
+    private static Collection<? extends Module> modulesRest;
 
     @BeforeClass
     public static void loadTestSchemaContextAndModules() throws Exception {
@@ -278,7 +277,7 @@ public class RestconfMappingNodeUtilTest {
      * @param expectedModules Modules from <code>SchemaContext</code>
      * @param loadedModules Loaded modules into Restconf module
      */
-    private static void verifyLoadedModules(final Set<Module> expectedModules,
+    private static void verifyLoadedModules(final Collection<? extends Module> expectedModules,
             final Map<String, String> loadedModules) {
         assertEquals("Number of loaded modules is not as expected", expectedModules.size(), loadedModules.size());
         for (final Module m : expectedModules) {
