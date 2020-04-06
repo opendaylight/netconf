@@ -84,7 +84,7 @@ public class RestconfInvokeOperationsServiceImpl implements RestconfInvokeOperat
             schemaContextRef = new SchemaContextRef(this.schemaContextHandler.get());
         } else {
             response = RestconfInvokeOperationsUtil.invokeRpcViaMountPoint(mountPoint, payload.getData(), schemaPath);
-            schemaContextRef = new SchemaContextRef(mountPoint.getSchemaContext());
+            schemaContextRef = new SchemaContextRef(mountPoint.getEffectiveModelContext());
         }
 
         final DOMRpcResult result = RestconfInvokeOperationsUtil.checkResponse(response);

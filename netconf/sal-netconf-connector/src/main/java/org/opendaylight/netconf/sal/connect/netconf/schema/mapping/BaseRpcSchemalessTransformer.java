@@ -39,7 +39,7 @@ import org.w3c.dom.Element;
  */
 public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfMessage> {
 
-    private static final Map<QName, RpcDefinition> MAPPED_RPCS = BaseSchema.BASE_NETCONF_CTX.getMappedRpcs();
+    private static final Map<QName, ? extends RpcDefinition> MAPPED_RPCS = BaseSchema.BASE_NETCONF_CTX.getMappedRpcs();
     private static final SchemaContext SCHEMA_CONTEXT = BaseSchema.BASE_NETCONF_CTX.getSchemaContext();
 
     private final MessageCounter counter;

@@ -68,7 +68,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
         final SchemaContextHandler schemaContextHandler = SchemaContextHandler.newInstance(txHandler,
             mock(DOMSchemaService.class));
-        schemaContextHandler.onGlobalContextUpdated(contextRef.get());
+        schemaContextHandler.onModelContextUpdated(contextRef.get());
         this.invokeOperationsService =
                 new RestconfInvokeOperationsServiceImpl(this.rpcServiceHandler, schemaContextHandler);
         when(this.rpcServiceHandler.get()).thenReturn(this.rpcService);
@@ -117,7 +117,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         doReturn(schemaNode).when(context).getSchemaNode();
         final NormalizedNode<?, ?> data = mock(NormalizedNode.class);
         final DOMRpcResult domRpcResult = mock(DOMRpcResult.class);
-        when(this.rpcService.invokeRpc(schemaPath, data)).thenReturn(immediateFluentFuture(domRpcResult));
+        doReturn(immediateFluentFuture(domRpcResult)).when(this.rpcService).invokeRpc(schemaPath, data);
         doReturn(result).when(domRpcResult).getResult();
         return new NormalizedNodeContext(context, data);
     }

@@ -22,14 +22,14 @@ import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class TestJsonBodyWriter extends AbstractBodyReaderTest {
 
     private final JsonNormalizedNodeBodyReader jsonBodyReader;
     private final NormalizedNodeJsonBodyWriter jsonBodyWriter;
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     public TestJsonBodyWriter() {
         super(schemaContext, null);
