@@ -360,7 +360,7 @@ public final class RestconfImpl implements RestconfService {
         final ArrayList<LeafSchemaNode> fakeRpcSchema = new ArrayList<>();
 
         for (final Module m : modules) {
-            final Set<RpcDefinition> rpcs = m.getRpcs();
+            final Collection<? extends RpcDefinition> rpcs = m.getRpcs();
             if (!rpcs.isEmpty()) {
                 neededModules.add(m);
 

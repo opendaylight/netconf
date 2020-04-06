@@ -13,7 +13,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -124,7 +124,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
     @Override
     public synchronized Streams getNotificationPublishers() {
-        return new StreamsBuilder().setStream(Lists.newArrayList(streamMetadata.values())).build();
+        return new StreamsBuilder().setStream(Maps.uniqueIndex(streamMetadata.values(), Stream::key)).build();
     }
 
     @Override

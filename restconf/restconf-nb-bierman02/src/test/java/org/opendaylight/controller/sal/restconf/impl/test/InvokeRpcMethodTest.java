@@ -26,9 +26,9 @@ import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
@@ -89,7 +89,7 @@ public class InvokeRpcMethodTest {
     @BeforeClass
     public static void init() throws FileNotFoundException, ReactorException {
         schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs", "/invoke-rpc");
-        final Set<Module> allModules = schemaContext.getModules();
+        final Collection<? extends Module> allModules = schemaContext.getModules();
         assertNotNull(allModules);
         final Module module = TestUtils.resolveModule("invoke-rpc-module", allModules);
         assertNotNull(module);
@@ -129,9 +129,8 @@ public class InvokeRpcMethodTest {
         assertNotNull(rpcModule);
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), "rpc-test");
         final QName rpcInputQName = QName.create(rpcModule.getQNameModule(),"input");
-        final Set<RpcDefinition> setRpcs = rpcModule.getRpcs();
         ContainerSchemaNode rpcInputSchemaNode = null;
-        for (final RpcDefinition rpc : setRpcs) {
+        for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
                 rpcInputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcInputQName);
                 break;
@@ -284,11 +283,9 @@ public class InvokeRpcMethodTest {
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), "make-toast");
         final QName rpcInputQName = QName.create(rpcModule.getQNameModule(),"input");
 
-        final Set<RpcDefinition> setRpcs = rpcModule.getRpcs();
         RpcDefinition rpcDef = null;
         ContainerSchemaNode rpcInputSchemaNode = null;
-
-        for (final RpcDefinition rpc : setRpcs) {
+        for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
                 rpcInputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcInputQName);
                 rpcDef = rpc;
@@ -333,10 +330,9 @@ public class InvokeRpcMethodTest {
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), "testOutput");
         final QName rpcOutputQName = QName.create(rpcModule.getQNameModule(),"output");
 
-        final Set<RpcDefinition> setRpcs = rpcModule.getRpcs();
         RpcDefinition rpcDef = null;
         ContainerSchemaNode rpcOutputSchemaNode = null;
-        for (final RpcDefinition rpc : setRpcs) {
+        for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
                 rpcOutputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcOutputQName);
                 rpcDef = rpc;
