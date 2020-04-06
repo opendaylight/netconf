@@ -23,10 +23,10 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.transform.OutputKeys;
@@ -83,7 +83,7 @@ public final class TestUtils {
         return YangParserTestUtils.parseYangFiles(files);
     }
 
-    public static Module findModule(final Set<Module> modules, final String moduleName) {
+    public static Module findModule(final Collection<? extends Module> modules, final String moduleName) {
         for (final Module module : modules) {
             if (module.getName().equals(moduleName)) {
                 return module;
@@ -130,7 +130,7 @@ public final class TestUtils {
      * module set has only one element then this element is returned.
      *
      */
-    public static Module resolveModule(final String searchedModuleName, final Set<Module> modules) {
+    public static Module resolveModule(final String searchedModuleName, final Collection<? extends Module> modules) {
         assertNotNull("Modules can't be null.", modules);
         if (searchedModuleName != null) {
             for (final Module m : modules) {

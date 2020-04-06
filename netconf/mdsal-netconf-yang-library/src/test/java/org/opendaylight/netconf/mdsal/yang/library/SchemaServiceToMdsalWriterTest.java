@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -92,17 +92,20 @@ public class SchemaServiceToMdsalWriterTest {
     }
 
     private static ModulesState createTestModuleState() {
-        Submodule sub = new SubmoduleBuilder().setName(new YangIdentifier("test-submodule"))
+        Submodule sub = new SubmoduleBuilder()
+                .setName(new YangIdentifier("test-submodule"))
                 .setRevision(RevisionUtils.emptyRevision())
                 .build();
 
         Module module = new ModuleBuilder().setName(new YangIdentifier("test-module"))
                 .setNamespace(new Uri("test:namespace"))
                 .setRevision(new Revision(new RevisionIdentifier("2013-07-22")))
-                .setSubmodule(ImmutableList.of(sub))
+                .setSubmodule(ImmutableMap.of(sub.key(), sub))
                 .setConformanceType(Module.ConformanceType.Implement)
                 .build();
-        return new ModulesStateBuilder().setModuleSetId("0")
-                .setModule(ImmutableList.of(module)).build();
+        return new ModulesStateBuilder()
+                .setModuleSetId("0")
+                .setModule(ImmutableMap.of(module.key(), module))
+                .build();
     }
 }

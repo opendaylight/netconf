@@ -9,9 +9,10 @@ package org.opendaylight.netconf.mdsal.yang.library;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
@@ -26,6 +27,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.librar
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.ModuleBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.module.Submodule;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.module.SubmoduleBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.module.SubmoduleKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.Module;
@@ -91,9 +93,12 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
         }, MoreExecutors.directExecutor());
     }
 
-    private ModulesState createModuleStateFromModules(final Set<Module> modules) {
+    private ModulesState createModuleStateFromModules(final Collection<? extends Module> modules) {
         return new ModulesStateBuilder()
-                .setModule(modules.stream().map(this::createModuleEntryFromModule).collect(Collectors.toList()))
+                .setModule(modules.stream()
+                    .map(this::createModuleEntryFromModule)
+                    .collect(Collectors.toMap(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library
+                        .rev160621.module.list.Module::key, Function.identity())))
                 .setModuleSetId(String.valueOf(moduleSetId.getAndIncrement()))
                 .build();
     }
@@ -111,10 +116,12 @@ public class SchemaServiceToMdsalWriter implements SchemaContextListener, AutoCl
                 .build();
     }
 
-    private static List<Submodule> createSubmodulesForModule(final Module module) {
-        return module.getSubmodules().stream().map(subModule -> new SubmoduleBuilder()
-            .setName(new YangIdentifier(subModule.getName()))
-            .setRevision(RevisionUtils.fromYangCommon(subModule.getQNameModule().getRevision()))
-            .build()).collect(Collectors.toList());
+    private static Map<SubmoduleKey, Submodule> createSubmodulesForModule(final Module module) {
+        return module.getSubmodules().stream()
+                .map(subModule -> new SubmoduleBuilder()
+                    .setName(new YangIdentifier(subModule.getName()))
+                    .setRevision(RevisionUtils.fromYangCommon(subModule.getQNameModule().getRevision()))
+                    .build())
+                .collect(Collectors.toMap(Submodule::key, Function.identity()));
     }
 }

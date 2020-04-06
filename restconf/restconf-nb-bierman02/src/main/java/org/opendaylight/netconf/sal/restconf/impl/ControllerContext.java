@@ -473,7 +473,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
     }
 
     private static DataSchemaNode childByQName(final ChoiceSchemaNode container, final QName name) {
-        for (final CaseSchemaNode caze : container.getCases().values()) {
+        for (final CaseSchemaNode caze : container.getCases()) {
             final DataSchemaNode ret = childByQName(caze, name);
             if (ret != null) {
                 return ret;
@@ -612,7 +612,8 @@ public final class ControllerContext implements SchemaContextListener, Closeable
                             ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
                 }
 
-                final Iterator<Module> it = mountPointSchema.findModules(moduleNameBehindMountPoint).iterator();
+                final Iterator<? extends Module> it = mountPointSchema.findModules(moduleNameBehindMountPoint)
+                        .iterator();
                 if (!it.hasNext()) {
                     throw new RestconfDocumentedException("\"" + moduleNameBehindMountPoint
                             + "\" module does not exist in mount point.", ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
@@ -766,7 +767,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
     private static void collectInstanceDataNodeContainers(final List<DataSchemaNode> potentialSchemaNodes,
             final DataNodeContainer container, final String name) {
 
-        final Iterable<DataSchemaNode> nodes = Iterables.filter(container.getChildNodes(),
+        final Iterable<? extends DataSchemaNode> nodes = Iterables.filter(container.getChildNodes(),
             node -> name.equals(node.getQName().getLocalName()));
 
         // Can't combine this loop with the filter above because the filter is
@@ -779,8 +780,8 @@ public final class ControllerContext implements SchemaContextListener, Closeable
 
         final Iterable<ChoiceSchemaNode> choiceNodes = Iterables.filter(container.getChildNodes(),
             ChoiceSchemaNode.class);
-        final Iterable<Collection<CaseSchemaNode>> map = Iterables.transform(choiceNodes,
-            choice -> choice.getCases().values());
+        final Iterable<Collection<? extends CaseSchemaNode>> map = Iterables.transform(choiceNodes,
+            ChoiceSchemaNode::getCases);
         for (final CaseSchemaNode caze : Iterables.concat(map)) {
             collectInstanceDataNodeContainers(potentialSchemaNodes, caze, name);
         }
