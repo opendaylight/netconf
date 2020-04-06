@@ -8,6 +8,7 @@
 package org.opendaylight.netconf.impl;
 
 import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Verify.verify;
 
 import com.google.common.net.InetAddresses;
 import io.netty.channel.Channel;
@@ -20,7 +21,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
@@ -34,7 +34,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv6Address;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.NetconfTcp;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.Session1;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.Session1Builder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfSsh;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.Transport;
@@ -52,7 +51,14 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfServerSession.class);
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-    private static final String DATE_TIME_PATTERN_STRING = DateAndTime.PATTERN_CONSTANTS.get(0);
+
+    private static final String DATE_TIME_PATTERN_STRING;
+
+    static {
+        verify(DateAndTime.PATTERN_CONSTANTS.size() == 1);
+        DATE_TIME_PATTERN_STRING = DateAndTime.PATTERN_CONSTANTS.get(0);
+    }
+
     private static final Pattern DATE_TIME_PATTERN = Pattern.compile(DATE_TIME_PATTERN_STRING);
 
     private final NetconfHelloMessageAdditionalHeader header;
@@ -116,11 +122,10 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
 
     @Override
     public Session toManagementSession() {
-        SessionBuilder builder = new SessionBuilder();
-
-        builder.setSessionId(Uint32.valueOf(getSessionId()));
-        IpAddress address;
-        InetAddress address1 = InetAddresses.forString(header.getAddress());
+        final SessionBuilder builder = new SessionBuilder()
+                .withKey(new SessionKey(Uint32.valueOf(getSessionId())));
+        final InetAddress address1 = InetAddresses.forString(header.getAddress());
+        final IpAddress address;
         if (address1 instanceof Inet4Address) {
             address = new IpAddress(new Ipv4Address(header.getAddress()));
         } else {
@@ -128,30 +133,20 @@ public final class NetconfServerSession extends AbstractNetconfSession<NetconfSe
         }
         builder.setSourceHost(new Host(address));
 
-        checkState(DateAndTime.PATTERN_CONSTANTS.size() == 1);
-        String formattedDateTime = DATE_FORMATTER.format(loginTime);
+        final String formattedDateTime = DATE_FORMATTER.format(loginTime);
+        checkState(DATE_TIME_PATTERN.matcher(formattedDateTime).matches(),
+            "Formatted datetime %s does not match pattern %s", formattedDateTime, DATE_TIME_PATTERN);
 
-        Matcher matcher = DATE_TIME_PATTERN.matcher(formattedDateTime);
-        checkState(matcher.matches(), "Formatted datetime %s does not match pattern %s",
-                formattedDateTime, DATE_TIME_PATTERN);
-        builder.setLoginTime(new DateAndTime(formattedDateTime));
-
-        builder.setInBadRpcs(new ZeroBasedCounter32(Uint32.valueOf(inRpcFail)));
-        builder.setInRpcs(new ZeroBasedCounter32(Uint32.valueOf(inRpcSuccess)));
-        builder.setOutRpcErrors(new ZeroBasedCounter32(Uint32.valueOf(outRpcError)));
-
-        builder.setUsername(header.getUserName());
-        builder.setTransport(getTransportForString(header.getTransport()));
-
-        builder.setOutNotifications(new ZeroBasedCounter32(Uint32.valueOf(outNotification)));
-
-        builder.withKey(new SessionKey(Uint32.valueOf(getSessionId())));
-
-        Session1Builder builder1 = new Session1Builder();
-        builder1.setSessionIdentifier(header.getSessionIdentifier());
-        builder.addAugmentation(Session1.class, builder1.build());
-
-        return builder.build();
+        return builder
+                .setLoginTime(new DateAndTime(formattedDateTime))
+                .setInBadRpcs(new ZeroBasedCounter32(Uint32.valueOf(inRpcFail)))
+                .setInRpcs(new ZeroBasedCounter32(Uint32.valueOf(inRpcSuccess)))
+                .setOutRpcErrors(new ZeroBasedCounter32(Uint32.valueOf(outRpcError)))
+                .setUsername(header.getUserName())
+                .setTransport(getTransportForString(header.getTransport()))
+                .setOutNotifications(new ZeroBasedCounter32(Uint32.valueOf(outNotification)))
+                .addAugmentation(new Session1Builder().setSessionIdentifier(header.getSessionIdentifier()).build())
+                .build();
     }
 
     private static Class<? extends Transport> getTransportForString(final String transport) {

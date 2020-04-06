@@ -11,11 +11,13 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 
 final class OperationsImportedModule extends AbstractOperationsModule {
     private final Module original;
@@ -47,5 +49,10 @@ final class OperationsImportedModule extends AbstractOperationsModule {
     @Override
     public Optional<DataSchemaNode> findDataChildByName(final QName name) {
         return Optional.empty();
+    }
+
+    @Override
+    public Collection<? extends EffectiveStatement<?, ?>> effectiveSubstatements() {
+        return List.of();
     }
 }

@@ -13,6 +13,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.opendaylight.restconf.common.patch.PatchEditOperation.CREATE;
@@ -199,13 +200,14 @@ public class RestconfDataServiceImplTest {
         final SchemaContextHandler schemaContextHandler = SchemaContextHandler.newInstance(transactionChainHandler,
                 Mockito.mock(DOMSchemaService.class));
 
-        schemaContextHandler.onGlobalContextUpdated(this.contextRef.get());
+        schemaContextHandler.onModelContextUpdated(this.contextRef.get());
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,
                 DOMMountPointServiceHandler.newInstance(mountPointService), this.delegRestconfSubscrService,
                 this.actionServiceHandler);
         doReturn(Optional.of(this.mountPoint)).when(this.mountPointService)
                 .getMountPoint(any(YangInstanceIdentifier.class));
-        doReturn(this.contextRef.get()).when(this.mountPoint).getSchemaContext();
+        doCallRealMethod().when(this.mountPoint).getSchemaContext();
+        doReturn(this.contextRef.get()).when(this.mountPoint).getEffectiveModelContext();
         doReturn(Optional.of(this.mountDataBroker)).when(this.mountPoint).getService(DOMDataBroker.class);
         doReturn(this.mountTransactionChain).when(this.mountDataBroker)
                 .createTransactionChain(any(DOMTransactionChainListener.class));

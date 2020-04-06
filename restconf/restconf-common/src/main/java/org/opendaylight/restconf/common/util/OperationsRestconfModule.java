@@ -12,14 +12,18 @@ import static java.util.Objects.requireNonNull;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
 
 final class OperationsRestconfModule extends AbstractOperationsModule {
     // There is no need to intern this nor add a revision, as we are providing the corresponding context anyway
-    static final QNameModule NAMESPACE = QNameModule.create(URI.create("urn:ietf:params:xml:ns:yang:ietf-restconf"));
+    static final @NonNull QNameModule NAMESPACE =
+            QNameModule.create(URI.create("urn:ietf:params:xml:ns:yang:ietf-restconf"));
 
     private final OperationsContainerSchemaNode operations;
 
@@ -38,6 +42,11 @@ final class OperationsRestconfModule extends AbstractOperationsModule {
     }
 
     @Override
+    public String getPrefix() {
+        return "rc";
+    }
+
+    @Override
     public Collection<DataSchemaNode> getChildNodes() {
         return Collections.singleton(operations);
     }
@@ -48,7 +57,8 @@ final class OperationsRestconfModule extends AbstractOperationsModule {
     }
 
     @Override
-    public String getPrefix() {
-        return "rc";
+    public Collection<? extends EffectiveStatement<?, ?>> effectiveSubstatements() {
+        // This is not accurate, but works for now
+        return List.of();
     }
 }

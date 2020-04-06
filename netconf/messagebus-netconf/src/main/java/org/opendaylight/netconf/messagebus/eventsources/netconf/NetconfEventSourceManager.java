@@ -19,6 +19,7 @@ import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeChangeListener;
 import org.opendaylight.mdsal.binding.api.DataTreeIdentifier;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
+import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.mdsal.dom.api.DOMNotificationPublishService;
@@ -54,12 +55,15 @@ public final class NetconfEventSourceManager implements DataTreeChangeListener<N
     private ListenerRegistration<NetconfEventSourceManager> listenerRegistration;
     private final EventSourceRegistry eventSourceRegistry;
     private final DataBroker dataBroker;
+    private final BindingNormalizedNodeSerializer serializer;
 
     public NetconfEventSourceManager(final DataBroker dataBroker,
+                                     final BindingNormalizedNodeSerializer serializer,
                                      final DOMNotificationPublishService domPublish,
                                      final DOMMountPointService domMount,
                                      final EventSourceRegistry eventSourceRegistry) {
         this.dataBroker = requireNonNull(dataBroker);
+        this.serializer = requireNonNull(serializer);
         this.domMounts = requireNonNull(domMount);
         this.publishService = requireNonNull(domPublish);
         this.eventSourceRegistry = requireNonNull(eventSourceRegistry);
@@ -100,7 +104,8 @@ public final class NetconfEventSourceManager implements DataTreeChangeListener<N
             return;
         }
         LOG.info("Netconf event source [{}] is creating...", key);
-        NetconfEventSourceRegistration nesr = NetconfEventSourceRegistration.create(requireNonNull(key), node, this);
+        NetconfEventSourceRegistration nesr = NetconfEventSourceRegistration.create(serializer, requireNonNull(key),
+            node, this);
         if (nesr != null) {
             NetconfEventSourceRegistration nesrOld = registrationMap.put(key, nesr);
             if (nesrOld != null) {

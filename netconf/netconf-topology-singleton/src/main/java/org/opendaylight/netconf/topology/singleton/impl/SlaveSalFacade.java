@@ -17,7 +17,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceNotificationService;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalProvider;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ public class SlaveSalFacade {
         this.actorResponseWaitTime = actorResponseWaitTime;
     }
 
-    public void registerSlaveMountPoint(final SchemaContext remoteSchemaContext, final DOMRpcService deviceRpc,
+    public void registerSlaveMountPoint(final EffectiveModelContext remoteSchemaContext, final DOMRpcService deviceRpc,
             final DOMActionService deviceAction, final ActorRef masterActorRef) {
         if (!registered.compareAndSet(false, true)) {
             return;

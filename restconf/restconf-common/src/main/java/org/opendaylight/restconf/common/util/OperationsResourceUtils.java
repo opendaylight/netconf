@@ -24,7 +24,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContaine
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.util.SimpleSchemaContext;
 
 
 public final class OperationsResourceUtils {
@@ -60,6 +59,6 @@ public final class OperationsResourceUtils {
         }
 
         return new NormalizedNodeContext(new InstanceIdentifierContext<>(null, operatationsSchema, mountPoint,
-                SimpleSchemaContext.forModules(ImmutableSet.copyOf(modules))), operationsBuilder.build());
+                new OperationsEffectiveModuleContext(ImmutableSet.copyOf(modules))), operationsBuilder.build());
     }
 }

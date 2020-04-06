@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,7 +20,6 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.r
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.streams.StreamBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.DomainName;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.connection.status.AvailableCapabilitiesBuilder;
@@ -59,7 +59,7 @@ public final class NetconfTestUtils {
 
         return new NodeBuilder()
                 .withKey(new NodeKey(new NodeId(nodeIdent)))
-                .addAugmentation(NetconfNode.class, new NetconfNodeBuilder()
+                .addAugmentation(new NetconfNodeBuilder()
                     .setConnectionStatus(cs)
                     .setHost(new Host(new DomainName(hostName)))
                     .setAvailableCapabilities(new AvailableCapabilitiesBuilder()
@@ -81,10 +81,7 @@ public final class NetconfTestUtils {
 
     public static Optional<Streams> getAvailableStream(final String name, final boolean replaySupport) {
         Stream stream = new StreamBuilder().setName(new StreamNameType(name)).setReplaySupport(replaySupport).build();
-        List<Stream> streamList = new ArrayList<>();
-        streamList.add(stream);
-        Streams streams = new StreamsBuilder().setStream(streamList).build();
-        return Optional.of(streams);
+        return Optional.of(new StreamsBuilder().setStream(ImmutableMap.of(stream.key(), stream)).build());
     }
 
     public static NormalizedNode<?, ?> getStreamsNode(final String... streamName) {
