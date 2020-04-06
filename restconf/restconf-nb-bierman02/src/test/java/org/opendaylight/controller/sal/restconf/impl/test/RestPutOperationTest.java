@@ -46,6 +46,7 @@ import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
@@ -57,8 +58,8 @@ public class RestPutOperationTest extends JerseyTest {
     private static String xmlData2;
     private static String xmlData3;
 
-    private static SchemaContext schemaContextYangsIetf;
-    private static SchemaContext schemaContextTestModule;
+    private static EffectiveModelContext schemaContextYangsIetf;
+    private static EffectiveModelContext schemaContextTestModule;
 
     private BrokerFacade brokerFacade;
     private RestconfImpl restconfImpl;

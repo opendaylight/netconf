@@ -12,11 +12,11 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Collections2;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,10 +44,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
-public class NetconfEventSourceMountTest {
-
+public class NetconfEventSourceMountTest extends AbstractCodecTest {
     public static final String STREAM_1 = "stream-1";
     public static final String STREAM_2 = "stream-2";
+
     @Mock
     private DOMMountPoint domMountPoint;
     @Mock
@@ -71,7 +71,7 @@ public class NetconfEventSourceMountTest {
         final NormalizedNode<?, ?> streamsNode = NetconfTestUtils.getStreamsNode(STREAM_1, STREAM_2);
         doReturn(FluentFutures.immediateFluentFuture(Optional.of(streamsNode)))
                 .when(tx).read(LogicalDatastoreType.OPERATIONAL, path);
-        mount = new NetconfEventSourceMount(NetconfTestUtils.getNode("node-1"), domMountPoint);
+        mount = new NetconfEventSourceMount(SERIALIZER, NetconfTestUtils.getNode("node-1"), domMountPoint);
     }
 
     @Test
@@ -126,9 +126,10 @@ public class NetconfEventSourceMountTest {
 
     @Test
     public void testGetAvailableStreams() throws Exception {
-        final List<Stream> availableStreams = mount.getAvailableStreams();
+        final Collection<Stream> availableStreams = mount.getAvailableStreams();
         Assert.assertEquals(2, availableStreams.size());
-        final List<String> streamNames = Lists.transform(availableStreams, input -> input.getName().getValue());
+        final Collection<String> streamNames = Collections2.transform(availableStreams,
+            input -> input.getName().getValue());
         streamNames.contains(STREAM_1);
         streamNames.contains(STREAM_2);
     }

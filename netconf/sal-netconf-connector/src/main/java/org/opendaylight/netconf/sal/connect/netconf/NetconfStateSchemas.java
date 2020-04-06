@@ -50,7 +50,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -93,7 +93,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
      */
     static NetconfStateSchemas create(final DOMRpcService deviceRpc,
             final NetconfSessionPreferences remoteSessionCapabilities, final RemoteDeviceId id,
-            final SchemaContext schemaContext) {
+            final EffectiveModelContext schemaContext) {
         if (!remoteSessionCapabilities.isMonitoringSupported()) {
             // TODO - need to search for get-schema support, not just ietf-netconf-monitoring support
             // issue might be a deviation to ietf-netconf-monitoring where get-schema is unsupported...
@@ -159,7 +159,7 @@ public final class NetconfStateSchemas implements NetconfDeviceSchemas {
     }
 
     private static Optional<? extends NormalizedNode<?, ?>> findSchemasNode(final NormalizedNode<?, ?> result,
-            final SchemaContext schemaContext) {
+            final EffectiveModelContext schemaContext) {
         if (result == null) {
             return Optional.empty();
         }

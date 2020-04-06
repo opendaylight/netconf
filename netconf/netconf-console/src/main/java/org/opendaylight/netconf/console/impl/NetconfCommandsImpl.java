@@ -67,7 +67,7 @@ public class NetconfCommandsImpl implements NetconfCommands {
             return new HashMap<>();
         }
         final Map<String, Map<String, String>> netconfNodes = new HashMap<>();
-        for (final Node node : topology.getNode()) {
+        for (final Node node : topology.nonnullNode().values()) {
             final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
             final Map<String, String> attributes = new HashMap<>();
             attributes.put(NetconfConsoleConstants.NETCONF_ID, node.getNodeId().getValue());

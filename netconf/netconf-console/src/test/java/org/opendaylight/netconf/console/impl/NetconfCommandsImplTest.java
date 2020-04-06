@@ -14,7 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +56,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.common.Uint16;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class NetconfCommandsImplTest {
@@ -66,7 +68,7 @@ public class NetconfCommandsImplTest {
             NetconfNodeConnectionStatus.ConnectionStatus.Connected;
     private static final String CAP_PREFIX = "prefix";
 
-    private static SchemaContext SCHEMA_CONTEXT;
+    private static EffectiveModelContext SCHEMA_CONTEXT;
 
     private DataBroker dataBroker;
     private NetconfCommandsImpl netconfCommands;
@@ -137,7 +139,7 @@ public class NetconfCommandsImplTest {
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
             final Topology topology = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
                     NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
-            final List<Node> nodes = topology.getNode();
+            final Collection<Node> nodes = topology.nonnullNode().values();
             if (nodes.size() != 2) {
                 return false;
             }
@@ -158,7 +160,7 @@ public class NetconfCommandsImplTest {
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
             final Topology topologyDeleted = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
                     NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
-            final List<Node> nodesDeleted = topologyDeleted.getNode();
+            final Collection<Node> nodesDeleted = topologyDeleted.nonnullNode().values();
             if (nodesDeleted.size() != 1) {
                 return false;
             }
@@ -187,7 +189,7 @@ public class NetconfCommandsImplTest {
         Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> {
             final Topology topology = NetconfConsoleUtils.read(LogicalDatastoreType.CONFIGURATION,
                     NetconfIidFactory.NETCONF_TOPOLOGY_IID, dataBroker);
-            final List<Node> nodes = topology.getNode();
+            final Collection<Node> nodes = topology.nonnullNode().values();
             if (nodes.size() != 1) {
                 return false;
             }
@@ -214,13 +216,12 @@ public class NetconfCommandsImplTest {
 
     private void createTopology(final LogicalDatastoreType dataStoreType)
             throws TimeoutException, InterruptedException, ExecutionException {
-        final List<Node> nodes = new ArrayList<>();
         final Node node = getNetconfNode(NODE_ID, IP, PORT, CONN_STATUS, CAP_PREFIX);
-        nodes.add(node);
 
         final Topology topology = new TopologyBuilder()
                 .withKey(new TopologyKey(new TopologyId(TopologyNetconf.QNAME.getLocalName())))
-                .setTopologyId(new TopologyId(TopologyNetconf.QNAME.getLocalName())).setNode(nodes).build();
+                .setTopologyId(new TopologyId(TopologyNetconf.QNAME.getLocalName()))
+                .setNode(ImmutableMap.of(node.key(), node)).build();
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         writeTransaction.put(dataStoreType, NetconfIidFactory.NETCONF_TOPOLOGY_IID, topology);
