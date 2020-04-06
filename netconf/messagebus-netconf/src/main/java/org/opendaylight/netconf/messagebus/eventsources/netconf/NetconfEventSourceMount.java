@@ -13,13 +13,14 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.mdsal.binding.dom.codec.impl.BindingNormalizedNodeCodecRegistry;
-import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
-import org.opendaylight.mdsal.binding.generator.util.BindingRuntimeContext;
+import org.opendaylight.mdsal.binding.generator.impl.DefaultBindingRuntimeGenerator;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
@@ -49,20 +50,15 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
  */
 class NetconfEventSourceMount {
 
-    private static final BindingNormalizedNodeCodecRegistry CODEC_REGISTRY;
+    private static final BindingNormalizedNodeSerializer CODEC_REGISTRY;
     private static final YangInstanceIdentifier STREAMS_PATH = YangInstanceIdentifier.builder().node(Netconf.QNAME)
             .node(Streams.QNAME).build();
     private static final SchemaPath CREATE_SUBSCRIPTION = SchemaPath
             .create(true, QName.create(CreateSubscriptionInput.QNAME, "create-subscription"));
 
     static {
-        final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        moduleInfoBackedContext.addModuleInfos(Collections.singletonList(org.opendaylight.yang.gen.v1.urn.ietf.params
-                .xml.ns.netmod.notification.rev080714.$YangModuleInfoImpl.getInstance()));
-        SchemaContext notificationsSchemaCtx = moduleInfoBackedContext.tryToCreateSchemaContext().get();
-
-        CODEC_REGISTRY = new BindingNormalizedNodeCodecRegistry(BindingRuntimeContext.create(moduleInfoBackedContext,
-                notificationsSchemaCtx));
+        CODEC_REGISTRY = new BindingNormalizedNodeCodecRegistry(BindingRuntimeHelpers.createRuntimeContext(
+            new DefaultBindingRuntimeGenerator(), Netconf.class));
     }
 
     private final DOMMountPoint mountPoint;
@@ -135,14 +131,14 @@ class NetconfEventSourceMount {
      * @throws ExecutionException if data read fails
      * @throws InterruptedException if data read fails
      */
-    List<Stream> getAvailableStreams() throws InterruptedException, ExecutionException {
+    Collection<Stream> getAvailableStreams() throws InterruptedException, ExecutionException {
         final Optional<NormalizedNode<?, ?>> streams;
         try (DOMDataTreeReadTransaction tx = dataBroker.newReadOnlyTransaction()) {
             streams = tx.read(LogicalDatastoreType.OPERATIONAL, STREAMS_PATH).get();
         }
         if (streams.isPresent()) {
             Streams streams1 = (Streams) CODEC_REGISTRY.fromNormalizedNode(STREAMS_PATH, streams.get()).getValue();
-            return streams1.getStream();
+            return streams1.nonnullStream().values();
         }
         return Collections.emptyList();
     }
