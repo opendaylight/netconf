@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -81,10 +82,7 @@ public final class NetconfTestUtils {
 
     public static Optional<Streams> getAvailableStream(final String name, final boolean replaySupport) {
         Stream stream = new StreamBuilder().setName(new StreamNameType(name)).setReplaySupport(replaySupport).build();
-        List<Stream> streamList = new ArrayList<>();
-        streamList.add(stream);
-        Streams streams = new StreamsBuilder().setStream(streamList).build();
-        return Optional.of(streams);
+        return Optional.of(new StreamsBuilder().setStream(ImmutableMap.of(stream.key(), stream)).build());
     }
 
     public static NormalizedNode<?, ?> getStreamsNode(final String... streamName) {
