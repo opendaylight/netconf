@@ -27,6 +27,7 @@ import akka.actor.ActorSystem;
 import akka.testkit.javadsl.TestKit;
 import akka.util.Timeout;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.Futures;
@@ -39,9 +40,9 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.concurrent.SucceededFuture;
 import java.io.File;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -54,6 +55,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
+import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -68,7 +70,6 @@ import org.opendaylight.mdsal.binding.api.TransactionChainListener;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.binding.dom.adapter.test.AbstractConcurrentDataBrokerTest;
 import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
-import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
 import org.opendaylight.mdsal.binding.spec.reflect.BindingReflections;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionProviderService;
@@ -118,6 +119,7 @@ import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controll
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.Top;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.two.level.list.TopLevelList;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.two.level.list.TopLevelListBuilder;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.params.xml.ns.yang.controller.md.sal.test.list.rev140701.two.level.list.TopLevelListKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
@@ -215,9 +217,7 @@ public class MountPointEndToEndTest {
 
         topModuleInfo = BindingReflections.getModuleInfo(Top.class);
 
-        final ModuleInfoBackedContext moduleContext = ModuleInfoBackedContext.create();
-        moduleContext.addModuleInfos(Arrays.asList(topModuleInfo));
-        deviceSchemaContext = moduleContext.tryToCreateSchemaContext().get();
+        deviceSchemaContext = BindingRuntimeHelpers.createEffectiveModel(Top.class);
 
         deviceRpcService.onGlobalContextUpdated(deviceSchemaContext);
 
@@ -487,8 +487,7 @@ public class MountPointEndToEndTest {
                 RpcResultBuilder.newError(ErrorType.APPLICATION, "tag2", "error2"))));
 
         testGetTopRpc(domRpcService, new DefaultDOMRpcResult(bindingToNormalized.toNormalizedNodeRpcData(
-                new GetTopOutputBuilder().setTopLevelList(Arrays.asList(new TopLevelListBuilder().setName("one")
-                        .build())).build())));
+                new GetTopOutputBuilder().setTopLevelList(oneTopLevelList()).build())));
 
         testFailedRpc(domRpcService, getTopRpcSchemaPath, null);
     }
@@ -496,9 +495,13 @@ public class MountPointEndToEndTest {
     private void testPutTopRpc(final DOMRpcService domRpcService, final DOMRpcResult result)
             throws InterruptedException, ExecutionException, TimeoutException {
         ContainerNode putTopInput = bindingToNormalized.toNormalizedNodeRpcData(
-                new PutTopInputBuilder().setTopLevelList(Arrays.asList(new TopLevelListBuilder().setName("one")
-                        .build())).build());
+                new PutTopInputBuilder().setTopLevelList(oneTopLevelList()).build());
         testRpc(domRpcService, putTopRpcSchemaPath, putTopInput, result);
+    }
+
+    private static Map<TopLevelListKey, TopLevelList> oneTopLevelList() {
+        final TopLevelListKey key = new TopLevelListKey("one");
+        return ImmutableMap.of(key, new TopLevelListBuilder().withKey(key).build());
     }
 
     private void testGetTopRpc(final DOMRpcService domRpcService, final DOMRpcResult result)

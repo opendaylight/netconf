@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -189,7 +188,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         }
 
         final InstanceIdentifierBuilder builder = YangInstanceIdentifier.builder();
-        final Set<Module> latestModule = this.globalSchema.findModules(startModule);
+        final Collection<? extends Module> latestModule = this.globalSchema.findModules(startModule);
 
         if (latestModule.isEmpty()) {
             throw new RestconfDocumentedException("The module named '" + startModule + "' does not exist.",
@@ -352,14 +351,14 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         return module == null ? null : module.getNamespace();
     }
 
-    public Set<Module> getAllModules(final DOMMountPoint mountPoint) {
+    public Collection<? extends Module> getAllModules(final DOMMountPoint mountPoint) {
         checkPreconditions();
 
         final SchemaContext schemaContext = mountPoint == null ? null : mountPoint.getSchemaContext();
         return schemaContext == null ? null : schemaContext.getModules();
     }
 
-    public Set<Module> getAllModules() {
+    public Collection<? extends Module> getAllModules() {
         checkPreconditions();
         return this.globalSchema.getModules();
     }
@@ -405,9 +404,9 @@ public final class ControllerContext implements SchemaContextListener, Closeable
             return null;
         }
 
-        final Set<GroupingDefinition> groupings = restconfModule.getGroupings();
+        final Collection<? extends GroupingDefinition> groupings = restconfModule.getGroupings();
 
-        final Iterable<GroupingDefinition> filteredGroups = Iterables.filter(groupings,
+        final Iterable<? extends GroupingDefinition> filteredGroups = Iterables.filter(groupings,
             g -> RestConfModule.ERRORS_GROUPING_SCHEMA_NODE.equals(g.getQName().getLocalName()));
 
         final GroupingDefinition restconfGrouping = Iterables.getFirst(filteredGroups, null);
@@ -428,8 +427,8 @@ public final class ControllerContext implements SchemaContextListener, Closeable
             return null;
         }
 
-        final Set<GroupingDefinition> groupings = restconfModule.getGroupings();
-        final Iterable<GroupingDefinition> filteredGroups = Iterables.filter(groupings,
+        final Collection<? extends GroupingDefinition> groupings = restconfModule.getGroupings();
+        final Iterable<? extends GroupingDefinition> filteredGroups = Iterables.filter(groupings,
             g -> RestConfModule.RESTCONF_GROUPING_SCHEMA_NODE.equals(g.getQName().getLocalName()));
         final GroupingDefinition restconfGrouping = Iterables.getFirst(filteredGroups, null);
 
@@ -473,7 +472,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
     }
 
     private static DataSchemaNode childByQName(final ChoiceSchemaNode container, final QName name) {
-        for (final CaseSchemaNode caze : container.getCases().values()) {
+        for (final CaseSchemaNode caze : container.getCases()) {
             final DataSchemaNode ret = childByQName(caze, name);
             if (ret != null) {
                 return ret;
@@ -612,7 +611,8 @@ public final class ControllerContext implements SchemaContextListener, Closeable
                             ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
                 }
 
-                final Iterator<Module> it = mountPointSchema.findModules(moduleNameBehindMountPoint).iterator();
+                final Iterator<? extends Module> it = mountPointSchema.findModules(moduleNameBehindMountPoint)
+                        .iterator();
                 if (!it.hasNext()) {
                     throw new RestconfDocumentedException("\"" + moduleNameBehindMountPoint
                             + "\" module does not exist in mount point.", ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
@@ -766,7 +766,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
     private static void collectInstanceDataNodeContainers(final List<DataSchemaNode> potentialSchemaNodes,
             final DataNodeContainer container, final String name) {
 
-        final Iterable<DataSchemaNode> nodes = Iterables.filter(container.getChildNodes(),
+        final Iterable<? extends DataSchemaNode> nodes = Iterables.filter(container.getChildNodes(),
             node -> name.equals(node.getQName().getLocalName()));
 
         // Can't combine this loop with the filter above because the filter is
@@ -779,8 +779,8 @@ public final class ControllerContext implements SchemaContextListener, Closeable
 
         final Iterable<ChoiceSchemaNode> choiceNodes = Iterables.filter(container.getChildNodes(),
             ChoiceSchemaNode.class);
-        final Iterable<Collection<CaseSchemaNode>> map = Iterables.transform(choiceNodes,
-            choice -> choice.getCases().values());
+        final Iterable<Collection<? extends CaseSchemaNode>> map = Iterables.transform(choiceNodes,
+            ChoiceSchemaNode::getCases);
         for (final CaseSchemaNode caze : Iterables.concat(map)) {
             collectInstanceDataNodeContainers(potentialSchemaNodes, caze, name);
         }
@@ -864,7 +864,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         checkPreconditions();
         final String module = toModuleName(name);
         final String node = toNodeName(name);
-        final Set<Module> modules = schemaContext.findModules(module);
+        final Collection<? extends Module> modules = schemaContext.findModules(module);
         return modules.isEmpty() ? null : QName.create(modules.iterator().next().getQNameModule(), node);
     }
 
@@ -895,7 +895,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
     @Override
     public void onGlobalContextUpdated(final SchemaContext context) {
         if (context != null) {
-            final Collection<RpcDefinition> defs = context.getOperations();
+            final Collection<? extends RpcDefinition> defs = context.getOperations();
             final Map<QName, RpcDefinition> newMap = new HashMap<>(defs.size());
 
             for (final RpcDefinition operation : defs) {

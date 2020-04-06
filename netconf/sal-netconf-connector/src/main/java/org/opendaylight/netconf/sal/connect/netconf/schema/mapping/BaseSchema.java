@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import java.util.Arrays;
 import org.eclipse.jdt.annotation.NonNull;
-import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
+import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.QName;
@@ -37,17 +37,15 @@ public enum BaseSchema implements SchemaContextProvider {
             .$YangModuleInfoImpl.getInstance()
     );
 
-    private final @NonNull ImmutableMap<QName, RpcDefinition> mappedRpcs;
+    private final @NonNull ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
     private final @NonNull EmptyMountPointContext mountContext;
 
     BaseSchema(final YangModuleInfo... modules) {
-        final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        moduleInfoBackedContext.addModuleInfos(Arrays.asList(modules));
-        mountContext = new EmptyMountPointContext(moduleInfoBackedContext.tryToCreateSchemaContext().get());
+        mountContext = new EmptyMountPointContext(BindingRuntimeHelpers.createEffectiveModel(Arrays.asList(modules)));
         mappedRpcs = Maps.uniqueIndex(getSchemaContext().getOperations(), RpcDefinition::getQName);
     }
 
-    @NonNull ImmutableMap<QName, RpcDefinition> getMappedRpcs() {
+    @NonNull ImmutableMap<QName, ? extends RpcDefinition> getMappedRpcs() {
         return mappedRpcs;
     }
 
