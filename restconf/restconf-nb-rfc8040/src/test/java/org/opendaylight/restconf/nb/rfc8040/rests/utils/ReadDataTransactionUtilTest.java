@@ -49,8 +49,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.UnkeyedListNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class ReadDataTransactionUtilTest {
 
@@ -66,7 +66,7 @@ public class ReadDataTransactionUtilTest {
     @Mock
     private DOMDataTreeReadTransaction read;
     @Mock
-    private SchemaContext schemaContext;
+    private EffectiveModelContext schemaContext;
     @Mock
     private ContainerSchemaNode containerSchemaNode;
     @Mock

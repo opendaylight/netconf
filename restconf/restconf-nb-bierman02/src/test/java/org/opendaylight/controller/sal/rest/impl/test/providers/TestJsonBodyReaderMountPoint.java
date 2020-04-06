@@ -33,13 +33,13 @@ import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
 
     private final JsonNormalizedNodeBodyReader jsonBodyReader;
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
         URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
@@ -120,13 +120,11 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
                 .getChild(yangCont.getLastPathArgument());
         assertTrue(contDataNode.isPresent());
         assertTrue(contDataNode.get() instanceof ContainerNode);
-        final YangInstanceIdentifier yangleaf = YangInstanceIdentifier.of(QName
-                .create(inputNode.getNodeType(), "lf"));
+        final YangInstanceIdentifier yangleaf = YangInstanceIdentifier.of(QName.create(inputNode.getNodeType(), "lf"));
         final Optional<DataContainerChild<? extends PathArgument, ?>> leafDataNode =
                 ((ContainerNode) contDataNode.get()).getChild(yangleaf.getLastPathArgument());
         assertTrue(leafDataNode.isPresent());
-        assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue()
-                .toString()));
+        assertTrue("lf-test".equalsIgnoreCase(leafDataNode.get().getValue().toString()));
     }
 
     private void checkExpectValueNormalizeNodeContext(
@@ -142,17 +140,13 @@ public class TestJsonBodyReaderMountPoint extends AbstractBodyReaderTest {
                 .of(dataSchemaNode.getQName());
         final DOMMountPoint mountPoint = nnContext
                 .getInstanceIdentifierContext().getMountPoint();
-        final DataSchemaNode mountDataSchemaNode = mountPoint
-                .getSchemaContext().getDataChildByName(
+        final DataSchemaNode mountDataSchemaNode = mountPoint.getSchemaContext().getDataChildByName(
                         dataSchemaNode.getQName());
         assertNotNull(mountDataSchemaNode);
         if (qualifiedName != null && dataSchemaNode instanceof DataNodeContainer) {
-            final DataSchemaNode child = ((DataNodeContainer) dataSchemaNode)
-                    .getDataChildByName(qualifiedName);
-            dataNodeIdent = YangInstanceIdentifier.builder(dataNodeIdent)
-                    .node(child.getQName()).build();
-            assertTrue(nnContext.getInstanceIdentifierContext().getSchemaNode()
-                    .equals(child));
+            final DataSchemaNode child = ((DataNodeContainer) dataSchemaNode).getDataChildByName(qualifiedName);
+            dataNodeIdent = YangInstanceIdentifier.builder(dataNodeIdent).node(child.getQName()).build();
+            assertTrue(nnContext.getInstanceIdentifierContext().getSchemaNode().equals(child));
         } else {
             assertTrue(mountDataSchemaNode.equals(dataSchemaNode));
         }

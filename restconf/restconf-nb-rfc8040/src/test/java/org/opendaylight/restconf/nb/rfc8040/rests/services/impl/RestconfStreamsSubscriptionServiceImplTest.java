@@ -113,7 +113,7 @@ public class RestconfStreamsSubscriptionServiceImplTest {
         when(uriInfo.getBaseUriBuilder()).thenReturn(baseUriBuilder);
         final URI uri = new URI("http://127.0.0.1/" + URI);
         when(uriInfo.getAbsolutePath()).thenReturn(uri);
-        this.schemaHandler.onGlobalContextUpdated(
+        this.schemaHandler.onModelContextUpdated(
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/notifications")));
     }
 

@@ -18,7 +18,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
+import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.$YangModuleInfoImpl;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
@@ -57,9 +57,8 @@ public class NetconfUtilTest {
 
     @Test
     public void testWriteNormalizedNode() throws Exception {
-        final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        moduleInfoBackedContext.addModuleInfos(Collections.singletonList($YangModuleInfoImpl.getInstance()));
-        final SchemaContext context = moduleInfoBackedContext.getSchemaContext();
+        final SchemaContext context = BindingRuntimeHelpers.createEffectiveModel(
+            Collections.singletonList($YangModuleInfoImpl.getInstance()));
         final LeafNode<?> username = Builders.leafBuilder()
                 .withNodeIdentifier(new NodeIdentifier(QName.create(Session.QNAME, "username")))
                 .withValue("admin")

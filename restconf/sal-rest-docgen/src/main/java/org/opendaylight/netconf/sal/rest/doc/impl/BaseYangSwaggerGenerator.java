@@ -96,7 +96,7 @@ public abstract class BaseYangSwaggerGenerator {
      * Return list of modules converted to swagger compliant resource list.
      */
     public ResourceList getResourceListing(final UriInfo uriInfo, final SchemaContext schemaContext,
-        final String context, final int pageNum, boolean all, final URIType uriType) {
+        final String context, final int pageNum, final boolean all, final URIType uriType) {
 
         final ResourceList resourceList = createResourceList();
 
@@ -201,7 +201,7 @@ public abstract class BaseYangSwaggerGenerator {
         final List<Api> apis = new ArrayList<>();
         boolean hasAddRootPostLink = false;
 
-        final Collection<DataSchemaNode> dataSchemaNodes = module.getChildNodes();
+        final Collection<? extends DataSchemaNode> dataSchemaNodes = module.getChildNodes();
         LOG.debug("child nodes size [{}]", dataSchemaNodes.size());
         for (final DataSchemaNode node : dataSchemaNodes) {
             if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
@@ -241,8 +241,7 @@ public abstract class BaseYangSwaggerGenerator {
             }
         }
 
-        final Set<RpcDefinition> rpcs = module.getRpcs();
-        for (final RpcDefinition rpcDefinition : rpcs) {
+        for (final RpcDefinition rpcDefinition : module.getRpcs()) {
             final String resourcePath;
             resourcePath = getDataStorePath("operations", context);
             addOperations(rpcDefinition, apis, resourcePath, schemaContext);
@@ -305,7 +304,7 @@ public abstract class BaseYangSwaggerGenerator {
         LOG.debug("Adding path: [{}]", resourcePath);
         api.setPath(resourcePath.concat(getContent(dataStore)));
 
-        Iterable<DataSchemaNode> childSchemaNodes = Collections.emptySet();
+        Iterable<? extends DataSchemaNode> childSchemaNodes = Collections.emptySet();
         if (node instanceof ListSchemaNode || node instanceof ContainerSchemaNode) {
             final DataNodeContainer dataNodeContainer = (DataNodeContainer) node;
             childSchemaNodes = dataNodeContainer.getChildNodes();
@@ -314,9 +313,9 @@ public abstract class BaseYangSwaggerGenerator {
         apis.add(api);
 
         if (uriType.equals(URIType.RFC8040)) {
-            ((ActionNodeContainer) node).getActions().forEach((actionDef -> {
+            ((ActionNodeContainer) node).getActions().forEach(actionDef -> {
                 addOperations(actionDef, apis, resourcePath, schemaContext);
-            }));
+            });
         }
 
         for (final DataSchemaNode childNode : childSchemaNodes) {
@@ -333,7 +332,7 @@ public abstract class BaseYangSwaggerGenerator {
 
     public abstract String getContent(String dataStore);
 
-    private static boolean containsListOrContainer(final Iterable<DataSchemaNode> nodes) {
+    private static boolean containsListOrContainer(final Iterable<? extends DataSchemaNode> nodes) {
         for (final DataSchemaNode child : nodes) {
             if (child instanceof ListSchemaNode || child instanceof ContainerSchemaNode) {
                 return true;
@@ -343,7 +342,8 @@ public abstract class BaseYangSwaggerGenerator {
     }
 
     private static List<Operation> operation(final DataSchemaNode node, final List<Parameter> pathParams,
-            final boolean isConfig, final Iterable<DataSchemaNode> childSchemaNodes, final String parentName) {
+            final boolean isConfig, final Iterable<? extends DataSchemaNode> childSchemaNodes,
+            final String parentName) {
         final List<Operation> operations = new ArrayList<>();
 
         final Get getBuilder = new Get(node, isConfig);
@@ -436,8 +436,6 @@ public abstract class BaseYangSwaggerGenerator {
             return new TreeSet<>();
         }
 
-        final Set<Module> modules = schemaContext.getModules();
-
         final SortedSet<Module> sortedModules = new TreeSet<>((module1, module2) -> {
             int result = module1.getName().compareTo(module2.getName());
             if (result == 0) {
@@ -448,7 +446,7 @@ public abstract class BaseYangSwaggerGenerator {
             }
             return result;
         });
-        for (final Module m : modules) {
+        for (final Module m : schemaContext.getModules()) {
             if (m != null) {
                 sortedModules.add(m);
             }

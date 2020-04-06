@@ -8,10 +8,11 @@
 package org.opendaylight.netconf.sal.connect.netconf;
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
@@ -57,7 +58,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeS
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,12 +76,12 @@ public class NetconfStateSchemasTest {
     @Mock
     private DOMRpcService rpc;
 
-    private SchemaContext schemaContext;
+    private EffectiveModelContext schemaContext;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        schemaContext = BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext();
+        schemaContext = BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getEffectiveModelContext();
         final DataSchemaNode schemasNode =
                 ((ContainerSchemaNode) schemaContext
                         .getDataChildByName(NetconfState.QNAME)).getDataChildByName(Schemas.QNAME);
@@ -122,8 +123,8 @@ public class NetconfStateSchemasTest {
                         .NodeIdentifier(NetconfMessageTransformUtil.NETCONF_RPC_REPLY_QNAME))
                 .withChild(data)
                 .build();
-        when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any()))
-            .thenReturn(immediateFluentFuture(new DefaultDOMRpcResult(rpcReply)));
+        doReturn(immediateFluentFuture(new DefaultDOMRpcResult(rpcReply))).when(rpc)
+            .invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any());
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         assertEquals(numberOfLegalSchemas, availableYangSchemasQNames.size());
@@ -152,8 +153,8 @@ public class NetconfStateSchemasTest {
     @Test
     public void testCreateRpcError() throws Exception {
         final RpcError rpcError = RpcResultBuilder.newError(RpcError.ErrorType.RPC, "fail", "fail");
-        when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any()))
-            .thenReturn(immediateFluentFuture(new DefaultDOMRpcResult(rpcError)));
+        doReturn(immediateFluentFuture(new DefaultDOMRpcResult(rpcError))).when(rpc)
+            .invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any());
         final NetconfStateSchemas stateSchemas = NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
         final Set<QName> availableYangSchemasQNames = stateSchemas.getAvailableYangSchemasQNames();
         Assert.assertTrue(availableYangSchemasQNames.isEmpty());
@@ -167,8 +168,8 @@ public class NetconfStateSchemasTest {
             final ListenableFuture<DOMRpcResult> interruptedFuture = mock(ListenableFuture.class);
             try {
                 when(interruptedFuture.get()).thenThrow(new InterruptedException("interrupted"));
-                when(rpc.invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any())).thenReturn(
-                        FluentFuture.from(interruptedFuture));
+                doReturn(FluentFuture.from(interruptedFuture)).when(rpc)
+                    .invokeRpc(eq(toPath(NETCONF_GET_QNAME)), any());
                 NetconfStateSchemas.create(rpc, CAPS, deviceId, schemaContext);
             } catch (final InterruptedException | ExecutionException e) {
                 LOG.info("Operation failed.", e);

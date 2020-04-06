@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf;
 
 import static org.junit.Assert.assertEquals;
@@ -14,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
-import java.util.Set;
+import java.util.Collection;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -27,8 +26,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 
@@ -49,12 +48,12 @@ public class NetconfToRpcRequestTest {
     private static final QName GET_CONFIG_QNAME =
             QName.create(CONFIG_TEST_NAMESPACE, CONFIG_TEST_REVISION, "get-config");
 
-    static SchemaContext cfgCtx;
+    static EffectiveModelContext cfgCtx;
     static NetconfMessageTransformer messageTransformer;
 
     @BeforeClass
     public static void setup() {
-        final Set<Module> notifModules = YangParserTestUtils.parseYangResource(
+        final Collection<? extends Module> notifModules = YangParserTestUtils.parseYangResource(
             "/schemas/rpc-notification-subscription.yang").getModules();
         assertTrue(!notifModules.isEmpty());
 

@@ -64,6 +64,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableMapEntryNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableMapNodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -83,10 +84,10 @@ public class RestGetOperationTest extends JerseyTest {
         }
     }
 
-    private static SchemaContext schemaContextYangsIetf;
-    private static SchemaContext schemaContextTestModule;
-    private static SchemaContext schemaContextModules;
-    private static SchemaContext schemaContextBehindMountPoint;
+    private static EffectiveModelContext schemaContextYangsIetf;
+    private static EffectiveModelContext schemaContextTestModule;
+    private static EffectiveModelContext schemaContextModules;
+    private static EffectiveModelContext schemaContextBehindMountPoint;
 
     @SuppressWarnings("rawtypes")
     private static NormalizedNode answerFromGet;
@@ -129,7 +130,7 @@ public class RestGetOperationTest extends JerseyTest {
         return resourceConfig;
     }
 
-    private void setControllerContext(final SchemaContext schemaContext) {
+    private void setControllerContext(final EffectiveModelContext schemaContext) {
         controllerContext.setSchemas(schemaContext);
     }
 

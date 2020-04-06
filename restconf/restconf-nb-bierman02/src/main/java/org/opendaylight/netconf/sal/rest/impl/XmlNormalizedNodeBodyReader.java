@@ -16,7 +16,6 @@ import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
@@ -199,8 +198,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
                                                             final String namespace) {
         final Deque<Object> result = new ArrayDeque<>();
         final ArrayList<ChoiceSchemaNode> choiceSchemaNodes = new ArrayList<>();
-        final Collection<DataSchemaNode> children = ((DataNodeContainer) schemaNode).getChildNodes();
-        for (final DataSchemaNode child : children) {
+        for (final DataSchemaNode child : ((DataNodeContainer) schemaNode).getChildNodes()) {
             if (child instanceof ChoiceSchemaNode) {
                 choiceSchemaNodes.add((ChoiceSchemaNode) child);
             } else if (child.getQName().getLocalName().equalsIgnoreCase(elementName)
@@ -222,7 +220,7 @@ public class XmlNormalizedNodeBodyReader extends AbstractIdentifierAwareJaxRsPro
         }
 
         for (final ChoiceSchemaNode choiceNode : choiceSchemaNodes) {
-            for (final CaseSchemaNode caseNode : choiceNode.getCases().values()) {
+            for (final CaseSchemaNode caseNode : choiceNode.getCases()) {
                 final Deque<Object> resultFromRecursion = findPathToSchemaNodeByName(caseNode, elementName, namespace);
                 if (!resultFromRecursion.isEmpty()) {
                     resultFromRecursion.push(choiceNode);

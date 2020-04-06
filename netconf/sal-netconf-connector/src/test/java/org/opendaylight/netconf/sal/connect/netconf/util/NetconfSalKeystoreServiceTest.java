@@ -15,7 +15,9 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.mdsal.common.api.CommitInfo.emptyFluentFuture;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -91,7 +93,7 @@ public class NetconfSalKeystoreServiceTest {
     }
 
     private AddPrivateKeyInput getPrivateKeyInput() throws Exception {
-        final List<PrivateKey> privateKeys = new ArrayList<>();
+        final Map<PrivateKeyKey, PrivateKey> privateKeys = new HashMap<>();
         final Document document = readKeystoreXML();
         final NodeList nodeList = document.getElementsByTagName(XML_ELEMENT_PRIVATE_KEY);
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -112,20 +114,19 @@ public class NetconfSalKeystoreServiceTest {
                 certChain.add(certNode.getTextContent());
             }
 
-            final PrivateKey privateKey = new PrivateKeyBuilder()
-                    .withKey(new PrivateKeyKey(keyName))
-                    .setName(keyName)
-                    .setData(keyData)
-                    .setCertificateChain(certChain)
-                    .build();
-            privateKeys.add(privateKey);
+            final PrivateKeyKey key = new PrivateKeyKey(keyName);
+            privateKeys.put(key, new PrivateKeyBuilder()
+                .withKey(key)
+                .setData(keyData)
+                .setCertificateChain(certChain)
+                .build());
         }
 
         return new AddPrivateKeyInputBuilder().setPrivateKey(privateKeys).build();
     }
 
     private AddTrustedCertificateInput getTrustedCertificateInput() throws Exception {
-        final List<TrustedCertificate> trustedCertificates = new ArrayList<>();
+        final Map<TrustedCertificateKey, TrustedCertificate> trustedCertificates = new HashMap<>();
         final Document document = readKeystoreXML();
         final NodeList nodeList = document.getElementsByTagName(XML_ELEMENT_TRUSTED_CERT);
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -137,12 +138,12 @@ public class NetconfSalKeystoreServiceTest {
             final String certName = element.getElementsByTagName(XML_ELEMENT_NAME).item(0).getTextContent();
             final String certData = element.getElementsByTagName(XML_ELEMENT_CERT).item(0).getTextContent();
 
-            final TrustedCertificate certificate = new TrustedCertificateBuilder()
-                    .withKey(new TrustedCertificateKey(certName))
-                    .setName(certName)
-                    .setCertificate(certData)
-                    .build();
-            trustedCertificates.add(certificate);
+            final TrustedCertificateKey key = new TrustedCertificateKey(certName);
+            trustedCertificates.put(key, new TrustedCertificateBuilder()
+                .withKey(key)
+                .setName(certName)
+                .setCertificate(certData)
+                .build());
         }
 
         return new AddTrustedCertificateInputBuilder().setTrustedCertificate(trustedCertificates).build();
