@@ -35,10 +35,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Util class for rpc.
- *
  */
 public final class RestconfInvokeOperationsUtil {
-
     private static final Logger LOG = LoggerFactory.getLogger(RestconfInvokeOperationsUtil.class);
 
     private RestconfInvokeOperationsUtil() {
@@ -60,8 +58,7 @@ public final class RestconfInvokeOperationsUtil {
             final SchemaPath schemaPath) {
         final Optional<DOMRpcService> mountPointService = mountPoint.getService(DOMRpcService.class);
         if (mountPointService.isPresent()) {
-            final ListenableFuture<DOMRpcResult> rpc = mountPointService.get().invokeRpc(schemaPath, data);
-            return prepareResult(rpc);
+            return prepareResult(mountPointService.get().invokeRpc(schemaPath, data));
         }
         final String errmsg = "RPC service is missing.";
         LOG.debug(errmsg);
@@ -86,8 +83,7 @@ public final class RestconfInvokeOperationsUtil {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }
 
-        final ListenableFuture<DOMRpcResult> rpc = rpcService.invokeRpc(schemaPath, data);
-        return prepareResult(rpc);
+        return prepareResult(rpcService.invokeRpc(schemaPath, data));
     }
 
     /**
@@ -114,7 +110,7 @@ public final class RestconfInvokeOperationsUtil {
         }
     }
 
-    private static DOMRpcResult prepareResult(final ListenableFuture<DOMRpcResult> rpc) {
+    private static DOMRpcResult prepareResult(final ListenableFuture<? extends DOMRpcResult> rpc) {
         final RpcResultFactory dataFactory = new RpcResultFactory();
         FutureCallbackTx.addCallback(rpc, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory);
         return dataFactory.build();

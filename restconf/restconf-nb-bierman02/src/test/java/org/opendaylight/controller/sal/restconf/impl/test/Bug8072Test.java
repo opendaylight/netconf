@@ -8,14 +8,12 @@
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
@@ -25,7 +23,7 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.model.api.Module;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
@@ -37,7 +35,7 @@ public class Bug8072Test {
     private static final QName TYPE_QNAME = QName.create("test:module", "2014-01-09", "type");
     private static final QName MODULE_TYPE_QNAME = QName.create("test:module", "2014-01-09", "module-type");
 
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     private final ControllerContext controllerContext;
 
@@ -45,15 +43,13 @@ public class Bug8072Test {
         final SchemaContext mountPointContext = TestUtils.loadSchemaContext("/full-versions/test-module");
         final DOMMountPoint mountInstance = mock(DOMMountPoint.class);
         controllerContext = TestRestconfUtils.newControllerContext(schemaContext, mountInstance);
-        doReturn(mountPointContext).when(mountInstance).getSchemaContext();
+        doReturn(mountPointContext).when(mountInstance).getEffectiveModelContext();
     }
 
     @BeforeClass
     public static void init() throws FileNotFoundException, ReactorException {
         schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
         assertEquals(0, schemaContext.findModules(EXTERNAL_MODULE_NAME).size());
-        final Set<Module> allModules = schemaContext.getModules();
-        assertNotNull(allModules);
     }
 
     @Test

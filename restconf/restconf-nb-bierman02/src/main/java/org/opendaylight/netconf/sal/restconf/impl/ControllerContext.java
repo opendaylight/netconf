@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -63,6 +62,8 @@ import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.api.GroupingDefinition;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
@@ -70,7 +71,6 @@ import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.IdentityrefTypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.type.LeafrefTypeDefinition;
@@ -79,7 +79,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public final class ControllerContext implements SchemaContextListener, Closeable {
+public final class ControllerContext implements EffectiveModelContextListener, Closeable {
     // FIXME: this should be in md-sal somewhere
     public static final String MOUNT = "yang-ext:mount";
 
@@ -99,8 +99,8 @@ public final class ControllerContext implements SchemaContextListener, Closeable
 
     private final DOMMountPointService mountService;
     private final DOMYangTextSourceProvider yangTextSourceProvider;
-    private final ListenerRegistration<SchemaContextListener> listenerRegistration;
-    private volatile SchemaContext globalSchema;
+    private final ListenerRegistration<?> listenerRegistration;
+    private volatile EffectiveModelContext globalSchema;
     private volatile DataNormalizer dataNormalizer;
 
     @Inject
@@ -109,7 +109,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         this.mountService = mountService;
         this.yangTextSourceProvider = domSchemaService.getExtensions().getInstance(DOMYangTextSourceProvider.class);
 
-        onGlobalContextUpdated(schemaService.getGlobalContext());
+        onModelContextUpdated(schemaService.getGlobalContext());
         listenerRegistration = schemaService.registerSchemaContextListener(this);
     }
 
@@ -126,7 +126,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         return new ControllerContext(schemaService, mountService, domSchemaService);
     }
 
-    private void setGlobalSchema(final SchemaContext globalSchema) {
+    private void setGlobalSchema(final EffectiveModelContext globalSchema) {
         this.globalSchema = globalSchema;
         this.dataNormalizer = new DataNormalizer(globalSchema);
     }
@@ -147,15 +147,15 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         listenerRegistration.close();
     }
 
-    public void setSchemas(final SchemaContext schemas) {
-        onGlobalContextUpdated(schemas);
+    public void setSchemas(final EffectiveModelContext schemas) {
+        onModelContextUpdated(schemas);
     }
 
     public InstanceIdentifierContext<?> toInstanceIdentifier(final String restconfInstance) {
         return toIdentifier(restconfInstance, false);
     }
 
-    public SchemaContext getGlobalSchema() {
+    public EffectiveModelContext getGlobalSchema() {
         return this.globalSchema;
     }
 
@@ -186,7 +186,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         }
 
         final InstanceIdentifierBuilder builder = YangInstanceIdentifier.builder();
-        final Set<Module> latestModule = this.globalSchema.findModules(startModule);
+        final Collection<? extends Module> latestModule = this.globalSchema.findModules(startModule);
 
         if (latestModule.isEmpty()) {
             throw new RestconfDocumentedException("The module named '" + startModule + "' does not exist.",
@@ -349,14 +349,14 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         return module == null ? null : module.getNamespace();
     }
 
-    public Set<Module> getAllModules(final DOMMountPoint mountPoint) {
+    public Collection<? extends Module> getAllModules(final DOMMountPoint mountPoint) {
         checkPreconditions();
 
         final SchemaContext schemaContext = mountPoint == null ? null : mountPoint.getSchemaContext();
         return schemaContext == null ? null : schemaContext.getModules();
     }
 
-    public Set<Module> getAllModules() {
+    public Collection<? extends Module> getAllModules() {
         checkPreconditions();
         return this.globalSchema.getModules();
     }
@@ -402,9 +402,9 @@ public final class ControllerContext implements SchemaContextListener, Closeable
             return null;
         }
 
-        final Set<GroupingDefinition> groupings = restconfModule.getGroupings();
+        final Collection<? extends GroupingDefinition> groupings = restconfModule.getGroupings();
 
-        final Iterable<GroupingDefinition> filteredGroups = Iterables.filter(groupings,
+        final Iterable<? extends GroupingDefinition> filteredGroups = Iterables.filter(groupings,
             g -> RestConfModule.ERRORS_GROUPING_SCHEMA_NODE.equals(g.getQName().getLocalName()));
 
         final GroupingDefinition restconfGrouping = Iterables.getFirst(filteredGroups, null);
@@ -425,8 +425,8 @@ public final class ControllerContext implements SchemaContextListener, Closeable
             return null;
         }
 
-        final Set<GroupingDefinition> groupings = restconfModule.getGroupings();
-        final Iterable<GroupingDefinition> filteredGroups = Iterables.filter(groupings,
+        final Collection<? extends GroupingDefinition> groupings = restconfModule.getGroupings();
+        final Iterable<? extends GroupingDefinition> filteredGroups = Iterables.filter(groupings,
             g -> RestConfModule.RESTCONF_GROUPING_SCHEMA_NODE.equals(g.getQName().getLocalName()));
         final GroupingDefinition restconfGrouping = Iterables.getFirst(filteredGroups, null);
 
@@ -470,7 +470,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
     }
 
     private static DataSchemaNode childByQName(final ChoiceSchemaNode container, final QName name) {
-        for (final CaseSchemaNode caze : container.getCases().values()) {
+        for (final CaseSchemaNode caze : container.getCases()) {
             final DataSchemaNode ret = childByQName(caze, name);
             if (ret != null) {
                 return ret;
@@ -555,7 +555,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
 
         if (strings.isEmpty()) {
             return createContext(builder.build(), (DataSchemaNode) parentNode,
-                mountPoint,mountPoint != null ? mountPoint.getSchemaContext() : this.globalSchema);
+                mountPoint,mountPoint != null ? mountPoint.getEffectiveModelContext() : this.globalSchema);
         }
 
         final String head = strings.iterator().next();
@@ -591,7 +591,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
                 }
                 final DOMMountPoint mount = mountOpt.get();
 
-                final SchemaContext mountPointSchema = mount.getSchemaContext();
+                final EffectiveModelContext mountPointSchema = mount.getEffectiveModelContext();
                 if (mountPointSchema == null) {
                     throw new RestconfDocumentedException("Mount point does not contain any schema with modules.",
                             ErrorType.APPLICATION, ErrorTag.UNKNOWN_ELEMENT);
@@ -599,7 +599,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
 
                 if (returnJustMountPoint || strings.size() == 1) {
                     final YangInstanceIdentifier instance = YangInstanceIdentifier.builder().build();
-                    return new InstanceIdentifierContext<>(instance, mountPointSchema, mount,mountPointSchema);
+                    return new InstanceIdentifierContext<>(instance, mountPointSchema, mount, mountPointSchema);
                 }
 
                 final String moduleNameBehindMountPoint = toModuleName(strings.get(1));
@@ -609,7 +609,8 @@ public final class ControllerContext implements SchemaContextListener, Closeable
                             ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
                 }
 
-                final Iterator<Module> it = mountPointSchema.findModules(moduleNameBehindMountPoint).iterator();
+                final Iterator<? extends Module> it = mountPointSchema.findModules(moduleNameBehindMountPoint)
+                        .iterator();
                 if (!it.hasNext()) {
                     throw new RestconfDocumentedException("\"" + moduleNameBehindMountPoint
                             + "\" module does not exist in mount point.", ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
@@ -629,7 +630,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
                             ErrorType.PROTOCOL, ErrorTag.UNKNOWN_ELEMENT);
                 }
             } else {
-                final SchemaContext schemaContext = mountPoint.getSchemaContext();
+                final EffectiveModelContext schemaContext = mountPoint.getEffectiveModelContext();
                 if (schemaContext != null) {
                     module = schemaContext.findModules(moduleName).stream().findFirst().orElse(null);
                 } else {
@@ -653,7 +654,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
                 }
                 if (rpc != null) {
                     return new InstanceIdentifierContext<>(builder.build(), rpc, mountPoint,
-                            mountPoint != null ? mountPoint.getSchemaContext() : this.globalSchema);
+                            mountPoint != null ? mountPoint.getEffectiveModelContext() : this.globalSchema);
                 }
             }
 
@@ -732,11 +733,12 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         }
 
         return createContext(builder.build(), targetNode, mountPoint,
-            mountPoint != null ? mountPoint.getSchemaContext() : this.globalSchema);
+            mountPoint != null ? mountPoint.getEffectiveModelContext() : this.globalSchema);
     }
 
     private static InstanceIdentifierContext<?> createContext(final YangInstanceIdentifier instance,
-            final DataSchemaNode dataSchemaNode, final DOMMountPoint mountPoint, final SchemaContext schemaContext) {
+            final DataSchemaNode dataSchemaNode, final DOMMountPoint mountPoint,
+            final EffectiveModelContext schemaContext) {
         final YangInstanceIdentifier instanceIdentifier = new DataNormalizer(schemaContext).toNormalized(instance);
         return new InstanceIdentifierContext<>(instanceIdentifier, dataSchemaNode, mountPoint, schemaContext);
     }
@@ -763,7 +765,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
     private static void collectInstanceDataNodeContainers(final List<DataSchemaNode> potentialSchemaNodes,
             final DataNodeContainer container, final String name) {
 
-        final Iterable<DataSchemaNode> nodes = Iterables.filter(container.getChildNodes(),
+        final Iterable<? extends DataSchemaNode> nodes = Iterables.filter(container.getChildNodes(),
             node -> name.equals(node.getQName().getLocalName()));
 
         // Can't combine this loop with the filter above because the filter is
@@ -776,8 +778,8 @@ public final class ControllerContext implements SchemaContextListener, Closeable
 
         final Iterable<ChoiceSchemaNode> choiceNodes = Iterables.filter(container.getChildNodes(),
             ChoiceSchemaNode.class);
-        final Iterable<Collection<CaseSchemaNode>> map = Iterables.transform(choiceNodes,
-            choice -> choice.getCases().values());
+        final Iterable<Collection<? extends CaseSchemaNode>> map = Iterables.transform(choiceNodes,
+            ChoiceSchemaNode::getCases);
         for (final CaseSchemaNode caze : Iterables.concat(map)) {
             collectInstanceDataNodeContainers(potentialSchemaNodes, caze, name);
         }
@@ -861,7 +863,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         checkPreconditions();
         final String module = toModuleName(name);
         final String node = toNodeName(name);
-        final Set<Module> modules = schemaContext.findModules(module);
+        final Collection<? extends Module> modules = schemaContext.findModules(module);
         return modules.isEmpty() ? null : QName.create(modules.iterator().next().getQNameModule(), node);
     }
 
@@ -890,9 +892,9 @@ public final class ControllerContext implements SchemaContextListener, Closeable
     }
 
     @Override
-    public void onGlobalContextUpdated(final SchemaContext context) {
+    public void onModelContextUpdated(final EffectiveModelContext context) {
         if (context != null) {
-            final Collection<RpcDefinition> defs = context.getOperations();
+            final Collection<? extends RpcDefinition> defs = context.getOperations();
             final Map<QName, RpcDefinition> newMap = new HashMap<>(defs.size());
 
             for (final RpcDefinition operation : defs) {

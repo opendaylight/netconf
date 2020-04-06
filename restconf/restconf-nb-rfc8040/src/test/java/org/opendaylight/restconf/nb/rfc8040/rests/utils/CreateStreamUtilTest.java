@@ -13,7 +13,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
-import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
@@ -32,10 +31,10 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.util.SchemaNodeUtils;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -81,13 +80,12 @@ public class CreateStreamUtilTest {
 
     private NormalizedNodeContext prepareDomPayload(final String rpcName, final String inputOutput,
             final String toasterValue, final String inputOutputName) {
-        final SchemaContext schema = this.refSchemaCtx.get();
+        final EffectiveModelContext schema = this.refSchemaCtx.get();
         final Module rpcModule = schema.findModules("sal-remote").iterator().next();
         final QName rpcQName = QName.create(rpcModule.getQNameModule(), rpcName);
         final QName rpcInputQName = QName.create(rpcModule.getQNameModule(), inputOutput);
-        final Set<RpcDefinition> setRpcs = rpcModule.getRpcs();
         ContainerSchemaNode rpcInputSchemaNode = null;
-        for (final RpcDefinition rpc : setRpcs) {
+        for (final RpcDefinition rpc : rpcModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
                 rpcInputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcInputQName);
                 break;

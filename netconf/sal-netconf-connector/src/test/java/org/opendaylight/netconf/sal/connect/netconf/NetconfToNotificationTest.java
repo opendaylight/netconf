@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Iterables;
 import java.io.InputStream;
-import java.util.Set;
+import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
@@ -24,8 +24,8 @@ import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 
@@ -45,8 +45,9 @@ public class NetconfToNotificationTest {
         userNotification = new NetconfMessage(doc);
     }
 
-    static SchemaContext getNotificationSchemaContext(final Class<?> loadClass, final boolean getExceptionTest) {
-        final SchemaContext context;
+    static EffectiveModelContext getNotificationSchemaContext(final Class<?> loadClass,
+            final boolean getExceptionTest) {
+        final EffectiveModelContext context;
         if (getExceptionTest) {
             context = YangParserTestUtils.parseYangResources(loadClass, "/schemas/user-notification4.yang",
                     "/schemas/user-notification3.yang");
@@ -55,7 +56,7 @@ public class NetconfToNotificationTest {
                 "/schemas/user-notification2.yang");
         }
 
-        final Set<Module> modules = context.getModules();
+        final Collection<? extends Module> modules = context.getModules();
         assertTrue(!modules.isEmpty());
         assertNotNull(context);
         return context;
@@ -63,14 +64,14 @@ public class NetconfToNotificationTest {
 
     @Test(expected =  IllegalArgumentException.class)
     public void testMostRecentWrongYangModel() throws Exception {
-        final SchemaContext schemaContext = getNotificationSchemaContext(getClass(), true);
+        final EffectiveModelContext schemaContext = getNotificationSchemaContext(getClass(), true);
         messageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(schemaContext), true);
         messageTransformer.toNotification(userNotification);
     }
 
     @Test
     public void testToNotificationFunction() throws Exception {
-        final SchemaContext schemaContext = getNotificationSchemaContext(getClass(), false);
+        final EffectiveModelContext schemaContext = getNotificationSchemaContext(getClass(), false);
         messageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(schemaContext), true);
         final DOMNotification domNotification = messageTransformer.toNotification(userNotification);
         final ContainerNode root = domNotification.getBody();

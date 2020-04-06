@@ -8,6 +8,7 @@
 package org.opendaylight.controller.md.sal.rest.common;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -42,9 +43,9 @@ import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
@@ -60,16 +61,17 @@ public final class TestRestconfUtils {
         throw new UnsupportedOperationException("Test utility class");
     }
 
-    public static ControllerContext newControllerContext(final SchemaContext schemaContext) {
+    public static ControllerContext newControllerContext(final EffectiveModelContext schemaContext) {
         return newControllerContext(schemaContext, null);
     }
 
-    public static ControllerContext newControllerContext(final SchemaContext schemaContext,
+    public static ControllerContext newControllerContext(final EffectiveModelContext schemaContext,
             final DOMMountPoint mountInstance) {
         final DOMMountPointService mockMountService = mock(DOMMountPointService.class);
 
         if (mountInstance != null) {
-            doReturn(schemaContext).when(mountInstance).getSchemaContext();
+            doReturn(schemaContext).when(mountInstance).getEffectiveModelContext();
+            doCallRealMethod().when(mountInstance).getSchemaContext();
             doReturn(Optional.ofNullable(mountInstance)).when(mockMountService).getMountPoint(
                 any(YangInstanceIdentifier.class));
         }
@@ -84,7 +86,8 @@ public final class TestRestconfUtils {
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public static SchemaContext loadSchemaContext(final String yangPath, final SchemaContext schemaContext) {
+    public static EffectiveModelContext loadSchemaContext(final String yangPath,
+            final EffectiveModelContext schemaContext) {
         try {
             Preconditions.checkArgument(yangPath != null, "Path can not be null.");
             Preconditions.checkArgument(!yangPath.isEmpty(), "Path can not be empty.");
@@ -141,8 +144,7 @@ public final class TestRestconfUtils {
         final String schemaNodeName = iiContext.getSchemaNode().getQName().getLocalName();
 
         if (!schemaNodeName.equalsIgnoreCase(docRootElm)) {
-            final Collection<DataSchemaNode> children = ((DataNodeContainer) schemaNode).getChildNodes();
-            for (final DataSchemaNode child : children) {
+            for (final DataSchemaNode child : ((DataNodeContainer) schemaNode).getChildNodes()) {
                 if (child.getQName().getLocalName().equalsIgnoreCase(docRootElm)) {
                     schemaNode = child;
                     break;

@@ -10,6 +10,7 @@ package org.opendaylight.netconf.test.tool;
 import com.google.common.base.Function;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -36,7 +37,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.mon
 
 public class DummyMonitoringService implements NetconfMonitoringService {
 
-    private static final Sessions EMPTY_SESSIONS = new SessionsBuilder().setSession(Collections.emptyList()).build();
+    private static final Sessions EMPTY_SESSIONS = new SessionsBuilder().build();
     private static final Function<Capability, Uri> CAPABILITY_URI_FUNCTION =
         capability -> new Uri(capability.getCapabilityUri());
 
@@ -68,8 +69,10 @@ public class DummyMonitoringService implements NetconfMonitoringService {
             }
         }
 
-        this.schemas = new SchemasBuilder().setSchema(
-            new ArrayList<>(Collections2.transform(moduleCapabilities, CAPABILITY_SCHEMA_FUNCTION))).build();
+        this.schemas = new SchemasBuilder()
+                .setSchema(Maps.uniqueIndex(Collections2.transform(moduleCapabilities, CAPABILITY_SCHEMA_FUNCTION),
+                    Schema::key))
+                .build();
     }
 
     @Override
