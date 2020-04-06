@@ -31,13 +31,13 @@ import org.opendaylight.yangtools.yang.model.api.ChoiceSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class NnToXmlWithChoiceTest extends AbstractBodyReaderTest {
 
     private final NormalizedNodeXmlBodyWriter xmlBodyWriter;
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     public NnToXmlWithChoiceTest() {
         super(schemaContext, null);

@@ -7,19 +7,19 @@
  */
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
+import static java.util.Objects.requireNonNull;
+
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import org.opendaylight.mdsal.binding.dom.codec.impl.BindingNormalizedNodeCodecRegistry;
-import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
-import org.opendaylight.mdsal.binding.generator.util.BindingRuntimeContext;
+import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
@@ -48,22 +48,10 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
  * Facade of mounted netconf device.
  */
 class NetconfEventSourceMount {
-
-    private static final BindingNormalizedNodeCodecRegistry CODEC_REGISTRY;
     private static final YangInstanceIdentifier STREAMS_PATH = YangInstanceIdentifier.builder().node(Netconf.QNAME)
             .node(Streams.QNAME).build();
     private static final SchemaPath CREATE_SUBSCRIPTION = SchemaPath
             .create(true, QName.create(CreateSubscriptionInput.QNAME, "create-subscription"));
-
-    static {
-        final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        moduleInfoBackedContext.addModuleInfos(Collections.singletonList(org.opendaylight.yang.gen.v1.urn.ietf.params
-                .xml.ns.netmod.notification.rev080714.$YangModuleInfoImpl.getInstance()));
-        SchemaContext notificationsSchemaCtx = moduleInfoBackedContext.tryToCreateSchemaContext().get();
-
-        CODEC_REGISTRY = new BindingNormalizedNodeCodecRegistry(BindingRuntimeContext.create(moduleInfoBackedContext,
-                notificationsSchemaCtx));
-    }
 
     private final DOMMountPoint mountPoint;
     private final DOMRpcService rpcService;
@@ -71,8 +59,11 @@ class NetconfEventSourceMount {
     private final DOMDataBroker dataBroker;
     private final Node node;
     private final String nodeId;
+    private final BindingNormalizedNodeSerializer serializer;
 
-    NetconfEventSourceMount(final Node node, final DOMMountPoint mountPoint) {
+    NetconfEventSourceMount(final BindingNormalizedNodeSerializer serializer, final Node node,
+            final DOMMountPoint mountPoint) {
+        this.serializer = requireNonNull(serializer);
         this.mountPoint = mountPoint;
         this.node = node;
         this.nodeId = node.getNodeId().getValue();
@@ -104,7 +95,7 @@ class NetconfEventSourceMount {
      * @param lastEventTime last event time
      * @return rpc result
      */
-    ListenableFuture<DOMRpcResult> invokeCreateSubscription(final Stream stream,
+    ListenableFuture<? extends DOMRpcResult> invokeCreateSubscription(final Stream stream,
             final Optional<Instant> lastEventTime) {
         final CreateSubscriptionInputBuilder inputBuilder = new CreateSubscriptionInputBuilder()
                 .setStream(stream.getName());
@@ -114,7 +105,7 @@ class NetconfEventSourceMount {
             inputBuilder.setStartTime(new DateAndTime(formattedDate));
         }
         final CreateSubscriptionInput input = inputBuilder.build();
-        final ContainerNode nnInput = CODEC_REGISTRY.toNormalizedNodeRpcData(input);
+        final ContainerNode nnInput = serializer.toNormalizedNodeRpcData(input);
         return rpcService.invokeRpc(CREATE_SUBSCRIPTION, nnInput);
     }
 
@@ -124,7 +115,7 @@ class NetconfEventSourceMount {
      * @param stream stream
      * @return rpc result
      */
-    ListenableFuture<DOMRpcResult> invokeCreateSubscription(final Stream stream) {
+    ListenableFuture<? extends DOMRpcResult> invokeCreateSubscription(final Stream stream) {
         return invokeCreateSubscription(stream, Optional.empty());
     }
 
@@ -135,14 +126,14 @@ class NetconfEventSourceMount {
      * @throws ExecutionException if data read fails
      * @throws InterruptedException if data read fails
      */
-    List<Stream> getAvailableStreams() throws InterruptedException, ExecutionException {
+    Collection<Stream> getAvailableStreams() throws InterruptedException, ExecutionException {
         final Optional<NormalizedNode<?, ?>> streams;
         try (DOMDataTreeReadTransaction tx = dataBroker.newReadOnlyTransaction()) {
             streams = tx.read(LogicalDatastoreType.OPERATIONAL, STREAMS_PATH).get();
         }
         if (streams.isPresent()) {
-            Streams streams1 = (Streams) CODEC_REGISTRY.fromNormalizedNode(STREAMS_PATH, streams.get()).getValue();
-            return streams1.getStream();
+            Streams streams1 = (Streams) serializer.fromNormalizedNode(STREAMS_PATH, streams.get()).getValue();
+            return streams1.nonnullStream().values();
         }
         return Collections.emptyList();
     }

@@ -33,6 +33,7 @@ import org.opendaylight.netconf.sal.rest.doc.swagger.Resource;
 import org.opendaylight.netconf.sal.rest.doc.swagger.ResourceList;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class MountPointSwaggerTest {
@@ -57,7 +58,7 @@ public class MountPointSwaggerTest {
         // We are sharing the global schema service and the mount schema service
         // in our test.
         // OK for testing - real thing would have seperate instances.
-        final SchemaContext context = this.helper.createMockSchemaContext();
+        final EffectiveModelContext context = this.helper.createMockSchemaContext();
         final DOMSchemaService schemaService = this.helper.createMockSchemaService(context);
 
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
