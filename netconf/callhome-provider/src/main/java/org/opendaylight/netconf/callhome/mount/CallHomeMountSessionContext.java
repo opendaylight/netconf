@@ -19,7 +19,6 @@ import org.opendaylight.netconf.callhome.protocol.CallHomeProtocolSessionContext
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
@@ -65,7 +64,7 @@ class CallHomeMountSessionContext {
     Node getConfigNode() {
         return new NodeBuilder()
                 .setNodeId(getId())
-                .addAugmentation(NetconfNode.class, new NetconfNodeBuilder()
+                .addAugmentation(new NetconfNodeBuilder()
                     .setHost(new Host(key.getIpAddress()))
                     .setPort(key.getPort())
                     .setTcpOnly(Boolean.FALSE)

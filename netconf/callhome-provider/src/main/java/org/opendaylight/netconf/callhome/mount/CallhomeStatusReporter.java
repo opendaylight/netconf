@@ -12,9 +12,8 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -29,6 +28,7 @@ import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.callhome.protocol.AuthorizedKeysDecoder;
 import org.opendaylight.netconf.callhome.protocol.StatusRecorder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.callhome.device.status.rev170112.Device1;
+import org.opendaylight.yang.gen.v1.urn.opendaylight.callhome.device.status.rev170112.Device1.DeviceStatus;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.callhome.device.status.rev170112.Device1Builder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus;
@@ -193,14 +193,12 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
         } catch (IOException e) {
             LOG.warn("Unable to encode public key to ssh format.", e);
         }
-        Device1 d1 = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.FAILEDNOTALLOWED).build();
-        DeviceBuilder builder = new DeviceBuilder()
+        return new DeviceBuilder()
                 .setUniqueId(id)
                 .withKey(new DeviceKey(id))
                 .setSshHostKey(sshEncodedKey)
-                .addAugmentation(Device1.class, d1);
-
-        return builder.build();
+                .addAugmentation(new Device1Builder().setDeviceStatus(Device1.DeviceStatus.FAILEDNOTALLOWED).build())
+                .build();
     }
 
     private Device readAndGetDevice(final NodeId nodeId) {
@@ -229,27 +227,27 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
     }
 
     private static Device withConnectedStatus(final Device opDev) {
-        Device1 status = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.CONNECTED).build();
-        return new DeviceBuilder().addAugmentation(Device1.class, status).setUniqueId(opDev.getUniqueId())
-                .setSshHostKey(opDev.getSshHostKey()).build();
+        return deviceWithStatus(opDev, Device1.DeviceStatus.CONNECTED);
     }
 
     private static Device withFailedStatus(final Device opDev) {
-        Device1 status = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.FAILED).build();
-        return new DeviceBuilder().addAugmentation(Device1.class, status).setUniqueId(opDev.getUniqueId())
-                .setSshHostKey(opDev.getSshHostKey()).build();
+        return deviceWithStatus(opDev, DeviceStatus.FAILED);
     }
 
     private static Device withDisconnectedStatus(final Device opDev) {
-        Device1 status = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.DISCONNECTED).build();
-        return new DeviceBuilder().addAugmentation(Device1.class, status).setUniqueId(opDev.getUniqueId())
-                .setSshHostKey(opDev.getSshHostKey()).build();
+        return deviceWithStatus(opDev, DeviceStatus.DISCONNECTED);
     }
 
     private static Device withFailedAuthStatus(final Device opDev) {
-        Device1 status = new Device1Builder().setDeviceStatus(Device1.DeviceStatus.FAILEDAUTHFAILURE).build();
-        return new DeviceBuilder().addAugmentation(Device1.class, status).setUniqueId(opDev.getUniqueId())
-                .setSshHostKey(opDev.getSshHostKey()).build();
+        return deviceWithStatus(opDev, DeviceStatus.FAILEDAUTHFAILURE);
+    }
+
+    private static Device deviceWithStatus(final Device opDev, final DeviceStatus status) {
+        return new DeviceBuilder()
+                .setUniqueId(opDev.getUniqueId())
+                .setSshHostKey(opDev.getSshHostKey())
+                .addAugmentation(new Device1Builder().setDeviceStatus(status).build())
+                .build();
     }
 
     private void setDeviceStatus(final Device device) {
@@ -286,9 +284,9 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
         }
     }
 
-    private List<Device> getDevicesAsList() {
+    private Collection<Device> getDevicesAsList() {
         AllowedDevices devices = getDevices();
-        return devices == null ? new ArrayList<>() : devices.getDevice();
+        return devices == null ? Collections.emptyList() : devices.nonnullDevice().values();
     }
 
     @Override

@@ -78,18 +78,16 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
 
         createNetworkTopologyIfNotPresent(writeTx);
 
-        final InstanceIdentifier<Node> path = id.getTopologyBindingPath();
-        final NodeBuilder nodeBuilder = getNodeIdBuilder(id);
-        NetconfNodeBuilder netconfNodeBuilder = new NetconfNodeBuilder();
-        netconfNodeBuilder.setConnectionStatus(ConnectionStatus.Connecting);
-        netconfNodeBuilder.setHost(id.getHost());
-        netconfNodeBuilder.setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort())));
-        nodeBuilder.addAugmentation(NetconfNode.class, netconfNodeBuilder.build());
-        Node node = nodeBuilder.build();
+        final Node node = getNodeIdBuilder(id)
+                .addAugmentation(new NetconfNodeBuilder()
+                    .setConnectionStatus(ConnectionStatus.Connecting)
+                    .setHost(id.getHost())
+                    .setPort(new PortNumber(Uint16.valueOf(id.getAddress().getPort()))).build())
+                .build();
 
         LOG.trace("{}: Init device state transaction {} putting if absent operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL, path, node);
+        writeTx.put(LogicalDatastoreType.OPERATIONAL, id.getTopologyBindingPath(), node);
         LOG.trace("{}: Init device state transaction {} putting operational data ended.", id, writeTx.getIdentifier());
         LOG.trace("{}: Init device state transaction {} putting if absent config data started.",
                 id, writeTx.getIdentifier());
@@ -110,7 +108,7 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(dsType, id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
+        writeTx.mergeParentStructurePut(dsType, id.getTopologyBindingPath().augmentation(NetconfNode.class), data);
         LOG.trace("{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
 
@@ -129,8 +127,8 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL,
-                id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
+        writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL,
+                id.getTopologyBindingPath().augmentation(NetconfNode.class), data);
         LOG.trace("{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
 
@@ -149,8 +147,8 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         LOG.trace(
                 "{}: Setting device state as failed {} putting operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL,
-                id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
+        writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL,
+                id.getTopologyBindingPath().augmentation(NetconfNode.class), data);
         LOG.trace(
                 "{}: Setting device state as failed {} putting operational data ended.",
                 id, writeTx.getIdentifier());

@@ -81,6 +81,7 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 
 public class NetconfTopologyManagerTest {
     private static final Uint16 ACTOR_RESPONSE_WAIT_TIME = Uint16.valueOf(10);
@@ -131,7 +132,8 @@ public class NetconfTopologyManagerTest {
         netconfTopologyManager = new NetconfTopologyManager(dataBroker, rpcProviderRegistry, actionProviderRegistry,
                 clusterSingletonServiceProvider, keepaliveExecutor, processingThreadPool,
                 actorSystemProvider, eventExecutor, clientDispatcher, TOPOLOGY_ID, config,
-                mountPointService, encryptionService, deviceActionFactory, new DefaultSchemaResourceManager()) {
+                mountPointService, encryptionService, deviceActionFactory,
+                new DefaultSchemaResourceManager(new YangParserFactoryImpl())) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
@@ -192,8 +194,7 @@ public class NetconfTopologyManagerTest {
                 .setPort(new PortNumber(Uint16.valueOf(1111)))
                 .setActorResponseWaitTime(ACTOR_RESPONSE_WAIT_TIME)
                 .build();
-        final Node node1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(NetconfNode.class,
-                netconfNode1).build();
+        final Node node1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(netconfNode1).build();
 
         final DataObjectModification<Node> dataObjectModification1 = mock(DataObjectModification.class);
         doReturn(WRITE).when(dataObjectModification1).getModificationType();
@@ -206,8 +207,7 @@ public class NetconfTopologyManagerTest {
                 .setPort(new PortNumber(Uint16.valueOf(2222)))
                 .setActorResponseWaitTime(ACTOR_RESPONSE_WAIT_TIME)
                 .build();
-        final Node node2 = new NodeBuilder().setNodeId(nodeId2).addAugmentation(NetconfNode.class,
-                netconfNode2).build();
+        final Node node2 = new NodeBuilder().setNodeId(nodeId2).addAugmentation(netconfNode2).build();
 
         final DataObjectModification<Node> dataObjectModification2 = mock(DataObjectModification.class);
         doReturn(WRITE).when(dataObjectModification2).getModificationType();
@@ -252,8 +252,7 @@ public class NetconfTopologyManagerTest {
 
         final NetconfNode updatedNetconfNode1 = new NetconfNodeBuilder(netconfNode1)
                 .setPort(new PortNumber(Uint16.valueOf(33333))).build();
-        final Node updatedNode1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(NetconfNode.class,
-                updatedNetconfNode1).build();
+        final Node updatedNode1 = new NodeBuilder().setNodeId(nodeId1).addAugmentation(updatedNetconfNode1).build();
 
         doReturn(WRITE).when(dataObjectModification1).getModificationType();
         doReturn(node1).when(dataObjectModification1).getDataBefore();
@@ -345,12 +344,14 @@ public class NetconfTopologyManagerTest {
         final InstanceIdentifier<Node> nodeInstanceId = NetconfTopologyUtils.createTopologyNodeListPath(
                 new NodeKey(nodeId), TOPOLOGY_ID);
 
-        final NetconfNode netconfNode = new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(Uint16.valueOf(10)))
-                .setActorResponseWaitTime(ACTOR_RESPONSE_WAIT_TIME).build();
-        final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(NetconfNode.class,
-                netconfNode).build();
+        final Node node = new NodeBuilder()
+                .setNodeId(nodeId)
+                .addAugmentation(new NetconfNodeBuilder()
+                    .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                    .setPort(new PortNumber(Uint16.valueOf(10)))
+                    .setActorResponseWaitTime(ACTOR_RESPONSE_WAIT_TIME)
+                    .build())
+                .build();
 
         final DataObjectModification<Node> dataObjectModification = mock(DataObjectModification.class);
         doReturn(WRITE).when(dataObjectModification).getModificationType();
