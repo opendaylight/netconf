@@ -35,7 +35,6 @@ import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -288,11 +287,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
 
     private static final class ResponseWaiting implements Runnable {
 
-        private final ListenableFuture<DOMRpcResult> rpcResultFuture;
+        private final ListenableFuture<? extends DOMRpcResult> rpcResultFuture;
         private final ResponseWaitingScheduler responseWaitingScheduler;
 
         ResponseWaiting(final ResponseWaitingScheduler responseWaitingScheduler,
-                final ListenableFuture<DOMRpcResult> rpcResultFuture) {
+                final ListenableFuture<? extends DOMRpcResult> rpcResultFuture) {
             this.responseWaitingScheduler = responseWaitingScheduler;
             this.rpcResultFuture = rpcResultFuture;
         }
@@ -324,11 +323,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
      * it.
      */
     private static final class RequestTimeoutTask implements Runnable {
-        private final ListenableFuture<DOMRpcResult> rpcResultFuture;
+        private final ListenableFuture<? extends DOMRpcResult> rpcResultFuture;
         private final ResponseWaiting responseWaiting;
 
-        RequestTimeoutTask(final ListenableFuture<DOMRpcResult> rpcResultFuture,
-            final ResponseWaiting responseWaiting) {
+        RequestTimeoutTask(final ListenableFuture<? extends DOMRpcResult> rpcResultFuture,
+                final ResponseWaiting responseWaiting) {
             this.rpcResultFuture = rpcResultFuture;
             this.responseWaiting = responseWaiting;
         }
@@ -349,7 +348,6 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
      * request-timeout-task to each RPC invocation.
      */
     public static final class KeepaliveDOMRpcService implements DOMRpcService {
-
         private final DOMRpcService deviceRpc;
         private final ResetKeepalive resetKeepaliveTask;
         private final long defaultRequestTimeoutMillis;
@@ -371,8 +369,8 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         }
 
         @Override
-        public ListenableFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
-            final ListenableFuture<DOMRpcResult> rpcResultFuture = deviceRpc.invokeRpc(type, input);
+        public ListenableFuture<? extends DOMRpcResult> invokeRpc(final SchemaPath type, final ContainerNode input) {
+            final ListenableFuture<? extends DOMRpcResult> rpcResultFuture = deviceRpc.invokeRpc(type, input);
             final ResponseWaiting responseWaiting = new ResponseWaiting(responseWaitingScheduler, rpcResultFuture);
             responseWaiting.start();
             Futures.addCallback(rpcResultFuture, resetKeepaliveTask, MoreExecutors.directExecutor());

@@ -110,7 +110,7 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(dsType, id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
+        writeTx.mergeParentStructurePut(dsType, id.getTopologyBindingPath().augmentation(NetconfNode.class), data);
         LOG.trace("{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
 
@@ -129,8 +129,8 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         final WriteTransaction writeTx = txChain.newWriteOnlyTransaction();
         LOG.trace("{}: Update device state transaction {} merging operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL,
-                id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
+        writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL,
+                id.getTopologyBindingPath().augmentation(NetconfNode.class), data);
         LOG.trace("{}: Update device state transaction {} merging operational data ended.",
                 id, writeTx.getIdentifier());
 
@@ -149,8 +149,8 @@ public class NetconfDeviceTopologyAdapter implements AutoCloseable {
         LOG.trace(
                 "{}: Setting device state as failed {} putting operational data started.",
                 id, writeTx.getIdentifier());
-        writeTx.put(LogicalDatastoreType.OPERATIONAL,
-                id.getTopologyBindingPath().augmentation(NetconfNode.class), data, true);
+        writeTx.mergeParentStructurePut(LogicalDatastoreType.OPERATIONAL,
+                id.getTopologyBindingPath().augmentation(NetconfNode.class), data);
         LOG.trace(
                 "{}: Setting device state as failed {} putting operational data ended.",
                 id, writeTx.getIdentifier());

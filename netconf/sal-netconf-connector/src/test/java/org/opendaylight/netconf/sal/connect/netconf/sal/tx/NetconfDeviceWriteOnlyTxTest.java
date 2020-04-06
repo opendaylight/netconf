@@ -44,6 +44,7 @@ import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
@@ -68,7 +69,7 @@ public class NetconfDeviceWriteOnlyTxTest {
         doReturn(successFuture)
                 .doReturn(FluentFutures.immediateFailedFluentFuture(new IllegalStateException("Failed tx")))
                 .doReturn(successFuture)
-                .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+                .when(rpc).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
 
         yangIId = YangInstanceIdentifier.builder().node(NetconfState.QNAME).build();
     }
@@ -83,7 +84,7 @@ public class NetconfDeviceWriteOnlyTxTest {
         tx.put(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier
                 .create(new YangInstanceIdentifier.NodeIdentifier(NETCONF_FILTER_QNAME)), emptyList);
 
-        verify(rpc, atMost(1)).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+        verify(rpc, atMost(1)).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
     }
 
     @Test
@@ -147,7 +148,7 @@ public class NetconfDeviceWriteOnlyTxTest {
         inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME),
                 NetconfBaseOps.getLockContent(NETCONF_RUNNING_QNAME));
         inOrder.verify(rpc).invokeRpc(eq(toPath(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)),
-                any(NormalizedNode.class));
+                any(ContainerNode.class));
         inOrder.verify(rpc).invokeRpc(toPath(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME),
                 NetconfBaseOps.getUnLockContent(NETCONF_RUNNING_QNAME));
     }
@@ -188,7 +189,7 @@ public class NetconfDeviceWriteOnlyTxTest {
     public void testListenerFailure() throws Exception {
         final IllegalStateException cause = new IllegalStateException("Failed tx");
         doReturn(FluentFutures.immediateFailedFluentFuture(cause))
-                .when(rpc).invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
+                .when(rpc).invokeRpc(any(SchemaPath.class), any(ContainerNode.class));
         final WriteCandidateTx tx = new WriteCandidateTx(
                 id, new NetconfBaseOps(rpc, BaseSchema.BASE_NETCONF_CTX.getSchemaContext()), false);
         final TxListener listener = mock(TxListener.class);

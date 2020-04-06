@@ -11,6 +11,7 @@ import static com.google.common.util.concurrent.Futures.immediateFuture;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -19,12 +20,10 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
@@ -138,15 +137,15 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
     }
 
     private Map<String, Stream> getAvailableStreams() {
-        Map<String, Stream> streamMap = new HashMap<>();
-        final List<Stream> availableStreams;
+        final Collection<Stream> availableStreams;
         try {
             availableStreams = mount.getAvailableStreams();
-            streamMap = Maps.uniqueIndex(availableStreams, input -> input.getName().getValue());
         } catch (InterruptedException | ExecutionException e) {
             LOG.warn("Can not read streams for node {}", mount.getNodeId(), e);
+            return ImmutableMap.of();
         }
-        return streamMap;
+
+        return Maps.uniqueIndex(availableStreams, input -> input.getName().getValue());
     }
 
     @Override
@@ -292,10 +291,8 @@ public class NetconfEventSource implements EventSource, DOMNotificationListener 
         // add Event Source Connection status notification
         availNotifList.add(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
 
-        final Set<NotificationDefinition> availableNotifications = mount.getSchemaContext()
-                .getNotifications();
         // add all known notifications from netconf device
-        for (final NotificationDefinition nd : availableNotifications) {
+        for (final NotificationDefinition nd : mount.getSchemaContext().getNotifications()) {
             availNotifList.add(nd.getPath());
         }
         return availNotifList;

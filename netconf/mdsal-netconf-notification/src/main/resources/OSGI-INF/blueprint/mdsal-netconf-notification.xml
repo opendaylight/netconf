@@ -16,12 +16,22 @@
     <reference id="netconfOperationServiceFactoryListener"
                interface="org.opendaylight.netconf.mapping.api.NetconfOperationServiceFactoryListener"
                odl:type="mapper-aggregator-registry"/>
+    <reference id="bindingGenerator"
+               interface="org.opendaylight.binding.runtime.api.BindingRuntimeGenerator"/>
+    <reference id="codecFactory"
+               interface="org.opendaylight.mdsal.binding.dom.codec.spi.BindingDOMCodecFactory"/>
 
     <!--This is the MD-SAL netconf server notification blueprint xml file-->
+    <bean id="transformUtil"
+          class="org.opendaylight.netconf.mdsal.notification.impl.ops.NotificationsTransformUtil">
+        <argument ref="bindingGenerator"/>
+        <argument ref="codecFactory"/>
+    </bean>
 
     <bean id="netconfNotificationManager"
           class="org.opendaylight.netconf.mdsal.notification.impl.NetconfNotificationManager"
           destroy-method="close">
+		<argument ref="transformUtil"/>
     </bean>
     <service ref="netconfNotificationManager"
              interface="org.opendaylight.netconf.notifications.NetconfNotificationRegistry"

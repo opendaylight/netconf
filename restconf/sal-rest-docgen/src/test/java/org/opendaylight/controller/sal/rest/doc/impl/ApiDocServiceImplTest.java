@@ -28,7 +28,7 @@ import org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorDraf
 import org.opendaylight.netconf.sal.rest.doc.impl.MountPointSwaggerGeneratorRFC8040;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class ApiDocServiceImplTest {
     private static final String HTTP_URL = "http://localhost/path";
@@ -47,7 +47,7 @@ public class ApiDocServiceImplTest {
         this.helper = new DocGenTestHelper();
         this.helper.setUp();
 
-        final SchemaContext context = this.helper.createMockSchemaContext();
+        final EffectiveModelContext context = this.helper.createMockSchemaContext();
         final DOMSchemaService schemaService = this.helper.createMockSchemaService(context);
 
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);

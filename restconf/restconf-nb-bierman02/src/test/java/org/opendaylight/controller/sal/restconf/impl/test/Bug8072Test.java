@@ -8,14 +8,12 @@
 package org.opendaylight.controller.sal.restconf.impl.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
@@ -25,7 +23,6 @@ import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
-import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
@@ -52,8 +49,6 @@ public class Bug8072Test {
     public static void init() throws FileNotFoundException, ReactorException {
         schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
         assertEquals(0, schemaContext.findModules(EXTERNAL_MODULE_NAME).size());
-        final Set<Module> allModules = schemaContext.getModules();
-        assertNotNull(allModules);
     }
 
     @Test

@@ -58,8 +58,8 @@ import org.opendaylight.netconf.test.tool.operations.OperationsProvider;
 import org.opendaylight.netconf.test.tool.rpchandler.SettableOperationRpcProvider;
 import org.opendaylight.netconf.test.tool.schemacache.SchemaSourceCache;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -85,7 +85,7 @@ public class NetconfDeviceSimulator implements Closeable {
     private final ScheduledExecutorService minaTimerExecutor;
     private final ExecutorService nioExecutor;
     private final Configuration configuration;
-    private SchemaContext schemaContext;
+    private EffectiveModelContext schemaContext;
 
     private boolean sendFakeSchema = false;
 

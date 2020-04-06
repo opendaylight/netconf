@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Iterables;
 import java.io.InputStream;
-import java.util.Set;
+import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 import org.opendaylight.mdsal.dom.api.DOMEvent;
@@ -55,7 +55,7 @@ public class NetconfToNotificationTest {
                 "/schemas/user-notification2.yang");
         }
 
-        final Set<Module> modules = context.getModules();
+        final Collection<? extends Module> modules = context.getModules();
         assertTrue(!modules.isEmpty());
         assertNotNull(context);
         return context;

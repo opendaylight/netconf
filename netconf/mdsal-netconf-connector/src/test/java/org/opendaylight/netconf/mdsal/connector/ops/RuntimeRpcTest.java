@@ -53,13 +53,12 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
@@ -88,7 +87,7 @@ public class RuntimeRpcTest {
 
     private static final DOMRpcService RPC_SERVICE_VOID_INVOKER = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+        public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final ContainerNode input) {
             return immediateFluentFuture(new DefaultDOMRpcResult(null, Collections.emptyList()));
         }
 
@@ -100,7 +99,7 @@ public class RuntimeRpcTest {
 
     private static final DOMRpcService RPC_SERVICE_FAILED_INVOCATION = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+        public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final ContainerNode input) {
             return immediateFailedFluentFuture(new DOMRpcException("rpc invocation not implemented yet") {
                 private static final long serialVersionUID = 1L;
             });
@@ -114,9 +113,8 @@ public class RuntimeRpcTest {
 
     private final DOMRpcService rpcServiceSuccessfulInvocation = new DOMRpcService() {
         @Override
-        public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
-            final Collection<DataContainerChild<? extends PathArgument, ?>> children =
-                    (Collection<DataContainerChild<? extends PathArgument, ?>>) input.getValue();
+        public FluentFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final ContainerNode input) {
+            final Collection<DataContainerChild<? extends PathArgument, ?>> children = input.getValue();
             final Module module = SCHEMA_CONTEXT.findModules(type.getLastComponent().getNamespace()).stream()
                 .findFirst().orElse(null);
             final RpcDefinition rpcDefinition = getRpcDefinitionFromModule(
@@ -135,13 +133,13 @@ public class RuntimeRpcTest {
         }
     };
 
-    private static SchemaContext SCHEMA_CONTEXT = null;
+    private static EffectiveModelContext SCHEMA_CONTEXT = null;
     private CurrentSchemaContext currentSchemaContext = null;
 
     @Mock
     private DOMSchemaService schemaService;
     @Mock
-    private SchemaContextListener listener;
+    private EffectiveModelContextListener listener;
     @Mock
     private ListenerRegistration<?> registration;
     @Mock
@@ -165,9 +163,9 @@ public class RuntimeRpcTest {
         doReturn(null).when(schemaService).getGlobalContext();
         doReturn(null).when(schemaService).getSessionContext();
         doAnswer(invocationOnMock -> {
-            ((SchemaContextListener) invocationOnMock.getArguments()[0]).onGlobalContextUpdated(SCHEMA_CONTEXT);
+            ((EffectiveModelContextListener) invocationOnMock.getArguments()[0]).onModelContextUpdated(SCHEMA_CONTEXT);
             return registration;
-        }).when(schemaService).registerSchemaContextListener(any(SchemaContextListener.class));
+        }).when(schemaService).registerSchemaContextListener(any(EffectiveModelContextListener.class));
 
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);

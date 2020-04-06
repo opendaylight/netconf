@@ -79,7 +79,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
     @Override
     protected HandlingPriority canHandle(final String netconfOperationName, final String namespace) {
         final URI namespaceURI = createNsUri(namespace);
-        final Optional<Module> module = getModule(namespaceURI);
+        final Optional<? extends Module> module = getModule(namespaceURI);
 
         if (!module.isPresent()) {
             LOG.debug("Cannot handle rpc: {}, {}", netconfOperationName, namespace);
@@ -102,7 +102,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
     }
 
     //this returns module with the newest revision if more then 1 module with same namespace is found
-    private Optional<Module> getModule(final URI namespaceURI) {
+    private Optional<? extends Module> getModule(final URI namespaceURI) {
         return schemaContext.getCurrentContext().findModules(namespaceURI).stream().findFirst();
     }
 
@@ -132,7 +132,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
         }
 
         final URI namespaceURI = createNsUri(netconfOperationNamespace);
-        final Optional<Module> moduleOptional = getModule(namespaceURI);
+        final Optional<? extends Module> moduleOptional = getModule(namespaceURI);
 
         if (!moduleOptional.isPresent()) {
             throw new DocumentedException("Unable to find module in Schema Context with namespace and name : "
@@ -152,7 +152,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
 
         final RpcDefinition rpcDefinition = rpcDefinitionOptional.get();
         final SchemaPath schemaPath = SchemaPath.create(Collections.singletonList(rpcDefinition.getQName()), true);
-        final NormalizedNode<?, ?> inputNode = rpcToNNode(operationElement, rpcDefinition.getInput());
+        final ContainerNode inputNode = rpcToNNode(operationElement, rpcDefinition.getInput());
 
         final DOMRpcResult result;
         try {
@@ -253,12 +253,8 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
      * @return parsed rpc into normalized node, or null if input schema is null
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
-    private @Nullable NormalizedNode<?, ?> rpcToNNode(final XmlElement element,
+    private @Nullable ContainerNode rpcToNNode(final XmlElement element,
             final @Nullable ContainerSchemaNode input) throws DocumentedException {
-        if (input == null || input.getChildNodes().isEmpty()) {
-            return null;
-        }
-
         final NormalizedNodeResult resultHolder = new NormalizedNodeResult();
         final NormalizedNodeStreamWriter writer = ImmutableNormalizedNodeStreamWriter.from(resultHolder);
         final XmlParserStream xmlParser = XmlParserStream.create(writer, schemaContext.getCurrentContext(), input);
@@ -270,7 +266,7 @@ public class RuntimeRpc extends AbstractSingletonNetconfOperation {
                     ErrorTag.MALFORMED_MESSAGE, ErrorSeverity.ERROR);
         }
 
-        return resultHolder.getResult();
+        return (ContainerNode) resultHolder.getResult();
     }
 
 }

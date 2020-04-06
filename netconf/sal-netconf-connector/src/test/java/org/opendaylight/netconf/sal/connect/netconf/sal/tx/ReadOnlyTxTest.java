@@ -27,6 +27,7 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransform
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
@@ -57,10 +58,10 @@ public class ReadOnlyTxTest {
 
         readOnlyTx.read(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create());
         verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
-                NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)), any(NormalizedNode.class));
+                NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)), any(ContainerNode.class));
         readOnlyTx.read(LogicalDatastoreType.OPERATIONAL, PATH);
         verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
-                NetconfMessageTransformUtil.NETCONF_GET_QNAME)), any(NormalizedNode.class));
+                NetconfMessageTransformUtil.NETCONF_GET_QNAME)), any(ContainerNode.class));
     }
 
     @Test
@@ -72,10 +73,10 @@ public class ReadOnlyTxTest {
 
         readOnlyTx.exists(LogicalDatastoreType.CONFIGURATION, YangInstanceIdentifier.create());
         verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
-                NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)), any(NormalizedNode.class));
+                NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)), any(ContainerNode.class));
         readOnlyTx.exists(LogicalDatastoreType.OPERATIONAL, PATH);
         verify(rpc).invokeRpc(Mockito.eq(NetconfMessageTransformUtil.toPath(
-                NetconfMessageTransformUtil.NETCONF_GET_QNAME)), any(NormalizedNode.class));
+                NetconfMessageTransformUtil.NETCONF_GET_QNAME)), any(ContainerNode.class));
     }
 
     @Test
