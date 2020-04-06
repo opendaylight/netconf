@@ -30,7 +30,7 @@ import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class RestconfOperationsServiceTest {
@@ -41,7 +41,7 @@ public class RestconfOperationsServiceTest {
     @Mock
     private UriInfo uriInfo;
 
-    private SchemaContext schemaContext;
+    private EffectiveModelContext schemaContext;
     private SchemaContextHandler schemaContextHandler;
     private DOMMountPointServiceHandler domMountPointServiceHandler;
 

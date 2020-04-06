@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -69,6 +70,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
@@ -107,7 +109,7 @@ public class JSONRestconfServiceImplTest {
     static final QName TEST_OUTPUT_QNAME = QName.create(TOASTER_MODULE_NS, TOASTER_MODULE_VERSION, "testOutput");
     static final QName TEXT_OUT_QNAME = QName.create(TOASTER_MODULE_NS, TOASTER_MODULE_VERSION, "textOut");
 
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     private final BrokerFacade brokerFacade = mock(BrokerFacade.class);
     private final DOMMountPoint mockMountPoint = mock(DOMMountPoint.class);
@@ -123,7 +125,8 @@ public class JSONRestconfServiceImplTest {
         final SchemaContext mountPointSchemaContext = TestUtils.loadSchemaContext("/full-versions/test-module");
         final ControllerContext controllerContext =
                 TestRestconfUtils.newControllerContext(schemaContext, mockMountPoint);
-        doReturn(mountPointSchemaContext).when(mockMountPoint).getSchemaContext();
+        doCallRealMethod().when(mockMountPoint).getSchemaContext();
+        doReturn(mountPointSchemaContext).when(mockMountPoint).getEffectiveModelContext();
 
         service = new JSONRestconfServiceImpl(controllerContext,
                 RestconfImpl.newInstance(brokerFacade, controllerContext));

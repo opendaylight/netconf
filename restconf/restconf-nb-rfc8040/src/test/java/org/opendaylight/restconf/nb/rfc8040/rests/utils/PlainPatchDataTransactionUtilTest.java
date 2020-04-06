@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class PlainPatchDataTransactionUtilTest {
@@ -65,7 +65,7 @@ public class PlainPatchDataTransactionUtilTest {
     private LeafNode leafGap;
     private ContainerNode jukeboxContainerWithPlayer;
     private ContainerNode jukeboxContainerWithPlaylist;
-    private SchemaContext schema;
+    private EffectiveModelContext schema;
     private DataSchemaNode schemaNodeForGap;
     private YangInstanceIdentifier iidGap;
     private DataSchemaNode schemaNodeForJukebox;

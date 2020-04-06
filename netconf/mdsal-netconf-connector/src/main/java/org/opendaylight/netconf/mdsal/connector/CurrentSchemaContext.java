@@ -7,7 +7,8 @@
  */
 package org.opendaylight.netconf.mdsal.connector;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,19 +17,19 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.netconf.api.capability.Capability;
 import org.opendaylight.netconf.api.monitoring.CapabilityListener;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 
-public class CurrentSchemaContext implements SchemaContextListener, AutoCloseable {
-    private final AtomicReference<SchemaContext> currentContext = new AtomicReference<>();
-    private final ListenerRegistration<SchemaContextListener> schemaContextListenerListenerRegistration;
+public class CurrentSchemaContext implements EffectiveModelContextListener, AutoCloseable {
+    private final AtomicReference<EffectiveModelContext> currentContext = new AtomicReference<>();
+    private final ListenerRegistration<?> schemaContextListenerListenerRegistration;
     private final Set<CapabilityListener> listeners1 = Collections.synchronizedSet(new HashSet<>());
     private final SchemaSourceProvider<YangTextSchemaSource> rootSchemaSourceProvider;
 
-    public SchemaContext getCurrentContext() {
-        Preconditions.checkState(currentContext.get() != null, "Current context not received");
+    public EffectiveModelContext getCurrentContext() {
+        checkState(currentContext.get() != null, "Current context not received");
         return currentContext.get();
     }
 
@@ -39,7 +40,7 @@ public class CurrentSchemaContext implements SchemaContextListener, AutoCloseabl
     }
 
     @Override
-    public void onGlobalContextUpdated(final SchemaContext schemaContext) {
+    public void onModelContextUpdated(final EffectiveModelContext schemaContext) {
         currentContext.set(schemaContext);
         // FIXME is notifying all the listeners from this callback wise ?
         final Set<Capability> addedCaps = MdsalNetconfOperationServiceFactory.transformCapabilities(

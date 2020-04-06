@@ -64,6 +64,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 import scala.concurrent.duration.Duration;
 
 public class RemoteDeviceConnectorImplTest {
@@ -138,9 +139,8 @@ public class RemoteDeviceConnectorImplTest {
     @SuppressWarnings("unchecked")
     @Test
     public void testStopRemoteDeviceConnection() {
-        final Credentials credentials = new LoginPasswordBuilder()
-                .setPassword("admin").setUsername("admin").build();
-        final NetconfNode netconfNode = new NetconfNodeBuilder()
+        builder.setNode(new NodeBuilder().setNodeId(NODE_ID)
+            .addAugmentation(new NetconfNodeBuilder()
                 .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
                 .setPort(new PortNumber(Uint16.valueOf(9999)))
                 .setReconnectOnChangedSchema(true)
@@ -148,12 +148,11 @@ public class RemoteDeviceConnectorImplTest {
                 .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
                 .setSchemaless(false)
                 .setTcpOnly(false)
-                .setCredentials(credentials)
-                .build();
-        final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(NetconfNode.class, netconfNode).build();
-
-        builder.setNode(node);
-
+                .setCredentials(new LoginPasswordBuilder()
+                    .setPassword("admin").setUsername("admin")
+                    .build())
+                .build())
+            .build());
 
         final NetconfDeviceCommunicator communicator = mock(NetconfDeviceCommunicator.class);
         final RemoteDeviceHandler<NetconfSessionPreferences> salFacade = mock(RemoteDeviceHandler.class);
@@ -167,7 +166,6 @@ public class RemoteDeviceConnectorImplTest {
 
         verify(communicator, times(1)).close();
         verify(salFacade, times(1)).close();
-
     }
 
     @SuppressWarnings("unchecked")
@@ -187,9 +185,10 @@ public class RemoteDeviceConnectorImplTest {
                 .setKeepaliveDelay(Uint32.ONE)
                 .build();
 
-        final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(NetconfNode.class, netconfNode).build();
+        final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(netconfNode).build();
 
-        builder.setSchemaResourceDTO(new DefaultSchemaResourceManager().getSchemaResources(netconfNode, "foo"));
+        builder.setSchemaResourceDTO(new DefaultSchemaResourceManager(new YangParserFactoryImpl())
+            .getSchemaResources(netconfNode, "foo"));
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
                 new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, deviceActionFactory);

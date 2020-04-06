@@ -85,8 +85,8 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
@@ -129,7 +129,7 @@ public class NetconfNodeManagerTest {
     private NetconfDeviceSchemasResolver mockSchemasResolver;
 
     @Mock
-    private SchemaContextFactory mockSchemaContextFactory;
+    private EffectiveModelContextFactory mockSchemaContextFactory;
 
     private ActorSystem slaveSystem;
     private ActorSystem masterSystem;
@@ -216,7 +216,7 @@ public class NetconfNodeManagerTest {
         // Connected. Expect the slave mount point created and registered.
 
         final NetconfNode netconfNode = newNetconfNode();
-        final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(NetconfNode.class, netconfNode).build();
+        final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNode).build();
 
         DataObjectModification<Node> mockDataObjModification = mock(DataObjectModification.class);
         doReturn(Iterables.getLast(nodeListPath.getPathArguments())).when(mockDataObjModification).getIdentifier();
@@ -279,9 +279,10 @@ public class NetconfNodeManagerTest {
         setupMountPointMocks();
 
         final Node updatedNode = new NodeBuilder().setNodeId(nodeId)
-                .addAugmentation(NetconfNode.class, new NetconfNodeBuilder(netconfNode)
-                        .setConnectionStatus(NetconfNodeConnectionStatus.ConnectionStatus.UnableToConnect)
-                        .build()).build();
+                .addAugmentation(new NetconfNodeBuilder(netconfNode)
+                    .setConnectionStatus(NetconfNodeConnectionStatus.ConnectionStatus.UnableToConnect)
+                    .build())
+                .build();
 
         doReturn(SUBTREE_MODIFIED).when(mockDataObjModification).getModificationType();
         doReturn(node).when(mockDataObjModification).getDataBefore();
@@ -308,7 +309,7 @@ public class NetconfNodeManagerTest {
                 nodeKey, topologyId);
 
         final NetconfNode netconfNode = newNetconfNode();
-        final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(NetconfNode.class, netconfNode).build();
+        final Node node = new NodeBuilder().setNodeId(nodeId).addAugmentation(netconfNode).build();
 
         DataObjectModification<Node> mockDataObjModification = mock(DataObjectModification.class);
         doReturn(Iterables.getLast(nodeListPath.getPathArguments())).when(mockDataObjModification).getIdentifier();

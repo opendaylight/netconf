@@ -59,8 +59,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuilder;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +72,7 @@ public class CutDataToCorrectDepthTest extends JerseyTest {
     private static NormalizedNode<?, ?> depth1Cont;
     private static NormalizedNode<?, ?> depth2Cont1;
     private NormalizedNode<?, ?> globalPayload;
-    private static SchemaContext schemaContextModules;
+    private static EffectiveModelContext schemaContextModules;
 
     private final ControllerContext controllerContext =
             TestRestconfUtils.newControllerContext(schemaContextModules, null);

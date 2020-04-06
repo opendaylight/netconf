@@ -14,12 +14,9 @@ import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.topology.api.NetconfConnectorFactory;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.HostBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeBuilder;
-import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.Credentials;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.LoginPwBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.netconf.node.credentials.credentials.login.pw.LoginPasswordBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
@@ -55,28 +52,21 @@ public class NetconfConnectorFactoryImpl implements NetconfConnectorFactory {
                             final Boolean tcpOnly,
                             final Boolean reconnectOnSchemaChange) {
 
-        final NodeId nodeId = new NodeId(instanceName);
-        final NodeKey nodeKey = new NodeKey(nodeId);
-        final Credentials credentials = new LoginPwBuilder()
-                .setLoginPassword(
-                        new LoginPasswordBuilder()
-                                .setUsername(username)
-                                .setPassword(password)
-                                .build())
-                .build();
-        final Host host = HostBuilder.getDefaultInstance(address);
-        final PortNumber portNumber = new PortNumber(Uint16.valueOf(port));
-        final NetconfNode netconfNode = new NetconfNodeBuilder()
-                .setHost(host)
-                .setPort(portNumber)
-                .setCredentials(credentials)
-                .setTcpOnly(tcpOnly)
-                .setReconnectOnChangedSchema(reconnectOnSchemaChange)
-                .build();
+        final NodeKey nodeKey = new NodeKey(new NodeId(instanceName));
         final Node node =  new NodeBuilder()
-                .setNodeId(nodeId)
                 .withKey(nodeKey)
-                .addAugmentation(NetconfNode.class, netconfNode)
+                .addAugmentation(new NetconfNodeBuilder()
+                    .setHost(HostBuilder.getDefaultInstance(address))
+                    .setPort(new PortNumber(Uint16.valueOf(port)))
+                    .setCredentials(new LoginPwBuilder()
+                        .setLoginPassword(new LoginPasswordBuilder()
+                            .setUsername(username)
+                            .setPassword(password)
+                            .build())
+                        .build())
+                    .setTcpOnly(tcpOnly)
+                    .setReconnectOnChangedSchema(reconnectOnSchemaChange)
+                    .build())
                 .build();
 
         final InstanceIdentifier<Node> nodePath = TOPOLOGY_PATH.child(Node.class, nodeKey);
