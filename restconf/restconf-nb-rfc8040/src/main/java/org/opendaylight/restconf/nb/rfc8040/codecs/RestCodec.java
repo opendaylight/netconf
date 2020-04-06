@@ -405,7 +405,7 @@ public final class RestCodec {
     private static void collectInstanceDataNodeContainers(final List<DataSchemaNode> potentialSchemaNodes,
             final DataNodeContainer container, final String name) {
 
-        final Iterable<DataSchemaNode> nodes =
+        final Iterable<? extends DataSchemaNode> nodes =
                 Iterables.filter(container.getChildNodes(), node -> name.equals(node.getQName().getLocalName()));
 
         // Can't combine this loop with the filter above because the filter is
@@ -418,8 +418,8 @@ public final class RestCodec {
 
         final Iterable<ChoiceSchemaNode> choiceNodes =
                 Iterables.filter(container.getChildNodes(), ChoiceSchemaNode.class);
-        final Iterable<Collection<CaseSchemaNode>> map = Iterables.transform(choiceNodes,
-            choice -> choice.getCases().values());
+        final Iterable<Collection<? extends CaseSchemaNode>> map = Iterables.transform(choiceNodes,
+            choice -> choice.getCases());
         for (final CaseSchemaNode caze : Iterables.concat(map)) {
             collectInstanceDataNodeContainers(potentialSchemaNodes, caze, name);
         }

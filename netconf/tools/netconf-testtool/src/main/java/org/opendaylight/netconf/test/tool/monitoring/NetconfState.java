@@ -34,12 +34,12 @@ public final class NetconfState {
     @XmlElementWrapper(name = "schemas")
     @XmlElement(name = "schema")
     public Collection<MonitoringSchema> getSchemas() {
-        return Collections2.transform(schemas.getSchema(), MonitoringSchema::new);
+        return Collections2.transform(schemas.getSchema().values(), MonitoringSchema::new);
     }
 
     @XmlElementWrapper(name = "sessions")
     @XmlElement(name = "session")
     public Collection<MonitoringSession> getSessions() {
-        return Collections2.transform(sessions.getSession(), MonitoringSession::new);
+        return Collections2.transform(sessions.getSession().values(), MonitoringSession::new);
     }
 }

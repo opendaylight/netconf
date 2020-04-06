@@ -85,8 +85,8 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
@@ -129,7 +129,7 @@ public class NetconfNodeManagerTest {
     private NetconfDeviceSchemasResolver mockSchemasResolver;
 
     @Mock
-    private SchemaContextFactory mockSchemaContextFactory;
+    private EffectiveModelContextFactory mockSchemaContextFactory;
 
     private ActorSystem slaveSystem;
     private ActorSystem masterSystem;

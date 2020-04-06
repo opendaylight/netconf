@@ -13,7 +13,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.opendaylight.netconf.mdsal.notification.impl.ops.NotificationsTransformUtil;
 import org.opendaylight.netconf.notifications.BaseNotificationPublisherRegistration;
@@ -48,6 +50,7 @@ import org.slf4j.LoggerFactory;
 /**
  *  A thread-safe implementation NetconfNotificationRegistry.
  */
+@Singleton
 public class NetconfNotificationManager implements NetconfNotificationCollector, NetconfNotificationRegistry,
         NetconfNotificationListener, AutoCloseable {
 
@@ -85,6 +88,12 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
     @GuardedBy("this")
     private final Set<GenericNotificationPublisherReg> notificationPublishers = new HashSet<>();
+    private final NotificationsTransformUtil transformUtil;
+
+    @Inject
+    public NetconfNotificationManager(final NotificationsTransformUtil transformUtil) {
+        this.transformUtil = requireNonNull(transformUtil);
+    }
 
     @Override
     public synchronized void onNotification(final StreamNameType stream, final NetconfNotification notification) {
@@ -124,7 +133,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
     @Override
     public synchronized Streams getNotificationPublishers() {
-        return new StreamsBuilder().setStream(Lists.newArrayList(streamMetadata.values())).build();
+        return new StreamsBuilder().setStream(Maps.uniqueIndex(streamMetadata.values(), Stream::key)).build();
     }
 
     @Override
@@ -235,7 +244,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
     public BaseNotificationPublisherRegistration registerBaseNotificationPublisher() {
         final NotificationPublisherRegistration notificationPublisherRegistration =
                 registerNotificationPublisher(BASE_NETCONF_STREAM);
-        return new BaseNotificationPublisherReg(notificationPublisherRegistration);
+        return new BaseNotificationPublisherReg(transformUtil, notificationPublisherRegistration);
     }
 
     private static class GenericNotificationPublisherReg implements NotificationPublisherRegistration {
@@ -269,8 +278,11 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
         static final SchemaPath SESSION_END_PATH = SchemaPath.create(true, NetconfSessionEnd.QNAME);
 
         private final NotificationPublisherRegistration baseRegistration;
+        private final NotificationsTransformUtil transformUtil;
 
-        BaseNotificationPublisherReg(final NotificationPublisherRegistration baseRegistration) {
+        BaseNotificationPublisherReg(final NotificationsTransformUtil transformUtil,
+                final NotificationPublisherRegistration baseRegistration) {
+            this.transformUtil = requireNonNull(transformUtil);
             this.baseRegistration = baseRegistration;
         }
 
@@ -279,9 +291,8 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
             baseRegistration.close();
         }
 
-        private static NetconfNotification serializeNotification(final Notification notification,
-                final SchemaPath path) {
-            return NotificationsTransformUtil.transform(notification, path);
+        private NetconfNotification serializeNotification(final Notification notification, final SchemaPath path) {
+            return transformUtil.transform(notification, path);
         }
 
         @Override

@@ -26,15 +26,17 @@
     <reference id="dataBroker"
                interface="org.opendaylight.mdsal.binding.api.DataBroker"/>
     <reference id="mountPointService"
-               interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"
-               odl:type="default"/>
+               interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"/>
     <reference id="encryptionService"
                interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
     <reference id="deviceActionFactory"
                interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
+    <reference id="parserFactory"
+               interface="org.opendaylight.yangtools.yang.model.parser.api.YangParserFactory"/>
 
     <bean id="schemaRepository" class="org.opendaylight.netconf.topology.spi.SharedSchemaRepositoryProvider">
         <argument value="netconf-topology-schemas"/>
+        <argument ref="parserFactory"/>
     </bean>
 
     <cm:property-placeholder persistent-id="org.opendaylight.netconf.topology.sb.keypair" update-strategy="none">

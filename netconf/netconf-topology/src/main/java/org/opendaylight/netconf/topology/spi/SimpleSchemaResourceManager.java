@@ -21,6 +21,7 @@ import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverI
 import org.opendaylight.netconf.topology.api.SchemaResourceManager;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
+import org.opendaylight.yangtools.yang.model.parser.api.YangParserFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactoryConfiguration;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
@@ -43,10 +44,13 @@ public final class SimpleSchemaResourceManager implements SchemaResourceManager 
     @GuardedBy("this")
     private final Map<String, SchemaResourcesDTO> resources = new HashMap<>();
     private final @NonNull SchemaResourcesDTO defaultResources;
+    private final YangParserFactory parserFactory;
     private final String defaultSubdirectory;
     private final String rootDirectory;
 
-    public SimpleSchemaResourceManager(final String rootDirectory, final String defaultSubdirectory) {
+    public SimpleSchemaResourceManager(final YangParserFactory parserFactory, final String rootDirectory,
+            final String defaultSubdirectory) {
+        this.parserFactory = requireNonNull(parserFactory);
         this.rootDirectory = requireNonNull(rootDirectory);
         this.defaultSubdirectory = requireNonNull(defaultSubdirectory);
         this.defaultResources = createResources(defaultSubdirectory);
@@ -87,8 +91,7 @@ public final class SimpleSchemaResourceManager implements SchemaResourceManager 
 
     private @NonNull SchemaResourcesDTO createResources(final String subdir) {
         // Setup the baseline empty registry
-        // FIXME: add YangParserFactory argument
-        final SharedSchemaRepository repository = new SharedSchemaRepository(subdir);
+        final SharedSchemaRepository repository = new SharedSchemaRepository(subdir, parserFactory);
 
         // Teach the registry how to transform YANG text to ASTSchemaSource internally
         repository.registerSchemaSourceListener(TextToASTTransformer.create(repository, repository));

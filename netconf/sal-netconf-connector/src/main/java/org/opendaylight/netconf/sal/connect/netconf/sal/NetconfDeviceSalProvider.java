@@ -25,7 +25,7 @@ import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.concepts.ObjectRegistration;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,13 +117,13 @@ public class NetconfDeviceSalProvider implements AutoCloseable {
             this.id = requireNonNull(id);
         }
 
-        public void onTopologyDeviceConnected(final SchemaContext initialCtx,
+        public void onTopologyDeviceConnected(final EffectiveModelContext initialCtx,
                 final DOMDataBroker broker, final DOMRpcService rpc,
                 final NetconfDeviceNotificationService newNotificationService) {
             onTopologyDeviceConnected(initialCtx, broker, rpc, newNotificationService, null);
         }
 
-        public synchronized void onTopologyDeviceConnected(final SchemaContext initialCtx,
+        public synchronized void onTopologyDeviceConnected(final EffectiveModelContext initialCtx,
                 final DOMDataBroker broker, final DOMRpcService rpc,
                 final NetconfDeviceNotificationService newNotificationService, final DOMActionService deviceAction) {
             requireNonNull(mountService, "Closed");
