@@ -16,13 +16,13 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.apache.aries.blueprint.annotation.service.Service;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfStateSchemasResolverImpl;
 import org.opendaylight.netconf.topology.api.SchemaResourceManager;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
+import org.opendaylight.yangtools.yang.model.parser.api.YangParserFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactoryConfiguration;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.util.FilesystemSchemaSourceCache;
@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
  * encountered based on configuration.
  */
 @Beta
-@Service
 @Singleton
 public final class DefaultSchemaResourceManager implements SchemaResourceManager {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultSchemaResourceManager.class);
@@ -47,15 +46,18 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
     @GuardedBy("this")
     private final Map<String, SchemaResourcesDTO> resources = new HashMap<>();
     private final @NonNull SchemaResourcesDTO defaultResources;
+    private final YangParserFactory parserFactory;
     private final String defaultSubdirectory;
     private final String rootDirectory;
 
     @Inject
-    public DefaultSchemaResourceManager() {
-        this("cache", "schema");
+    public DefaultSchemaResourceManager(final YangParserFactory parserFactory) {
+        this(parserFactory, "cache", "schema");
     }
 
-    public DefaultSchemaResourceManager(final String rootDirectory, final String defaultSubdirectory) {
+    public DefaultSchemaResourceManager(final YangParserFactory parserFactory, final String rootDirectory,
+            final String defaultSubdirectory) {
+        this.parserFactory = requireNonNull(parserFactory);
         this.rootDirectory = requireNonNull(rootDirectory);
         this.defaultSubdirectory = requireNonNull(defaultSubdirectory);
         this.defaultResources = createResources(defaultSubdirectory);
@@ -96,8 +98,7 @@ public final class DefaultSchemaResourceManager implements SchemaResourceManager
 
     private @NonNull SchemaResourcesDTO createResources(final String subdir) {
         // Setup the baseline empty registry
-        // FIXME: add YangParserFactory argument
-        final SharedSchemaRepository repository = new SharedSchemaRepository(subdir);
+        final SharedSchemaRepository repository = new SharedSchemaRepository(subdir, parserFactory);
 
         // Teach the registry how to transform YANG text to ASTSchemaSource internally
         repository.registerSchemaSourceListener(TextToASTTransformer.create(repository, repository));

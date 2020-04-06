@@ -33,8 +33,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 import org.opendaylight.yangtools.yang.parser.spi.source.SourceException;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 public class JsonBodyReaderTest extends AbstractBodyReaderTest {
 
     private final JsonNormalizedNodeBodyReader jsonBodyReader;
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
         URI.create("instance:identifier:module"), Revision.of("2014-01-17"));

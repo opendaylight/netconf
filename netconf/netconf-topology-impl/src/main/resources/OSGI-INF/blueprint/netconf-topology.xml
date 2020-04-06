@@ -26,8 +26,7 @@
     <reference id="dataBroker"
                interface="org.opendaylight.mdsal.binding.api.DataBroker"/>
     <reference id="mountPointService"
-               interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"
-               odl:type="default"/>
+               interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"/>
     <reference id="encryptionService"
                interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
     <reference id="deviceActionFactory"
