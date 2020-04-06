@@ -32,9 +32,9 @@ import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
@@ -132,16 +132,16 @@ public class ParserFieldsParameterTest {
 
     @Before
     public void setUp() throws Exception {
-        final SchemaContext schemaContextJukebox =
+        final EffectiveModelContext schemaContextJukebox =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/jukebox"));
         initJukeboxSchemaNodes(schemaContextJukebox);
 
-        final SchemaContext schemaContextTestServices =
+        final EffectiveModelContext schemaContextTestServices =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/test-services"));
         initTestServicesSchemaNodes(schemaContextTestServices);
     }
 
-    private void initJukeboxSchemaNodes(final SchemaContext schemaContext) {
+    private void initJukeboxSchemaNodes(final EffectiveModelContext schemaContext) {
         Mockito.when(identifierJukebox.getSchemaContext()).thenReturn(schemaContext);
         Mockito.when(containerJukebox.getQName()).thenReturn(JUKEBOX_Q_NAME);
         Mockito.when(identifierJukebox.getSchemaNode()).thenReturn(containerJukebox);
@@ -163,7 +163,7 @@ public class ParserFieldsParameterTest {
         Mockito.when(listAlbum.getDataChildByName(NAME_Q_NAME)).thenReturn(leafName);
     }
 
-    private void initTestServicesSchemaNodes(final SchemaContext schemaContext) {
+    private void initTestServicesSchemaNodes(final EffectiveModelContext schemaContext) {
         Mockito.when(identifierTestServices.getSchemaContext()).thenReturn(schemaContext);
         Mockito.when(containerTestData.getQName()).thenReturn(TEST_DATA_Q_NAME);
         Mockito.when(identifierTestServices.getSchemaNode()).thenReturn(containerTestData);

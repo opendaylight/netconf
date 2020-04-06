@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Optional;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.controller.messagebus.spi.EventSource;
 import org.opendaylight.controller.messagebus.spi.EventSourceRegistry;
@@ -46,10 +45,10 @@ import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 
-public class NetconfEventSourceManagerTest {
+public class NetconfEventSourceManagerTest extends AbstractCodecTest {
 
     NetconfEventSourceManager netconfEventSourceManager;
-    ListenerRegistration listenerRegistrationMock;
+    ListenerRegistration<?> listenerRegistrationMock;
     DOMMountPointService domMountPointServiceMock;
     MountPointService mountPointServiceMock;
     EventSourceRegistry eventSourceTopologyMock;
@@ -57,9 +56,6 @@ public class NetconfEventSourceManagerTest {
     RpcProviderService rpcProviderRegistryMock;
     EventSourceRegistry eventSourceRegistry;
 
-    @BeforeClass
-    public static void initTestClass() throws IllegalAccessException, InstantiationException {
-    }
 
     @SuppressWarnings("unchecked")
     @Before
@@ -95,7 +91,7 @@ public class NetconfEventSourceManagerTest {
                 .build();
         doReturn(readStreamFuture).when(rtx).read(LogicalDatastoreType.OPERATIONAL, pathStream);
 
-        netconfEventSourceManager = new NetconfEventSourceManager(dataBrokerMock,
+        netconfEventSourceManager = new NetconfEventSourceManager(dataBrokerMock, SERIALIZER,
                 domNotificationPublishServiceMock, domMountPointServiceMock, eventSourceRegistry);
         netconfEventSourceManager.setStreamMap(new HashMap<>());
     }

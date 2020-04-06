@@ -41,14 +41,14 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.DataTreeCandidate;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class RestconfImplNotificationSubscribingTest {
 
     private final String identifier = "data-change-event-subscription/datastore=OPERATIONAL/scope=ONE";
 
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     @Mock
     private BrokerFacade broker;

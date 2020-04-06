@@ -200,7 +200,7 @@ public class RestconfDataServiceImplTest {
         final SchemaContextHandler schemaContextHandler = SchemaContextHandler.newInstance(transactionChainHandler,
                 Mockito.mock(DOMSchemaService.class));
 
-        schemaContextHandler.onGlobalContextUpdated(this.contextRef.get());
+        schemaContextHandler.onModelContextUpdated(this.contextRef.get());
         this.dataService = new RestconfDataServiceImpl(schemaContextHandler, this.transactionChainHandler,
                 DOMMountPointServiceHandler.newInstance(mountPointService), this.delegRestconfSubscrService,
                 this.actionServiceHandler);

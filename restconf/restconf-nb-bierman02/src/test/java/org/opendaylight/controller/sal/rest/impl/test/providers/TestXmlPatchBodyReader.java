@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.controller.sal.rest.impl.test.providers;
 
 import static org.junit.Assert.assertEquals;
@@ -18,12 +17,12 @@ import org.junit.Test;
 import org.opendaylight.netconf.sal.rest.impl.XmlToPatchBodyReader;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class TestXmlPatchBodyReader extends AbstractBodyReaderTest {
 
     private final XmlToPatchBodyReader xmlToPatchBodyReader;
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     public TestXmlPatchBodyReader() {
         super(schemaContext, null);
