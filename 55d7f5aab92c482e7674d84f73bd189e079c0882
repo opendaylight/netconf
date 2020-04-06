@@ -22,6 +22,30 @@
       "revId": "55d7f5aab92c482e7674d84f73bd189e079c0882",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a5215a28_60a27fe6",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ModelGenerator.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-04-06T22:04:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9cd4e63_d45d07f2",
+      "range": {
+        "startLine": 471,
+        "startChar": 12,
+        "endLine": 471,
+        "endChar": 54
+      },
+      "revId": "55d7f5aab92c482e7674d84f73bd189e079c0882",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
