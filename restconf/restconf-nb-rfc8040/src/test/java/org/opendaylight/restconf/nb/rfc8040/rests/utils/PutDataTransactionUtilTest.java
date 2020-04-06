@@ -42,7 +42,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class PutDataTransactionUtilTest {
@@ -66,7 +66,7 @@ public class PutDataTransactionUtilTest {
     private ContainerNode buildBaseCont;
     private ContainerNode buildBaseContWithList;
     private MapEntryNode buildListEntry;
-    private SchemaContext schema;
+    private EffectiveModelContext schema;
     private DataSchemaNode schemaNode;
     private YangInstanceIdentifier iid;
     private DataSchemaNode schemaNode2;

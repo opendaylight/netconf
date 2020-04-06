@@ -35,8 +35,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
                interface="org.opendaylight.netconf.client.NetconfClientDispatcher"
                odl:type="netconf-client-dispatcher"/>
     <reference id="mountPointService"
-               interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"
-               odl:type="default"/>
+               interface="org.opendaylight.mdsal.dom.api.DOMMountPointService"/>
     <reference id="deviceActionFactory"
                interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
     <reference id="schemaManager"

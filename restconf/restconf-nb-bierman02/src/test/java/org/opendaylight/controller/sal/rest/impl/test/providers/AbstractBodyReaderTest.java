@@ -26,6 +26,7 @@ import org.opendaylight.netconf.sal.rest.impl.AbstractIdentifierAwareJaxRsProvid
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.restconf.common.patch.PatchContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public abstract class AbstractBodyReaderTest {
@@ -56,8 +57,8 @@ public abstract class AbstractBodyReaderTest {
 
     protected abstract MediaType getMediaType();
 
-    protected static SchemaContext schemaContextLoader(final String yangPath,
-            final SchemaContext schemaContext) {
+    protected static EffectiveModelContext schemaContextLoader(final String yangPath,
+            final EffectiveModelContext schemaContext) {
         return TestRestconfUtils.loadSchemaContext(yangPath, schemaContext);
     }
 

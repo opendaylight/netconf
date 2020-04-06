@@ -20,12 +20,12 @@ import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.AbstractBodyReaderTest;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.test.JsonBodyReaderTest;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class JsonPatchBodyReaderMountPointTest extends AbstractBodyReaderTest {
 
     private static final String MOUNT_POINT = "instance-identifier-module:cont/yang-ext:mount/";
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
     private final JsonToPatchBodyReader jsonToPatchBodyReader;
 
     public JsonPatchBodyReaderMountPointTest() throws Exception {

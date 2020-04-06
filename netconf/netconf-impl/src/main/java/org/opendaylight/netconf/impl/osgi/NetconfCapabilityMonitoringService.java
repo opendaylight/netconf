@@ -17,7 +17,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -155,28 +154,17 @@ class NetconfCapabilityMonitoringService implements CapabilityListener, AutoClos
     }
 
     private static Schemas transformSchemas(final Set<Capability> caps) {
-        final List<Schema> schemas = new ArrayList<>(caps.size());
+        final Map<SchemaKey, Schema> schemas = Maps.newHashMapWithExpectedSize(caps.size());
         for (final Capability cap : caps) {
             if (cap.getCapabilitySchema().isPresent()) {
-                final SchemaBuilder builder = new SchemaBuilder();
-
                 Preconditions.checkState(isValidModuleCapability(cap));
 
-                builder.setNamespace(new Uri(cap.getModuleNamespace().get()));
-
-                final String version = cap.getRevision().get();
-                builder.setVersion(version);
-
-                final String identifier = cap.getModuleName().get();
-                builder.setIdentifier(identifier);
-
-                builder.setFormat(Yang.class);
-
-                builder.setLocation(transformLocations(cap.getLocation()));
-
-                builder.withKey(new SchemaKey(Yang.class, identifier, version));
-
-                schemas.add(builder.build());
+                final SchemaKey key = new SchemaKey(Yang.class, cap.getModuleName().get(), cap.getRevision().get());
+                schemas.put(key, new SchemaBuilder()
+                    .withKey(key)
+                    .setNamespace(new Uri(cap.getModuleNamespace().get()))
+                    .setLocation(transformLocations(cap.getLocation()))
+                    .build());
             }
         }
 

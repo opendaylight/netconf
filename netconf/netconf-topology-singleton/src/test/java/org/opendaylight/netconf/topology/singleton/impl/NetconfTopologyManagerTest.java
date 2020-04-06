@@ -81,6 +81,7 @@ import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.Uint16;
+import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 
 public class NetconfTopologyManagerTest {
     private static final Uint16 ACTOR_RESPONSE_WAIT_TIME = Uint16.valueOf(10);
@@ -131,7 +132,8 @@ public class NetconfTopologyManagerTest {
         netconfTopologyManager = new NetconfTopologyManager(dataBroker, rpcProviderRegistry, actionProviderRegistry,
                 clusterSingletonServiceProvider, keepaliveExecutor, processingThreadPool,
                 actorSystemProvider, eventExecutor, clientDispatcher, TOPOLOGY_ID, config,
-                mountPointService, encryptionService, deviceActionFactory, new DefaultSchemaResourceManager()) {
+                mountPointService, encryptionService, deviceActionFactory,
+                new DefaultSchemaResourceManager(new YangParserFactoryImpl())) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
