@@ -16,16 +16,13 @@ import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class RestconfImplTest {
-
     @Test
     public void restImplTest() throws Exception {
-        final SchemaContext schemaContext =
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/restconf/impl"));
-        final SchemaContextHandler schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
+        final SchemaContextHandler schemaContextHandler = TestUtils.newSchemaContextHandler(
+            YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/restconf/impl")));
         final RestconfImpl restconfImpl = new RestconfImpl(schemaContextHandler);
         final NormalizedNodeContext libraryVersion = restconfImpl.getLibraryVersion();
         final LeafNode<?> value = (LeafNode<?>) libraryVersion.getData();
