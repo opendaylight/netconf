@@ -8,6 +8,7 @@
 package org.opendaylight.controller.sal.rest.doc.impl;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,25 +20,24 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.mockito.ArgumentCaptor;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class DocGenTestHelper {
 
-    private Set<Module> modules;
+    private Collection<? extends Module> modules;
     private ObjectMapper mapper;
-    private SchemaContext schemaContext;
+    private EffectiveModelContext schemaContext;
 
-    public Set<Module> loadModules(final String resourceDirectory) throws URISyntaxException, FileNotFoundException {
+    public Collection<? extends Module> loadModules(final String resourceDirectory)
+            throws URISyntaxException, FileNotFoundException {
 
         final URI resourceDirUri = getClass().getResource(resourceDirectory).toURI();
         final File testDir = new File(resourceDirUri);
@@ -54,7 +54,7 @@ public class DocGenTestHelper {
         return this.schemaContext.getModules();
     }
 
-    public Collection<Module> getModules() {
+    public Collection<? extends Module> getModules() {
         return this.modules;
     }
 
@@ -64,11 +64,11 @@ public class DocGenTestHelper {
         this.mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
     }
 
-    public SchemaContext getSchemaContext() {
+    public EffectiveModelContext getSchemaContext() {
         return this.schemaContext;
     }
 
-    public DOMSchemaService createMockSchemaService(SchemaContext mockContext) {
+    public DOMSchemaService createMockSchemaService(EffectiveModelContext mockContext) {
         if (mockContext == null) {
             mockContext = createMockSchemaContext();
         }
@@ -78,9 +78,9 @@ public class DocGenTestHelper {
         return mockSchemaService;
     }
 
-    public SchemaContext createMockSchemaContext() {
-        final SchemaContext mockContext = mock(SchemaContext.class);
-        when(mockContext.getModules()).thenReturn(this.modules);
+    public EffectiveModelContext createMockSchemaContext() {
+        final EffectiveModelContext mockContext = mock(EffectiveModelContext.class);
+        doReturn(this.modules).when(mockContext).getModules();
 
         final ArgumentCaptor<String> moduleCapture = ArgumentCaptor.forClass(String.class);
         final ArgumentCaptor<Optional> dateCapture = ArgumentCaptor.forClass(Optional.class);
@@ -89,7 +89,7 @@ public class DocGenTestHelper {
             invocation -> {
                 final String module = moduleCapture.getValue();
                 final Optional<?> date = dateCapture.getValue();
-                for (final Module m : Collections.unmodifiableSet(DocGenTestHelper.this.modules)) {
+                for (final Module m : DocGenTestHelper.this.modules) {
                     if (m.getName().equals(module) && m.getRevision().equals(date)) {
                         return Optional.of(m);
                     }
@@ -100,7 +100,7 @@ public class DocGenTestHelper {
             invocation -> {
                 final URI namespace = namespaceCapture.getValue();
                 final Optional<?> date = dateCapture.getValue();
-                for (final Module m : Collections.unmodifiableSet(DocGenTestHelper.this.modules)) {
+                for (final Module m : DocGenTestHelper.this.modules) {
                     if (m.getNamespace().equals(namespace) && m.getRevision().equals(date)) {
                         return Optional.of(m);
                     }

@@ -347,7 +347,7 @@ public final class YangInstanceIdentifierDeserializer {
 
     private static <T extends DataNodeContainer & SchemaNode & ActionNodeContainer> QName getQNameOfDataSchemaNode(
             final T parent, final String nodeName) {
-        final Optional<ActionDefinition> actionDef = findActionDefinition(parent, nodeName);
+        final Optional<? extends ActionDefinition> actionDef = findActionDefinition(parent, nodeName);
         final SchemaNode node;
         if (actionDef.isPresent()) {
             node = actionDef.get();
@@ -357,7 +357,7 @@ public final class YangInstanceIdentifierDeserializer {
         return node.getQName();
     }
 
-    private static Optional<ActionDefinition> findActionDefinition(final SchemaNode dataSchemaNode,
+    private static Optional<? extends ActionDefinition> findActionDefinition(final SchemaNode dataSchemaNode,
             final String nodeName) {
         requireNonNull(dataSchemaNode, "DataSchema Node must not be null.");
         if (dataSchemaNode instanceof ActionNodeContainer) {

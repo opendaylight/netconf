@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -31,7 +32,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public abstract class AbstractBodyReaderTest {
 
@@ -39,7 +40,7 @@ public abstract class AbstractBodyReaderTest {
     protected final SchemaContextHandler schemaContextHandler;
     protected final DOMMountPointServiceHandler mountPointServiceHandler;
 
-    protected AbstractBodyReaderTest(final SchemaContext schemaContext) throws NoSuchFieldException,
+    protected AbstractBodyReaderTest(final EffectiveModelContext schemaContext) throws NoSuchFieldException,
             IllegalAccessException {
         mediaType = getMediaType();
 
@@ -48,15 +49,16 @@ public abstract class AbstractBodyReaderTest {
         final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
-        doReturn(schemaContext).when(mountPoint).getSchemaContext();
+        doReturn(schemaContext).when(mountPoint).getEffectiveModelContext();
+        doCallRealMethod().when(mountPoint).getSchemaContext();
 
         mountPointServiceHandler = DOMMountPointServiceHandler.newInstance(mountPointService);
     }
 
     protected abstract MediaType getMediaType();
 
-    protected static SchemaContext schemaContextLoader(final String yangPath,
-            final SchemaContext schemaContext) {
+    protected static EffectiveModelContext schemaContextLoader(final String yangPath,
+            final EffectiveModelContext schemaContext) {
         return TestRestconfUtils.loadSchemaContext(yangPath, schemaContext);
     }
 

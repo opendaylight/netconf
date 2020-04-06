@@ -9,6 +9,7 @@ package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateNullFluentFuture;
@@ -59,8 +60,8 @@ public class StreamNotificationTopicRegistrationTest {
         when(mount.registerNotificationListener(source, ConnectionNotificationTopicRegistration
                 .EVENT_SOURCE_STATUS_PATH))
                 .thenReturn(listenerRegistration);
-        when(mount.invokeCreateSubscription(any(), any())).thenReturn(immediateNullFluentFuture());
-        when(mount.invokeCreateSubscription(any())).thenReturn(immediateNullFluentFuture());
+        doReturn(immediateNullFluentFuture()).when(mount).invokeCreateSubscription(any(), any());
+        doReturn(immediateNullFluentFuture()).when(mount).invokeCreateSubscription(any());
 
         when(source.getMount()).thenReturn(mount);
         stream = new StreamBuilder().setName(StreamNameType.getDefaultInstance(STREAM_NAME)).setReplaySupport(true)

@@ -19,12 +19,12 @@ import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.netconf.sal.rest.impl.XmlToPatchBodyReader;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.common.patch.PatchContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class TestXmlPatchBodyReaderMountPoint extends AbstractBodyReaderTest {
 
     private final XmlToPatchBodyReader xmlToPatchBodyReader;
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
     private static final String MOUNT_POINT = "instance-identifier-module:cont/yang-ext:mount";
 
     public TestXmlPatchBodyReaderMountPoint() {

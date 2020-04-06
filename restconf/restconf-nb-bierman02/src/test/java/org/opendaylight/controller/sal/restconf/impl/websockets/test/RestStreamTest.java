@@ -34,7 +34,7 @@ import org.opendaylight.netconf.sal.rest.impl.XmlNormalizedNodeBodyReader;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -42,7 +42,7 @@ import org.w3c.dom.Node;
 
 public class RestStreamTest extends JerseyTest {
 
-    private static SchemaContext schemaContextYangsIetf;
+    private static EffectiveModelContext schemaContextYangsIetf;
 
     private BrokerFacade brokerFacade;
     private RestconfImpl restconfImpl;
@@ -84,7 +84,7 @@ public class RestStreamTest extends JerseyTest {
         createAndSubscribe("odl-leaf-nodes-only", "true");
     }
 
-    private void createAndSubscribe(String queryParamName, Object... values)
+    private void createAndSubscribe(final String queryParamName, final Object... values)
                                                 throws UnsupportedEncodingException, InterruptedException {
         String uri = "/operations/sal-remote:create-data-change-event-subscription";
         String rpcInput = getRpcInput();
@@ -112,7 +112,7 @@ public class RestStreamTest extends JerseyTest {
         return target(uri).request(mediaType).post(Entity.entity(data, mediaType));
     }
 
-    private Response get(final String uri, final String mediaType, String queryParam, Object... values) {
+    private Response get(final String uri, final String mediaType, final String queryParam, final Object... values) {
         if (queryParam != null) {
             return target(uri).queryParam(queryParam, values).request(mediaType).get();
         } else {
