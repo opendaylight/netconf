@@ -13,8 +13,10 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.yangtools.concepts.SemVer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -32,10 +34,18 @@ import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
+import org.opendaylight.yangtools.yang.model.api.YangStmtMapping;
+import org.opendaylight.yangtools.yang.model.api.meta.EffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.meta.IdentifierNamespace;
+import org.opendaylight.yangtools.yang.model.api.meta.StatementDefinition;
+import org.opendaylight.yangtools.yang.model.api.meta.StatementSource;
+import org.opendaylight.yangtools.yang.model.api.stmt.ModuleEffectiveStatement;
+import org.opendaylight.yangtools.yang.model.api.stmt.ModuleStatement;
 
-final class OperationsRestconfModule implements Module  {
+final class OperationsRestconfModule implements Module, ModuleEffectiveStatement {
     // There is no need to intern this nor add a revision, as we are providing the corresponding context anyway
-    static final QNameModule NAMESPACE = QNameModule.create(URI.create("urn:ietf:params:xml:ns:yang:ietf-restconf"));
+    static final @NonNull QNameModule NAMESPACE =
+            QNameModule.create(URI.create("urn:ietf:params:xml:ns:yang:ietf-restconf"));
 
     private final OperationsContainerSchemaNode operations;
 
@@ -44,13 +54,23 @@ final class OperationsRestconfModule implements Module  {
     }
 
     @Override
-    public String getName() {
+    public String argument() {
         return "ietf-restconf";
     }
 
     @Override
-    public QNameModule getQNameModule() {
+    public QNameModule localQNameModule() {
         return NAMESPACE;
+    }
+
+    @Override
+    public String getName() {
+        return argument();
+    }
+
+    @Override
+    public QNameModule getQNameModule() {
+        return localQNameModule();
     }
 
     @Override
@@ -71,6 +91,37 @@ final class OperationsRestconfModule implements Module  {
     @Override
     public YangVersion getYangVersion() {
         return YangVersion.VERSION_1;
+    }
+
+    @Override
+    public Collection<? extends EffectiveStatement<?, ?>> effectiveSubstatements() {
+        return List.of();
+    }
+
+    @Override
+    public StatementDefinition statementDefinition() {
+        return YangStmtMapping.MODULE;
+    }
+
+    @Override
+    public StatementSource getStatementSource() {
+        return StatementSource.CONTEXT;
+    }
+
+    @Override
+    public ModuleStatement getDeclared() {
+        return null;
+    }
+
+    @Override
+    public <K, V, N extends IdentifierNamespace<K, V>> Optional<? extends V> get(final Class<N> namespace,
+            final K identifier) {
+        return Optional.empty();
+    }
+
+    @Override
+    public <K, V, N extends IdentifierNamespace<K, V>> Map<K, V> getAll(final Class<N> namespace) {
+        return Map.of();
     }
 
     @Override

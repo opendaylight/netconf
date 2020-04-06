@@ -103,7 +103,7 @@ public class NetconfTopologyRPCProvider implements NetconfNodeTopologyService {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
         final InstanceIdentifier<NetconfNode> niid = topologyPath.child(Node.class,
                 new NodeKey(nodeId)).augmentation(NetconfNode.class);
-        writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, niid, node, true);
+        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, niid, node);
         writeTransaction.commit().addCallback(new FutureCallback<CommitInfo>() {
 
             @Override

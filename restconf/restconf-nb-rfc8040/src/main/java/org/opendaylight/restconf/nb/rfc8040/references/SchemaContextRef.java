@@ -9,53 +9,53 @@ package org.opendaylight.restconf.nb.rfc8040.references;
 
 import java.lang.ref.SoftReference;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
-import java.util.Set;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
- * This class creates {@link SoftReference} of actual {@link SchemaContext}
+ * This class creates {@link SoftReference} of actual {@link EffectiveModelContext}
  * object and even if the {@link SchemaContext} changes, this will be sticks
  * reference to the old {@link SchemaContext} and provides work with the old
- * {@link SchemaContext}.
+ * {@link EffectiveModelContext}.
  *
  */
 public final class SchemaContextRef {
 
-    private final SoftReference<SchemaContext> schemaContextRef;
+    private final SoftReference<EffectiveModelContext> schemaContextRef;
 
     /**
-     * Create {@link SoftReference} of actual {@link SchemaContext}.
+     * Create {@link SoftReference} of actual {@link EffectiveModelContext}.
      *
      * @param schemaContext
-     *             actual {@link SchemaContext}
+     *             actual {@link EffectiveModelContext}
      */
-    public SchemaContextRef(final SchemaContext schemaContext) {
+    public SchemaContextRef(final EffectiveModelContext schemaContext) {
         this.schemaContextRef = new SoftReference<>(schemaContext);
     }
 
     /**
-     * Get {@link SchemaContext} from reference.
+     * Get {@link EffectiveModelContext} from reference.
      *
-     * @return {@link SchemaContext}
+     * @return {@link EffectiveModelContext}
      */
-    public SchemaContext get() {
+    public EffectiveModelContext get() {
         return this.schemaContextRef.get();
     }
 
     /**
-     * Get all modules like {@link Set} of {@link Module} from
-     * {@link SchemaContext}.
+     * Get all modules like {@link Collection} of {@link Module} from {@link SchemaContext}.
      *
-     * @return {@link Set} of {@link Module}
+     * @return {@link Collection} of {@link Module}
      */
-    public Set<Module> getModules() {
+    public Collection<? extends Module> getModules() {
         return get().getModules();
     }
 

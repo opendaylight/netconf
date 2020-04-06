@@ -16,8 +16,8 @@ import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.WriteTransaction;
 import org.opendaylight.mdsal.common.api.CommitInfo;
@@ -101,7 +101,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
 
     @Override
     public void schemaSourceRegistered(final Iterable<PotentialSchemaSource<?>> sources) {
-        final List<Module> newModules = new ArrayList<>();
+        final Map<ModuleKey, Module> newModules = new HashMap<>();
 
         for (PotentialSchemaSource<?> potentialYangSource : Iterables.filter(sources, YANG_SCHEMA_SOURCE)) {
             final YangIdentifier moduleName = new YangIdentifier(potentialYangSource.getSourceIdentifier().getName());
@@ -112,7 +112,7 @@ public class YangLibProvider implements AutoCloseable, SchemaSourceListener {
                     .setSchema(getUrlForModule(potentialYangSource.getSourceIdentifier()))
                     .build();
 
-            newModules.add(newModule);
+            newModules.put(newModule.key(), newModule);
         }
 
         if (newModules.isEmpty()) {

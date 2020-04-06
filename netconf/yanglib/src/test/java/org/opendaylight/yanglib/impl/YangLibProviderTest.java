@@ -22,7 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -117,7 +119,7 @@ public class YangLibProviderTest {
         doReturn(emptyFluentFuture()).when(writeTransaction).commit();
         yangLibProvider.schemaSourceRegistered(list);
 
-        List<Module> newModulesList = new ArrayList<>();
+        Map<ModuleKey, Module> newModulesList = new HashMap<>();
 
         Module newModule = new ModuleBuilder()
                 .setName(new YangIdentifier("no-revision"))
@@ -125,7 +127,7 @@ public class YangLibProviderTest {
                 .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/no-revision/"))
                 .build();
 
-        newModulesList.add(newModule);
+        newModulesList.put(newModule.key(), newModule);
 
         newModule = new ModuleBuilder()
                 .setName(new YangIdentifier("with-revision"))
@@ -133,7 +135,7 @@ public class YangLibProviderTest {
                 .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/with-revision/2016-04-28"))
                 .build();
 
-        newModulesList.add(newModule);
+        newModulesList.put(newModule.key(), newModule);
 
         verify(dataBroker).newWriteOnlyTransaction();
         verify(writeTransaction).merge(eq(LogicalDatastoreType.OPERATIONAL),

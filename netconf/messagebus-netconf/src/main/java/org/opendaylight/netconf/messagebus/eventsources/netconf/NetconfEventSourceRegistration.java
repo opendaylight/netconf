@@ -13,6 +13,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.List;
 import java.util.Optional;
 import org.opendaylight.controller.messagebus.spi.EventSourceRegistration;
+import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNodeConnectionStatus.ConnectionStatus;
@@ -31,7 +32,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Helper class to keep connection status of netconf node  and event source registration object.
  */
-public final class NetconfEventSourceRegistration implements AutoCloseable {
+final class NetconfEventSourceRegistration implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfEventSourceRegistration.class);
     private static final YangInstanceIdentifier NETCONF_DEVICE_DOM_PATH = YangInstanceIdentifier.builder()
@@ -44,18 +45,30 @@ public final class NetconfEventSourceRegistration implements AutoCloseable {
 
     private final Node node;
     private final NetconfEventSourceManager netconfEventSourceManager;
+    private final BindingNormalizedNodeSerializer serializer;
+
     private ConnectionStatus currentNetconfConnStatus;
     private EventSourceRegistration<NetconfEventSource> eventSourceRegistration;
 
-    public static NetconfEventSourceRegistration create(final InstanceIdentifier<?> instanceIdent, final Node node,
-                                                        final NetconfEventSourceManager netconfEventSourceManager) {
+    private NetconfEventSourceRegistration(final BindingNormalizedNodeSerializer serializer, final Node node,
+            final NetconfEventSourceManager netconfEventSourceManager) {
+        this.serializer = requireNonNull(serializer);
+        this.node = node;
+        this.netconfEventSourceManager = netconfEventSourceManager;
+        this.eventSourceRegistration = null;
+        this.currentNetconfConnStatus = ConnectionStatus.Connecting;
+    }
+
+    static NetconfEventSourceRegistration create(final BindingNormalizedNodeSerializer serializer,
+            final InstanceIdentifier<?> instanceIdent, final Node node,
+            final NetconfEventSourceManager netconfEventSourceManager) {
         requireNonNull(instanceIdent);
-        requireNonNull(node);
         requireNonNull(netconfEventSourceManager);
         if (!isEventSource(node)) {
             return null;
         }
-        NetconfEventSourceRegistration nesr = new NetconfEventSourceRegistration(node, netconfEventSourceManager);
+        NetconfEventSourceRegistration nesr = new NetconfEventSourceRegistration(serializer, node,
+            netconfEventSourceManager);
         nesr.updateStatus();
         LOG.debug("NetconfEventSourceRegistration for node {} has been initialized...", node.getNodeId().getValue());
         return nesr;
@@ -80,13 +93,6 @@ public final class NetconfEventSourceRegistration implements AutoCloseable {
         }
 
         return false;
-    }
-
-    private NetconfEventSourceRegistration(final Node node, final NetconfEventSourceManager netconfEventSourceManager) {
-        this.node = node;
-        this.netconfEventSourceManager = netconfEventSourceManager;
-        this.eventSourceRegistration = null;
-        this.currentNetconfConnStatus = ConnectionStatus.Connecting;
     }
 
     Optional<EventSourceRegistration<NetconfEventSource>> getEventSourceRegistration() {
@@ -146,7 +152,7 @@ public final class NetconfEventSourceRegistration implements AutoCloseable {
                 .getMountPoint(domMountPath(node.getNodeId()));
         EventSourceRegistration<NetconfEventSource> registration = null;
         if (domMountPoint.isPresent()/* && mountPoint.isPresent()*/) {
-            NetconfEventSourceMount mount = new NetconfEventSourceMount(node, domMountPoint.get());
+            NetconfEventSourceMount mount = new NetconfEventSourceMount(serializer, node, domMountPoint.get());
             final NetconfEventSource netconfEventSource = new NetconfEventSource(
                     netconfEventSourceManager.getStreamMap(),
                     mount,
