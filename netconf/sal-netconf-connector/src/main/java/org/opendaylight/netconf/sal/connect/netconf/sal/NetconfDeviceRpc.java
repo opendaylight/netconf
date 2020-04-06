@@ -35,7 +35,6 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
  * Invokes RPC by sending netconf message via listener. Also transforms result from NetconfMessage to CompositeNode.
  */
 public final class NetconfDeviceRpc implements DOMRpcService {
-
     private final RemoteDeviceCommunicator<NetconfMessage> communicator;
     private final MessageTransformer<NetconfMessage> transformer;
     private final SchemaContext schemaContext;

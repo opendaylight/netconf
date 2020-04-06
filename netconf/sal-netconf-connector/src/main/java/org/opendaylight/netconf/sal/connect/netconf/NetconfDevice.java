@@ -65,9 +65,9 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.repo.api.EffectiveModelContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.MissingSchemaSourceException;
-import org.opendaylight.yangtools.yang.model.repo.api.SchemaContextFactory;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaRepository;
 import org.opendaylight.yangtools.yang.model.repo.api.SchemaResolutionException;
 import org.opendaylight.yangtools.yang.model.repo.api.SourceIdentifier;
@@ -95,7 +95,7 @@ public class NetconfDevice
         NodeIdentifier.create(RFC8528_SCHEMA_MOUNTS_QNAME));
 
     protected final RemoteDeviceId id;
-    protected final SchemaContextFactory schemaContextFactory;
+    protected final EffectiveModelContextFactory schemaContextFactory;
     protected final SchemaSourceRegistry schemaRegistry;
     protected final SchemaRepository schemaRepository;
 
@@ -167,7 +167,7 @@ public class NetconfDevice
         }
 
         // Set up the SchemaContext for the device
-        final ListenableFuture<SchemaContext> futureSchema = Futures.transformAsync(sourceResolverFuture,
+        final ListenableFuture<EffectiveModelContext> futureSchema = Futures.transformAsync(sourceResolverFuture,
             deviceSources -> assembleSchemaContext(deviceSources, remoteSessionCapabilities), processingExecutor);
 
         // Potentially acquire mount point list and interpret it
@@ -295,7 +295,7 @@ public class NetconfDevice
 
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD",
             justification = "https://github.com/spotbugs/spotbugs/issues/811")
-    private ListenableFuture<SchemaContext> assembleSchemaContext(final DeviceSources deviceSources,
+    private ListenableFuture<EffectiveModelContext> assembleSchemaContext(final DeviceSources deviceSources,
             final NetconfSessionPreferences remoteSessionCapabilities) {
         LOG.debug("{}: Resolved device sources to {}", id, deviceSources);
         final SchemaSourceProvider<YangTextSchemaSource> yangProvider = deviceSources.getSourceProvider();
@@ -308,7 +308,7 @@ public class NetconfDevice
         return new SchemaSetup(deviceSources, remoteSessionCapabilities).startResolution();
     }
 
-    private ListenableFuture<MountPointContext> createMountPointContext(final SchemaContext schemaContext,
+    private ListenableFuture<MountPointContext> createMountPointContext(final EffectiveModelContext schemaContext,
             final BaseSchema baseSchema, final NetconfDeviceCommunicator listener) {
         final MountPointContext emptyContext = new EmptyMountPointContext(schemaContext);
         if (!schemaContext.findModule(SchemaMountConstants.RFC8528_MODULE).isPresent()) {
@@ -381,12 +381,12 @@ public class NetconfDevice
     public static class SchemaResourcesDTO {
         private final SchemaSourceRegistry schemaRegistry;
         private final SchemaRepository schemaRepository;
-        private final SchemaContextFactory schemaContextFactory;
+        private final EffectiveModelContextFactory schemaContextFactory;
         private final NetconfDeviceSchemasResolver stateSchemasResolver;
 
         public SchemaResourcesDTO(final SchemaSourceRegistry schemaRegistry,
                                   final SchemaRepository schemaRepository,
-                                  final SchemaContextFactory schemaContextFactory,
+                                  final EffectiveModelContextFactory schemaContextFactory,
                                   final NetconfDeviceSchemasResolver deviceSchemasResolver) {
             this.schemaRegistry = requireNonNull(schemaRegistry);
             this.schemaRepository = requireNonNull(schemaRepository);
@@ -402,7 +402,7 @@ public class NetconfDevice
             return schemaRepository;
         }
 
-        public SchemaContextFactory getSchemaContextFactory() {
+        public EffectiveModelContextFactory getSchemaContextFactory() {
             return schemaContextFactory;
         }
 
@@ -427,8 +427,8 @@ public class NetconfDevice
     /**
      * Schema builder that tries to build schema context from provided sources or biggest subset of it.
      */
-    private final class SchemaSetup implements FutureCallback<SchemaContext> {
-        private final SettableFuture<SchemaContext> resultFuture = SettableFuture.create();
+    private final class SchemaSetup implements FutureCallback<EffectiveModelContext> {
+        private final SettableFuture<EffectiveModelContext> resultFuture = SettableFuture.create();
 
         private final DeviceSources deviceSources;
         private final NetconfSessionPreferences remoteSessionCapabilities;
@@ -449,13 +449,13 @@ public class NetconfDevice
             requiredSources.removeAll(missingSources);
         }
 
-        ListenableFuture<SchemaContext> startResolution() {
+        ListenableFuture<EffectiveModelContext> startResolution() {
             trySetupSchema();
             return resultFuture;
         }
 
         @Override
-        public void onSuccess(final SchemaContext result) {
+        public void onSuccess(final EffectiveModelContext result) {
             LOG.debug("{}: Schema context built successfully from {}", id, requiredSources);
 
             final Collection<QName> filteredQNames = Sets.difference(deviceSources.getRequiredSourcesQName(),
@@ -497,7 +497,7 @@ public class NetconfDevice
             if (!requiredSources.isEmpty()) {
                 // Initiate async resolution, drive it back based on the result
                 LOG.trace("{}: Trying to build schema context from {}", id, requiredSources);
-                Futures.addCallback(schemaContextFactory.createSchemaContext(requiredSources), this,
+                Futures.addCallback(schemaContextFactory.createEffectiveModelContext(requiredSources), this,
                     MoreExecutors.directExecutor());
             } else {
                 LOG.debug("{}: no more sources for schema context", id);

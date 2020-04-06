@@ -31,7 +31,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.jersey.providers.spi.AbstractIdentifierAwareJaxRsProvider;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public abstract class AbstractBodyReaderTest {
 
@@ -39,7 +39,7 @@ public abstract class AbstractBodyReaderTest {
     protected final SchemaContextHandler schemaContextHandler;
     protected final DOMMountPointServiceHandler mountPointServiceHandler;
 
-    protected AbstractBodyReaderTest(final SchemaContext schemaContext) throws NoSuchFieldException,
+    protected AbstractBodyReaderTest(final EffectiveModelContext schemaContext) throws NoSuchFieldException,
             IllegalAccessException {
         mediaType = getMediaType();
 
@@ -55,8 +55,8 @@ public abstract class AbstractBodyReaderTest {
 
     protected abstract MediaType getMediaType();
 
-    protected static SchemaContext schemaContextLoader(final String yangPath,
-            final SchemaContext schemaContext) {
+    protected static EffectiveModelContext schemaContextLoader(final String yangPath,
+            final EffectiveModelContext schemaContext) {
         return TestRestconfUtils.loadSchemaContext(yangPath, schemaContext);
     }
 

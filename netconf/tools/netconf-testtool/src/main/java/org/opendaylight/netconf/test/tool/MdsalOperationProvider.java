@@ -60,8 +60,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.CollectionNodeBuilder;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextListener;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceProvider;
 import org.slf4j.Logger;
@@ -73,12 +73,12 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             .getLogger(MdsalOperationProvider.class);
 
     private final Set<Capability> caps;
-    private final SchemaContext schemaContext;
+    private final EffectiveModelContext schemaContext;
     private final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
     MdsalOperationProvider(final SessionIdProvider idProvider,
                            final Set<Capability> caps,
-                           final SchemaContext schemaContext,
+                           final EffectiveModelContext schemaContext,
                            final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
         this.caps = caps;
         this.schemaContext = schemaContext;
@@ -106,14 +106,14 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
 
     static class MdsalOperationService implements NetconfOperationService {
         private final long currentSessionId;
-        private final SchemaContext schemaContext;
+        private final EffectiveModelContext schemaContext;
         private final Set<Capability> caps;
         private final DOMSchemaService schemaService;
         private final DOMDataBroker dataBroker;
         private final SchemaSourceProvider<YangTextSchemaSource> sourceProvider;
 
         MdsalOperationService(final long currentSessionId,
-                              final SchemaContext schemaContext,
+                              final EffectiveModelContext schemaContext,
                               final Set<Capability> caps,
                               final SchemaSourceProvider<YangTextSchemaSource> sourceProvider) {
             this.currentSessionId = currentSessionId;
@@ -182,7 +182,7 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
                             new NodeWithValue<>(location, "NETCONF")).withValue("NETCONF").build();
 
             Map<QName, Object> keyValues = new HashMap<>();
-            for (final Schema schema : monitor.getSchemas().getSchema()) {
+            for (final Schema schema : monitor.getSchemas().getSchema().values()) {
                 keyValues.put(identifier, schema.getIdentifier());
                 keyValues.put(version, schema.getVersion());
                 keyValues.put(format, Yang.QNAME);
@@ -232,20 +232,20 @@ class MdsalOperationProvider implements NetconfOperationServiceFactory {
             return new DOMSchemaService() {
 
                 @Override
-                public SchemaContext getSessionContext() {
+                public EffectiveModelContext getSessionContext() {
                     return schemaContext;
                 }
 
                 @Override
-                public SchemaContext getGlobalContext() {
+                public EffectiveModelContext getGlobalContext() {
                     return schemaContext;
                 }
 
                 @Override
-                public ListenerRegistration<SchemaContextListener> registerSchemaContextListener(
-                        final SchemaContextListener listener) {
-                    listener.onGlobalContextUpdated(getGlobalContext());
-                    return new AbstractListenerRegistration<SchemaContextListener>(listener) {
+                public ListenerRegistration<EffectiveModelContextListener> registerSchemaContextListener(
+                        final EffectiveModelContextListener listener) {
+                    listener.onModelContextUpdated(getGlobalContext());
+                    return new AbstractListenerRegistration<>(listener) {
 
                         @Override
                         protected void removeRegistration() {

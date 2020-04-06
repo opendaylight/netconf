@@ -123,11 +123,12 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
         LOG.debug("Adding keypairs: {}", input);
 
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
-        final List<KeyCredential> keypairs = input.getKeyCredential().stream().map(keypair ->
-                new KeyCredentialBuilder(keypair)
+        final List<KeyCredential> keypairs = input.nonnullKeyCredential().values().stream()
+                .map(keypair -> new KeyCredentialBuilder(keypair)
                         .setPrivateKey(encryptionService.encrypt(keypair.getPrivateKey()))
                         .setPassphrase(encryptionService.encrypt(keypair.getPassphrase()))
-                        .build()).collect(Collectors.toList());
+                        .build())
+                .collect(Collectors.toList());
 
         for (KeyCredential keypair : keypairs) {
             writeTransaction.merge(LogicalDatastoreType.CONFIGURATION,
@@ -158,7 +159,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
             final AddTrustedCertificateInput input) {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
 
-        for (TrustedCertificate certificate : input.getTrustedCertificate()) {
+        for (TrustedCertificate certificate : input.nonnullTrustedCertificate().values()) {
             writeTransaction.merge(LogicalDatastoreType.CONFIGURATION,
                     keystoreIid.child(TrustedCertificate.class, certificate.key()), certificate);
         }
@@ -216,7 +217,7 @@ public class NetconfSalKeystoreService implements NetconfKeystoreService {
     public ListenableFuture<RpcResult<AddPrivateKeyOutput>> addPrivateKey(final AddPrivateKeyInput input) {
         final WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
 
-        for (PrivateKey key: input.getPrivateKey()) {
+        for (PrivateKey key: input.nonnullPrivateKey().values()) {
             writeTransaction.merge(LogicalDatastoreType.CONFIGURATION,
                     keystoreIid.child(PrivateKey.class, key.key()), key);
         }

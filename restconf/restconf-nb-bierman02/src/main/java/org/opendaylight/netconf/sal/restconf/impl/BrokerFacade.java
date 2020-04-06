@@ -490,7 +490,7 @@ public class BrokerFacade implements Closeable {
     }
 
     // RPC
-    public ListenableFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
+    public ListenableFuture<? extends DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
         if (this.rpcService == null) {
             throw new RestconfDocumentedException(Status.SERVICE_UNAVAILABLE);
         }

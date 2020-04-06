@@ -40,6 +40,7 @@ import org.opendaylight.yangtools.yang.data.codec.xml.XmlParserStream;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNormalizedNodeStreamWriter;
 import org.opendaylight.yangtools.yang.data.impl.schema.NormalizedNodeResult;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -179,7 +180,7 @@ public final class NetconfUtil {
 
 
     // FIXME: document this interface contract. Does it support RFC8528/RFC8542? How?
-    public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final SchemaContext schemaContext,
+    public static NormalizedNodeResult transformDOMSourceToNormalizedNode(final EffectiveModelContext schemaContext,
             final DOMSource value) throws XMLStreamException, URISyntaxException, IOException, SAXException {
         return transformDOMSourceToNormalizedNode(new EmptyMountPointContext(schemaContext), value);
     }

@@ -7,9 +7,11 @@
  */
 package org.opendaylight.netconf.console.utils;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -40,13 +42,11 @@ public final class NetconfConsoleUtils {
     public static List<Node> getNetconfNodeFromIp(final String deviceIp, final DataBroker db) {
         final Topology topology = read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.NETCONF_TOPOLOGY_IID, db);
         List<Node> nodes = new ArrayList<>();
-        if (isNetconfNodesPresent(topology)) {
-            for (Node node : topology.getNode()) {
-                final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
-                if (netconfNode != null
-                        && netconfNode.getHost().getIpAddress().getIpv4Address().getValue().equals(deviceIp)) {
-                    nodes.add(node);
-                }
+        for (Node node : netconfNodes(topology)) {
+            final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
+            if (netconfNode != null
+                    && netconfNode.getHost().getIpAddress().getIpv4Address().getValue().equals(deviceIp)) {
+                nodes.add(node);
             }
         }
         return nodes.isEmpty() ? null : nodes;
@@ -76,14 +76,11 @@ public final class NetconfConsoleUtils {
     public static Node getNetconfNodeFromIpAndPort(final String deviceIp, final String devicePort,
                                                    final DataBroker db) {
         final Topology topology = read(LogicalDatastoreType.OPERATIONAL, NetconfIidFactory.NETCONF_TOPOLOGY_IID, db);
-        if (isNetconfNodesPresent(topology)) {
-            for (Node node : topology.getNode()) {
-                final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
-                if (netconfNode != null
-                        && netconfNode.getHost().getIpAddress().getIpv4Address().getValue().equals(deviceIp)
-                        && devicePort.equals(netconfNode.getPort().getValue().toString())) {
-                    return node;
-                }
+        for (Node node : netconfNodes(topology)) {
+            final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
+            if (netconfNode != null && netconfNode.getHost().getIpAddress().getIpv4Address().getValue().equals(deviceIp)
+                    && devicePort.equals(netconfNode.getPort().getValue().toString())) {
+                return node;
             }
         }
         return null;
@@ -94,8 +91,8 @@ public final class NetconfConsoleUtils {
      * @param topology :NETCONF topology instance
      * @return :<code>true</code> if not empty, else, <code>false</code>
      */
-    private static boolean isNetconfNodesPresent(final Topology topology) {
-        return topology != null && topology.getNode() != null && !topology.getNode().isEmpty();
+    private static Collection<Node> netconfNodes(final Topology topology) {
+        return topology == null ? ImmutableList.of() : topology.nonnullNode().values();
     }
 
     /**
