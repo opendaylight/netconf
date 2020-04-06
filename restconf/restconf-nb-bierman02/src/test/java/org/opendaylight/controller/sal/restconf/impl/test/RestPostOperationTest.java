@@ -46,8 +46,8 @@ import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 public class RestPostOperationTest extends JerseyTest {
 
@@ -55,9 +55,9 @@ public class RestPostOperationTest extends JerseyTest {
     private static String xmlData3;
     private static String xmlData4;
 
-    private static SchemaContext schemaContextYangsIetf;
-    private static SchemaContext schemaContextTestModule;
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContextYangsIetf;
+    private static EffectiveModelContext schemaContextTestModule;
+    private static EffectiveModelContext schemaContext;
 
     private BrokerFacade brokerFacade;
     private RestconfImpl restconfImpl;
@@ -65,7 +65,7 @@ public class RestPostOperationTest extends JerseyTest {
     private DOMMountPoint mountInstance;
 
     @BeforeClass
-    public static void init() throws URISyntaxException, IOException, ReactorException {
+    public static void init() throws URISyntaxException, IOException {
         schemaContextYangsIetf = TestUtils.loadSchemaContext("/full-versions/yangs");
         schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
         schemaContext = TestUtils.loadSchemaContext("/test-config-data/yang1");
@@ -93,7 +93,7 @@ public class RestPostOperationTest extends JerseyTest {
         return resourceConfig;
     }
 
-    private void setSchemaControllerContext(final SchemaContext schema) {
+    private void setSchemaControllerContext(final EffectiveModelContext schema) {
         controllerContext.setSchemas(schema);
     }
 

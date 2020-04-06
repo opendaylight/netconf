@@ -14,9 +14,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.opendaylight.yangtools.concepts.SemVer;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
@@ -34,7 +32,6 @@ import org.opendaylight.yangtools.yang.model.api.ModuleImport;
 import org.opendaylight.yangtools.yang.model.api.NotificationDefinition;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.UnknownSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
 
 final class FakeImportedModule extends ForwardingObject implements Module {
@@ -51,22 +48,22 @@ final class FakeImportedModule extends ForwardingObject implements Module {
     }
 
     @Override
-    public Set<TypeDefinition<?>> getTypeDefinitions() {
+    public Collection<? extends TypeDefinition<?>> getTypeDefinitions() {
         return ImmutableSet.of();
     }
 
     @Override
-    public Collection<DataSchemaNode> getChildNodes() {
+    public Collection<? extends DataSchemaNode> getChildNodes() {
         return ImmutableList.of();
     }
 
     @Override
-    public Set<GroupingDefinition> getGroupings() {
+    public Collection<? extends GroupingDefinition> getGroupings() {
         return ImmutableSet.of();
     }
 
     @Override
-    public Set<UsesNode> getUses() {
+    public Collection<? extends UsesNode> getUses() {
         return ImmutableSet.of();
     }
 
@@ -121,47 +118,42 @@ final class FakeImportedModule extends ForwardingObject implements Module {
     }
 
     @Override
-    public Set<ModuleImport> getImports() {
+    public Collection<? extends ModuleImport> getImports() {
         return ImmutableSet.of();
     }
 
     @Override
-    public Set<Module> getSubmodules() {
+    public Collection<? extends Module> getSubmodules() {
         return ImmutableSet.of();
     }
 
     @Override
-    public Set<FeatureDefinition> getFeatures() {
+    public Collection<? extends FeatureDefinition> getFeatures() {
         return ImmutableSet.of();
     }
 
     @Override
-    public Set<AugmentationSchemaNode> getAugmentations() {
+    public Collection<? extends AugmentationSchemaNode> getAugmentations() {
         return ImmutableSet.of();
     }
 
     @Override
-    public Set<RpcDefinition> getRpcs() {
+    public Collection<? extends RpcDefinition> getRpcs() {
         return ImmutableSet.of();
     }
 
     @Override
-    public Set<Deviation> getDeviations() {
+    public Collection<? extends Deviation> getDeviations() {
         return ImmutableSet.of();
     }
 
     @Override
-    public Set<IdentitySchemaNode> getIdentities() {
+    public Collection<? extends IdentitySchemaNode> getIdentities() {
         return ImmutableSet.of();
     }
 
     @Override
-    public List<ExtensionDefinition> getExtensionSchemaNodes() {
-        return ImmutableList.of();
-    }
-
-    @Override
-    public List<UnknownSchemaNode> getUnknownSchemaNodes() {
+    public Collection<? extends ExtensionDefinition> getExtensionSchemaNodes() {
         return ImmutableList.of();
     }
 
@@ -171,7 +163,7 @@ final class FakeImportedModule extends ForwardingObject implements Module {
     }
 
     @Override
-    public Set<NotificationDefinition> getNotifications() {
+    public Collection<? extends NotificationDefinition> getNotifications() {
         return delegate.getNotifications();
     }
 

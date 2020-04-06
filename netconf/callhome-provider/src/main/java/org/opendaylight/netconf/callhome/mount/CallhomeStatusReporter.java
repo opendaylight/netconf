@@ -12,9 +12,8 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import org.opendaylight.mdsal.binding.api.DataBroker;
@@ -286,9 +285,9 @@ class CallhomeStatusReporter implements DataTreeChangeListener<Node>, StatusReco
         }
     }
 
-    private List<Device> getDevicesAsList() {
+    private Collection<Device> getDevicesAsList() {
         AllowedDevices devices = getDevices();
-        return devices == null ? new ArrayList<>() : devices.getDevice();
+        return devices == null ? Collections.emptyList() : devices.nonnullDevice().values();
     }
 
     @Override

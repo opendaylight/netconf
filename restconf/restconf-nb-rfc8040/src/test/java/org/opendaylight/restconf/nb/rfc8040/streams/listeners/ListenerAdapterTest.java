@@ -42,7 +42,7 @@ import org.opendaylight.yang.gen.v1.instance.identifier.patch.module.rev151121.p
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
@@ -61,7 +61,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     private static final YangInstanceIdentifier PATCH_CONT_YIID =
             YangInstanceIdentifier.create(new YangInstanceIdentifier.NodeIdentifier(PatchCont.QNAME));
 
-    private static SchemaContext SCHEMA_CONTEXT;
+    private static EffectiveModelContext SCHEMA_CONTEXT;
 
     private DataBroker dataBroker;
     private DOMDataBroker domDataBroker;
@@ -87,7 +87,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         transactionChainHandler = new TransactionChainHandler(domDataBroker);
         schemaContextHandler = SchemaContextHandler.newInstance(transactionChainHandler,
                 Mockito.mock(DOMSchemaService.class));
-        schemaContextHandler.onGlobalContextUpdated(SCHEMA_CONTEXT);
+        schemaContextHandler.onModelContextUpdated(SCHEMA_CONTEXT);
     }
 
     class ListenerAdapterTester extends ListenerAdapter {
@@ -154,13 +154,13 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
         InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
                 .child(MyList1.class, new MyList1Key("Althea"));
-        writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
+        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
         writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_CREATE));
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
         builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
-        writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
+        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
         writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_LEAVES_UPDATE));
 
@@ -185,13 +185,13 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
         InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
                 .child(MyList1.class, new MyList1Key("Althea"));
-        writeTransaction.put(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
+        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
         writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_CREATE));
 
         writeTransaction = dataBroker.newWriteOnlyTransaction();
         builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
-        writeTransaction.merge(LogicalDatastoreType.CONFIGURATION, iid, builder.build(), true);
+        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
         writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_UPDATE));
 

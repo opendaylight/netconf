@@ -5,14 +5,16 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -51,46 +53,46 @@ public class NodeContainerProxyTest {
 
     @Test
     public void testGetQName() throws Exception {
-        Assert.assertEquals(QNAME, proxy.getQName());
+        assertEquals(QNAME, proxy.getQName());
     }
 
     @Test
     public void testGetChildNodes() throws Exception {
-        Assert.assertEquals(2, proxy.getChildNodes().size());
+        assertEquals(2, proxy.getChildNodes().size());
     }
 
     @Test
     public void testGetAvailableAugmentations() throws Exception {
-        final Set<AugmentationSchemaNode> augmentations = proxy.getAvailableAugmentations();
-        Assert.assertEquals(2, augmentations.size());
-        Assert.assertTrue(augmentations.contains(augSchema1));
-        Assert.assertTrue(augmentations.contains(augSchema2));
+        final Collection<? extends AugmentationSchemaNode> augmentations = proxy.getAvailableAugmentations();
+        assertEquals(2, augmentations.size());
+        assertTrue(augmentations.contains(augSchema1));
+        assertTrue(augmentations.contains(augSchema2));
     }
 
     @Test
     public void testGetDataChildByName() throws Exception {
         final DataSchemaNode schemaNode = proxy.getDataChildByName(NODE_1_QNAME);
-        Assert.assertEquals(schemaNode1, schemaNode);
+        assertEquals(schemaNode1, schemaNode);
     }
 
     @Test
     public void testGetTypeDefinitions() throws Exception {
-        Assert.assertTrue(proxy.getTypeDefinitions().isEmpty());
+        assertTrue(proxy.getTypeDefinitions().isEmpty());
     }
 
     @Test
     public void testGetGroupings() throws Exception {
-        Assert.assertTrue(proxy.getGroupings().isEmpty());
+        assertTrue(proxy.getGroupings().isEmpty());
     }
 
     @Test
     public void testGetUses() throws Exception {
-        Assert.assertTrue(proxy.getUses().isEmpty());
+        assertTrue(proxy.getUses().isEmpty());
     }
 
     @Test
     public void testGetUnknownSchemaNodes() throws Exception {
-        Assert.assertTrue(proxy.getUnknownSchemaNodes().isEmpty());
+        assertTrue(proxy.getUnknownSchemaNodes().isEmpty());
     }
 
     @Test(expected = UnsupportedOperationException.class)

@@ -452,7 +452,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
             final ImmutableMap.Builder<PathArgument, DataNormalizationOperation<?>> byArgBuilder =
                     ImmutableMap.builder();
 
-            for (final CaseSchemaNode caze : schema.getCases().values()) {
+            for (final CaseSchemaNode caze : schema.getCases()) {
                 for (final DataSchemaNode cazeChild : caze.getChildNodes()) {
                     final DataNormalizationOperation<?> childOp = fromDataSchemaNode(cazeChild);
                     byArgBuilder.put(childOp.getIdentifier(), childOp);
@@ -514,7 +514,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
 
     private static @Nullable ChoiceSchemaNode findChoice(final DataNodeContainer parent, final QName child) {
         for (final ChoiceSchemaNode choice : Iterables.filter(parent.getChildNodes(), ChoiceSchemaNode.class)) {
-            for (final CaseSchemaNode caze : choice.getCases().values()) {
+            for (final CaseSchemaNode caze : choice.getCases()) {
                 if (findChildSchemaNode(caze, child) != null) {
                     return choice;
                 }

@@ -241,7 +241,7 @@ public class NetconfNodeActor extends AbstractUntypedActor {
         LOG.debug("{}: invokeSlaveRpc for {}, input: {} on rpc service {}", id, schemaPath, normalizedNodeMessage,
                 deviceRpc);
 
-        final ListenableFuture<DOMRpcResult> rpcResult = deviceRpc.invokeRpc(schemaPath,
+        final ListenableFuture<? extends DOMRpcResult> rpcResult = deviceRpc.invokeRpc(schemaPath,
                 normalizedNodeMessage != null ? normalizedNodeMessage.getNode() : null);
 
         Futures.addCallback(rpcResult, new FutureCallback<DOMRpcResult>() {
