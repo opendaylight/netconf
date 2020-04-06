@@ -11,13 +11,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.FileNotFoundException;
-import java.util.Set;
+import java.util.Collection;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 
 public abstract class YangAndXmlAndDataSchemaLoader {
-
-    protected static Set<Module> modules;
+    protected static Collection<? extends Module> modules;
     protected static DataSchemaNode dataSchemaNode;
     protected static String searchedModuleName;
     protected static String searchedDataSchemaName;

@@ -107,7 +107,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
 
     private static ChoiceSchemaNode findChoice(final Iterable<ChoiceSchemaNode> choices, final QName child) {
         for (final ChoiceSchemaNode choice : choices) {
-            for (final CaseSchemaNode caze : choice.getCases().values()) {
+            for (final CaseSchemaNode caze : choice.getCases()) {
                 if (findChildSchemaNode(caze, child).isPresent()) {
                     return choice;
                 }
@@ -257,7 +257,7 @@ abstract class StreamingContext<T extends PathArgument> implements Identifiable<
             super(NodeIdentifier.create(schema.getQName()));
             final ImmutableMap.Builder<PathArgument, StreamingContext<?>> byArgBuilder = ImmutableMap.builder();
 
-            for (final CaseSchemaNode caze : schema.getCases().values()) {
+            for (final CaseSchemaNode caze : schema.getCases()) {
                 for (final DataSchemaNode cazeChild : caze.getChildNodes()) {
                     final StreamingContext<?> childOp = fromDataSchemaNode(cazeChild);
                     byArgBuilder.put(childOp.getIdentifier(), childOp);

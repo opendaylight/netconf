@@ -49,7 +49,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
     protected final RemoteDeviceId id;
     protected final NetconfBaseOps netOps;
     protected final boolean rollbackSupport;
-    protected final List<ListenableFuture<DOMRpcResult>> resultsFutures = new ArrayList<>();
+    protected final List<ListenableFuture<? extends DOMRpcResult>> resultsFutures = new ArrayList<>();
     private final List<TxListener> listeners = new CopyOnWriteArrayList<>();
     // Allow commit to be called only once
     protected volatile boolean finished = false;

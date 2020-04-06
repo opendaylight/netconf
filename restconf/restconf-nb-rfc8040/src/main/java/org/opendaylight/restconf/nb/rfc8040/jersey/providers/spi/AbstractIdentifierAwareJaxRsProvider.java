@@ -27,7 +27,7 @@ import org.opendaylight.restconf.nb.rfc8040.handlers.DOMMountPointServiceHandler
 import org.opendaylight.restconf.nb.rfc8040.handlers.SchemaContextHandler;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements MessageBodyReader<T> {
 
@@ -96,7 +96,7 @@ public abstract class AbstractIdentifierAwareJaxRsProvider<T> implements Message
         return this.uriInfo;
     }
 
-    protected SchemaContext getSchemaContext() {
+    protected EffectiveModelContext getSchemaContext() {
         return schemaContextHandler.get();
     }
 

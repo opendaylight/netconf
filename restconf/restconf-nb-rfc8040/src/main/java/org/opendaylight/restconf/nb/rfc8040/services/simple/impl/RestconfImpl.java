@@ -19,9 +19,9 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.GroupingDefinition;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 
 @Path("/")
@@ -35,7 +35,7 @@ public class RestconfImpl implements RestconfService {
 
     @Override
     public NormalizedNodeContext getLibraryVersion() {
-        final SchemaContext context = this.schemaContextHandler.get();
+        final EffectiveModelContext context = this.schemaContextHandler.get();
         SchemaNode schemaNode = null;
         for (final GroupingDefinition groupingDefinition : context
                 .findModule(RestconfModule.IETF_RESTCONF_QNAME.getModule()).get().getGroupings()) {

@@ -20,13 +20,13 @@ import org.junit.Test;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeXmlBodyWriter;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class TestXmlBodyWriter extends AbstractBodyReaderTest {
 
     private final NormalizedNodeXmlBodyWriter xmlBodyWriter;
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     public TestXmlBodyWriter() {
         super(schemaContext, null);

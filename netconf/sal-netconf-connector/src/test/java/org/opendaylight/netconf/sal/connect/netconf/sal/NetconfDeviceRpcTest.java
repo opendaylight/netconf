@@ -7,24 +7,23 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.sal;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import com.google.common.util.concurrent.Futures;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
+import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -33,24 +32,23 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.RpcResult;
 import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Node;
 
 public class NetconfDeviceRpcTest {
-    private static SchemaContext SCHEMA_CONTEXT;
+    private static EffectiveModelContext SCHEMA_CONTEXT;
 
     @Mock
     private DOMRpcAvailabilityListener listener;
@@ -63,9 +61,7 @@ public class NetconfDeviceRpcTest {
 
     @BeforeClass
     public static void beforeClass() {
-        final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        moduleInfoBackedContext.addModuleInfos(Collections.singleton($YangModuleInfoImpl.getInstance()));
-        SCHEMA_CONTEXT = moduleInfoBackedContext.tryToCreateSchemaContext().get();
+        SCHEMA_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfService.class);
     }
 
     @AfterClass
@@ -96,10 +92,10 @@ public class NetconfDeviceRpcTest {
 
     @Test
     public void testInvokeRpc() throws Exception {
-        NormalizedNode<?, ?> input = createNode("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "filter");
+        ContainerNode input = createNode("urn:ietf:params:xml:ns:netconf:base:1.0", "2011-06-01", "filter");
         final DOMRpcResult result = rpc.invokeRpc(path, input).get();
-        Assert.assertEquals(expectedReply.getResult().getIdentifier(), result.getResult().getIdentifier());
-        Assert.assertEquals(resolveNode(expectedReply), resolveNode(result));
+        assertEquals(expectedReply.getResult().getIdentifier(), result.getResult().getIdentifier());
+        assertEquals(resolveNode(expectedReply), resolveNode(result));
     }
 
     private static Node resolveNode(final DOMRpcResult result) {
@@ -118,17 +114,17 @@ public class NetconfDeviceRpcTest {
 
         verify(listener).onRpcAvailable(argument.capture());
         final Collection<DOMRpcIdentifier> argValue = argument.getValue();
-        final Set<RpcDefinition> operations = SCHEMA_CONTEXT.getOperations();
-        Assert.assertEquals(argValue.size(), operations.size());
+        final Collection<? extends RpcDefinition> operations = SCHEMA_CONTEXT.getOperations();
+        assertEquals(argValue.size(), operations.size());
         for (RpcDefinition operation : operations) {
             final DOMRpcIdentifier domRpcIdentifier = DOMRpcIdentifier.create(operation.getPath());
-            Assert.assertTrue(argValue.contains(domRpcIdentifier));
+            assertTrue(argValue.contains(domRpcIdentifier));
 
         }
     }
 
     private static ContainerNode createNode(final String namespace, final String date, final String localName) {
         return Builders.containerBuilder().withNodeIdentifier(
-                new YangInstanceIdentifier.NodeIdentifier(QName.create(namespace, date, localName))).build();
+                new NodeIdentifier(QName.create(namespace, date, localName))).build();
     }
 }

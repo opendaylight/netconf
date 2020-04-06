@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -49,10 +48,10 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,11 +73,11 @@ public class RestconfMappingNodeUtilTest {
     @Mock private LeafSchemaNode leafReplayLog;
     @Mock private LeafSchemaNode leafEvents;
 
-    private static Set<Module> modules;
-    private static SchemaContext schemaContext;
-    private static SchemaContext schemaContextMonitoring;
+    private static Collection<? extends Module> modules;
+    private static EffectiveModelContext schemaContext;
+    private static EffectiveModelContext schemaContextMonitoring;
 
-    private static Set<Module> modulesRest;
+    private static Collection<? extends Module> modulesRest;
 
     @BeforeClass
     public static void loadTestSchemaContextAndModules() throws Exception {
@@ -278,7 +277,7 @@ public class RestconfMappingNodeUtilTest {
      * @param expectedModules Modules from <code>SchemaContext</code>
      * @param loadedModules Loaded modules into Restconf module
      */
-    private static void verifyLoadedModules(final Set<Module> expectedModules,
+    private static void verifyLoadedModules(final Collection<? extends Module> expectedModules,
             final Map<String, String> loadedModules) {
         assertEquals("Number of loaded modules is not as expected", expectedModules.size(), loadedModules.size());
         for (final Module m : expectedModules) {
