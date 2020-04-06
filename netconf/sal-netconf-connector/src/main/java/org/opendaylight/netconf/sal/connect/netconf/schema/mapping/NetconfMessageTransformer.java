@@ -78,7 +78,6 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 public class NetconfMessageTransformer implements MessageTransformer<NetconfMessage> {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfMessageTransformer.class);
 
     private static final ImmutableSet<URI> BASE_OR_NOTIFICATION_NS = ImmutableSet.of(
@@ -90,8 +89,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     private final DataSchemaContextTree contextTree;
     private final BaseSchema baseSchema;
     private final MessageCounter counter;
-    private final ImmutableMap<QName, RpcDefinition> mappedRpcs;
-    private final Multimap<QName, NotificationDefinition> mappedNotifications;
+    private final ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
+    private final Multimap<QName, ? extends NotificationDefinition> mappedNotifications;
     private final boolean strictParsing;
     private final ImmutableMap<SchemaPath, ActionDefinition> actions;
 
@@ -133,7 +132,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
                 findAction(innerDataSchemaNode, builder);
             }
         } else if (dataSchemaNode instanceof ChoiceSchemaNode) {
-            for (CaseSchemaNode caze : ((ChoiceSchemaNode) dataSchemaNode).getCases().values()) {
+            for (CaseSchemaNode caze : ((ChoiceSchemaNode) dataSchemaNode).getCases()) {
                 findAction(caze, builder);
             }
         }
@@ -150,7 +149,8 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             throw new IllegalArgumentException(
                     "Unable to parse notification " + message + ", cannot find namespace", e);
         }
-        final Collection<NotificationDefinition> notificationDefinitions = mappedNotifications.get(notificationNoRev);
+        final Collection<? extends NotificationDefinition> notificationDefinitions =
+                mappedNotifications.get(notificationNoRev);
         Preconditions.checkArgument(notificationDefinitions.size() > 0,
                 "Unable to parse notification %s, unknown notification. Available notifications: %s",
                 notificationDefinitions, mappedNotifications.keySet());
@@ -177,7 +177,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     }
 
     private static NotificationDefinition getMostRecentNotification(
-            final Collection<NotificationDefinition> notificationDefinitions) {
+            final Collection<? extends NotificationDefinition> notificationDefinitions) {
         return Collections.max(notificationDefinitions, (o1, o2) ->
             Revision.compare(o1.getQName().getRevision(), o2.getQName().getRevision()));
     }
@@ -191,7 +191,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
         // and also check if the device exposed model for base netconf.
         // If no, use pre built base netconf operations model
         final boolean needToUseBaseCtx = mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName);
-        final ImmutableMap<QName, RpcDefinition> currentMappedRpcs;
+        final ImmutableMap<QName, ? extends RpcDefinition> currentMappedRpcs;
         if (needToUseBaseCtx) {
             currentMappedRpcs = baseSchema.getMappedRpcs();
         } else {
@@ -280,7 +280,7 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
             // Determine whether a base netconf operation is being invoked
             // and also check if the device exposed model for base netconf.
             // If no, use pre built base netconf operations model
-            final ImmutableMap<QName, RpcDefinition> currentMappedRpcs;
+            final ImmutableMap<QName, ? extends RpcDefinition> currentMappedRpcs;
             if (mappedRpcs.get(rpcQName) == null && isBaseOrNotificationRpc(rpcQName)) {
                 currentMappedRpcs = baseSchema.getMappedRpcs();
             } else {

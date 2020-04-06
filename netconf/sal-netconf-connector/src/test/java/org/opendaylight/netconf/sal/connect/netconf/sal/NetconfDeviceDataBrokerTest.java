@@ -9,12 +9,11 @@ package org.opendaylight.netconf.sal.connect.netconf.sal;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
-import com.google.common.collect.Lists;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import org.junit.AfterClass;
@@ -22,13 +21,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadTransaction;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
-import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
@@ -38,7 +37,8 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteCandidateTx;
 import org.opendaylight.netconf.sal.connect.netconf.sal.tx.WriteRunningTx;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.extension.rev131210.NetconfTcp;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
@@ -46,6 +46,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
+@RunWith(MockitoJUnitRunner.class)
 public class NetconfDeviceDataBrokerTest {
     private static SchemaContext SCHEMA_CONTEXT;
 
@@ -55,12 +56,7 @@ public class NetconfDeviceDataBrokerTest {
 
     @BeforeClass
     public static void beforeClass() {
-        final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        moduleInfoBackedContext.addModuleInfos(
-                Lists.newArrayList($YangModuleInfoImpl.getInstance(),
-                        org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns
-                                .netconf.base._1._0.rev110601.$YangModuleInfoImpl.getInstance()));
-        SCHEMA_CONTEXT = moduleInfoBackedContext.tryToCreateSchemaContext().get();
+        SCHEMA_CONTEXT = BindingRuntimeHelpers.createEffectiveModel(IetfNetconfService.class, NetconfTcp.class);
     }
 
     @AfterClass
@@ -70,12 +66,8 @@ public class NetconfDeviceDataBrokerTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
-        DOMRpcResult result = new DefaultDOMRpcResult();
-        when(rpcService.invokeRpc(any(SchemaPath.class), any(NormalizedNode.class)))
-                .thenReturn(FluentFutures.immediateFluentFuture(result));
-
+        doReturn(FluentFutures.immediateFluentFuture(new DefaultDOMRpcResult())).when(rpcService)
+            .invokeRpc(any(SchemaPath.class), any(NormalizedNode.class));
         dataBroker = getDataBroker(NetconfMessageTransformUtil.NETCONF_CANDIDATE_URI.toString());
     }
 

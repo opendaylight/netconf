@@ -8,7 +8,6 @@
 package org.opendaylight.netconf.mdsal.notification.impl;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -52,7 +51,7 @@ public class NotificationToMdsalWriterTest {
 
         WriteTransaction tx = mock(WriteTransaction.class);
         doNothing().when(tx).merge(any(LogicalDatastoreType.class), any(InstanceIdentifier.class),
-                any(DataObject.class), anyBoolean());
+            any(DataObject.class));
         doNothing().when(tx).delete(any(LogicalDatastoreType.class), any(InstanceIdentifier.class));
         doReturn(emptyFluentFuture()).when(tx).commit();
         doReturn(tx).when(dataBroker).newWriteOnlyTransaction();
@@ -71,7 +70,7 @@ public class NotificationToMdsalWriterTest {
         writer.onStreamRegistered(testStream);
 
         verify(dataBroker.newWriteOnlyTransaction()).merge(LogicalDatastoreType.OPERATIONAL, streamIdentifier,
-                testStream, true);
+                testStream);
 
         writer.onStreamUnregistered(testStreamName);
 

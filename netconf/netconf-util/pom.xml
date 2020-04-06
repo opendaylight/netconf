@@ -45,16 +45,6 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.xmlunit</groupId>
-      <artifactId>xmlunit-legacy</artifactId>
-      <scope>test</scope>
-    </dependency>
-   <dependency>
-      <groupId>org.opendaylight.mdsal</groupId>
-      <artifactId>mdsal-binding-generator-impl</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.opendaylight.yangtools</groupId>
       <artifactId>mockito-configuration</artifactId>
     </dependency>
@@ -77,6 +67,22 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>osgi.cmpn</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.xmlunit</groupId>
+      <artifactId>xmlunit-legacy</artifactId>
+      <scope>test</scope>
+    </dependency>
+   <dependency>
+      <groupId>org.opendaylight.mdsal</groupId>
+      <artifactId>mdsal-binding-generator-impl</artifactId>
+      <scope>test</scope>
+    </dependency>
+   <dependency>
+      <groupId>org.opendaylight.mdsal</groupId>
+      <artifactId>mdsal-binding-runtime-spi</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

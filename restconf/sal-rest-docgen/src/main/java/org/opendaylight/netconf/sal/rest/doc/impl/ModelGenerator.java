@@ -18,9 +18,9 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.mifmif.common.regex.Generex;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Pattern;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder;
 import org.opendaylight.netconf.sal.rest.doc.model.builder.OperationBuilder.Post;
@@ -120,7 +120,7 @@ public class ModelGenerator {
         processModules(module, models, schemaContext);
         processContainersAndLists(module, models, schemaContext);
         processRPCs(module, models, schemaContext);
-        processIdentities(module, models);
+        processIdentities(schemaContext, module, models);
         return models;
     }
 
@@ -244,10 +244,11 @@ public class ModelGenerator {
      * @param module The module from which the identity stmt will be processed
      * @param models The ObjectNode in which the parsed identity will be put as a 'model' obj
      */
-    private static void processIdentities(final Module module, final ObjectNode models) {
+    private static void processIdentities(final SchemaContext schemaContext, final Module module,
+            final ObjectNode models) {
 
         final String moduleName = module.getName();
-        final Set<IdentitySchemaNode> idNodes = module.getIdentities();
+        final Collection<? extends IdentitySchemaNode> idNodes = module.getIdentities();
         LOG.debug("Processing Identities for module {} . Found {} identity statements", moduleName, idNodes.size());
 
         for (final IdentitySchemaNode idNode : idNodes) {
@@ -265,15 +266,13 @@ public class ModelGenerator {
                  * This is a base identity. So lets see if it has sub types. If it does, then add them to the model
                  * definition.
                  */
-                final Set<IdentitySchemaNode> derivedIds = idNode.getDerivedIdentities();
-
-                if (derivedIds != null) {
+                final Collection<? extends IdentitySchemaNode> derivedIds = schemaContext.getDerivedIdentities(idNode);
+                if (!derivedIds.isEmpty()) {
                     final ArrayNode subTypes = new ArrayNode(JsonNodeFactory.instance);
                     for (final IdentitySchemaNode derivedId : derivedIds) {
                         subTypes.add(derivedId.getQName().getLocalName());
                     }
                     identityObj.set(SUB_TYPES_KEY, subTypes);
-
                 }
             } else {
                 /*
@@ -292,10 +291,9 @@ public class ModelGenerator {
             final DataNodeContainer dataNode, final String parentName, final ObjectNode models, final boolean isConfig,
             final SchemaContext schemaContext) throws IOException {
         if (dataNode instanceof ListSchemaNode || dataNode instanceof ContainerSchemaNode) {
-            final Iterable<DataSchemaNode> containerChildren = dataNode.getChildNodes();
             final String localName = ((SchemaNode) dataNode).getQName().getLocalName();
-            final ObjectNode properties =
-                    processChildren(containerChildren, parentName + "/" + localName, models, isConfig, schemaContext);
+            final ObjectNode properties = processChildren(dataNode.getChildNodes(), parentName + "/" + localName,
+                models, isConfig, schemaContext);
             final String nodeName = parentName + (isConfig ? OperationBuilder.CONFIG : OperationBuilder.OPERATIONAL)
                     + localName;
 
@@ -349,7 +347,7 @@ public class ModelGenerator {
      * Processes the nodes.
      */
     private ObjectNode processChildren(
-            final Iterable<DataSchemaNode> nodes, final String parentName, final ObjectNode models,
+            final Iterable<? extends DataSchemaNode> nodes, final String parentName, final ObjectNode models,
             final boolean isConfig, final SchemaContext schemaContext) throws IOException {
         final ObjectNode properties = JsonNodeFactory.instance.objectNode();
         for (final DataSchemaNode node : nodes) {
@@ -367,8 +365,8 @@ public class ModelGenerator {
                     property = processLeafListNode((LeafListSchemaNode) node, schemaContext);
 
                 } else if (node instanceof ChoiceSchemaNode) {
-                    if (((ChoiceSchemaNode) node).getCases().values().iterator().hasNext()) {
-                        processChoiceNode(((ChoiceSchemaNode) node).getCases().values().iterator().next()
+                    if (((ChoiceSchemaNode) node).getCases().iterator().hasNext()) {
+                        processChoiceNode(((ChoiceSchemaNode) node).getCases().iterator().next()
                             .getChildNodes(), parentName, models, schemaContext, isConfig, properties);
                     }
                     continue;
@@ -421,7 +419,7 @@ public class ModelGenerator {
     }
 
     private void processChoiceNode(
-            final Iterable<DataSchemaNode> nodes, final String moduleName, final ObjectNode models,
+            final Iterable<? extends DataSchemaNode> nodes, final String moduleName, final ObjectNode models,
             final SchemaContext schemaContext, final boolean isConfig, final ObjectNode properties)
            throws IOException {
         for (final DataSchemaNode node : nodes) {
@@ -439,8 +437,8 @@ public class ModelGenerator {
                 property = processLeafListNode((LeafListSchemaNode) node, schemaContext);
 
             } else if (node instanceof ChoiceSchemaNode) {
-                if (((ChoiceSchemaNode) node).getCases().values().iterator().hasNext()) {
-                    processChoiceNode(((ChoiceSchemaNode) node).getCases().values().iterator().next().getChildNodes(),
+                if (((ChoiceSchemaNode) node).getCases().iterator().hasNext()) {
+                    processChoiceNode(((ChoiceSchemaNode) node).getCases().iterator().next().getChildNodes(),
                             moduleName, models, schemaContext, isConfig, properties);
                 }
                 continue;
@@ -617,8 +615,7 @@ public class ModelGenerator {
         property.put(MIN_ITEMS, 0);
         property.put(UNIQUE_ITEMS_KEY, true);
         ArrayNode enumNames = new ArrayNode(JsonNodeFactory.instance);
-        final List<Bit> bits = bitsType.getBits();
-        for (final Bit bit : bits) {
+        for (final Bit bit : bitsType.getBits()) {
             enumNames.add(new TextNode(bit.getName()));
         }
         property.set(ENUM, enumNames);

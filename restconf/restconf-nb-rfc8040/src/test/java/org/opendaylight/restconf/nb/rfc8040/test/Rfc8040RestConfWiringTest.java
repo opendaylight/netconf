@@ -34,7 +34,7 @@ import org.opendaylight.restconf.nb.rfc8040.services.wrapper.ServicesWrapper;
 import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketConfiguration;
 import org.opendaylight.restconf.nb.rfc8040.test.incubate.InMemoryMdsalModule;
 import org.opendaylight.restconf.nb.rfc8040.web.WebInitializer;
-import org.opendaylight.yangtools.yang.model.api.SchemaContextProvider;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContextProvider;
 
 /**
  * Tests if the {@link Rfc8040RestConfWiring} works.
@@ -75,12 +75,12 @@ public class Rfc8040RestConfWiringTest {
     @Inject WebServer webServer;
     @Inject TestWebClient webClient;
 
-    @Inject SchemaContextProvider schemaContextProvider;
+    @Inject EffectiveModelContextProvider schemaContextProvider;
     @Inject SchemaContextHandler schemaContextHandler;
 
     @Test
     public void testWiring() throws IOException, InterruptedException, URISyntaxException {
-        schemaContextHandler.onGlobalContextUpdated(schemaContextProvider.getSchemaContext());
+        schemaContextHandler.onModelContextUpdated(schemaContextProvider.getEffectiveModelContext());
         assertEquals(200, webClient.request("GET", "/rests/yang-library-version").statusCode());
     }
 }

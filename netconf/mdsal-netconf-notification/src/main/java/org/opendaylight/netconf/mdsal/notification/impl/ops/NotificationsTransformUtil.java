@@ -7,86 +7,68 @@
  */
 package org.opendaylight.netconf.mdsal.notification.impl.ops;
 
-import static com.google.common.base.Preconditions.checkState;
-import static java.util.Objects.requireNonNull;
+import static com.google.common.base.Verify.verify;
 
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
+import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
-import org.opendaylight.mdsal.binding.dom.codec.impl.BindingNormalizedNodeCodecRegistry;
-import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
-import org.opendaylight.mdsal.binding.generator.util.BindingRuntimeContext;
+import org.opendaylight.binding.runtime.api.BindingRuntimeContext;
+import org.opendaylight.binding.runtime.api.BindingRuntimeGenerator;
+import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
+import org.opendaylight.mdsal.binding.dom.codec.spi.BindingDOMCodecFactory;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.util.NetconfUtil;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfConfigChange;
 import org.opendaylight.yangtools.yang.binding.Notification;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Document;
 
+@Singleton
 public final class NotificationsTransformUtil {
-    static final SchemaContext NOTIFICATIONS_SCHEMA_CTX;
-    static final BindingNormalizedNodeCodecRegistry CODEC_REGISTRY;
-    static final RpcDefinition CREATE_SUBSCRIPTION_RPC;
+    private final SchemaContext schemaContext;
+    private final BindingNormalizedNodeSerializer serializer;
 
-    static {
-        final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        moduleInfoBackedContext.addModuleInfos(Collections.singletonList($YangModuleInfoImpl.getInstance()));
-        moduleInfoBackedContext.addModuleInfos(Collections.singletonList(org.opendaylight.yang.gen.v1.urn.ietf.params
-                .xml.ns.yang.ietf.netconf.notifications.rev120206.$YangModuleInfoImpl.getInstance()));
-        final Optional<? extends SchemaContext> schemaContextOptional =
-                moduleInfoBackedContext.tryToCreateSchemaContext();
-        checkState(schemaContextOptional.isPresent());
-        NOTIFICATIONS_SCHEMA_CTX = schemaContextOptional.get();
-
-        CREATE_SUBSCRIPTION_RPC = requireNonNull(findCreateSubscriptionRpc());
-
-        CODEC_REGISTRY = new BindingNormalizedNodeCodecRegistry(BindingRuntimeContext.create(moduleInfoBackedContext,
-                NOTIFICATIONS_SCHEMA_CTX));
-    }
-
-    private NotificationsTransformUtil() {
-
-    }
-
-    @SuppressFBWarnings(value = "NP_NONNULL_PARAM_VIOLATION", justification = "Unrecognised NullableDecl")
-    private static RpcDefinition findCreateSubscriptionRpc() {
-        return Iterables.getFirst(Collections2.filter(NOTIFICATIONS_SCHEMA_CTX.getOperations(),
-            input -> input.getQName().getLocalName().equals(CreateSubscription.CREATE_SUBSCRIPTION)), null);
+    public NotificationsTransformUtil(final BindingRuntimeGenerator generator,
+            final BindingDOMCodecFactory codecFactory) {
+        final BindingRuntimeContext ctx = BindingRuntimeHelpers.createRuntimeContext(generator,
+            Netconf.class, NetconfConfigChange.class);
+        schemaContext = ctx.getSchemaContext();
+        verify(schemaContext.getOperations().stream()
+                .filter(input -> input.getQName().getLocalName().equals(CreateSubscription.CREATE_SUBSCRIPTION))
+                .findFirst()
+                .isPresent());
+        serializer = codecFactory.createBindingDOMCodec(ctx);
     }
 
     /**
      * Transform base notification for capabilities into NetconfNotification.
      */
-    public static NetconfNotification transform(final Notification notification, final SchemaPath path) {
+    public NetconfNotification transform(final Notification notification, final SchemaPath path) {
         return transform(notification, Optional.empty(), path);
     }
 
-    public static NetconfNotification transform(final Notification notification, final Date eventTime,
-            final SchemaPath path) {
+    public NetconfNotification transform(final Notification notification, final Date eventTime, final SchemaPath path) {
         return transform(notification, Optional.ofNullable(eventTime), path);
     }
 
-    private static NetconfNotification transform(final Notification notification, final Optional<Date> eventTime,
+    private NetconfNotification transform(final Notification notification, final Optional<Date> eventTime,
             final SchemaPath path) {
-        final ContainerNode containerNode = CODEC_REGISTRY.toNormalizedNodeNotification(notification);
+        final ContainerNode containerNode = serializer.toNormalizedNodeNotification(notification);
         final DOMResult result = new DOMResult(XmlUtil.newDocument());
         try {
-            NetconfUtil.writeNormalizedNode(containerNode, result, path, NOTIFICATIONS_SCHEMA_CTX);
+            NetconfUtil.writeNormalizedNode(containerNode, result, path, schemaContext);
         } catch (final XMLStreamException | IOException e) {
             throw new IllegalStateException("Unable to serialize " + notification, e);
         }
         final Document node = (Document) result.getNode();
         return eventTime.isPresent() ? new NetconfNotification(node, eventTime.get()) : new NetconfNotification(node);
     }
-
 }
