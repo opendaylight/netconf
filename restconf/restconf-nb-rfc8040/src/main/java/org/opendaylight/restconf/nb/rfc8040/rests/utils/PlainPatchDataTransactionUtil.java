@@ -9,10 +9,8 @@
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.FluentFuture;
-
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -28,10 +26,8 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Util class for plain patch data to DS.
- *
  */
 public final class PlainPatchDataTransactionUtil {
 

@@ -43,6 +43,7 @@ import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextNode;
 import org.opendaylight.yangtools.yang.data.util.DataSchemaContextTree;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -159,7 +160,7 @@ public final class PutDataTransactionUtil {
     public static Response putData(final NormalizedNodeContext payload, final SchemaContextRef schemaCtxRef,
                                final TransactionVarsWrapper transactionNode, final String insert, final String point) {
         final YangInstanceIdentifier path = payload.getInstanceIdentifierContext().getInstanceIdentifier();
-        final SchemaContext schemaContext = schemaCtxRef.get();
+        final EffectiveModelContext schemaContext = schemaCtxRef.get();
 
         final DOMDataTreeReadWriteTransaction readWriteTransaction =
                 transactionNode.getTransactionChain().newReadWriteTransaction();
@@ -197,7 +198,7 @@ public final class PutDataTransactionUtil {
      * @return {@link FluentFuture}
      */
     private static FluentFuture<? extends CommitInfo> submitData(final YangInstanceIdentifier path,
-            final SchemaContext schemaContext, final TransactionChainHandler transactionChainHandler,
+            final EffectiveModelContext schemaContext, final TransactionChainHandler transactionChainHandler,
             final DOMDataTreeReadWriteTransaction readWriteTransaction,
             final NormalizedNode<?, ?> data, final String insert, final String point) {
         if (insert == null) {
@@ -296,8 +297,9 @@ public final class PutDataTransactionUtil {
         }
     }
 
-    public static NormalizedNode<?, ?> readList(final YangInstanceIdentifier path, final SchemaContext schemaContext,
-            final TransactionChainHandler transactionChainHandler, final DataSchemaNode schemaNode) {
+    public static NormalizedNode<?, ?> readList(final YangInstanceIdentifier path,
+            final EffectiveModelContext schemaContext, final TransactionChainHandler transactionChainHandler,
+            final DataSchemaNode schemaNode) {
         final InstanceIdentifierContext<?> iid = new InstanceIdentifierContext<SchemaNode>(
                 path.getParent(), schemaNode, null, schemaContext);
         final TransactionVarsWrapper transactionNode = new TransactionVarsWrapper(iid, null, transactionChainHandler);
@@ -308,7 +310,7 @@ public final class PutDataTransactionUtil {
 
     private static void insertWithPointLeafListPut(final DOMDataTreeReadWriteTransaction rwTransaction,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
-            final NormalizedNode<?, ?> data, final SchemaContext schemaContext, final String point,
+            final NormalizedNode<?, ?> data, final EffectiveModelContext schemaContext, final String point,
             final OrderedLeafSetNode<?> readLeafList, final boolean before) {
         rwTransaction.delete(datastore, path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =
@@ -338,7 +340,7 @@ public final class PutDataTransactionUtil {
 
     private static void insertWithPointListPut(final DOMDataTreeReadWriteTransaction writeTx,
             final LogicalDatastoreType datastore, final YangInstanceIdentifier path,
-            final NormalizedNode<?, ?> data, final SchemaContext schemaContext, final String point,
+            final NormalizedNode<?, ?> data, final EffectiveModelContext schemaContext, final String point,
             final OrderedMapNode readList, final boolean before) {
         writeTx.delete(datastore, path.getParent());
         final InstanceIdentifierContext<?> instanceIdentifier =

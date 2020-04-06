@@ -22,7 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -52,7 +54,7 @@ import org.opendaylight.yangtools.yang.model.repo.api.RevisionSourceIdentifier;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.opendaylight.yangtools.yang.model.repo.api.YinSchemaSourceRepresentation;
 import org.opendaylight.yangtools.yang.model.repo.spi.PotentialSchemaSource;
-import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
+import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 import org.opendaylight.yangtools.yang.parser.rfc7950.repo.ASTSchemaSource;
 
 public class YangLibProviderTest {
@@ -92,7 +94,7 @@ public class YangLibProviderTest {
 
         final YanglibConfig yanglibConfig = new YanglibConfigBuilder().setBindingAddr("www.fake.com")
                 .setBindingPort(Uint32.valueOf(300)).setCacheFolder(CACHE_DIR.getAbsolutePath()).build();
-        yangLibProvider = new YangLibProvider(yanglibConfig, dataBroker, new SharedSchemaRepository("yang-library"));
+        yangLibProvider = new YangLibProvider(yanglibConfig, dataBroker, new YangParserFactoryImpl());
     }
 
     @Test
@@ -117,7 +119,7 @@ public class YangLibProviderTest {
         doReturn(emptyFluentFuture()).when(writeTransaction).commit();
         yangLibProvider.schemaSourceRegistered(list);
 
-        List<Module> newModulesList = new ArrayList<>();
+        Map<ModuleKey, Module> newModulesList = new HashMap<>();
 
         Module newModule = new ModuleBuilder()
                 .setName(new YangIdentifier("no-revision"))
@@ -125,7 +127,7 @@ public class YangLibProviderTest {
                 .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/no-revision/"))
                 .build();
 
-        newModulesList.add(newModule);
+        newModulesList.put(newModule.key(), newModule);
 
         newModule = new ModuleBuilder()
                 .setName(new YangIdentifier("with-revision"))
@@ -133,7 +135,7 @@ public class YangLibProviderTest {
                 .setSchema(new Uri("http://www.fake.com:300/yanglib/schemas/with-revision/2016-04-28"))
                 .build();
 
-        newModulesList.add(newModule);
+        newModulesList.put(newModule.key(), newModule);
 
         verify(dataBroker).newWriteOnlyTransaction();
         verify(writeTransaction).merge(eq(LogicalDatastoreType.OPERATIONAL),

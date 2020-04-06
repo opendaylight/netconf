@@ -38,14 +38,14 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 public class TestXmlBodyReader extends AbstractBodyReaderTest {
 
     private final XmlNormalizedNodeBodyReader xmlBodyReader;
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
     private static final QNameModule INSTANCE_IDENTIFIER_MODULE_QNAME = QNameModule.create(
         URI.create("instance:identifier:module"), Revision.of("2014-01-17"));
 

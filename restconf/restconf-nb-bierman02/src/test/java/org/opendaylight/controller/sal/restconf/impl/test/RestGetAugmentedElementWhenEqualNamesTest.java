@@ -20,11 +20,11 @@ import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.restconf.common.context.InstanceIdentifierContext;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class RestGetAugmentedElementWhenEqualNamesTest {
 
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     private final ControllerContext controllerContext = TestRestconfUtils.newControllerContext(schemaContext);
 

@@ -46,7 +46,7 @@ import org.opendaylight.netconf.mdsal.connector.ops.get.GetConfig;
 import org.opendaylight.netconf.util.test.NetconfXmlUnitRecursiveQualifier;
 import org.opendaylight.netconf.util.test.XmlFileLoader;
 import org.opendaylight.yangtools.util.concurrent.SpecialExecutors;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.repo.api.YangTextSchemaSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,7 @@ public abstract class AbstractNetconfOperationTest {
     private static final String DATA_ELEMENT = "data";
     protected static final Document RPC_REPLY_OK = getReplyOk();
 
-    private static SchemaContext SCHEMA_CONTEXT;
+    private static EffectiveModelContext SCHEMA_CONTEXT;
 
     private CurrentSchemaContext currentSchemaContext;
     private TransactionProvider transactionProvider;

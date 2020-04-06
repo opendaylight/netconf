@@ -38,14 +38,14 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.ListNodeBuil
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.DataNodeContainer;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public class NnInstanceIdentifierToXmlTest extends AbstractBodyReaderTest {
 
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
     NormalizedNodeXmlBodyWriter xmlBodyWriter;
 
     public NnInstanceIdentifierToXmlTest() {
