@@ -18,12 +18,12 @@ import org.opendaylight.controller.sal.rest.impl.test.providers.AbstractBodyRead
 import org.opendaylight.netconf.sal.rest.impl.JsonNormalizedNodeBodyReader;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNodes;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class JsonIdentityrefToNnTest extends AbstractBodyReaderTest {
 
     private final JsonNormalizedNodeBodyReader jsonBodyReader;
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
 
     public JsonIdentityrefToNnTest() {
         super(schemaContext, null);

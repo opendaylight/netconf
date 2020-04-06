@@ -20,6 +20,7 @@ import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.mdsal.dom.api.DOMTransactionChain;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
@@ -32,7 +33,7 @@ public class SchemaContextHandlerTest {
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/modules/modules-behind-mount-point";
 
     private SchemaContextHandler schemaContextHandler;
-    private SchemaContext schemaContext;
+    private EffectiveModelContext schemaContext;
     private final DOMSchemaService mockDOMSchemaService = Mockito.mock(DOMSchemaService.class);
 
     @Before
@@ -48,7 +49,7 @@ public class SchemaContextHandlerTest {
 
         this.schemaContext =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_ACTUAL_SCHEMA_CONTEXT));
-        this.schemaContextHandler.onGlobalContextUpdated(this.schemaContext);
+        this.schemaContextHandler.onModelContextUpdated(this.schemaContext);
     }
 
     /**
@@ -92,9 +93,9 @@ public class SchemaContextHandlerTest {
     @Test
     public void onGlobalContextUpdateTest() throws Exception {
         // create new SchemaContext and update SchemaContextHandler
-        final SchemaContext newSchemaContext =
+        final EffectiveModelContext newSchemaContext =
                 YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_NEW_SCHEMA_CONTEXT));
-        this.schemaContextHandler.onGlobalContextUpdated(newSchemaContext);
+        this.schemaContextHandler.onModelContextUpdated(newSchemaContext);
 
         assertNotEquals("SchemaContextHandler should not has reference to old SchemaContext",
                 this.schemaContext, this.schemaContextHandler.get());

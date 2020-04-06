@@ -38,8 +38,8 @@ import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.Revision;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
@@ -78,9 +78,9 @@ public class ParserIdentifierTest {
             "parser-identifier:cont2/listTest/list-in-grouping=name/leaf-A.B";
 
     // schema context with test modules
-    private SchemaContext schemaContext;
+    private EffectiveModelContext schemaContext;
     // contains the same modules but it is different object (it can be compared with equals)
-    private SchemaContext schemaContextOnMountPoint;
+    private EffectiveModelContext schemaContextOnMountPoint;
 
     private static final String TEST_MODULE_NAME = "test-module";
     private static final String TEST_MODULE_REVISION = "2016-06-02";
@@ -127,7 +127,7 @@ public class ParserIdentifierTest {
                 .getInstance();
 
         // register mount point with null schema context
-        when(this.mockMountPoint.getSchemaContext()).thenReturn(null);
+        when(this.mockMountPoint.getEffectiveModelContext()).thenReturn(null);
         when(this.mockMountPointService.getMountPoint(YangInstanceIdentifier.empty()))
                 .thenReturn(Optional.of(this.mockMountPoint));
     }

@@ -7,6 +7,11 @@
  */
 package org.opendaylight.netconf.topology.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -23,7 +28,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
 import java.util.Collection;
 import java.util.HashSet;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -146,20 +150,20 @@ public class NetconfTopologyImplTest {
         PathArgument pa = IdentifiableItem.of(Node.class, new NodeKey(NODE_ID));
         when(newNode.getIdentifier()).thenReturn(pa);
 
-
-        final NetconfNode testingNode = new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(Uint16.valueOf(9999)))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
-                .setKeepaliveDelay(Uint32.valueOf(1000))
-                .setTcpOnly(true)
-                .setCredentials(new LoginPasswordBuilder()
-                        .setUsername("testuser").setPassword("testpassword").build())
-                .build();
-
-        final NodeBuilder nn = new NodeBuilder().addAugmentation(NetconfNode.class, testingNode);
+        final NodeBuilder nn = new NodeBuilder()
+                .addAugmentation(new NetconfNodeBuilder()
+                    .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                    .setPort(new PortNumber(Uint16.valueOf(9999)))
+                    .setReconnectOnChangedSchema(true)
+                    .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
+                    .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
+                    .setKeepaliveDelay(Uint32.valueOf(1000))
+                    .setTcpOnly(true)
+                    .setCredentials(new LoginPasswordBuilder()
+                        .setUsername("testuser")
+                        .setPassword("testpassword")
+                        .build())
+                    .build());
 
         when(newNode.getDataAfter()).thenReturn(nn.build());
 
@@ -202,9 +206,9 @@ public class NetconfTopologyImplTest {
                 .build();
         final NetconfReconnectingClientConfiguration configuration =
                 spyTopology.getClientConfig(sessionListener, testingNode);
-        Assert.assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TCP, configuration.getProtocol());
-        Assert.assertNotNull(configuration.getAuthHandler());
-        Assert.assertNull(configuration.getSslHandlerFactory());
+        assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TCP, configuration.getProtocol());
+        assertNotNull(configuration.getAuthHandler());
+        assertNull(configuration.getSslHandlerFactory());
 
 
         final NetconfNode testingNode2 = new NetconfNodeBuilder()
@@ -220,9 +224,9 @@ public class NetconfTopologyImplTest {
                 .build();
         final NetconfReconnectingClientConfiguration configuration2 =
                 spyTopology.getClientConfig(sessionListener, testingNode2);
-        Assert.assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, configuration2.getProtocol());
-        Assert.assertNotNull(configuration2.getAuthHandler());
-        Assert.assertNull(configuration2.getSslHandlerFactory());
+        assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, configuration2.getProtocol());
+        assertNotNull(configuration2.getAuthHandler());
+        assertNull(configuration2.getSslHandlerFactory());
 
 
         final NetconfNode testingNode3 = new NetconfNodeBuilder()
@@ -239,9 +243,9 @@ public class NetconfTopologyImplTest {
                 .build();
         final NetconfReconnectingClientConfiguration configuration3 =
                 spyTopology.getClientConfig(sessionListener, testingNode3);
-        Assert.assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, configuration3.getProtocol());
-        Assert.assertNotNull(configuration3.getAuthHandler());
-        Assert.assertNull(configuration3.getSslHandlerFactory());
+        assertEquals(NetconfClientConfiguration.NetconfClientProtocol.SSH, configuration3.getProtocol());
+        assertNotNull(configuration3.getAuthHandler());
+        assertNull(configuration3.getSslHandlerFactory());
 
 
         final NetconfNode testingNode4 = new NetconfNodeBuilder()
@@ -258,9 +262,9 @@ public class NetconfTopologyImplTest {
                 .build();
         final NetconfReconnectingClientConfiguration configuration4 =
                 spyTopology.getClientConfig(sessionListener, testingNode4);
-        Assert.assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TLS, configuration4.getProtocol());
-        Assert.assertNull(configuration4.getAuthHandler());
-        Assert.assertNotNull(configuration4.getSslHandlerFactory());
+        assertEquals(NetconfClientConfiguration.NetconfClientProtocol.TLS, configuration4.getProtocol());
+        assertNull(configuration4.getAuthHandler());
+        assertNotNull(configuration4.getSslHandlerFactory());
     }
 
     public static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
@@ -292,25 +296,26 @@ public class NetconfTopologyImplTest {
     public void hideCredentialsTest() {
         final String userName = "admin";
         final String password = "pa$$word";
-        final NetconfNode netconfNode = new NetconfNodeBuilder()
-                .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
-                .setPort(new PortNumber(Uint16.valueOf(9999)))
-                .setReconnectOnChangedSchema(true)
-                .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
-                .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
-                .setKeepaliveDelay(Uint32.valueOf(1000))
-                .setTcpOnly(false)
-                .setProtocol(new ProtocolBuilder().setName(Name.TLS).build())
-                .setCredentials(new LoginPasswordBuilder()
-                        .setUsername(userName).setPassword(password).build())
-                .build();
         final Node node = new NodeBuilder()
-                .addAugmentation(NetconfNode.class, netconfNode)
+                .addAugmentation(new NetconfNodeBuilder()
+                    .setHost(new Host(new IpAddress(new Ipv4Address("127.0.0.1"))))
+                    .setPort(new PortNumber(Uint16.valueOf(9999)))
+                    .setReconnectOnChangedSchema(true)
+                    .setDefaultRequestTimeoutMillis(Uint32.valueOf(1000))
+                    .setBetweenAttemptsTimeoutMillis(Uint16.valueOf(100))
+                    .setKeepaliveDelay(Uint32.valueOf(1000))
+                    .setTcpOnly(false)
+                    .setProtocol(new ProtocolBuilder().setName(Name.TLS).build())
+                    .setCredentials(new LoginPasswordBuilder()
+                        .setUsername(userName)
+                        .setPassword(password)
+                        .build())
+                    .build())
                 .setNodeId(NodeId.getDefaultInstance("junos"))
                 .build();
         final String transformedNetconfNode = AbstractNetconfTopology.hideCredentials(node);
-        Assert.assertTrue(transformedNetconfNode.contains("credentials=***"));
-        Assert.assertFalse(transformedNetconfNode.contains(userName));
-        Assert.assertFalse(transformedNetconfNode.contains(password));
+        assertTrue(transformedNetconfNode.contains("credentials=***"));
+        assertFalse(transformedNetconfNode.contains(userName));
+        assertFalse(transformedNetconfNode.contains(password));
     }
 }

@@ -21,11 +21,11 @@ import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
 import org.opendaylight.controller.sal.rest.impl.test.providers.AbstractBodyReaderTest;
 import org.opendaylight.netconf.sal.rest.impl.NormalizedNodeJsonBodyWriter;
 import org.opendaylight.restconf.common.context.NormalizedNodeContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 public class NnToJsonLeafrefType extends AbstractBodyReaderTest {
 
-    private static SchemaContext schemaContext;
+    private static EffectiveModelContext schemaContext;
     private final NormalizedNodeJsonBodyWriter jsonBodyWriter;
 
     public NnToJsonLeafrefType() {

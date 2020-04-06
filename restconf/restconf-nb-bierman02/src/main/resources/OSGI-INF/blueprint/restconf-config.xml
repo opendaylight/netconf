@@ -37,7 +37,7 @@
   <reference id="dOMDataBroker" interface="org.opendaylight.mdsal.dom.api.DOMDataBroker"
           ext:filter="(type=@{databroker-service-type})"/>
 
-  <bean id="webSocketPort" class="org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber">
+  <bean id="webSocketPort" class="org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.PortNumber" factory-method="getDefaultInstance">
     <argument value="${websocket-port}"/>
   </bean>
 

@@ -23,10 +23,10 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.transform.OutputKeys;
@@ -46,8 +46,8 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContaine
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableLeafNodeBuilder;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableMapEntryNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,7 @@ public final class TestUtils {
 
     }
 
-    public static SchemaContext loadSchemaContext(final String... yangPath) throws FileNotFoundException {
+    public static EffectiveModelContext loadSchemaContext(final String... yangPath) throws FileNotFoundException {
         final List<File> files = new ArrayList<>();
         for (final String path : yangPath) {
             final String pathToFile = TestUtils.class.getResource(path).getPath();
@@ -83,7 +83,7 @@ public final class TestUtils {
         return YangParserTestUtils.parseYangFiles(files);
     }
 
-    public static Module findModule(final Set<Module> modules, final String moduleName) {
+    public static Module findModule(final Collection<? extends Module> modules, final String moduleName) {
         for (final Module module : modules) {
             if (module.getName().equals(moduleName)) {
                 return module;
@@ -130,7 +130,7 @@ public final class TestUtils {
      * module set has only one element then this element is returned.
      *
      */
-    public static Module resolveModule(final String searchedModuleName, final Set<Module> modules) {
+    public static Module resolveModule(final String searchedModuleName, final Collection<? extends Module> modules) {
         assertNotNull("Modules can't be null.", modules);
         if (searchedModuleName != null) {
             for (final Module m : modules) {

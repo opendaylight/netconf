@@ -34,9 +34,8 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgum
 import org.opendaylight.yangtools.yang.data.api.schema.DataContainerChild;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.tree.ConflictingModificationAppliedException;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,9 +52,9 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
 
     private final TransactionChainHandler transactionChainHandler;
     private final DOMSchemaService domSchemaService;
-    private ListenerRegistration<SchemaContextListener> listenerRegistration;
+    private ListenerRegistration<?> listenerRegistration;
 
-    private volatile SchemaContext schemaContext;
+    private volatile EffectiveModelContext schemaContext;
 
     /**
      * Constructor.
@@ -90,7 +89,7 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
 
     @Override
     @SuppressWarnings("checkstyle:hiddenField")
-    public void onGlobalContextUpdated(final SchemaContext context) {
+    public void onModelContextUpdated(final EffectiveModelContext context) {
         schemaContext = requireNonNull(context);
 
         final Module ietfYangLibraryModule =
@@ -112,7 +111,7 @@ public class SchemaContextHandler implements SchemaContextListenerHandler, AutoC
     }
 
     @Override
-    public SchemaContext get() {
+    public EffectiveModelContext get() {
         return schemaContext;
     }
 
