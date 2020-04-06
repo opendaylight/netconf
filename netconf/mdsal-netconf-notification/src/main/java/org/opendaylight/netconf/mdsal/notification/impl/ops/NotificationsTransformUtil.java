@@ -7,25 +7,26 @@
  */
 package org.opendaylight.netconf.mdsal.notification.impl.ops;
 
-import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
+import org.opendaylight.binding.runtime.api.BindingRuntimeContext;
+import org.opendaylight.binding.runtime.spi.BindingRuntimeHelpers;
+import org.opendaylight.mdsal.binding.dom.codec.api.BindingNormalizedNodeSerializer;
 import org.opendaylight.mdsal.binding.dom.codec.impl.BindingNormalizedNodeCodecRegistry;
-import org.opendaylight.mdsal.binding.generator.impl.ModuleInfoBackedContext;
-import org.opendaylight.mdsal.binding.generator.util.BindingRuntimeContext;
+import org.opendaylight.mdsal.binding.generator.impl.DefaultBindingRuntimeGenerator;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.util.NetconfUtil;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.$YangModuleInfoImpl;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfConfigChange;
 import org.opendaylight.yangtools.yang.binding.Notification;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -35,23 +36,15 @@ import org.w3c.dom.Document;
 
 public final class NotificationsTransformUtil {
     static final SchemaContext NOTIFICATIONS_SCHEMA_CTX;
-    static final BindingNormalizedNodeCodecRegistry CODEC_REGISTRY;
+    static final BindingNormalizedNodeSerializer CODEC_REGISTRY;
     static final RpcDefinition CREATE_SUBSCRIPTION_RPC;
 
     static {
-        final ModuleInfoBackedContext moduleInfoBackedContext = ModuleInfoBackedContext.create();
-        moduleInfoBackedContext.addModuleInfos(Collections.singletonList($YangModuleInfoImpl.getInstance()));
-        moduleInfoBackedContext.addModuleInfos(Collections.singletonList(org.opendaylight.yang.gen.v1.urn.ietf.params
-                .xml.ns.yang.ietf.netconf.notifications.rev120206.$YangModuleInfoImpl.getInstance()));
-        final Optional<? extends SchemaContext> schemaContextOptional =
-                moduleInfoBackedContext.tryToCreateSchemaContext();
-        checkState(schemaContextOptional.isPresent());
-        NOTIFICATIONS_SCHEMA_CTX = schemaContextOptional.get();
-
+        final BindingRuntimeContext ctx = BindingRuntimeHelpers.createRuntimeContext(
+            new DefaultBindingRuntimeGenerator(), Netconf.class, NetconfConfigChange.class);
+        NOTIFICATIONS_SCHEMA_CTX = ctx.getSchemaContext();
         CREATE_SUBSCRIPTION_RPC = requireNonNull(findCreateSubscriptionRpc());
-
-        CODEC_REGISTRY = new BindingNormalizedNodeCodecRegistry(BindingRuntimeContext.create(moduleInfoBackedContext,
-                NOTIFICATIONS_SCHEMA_CTX));
+        CODEC_REGISTRY = new BindingNormalizedNodeCodecRegistry(ctx);
     }
 
     private NotificationsTransformUtil() {
