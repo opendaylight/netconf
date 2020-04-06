@@ -11,7 +11,7 @@ package org.opendaylight.netconf.sal.connect.api;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 
 /**
  * Factory for netconf device schemas.
@@ -19,5 +19,5 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 public interface NetconfDeviceSchemasResolver {
     NetconfDeviceSchemas resolve(
             NetconfDeviceRpc deviceRpc, NetconfSessionPreferences remoteSessionCapabilities, RemoteDeviceId id,
-            SchemaContext schemaContext);
+            EffectiveModelContext schemaContext);
 }
