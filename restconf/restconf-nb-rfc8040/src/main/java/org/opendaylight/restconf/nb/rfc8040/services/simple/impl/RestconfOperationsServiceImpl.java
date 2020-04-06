@@ -11,7 +11,6 @@ import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.dom.api.DOMMountPoint;
@@ -32,6 +31,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.ContainerSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
@@ -85,14 +85,14 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
 
     @Override
     public NormalizedNodeContext getOperations(final String identifier, final UriInfo uriInfo) {
-        final Set<Module> modules;
+        final Collection<? extends Module> modules;
         final DOMMountPoint mountPoint;
         final SchemaContextRef ref = new SchemaContextRef(this.schemaContextHandler.get());
         if (identifier.contains(RestconfConstants.MOUNT)) {
             final InstanceIdentifierContext<?> mountPointIdentifier = ParserIdentifier.toInstanceIdentifier(identifier,
                     ref.get(), Optional.of(this.domMountPointServiceHandler.get()));
             mountPoint = mountPointIdentifier.getMountPoint();
-            modules = ref.getModules(mountPoint);
+            modules = SchemaContextRef.getModules(mountPoint);
         } else {
             final String errMsg = "URI has bad format. If operations behind mount point should be showed, URI has to "
                     + " end with " + RestconfConstants.MOUNT;
@@ -116,12 +116,13 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
      *             mount point, if in use otherwise null
      * @return {@link NormalizedNodeContext}
      */
-    private static NormalizedNodeContext getOperations(final Set<Module> modules, final DOMMountPoint mountPoint) {
+    private static NormalizedNodeContext getOperations(final Collection<? extends Module> modules,
+            final DOMMountPoint mountPoint) {
         final Collection<Module> neededModules = new ArrayList<>(modules.size());
         final ArrayList<LeafSchemaNode> fakeRpcSchema = new ArrayList<>();
 
         for (final Module m : modules) {
-            final Set<RpcDefinition> rpcs = m.getRpcs();
+            final Collection<? extends RpcDefinition> rpcs = m.getRpcs();
             if (!rpcs.isEmpty()) {
                 neededModules.add(m);
 
@@ -142,7 +143,7 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
         neededModules.forEach(imp -> fakeModules.add(new FakeImportedModule(imp)));
         fakeModules.add(new FakeRestconfModule(neededModules, fakeCont));
 
-        final SchemaContext fakeSchemaCtx = SimpleSchemaContext.forModules(ImmutableSet.copyOf(fakeModules));
+        final EffectiveModelContext fakeSchemaCtx = SimpleSchemaContext.forModules(ImmutableSet.copyOf(fakeModules));
         final InstanceIdentifierContext<ContainerSchemaNode> instanceIdentifierContext =
                 new InstanceIdentifierContext<>(null, fakeCont, mountPoint, fakeSchemaCtx);
         return new NormalizedNodeContext(instanceIdentifierContext, containerBuilder.build());

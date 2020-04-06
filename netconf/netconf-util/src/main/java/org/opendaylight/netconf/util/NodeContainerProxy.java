@@ -10,13 +10,10 @@ package org.opendaylight.netconf.util;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.model.api.ActionDefinition;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
@@ -29,7 +26,6 @@ import org.opendaylight.yangtools.yang.model.api.RevisionAwareXPath;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.opendaylight.yangtools.yang.model.api.Status;
 import org.opendaylight.yangtools.yang.model.api.TypeDefinition;
-import org.opendaylight.yangtools.yang.model.api.UnknownSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.UsesNode;
 
 /**
@@ -37,42 +33,42 @@ import org.opendaylight.yangtools.yang.model.api.UsesNode;
  */
 public final class NodeContainerProxy implements ContainerSchemaNode {
 
-    private final Map<QName, DataSchemaNode> childNodes;
+    private final Map<QName, ? extends DataSchemaNode> childNodes;
     private final QName qualifiedName;
-    private final Set<AugmentationSchemaNode> availableAugmentations;
+    private final Collection<? extends AugmentationSchemaNode> availableAugmentations;
 
-    public NodeContainerProxy(final QName qualifiedName, final Map<QName, DataSchemaNode> childNodes,
-                              final Set<AugmentationSchemaNode> availableAugmentations) {
+    public NodeContainerProxy(final QName qualifiedName, final Map<QName, ? extends DataSchemaNode> childNodes,
+                              final Collection<? extends AugmentationSchemaNode> availableAugmentations) {
         this.availableAugmentations = availableAugmentations;
         this.childNodes = requireNonNull(childNodes, "childNodes");
         this.qualifiedName = qualifiedName;
     }
 
-    public NodeContainerProxy(final QName qualifiedName, final Collection<DataSchemaNode> childNodes) {
+    public NodeContainerProxy(final QName qualifiedName, final Collection<? extends DataSchemaNode> childNodes) {
         this(qualifiedName, asMap(childNodes), Collections.emptySet());
     }
 
-    public NodeContainerProxy(final QName qualifiedName, final Collection<DataSchemaNode> childNodes,
-                              final Set<AugmentationSchemaNode> availableAugmentations) {
+    public NodeContainerProxy(final QName qualifiedName, final Collection<? extends DataSchemaNode> childNodes,
+                              final Collection<? extends AugmentationSchemaNode> availableAugmentations) {
         this(qualifiedName, asMap(childNodes), availableAugmentations);
     }
 
-    private static Map<QName, DataSchemaNode> asMap(final Collection<DataSchemaNode> childNodes) {
+    private static Map<QName, ? extends DataSchemaNode> asMap(final Collection<? extends DataSchemaNode> childNodes) {
         return Maps.uniqueIndex(childNodes, DataSchemaNode::getQName);
     }
 
     @Override
-    public Set<TypeDefinition<?>> getTypeDefinitions() {
+    public Collection<? extends TypeDefinition<?>> getTypeDefinitions() {
         return Collections.emptySet();
     }
 
     @Override
-    public Set<DataSchemaNode> getChildNodes() {
-        return Sets.newHashSet(childNodes.values());
+    public Collection<? extends DataSchemaNode> getChildNodes() {
+        return childNodes.values();
     }
 
     @Override
-    public Set<GroupingDefinition> getGroupings() {
+    public Collection<? extends GroupingDefinition> getGroupings() {
         return Collections.emptySet();
     }
 
@@ -82,7 +78,7 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     @Override
-    public Set<UsesNode> getUses() {
+    public Collection<? extends UsesNode> getUses() {
         return Collections.emptySet();
     }
 
@@ -92,7 +88,7 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     @Override
-    public Set<AugmentationSchemaNode> getAvailableAugmentations() {
+    public Collection<? extends AugmentationSchemaNode> getAvailableAugmentations() {
         return availableAugmentations;
     }
 
@@ -137,17 +133,12 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     @Override
-    public List<UnknownSchemaNode> getUnknownSchemaNodes() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Set<NotificationDefinition> getNotifications() {
+    public Collection<? extends NotificationDefinition> getNotifications() {
         return Collections.emptySet();
     }
 
     @Override
-    public Set<ActionDefinition> getActions() {
+    public Collection<? extends ActionDefinition> getActions() {
         return Collections.emptySet();
     }
 
@@ -157,7 +148,7 @@ public final class NodeContainerProxy implements ContainerSchemaNode {
     }
 
     @Override
-    public Collection<MustDefinition> getMustConstraints() {
+    public Collection<? extends MustDefinition> getMustConstraints() {
         return Collections.emptySet();
     }
 }

@@ -17,7 +17,6 @@ import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -201,9 +200,9 @@ public class IetfZeroTouchCallHomeServerProvider implements AutoCloseable, DataT
         }, MoreExecutors.directExecutor());
     }
 
-    private static List<Device> getReadDevices(final ListenableFuture<Optional<AllowedDevices>> devicesFuture)
+    private static Collection<Device> getReadDevices(final ListenableFuture<Optional<AllowedDevices>> devicesFuture)
             throws InterruptedException, ExecutionException {
-        return devicesFuture.get().map(AllowedDevices::getDevice).orElse(Collections.emptyList());
+        return devicesFuture.get().map(AllowedDevices::nonnullDevice).orElse(Collections.emptyMap()).values();
     }
 
     private void readAndUpdateStatus(final Device cfgDevice) throws InterruptedException, ExecutionException {

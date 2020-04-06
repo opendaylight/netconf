@@ -65,7 +65,7 @@ abstract class AbstractEdit extends AbstractConfigOperation {
 
     protected DataSchemaNode getSchemaNodeFromNamespace(final String namespace, final XmlElement element)
         throws DocumentedException {
-        final Iterator<Module> it;
+        final Iterator<? extends Module> it;
         try {
             // Returns module with newest revision since findModuleByNamespace returns a set of modules and we only
             // need the newest one

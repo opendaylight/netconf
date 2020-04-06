@@ -48,7 +48,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.DOMException;
@@ -75,7 +75,7 @@ public class PostDataTransactionUtilTest {
     private TransactionChainHandler transactionChainHandler;
     private SchemaContextRef refSchemaCtx;
     private ContainerNode buildBaseCont;
-    private SchemaContext schema;
+    private EffectiveModelContext schema;
     private YangInstanceIdentifier iid2;
     private MapNode buildList;
 
