@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf;
 
 import static org.junit.Assert.assertEquals;
@@ -14,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
-import java.util.Set;
+import java.util.Collection;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -54,7 +53,7 @@ public class NetconfToRpcRequestTest {
 
     @BeforeClass
     public static void setup() {
-        final Set<Module> notifModules = YangParserTestUtils.parseYangResource(
+        final Collection<? extends Module> notifModules = YangParserTestUtils.parseYangResource(
             "/schemas/rpc-notification-subscription.yang").getModules();
         assertTrue(!notifModules.isEmpty());
 
