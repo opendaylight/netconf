@@ -156,7 +156,8 @@ public class NetconfKeystoreAdapter implements ClusteredDataTreeChangeListener<K
 
                     pairs.clear();
                     if (dataAfter != null) {
-                        dataAfter.getKeyCredential().forEach(pair -> pairs.put(pair.key().getKeyId(), pair));
+                        dataAfter.nonnullKeyCredential().values()
+                            .forEach(pair -> pairs.put(pair.key().getKeyId(), pair));
                     }
 
                 } else if (changedChild.getDataType().equals(PrivateKey.class)) {

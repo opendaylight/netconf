@@ -7,6 +7,9 @@
  */
 package org.opendaylight.netconf.impl.osgi;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -22,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -138,10 +140,10 @@ public class NetconfCapabilityMonitoringServiceTest {
     @Test
     public void testGetSchemas() throws Exception {
         Schemas schemas = monitoringService.getSchemas();
-        Schema schema = schemas.getSchema().get(0);
-        Assert.assertEquals(TEST_MODULE_NAMESPACE, schema.getNamespace());
-        Assert.assertEquals(TEST_MODULE_NAME, schema.getIdentifier());
-        Assert.assertEquals(TEST_MODULE_REV, schema.getVersion());
+        Schema schema = schemas.getSchema().values().iterator().next();
+        assertEquals(TEST_MODULE_NAMESPACE, schema.getNamespace());
+        assertEquals(TEST_MODULE_NAME, schema.getIdentifier());
+        assertEquals(TEST_MODULE_REV, schema.getVersion());
     }
 
     @Test
@@ -150,15 +152,15 @@ public class NetconfCapabilityMonitoringServiceTest {
         monitoringService.onCapabilitiesChanged(Collections.singleton(moduleCapability2), Collections.emptySet());
         final String schema =
                 monitoringService.getSchemaForModuleRevision(TEST_MODULE_NAME, Optional.of(TEST_MODULE_REV));
-        Assert.assertEquals(TEST_MODULE_CONTENT, schema);
+        assertEquals(TEST_MODULE_CONTENT, schema);
         final String schema2 =
                 monitoringService.getSchemaForModuleRevision(TEST_MODULE_NAME, Optional.of(TEST_MODULE_REV2));
-        Assert.assertEquals(TEST_MODULE_CONTENT2, schema2);
+        assertEquals(TEST_MODULE_CONTENT2, schema2);
         //remove one revision
         monitoringService.onCapabilitiesChanged(Collections.emptySet(), Collections.singleton(moduleCapability1));
         //only one revision present
         final String schema3 = monitoringService.getSchemaForModuleRevision(TEST_MODULE_NAME, Optional.empty());
-        Assert.assertEquals(TEST_MODULE_CONTENT2, schema3);
+        assertEquals(TEST_MODULE_CONTENT2, schema3);
     }
 
     @Test
@@ -172,14 +174,14 @@ public class NetconfCapabilityMonitoringServiceTest {
         exp.add(new Uri(URN_IETF_PARAMS_NETCONF_CAPABILITY_URL_1_0));
         Capabilities expected = new CapabilitiesBuilder().setCapability(exp).build();
         Capabilities actual = monitoringService.getCapabilities();
-        Assert.assertEquals(new HashSet<>(expected.getCapability()), new HashSet<>(actual.getCapability()));
+        assertEquals(new HashSet<>(expected.getCapability()), new HashSet<>(actual.getCapability()));
     }
 
     @Test
     public void testClose() throws Exception {
-        Assert.assertFalse(monitoringService.getCapabilities().getCapability().isEmpty());
+        assertFalse(monitoringService.getCapabilities().getCapability().isEmpty());
         monitoringService.close();
-        Assert.assertTrue(monitoringService.getCapabilities().getCapability().isEmpty());
+        assertTrue(monitoringService.getCapabilities().getCapability().isEmpty());
     }
 
     @Test
@@ -205,22 +207,21 @@ public class NetconfCapabilityMonitoringServiceTest {
         final List<Uri> afterAddState = listenerValues.get(1).getCapability();
         final List<Uri> afterRemoveState = listenerValues.get(2).getCapability();
 
-        Assert.assertEquals(capabilitiesSize, afterRegisterState.size());
-        Assert.assertEquals(capabilitiesSize + 1, afterAddState.size());
-        Assert.assertEquals(capabilitiesSize, afterRemoveState.size());
-        Assert.assertFalse(afterRegisterState.contains(uri));
-        Assert.assertTrue(afterAddState.contains(uri));
-        Assert.assertFalse(afterRemoveState.contains(uri));
+        assertEquals(capabilitiesSize, afterRegisterState.size());
+        assertEquals(capabilitiesSize + 1, afterAddState.size());
+        assertEquals(capabilitiesSize, afterRemoveState.size());
+        assertFalse(afterRegisterState.contains(uri));
+        assertTrue(afterAddState.contains(uri));
+        assertFalse(afterRemoveState.contains(uri));
 
         //verify notification publication
         final List<NetconfCapabilityChange> publisherValues = capabilityChangeCaptor.getAllValues();
         final NetconfCapabilityChange afterAdd = publisherValues.get(0);
         final NetconfCapabilityChange afterRemove = publisherValues.get(1);
 
-        Assert.assertEquals(Collections.singleton(uri), new HashSet<>(afterAdd.getAddedCapability()));
-        Assert.assertEquals(Collections.emptySet(), new HashSet<>(afterAdd.getDeletedCapability()));
-        Assert.assertEquals(Collections.singleton(uri), new HashSet<>(afterRemove.getDeletedCapability()));
-        Assert.assertEquals(Collections.emptySet(), new HashSet<>(afterRemove.getAddedCapability()));
+        assertEquals(Collections.singleton(uri), new HashSet<>(afterAdd.getAddedCapability()));
+        assertEquals(Collections.emptySet(), new HashSet<>(afterAdd.getDeletedCapability()));
+        assertEquals(Collections.singleton(uri), new HashSet<>(afterRemove.getDeletedCapability()));
+        assertEquals(Collections.emptySet(), new HashSet<>(afterRemove.getAddedCapability()));
     }
-
 }

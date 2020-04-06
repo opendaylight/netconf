@@ -288,11 +288,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
 
     private static final class ResponseWaiting implements Runnable {
 
-        private final ListenableFuture<DOMRpcResult> rpcResultFuture;
+        private final ListenableFuture<? extends DOMRpcResult> rpcResultFuture;
         private final ResponseWaitingScheduler responseWaitingScheduler;
 
         ResponseWaiting(final ResponseWaitingScheduler responseWaitingScheduler,
-                final ListenableFuture<DOMRpcResult> rpcResultFuture) {
+                final ListenableFuture<? extends DOMRpcResult> rpcResultFuture) {
             this.responseWaitingScheduler = responseWaitingScheduler;
             this.rpcResultFuture = rpcResultFuture;
         }
@@ -324,11 +324,11 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
      * it.
      */
     private static final class RequestTimeoutTask implements Runnable {
-        private final ListenableFuture<DOMRpcResult> rpcResultFuture;
+        private final ListenableFuture<? extends DOMRpcResult> rpcResultFuture;
         private final ResponseWaiting responseWaiting;
 
-        RequestTimeoutTask(final ListenableFuture<DOMRpcResult> rpcResultFuture,
-            final ResponseWaiting responseWaiting) {
+        RequestTimeoutTask(final ListenableFuture<? extends DOMRpcResult> rpcResultFuture,
+                final ResponseWaiting responseWaiting) {
             this.rpcResultFuture = rpcResultFuture;
             this.responseWaiting = responseWaiting;
         }
@@ -371,8 +371,9 @@ public final class KeepaliveSalFacade implements RemoteDeviceHandler<NetconfSess
         }
 
         @Override
-        public ListenableFuture<DOMRpcResult> invokeRpc(final SchemaPath type, final NormalizedNode<?, ?> input) {
-            final ListenableFuture<DOMRpcResult> rpcResultFuture = deviceRpc.invokeRpc(type, input);
+        public ListenableFuture<? extends DOMRpcResult> invokeRpc(final SchemaPath type,
+                final NormalizedNode<?, ?> input) {
+            final ListenableFuture<? extends DOMRpcResult> rpcResultFuture = deviceRpc.invokeRpc(type, input);
             final ResponseWaiting responseWaiting = new ResponseWaiting(responseWaitingScheduler, rpcResultFuture);
             responseWaiting.start();
             Futures.addCallback(rpcResultFuture, resetKeepaliveTask, MoreExecutors.directExecutor());

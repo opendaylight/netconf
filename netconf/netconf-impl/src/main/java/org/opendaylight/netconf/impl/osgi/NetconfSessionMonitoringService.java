@@ -10,6 +10,7 @@ package org.opendaylight.netconf.impl.osgi;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -31,12 +32,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class implements {@link SessionListener} to receive updates about Netconf sessions. Instance notifies its
- * listeners
- * about session start and end. It also publishes on regular interval list of sessions,
+ * listeners about session start and end. It also publishes on regular interval list of sessions,
  * where events like rpc or notification happened.
  */
 class NetconfSessionMonitoringService implements SessionListener, AutoCloseable {
-
     private static final Logger LOG = LoggerFactory.getLogger(NetconfSessionMonitoringService.class);
 
     private final Set<NetconfManagementSession> sessions = new HashSet<>();
@@ -53,7 +52,8 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
      *                             scheduled.
      * @param updateInterval       update interval. If is less than 0, updates won't be scheduled
      */
-    NetconfSessionMonitoringService(Optional<ScheduledThreadPool> schedulingThreadPool, long updateInterval) {
+    NetconfSessionMonitoringService(final Optional<ScheduledThreadPool> schedulingThreadPool,
+            final long updateInterval) {
         this.updateInterval = updateInterval;
         if (schedulingThreadPool.isPresent() && updateInterval > 0) {
             this.executor = schedulingThreadPool.get().getExecutor();
@@ -69,7 +69,9 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
     synchronized Sessions getSessions() {
         final Collection<Session> managementSessions = Collections2.transform(sessions,
                 NetconfManagementSession::toManagementSession);
-        return new SessionsBuilder().setSession(ImmutableList.copyOf(managementSessions)).build();
+        return new SessionsBuilder()
+                .setSession(Maps.uniqueIndex(managementSessions, Session::key))
+                .build();
     }
 
     @Override
@@ -90,7 +92,7 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
     }
 
     @Override
-    public synchronized void onSessionEvent(SessionEvent event) {
+    public synchronized void onSessionEvent(final SessionEvent event) {
         changedSessions.add(event.getSession());
     }
 
@@ -123,14 +125,14 @@ class NetconfSessionMonitoringService implements SessionListener, AutoCloseable 
         changedSessions.clear();
     }
 
-    private void notifySessionUp(NetconfManagementSession managementSession) {
+    private void notifySessionUp(final NetconfManagementSession managementSession) {
         Session session = managementSession.toManagementSession();
         for (NetconfMonitoringService.SessionsListener listener : listeners) {
             listener.onSessionStarted(session);
         }
     }
 
-    private void notifySessionDown(NetconfManagementSession managementSession) {
+    private void notifySessionDown(final NetconfManagementSession managementSession) {
         Session session = managementSession.toManagementSession();
         for (NetconfMonitoringService.SessionsListener listener : listeners) {
             listener.onSessionEnded(session);

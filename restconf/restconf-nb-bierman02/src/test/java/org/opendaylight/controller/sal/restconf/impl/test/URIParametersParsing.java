@@ -15,15 +15,14 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.base.Preconditions;
 import java.io.FileNotFoundException;
-import java.util.Set;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.controller.md.sal.rest.common.TestRestconfUtils;
+import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.netconf.sal.restconf.impl.BrokerFacade;
 import org.opendaylight.netconf.sal.restconf.impl.ControllerContext;
 import org.opendaylight.netconf.sal.restconf.impl.RestconfImpl;
@@ -113,14 +112,13 @@ public class URIParametersParsing {
     private NormalizedNodeContext prepareDomRpcNode(final String datastore, final String scope) {
         final SchemaContext schema = this.controllerContext.getGlobalSchema();
         final Module rpcSalRemoteModule = schema.findModule("sal-remote", Revision.of("2014-01-14")).get();
-        final Set<RpcDefinition> setRpcs = rpcSalRemoteModule.getRpcs();
         final QName rpcQName =
                 QName.create(rpcSalRemoteModule.getQNameModule(), "create-data-change-event-subscription");
         final QName rpcInputQName =
                 QName.create("urn:opendaylight:params:xml:ns:yang:controller:md:sal:remote", "2014-01-14", "input");
         final RpcDefinition rpcDef = Mockito.mock(RpcDefinition.class);
         ContainerSchemaNode rpcInputSchemaNode = null;
-        for (final RpcDefinition rpc : setRpcs) {
+        for (final RpcDefinition rpc : rpcSalRemoteModule.getRpcs()) {
             if (rpcQName.isEqualWithoutRevision(rpc.getQName())) {
                 rpcInputSchemaNode = SchemaNodeUtils.getRpcDataSchema(rpc, rpcInputQName);
                 break;
