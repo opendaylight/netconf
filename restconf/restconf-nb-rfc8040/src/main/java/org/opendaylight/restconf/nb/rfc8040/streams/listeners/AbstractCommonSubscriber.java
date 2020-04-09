@@ -10,6 +10,7 @@ package org.opendaylight.restconf.nb.rfc8040.streams.listeners;
 import com.google.common.base.Preconditions;
 import java.net.InetSocketAddress;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketSessionHandler;
@@ -82,7 +83,9 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
      * @param data Data of incoming notifications.
      */
     synchronized void post(final String data) {
-        for (final WebSocketSessionHandler subscriber : subscribers) {
+        Iterator<WebSocketSessionHandler> iterator = subscribers.iterator();
+        while (iterator.hasNext()) {
+            WebSocketSessionHandler subscriber = iterator.next();
             final Optional<InetSocketAddress> remoteEndpointAddress = subscriber.getRemoteEndpointAddress();
             if (remoteEndpointAddress.isPresent()) {
                 subscriber.sendDataMessage(data);
@@ -90,7 +93,7 @@ abstract class AbstractCommonSubscriber extends AbstractQueryParams implements B
             } else {
                 // removal is probably not necessary, because it will be removed explicitly soon after invocation of
                 // onWebSocketClosed(..) in handler; but just to be sure ...
-                subscribers.remove(subscriber);
+                iterator.remove();
                 LOG.debug("Subscriber for {} was removed - web-socket session is not open.", this);
             }
         }
