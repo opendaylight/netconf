@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "620c1e65_ec883d6f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-04-09T23:24:32Z",
+      "side": 1,
+      "message": "Clean the commit message please.\n\nfirst line should be concise and summarize the change\n\nthen a newline, followed by a body explaining all you need.\n\nfinally, just above the Change-Id: line, please put \"JIRA: NETCONF-663\"",
+      "revId": "4f81881f9ab52587ed9cf59fa42fef5267e806ce",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
