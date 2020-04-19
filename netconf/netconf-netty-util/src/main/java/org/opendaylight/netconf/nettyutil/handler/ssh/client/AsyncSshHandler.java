@@ -127,10 +127,8 @@ public class AsyncSshHandler extends ChannelOutboundHandlerAdapter {
                 if (future1.isSuccess()) {
                     handleSshAuthenticated(localSession, ctx);
                 } else {
-                    // Exception does not have to be set in the future, add simple exception in such case
-                    final Throwable exception = future1.getException() == null
-                            ? new IllegalStateException("Authentication failed") : future1.getException();
-                    handleSshSetupFailure(ctx, exception);
+                    handleSshSetupFailure(ctx, new AuthenticationFailedException("Authentication failed",
+                        future1.getException()));
                 }
             });
         } catch (final IOException e) {
