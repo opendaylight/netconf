@@ -7,18 +7,15 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
-import java.net.URI;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.common.QNameModule;
+import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
  * Constants for RestconfDataService.
  *
  */
 public final class RestconfDataServiceConstant {
-
-    public static final QName NETCONF_BASE_QNAME  = QName.create(QNameModule.create(URI.create(PutData.NETCONF_BASE)),
-        PutData.NETCONF_BASE_PAYLOAD_NAME);
+    public static final QName NETCONF_BASE_QNAME = SchemaContext.NAME;
 
     private RestconfDataServiceConstant() {
         throw new UnsupportedOperationException("Util class.");
@@ -71,8 +68,6 @@ public final class RestconfDataServiceConstant {
      *
      */
     public static final class PutData {
-        public static final String NETCONF_BASE = "urn:ietf:params:xml:ns:netconf:base:1.0";
-        public static final String NETCONF_BASE_PAYLOAD_NAME = "data";
         public static final String PUT_TX_TYPE = "PUT";
 
         private PutData() {
