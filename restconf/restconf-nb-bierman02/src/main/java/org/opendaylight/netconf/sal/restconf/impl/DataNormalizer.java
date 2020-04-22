@@ -69,8 +69,4 @@ class DataNormalizer {
         }
         return YangInstanceIdentifier.create(legacyArgs.build());
     }
-
-    DataNormalizationOperation<?> getRootOperation() {
-        return operation;
-    }
 }

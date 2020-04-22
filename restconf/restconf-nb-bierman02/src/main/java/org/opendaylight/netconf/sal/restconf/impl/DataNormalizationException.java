@@ -13,8 +13,4 @@ final class DataNormalizationException extends Exception {
     DataNormalizationException(final String message) {
         super(message);
     }
-
-    DataNormalizationException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
 }

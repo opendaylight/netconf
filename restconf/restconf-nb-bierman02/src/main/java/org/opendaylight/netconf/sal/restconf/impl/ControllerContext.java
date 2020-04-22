@@ -905,7 +905,7 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         }
     }
 
-    public static List<String> urlPathArgsDecode(final Iterable<String> strings) {
+    private static List<String> urlPathArgsDecode(final Iterable<String> strings) {
         try {
             final List<String> decodedPathArgs = new ArrayList<>();
             for (final String pathArg : strings) {
@@ -919,17 +919,16 @@ public final class ControllerContext implements SchemaContextListener, Closeable
         }
     }
 
-    public String urlPathArgDecode(final String pathArg) {
-        if (pathArg != null) {
-            try {
-                return URLDecoder.decode(pathArg, URI_ENCODING_CHARSET.name());
-            } catch (final UnsupportedEncodingException e) {
-                throw new RestconfDocumentedException("Invalid URL path arg '" + pathArg + "': " + e.getMessage(),
-                        ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
-            }
+    static String urlPathArgDecode(final String pathArg) {
+        if (pathArg == null) {
+            return null;
         }
-
-        return null;
+        try {
+            return URLDecoder.decode(pathArg, URI_ENCODING_CHARSET.name());
+        } catch (final UnsupportedEncodingException e) {
+            throw new RestconfDocumentedException("Invalid URL path arg '" + pathArg + "': " + e.getMessage(),
+                ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE, e);
+        }
     }
 
     private CharSequence convertToRestconfIdentifier(final PathArgument argument, final DataSchemaNode node,
@@ -1012,9 +1011,5 @@ public final class ControllerContext implements SchemaContextListener, Closeable
             throw new RestconfDocumentedException("Data normalizer failed. Normalization isn't possible", e);
         }
         return operation.isMixin();
-    }
-
-    public DataNormalizationOperation<?> getRootOperation() {
-        return this.dataNormalizer.getRootOperation();
     }
 }

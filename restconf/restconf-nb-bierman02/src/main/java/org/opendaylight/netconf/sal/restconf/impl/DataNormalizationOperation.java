@@ -7,20 +7,16 @@
  */
 package org.opendaylight.netconf.sal.restconf.impl;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.jdt.annotation.Nullable;
-import org.gaul.modernizer_maven_annotations.SuppressModernizer;
 import org.opendaylight.yangtools.concepts.Identifiable;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
@@ -28,10 +24,6 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdent
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.PathArgument;
-import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
-import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
-import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
 import org.opendaylight.yangtools.yang.model.api.AnyxmlSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AugmentationSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.AugmentationTarget;
@@ -44,119 +36,80 @@ import org.opendaylight.yangtools.yang.model.api.LeafListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
-import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.util.EffectiveAugmentationSchema;
 
 abstract class DataNormalizationOperation<T extends PathArgument> implements Identifiable<T> {
     private final T identifier;
-    private final DataSchemaNode dataSchemaNode;
 
     @Override
     public T getIdentifier() {
         return identifier;
     }
 
-    protected DataNormalizationOperation(final T identifier, final SchemaNode schema) {
+    DataNormalizationOperation(final T identifier) {
         this.identifier = identifier;
-        dataSchemaNode = schema instanceof DataSchemaNode ? (DataSchemaNode)schema : null;
     }
 
-    public boolean isMixin() {
+    static DataNormalizationOperation<?> from(final SchemaContext ctx) {
+        return new ContainerNormalization(ctx);
+    }
+
+    boolean isMixin() {
         return false;
     }
 
-
-    public boolean isKeyedEntry() {
-        return false;
-    }
-
-    protected Set<QName> getQNameIdentifiers() {
+    Set<QName> getQNameIdentifiers() {
         return Collections.singleton(identifier.getNodeType());
     }
 
-    public abstract DataNormalizationOperation<?> getChild(PathArgument child) throws DataNormalizationException;
+    abstract DataNormalizationOperation<?> getChild(PathArgument child) throws DataNormalizationException;
 
-    public abstract DataNormalizationOperation<?> getChild(QName child) throws DataNormalizationException;
-
-    public abstract boolean isLeaf();
-
-    @SuppressModernizer
-    public Optional<DataSchemaNode> getDataSchemaNode() {
-        return Optional.fromNullable(dataSchemaNode);
-    }
+    abstract DataNormalizationOperation<?> getChild(QName child) throws DataNormalizationException;
 
     private abstract static class SimpleTypeNormalization<T extends PathArgument>
             extends DataNormalizationOperation<T> {
-        SimpleTypeNormalization(final T identifier, final DataSchemaNode potential) {
-            super(identifier,potential);
+        SimpleTypeNormalization(final T identifier) {
+            super(identifier);
         }
 
         @Override
-        public DataNormalizationOperation<?> getChild(final PathArgument child) {
+        final DataNormalizationOperation<?> getChild(final PathArgument child) {
             return null;
         }
 
         @Override
-        public DataNormalizationOperation<?> getChild(final QName child) {
+        final DataNormalizationOperation<?> getChild(final QName child) {
             return null;
-        }
-
-        @Override
-        public NormalizedNode<?, ?> createDefault(final PathArgument currentArg) {
-            return null;
-        }
-
-        @Override
-        public boolean isLeaf() {
-            return true;
         }
     }
 
     private static final class LeafNormalization extends SimpleTypeNormalization<NodeIdentifier> {
         LeafNormalization(final LeafSchemaNode potential) {
-            super(new NodeIdentifier(potential.getQName()),potential);
+            super(new NodeIdentifier(potential.getQName()));
         }
     }
 
     private static final class LeafListEntryNormalization extends SimpleTypeNormalization<NodeWithValue> {
         LeafListEntryNormalization(final LeafListSchemaNode potential) {
-            super(new NodeWithValue(potential.getQName(), null),potential);
-        }
-
-        @Override
-        public boolean isKeyedEntry() {
-            return true;
-        }
-    }
-
-    private abstract static class CompositeNodeNormalizationOperation<T extends PathArgument>
-            extends DataNormalizationOperation<T> {
-        CompositeNodeNormalizationOperation(final T identifier, final DataSchemaNode schema) {
-            super(identifier,schema);
-        }
-
-        @Override
-        public boolean isLeaf() {
-            return false;
+            super(new NodeWithValue(potential.getQName(), null));
         }
     }
 
     private abstract static class DataContainerNormalizationOperation<T extends PathArgument>
-            extends CompositeNodeNormalizationOperation<T> {
+            extends DataNormalizationOperation<T> {
         private final DataNodeContainer schema;
         private final Map<QName, DataNormalizationOperation<?>> byQName;
         private final Map<PathArgument, DataNormalizationOperation<?>> byArg;
 
-        DataContainerNormalizationOperation(final T identifier, final DataNodeContainer schema,
-                final DataSchemaNode node) {
-            super(identifier,node);
+        DataContainerNormalizationOperation(final T identifier, final DataNodeContainer schema) {
+            super(identifier);
             this.schema = schema;
             this.byArg = new ConcurrentHashMap<>();
             this.byQName = new ConcurrentHashMap<>();
         }
 
         @Override
-        public DataNormalizationOperation<?> getChild(final PathArgument child) throws DataNormalizationException {
+        DataNormalizationOperation<?> getChild(final PathArgument child) throws DataNormalizationException {
             DataNormalizationOperation<?> potential = byArg.get(child);
             if (potential != null) {
                 return potential;
@@ -166,7 +119,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         }
 
         @Override
-        public DataNormalizationOperation<?> getChild(final QName child) throws DataNormalizationException {
+        DataNormalizationOperation<?> getChild(final QName child) throws DataNormalizationException {
             DataNormalizationOperation<?> potential = byQName.get(child);
             if (potential != null) {
                 return potential;
@@ -184,7 +137,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
             return fromSchemaAndQNameChecked(schema, child.getNodeType());
         }
 
-        protected DataNormalizationOperation<?> fromLocalSchemaAndQName(final DataNodeContainer schema2,
+        DataNormalizationOperation<?> fromLocalSchemaAndQName(final DataNodeContainer schema2,
                 final QName child) throws DataNormalizationException {
             return fromSchemaAndQNameChecked(schema2, child);
         }
@@ -220,94 +173,44 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
     private static final class ListItemNormalization extends
             DataContainerNormalizationOperation<NodeIdentifierWithPredicates> {
         ListItemNormalization(final NodeIdentifierWithPredicates identifier, final ListSchemaNode schema) {
-            super(identifier, schema, schema);
-        }
-
-        @Override
-        @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
-        public NormalizedNode<?, ?> createDefault(final PathArgument currentArg) {
-            final DataContainerNodeBuilder<NodeIdentifierWithPredicates, MapEntryNode> builder = Builders
-                    .mapEntryBuilder().withNodeIdentifier((NodeIdentifierWithPredicates) currentArg);
-            for (final Entry<QName, Object> keyValue : ((NodeIdentifierWithPredicates) currentArg).entrySet()) {
-                builder.addChild(Builders.leafBuilder()
-                        //
-                        .withNodeIdentifier(new NodeIdentifier(keyValue.getKey())).withValue(keyValue.getValue())
-                        .build());
-            }
-            return builder.build();
-        }
-
-        @Override
-        public boolean isKeyedEntry() {
-            return true;
+            super(identifier, schema);
         }
     }
 
     private static final class UnkeyedListItemNormalization
             extends DataContainerNormalizationOperation<NodeIdentifier> {
         UnkeyedListItemNormalization(final ListSchemaNode schema) {
-            super(new NodeIdentifier(schema.getQName()), schema,schema);
-        }
-
-        @Override
-        @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
-        public NormalizedNode<?, ?> createDefault(final PathArgument currentArg) {
-            return Builders.unkeyedListEntryBuilder().withNodeIdentifier((NodeIdentifier) currentArg).build();
+            super(new NodeIdentifier(schema.getQName()), schema);
         }
     }
 
     private static final class ContainerNormalization extends DataContainerNormalizationOperation<NodeIdentifier> {
         ContainerNormalization(final ContainerSchemaNode schema) {
-            super(new NodeIdentifier(schema.getQName()),schema, schema);
-        }
-
-        @Override
-        @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
-        public NormalizedNode<?, ?> createDefault(final PathArgument currentArg) {
-            return Builders.containerBuilder().withNodeIdentifier((NodeIdentifier) currentArg).build();
+            super(new NodeIdentifier(schema.getQName()), schema);
         }
     }
 
-    private abstract static class MixinNormalizationOp<T extends PathArgument>
-            extends CompositeNodeNormalizationOperation<T> {
-
-        MixinNormalizationOp(final T identifier, final DataSchemaNode schema) {
-            super(identifier,schema);
+    private abstract static class MixinNormalizationOp<T extends PathArgument> extends DataNormalizationOperation<T> {
+        MixinNormalizationOp(final T identifier) {
+            super(identifier);
         }
 
         @Override
-        public final boolean isMixin() {
+        final boolean isMixin() {
             return true;
         }
     }
 
-    private static final class OrderedLeafListMixinNormalization extends UnorderedLeafListMixinNormalization {
-        OrderedLeafListMixinNormalization(final LeafListSchemaNode potential) {
-            super(potential);
-        }
-
-        @Override
-        public NormalizedNode<?, ?> createDefault(final PathArgument currentArg) {
-            return Builders.orderedLeafSetBuilder().withNodeIdentifier(getIdentifier()).build();
-        }
-    }
-
-    private static class UnorderedLeafListMixinNormalization extends MixinNormalizationOp<NodeIdentifier> {
-
+    private static final class LeafListMixinNormalization extends MixinNormalizationOp<NodeIdentifier> {
         private final DataNormalizationOperation<?> innerOp;
 
-        UnorderedLeafListMixinNormalization(final LeafListSchemaNode potential) {
-            super(new NodeIdentifier(potential.getQName()),potential);
+        LeafListMixinNormalization(final LeafListSchemaNode potential) {
+            super(new NodeIdentifier(potential.getQName()));
             innerOp = new LeafListEntryNormalization(potential);
         }
 
         @Override
-        public NormalizedNode<?, ?> createDefault(final PathArgument currentArg) {
-            return Builders.leafSetBuilder().withNodeIdentifier(getIdentifier()).build();
-        }
-
-        @Override
-        public DataNormalizationOperation<?> getChild(final PathArgument child) {
+        DataNormalizationOperation<?> getChild(final PathArgument child) {
             if (child instanceof NodeWithValue) {
                 return innerOp;
             }
@@ -315,7 +218,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         }
 
         @Override
-        public DataNormalizationOperation<?> getChild(final QName child) {
+        DataNormalizationOperation<?> getChild(final QName child) {
             if (getIdentifier().getNodeType().equals(child)) {
                 return innerOp;
             }
@@ -327,7 +230,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
             extends DataContainerNormalizationOperation<AugmentationIdentifier> {
 
         AugmentationNormalization(final AugmentationSchemaNode augmentation, final DataNodeContainer schema) {
-            super(augmentationIdentifierFrom(augmentation), augmentationProxy(augmentation,schema),null);
+            super(augmentationIdentifierFrom(augmentation), augmentationProxy(augmentation,schema));
         }
 
         private static DataNodeContainer augmentationProxy(final AugmentationSchemaNode augmentation,
@@ -340,13 +243,12 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         }
 
         @Override
-        public boolean isMixin() {
+        boolean isMixin() {
             return true;
         }
 
         @Override
-        protected DataNormalizationOperation<?> fromLocalSchemaAndQName(final DataNodeContainer schema,
-                final QName child) {
+        DataNormalizationOperation<?> fromLocalSchemaAndQName(final DataNodeContainer schema, final QName child) {
             final DataSchemaNode result = findChildSchemaNode(schema, child);
             if (result == null) {
                 return null;
@@ -360,32 +262,30 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         }
 
         @Override
-        protected Set<QName> getQNameIdentifiers() {
+        Set<QName> getQNameIdentifiers() {
             return getIdentifier().getPossibleChildNames();
         }
 
-        @Override
-        public NormalizedNode<?, ?> createDefault(final PathArgument currentArg) {
-            return Builders.augmentationBuilder().withNodeIdentifier(getIdentifier()).build();
+        private static AugmentationIdentifier augmentationIdentifierFrom(final AugmentationSchemaNode augmentation) {
+            final ImmutableSet.Builder<QName> potentialChildren = ImmutableSet.builder();
+            for (final DataSchemaNode child : augmentation.getChildNodes()) {
+                potentialChildren.add(child.getQName());
+            }
+            return new AugmentationIdentifier(potentialChildren.build());
         }
     }
 
-    private static class UnorderedMapMixinNormalization extends MixinNormalizationOp<NodeIdentifier> {
+    private static final class MapMixinNormalization extends MixinNormalizationOp<NodeIdentifier> {
         private final ListItemNormalization innerNode;
 
-        UnorderedMapMixinNormalization(final ListSchemaNode list) {
-            super(new NodeIdentifier(list.getQName()),list);
+        MapMixinNormalization(final ListSchemaNode list) {
+            super(new NodeIdentifier(list.getQName()));
             this.innerNode = new ListItemNormalization(NodeIdentifierWithPredicates.of(list.getQName(),
                     Collections.<QName, Object>emptyMap()), list);
         }
 
         @Override
-        public NormalizedNode<?, ?> createDefault(final PathArgument currentArg) {
-            return Builders.mapBuilder().withNodeIdentifier(getIdentifier()).build();
-        }
-
-        @Override
-        public DataNormalizationOperation<?> getChild(final PathArgument child) {
+        DataNormalizationOperation<?> getChild(final PathArgument child) {
             if (child.getNodeType().equals(getIdentifier().getNodeType())) {
                 return innerNode;
             }
@@ -393,7 +293,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         }
 
         @Override
-        public DataNormalizationOperation<?> getChild(final QName child) {
+        DataNormalizationOperation<?> getChild(final QName child) {
             if (getIdentifier().getNodeType().equals(child)) {
                 return innerNode;
             }
@@ -401,21 +301,16 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         }
     }
 
-    private static class UnkeyedListMixinNormalization extends MixinNormalizationOp<NodeIdentifier> {
+    private static final class UnkeyedListMixinNormalization extends MixinNormalizationOp<NodeIdentifier> {
         private final UnkeyedListItemNormalization innerNode;
 
         UnkeyedListMixinNormalization(final ListSchemaNode list) {
-            super(new NodeIdentifier(list.getQName()),list);
+            super(new NodeIdentifier(list.getQName()));
             this.innerNode = new UnkeyedListItemNormalization(list);
         }
 
         @Override
-        public NormalizedNode<?, ?> createDefault(final PathArgument currentArg) {
-            return Builders.unkeyedListBuilder().withNodeIdentifier(getIdentifier()).build();
-        }
-
-        @Override
-        public DataNormalizationOperation<?> getChild(final PathArgument child) {
+        DataNormalizationOperation<?> getChild(final PathArgument child) {
             if (child.getNodeType().equals(getIdentifier().getNodeType())) {
                 return innerNode;
             }
@@ -423,7 +318,7 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         }
 
         @Override
-        public DataNormalizationOperation<?> getChild(final QName child) {
+        DataNormalizationOperation<?> getChild(final QName child) {
             if (getIdentifier().getNodeType().equals(child)) {
                 return innerNode;
             }
@@ -431,23 +326,12 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         }
     }
 
-    private static final class OrderedMapMixinNormalization extends UnorderedMapMixinNormalization {
-        OrderedMapMixinNormalization(final ListSchemaNode list) {
-            super(list);
-        }
-
-        @Override
-        public NormalizedNode<?, ?> createDefault(final PathArgument currentArg) {
-            return Builders.orderedMapBuilder().withNodeIdentifier(getIdentifier()).build();
-        }
-    }
-
-    private static class ChoiceNodeNormalization extends MixinNormalizationOp<NodeIdentifier> {
+    private static final class ChoiceNodeNormalization extends MixinNormalizationOp<NodeIdentifier> {
         private final ImmutableMap<QName, DataNormalizationOperation<?>> byQName;
         private final ImmutableMap<PathArgument, DataNormalizationOperation<?>> byArg;
 
         ChoiceNodeNormalization(final ChoiceSchemaNode schema) {
-            super(new NodeIdentifier(schema.getQName()),schema);
+            super(new NodeIdentifier(schema.getQName()));
             final ImmutableMap.Builder<QName, DataNormalizationOperation<?>> byQNameBuilder = ImmutableMap.builder();
             final ImmutableMap.Builder<PathArgument, DataNormalizationOperation<?>> byArgBuilder =
                     ImmutableMap.builder();
@@ -466,44 +350,19 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         }
 
         @Override
-        public DataNormalizationOperation<?> getChild(final PathArgument child) {
+        DataNormalizationOperation<?> getChild(final PathArgument child) {
             return byArg.get(child);
         }
 
         @Override
-        public DataNormalizationOperation<?> getChild(final QName child) {
+        DataNormalizationOperation<?> getChild(final QName child) {
             return byQName.get(child);
-        }
-
-        @Override
-        public NormalizedNode<?, ?> createDefault(final PathArgument currentArg) {
-            return Builders.choiceBuilder().withNodeIdentifier(getIdentifier()).build();
         }
     }
 
-    private static class AnyxmlNormalization extends DataNormalizationOperation<NodeIdentifier> {
+    private static final class AnyxmlNormalization extends SimpleTypeNormalization<NodeIdentifier> {
         AnyxmlNormalization(final AnyxmlSchemaNode schema) {
-            super(new NodeIdentifier(schema.getQName()), schema);
-        }
-
-        @Override
-        public DataNormalizationOperation<?> getChild(final PathArgument child) {
-            return null;
-        }
-
-        @Override
-        public DataNormalizationOperation<?> getChild(final QName child) {
-            return null;
-        }
-
-        @Override
-        public boolean isLeaf() {
-            return false;
-        }
-
-        @Override
-        public NormalizedNode<?, ?> createDefault(final PathArgument currentArg) {
-            return null;
+            super(new NodeIdentifier(schema.getQName()));
         }
     }
 
@@ -521,14 +380,6 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
             }
         }
         return null;
-    }
-
-    public static AugmentationIdentifier augmentationIdentifierFrom(final AugmentationSchemaNode augmentation) {
-        final ImmutableSet.Builder<QName> potentialChildren = ImmutableSet.builder();
-        for (final DataSchemaNode child : augmentation.getChildNodes()) {
-            potentialChildren.add(child.getQName());
-        }
-        return new AugmentationIdentifier(potentialChildren.build());
     }
 
     /**
@@ -560,18 +411,17 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
         }
     }
 
-    public static DataNormalizationOperation<?> fromDataSchemaNode(final DataSchemaNode potential) {
+    static DataNormalizationOperation<?> fromDataSchemaNode(final DataSchemaNode potential) {
         if (potential instanceof ContainerSchemaNode) {
             return new ContainerNormalization((ContainerSchemaNode) potential);
         } else if (potential instanceof ListSchemaNode) {
-
             return fromListSchemaNode((ListSchemaNode) potential);
         } else if (potential instanceof LeafSchemaNode) {
             return new LeafNormalization((LeafSchemaNode) potential);
         } else if (potential instanceof ChoiceSchemaNode) {
             return new ChoiceNodeNormalization((ChoiceSchemaNode) potential);
         } else if (potential instanceof LeafListSchemaNode) {
-            return fromLeafListSchemaNode((LeafListSchemaNode) potential);
+            return new LeafListMixinNormalization((LeafListSchemaNode) potential);
         } else if (potential instanceof AnyxmlSchemaNode) {
             return new AnyxmlNormalization((AnyxmlSchemaNode) potential);
         }
@@ -579,27 +429,9 @@ abstract class DataNormalizationOperation<T extends PathArgument> implements Ide
     }
 
     private static DataNormalizationOperation<?> fromListSchemaNode(final ListSchemaNode potential) {
-        final List<QName> keyDefinition = potential.getKeyDefinition();
-        if (keyDefinition == null || keyDefinition.isEmpty()) {
+        if (potential.getKeyDefinition().isEmpty()) {
             return new UnkeyedListMixinNormalization(potential);
         }
-        if (potential.isUserOrdered()) {
-            return new OrderedMapMixinNormalization(potential);
-        }
-        return new UnorderedMapMixinNormalization(potential);
+        return new MapMixinNormalization(potential);
     }
-
-    private static DataNormalizationOperation<?> fromLeafListSchemaNode(final LeafListSchemaNode potential) {
-        if (potential.isUserOrdered()) {
-            return new OrderedLeafListMixinNormalization(potential);
-        }
-        return new UnorderedLeafListMixinNormalization(potential);
-    }
-
-
-    public static DataNormalizationOperation<?> from(final SchemaContext ctx) {
-        return new ContainerNormalization(ctx);
-    }
-
-    public abstract NormalizedNode<?, ?> createDefault(PathArgument currentArg);
 }
