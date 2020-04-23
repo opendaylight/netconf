@@ -31,6 +31,7 @@ import org.opendaylight.netconf.notifications.NetconfNotificationRegistry;
 import org.opendaylight.netconf.notifications.NotificationListenerRegistration;
 import org.opendaylight.netconf.notifications.NotificationPublisherRegistration;
 import org.opendaylight.netconf.notifications.NotificationRegistration;
+import org.opendaylight.netconf.notifications.YangLibraryPublisherRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.notification._1._0.rev080714.StreamNameType;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.Streams;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.netconf.StreamsBuilder;
@@ -40,6 +41,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.r
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionEnd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionStart;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.YangLibraryChange;
 import org.opendaylight.yangtools.yang.binding.Notification;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -238,6 +240,13 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
         return new BaseNotificationPublisherReg(notificationPublisherRegistration);
     }
 
+    @Override
+    public YangLibraryPublisherRegistration registerYangLibraryPublisher() {
+        final NotificationPublisherRegistration notificationPublisherRegistration =
+                registerNotificationPublisher(BASE_NETCONF_STREAM);
+        return new YangLibraryPublisherReg(notificationPublisherRegistration);
+    }
+
     private static class GenericNotificationPublisherReg implements NotificationPublisherRegistration {
         private NetconfNotificationManager baseListener;
         private final StreamNameType registeredStream;
@@ -298,6 +307,27 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
         @Override
         public void onSessionEnded(final NetconfSessionEnd end) {
             baseRegistration.onNotification(BASE_STREAM_NAME, serializeNotification(end, SESSION_END_PATH));
+        }
+    }
+
+    private static class YangLibraryPublisherReg implements YangLibraryPublisherRegistration {
+        static final SchemaPath YANG_LIBRARY_CHANGE_PATH = SchemaPath.create(true, YangLibraryChange.QNAME);
+
+        private final NotificationPublisherRegistration baseRegistration;
+
+        YangLibraryPublisherReg(final NotificationPublisherRegistration baseRegistration) {
+            this.baseRegistration = baseRegistration;
+        }
+
+        @Override
+        public void onYangLibraryChange(YangLibraryChange yangLibraryChange) {
+            baseRegistration.onNotification(BASE_STREAM_NAME, NotificationsTransformUtil
+                    .transform(yangLibraryChange, YANG_LIBRARY_CHANGE_PATH));
+        }
+
+        @Override
+        public void close() {
+            baseRegistration.close();
         }
     }
 

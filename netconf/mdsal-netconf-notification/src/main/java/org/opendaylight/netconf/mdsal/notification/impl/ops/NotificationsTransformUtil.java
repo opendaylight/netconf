@@ -43,6 +43,8 @@ public final class NotificationsTransformUtil {
         moduleInfoBackedContext.addModuleInfos(Collections.singletonList($YangModuleInfoImpl.getInstance()));
         moduleInfoBackedContext.addModuleInfos(Collections.singletonList(org.opendaylight.yang.gen.v1.urn.ietf.params
                 .xml.ns.yang.ietf.netconf.notifications.rev120206.$YangModuleInfoImpl.getInstance()));
+        moduleInfoBackedContext.addModuleInfos(Collections.singletonList(org.opendaylight.yang.gen.v1.urn.ietf.params
+                .xml.ns.yang.ietf.yang.library.rev160621.$YangModuleInfoImpl.getInstance()));
         final Optional<? extends SchemaContext> schemaContextOptional =
                 moduleInfoBackedContext.tryToCreateSchemaContext();
         checkState(schemaContextOptional.isPresent());
