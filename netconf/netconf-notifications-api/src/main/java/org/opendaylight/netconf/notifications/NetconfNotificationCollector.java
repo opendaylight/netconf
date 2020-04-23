@@ -33,6 +33,11 @@ public interface NetconfNotificationCollector {
     BaseNotificationPublisherRegistration registerBaseNotificationPublisher();
 
     /**
+     * Register yang-library publisher.
+     */
+    YangLibraryPublisherRegistration registerYangLibraryPublisher();
+
+    /**
      * Users of the registry have an option to get notification each time new notification stream gets registered
      * This allows for a push model in addition to pull model for retrieving information about available streams.
      *

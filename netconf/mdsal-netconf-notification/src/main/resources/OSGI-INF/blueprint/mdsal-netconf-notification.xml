@@ -47,6 +47,13 @@
         <argument ref="dataBroker"/>
     </bean>
 
+    <bean id="yangLibraryNotificationProducer"
+          class="org.opendaylight.netconf.mdsal.notification.impl.YangLibraryNotificationProducer"
+          destroy-method="close">
+        <argument ref="netconfNotificationManager"/>
+        <argument ref="dataBroker"/>
+    </bean>
+
     <bean id="sessionNotificationProducer"
           class="org.opendaylight.netconf.mdsal.notification.impl.SessionNotificationProducer"
           destroy-method="close">
