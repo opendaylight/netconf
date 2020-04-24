@@ -33,8 +33,8 @@
     <reference id="deviceActionFactory"
                interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
 
-    <bean id="schemaRepository" class="org.opendaylight.netconf.topology.impl.SchemaRepositoryProviderImpl">
-        <argument value="shared-schema-repository-impl"/>
+    <bean id="schemaRepository" class="org.opendaylight.netconf.topology.spi.SharedSchemaRepositoryProvider">
+        <argument value="netconf-topology-schemas"/>
     </bean>
 
     <cm:property-placeholder persistent-id="org.opendaylight.netconf.topology.sb.keypair" update-strategy="none">

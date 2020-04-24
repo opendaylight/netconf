@@ -1,21 +1,20 @@
 /*
- * Copyright (c) 2016 Brocade Communication Systems and others.  All rights reserved.
+ * Copyright (c) 2016 Inocybe Technologies and others.  All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netconf.callhome.mount;
+package org.opendaylight.netconf.topology.spi;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 
-// FIXME: Figure out why blueprint rejects to instantiate if class is not public
-public class SchemaRepositoryProviderImpl implements SchemaRepositoryProvider {
+public class SharedSchemaRepositoryProvider implements SchemaRepositoryProvider {
+    private final @NonNull SharedSchemaRepository schemaRepository;
 
-    private final SharedSchemaRepository schemaRepository;
-
-    public SchemaRepositoryProviderImpl(final String moduleName) {
+    public SharedSchemaRepositoryProvider(final String moduleName) {
         schemaRepository = new SharedSchemaRepository(moduleName);
     }
 

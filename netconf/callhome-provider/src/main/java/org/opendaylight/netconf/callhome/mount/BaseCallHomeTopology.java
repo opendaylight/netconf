@@ -15,8 +15,8 @@ import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.dom.api.DOMMountPointService;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
-import org.opendaylight.netconf.topology.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
+import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 
 abstract class BaseCallHomeTopology extends AbstractNetconfTopology {
     BaseCallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,

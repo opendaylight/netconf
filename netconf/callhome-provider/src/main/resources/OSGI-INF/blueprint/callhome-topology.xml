@@ -28,8 +28,8 @@
     <reference id="deviceActionFactory"
                interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
 
-    <bean id="schemaRepository" class="org.opendaylight.netconf.callhome.mount.SchemaRepositoryProviderImpl">
-        <argument value="shared-schema-repository-impl"/>
+    <bean id="schemaRepository" class="org.opendaylight.netconf.topology.spi.SharedSchemaRepositoryProvider">
+        <argument value="callhome-topology-schemas"/>
     </bean>
 
     <bean id="callhomeProvider" class="org.opendaylight.netconf.callhome.mount.IetfZeroTouchCallHomeServerProvider"
