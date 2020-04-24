@@ -153,7 +153,7 @@ public class NetconfTopologyImplTest {
         InstanceIdentifier.PathArgument pa = null;
 
         for (final InstanceIdentifier.PathArgument p
-                : TopologyUtil.createTopologyListPath(TOPOLOGY_ID)
+                : NetconfTopologyImpl.createTopologyListPath(TOPOLOGY_ID)
                     .child(Node.class, new NodeKey(NODE_ID)).getPathArguments()) {
             pa = p;
         }
@@ -183,18 +183,18 @@ public class NetconfTopologyImplTest {
         when(ch.getRootNode()).thenReturn(newNode);
         changes.add(ch);
         spyTopology.onDataTreeChanged(changes);
-        verify(spyTopology).connectNode(TopologyUtil.getNodeId(pa), nn.build());
+        verify(spyTopology).connectNode(NetconfTopologyImpl.getNodeId(pa), nn.build());
 
         when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.DELETE);
         spyTopology.onDataTreeChanged(changes);
-        verify(spyTopology).disconnectNode(TopologyUtil.getNodeId(pa));
+        verify(spyTopology).disconnectNode(NetconfTopologyImpl.getNodeId(pa));
 
         when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.SUBTREE_MODIFIED);
         spyTopology.onDataTreeChanged(changes);
 
         //one in previous creating and deleting node and one in updating
-        verify(spyTopology, times(2)).disconnectNode(TopologyUtil.getNodeId(pa));
-        verify(spyTopology, times(2)).connectNode(TopologyUtil.getNodeId(pa), nn.build());
+        verify(spyTopology, times(2)).disconnectNode(NetconfTopologyImpl.getNodeId(pa));
+        verify(spyTopology, times(2)).connectNode(NetconfTopologyImpl.getNodeId(pa), nn.build());
 
 
     }

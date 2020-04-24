@@ -7,6 +7,7 @@
  */
 package org.opendaylight.netconf.topology.impl;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
@@ -33,13 +34,17 @@ import org.opendaylight.netconf.topology.AbstractNetconfTopology;
 import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.TopologyId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.Topology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyBuilder;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.TopologyKey;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
+import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
+import org.opendaylight.yangtools.yang.binding.Identifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.KeyedInstanceIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,32 +116,34 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
 
         LOG.debug("Registering datastore listener");
         datastoreListenerRegistration = dataBroker.registerDataTreeChangeListener(DataTreeIdentifier.create(
-            LogicalDatastoreType.CONFIGURATION, TopologyUtil.createTopologyListPath(topologyId).child(Node.class)),
-            this);
+            LogicalDatastoreType.CONFIGURATION, createTopologyListPath(topologyId).child(Node.class)), this);
     }
 
     @Override
     public void onDataTreeChanged(final Collection<DataTreeModification<Node>> collection) {
         for (final DataTreeModification<Node> change : collection) {
             final DataObjectModification<Node> rootNode = change.getRootNode();
+            final NodeId nodeId;
             switch (rootNode.getModificationType()) {
                 case SUBTREE_MODIFIED:
-                    LOG.debug("Config for node {} updated", TopologyUtil.getNodeId(rootNode.getIdentifier()));
-                    disconnectNode(TopologyUtil.getNodeId(rootNode.getIdentifier()));
-                    connectNode(TopologyUtil.getNodeId(rootNode.getIdentifier()), rootNode.getDataAfter());
+                    nodeId = getNodeId(rootNode.getIdentifier());
+                    LOG.debug("Config for node {} updated", nodeId);
+                    disconnectNode(nodeId);
+                    connectNode(nodeId, rootNode.getDataAfter());
                     break;
                 case WRITE:
-                    LOG.debug("Config for node {} created", TopologyUtil.getNodeId(rootNode.getIdentifier()));
-                    if (activeConnectors.containsKey(TopologyUtil.getNodeId(rootNode.getIdentifier()))) {
-                        LOG.warn("RemoteDevice{{}} was already configured, reconfiguring..",
-                                TopologyUtil.getNodeId(rootNode.getIdentifier()));
-                        disconnectNode(TopologyUtil.getNodeId(rootNode.getIdentifier()));
+                    nodeId = getNodeId(rootNode.getIdentifier());
+                    LOG.debug("Config for node {} created", nodeId);
+                    if (activeConnectors.containsKey(nodeId)) {
+                        LOG.warn("RemoteDevice{{}} was already configured, reconfiguring..", nodeId);
+                        disconnectNode(nodeId);
                     }
-                    connectNode(TopologyUtil.getNodeId(rootNode.getIdentifier()), rootNode.getDataAfter());
+                    connectNode(nodeId, rootNode.getDataAfter());
                     break;
                 case DELETE:
-                    LOG.debug("Config for node {} deleted", TopologyUtil.getNodeId(rootNode.getIdentifier()));
-                    disconnectNode(TopologyUtil.getNodeId(rootNode.getIdentifier()));
+                    nodeId = getNodeId(rootNode.getIdentifier());
+                    LOG.debug("Config for node {} deleted", nodeId);
+                    disconnectNode(nodeId);
                     break;
                 default:
                     LOG.debug("Unsupported modification type: {}.", rootNode.getModificationType());
@@ -154,4 +161,27 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
                 networkTopologyId.child(Topology.class, new TopologyKey(new TopologyId(topologyId))), topology);
     }
 
+    /**
+     * Determines the Netconf Node Node ID, given the node's instance
+     * identifier.
+     *
+     * @param pathArgument Node's path argument
+     * @return     NodeId for the node
+     */
+    @VisibleForTesting
+    static NodeId getNodeId(final InstanceIdentifier.PathArgument pathArgument) {
+        if (pathArgument instanceof InstanceIdentifier.IdentifiableItem<?, ?>) {
+            final Identifier key = ((InstanceIdentifier.IdentifiableItem) pathArgument).getKey();
+            if (key instanceof NodeKey) {
+                return ((NodeKey) key).getNodeId();
+            }
+        }
+        throw new IllegalStateException("Unable to create NodeId from: " + pathArgument);
+    }
+
+    @VisibleForTesting
+    static KeyedInstanceIdentifier<Topology, TopologyKey> createTopologyListPath(final String topologyId) {
+        final InstanceIdentifier<NetworkTopology> networkTopology = InstanceIdentifier.create(NetworkTopology.class);
+        return networkTopology.child(Topology.class, new TopologyKey(new TopologyId(topologyId)));
+    }
 }
