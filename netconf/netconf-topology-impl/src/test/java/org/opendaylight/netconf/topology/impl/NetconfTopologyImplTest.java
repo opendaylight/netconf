@@ -45,7 +45,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
-import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
+import org.opendaylight.netconf.topology.api.SchemaResourceManager;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -90,7 +90,7 @@ public class NetconfTopologyImplTest {
     private ThreadPool mockedProcessingExecutor;
 
     @Mock
-    private SchemaRepositoryProvider mockedSchemaRepositoryProvider;
+    private SchemaResourceManager mockedSchemaRepositoryProvider;
 
     @Mock
     private DataBroker dataBroker;
@@ -283,7 +283,7 @@ public class NetconfTopologyImplTest {
                                           final EventExecutor eventExecutor,
                                           final ScheduledThreadPool keepaliveExecutor,
                                           final ThreadPool processingExecutor,
-                                          final SchemaRepositoryProvider schemaRepositoryProvider,
+                                          final SchemaResourceManager schemaRepositoryProvider,
                                           final DataBroker dataBroker, final DOMMountPointService mountPointService,
                                           final AAAEncryptionService encryptionService) {
             super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
