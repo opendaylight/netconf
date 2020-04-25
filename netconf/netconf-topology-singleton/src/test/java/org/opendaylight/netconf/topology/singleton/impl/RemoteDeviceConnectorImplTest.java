@@ -50,7 +50,7 @@ import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfConnectorDTO;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
-import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
+import org.opendaylight.netconf.topology.spi.DefaultSchemaResourceManager;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -188,7 +188,8 @@ public class RemoteDeviceConnectorImplTest {
                 .build();
 
         final Node node = new NodeBuilder().setNodeId(NODE_ID).addAugmentation(NetconfNode.class, netconfNode).build();
-        builder.setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node));
+
+        builder.setSchemaResourceDTO(new DefaultSchemaResourceManager().getSchemaResources(netconfNode, "foo"));
 
         final RemoteDeviceConnectorImpl remoteDeviceConnection =
                 new RemoteDeviceConnectorImpl(builder.build(), remoteDeviceId, deviceActionFactory);

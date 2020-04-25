@@ -25,7 +25,7 @@ import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
-import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
+import org.opendaylight.netconf.topology.api.SchemaResourceManager;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
     private final EventExecutor eventExecutor;
     private final ScheduledThreadPool keepaliveExecutor;
     private final ThreadPool processingExecutor;
-    private final SchemaRepositoryProvider schemaRepositoryProvider;
+    private final SchemaResourceManager schemaRepositoryProvider;
     private final CallHomeMountSessionManager sessionManager;
     private final DataBroker dataBroker;
     private final DOMMountPointService mountService;
@@ -56,7 +56,7 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
 
     public CallHomeMountDispatcher(final String topologyId, final EventExecutor eventExecutor,
                                    final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-                                   final SchemaRepositoryProvider schemaRepositoryProvider, final DataBroker dataBroker,
+                                   final SchemaResourceManager schemaRepositoryProvider, final DataBroker dataBroker,
                                    final DOMMountPointService mountService,
                                    final AAAEncryptionService encryptionService) {
         this(topologyId, eventExecutor, keepaliveExecutor, processingExecutor, schemaRepositoryProvider, dataBroker,
@@ -65,7 +65,7 @@ public class CallHomeMountDispatcher implements NetconfClientDispatcher, CallHom
 
     public CallHomeMountDispatcher(final String topologyId, final EventExecutor eventExecutor,
             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-            final SchemaRepositoryProvider schemaRepositoryProvider, final DataBroker dataBroker,
+            final SchemaResourceManager schemaRepositoryProvider, final DataBroker dataBroker,
             final DOMMountPointService mountService,
             final AAAEncryptionService encryptionService, final DeviceActionFactory deviceActionFactory) {
         this.topologyId = topologyId;
