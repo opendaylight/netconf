@@ -41,6 +41,8 @@ import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceRegist
 import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
+import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
+import org.opendaylight.netconf.topology.api.SchemaResourceManager;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup.NetconfTopologySetupBuilder;
@@ -84,6 +86,7 @@ public class NetconfTopologyManager
     private final DOMMountPointService mountPointService;
     private final AAAEncryptionService encryptionService;
     private final DeviceActionFactory deviceActionFactory;
+    private final SchemaResourceManager resourceManager;
     private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
     private String privateKeyPath;
     private String privateKeyPassphrase;
@@ -97,8 +100,8 @@ public class NetconfTopologyManager
                                   final String topologyId, final Config config,
                                   final DOMMountPointService mountPointService,
                                   final AAAEncryptionService encryptionService,
-                                  final DeviceActionFactory deviceActionFactory) {
-
+                                  final DeviceActionFactory deviceActionFactory,
+                                  final SchemaResourceManager resourceManager) {
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcProviderRegistry = requireNonNull(rpcProviderRegistry);
         this.actionProviderRegistry = requireNonNull(actionProviderService);
@@ -113,7 +116,7 @@ public class NetconfTopologyManager
         this.mountPointService = mountPointService;
         this.encryptionService = requireNonNull(encryptionService);
         this.deviceActionFactory = requireNonNull(deviceActionFactory);
-
+        this.resourceManager = requireNonNull(resourceManager);
     }
 
     // Blueprint init method
@@ -282,6 +285,9 @@ public class NetconfTopologyManager
     }
 
     private NetconfTopologySetup createSetup(final InstanceIdentifier<Node> instanceIdentifier, final Node node) {
+        final NetconfNode netconfNode = node.augmentation(NetconfNode.class);
+        final RemoteDeviceId deviceId = NetconfTopologyUtils.createRemoteDeviceId(node.getNodeId(), netconfNode);
+
         final NetconfTopologySetupBuilder builder = NetconfTopologySetupBuilder.create()
                 .setClusterSingletonServiceProvider(clusterSingletonServiceProvider)
                 .setDataBroker(dataBroker)
@@ -295,7 +301,7 @@ public class NetconfTopologyManager
                 .setProcessingExecutor(processingExecutor)
                 .setTopologyId(topologyId)
                 .setNetconfClientDispatcher(clientDispatcher)
-                .setSchemaResourceDTO(NetconfTopologyUtils.setupSchemaCacheDTO(node))
+                .setSchemaResourceDTO(resourceManager.getSchemaResources(netconfNode, deviceId))
                 .setIdleTimeout(writeTxIdleTimeout)
                 .setPrivateKeyPath(privateKeyPath)
                 .setPrivateKeyPassphrase(privateKeyPassphrase)
