@@ -39,6 +39,8 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
                odl:type="default"/>
     <reference id="deviceActionFactory"
                interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
+    <reference id="schemaManager"
+               interface="org.opendaylight.netconf.sal.connect.api.SchemaResourceManager"/>
     <odl:clustered-app-config
             id="singletonConfig"
             binding-class="org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config"
@@ -75,6 +77,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
         <property name="privateKeyPassphrase" value="${private-key-passphrase}"/>
         <argument ref="encryptionService" />
         <argument ref="deviceActionFactory"/>
+        <argument ref="schemaManager"/>
     </bean>
     <service ref="netconfTopologyManager"
              interface="org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService"/>

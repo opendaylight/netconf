@@ -104,6 +104,12 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>org.xmlunit</groupId>
       <artifactId>xmlunit-legacy</artifactId>
     </dependency>
