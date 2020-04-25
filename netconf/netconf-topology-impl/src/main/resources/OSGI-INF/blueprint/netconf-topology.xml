@@ -32,10 +32,8 @@
                interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
     <reference id="deviceActionFactory"
                interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
-
-    <bean id="schemaRepository" class="org.opendaylight.netconf.topology.spi.SharedSchemaRepositoryProvider">
-        <argument value="netconf-topology-schemas"/>
-    </bean>
+    <reference id="schemaManager"
+               interface="org.opendaylight.netconf.topology.api.SchemaResourceManager"/>
 
     <cm:property-placeholder persistent-id="org.opendaylight.netconf.topology.sb.keypair" update-strategy="none">
       <cm:default-properties>
@@ -54,7 +52,7 @@
         <argument ref="eventExecutor"/>
         <argument ref="keepAliveExecutor"/>
         <argument ref="processingExecutor"/>
-        <argument ref="schemaRepository"/>
+        <argument ref="schemaManager"/>
         <argument ref="dataBroker"/>
         <argument ref="mountPointService"/>
         <property name="privateKeyPath" value="${private-key-path}"/>
