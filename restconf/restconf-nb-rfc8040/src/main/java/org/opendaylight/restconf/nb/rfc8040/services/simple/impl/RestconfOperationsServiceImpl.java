@@ -79,8 +79,7 @@ public class RestconfOperationsServiceImpl implements RestconfOperationsService 
 
     @Override
     public NormalizedNodeContext getOperations(final UriInfo uriInfo) {
-        final SchemaContextRef ref = new SchemaContextRef(this.schemaContextHandler.get());
-        return getOperations(ref.getModules(), null);
+        return getOperations(schemaContextHandler.get().getModules(), null);
     }
 
     @Override
