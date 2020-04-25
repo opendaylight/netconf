@@ -208,7 +208,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>netconf-topology-config</artifactId>
+                <artifactId>netconf-topology-impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

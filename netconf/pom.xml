@@ -47,8 +47,8 @@
     <module>aaa-authn-odl-plugin</module>
     <module>netconf-notifications-api</module>
     <module>netconf-topology</module>
+    <module>netconf-topology-impl</module>
     <module>netconf-topology-singleton</module>
-    <module>netconf-topology-config</module>
     <module>sal-netconf-connector</module>
     <module>messagebus-netconf</module>
     <module>yanglib</module>
