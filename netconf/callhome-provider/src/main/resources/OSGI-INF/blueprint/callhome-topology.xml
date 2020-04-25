@@ -27,10 +27,8 @@
                interface="org.opendaylight.aaa.encrypt.AAAEncryptionService" />
     <reference id="deviceActionFactory"
                interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
-
-    <bean id="schemaRepository" class="org.opendaylight.netconf.topology.spi.SharedSchemaRepositoryProvider">
-        <argument value="callhome-topology-schemas"/>
-    </bean>
+    <reference id="schemaManager"
+               interface="org.opendaylight.netconf.topology.api.SchemaResourceManager"/>
 
     <bean id="callhomeProvider" class="org.opendaylight.netconf.callhome.mount.IetfZeroTouchCallHomeServerProvider"
           init-method="init"
@@ -45,7 +43,7 @@
         <argument ref="eventExecutor"/>
         <argument ref="keepAliveExecutor"/>
         <argument ref="processingExecutor"/>
-        <argument ref="schemaRepository"/>
+        <argument ref="schemaManager"/>
         <argument ref="dataBroker"/>
         <argument ref="domMountPointService"/>
         <argument ref="encryptionService"/>

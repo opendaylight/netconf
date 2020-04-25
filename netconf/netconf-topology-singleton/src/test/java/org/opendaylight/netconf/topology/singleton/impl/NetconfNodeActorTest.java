@@ -26,7 +26,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -408,9 +407,11 @@ public class NetconfNodeActorTest {
 
     @Test(expected = MissingSchemaSourceException.class)
     public void testMissingSchemaSourceOnMissingProvider() throws Exception {
+        final SharedSchemaRepository repository = new SharedSchemaRepository("test");
+
         SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
-        doReturn(DEFAULT_SCHEMA_REPOSITORY).when(schemaResourceDTO2).getSchemaRegistry();
-        doReturn(DEFAULT_SCHEMA_REPOSITORY).when(schemaResourceDTO2).getSchemaRepository();
+        doReturn(repository).when(schemaResourceDTO2).getSchemaRegistry();
+        doReturn(repository).when(schemaResourceDTO2).getSchemaRepository();
         final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create().setActorSystem(system)
                 .setSchemaResourceDTO(schemaResourceDTO2).setIdleTimeout(Duration.apply(1, TimeUnit.SECONDS)).build();
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT, mockMountPointService);

@@ -30,7 +30,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
+import org.opendaylight.netconf.topology.api.SchemaResourceManager;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopologyBuilder;
@@ -58,7 +58,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
             final ThreadPool processingExecutor,
-            final SchemaRepositoryProvider schemaRepositoryProvider,
+            final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService) {
         this(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
@@ -68,7 +68,7 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
             final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
             final ThreadPool processingExecutor,
-            final SchemaRepositoryProvider schemaRepositoryProvider,
+            final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService,
             final DeviceActionFactory deviceActionFactory) {

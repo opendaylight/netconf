@@ -21,7 +21,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 import akka.actor.ActorSystem;
 import akka.testkit.javadsl.TestKit;
@@ -52,7 +51,9 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.cluster.ActorSystemProvider;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
@@ -96,10 +97,13 @@ import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.mdsal.singleton.dom.impl.DOMClusterSingletonServiceProviderImpl;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
+import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice.SchemaResourcesDTO;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.topology.api.SchemaResourceManager;
 import org.opendaylight.netconf.topology.singleton.impl.utils.ClusteringRpcException;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologyUtils;
+import org.opendaylight.netconf.topology.spi.DefaultSchemaResourceManager;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Ipv4Address;
@@ -156,6 +160,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Pantelis
  */
+@RunWith(MockitoJUnitRunner.class)
 public class MountPointEndToEndTest {
     private static final Logger LOG = LoggerFactory.getLogger(MountPointEndToEndTest.class);
 
@@ -165,6 +170,9 @@ public class MountPointEndToEndTest {
     private static final NodeId NODE_ID = new NodeId("node-id");
     private static final InstanceIdentifier<Node> NODE_INSTANCE_ID = NetconfTopologyUtils.createTopologyNodeListPath(
             new NodeKey(NODE_ID), TOPOLOGY_ID);
+
+    private static final String TEST_ROOT_DIRECTORY = "test-cache-root";
+    private static final String TEST_DEFAULT_SUBDIR = "test-schema";
 
     @Mock private DOMRpcProviderService mockRpcProviderRegistry;
     @Mock private DOMActionProviderService mockActionProviderRegistry;
@@ -206,12 +214,14 @@ public class MountPointEndToEndTest {
     private YangInstanceIdentifier yangNodeInstanceId;
     private final TopDOMRpcImplementation topRpcImplementation = new TopDOMRpcImplementation();
 
+    private SchemaResourceManager resourceManager;
+
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Before
     public void setUp() throws Exception {
-        initMocks(this);
-
         deleteCacheDir();
+
+        resourceManager = new DefaultSchemaResourceManager(TEST_ROOT_DIRECTORY, TEST_DEFAULT_SUBDIR);
 
         topModuleInfo = BindingReflections.getModuleInfo(Top.class);
 
@@ -240,7 +250,7 @@ public class MountPointEndToEndTest {
     }
 
     private static void deleteCacheDir() {
-        FileUtils.deleteQuietly(new File(NetconfTopologyUtils.CACHE_DIRECTORY));
+        FileUtils.deleteQuietly(new File(TEST_ROOT_DIRECTORY));
     }
 
     @After
@@ -266,7 +276,9 @@ public class MountPointEndToEndTest {
 
         doReturn(MoreExecutors.newDirectExecutorService()).when(mockThreadPool).getExecutor();
 
-        NetconfTopologyUtils.DEFAULT_SCHEMA_REPOSITORY.registerSchemaSource(
+        final SchemaResourcesDTO resources =  resourceManager.getSchemaResources(
+            new NetconfNodeBuilder().setSchemaCacheDirectory(TEST_DEFAULT_SUBDIR).build(), "test");
+        resources.getSchemaRegistry().registerSchemaSource(
             id -> Futures.immediateFuture(YangTextSchemaSource.delegateForByteSource(id,
                     topModuleInfo.getYangTextByteSource())),
             PotentialSchemaSource.create(RevisionSourceIdentifier.create(TOP_MODULE_NAME,
@@ -275,7 +287,7 @@ public class MountPointEndToEndTest {
         masterNetconfTopologyManager = new NetconfTopologyManager(masterDataBroker, mockRpcProviderRegistry,
             mockActionProviderRegistry, masterClusterSingletonServiceProvider, mockKeepaliveExecutor, mockThreadPool,
                 mockMasterActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
-                masterMountPointService, mockEncryptionService, deviceActionFactory) {
+                masterMountPointService, mockEncryptionService, deviceActionFactory, resourceManager) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
@@ -314,7 +326,7 @@ public class MountPointEndToEndTest {
         slaveNetconfTopologyManager = new NetconfTopologyManager(slaveDataBroker, mockRpcProviderRegistry,
             mockActionProviderRegistry, mockSlaveClusterSingletonServiceProvider, mockKeepaliveExecutor, mockThreadPool,
                 mockSlaveActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
-                slaveMountPointService, mockEncryptionService, deviceActionFactory) {
+                slaveMountPointService, mockEncryptionService, deviceActionFactory, resourceManager) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
@@ -360,7 +372,7 @@ public class MountPointEndToEndTest {
     private MasterSalFacade testMaster() throws InterruptedException, ExecutionException, TimeoutException {
         LOG.info("****** Testing master");
 
-        writeNetconfNode(NetconfTopologyUtils.DEFAULT_CACHE_DIRECTORY, masterDataBroker);
+        writeNetconfNode(TEST_DEFAULT_SUBDIR, masterDataBroker);
 
         final MasterSalFacade masterSalFacade = masterSalFacadeFuture.get(5, TimeUnit.SECONDS);
 
@@ -433,7 +445,7 @@ public class MountPointEndToEndTest {
         slaveMountPointService.registerProvisionListener(slaveMountPointListener);
 
         masterSalFacadeFuture = SettableFuture.create();
-        writeNetconfNode(NetconfTopologyUtils.DEFAULT_CACHE_DIRECTORY, masterDataBroker);
+        writeNetconfNode(TEST_DEFAULT_SUBDIR, masterDataBroker);
 
         verify(masterMountPointListener, timeout(5000)).onMountPointRemoved(yangNodeInstanceId);
 

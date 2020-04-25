@@ -19,14 +19,14 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
-import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
+import org.opendaylight.netconf.topology.api.SchemaResourceManager;
 
 public class CallHomeTopology extends BaseCallHomeTopology {
 
     public CallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
             final EventExecutor eventExecutor,
             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-            final SchemaRepositoryProvider schemaRepositoryProvider,
+            final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
             final AAAEncryptionService encryptionService) {
         this(topologyId, clientDispatcher, eventExecutor,
@@ -37,7 +37,7 @@ public class CallHomeTopology extends BaseCallHomeTopology {
     public CallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                             final EventExecutor eventExecutor,
                             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
-                            final SchemaRepositoryProvider schemaRepositoryProvider,
+                            final SchemaResourceManager schemaRepositoryProvider,
                             final DataBroker dataBroker, final DOMMountPointService mountPointService,
                             final AAAEncryptionService encryptionService,
                             final DeviceActionFactory deviceActionFactory) {
