@@ -55,6 +55,12 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>net.i2p.crypto</groupId>
+      <artifactId>eddsa</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>
