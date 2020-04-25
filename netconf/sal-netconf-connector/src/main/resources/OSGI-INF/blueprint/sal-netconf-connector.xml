@@ -18,4 +18,11 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
     <service ref="deviceActionFactory"
              interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"
              odl:type="default"/>
+
+    <bean id="schemaResourceManager"
+          class="org.opendaylight.netconf.sal.connect.impl.DefaultSchemaResourceManager">
+    </bean>
+
+    <service ref="schemaResourceManager"
+             interface="org.opendaylight.netconf.sal.connect.api.SchemaResourceManager"/>
 </blueprint>

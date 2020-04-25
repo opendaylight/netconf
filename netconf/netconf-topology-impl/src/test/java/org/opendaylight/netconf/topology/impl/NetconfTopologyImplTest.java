@@ -21,16 +21,14 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
 import io.netty.util.concurrent.EventExecutor;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.ImmediateEventExecutor;
-import io.netty.util.concurrent.SucceededFuture;
 import java.util.Collection;
 import java.util.HashSet;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.controller.config.threadpool.ScheduledThreadPool;
 import org.opendaylight.controller.config.threadpool.ThreadPool;
@@ -44,8 +42,8 @@ import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
+import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
-import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -68,10 +66,12 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeKey;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.IdentifiableItem;
+import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
-import org.opendaylight.yangtools.yang.parser.repo.SharedSchemaRepository;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfTopologyImplTest {
 
     private static final NodeId NODE_ID = new NodeId("testing-node");
@@ -90,7 +90,7 @@ public class NetconfTopologyImplTest {
     private ThreadPool mockedProcessingExecutor;
 
     @Mock
-    private SchemaRepositoryProvider mockedSchemaRepositoryProvider;
+    private SchemaResourceManager mockedResourceManager;
 
     @Mock
     private DataBroker dataBroker;
@@ -106,18 +106,11 @@ public class NetconfTopologyImplTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
-        when(mockedSchemaRepositoryProvider.getSharedSchemaRepository())
-                .thenReturn(new SharedSchemaRepository("testingSharedSchemaRepo"));
         when(mockedProcessingExecutor.getExecutor()).thenReturn(MoreExecutors.newDirectExecutorService());
-        final Future future = new SucceededFuture(ImmediateEventExecutor.INSTANCE, new NetconfDeviceCapabilities());
-        when(mockedClientDispatcher.createReconnectingClient(any(NetconfReconnectingClientConfiguration.class)))
-                .thenReturn(future);
 
-        topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher,
-                mockedEventExecutor, mockedKeepaliveExecutor, mockedProcessingExecutor, mockedSchemaRepositoryProvider,
-                dataBroker, mountPointService, encryptionService);
+        topology = new TestingNetconfTopologyImpl(TOPOLOGY_ID, mockedClientDispatcher, mockedEventExecutor,
+            mockedKeepaliveExecutor, mockedProcessingExecutor, mockedResourceManager, dataBroker, mountPointService,
+            encryptionService);
 
         spyTopology = spy(topology);
     }
@@ -150,14 +143,7 @@ public class NetconfTopologyImplTest {
         final DataObjectModification<Node> newNode = mock(DataObjectModification.class);
         when(newNode.getModificationType()).thenReturn(DataObjectModification.ModificationType.WRITE);
 
-        InstanceIdentifier.PathArgument pa = null;
-
-        for (final InstanceIdentifier.PathArgument p
-                : NetconfTopologyImpl.createTopologyListPath(TOPOLOGY_ID)
-                    .child(Node.class, new NodeKey(NODE_ID)).getPathArguments()) {
-            pa = p;
-        }
-
+        PathArgument pa = IdentifiableItem.of(Node.class, new NodeKey(NODE_ID));
         when(newNode.getIdentifier()).thenReturn(pa);
 
 
@@ -283,7 +269,7 @@ public class NetconfTopologyImplTest {
                                           final EventExecutor eventExecutor,
                                           final ScheduledThreadPool keepaliveExecutor,
                                           final ThreadPool processingExecutor,
-                                          final SchemaRepositoryProvider schemaRepositoryProvider,
+                                          final SchemaResourceManager schemaRepositoryProvider,
                                           final DataBroker dataBroker, final DOMMountPointService mountPointService,
                                           final AAAEncryptionService encryptionService) {
             super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,

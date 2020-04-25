@@ -35,7 +35,7 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfClientConfigurationBuilder;
 import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
-import org.opendaylight.netconf.topology.api.SchemaRepositoryProvider;
+import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NodeId;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 
@@ -44,7 +44,7 @@ public class CallHomeMountDispatcherTest {
     private EventExecutor mockExecutor;
     private ScheduledThreadPool mockKeepAlive;
     private ThreadPool mockProcessingExecutor;
-    private SchemaRepositoryProvider mockSchemaRepoProvider;
+    private SchemaResourceManager mockSchemaRepoProvider;
 
     private CallHomeMountDispatcher instance;
     private DataBroker mockDataBroker;
@@ -61,7 +61,7 @@ public class CallHomeMountDispatcherTest {
         mockExecutor = mock(EventExecutor.class);
         mockKeepAlive = mock(ScheduledThreadPool.class);
         mockProcessingExecutor = mock(ThreadPool.class);
-        mockSchemaRepoProvider = mock(SchemaRepositoryProvider.class);
+        mockSchemaRepoProvider = mock(SchemaResourceManager.class);
         mockDataBroker = mock(DataBroker.class);
         mockMount = mock(DOMMountPointService.class);
         mockSessMgr = mock(CallHomeMountSessionManager.class);
