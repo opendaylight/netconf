@@ -40,7 +40,7 @@
         </dependency>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
-            <artifactId>netconf-topology-config</artifactId>
+            <artifactId>netconf-topology-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

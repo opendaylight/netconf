@@ -8,18 +8,17 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
-        <groupId>org.opendaylight.odlparent</groupId>
-        <artifactId>bundle-parent</artifactId>
-        <version>6.0.4</version>
-        <relativePath/>
+        <groupId>org.opendaylight.netconf</groupId>
+        <artifactId>netconf-parent</artifactId>
+        <version>1.9.0-SNAPSHOT</version>
+        <relativePath>../../parent</relativePath>
     </parent>
 
     <groupId>org.opendaylight.netconf</groupId>
-    <artifactId>netconf-topology-config</artifactId>
+    <artifactId>netconf-topology-impl</artifactId>
     <version>1.9.0-SNAPSHOT</version>
-    <description>Configuration files for netconf topology</description>
+    <description>Simple NETCONF topology</description>
     <packaging>bundle</packaging>
 
     <dependencyManagement>
@@ -43,17 +42,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Embed-Dependency>netconf-topology</Embed-Dependency>
-                    </instructions>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
