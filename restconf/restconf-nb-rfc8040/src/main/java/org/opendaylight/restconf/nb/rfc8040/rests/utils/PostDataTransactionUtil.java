@@ -33,9 +33,13 @@ import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.api.schema.OrderedLeafSetNode;
 import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
+import org.opendaylight.yangtools.yang.common.QName;
+import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+
+import java.util.Set;
 
 /**
  * Util class to post data to DS.
@@ -70,7 +74,7 @@ public final class PostDataTransactionUtil {
         final FluentFuture<? extends CommitInfo> future = submitData(
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(),
                 transactionNode, schemaContextRef.get(), insert, point);
-        final URI location = PostDataTransactionUtil.resolveLocation(uriInfo, transactionNode, schemaContextRef);
+        final URI location = PostDataTransactionUtil.resolveLocation(uriInfo, transactionNode, schemaContextRef, payload);
         final ResponseFactory dataFactory = new ResponseFactory(Status.CREATED).location(location);
         //This method will close transactionChain
         FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory,
@@ -329,16 +333,31 @@ public final class PostDataTransactionUtil {
      * @return {@link URI}
      */
     private static URI resolveLocation(final UriInfo uriInfo, final TransactionVarsWrapper transactionNode,
-            final SchemaContextRef schemaContextRef) {
+            final SchemaContextRef schemaContextRef, final NormalizedNodeContext payload) {
         if (uriInfo == null) {
             return null;
         }
 
         final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
         uriBuilder.path("data");
+		String prifx = "";
+		if (payload.getData() instanceof MapNode) {
+			Collection<MapEntryNode> value = (Collection<MapEntryNode>) payload.getData().getValue();
+            MapEntryNode next = value.iterator().next();
+            @NonNull Set<Map.Entry<QName, Object>> entrySet = next.getIdentifier().entrySet();
+            Map.Entry<QName, Object> qNameObjectEntry = entrySet.iterator().next();
+            Object o = qNameObjectEntry.getValue();
+            String localName = next.getIdentifier().getNodeType().getLocalName();
+            URI namespace = payload.getData().getNodeType().getNamespace();
+			Set<Module> moduleSet = payload.getInstanceIdentifierContext().getSchemaContext().findModules(namespace);
+			if (moduleSet.iterator().hasNext()) {
+				String name = moduleSet.iterator().next().getName();
+				prifx = "/" + name + ":" + localName + "=" + o;
+			}
+		}
         uriBuilder.path(ParserIdentifier
                 .stringFromYangInstanceIdentifier(transactionNode.getInstanceIdentifier().getInstanceIdentifier(),
-                schemaContextRef.get()));
+                schemaContextRef.get()) + prifx);
 
         return uriBuilder.build();
     }
