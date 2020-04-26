@@ -60,20 +60,6 @@ public final class SchemaContextRef {
     }
 
     /**
-     * Get all modules like {@link Set} of {@link Module} from
-     * {@link SchemaContext} of {@link DOMMountPoint}.
-     *
-     * @param mountPoint
-     *             mount point
-     *
-     * @return {@link Set} of {@link Module}
-     */
-    public Set<Module> getModules(final DOMMountPoint mountPoint) {
-        final SchemaContext schemaContext = mountPoint == null ? null : mountPoint.getSchemaContext();
-        return schemaContext == null ? null : schemaContext.getModules();
-    }
-
-    /**
      * Get {@link Module} by ietf-restconf qname from
      * {@link Rfc8040.RestconfModule}.
      *
