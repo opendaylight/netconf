@@ -73,9 +73,9 @@ import org.opendaylight.restconf.common.errors.RestconfError.ErrorType;
 import org.opendaylight.restconf.common.patch.PatchContext;
 import org.opendaylight.restconf.common.patch.PatchStatusContext;
 import org.opendaylight.restconf.common.util.DataChangeScope;
+import org.opendaylight.restconf.common.util.OperationsResourceUtils;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.DateAndTime;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
-import org.opendaylight.yangtools.yang.common.Empty;
 import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.common.QNameModule;
 import org.opendaylight.yangtools.yang.common.Revision;
@@ -114,7 +114,6 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.model.util.SimpleSchemaContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -317,74 +316,22 @@ public final class RestconfImpl implements RestconfService {
 
     @Override
     public NormalizedNodeContext getOperations(final UriInfo uriInfo) {
-        final Set<Module> allModules = this.controllerContext.getAllModules();
-        return operationsFromModulesToNormalizedContext(allModules, null);
+        return OperationsResourceUtils.contextForModelContext(controllerContext.getGlobalSchema(), null);
     }
 
     @Override
     public NormalizedNodeContext getOperations(final String identifier, final UriInfo uriInfo) {
-        Set<Module> modules = null;
-        DOMMountPoint mountPoint = null;
-        if (identifier.contains(ControllerContext.MOUNT)) {
-            final InstanceIdentifierContext<?> mountPointIdentifier =
-                    this.controllerContext.toMountPointIdentifier(identifier);
-            mountPoint = mountPointIdentifier.getMountPoint();
-            modules = this.controllerContext.getAllModules(mountPoint);
-
-        } else {
+        if (!identifier.contains(ControllerContext.MOUNT)) {
             final String errMsg = "URI has bad format. If operations behind mount point should be showed, URI has to "
                     + " end with " +  ControllerContext.MOUNT;
             LOG.debug("{} for {}", errMsg, identifier);
             throw new RestconfDocumentedException(errMsg, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
-        return operationsFromModulesToNormalizedContext(modules, mountPoint);
-    }
-
-    /**
-     * Special case only for GET restconf/operations use (since moment of
-     * pre-Beryllium Yang parser and Yang model API removal). The method is
-     * creating fake schema context with fake module and fake data by use own
-     * implementations of schema nodes and module.
-     *
-     * @param modules
-     *            set of modules for get RPCs from every module
-     * @param mountPoint
-     *            mount point, if in use otherwise null
-     * @return {@link NormalizedNodeContext}
-     */
-    private static NormalizedNodeContext operationsFromModulesToNormalizedContext(final Set<Module> modules,
-            final DOMMountPoint mountPoint) {
-
-        final Collection<Module> neededModules = new ArrayList<>(modules.size());
-        final ArrayList<LeafSchemaNode> fakeRpcSchema = new ArrayList<>();
-
-        for (final Module m : modules) {
-            final Set<RpcDefinition> rpcs = m.getRpcs();
-            if (!rpcs.isEmpty()) {
-                neededModules.add(m);
-
-                fakeRpcSchema.ensureCapacity(fakeRpcSchema.size() + rpcs.size());
-                rpcs.forEach(rpc -> fakeRpcSchema.add(new FakeLeafSchemaNode(rpc.getQName())));
-            }
-        }
-
-        final ContainerSchemaNode fakeCont = new FakeContainerSchemaNode(fakeRpcSchema);
-        final DataContainerNodeBuilder<NodeIdentifier, ContainerNode> containerBuilder =
-                Builders.containerBuilder(fakeCont);
-
-        for (final LeafSchemaNode leaf : fakeRpcSchema) {
-            containerBuilder.withChild(Builders.leafBuilder(leaf).withValue(Empty.getInstance()).build());
-        }
-
-        final Collection<Module> fakeModules = new ArrayList<>(neededModules.size() + 1);
-        neededModules.forEach(imp -> fakeModules.add(new FakeImportedModule(imp)));
-        fakeModules.add(new FakeRestconfModule(neededModules, fakeCont));
-
-        final SchemaContext fakeSchemaCtx = SimpleSchemaContext.forModules(ImmutableSet.copyOf(fakeModules));
-        final InstanceIdentifierContext<ContainerSchemaNode> instanceIdentifierContext =
-                new InstanceIdentifierContext<>(null, fakeCont, mountPoint, fakeSchemaCtx);
-        return new NormalizedNodeContext(instanceIdentifierContext, containerBuilder.build());
+        final InstanceIdentifierContext<?> mountPointIdentifier =
+                this.controllerContext.toMountPointIdentifier(identifier);
+        final DOMMountPoint mountPoint = mountPointIdentifier.getMountPoint();
+        return OperationsResourceUtils.contextForModelContext(mountPoint.getSchemaContext(), mountPoint);
     }
 
     private Module getRestconfModule() {
@@ -514,7 +461,7 @@ public final class RestconfImpl implements RestconfService {
             schemaContext = this.controllerContext.getGlobalSchema();
         }
 
-        final String identifierDecoded = this.controllerContext.urlPathArgDecode(identifierEncoded);
+        final String identifierDecoded = ControllerContext.urlPathArgDecode(identifierEncoded);
 
         RpcDefinition rpc;
         if (mountPoint == null) {
