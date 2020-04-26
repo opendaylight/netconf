@@ -14,36 +14,22 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.api.AuthenticationException;
 import org.opendaylight.aaa.api.Claim;
 import org.opendaylight.aaa.api.PasswordCredentialAuth;
 import org.opendaylight.aaa.api.PasswordCredentials;
-import org.osgi.framework.ServiceListener;
-import org.osgi.framework.ServiceReference;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CredentialServiceAuthProviderTest {
-
     @Mock
     private PasswordCredentialAuth credAuth;
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-    }
-
-
     @Test
     public void testAuthenticatedTrue() throws Exception {
-        ServiceReference serviceRef = mock(ServiceReference.class);
-
-        ServiceListenerAnswer answer = new ServiceListenerAnswer();
-
         Claim claim = mock(Claim.class);
         doReturn("domain").when(claim).domain();
         doReturn(claim).when(credAuth).authenticate(any(PasswordCredentials.class));
@@ -57,16 +43,5 @@ public class CredentialServiceAuthProviderTest {
         doThrow(AuthenticationException.class).when(credAuth).authenticate(any(PasswordCredentials.class));
         CredentialServiceAuthProvider credentialServiceAuthProvider = new CredentialServiceAuthProvider(credAuth);
         assertFalse(credentialServiceAuthProvider.authenticated("user", "pwd"));
-    }
-
-    private static class ServiceListenerAnswer implements Answer {
-
-        ServiceListener serviceListener;
-
-        @Override
-        public Object answer(final InvocationOnMock invocationOnMock) throws Throwable {
-            serviceListener = (ServiceListener) invocationOnMock.getArguments()[0];
-            return null;
-        }
     }
 }
