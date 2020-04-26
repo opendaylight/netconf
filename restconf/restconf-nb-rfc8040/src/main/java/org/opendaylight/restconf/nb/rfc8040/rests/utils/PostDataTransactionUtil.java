@@ -9,10 +9,10 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.FluentFuture;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
@@ -70,7 +70,7 @@ public final class PostDataTransactionUtil {
         final FluentFuture<? extends CommitInfo> future = submitData(
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(),
                 transactionNode, schemaContextRef.get(), insert, point);
-        final URI location = resolveLocation(uriInfo, transactionNode, schemaContextRef);
+        final URI location = resolveLocation(uriInfo, transactionNode, schemaContextRef, payload.getData());
         final ResponseFactory dataFactory = new ResponseFactory(Status.CREATED).location(location);
         //This method will close transactionChain
         FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory,
@@ -315,18 +315,23 @@ public final class PostDataTransactionUtil {
      * @return {@link URI}
      */
     private static URI resolveLocation(final UriInfo uriInfo, final TransactionVarsWrapper transactionNode,
-            final SchemaContextRef schemaContextRef) {
+            final SchemaContextRef schemaContextRef, final NormalizedNode<?, ?> data) {
         if (uriInfo == null) {
             return null;
         }
 
-        final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
-        uriBuilder.path("data");
-        uriBuilder.path(ParserIdentifier
-                .stringFromYangInstanceIdentifier(transactionNode.getInstanceIdentifier().getInstanceIdentifier(),
-                schemaContextRef.get()));
+        YangInstanceIdentifier path = transactionNode.getInstanceIdentifier().getInstanceIdentifier();
+        if (data instanceof MapNode) {
+            final Collection<MapEntryNode> children = ((MapNode) data).getValue();
+            if (!children.isEmpty()) {
+                path = path.node(children.iterator().next().getIdentifier());
+            }
+        }
 
-        return uriBuilder.build();
+        return uriInfo.getBaseUriBuilder()
+                .path("data")
+                .path(ParserIdentifier.stringFromYangInstanceIdentifier(path, schemaContextRef.get()))
+                .build();
     }
 
     private static void simplePost(final DOMDataTreeReadWriteTransaction rwTransaction,
