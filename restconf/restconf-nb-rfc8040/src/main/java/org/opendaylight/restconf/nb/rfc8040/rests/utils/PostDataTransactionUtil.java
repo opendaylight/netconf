@@ -9,11 +9,15 @@ package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
 import com.google.common.util.concurrent.FluentFuture;
 import java.net.URI;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
@@ -25,6 +29,7 @@ import org.opendaylight.restconf.common.errors.RestconfError;
 import org.opendaylight.restconf.nb.rfc8040.references.SchemaContextRef;
 import org.opendaylight.restconf.nb.rfc8040.rests.transactions.TransactionVarsWrapper;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.ParserIdentifier;
+import org.opendaylight.yangtools.yang.common.QName;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.LeafSetEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
@@ -35,6 +40,7 @@ import org.opendaylight.yangtools.yang.data.api.schema.OrderedMapNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
+import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 /**
@@ -70,7 +76,8 @@ public final class PostDataTransactionUtil {
         final FluentFuture<? extends CommitInfo> future = submitData(
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(),
                 transactionNode, schemaContextRef.get(), insert, point);
-        final URI location = PostDataTransactionUtil.resolveLocation(uriInfo, transactionNode, schemaContextRef);
+        final URI location = PostDataTransactionUtil.resolveLocation(uriInfo, transactionNode,
+                               schemaContextRef, payload);
         final ResponseFactory dataFactory = new ResponseFactory(Status.CREATED).location(location);
         //This method will close transactionChain
         FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory,
@@ -329,16 +336,31 @@ public final class PostDataTransactionUtil {
      * @return {@link URI}
      */
     private static URI resolveLocation(final UriInfo uriInfo, final TransactionVarsWrapper transactionNode,
-            final SchemaContextRef schemaContextRef) {
+            final SchemaContextRef schemaContextRef, final NormalizedNodeContext payload) {
         if (uriInfo == null) {
             return null;
         }
 
         final UriBuilder uriBuilder = uriInfo.getBaseUriBuilder();
         uriBuilder.path("data");
+        String prifx = "";
+        if (payload.getData() instanceof MapNode) {
+            Collection<MapEntryNode> value = (Collection<MapEntryNode>) payload.getData().getValue();
+            MapEntryNode next = value.iterator().next();
+            @NonNull Set<Map.Entry<QName, Object>> entrySet = next.getIdentifier().entrySet();
+            Map.Entry<QName, Object> nameObjectEntry = entrySet.iterator().next();
+            Object object = nameObjectEntry.getValue();
+            String localName = next.getIdentifier().getNodeType().getLocalName();
+            URI namespace = payload.getData().getNodeType().getNamespace();
+            Set<Module> moduleSet = payload.getInstanceIdentifierContext().getSchemaContext().findModules(namespace);
+            if (moduleSet.iterator().hasNext()) {
+                String name = moduleSet.iterator().next().getName();
+                prifx = "/" + name + ":" + localName + "=" + object;
+            }
+        }
         uriBuilder.path(ParserIdentifier
                 .stringFromYangInstanceIdentifier(transactionNode.getInstanceIdentifier().getInstanceIdentifier(),
-                schemaContextRef.get()));
+                schemaContextRef.get()) + prifx);
 
         return uriBuilder.build();
     }
