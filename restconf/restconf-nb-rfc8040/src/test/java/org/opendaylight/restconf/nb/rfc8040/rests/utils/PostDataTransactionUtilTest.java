@@ -7,6 +7,8 @@
  */
 package org.opendaylight.restconf.nb.rfc8040.rests.utils;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -16,6 +18,8 @@ import static org.mockito.Mockito.verify;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFalseFluentFuture;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Collection;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -77,6 +81,7 @@ public class PostDataTransactionUtilTest {
     private ContainerNode buildBaseCont;
     private EffectiveModelContext schema;
     private YangInstanceIdentifier iid2;
+    private YangInstanceIdentifier iidList;
     private MapNode buildList;
 
     @Before
@@ -95,6 +100,10 @@ public class PostDataTransactionUtilTest {
             "name of band");
         this.iid2 = YangInstanceIdentifier.builder()
                 .node(baseQName)
+                .build();
+        this.iidList = YangInstanceIdentifier.builder()
+                .node(baseQName)
+                .node(listQname)
                 .build();
 
         final LeafNode<?> buildLeaf = Builders.leafBuilder()
@@ -162,9 +171,9 @@ public class PostDataTransactionUtilTest {
     }
 
     @Test
-    public void testPostListData() {
+    public void testPostListData() throws UnsupportedEncodingException {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid2, null, null, this.schema);
+                new InstanceIdentifierContext<>(this.iidList, null, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildList);
 
         final MapNode data = (MapNode) payload.getData();
@@ -179,6 +188,8 @@ public class PostDataTransactionUtilTest {
         final Response response =
                 PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
         assertEquals(201, response.getStatus());
+        assertThat(URLDecoder.decode(response.getLocation().toString(), "UTF-8"),
+            containsString(identifier.getValue(identifier.keySet().iterator().next()).toString()));
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, data.getValue().iterator().next());
     }
