@@ -7,8 +7,7 @@
  */
 package org.opendaylight.netconf.authprovider;
 
-import org.opendaylight.aaa.api.CredentialAuth;
-import org.opendaylight.aaa.api.PasswordCredentials;
+import org.opendaylight.aaa.api.PasswordCredentialAuth;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -23,7 +22,7 @@ public final class OSGiPasswordAuthProvider implements AuthProvider {
     private static final Logger LOG = LoggerFactory.getLogger(OSGiPasswordAuthProvider.class);
 
     @Reference
-    CredentialAuth<PasswordCredentials> credService = null;
+    PasswordCredentialAuth credService = null;
 
     private CredentialServiceAuthProvider delegate = null;
 
