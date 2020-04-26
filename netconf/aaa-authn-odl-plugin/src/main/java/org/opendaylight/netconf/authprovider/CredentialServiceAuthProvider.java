@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.authprovider;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.opendaylight.aaa.api.AuthenticationException;
 import org.opendaylight.aaa.api.Claim;
 import org.opendaylight.aaa.api.CredentialAuth;
@@ -15,10 +17,10 @@ import org.opendaylight.netconf.auth.AuthProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * AuthProvider implementation delegating to AAA CredentialAuth&lt;PasswordCredentials&gt; instance.
  */
+@Singleton
 public final class CredentialServiceAuthProvider implements AuthProvider {
     private static final Logger LOG = LoggerFactory.getLogger(CredentialServiceAuthProvider.class);
 
@@ -26,6 +28,7 @@ public final class CredentialServiceAuthProvider implements AuthProvider {
     // Maybe there should be a PasswordCredentialAuth implements CredentialAuth<PasswordCredentials>
     private final CredentialAuth<PasswordCredentials> credService;
 
+    @Inject
     public CredentialServiceAuthProvider(final CredentialAuth<PasswordCredentials> credService) {
         this.credService = credService;
     }
@@ -36,8 +39,7 @@ public final class CredentialServiceAuthProvider implements AuthProvider {
      */
     @Override
     public boolean authenticated(final String username, final String password) {
-
-        Claim claim;
+        final Claim claim;
         try {
             claim = credService.authenticate(new PasswordCredentialsWrapper(username, password));
         } catch (AuthenticationException e) {
