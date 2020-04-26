@@ -20,13 +20,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.aaa.api.AuthenticationException;
 import org.opendaylight.aaa.api.Claim;
-import org.opendaylight.aaa.api.CredentialAuth;
+import org.opendaylight.aaa.api.PasswordCredentialAuth;
 import org.opendaylight.aaa.api.PasswordCredentials;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class CredentialServiceAuthProviderTest {
     @Mock
-    private CredentialAuth<PasswordCredentials> credAuth;
+    private PasswordCredentialAuth credAuth;
 
     @Test
     public void testAuthenticatedTrue() throws Exception {
