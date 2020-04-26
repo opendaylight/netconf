@@ -7,30 +7,30 @@
  */
 package org.opendaylight.netconf.authprovider;
 
+import static java.util.Objects.requireNonNull;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.opendaylight.aaa.api.AuthenticationException;
 import org.opendaylight.aaa.api.Claim;
-import org.opendaylight.aaa.api.CredentialAuth;
+import org.opendaylight.aaa.api.PasswordCredentialAuth;
 import org.opendaylight.aaa.api.PasswordCredentials;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * AuthProvider implementation delegating to AAA CredentialAuth&lt;PasswordCredentials&gt; instance.
+ * AuthProvider implementation delegating to a {@link PasswordCredentialAuth} instance.
  */
 @Singleton
 public final class CredentialServiceAuthProvider implements AuthProvider {
     private static final Logger LOG = LoggerFactory.getLogger(CredentialServiceAuthProvider.class);
 
-    // FIXME CredentialAuth is generic and it causes warnings during compilation
-    // Maybe there should be a PasswordCredentialAuth implements CredentialAuth<PasswordCredentials>
-    private final CredentialAuth<PasswordCredentials> credService;
+    private final PasswordCredentialAuth credService;
 
     @Inject
-    public CredentialServiceAuthProvider(final CredentialAuth<PasswordCredentials> credService) {
-        this.credService = credService;
+    public CredentialServiceAuthProvider(final PasswordCredentialAuth credService) {
+        this.credService = requireNonNull(credService);
     }
 
     /**
