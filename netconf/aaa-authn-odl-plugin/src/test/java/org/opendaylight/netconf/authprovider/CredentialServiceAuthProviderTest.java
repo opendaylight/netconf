@@ -22,7 +22,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.opendaylight.aaa.api.AuthenticationException;
 import org.opendaylight.aaa.api.Claim;
-import org.opendaylight.aaa.api.CredentialAuth;
+import org.opendaylight.aaa.api.PasswordCredentialAuth;
 import org.opendaylight.aaa.api.PasswordCredentials;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
@@ -30,7 +30,7 @@ import org.osgi.framework.ServiceReference;
 public class CredentialServiceAuthProviderTest {
 
     @Mock
-    private CredentialAuth<PasswordCredentials> credAuth;
+    private PasswordCredentialAuth credAuth;
 
     @Before
     public void setUp() throws Exception {
