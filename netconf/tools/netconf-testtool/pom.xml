@@ -26,7 +26,6 @@
 
     <properties>
         <sonar.skip>true</sonar.skip>
-        <xmlunit.version>2.6.3</xmlunit.version>
     </properties>
 
     <dependencies>
@@ -131,6 +130,10 @@
             <artifactId>mdsal-netconf-ssh</artifactId>
         </dependency>
         <dependency>
+            <groupId>net.i2p.crypto</groupId>
+            <artifactId>eddsa</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>org.apache.karaf.features.core</artifactId>
             <version>${karaf.version}</version>
@@ -138,14 +141,10 @@
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
-            <version>${xmlunit.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-assertj</artifactId>
-            <version>${xmlunit.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
