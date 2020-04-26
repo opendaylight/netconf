@@ -9,6 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.jersey.providers.test;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -48,7 +49,8 @@ public abstract class AbstractBodyReaderTest {
         final DOMMountPointService mountPointService = mock(DOMMountPointService.class);
         final DOMMountPoint mountPoint = mock(DOMMountPoint.class);
         doReturn(Optional.of(mountPoint)).when(mountPointService).getMountPoint(any(YangInstanceIdentifier.class));
-        doReturn(schemaContext).when(mountPoint).getSchemaContext();
+        doReturn(schemaContext).when(mountPoint).getEffectiveModelContext();
+        doCallRealMethod().when(mountPoint).getSchemaContext();
 
         mountPointServiceHandler = DOMMountPointServiceHandler.newInstance(mountPointService);
     }

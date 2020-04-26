@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.notNull;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -581,7 +582,8 @@ public class JSONRestconfServiceRfc8040ImplTest {
     DOMMountPoint setupTestMountPoint() throws FileNotFoundException, ReactorException {
         final SchemaContext schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
         final DOMMountPoint mockMountPoint = mock(DOMMountPoint.class);
-        doReturn(schemaContextTestModule).when(mockMountPoint).getSchemaContext();
+        doReturn(schemaContextTestModule).when(mockMountPoint).getEffectiveModelContext();
+        doCallRealMethod().when(mockMountPoint).getSchemaContext();
 
         doReturn(Optional.of(mockDOMDataBroker)).when(mockMountPoint).getService(DOMDataBroker.class);
 
