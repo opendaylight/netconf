@@ -53,6 +53,9 @@ import org.opendaylight.yangtools.yang.model.api.SchemaNode;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.DOMException;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 public class PostDataTransactionUtilTest {
 
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/jukebox";
@@ -77,6 +80,7 @@ public class PostDataTransactionUtilTest {
     private ContainerNode buildBaseCont;
     private SchemaContext schema;
     private YangInstanceIdentifier iid2;
+    private YangInstanceIdentifier iid_list;
     private MapNode buildList;
 
     @Before
@@ -95,6 +99,10 @@ public class PostDataTransactionUtilTest {
             "name of band");
         this.iid2 = YangInstanceIdentifier.builder()
                 .node(baseQName)
+                .build();
+        this.iid_list = YangInstanceIdentifier.builder()
+                .node(baseQName)
+                .node(listQname)
                 .build();
 
         final LeafNode<?> buildLeaf = Builders.leafBuilder()
@@ -162,9 +170,9 @@ public class PostDataTransactionUtilTest {
     }
 
     @Test
-    public void testPostListData() {
+    public void testPostListData() throws UnsupportedEncodingException {
         final InstanceIdentifierContext<? extends SchemaNode> iidContext =
-                new InstanceIdentifierContext<>(this.iid2, null, null, this.schema);
+                new InstanceIdentifierContext<>(this.iid_list, null, null, this.schema);
         final NormalizedNodeContext payload = new NormalizedNodeContext(iidContext, this.buildList);
 
         final MapNode data = (MapNode) payload.getData();
@@ -179,6 +187,8 @@ public class PostDataTransactionUtilTest {
         final Response response =
                 PostDataTransactionUtil.postData(this.uriInfo, payload, wrapper, this.refSchemaCtx, null, null);
         assertEquals(201, response.getStatus());
+        String decode = URLDecoder.decode(response.getLocation().toString(), "UTF-8");
+        assertTrue(decode.contains(identifier.getValue(identifier.keySet().iterator().next()).toString()));
         verify(this.readWrite).exists(LogicalDatastoreType.CONFIGURATION, node);
         verify(this.readWrite).put(LogicalDatastoreType.CONFIGURATION, node, data.getValue().iterator().next());
     }
