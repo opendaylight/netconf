@@ -130,10 +130,6 @@
             <artifactId>mdsal-netconf-ssh</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.i2p.crypto</groupId>
-            <artifactId>eddsa</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>org.apache.karaf.features.core</artifactId>
             <version>${karaf.version}</version>
