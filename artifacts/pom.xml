@@ -252,6 +252,11 @@
                 <artifactId>shaded-exificient</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>shaded-sshd</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- netconf features -->
             <dependency>

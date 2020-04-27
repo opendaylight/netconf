@@ -9,9 +9,9 @@ package org.opendaylight.netconf.ssh;
 
 import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
-import org.apache.sshd.common.keyprovider.KeyPairProvider;
-import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.opendaylight.netconf.auth.AuthProvider;
+import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyPairProvider;
+import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.PublickeyAuthenticator;
 
 public final class SshProxyServerConfigurationBuilder {
     private InetSocketAddress bindingAddress;
