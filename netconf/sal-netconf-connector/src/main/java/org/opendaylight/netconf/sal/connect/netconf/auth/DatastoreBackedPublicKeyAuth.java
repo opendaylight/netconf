@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.sal.connect.netconf.auth;
 
 import com.google.common.base.Strings;
@@ -13,12 +12,12 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.security.KeyPair;
 import java.util.Optional;
-import org.apache.sshd.client.future.AuthFuture;
-import org.apache.sshd.client.session.ClientSession;
 import org.opendaylight.aaa.encrypt.AAAEncryptionService;
 import org.opendaylight.aaa.encrypt.PKIUtil;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
+import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
+import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.keystore.rev171017.keystore.entry.KeyCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

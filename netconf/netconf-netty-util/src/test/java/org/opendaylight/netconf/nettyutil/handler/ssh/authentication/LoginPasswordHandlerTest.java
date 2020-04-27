@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.nettyutil.handler.ssh.authentication;
 
 import static org.junit.Assert.assertEquals;
@@ -14,12 +13,11 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import org.apache.sshd.client.future.AuthFuture;
-import org.apache.sshd.client.session.ClientSession;
 import org.junit.Test;
+import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
+import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 
 public class LoginPasswordHandlerTest {
-
     @Test
     public void testLoginPassword() throws Exception {
         final LoginPasswordHandler loginPasswordHandler = new LoginPasswordHandler("user", "pwd");
