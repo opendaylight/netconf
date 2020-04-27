@@ -5,17 +5,16 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.test.tool.client.stress;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.Timer;
 import java.util.Set;
-import org.apache.sshd.client.SshClient;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
+import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 
 public final class ConfigurableClientDispatcher extends NetconfClientDispatcherImpl {
 
