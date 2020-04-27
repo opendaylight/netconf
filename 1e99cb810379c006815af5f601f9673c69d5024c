@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "85211ee6_3a666e29",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/utils/PostDataTransactionUtil.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-04-27T17:55:44Z",
+      "side": 1,
+      "message": "do you mean prefix?",
+      "range": {
+        "startLine": 346,
+        "startChar": 15,
+        "endLine": 346,
+        "endChar": 20
+      },
+      "revId": "1e99cb810379c006815af5f601f9673c69d5024c",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
