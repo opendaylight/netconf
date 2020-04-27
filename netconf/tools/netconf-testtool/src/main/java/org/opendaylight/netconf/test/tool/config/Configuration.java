@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableSet;
 import java.io.File;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
+import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.opendaylight.netconf.api.xml.XmlNetconfConstants;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.test.tool.operations.OperationsCreator;

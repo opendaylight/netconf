@@ -11,7 +11,7 @@ package org.opendaylight.netconf.test.tool.client.stress;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.Timer;
 import java.util.Set;
-import org.apache.sshd.client.SshClient;
+import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.NetconfClientDispatcherImpl;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
