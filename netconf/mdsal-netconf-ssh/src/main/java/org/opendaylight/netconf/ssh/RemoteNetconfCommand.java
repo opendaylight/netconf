@@ -21,7 +21,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import org.opendaylight.netconf.api.messages.NetconfHelloMessageAdditionalHeader;
-import org.opendaylight.netconf.shaded.sshd.common.NamedFactory;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoInputStream;
 import org.opendaylight.netconf.shaded.sshd.common.io.IoOutputStream;
 import org.opendaylight.netconf.shaded.sshd.server.Environment;
@@ -30,6 +29,7 @@ import org.opendaylight.netconf.shaded.sshd.server.channel.ChannelSession;
 import org.opendaylight.netconf.shaded.sshd.server.command.AsyncCommand;
 import org.opendaylight.netconf.shaded.sshd.server.command.Command;
 import org.opendaylight.netconf.shaded.sshd.server.session.ServerSession;
+import org.opendaylight.netconf.shaded.sshd.server.subsystem.SubsystemFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,7 +163,7 @@ public class RemoteNetconfCommand implements AsyncCommand {
         return netconfHelloMessageAdditionalHeader.getAddress();
     }
 
-    public static class NetconfCommandFactory implements NamedFactory<Command> {
+    public static class NetconfCommandFactory implements SubsystemFactory {
 
         public static final String NETCONF = "netconf";
 
@@ -182,7 +182,7 @@ public class RemoteNetconfCommand implements AsyncCommand {
         }
 
         @Override
-        public RemoteNetconfCommand create() {
+        public Command createSubsystem(final ChannelSession channel) {
             return new RemoteNetconfCommand(clientBootstrap, localAddress);
         }
     }
