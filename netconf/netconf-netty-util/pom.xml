@@ -44,18 +44,14 @@
       <groupId>io.netty</groupId>
       <artifactId>netty-handler</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.sshd</groupId>
-      <artifactId>sshd-osgi</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.sshd</groupId>
-      <artifactId>sshd-netty</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>org.opendaylight.netconf</groupId>
       <artifactId>shaded-exificient</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opendaylight.netconf</groupId>
+      <artifactId>shaded-sshd</artifactId>
     </dependency>
 
     <dependency>
