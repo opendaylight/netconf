@@ -5,7 +5,6 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.callhome.protocol;
 
 import static org.junit.Assert.assertFalse;
@@ -25,17 +24,6 @@ import java.net.SocketAddress;
 import java.security.PublicKey;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.sshd.client.SshClient;
-import org.apache.sshd.client.future.AuthFuture;
-import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.client.session.ClientSessionImpl;
-import org.apache.sshd.common.future.SshFutureListener;
-import org.apache.sshd.common.io.IoAcceptor;
-import org.apache.sshd.common.io.IoHandler;
-import org.apache.sshd.common.io.IoServiceFactory;
-import org.apache.sshd.common.kex.KeyExchange;
-import org.apache.sshd.common.session.Session;
-import org.apache.sshd.common.session.SessionListener;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -44,6 +32,17 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.opendaylight.netconf.shaded.sshd.client.SshClient;
+import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
+import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.shaded.sshd.client.session.ClientSessionImpl;
+import org.opendaylight.netconf.shaded.sshd.common.future.SshFutureListener;
+import org.opendaylight.netconf.shaded.sshd.common.io.IoAcceptor;
+import org.opendaylight.netconf.shaded.sshd.common.io.IoHandler;
+import org.opendaylight.netconf.shaded.sshd.common.io.IoServiceFactory;
+import org.opendaylight.netconf.shaded.sshd.common.kex.KeyExchange;
+import org.opendaylight.netconf.shaded.sshd.common.session.Session;
+import org.opendaylight.netconf.shaded.sshd.common.session.SessionListener;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NetconfCallHomeServerTest {

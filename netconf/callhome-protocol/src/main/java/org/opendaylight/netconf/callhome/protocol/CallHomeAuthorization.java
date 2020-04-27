@@ -14,7 +14,7 @@ import java.security.KeyPair;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import org.apache.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 
 /**
  * Authorization context for incoming call home sessions.
