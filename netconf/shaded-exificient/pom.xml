@@ -22,6 +22,11 @@
     <version>1.7.3-SNAPSHOT</version>
     <name>${project.artifactId}</name>
 
+    <properties>
+        <!-- We do not want to generate javadoc -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.opendaylight.netconf</groupId>
@@ -56,6 +61,18 @@
                             <outputDirectory>${project.build.directory}/classes</outputDirectory>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>unpack-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>sources</classifier>
+                            <includeArtifactIds>shaded-exificient-jar</includeArtifactIds>
+                            <outputDirectory>${project.build.directory}/shaded-sources</outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -63,13 +80,13 @@
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>generate-sources</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>add-source</goal>
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${project.build.directory}/generated-sources</source>
+                                <source>${project.build.directory}/shaded-sources</source>
                             </sources>
                         </configuration>
                     </execution>
