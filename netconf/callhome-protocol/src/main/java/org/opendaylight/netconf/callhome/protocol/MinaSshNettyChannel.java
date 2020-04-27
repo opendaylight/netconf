@@ -20,8 +20,8 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.DefaultChannelConfig;
 import io.netty.channel.EventLoop;
 import java.net.SocketAddress;
-import org.apache.sshd.client.channel.ClientChannel;
-import org.apache.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
+import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerReader;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerReader.ReadMsgHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandlerWriter;
@@ -66,7 +66,7 @@ class MinaSshNettyChannel extends AbstractServerChannel {
         return config;
     }
 
-    private static boolean notClosing(final org.apache.sshd.common.Closeable sshCloseable) {
+    private static boolean notClosing(final org.opendaylight.netconf.shaded.sshd.common.Closeable sshCloseable) {
         return !sshCloseable.isClosing() && !sshCloseable.isClosed();
     }
 

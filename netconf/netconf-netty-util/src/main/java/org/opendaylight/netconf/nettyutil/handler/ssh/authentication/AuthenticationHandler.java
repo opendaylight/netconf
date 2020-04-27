@@ -9,7 +9,7 @@
 package org.opendaylight.netconf.nettyutil.handler.ssh.authentication;
 
 import java.io.IOException;
-import org.apache.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
 
 /**
  * Class providing authentication facility to SSH handler.
@@ -18,6 +18,6 @@ public abstract class AuthenticationHandler {
 
     public abstract String getUsername();
 
-    public abstract org.apache.sshd.client.future.AuthFuture authenticate(ClientSession session)
+    public abstract org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture authenticate(ClientSession session)
             throws IOException;
 }

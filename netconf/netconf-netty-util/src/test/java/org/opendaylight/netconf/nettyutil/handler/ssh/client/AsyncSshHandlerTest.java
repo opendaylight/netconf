@@ -38,22 +38,22 @@ import io.netty.channel.EventLoop;
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
-import org.apache.sshd.client.SshClient;
-import org.apache.sshd.client.channel.ChannelSubsystem;
-import org.apache.sshd.client.channel.ClientChannel;
-import org.apache.sshd.client.future.AuthFuture;
-import org.apache.sshd.client.future.ConnectFuture;
-import org.apache.sshd.client.future.OpenFuture;
-import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.common.future.CloseFuture;
-import org.apache.sshd.common.future.SshFuture;
-import org.apache.sshd.common.future.SshFutureListener;
-import org.apache.sshd.common.io.IoInputStream;
-import org.apache.sshd.common.io.IoOutputStream;
-import org.apache.sshd.common.io.IoReadFuture;
-import org.apache.sshd.common.io.IoWriteFuture;
-import org.apache.sshd.common.util.buffer.Buffer;
-import org.apache.sshd.common.util.buffer.ByteArrayBuffer;
+import org.opendaylight.netconf.shaded.sshd.client.SshClient;
+import org.opendaylight.netconf.shaded.sshd.client.channel.ChannelSubsystem;
+import org.opendaylight.netconf.shaded.sshd.client.channel.ClientChannel;
+import org.opendaylight.netconf.shaded.sshd.client.future.AuthFuture;
+import org.opendaylight.netconf.shaded.sshd.client.future.ConnectFuture;
+import org.opendaylight.netconf.shaded.sshd.client.future.OpenFuture;
+import org.opendaylight.netconf.shaded.sshd.client.session.ClientSession;
+import org.opendaylight.netconf.shaded.sshd.common.future.CloseFuture;
+import org.opendaylight.netconf.shaded.sshd.common.future.SshFuture;
+import org.opendaylight.netconf.shaded.sshd.common.future.SshFutureListener;
+import org.opendaylight.netconf.shaded.sshd.common.io.IoInputStream;
+import org.opendaylight.netconf.shaded.sshd.common.io.IoOutputStream;
+import org.opendaylight.netconf.shaded.sshd.common.io.IoReadFuture;
+import org.opendaylight.netconf.shaded.sshd.common.io.IoWriteFuture;
+import org.opendaylight.netconf.shaded.sshd.common.util.buffer.Buffer;
+import org.opendaylight.netconf.shaded.sshd.common.util.buffer.ByteArrayBuffer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -354,7 +354,7 @@ public class AsyncSshHandlerTest {
 
         final ChannelPromise secondWritePromise = getMockedPromise();
         // now make write throw pending exception
-        doThrow(org.apache.sshd.common.io.WritePendingException.class).when(asyncIn).writePacket(any(Buffer.class));
+        doThrow(org.opendaylight.netconf.shaded.sshd.common.io.WritePendingException.class).when(asyncIn).writePacket(any(Buffer.class));
         asyncSshHandler.write(ctx, Unpooled.copiedBuffer(new byte[]{0, 1, 2, 3, 4, 5}), secondWritePromise);
 
         doReturn(ioWriteFuture).when(asyncIn).writePacket(any(Buffer.class));
@@ -399,7 +399,7 @@ public class AsyncSshHandlerTest {
 
         final ChannelPromise secondWritePromise = getMockedPromise();
         // now make write throw pending exception
-        doThrow(org.apache.sshd.common.io.WritePendingException.class).when(asyncIn).writePacket(any(Buffer.class));
+        doThrow(org.opendaylight.netconf.shaded.sshd.common.io.WritePendingException.class).when(asyncIn).writePacket(any(Buffer.class));
         for (int i = 0; i < 1001; i++) {
             asyncSshHandler.write(ctx, Unpooled.copiedBuffer(new byte[]{0, 1, 2, 3, 4, 5}), secondWritePromise);
         }
