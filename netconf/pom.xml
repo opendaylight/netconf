@@ -65,5 +65,7 @@
 
     <module>shaded-exificient-jar</module>
     <module>shaded-exificient</module>
+    <module>shaded-sshd-jar</module>
+    <module>shaded-sshd</module>
   </modules>
 </project>

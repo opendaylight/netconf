@@ -12,11 +12,11 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Collections;
-import org.apache.sshd.common.cipher.ECCurves;
-import org.apache.sshd.common.config.keys.KeyUtils;
-import org.apache.sshd.common.keyprovider.KeyPairProvider;
-import org.apache.sshd.common.session.SessionContext;
-import org.apache.sshd.common.util.security.SecurityUtils;
+import org.opendaylight.netconf.shaded.sshd.common.cipher.ECCurves;
+import org.opendaylight.netconf.shaded.sshd.common.config.keys.KeyUtils;
+import org.opendaylight.netconf.shaded.sshd.common.keyprovider.KeyPairProvider;
+import org.opendaylight.netconf.shaded.sshd.common.session.SessionContext;
+import org.opendaylight.netconf.shaded.sshd.common.util.security.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
