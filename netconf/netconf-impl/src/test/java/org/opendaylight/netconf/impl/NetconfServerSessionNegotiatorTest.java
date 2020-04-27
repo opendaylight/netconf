@@ -13,7 +13,7 @@ import static org.junit.Assert.assertNotNull;
 
 import io.netty.channel.local.LocalAddress;
 import java.net.InetSocketAddress;
-import org.apache.sshd.common.util.net.SshdSocketAddress;
+import org.opendaylight.netconf.shaded.sshd.common.util.net.SshdSocketAddress;
 import org.junit.Test;
 
 public class NetconfServerSessionNegotiatorTest {

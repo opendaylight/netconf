@@ -10,7 +10,7 @@ package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.annotations.Beta;
-import org.apache.sshd.common.SshException;
+import org.opendaylight.netconf.shaded.sshd.common.SshException;
 
 /**
  * Exception reported when endpoint authentication fails.

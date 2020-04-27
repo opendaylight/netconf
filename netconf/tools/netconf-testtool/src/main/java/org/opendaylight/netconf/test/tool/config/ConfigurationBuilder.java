@@ -9,7 +9,7 @@ package org.opendaylight.netconf.test.tool.config;
 
 import java.io.File;
 import java.util.Set;
-import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
+import org.opendaylight.netconf.shaded.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.opendaylight.netconf.auth.AuthProvider;
 import org.opendaylight.netconf.test.tool.TesttoolParameters;
 import org.opendaylight.netconf.test.tool.operations.OperationsCreator;

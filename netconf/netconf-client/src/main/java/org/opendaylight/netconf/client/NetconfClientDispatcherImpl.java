@@ -13,7 +13,7 @@ import io.netty.util.concurrent.Future;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.sshd.client.SshClient;
+import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
