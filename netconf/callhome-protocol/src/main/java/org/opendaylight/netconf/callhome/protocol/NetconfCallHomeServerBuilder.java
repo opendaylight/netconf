@@ -13,9 +13,9 @@ import io.netty.util.HashedWheelTimer;
 import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import org.apache.sshd.client.SshClient;
 import org.opendaylight.netconf.callhome.protocol.CallHomeSessionContext.Factory;
 import org.opendaylight.netconf.client.NetconfClientSessionNegotiatorFactory;
+import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 import org.opendaylight.yangtools.concepts.Builder;
 
 public class NetconfCallHomeServerBuilder implements Builder<NetconfCallHomeServer> {
