@@ -61,6 +61,12 @@
                             </artifactSet>
                             <filters>
                                 <filter>
+                                    <artifact>xmlpull</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
                                     <artifact>com.siemens.ct.exi</artifact>
                                     <includes>
                                         <include>com/siemens/ct/exi/**</include>
