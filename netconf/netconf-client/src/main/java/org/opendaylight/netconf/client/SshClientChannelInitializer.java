@@ -9,11 +9,11 @@ package org.opendaylight.netconf.client;
 
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Promise;
-import org.apache.sshd.client.SshClient;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.nettyutil.AbstractChannelInitializer;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
 import org.opendaylight.netconf.nettyutil.handler.ssh.client.AsyncSshHandler;
+import org.opendaylight.netconf.shaded.sshd.client.SshClient;
 
 final class SshClientChannelInitializer extends AbstractChannelInitializer<NetconfClientSession> {
 
