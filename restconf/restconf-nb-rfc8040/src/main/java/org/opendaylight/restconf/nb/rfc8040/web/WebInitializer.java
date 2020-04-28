@@ -24,6 +24,7 @@ import org.opendaylight.aaa.web.WebContextSecurer;
 import org.opendaylight.aaa.web.WebServer;
 import org.opendaylight.aaa.web.servlet.ServletSupport;
 import org.opendaylight.restconf.nb.rfc8040.RestconfApplication;
+import org.opendaylight.restconf.nb.rfc8040.RootFoundApplication;
 import org.opendaylight.restconf.nb.rfc8040.rests.utils.RestconfStreamsConstants;
 import org.opendaylight.restconf.nb.rfc8040.streams.websockets.WebSocketInitializer;
 import org.opendaylight.restconf.nb.rfc8040.utils.RestconfConstants;
@@ -43,13 +44,18 @@ public class WebInitializer {
             @Reference ServletSupport servletSupport, RestconfApplication webApp,
             @Reference CustomFilterAdapterConfiguration customFilterAdapterConfig,
             WebSocketInitializer webSocketServlet) throws ServletException {
-        WebContextBuilder webContextBuilder = WebContext.builder().contextPath(RestconfConstants.BASE_URI_PATTERN)
+        WebContextBuilder webContextBuilder = WebContext.builder().contextPath("/")
                 .supportsSessions(false)
                 .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(webApp).build())
-                        .addUrlPattern("/*").build())
+                        .addUrlPattern(RestconfConstants.BASE_URI_PATTERN + "/*").build())
                 .addServlet(ServletDetails.builder().servlet(webSocketServlet).addAllUrlPatterns(Lists.newArrayList(
-                        RestconfStreamsConstants.DATA_CHANGE_EVENT_STREAM_PATTERN,
-                        RestconfStreamsConstants.YANG_NOTIFICATION_STREAM_PATTERN)).build())
+                        RestconfConstants.BASE_URI_PATTERN + RestconfStreamsConstants.DATA_CHANGE_EVENT_STREAM_PATTERN,
+                        RestconfConstants.BASE_URI_PATTERN + RestconfStreamsConstants.YANG_NOTIFICATION_STREAM_PATTERN))
+                        .build())
+
+                .addServlet(ServletDetails.builder().servlet(servletSupport.createHttpServletBuilder(
+                            new RootFoundApplication()).build())
+                        .addUrlPattern(".well-known/*").name("Rootfound").build())
 
                 // Allows user to add javax.servlet.Filter(s) in front of REST services
                 .addFilter(FilterDetails.builder().filter(new CustomFilterAdapter(customFilterAdapterConfig))
