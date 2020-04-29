@@ -23,7 +23,6 @@ import org.apache.sshd.client.channel.ClientChannel;
 import org.apache.sshd.client.future.AuthFuture;
 import org.apache.sshd.client.future.OpenFuture;
 import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.client.session.ClientSessionImpl;
 import org.apache.sshd.common.future.SshFutureListener;
 import org.apache.sshd.common.session.Session;
 import org.checkerframework.checker.lock.qual.Holding;
@@ -41,7 +40,7 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
 
     private static final String NETCONF = "netconf";
 
-    private final ClientSessionImpl sshSession;
+    private final ClientSession sshSession;
     private final CallHomeAuthorization authorization;
     private final Factory factory;
 
@@ -55,10 +54,8 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
                            final SocketAddress remoteAddress, final Factory factory) {
         this.authorization = requireNonNull(authorization, "authorization");
         checkArgument(this.authorization.isServerAllowed(), "Server was not allowed.");
-        checkArgument(sshSession instanceof ClientSessionImpl,
-                "sshSession must implement ClientSessionImpl");
         this.factory = requireNonNull(factory, "factory");
-        this.sshSession = (ClientSessionImpl) sshSession;
+        this.sshSession = requireNonNull(sshSession, "sshSession");
         this.sshSession.setAttribute(SESSION_KEY, this);
         this.remoteAddress = (InetSocketAddress) this.sshSession.getIoSession().getRemoteAddress();
         this.serverKey = this.sshSession.getKex().getServerKey();

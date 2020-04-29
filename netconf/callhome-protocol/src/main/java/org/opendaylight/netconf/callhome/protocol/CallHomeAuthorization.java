@@ -7,7 +7,6 @@
  */
 package org.opendaylight.netconf.callhome.protocol;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.ImmutableSet;
@@ -16,7 +15,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import org.apache.sshd.client.session.ClientSession;
-import org.apache.sshd.client.session.ClientSessionImpl;
 
 /**
  * Authorization context for incoming call home sessions.
@@ -166,7 +164,6 @@ public abstract class CallHomeAuthorization {
 
         @Override
         protected void applyTo(final ClientSession session) {
-            checkArgument(session instanceof ClientSessionImpl);
             session.setUsername(username);
 
             // First try authentication using server host keys, else try password.
