@@ -25,7 +25,6 @@ import org.apache.sshd.client.future.OpenFuture;
 import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.common.future.SshFutureListener;
 import org.apache.sshd.common.session.Session;
-import org.checkerframework.checker.lock.qual.Holding;
 import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.NetconfClientSession;
 import org.opendaylight.netconf.client.NetconfClientSessionListener;
@@ -44,7 +43,6 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
     private final CallHomeAuthorization authorization;
     private final Factory factory;
 
-    private volatile MinaSshNettyChannel nettyChannel = null;
     private volatile boolean activated;
 
     private final InetSocketAddress remoteAddress;
@@ -84,7 +82,8 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
     SshFutureListener<OpenFuture> newSshFutureListener(final ClientChannel netconfChannel) {
         return future -> {
             if (future.isOpened()) {
-                netconfChannelOpened(netconfChannel);
+                factory.getChannelOpenListener().onNetconfSubsystemOpened(this,
+                    listener -> doActivate(netconfChannel, listener));
             } else {
                 channelOpenFailed(future.getException());
             }
@@ -102,21 +101,16 @@ class CallHomeSessionContext implements CallHomeProtocolSessionContext {
         sshSession.close(false);
     }
 
-    private void netconfChannelOpened(final ClientChannel netconfChannel) {
-        nettyChannel = newMinaSshNettyChannel(netconfChannel);
-        factory.getChannelOpenListener().onNetconfSubsystemOpened(
-            CallHomeSessionContext.this, this::doActivate);
-    }
-
-    // FIXME: this does not look right
-    @Holding("this")
-    private synchronized Promise<NetconfClientSession> doActivate(final NetconfClientSessionListener listener) {
+    private synchronized Promise<NetconfClientSession> doActivate(final ClientChannel netconfChannel,
+            final NetconfClientSessionListener listener) {
         if (activated) {
             return newSessionPromise().setFailure(new IllegalStateException("Session already activated."));
         }
+
         activated = true;
         LOG.info("Activating Netconf channel for {} with {}", getRemoteAddress(), listener);
         Promise<NetconfClientSession> activationPromise = newSessionPromise();
+        final MinaSshNettyChannel nettyChannel = newMinaSshNettyChannel(netconfChannel);
         factory.getChannelInitializer(listener).initialize(nettyChannel, activationPromise);
         factory.getNettyGroup().register(nettyChannel).awaitUninterruptibly(500);
         return activationPromise;
