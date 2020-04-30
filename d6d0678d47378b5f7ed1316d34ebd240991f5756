@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6ae7d6f5_fedb9ddf",
+        "filename": "netconf/callhome-protocol/src/main/java/org/opendaylight/netconf/callhome/protocol/MinaSshNettyChannel.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-04-30T07:51:40Z",
+      "side": 0,
+      "message": "and this needs to be replaced",
+      "range": {
+        "startLine": 39,
+        "startChar": 3,
+        "endLine": 39,
+        "endChar": 55
+      },
+      "revId": "d6d0678d47378b5f7ed1316d34ebd240991f5756",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4716cff5_6ead222e",
+        "filename": "netconf/netconf-netty-util/src/main/java/org/opendaylight/netconf/nettyutil/handler/ssh/client/NetconfClientSession.java",
+        "patchSetId": 24
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-04-30T07:51:40Z",
+      "side": 1,
+      "message": "well, this conflicts with netconf-client\u0027s view of what NetconfClientSession is -- and those two are meeting in callhome-protocol",
+      "range": {
+        "startLine": 19,
+        "startChar": 17,
+        "endLine": 19,
+        "endChar": 37
+      },
+      "revId": "016c04de7f31eda03cc1e1050c10a9f7cb8a7df8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
