@@ -40,7 +40,7 @@ public final class OperationsResourceUtils {
         for (final Module m : context.getModules()) {
             final Collection<? extends RpcDefinition> rpcs = m.getRpcs();
             if (!rpcs.isEmpty()) {
-                modules.add(m);
+                modules.add(new OperationsImportedModule(m));
                 rpcLeafSchemas.ensureCapacity(rpcLeafSchemas.size() + rpcs.size());
                 for (RpcDefinition rpc : rpcs) {
                     rpcLeafSchemas.add(new OperationsLeafSchemaNode(rpc));
