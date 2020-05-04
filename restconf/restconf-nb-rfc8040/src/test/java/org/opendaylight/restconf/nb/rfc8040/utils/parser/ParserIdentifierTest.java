@@ -250,8 +250,6 @@ public class ParserIdentifierTest {
                     RestconfError.ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
             assertEquals("Not expected error tag",
                     ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals("Not expected error status code",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
     }
 
