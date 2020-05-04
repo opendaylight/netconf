@@ -333,7 +333,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
     public void testToJsonResponseWithDataMissingErrorTag() throws Exception {
 
         testJsonResponse(new RestconfDocumentedException("mock error", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING),
-                Status.NOT_FOUND, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "mock error", null, null);
+                Status.CONFLICT, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "mock error", null, null);
     }
 
     @Test
@@ -556,7 +556,7 @@ public class RestconfDocumentedExceptionMapperTest extends JerseyTest {
     public void testToXMLResponseWithDataMissingErrorTag() throws Exception {
 
         testXMLResponse(new RestconfDocumentedException("mock error", ErrorType.PROTOCOL, ErrorTag.DATA_MISSING),
-                Status.NOT_FOUND, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "mock error", null, null);
+                Status.CONFLICT, ErrorType.PROTOCOL, ErrorTag.DATA_MISSING, "mock error", null, null);
     }
 
     @Test
