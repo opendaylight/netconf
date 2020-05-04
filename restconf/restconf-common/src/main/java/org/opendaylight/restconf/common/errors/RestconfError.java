@@ -13,6 +13,8 @@ import java.io.Serializable;
 import java.util.Locale;
 import org.opendaylight.yangtools.yang.common.RpcError;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Encapsulates a restconf error as defined in the ietf restconf draft.
@@ -25,6 +27,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
  *     See also <a href="https://tools.ietf.org/html/draft-bierman-netconf-restconf-02">RESTCONF</a>.
  */
 public class RestconfError implements Serializable {
+    private static final Logger LOG = LoggerFactory.getLogger(RestconfError.class);
     private static final long serialVersionUID = 1L;
 
     public enum ErrorType {
@@ -74,7 +77,7 @@ public class RestconfError implements Serializable {
         RESOURCE_DENIED("resource-denied", 409 /* Conflict */),
         ROLLBACK_FAILED("rollback-failed", 500 /* INTERNAL_SERVER_ERROR */),
         DATA_EXISTS("data-exists", 409 /* Conflict */),
-        DATA_MISSING("data-missing", 404 /* Resource Not Found */),
+        DATA_MISSING("data-missing", dataMissingHttpStatus()),
         OPERATION_NOT_SUPPORTED("operation-not-supported", 501 /* Not Implemented */),
         OPERATION_FAILED("operation-failed", 500 /* INTERNAL_SERVER_ERROR */),
         PARTIAL_OPERATION("partial-operation", 500 /* INTERNAL_SERVER_ERROR */),
@@ -103,6 +106,28 @@ public class RestconfError implements Serializable {
 
         public int getStatusCode() {
             return statusCode;
+        }
+
+        private static int dataMissingHttpStatus() {
+            // Control over the HTTP status reported on "data-missing" conditions. This defaults to disabled,
+            // HTTP status 409 as specified by RFC8040 (and all previous drafts). See the discussion in:
+            // https://www.rfc-editor.org/errata/eid5565
+            // https://mailarchive.ietf.org/arch/msg/netconf/hkVDdHK4xA74NgvXzWP0zObMiyY/
+            final String propName = "org.opendaylight.restconf.eid5565";
+            final String propValue = System.getProperty(propName, "enabled");
+            switch (propValue) {
+                case "enabled":
+                    // RFC7231 interpretation: 404 Not Found
+                    LOG.info("RESTCONF data-missing condition is reported as HTTP status 404 (Errata 5565)");
+                    return 404;
+                case "disabled":
+                    break;
+                default:
+                    LOG.warn("Unhandled {} value \"{}\", assuming disabled", propName, propValue);
+            }
+
+            // RFC8040 specification: 409 Conflict
+            return 409;
         }
     }
 
