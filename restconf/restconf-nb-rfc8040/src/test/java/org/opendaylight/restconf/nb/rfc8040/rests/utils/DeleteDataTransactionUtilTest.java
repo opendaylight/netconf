@@ -73,7 +73,7 @@ public class DeleteDataTransactionUtilTest {
     }
 
     /**
-     * Negative test for DELETE operation when data to delete does not exist. Error 404 is expected.
+     * Negative test for DELETE operation when data to delete does not exist. Error DATA_MISSING is expected.
      */
     @Test
     public void deleteDataNegativeTest() throws Exception {
@@ -89,7 +89,6 @@ public class DeleteDataTransactionUtilTest {
         } catch (final RestconfDocumentedException e) {
             assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
             assertEquals(ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals(404, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
     }
 }
