@@ -251,7 +251,7 @@ public class ParserIdentifierTest {
             assertEquals("Not expected error tag",
                     ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
             assertEquals("Not expected error status code",
-                    404, e.getErrors().get(0).getErrorTag().getStatusCode());
+                    409, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
     }
 

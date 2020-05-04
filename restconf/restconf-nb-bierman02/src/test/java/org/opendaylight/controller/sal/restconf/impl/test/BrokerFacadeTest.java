@@ -271,21 +271,21 @@ public class BrokerFacadeTest {
     }
 
     /**
-     * Negative test of delete operation when data to delete does not exist. Error 404 should be returned.
+     * Negative test of delete operation when data to delete does not exist. Error 409 should be returned.
      */
     @Test
     public void testCommitConfigurationDataDeleteNoData() throws Exception {
         // assume that data to delete does not exist
         prepareDataForDelete(false);
 
-        // try to delete and expect 404 error
+        // try to delete and expect 409 error
         try {
             this.brokerFacade.commitConfigurationDataDelete(this.instanceID);
             fail("Delete operation should fail due to missing data");
         } catch (final RestconfDocumentedException e) {
             assertEquals(ErrorType.PROTOCOL, e.getErrors().get(0).getErrorType());
             assertEquals(ErrorTag.DATA_MISSING, e.getErrors().get(0).getErrorTag());
-            assertEquals(404, e.getErrors().get(0).getErrorTag().getStatusCode());
+            assertEquals(409, e.getErrors().get(0).getErrorTag().getStatusCode());
         }
     }
 
