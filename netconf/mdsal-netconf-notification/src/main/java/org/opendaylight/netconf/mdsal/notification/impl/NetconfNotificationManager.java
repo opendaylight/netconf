@@ -43,7 +43,8 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.r
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfCapabilityChange;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionEnd;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfSessionStart;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.YangLibraryChange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdate;
 import org.opendaylight.yangtools.yang.binding.Notification;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
@@ -319,6 +320,7 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
 
     private static class YangLibraryPublisherReg implements YangLibraryPublisherRegistration {
         static final SchemaPath YANG_LIBRARY_CHANGE_PATH = SchemaPath.create(true, YangLibraryChange.QNAME);
+        static final SchemaPath YANG_LIBRARY_UPDATE_PATH = SchemaPath.create(true, YangLibraryUpdate.QNAME);
 
         private final NotificationPublisherRegistration baseRegistration;
         private final NotificationsTransformUtil transformUtil;
@@ -333,6 +335,12 @@ public class NetconfNotificationManager implements NetconfNotificationCollector,
         public void onYangLibraryChange(final YangLibraryChange yangLibraryChange) {
             baseRegistration.onNotification(BASE_STREAM_NAME,
                 transformUtil.transform(yangLibraryChange, YANG_LIBRARY_CHANGE_PATH));
+        }
+
+        @Override
+        public void onYangLibraryUpdate(YangLibraryUpdate yangLibraryUpdate) {
+            baseRegistration.onNotification(BASE_STREAM_NAME,
+                    transformUtil.transform(yangLibraryUpdate, YANG_LIBRARY_UPDATE_PATH));
         }
 
         @Override
