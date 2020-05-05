@@ -8,10 +8,11 @@
 
 package org.opendaylight.netconf.notifications;
 
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.YangLibraryChange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdate;
 
 /**
- * Listener for "yang-library-change" notification defined in https://tools.ietf.org/html/rfc7895.
+ * Listener for "yang-library-change" notification defined in https://tools.ietf.org/html/rfc8525.
  * This listener uses generated classes from yang model defined in RFC7895.
  */
 public interface YangLibraryNotificationListener {
@@ -20,4 +21,9 @@ public interface YangLibraryNotificationListener {
      * Callback used to notify about a change in the set of modules and submodules supported by the server.
      */
     void onYangLibraryChange(YangLibraryChange yangLibraryChange);
+
+    /**
+     * Callback generated when any YANG library information on the server has changed.
+     */
+    void onYangLibraryUpdate(YangLibraryUpdate yangLibraryUpdate);
 }
