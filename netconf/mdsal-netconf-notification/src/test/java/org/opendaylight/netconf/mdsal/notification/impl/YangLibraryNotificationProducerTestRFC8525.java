@@ -7,6 +7,7 @@
  */
 
 package org.opendaylight.netconf.mdsal.notification.impl;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -24,14 +25,14 @@ import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.notifications.YangLibraryPublisherRegistration;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.netconf.state.Capabilities;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesStateBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChange;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChangeBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdate;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdateBuilder;
 
-public class YangLibraryNotificationProducerTest {
+public class YangLibraryNotificationProducerTestRFC8525 {
 
-    private YangLibraryNotificationProducer yangLibraryNotificationProducer;
+    private YangLibraryNotificationProducerRFC8525 yangLibraryNotificationProducer;
 
     @Mock
     private YangLibraryPublisherRegistration yangLibraryPublisherRegistration;
@@ -45,27 +46,27 @@ public class YangLibraryNotificationProducerTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        doNothing().when(yangLibraryPublisherRegistration).onYangLibraryChange(any(YangLibraryChange.class));
+        doNothing().when(yangLibraryPublisherRegistration).onYangLibraryUpdate(any(YangLibraryUpdate.class));
         doReturn(yangLibraryPublisherRegistration).when(netconfNotificationCollector)
                 .registerYangLibraryPublisher();
 
-        yangLibraryNotificationProducer = new YangLibraryNotificationProducer(netconfNotificationCollector,
+        yangLibraryNotificationProducer = new YangLibraryNotificationProducerRFC8525(netconfNotificationCollector,
                 dataBroker);
     }
 
     @Test
     public void testOnDataTreeChanged() {
-        final String moduleSetId = "1";
-        ModulesState modulesStateAfter = new ModulesStateBuilder().setModuleSetId(moduleSetId).build();
+        final String contentId = "1";
+        YangLibrary yangLibraryAfter = new YangLibraryBuilder().setContentId(contentId).build();
 
-        final DataTreeModification<ModulesState> treeChange = mock(DataTreeModification.class);
+        final DataTreeModification<YangLibrary> treeChange = mock(DataTreeModification.class);
         final DataObjectModification<Capabilities> objectChange = mock(DataObjectModification.class);
         doReturn(objectChange).when(treeChange).getRootNode();
-        doReturn(modulesStateAfter).when(objectChange).getDataAfter();
+        doReturn(yangLibraryAfter).when(objectChange).getDataAfter();
 
-        YangLibraryChange yangLibraryChange = new YangLibraryChangeBuilder().setModuleSetId(moduleSetId).build();
+        YangLibraryUpdate yangLibraryUpdate = new YangLibraryUpdateBuilder().setContentId(contentId).build();
         yangLibraryNotificationProducer.onDataTreeChanged(Collections.singleton(treeChange));
 
-        verify(yangLibraryPublisherRegistration).onYangLibraryChange(yangLibraryChange);
+        verify(yangLibraryPublisherRegistration).onYangLibraryUpdate(yangLibraryUpdate);
     }
 }
