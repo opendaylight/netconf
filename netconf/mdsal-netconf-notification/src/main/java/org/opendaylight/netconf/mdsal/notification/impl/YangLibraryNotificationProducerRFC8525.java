@@ -9,52 +9,49 @@
 package org.opendaylight.netconf.mdsal.notification.impl;
 
 import java.util.Collection;
+import org.eclipse.jdt.annotation.NonNull;
 import org.opendaylight.mdsal.binding.api.DataBroker;
 import org.opendaylight.mdsal.binding.api.DataObjectModification;
 import org.opendaylight.mdsal.binding.api.DataTreeModification;
 import org.opendaylight.netconf.notifications.NetconfNotificationCollector;
 import org.opendaylight.netconf.notifications.YangLibraryPublisherRegistration;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChange;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChangeBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibrary;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdate;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdateBuilder;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
 /**
- * Listens on the set of modules and submodules changes in data store and publishes
+ * Listens on the modules, submodules, datastores, and datastore schemas changes in data store and publishes
  * to base netconf notification stream listener a server-specific identifier representing
- * the current set of modules and submodules.
- *
- * @deprecated ietf-yang-library:yang-library-change was deprecated in the new RFC8525.
- *             Use {@link YangLibraryNotificationProducerRFC8525}.
+ * the current set of modules, submodules, datastores, and datastore schemas.
  */
-@Deprecated(forRemoval = true)
-public final class YangLibraryNotificationProducer extends OperationalDatastoreListener<ModulesState>
-    implements AutoCloseable {
+public final class YangLibraryNotificationProducerRFC8525 extends OperationalDatastoreListener<YangLibrary>
+        implements AutoCloseable {
 
-    private static final InstanceIdentifier<ModulesState> MODULES_STATE_INSTANCE_IDENTIFIER =
-            InstanceIdentifier.create(ModulesState.class);
+    private static final InstanceIdentifier<YangLibrary> YANG_LIBRARY_INSTANCE_IDENTIFIER =
+            InstanceIdentifier.create(YangLibrary.class);
 
     private final ListenerRegistration<?> yangLibraryChangeListenerRegistration;
     private final YangLibraryPublisherRegistration yangLibraryPublisherRegistration;
 
-    public YangLibraryNotificationProducer(final NetconfNotificationCollector netconfNotificationCollector,
+    public YangLibraryNotificationProducerRFC8525(final NetconfNotificationCollector netconfNotificationCollector,
                                            final DataBroker dataBroker) {
-        super(MODULES_STATE_INSTANCE_IDENTIFIER);
+        super(YANG_LIBRARY_INSTANCE_IDENTIFIER);
         this.yangLibraryPublisherRegistration = netconfNotificationCollector.registerYangLibraryPublisher();
         this.yangLibraryChangeListenerRegistration = registerOnChanges(dataBroker);
     }
 
     @Override
-    public void onDataTreeChanged(final Collection<DataTreeModification<ModulesState>> changes) {
-        for (DataTreeModification<ModulesState> change : changes) {
-            final DataObjectModification<ModulesState> rootNode = change.getRootNode();
-            final ModulesState dataAfter = rootNode.getDataAfter();
+    public void onDataTreeChanged(@NonNull Collection<DataTreeModification<YangLibrary>> changes) {
+        for (DataTreeModification<YangLibrary> change : changes) {
+            final DataObjectModification<YangLibrary> rootNode = change.getRootNode();
+            final YangLibrary dataAfter = rootNode.getDataAfter();
             if (dataAfter != null) {
-                final YangLibraryChange yangLibraryChange = new YangLibraryChangeBuilder()
-                        .setModuleSetId(dataAfter.getModuleSetId())
+                final YangLibraryUpdate yangLibraryUpdate = new YangLibraryUpdateBuilder()
+                        .setContentId(dataAfter.getContentId())
                         .build();
-                yangLibraryPublisherRegistration.onYangLibraryChange(yangLibraryChange);
+                yangLibraryPublisherRegistration.onYangLibraryUpdate(yangLibraryUpdate);
             }
         }
     }

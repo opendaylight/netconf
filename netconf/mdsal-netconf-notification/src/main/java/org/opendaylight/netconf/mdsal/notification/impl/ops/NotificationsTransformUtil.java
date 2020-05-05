@@ -25,7 +25,8 @@ import org.opendaylight.netconf.notifications.NetconfNotification;
 import org.opendaylight.netconf.util.NetconfUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netmod.notification.rev080714.Netconf;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.notifications.rev120206.NetconfConfigChange;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.YangLibraryChange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryChange;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.YangLibraryUpdate;
 import org.opendaylight.yangtools.yang.binding.Notification;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
@@ -41,7 +42,7 @@ public final class NotificationsTransformUtil {
     public NotificationsTransformUtil(final YangParserFactory parserFactory, final BindingRuntimeGenerator generator,
             final BindingDOMCodecFactory codecFactory) {
         final BindingRuntimeContext ctx = BindingRuntimeHelpers.createRuntimeContext(parserFactory, generator,
-            Netconf.class, NetconfConfigChange.class, YangLibraryChange.class);
+            Netconf.class, NetconfConfigChange.class, YangLibraryChange.class, YangLibraryUpdate.class);
         schemaContext = ctx.getSchemaContext();
         verify(schemaContext.getOperations().stream()
                 .filter(input -> input.getQName().getLocalName().equals(CreateSubscription.CREATE_SUBSCRIPTION))
