@@ -24,4 +24,12 @@
         <argument ref="dataBroker" />
     </bean>
 
+    <bean id="schemaServiceToMdsalWriterRFC8525"
+          class="org.opendaylight.netconf.mdsal.yang.library.rfc8525.SchemaServiceToMdsalWriter"
+          init-method="start"
+          destroy-method="close">
+        <argument ref="schemaService" />
+        <argument ref="dataBroker" />
+    </bean>
+
 </blueprint>

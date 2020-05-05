@@ -20,14 +20,14 @@ import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesState;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.ModulesStateBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.RevisionUtils;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module.ConformanceType;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.ModuleBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.module.Submodule;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.module.SubmoduleBuilder;
-import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.module.SubmoduleKey;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesState;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.ModulesStateBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.CommonLeafsRevisionBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module.ConformanceType;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.ModuleBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.Submodule;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.SubmoduleBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.module.SubmoduleKey;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.YangIdentifier;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
@@ -58,7 +58,20 @@ public class SchemaServiceToMdsalWriter implements EffectiveModelContextListener
 
     @Override
     public void close() {
-        // TODO Delete modules-state from operational data store
+        final WriteTransaction tx = dataBroker.newWriteOnlyTransaction();
+        tx.delete(LogicalDatastoreType.OPERATIONAL, MODULES_STATE_INSTANCE_IDENTIFIER);
+
+        tx.commit().addCallback(new FutureCallback<CommitInfo>() {
+            @Override
+            public void onSuccess(final CommitInfo info) {
+                LOG.debug("Module state cleared successfully");
+            }
+
+            @Override
+            public void onFailure(final Throwable throwable) {
+                LOG.warn("Unable to clear module state", throwable);
+            }
+        }, MoreExecutors.directExecutor());
     }
 
     /**
@@ -95,16 +108,16 @@ public class SchemaServiceToMdsalWriter implements EffectiveModelContextListener
                 .setModule(modules.stream()
                     .map(this::createModuleEntryFromModule)
                     .collect(Collectors.toMap(org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library
-                        .rev160621.module.list.Module::key, Function.identity())))
+                        .rev190104.module.list.Module::key, Function.identity())))
                 .setModuleSetId(String.valueOf(moduleSetId.getAndIncrement()))
                 .build();
     }
 
-    private org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev160621.module.list.Module
+    private org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.library.rev190104.module.list.Module
         createModuleEntryFromModule(final Module module) {
         return new ModuleBuilder()
                 .setName(new YangIdentifier(module.getName()))
-                .setRevision(RevisionUtils.fromYangCommon(module.getQNameModule().getRevision()))
+                .setRevision(CommonLeafsRevisionBuilder.fromYangCommon(module.getQNameModule().getRevision()))
                 .setNamespace(new Uri(module.getNamespace().toString()))
                 // FIXME: Conformance type is always set to Implement value, but it should it really be like this?
                 .setConformanceType(ConformanceType.Implement)
@@ -117,7 +130,7 @@ public class SchemaServiceToMdsalWriter implements EffectiveModelContextListener
         return module.getSubmodules().stream()
                 .map(subModule -> new SubmoduleBuilder()
                     .setName(new YangIdentifier(subModule.getName()))
-                    .setRevision(RevisionUtils.fromYangCommon(subModule.getQNameModule().getRevision()))
+                    .setRevision(CommonLeafsRevisionBuilder.fromYangCommon(subModule.getQNameModule().getRevision()))
                     .build())
                 .collect(Collectors.toMap(Submodule::key, Function.identity()));
     }
