@@ -105,18 +105,21 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
         final List<Set<QName>> limitedFields = new ArrayList<>();
         limitedFields.add(Sets.newHashSet(leafSetNodeIdentifier.getNodeType()));
         limitedFields.add(Sets.newHashSet(leafSetEntryNodeIdentifier.getNodeType()));
+        final List<String> parentChildRelation = new ArrayList<>();
 
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, 1, limitedFields);
+                writer, 1, limitedFields, parentChildRelation);
 
         parameterWriter.write(containerNodeData);
 
         final InOrder inOrder = Mockito.inOrder(writer);
         inOrder.verify(writer, Mockito.times(1)).startContainerNode(containerNodeIdentifier, containerNodeValue.size());
+        /*After fixed NETCONF-660 issue, commented out below lines
         inOrder.verify(writer, Mockito.times(1)).startLeafSet(leafSetNodeIdentifier, leafSetNodeValue.size());
         inOrder.verify(writer, Mockito.times(1)).startLeafSetEntryNode(leafSetEntryNodeIdentifier);
         inOrder.verify(writer, Mockito.times(1)).scalarValue(leafSetEntryNodeValue);
-        inOrder.verify(writer, Mockito.times(3)).endNode();
+        */
+        inOrder.verify(writer, Mockito.times(1)).endNode();
         Mockito.verifyNoMoreInteractions(writer);
     }
 
@@ -127,7 +130,7 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
     @Test
     public void writeRootDataTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, null, null);
+                writer, null, null, null);
 
         parameterWriter.write(rootDataContainerData);
 
