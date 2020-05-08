@@ -54,12 +54,16 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
     private final Integer maxDepth;
     protected final List<Set<QName>> fields;
     protected int currentDepth = 0;
+    protected final List<String> parentChildRelation;
+    protected String parentNode = "";
 
     private ParameterAwareNormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final Integer maxDepth,
-                                               final List<Set<QName>> fields) {
+                                               final List<Set<QName>> fields,
+                                               final List<String> parentChildRelation) {
         this.writer = requireNonNull(writer);
         this.maxDepth = maxDepth;
         this.fields = fields;
+        this.parentChildRelation = parentChildRelation;
     }
 
     protected final NormalizedNodeStreamWriter getWriter() {
@@ -72,16 +76,18 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
      * @param writer Back-end writer
      * @param maxDepth Maximal depth to write
      * @param fields Selected child nodes to write
+     * @param parentChildRelation Contain parent and child relation
      * @return A new instance.
      */
     public static ParameterAwareNormalizedNodeWriter forStreamWriter(
-            final NormalizedNodeStreamWriter writer, final Integer maxDepth, final List<Set<QName>> fields) {
-        return forStreamWriter(writer, true,  maxDepth, fields);
+            final NormalizedNodeStreamWriter writer, final Integer maxDepth,
+            final List<Set<QName>> fields, final List<String> parentChildRelation) {
+        return forStreamWriter(writer, true,  maxDepth, fields, parentChildRelation);
     }
 
     /**
      * Create a new writer backed by a {@link NormalizedNodeStreamWriter}. Unlike the simple
-     * {@link #forStreamWriter(NormalizedNodeStreamWriter, Integer, List)}
+     * {@link #forStreamWriter(NormalizedNodeStreamWriter, Integer, List, List)}
      * method, this allows the caller to switch off RFC6020 XML compliance, providing better
      * throughput. The reason is that the XML mapping rules in RFC6020 require the encoding
      * to emit leaf nodes which participate in a list's key first and in the order in which
@@ -94,14 +100,17 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
      * @param orderKeyLeaves whether the returned instance should be RFC6020 XML compliant.
      * @param maxDepth Maximal depth to write
      * @param fields Selected child nodes to write
+     * @param parentChildRelation Contain parent and child relation
      * @return A new instance.
      */
     public static ParameterAwareNormalizedNodeWriter forStreamWriter(final NormalizedNodeStreamWriter writer,
                                                                      final boolean orderKeyLeaves,
                                                                      final Integer maxDepth,
-                                                                     final List<Set<QName>> fields) {
-        return orderKeyLeaves ? new OrderedParameterAwareNormalizedNodeWriter(writer, maxDepth, fields)
-                : new ParameterAwareNormalizedNodeWriter(writer, maxDepth, fields);
+                                                                     final List<Set<QName>> fields,
+                                                                     final List<String> parentChildRelation) {
+        return orderKeyLeaves ? new OrderedParameterAwareNormalizedNodeWriter(writer, maxDepth,
+            fields, parentChildRelation)
+                : new ParameterAwareNormalizedNodeWriter(writer, maxDepth, fields, parentChildRelation);
     }
 
     /**
@@ -205,26 +214,71 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
 
         // write only selected nodes
         if (currentDepth > 0 && currentDepth <= fields.size()) {
-            return fields.get(currentDepth - 1).contains(node.getNodeType());
+            for (Set<QName> field : fields) {
+                if (field.contains(node.getNodeType())) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         // after this depth only depth parameter is used to determine when to write node
         return maxDepth == null || currentDepth < maxDepth;
     }
 
-    /**
-     * Emit events for all children and then emit an endNode() event.
-     *
-     * @param children Child iterable
-     * @param mixinParent {@code true} if parent is mixin, {@code false} otherwise
-     * @return True
-     * @throws IOException when the writer reports it
-     */
-    protected final boolean writeChildren(final Iterable<? extends NormalizedNode<?, ?>> children,
-                                          final boolean mixinParent) throws IOException {
+    protected final boolean checkParentChildRelation(String parent, String child) {
+        if (parentChildRelation == null || parent.isBlank()) {
+            return true;
+        }
+        else if (parent.equalsIgnoreCase(child)) {
+            return true;
+        }
+        else {
+            String[] arrOfStr;
+            for (String str : parentChildRelation) {
+                arrOfStr = str.split("#");
+                if (arrOfStr[0].equalsIgnoreCase(parent) && arrOfStr[1].equalsIgnoreCase(child)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    protected final boolean escapeSearchFields(final Iterable<? extends NormalizedNode<?, ?>> children) {
+        if (fields != null) {
+            for (final NormalizedNode<?, ?> child : children) {
+                for (Set<QName> field : fields) {
+                    if (field.contains(child.getNodeType())) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    protected final boolean writeChildren(final NormalizedNode<?, ?> node,
+                        final Iterable<? extends NormalizedNode<?, ?>> children,
+        final boolean mixinParent) throws IOException {
+        boolean escapeSearchFields = escapeSearchFields(children);
         for (final NormalizedNode<?, ?> child : children) {
-            if (selectedByParameters(child, mixinParent)) {
+            if (escapeSearchFields) {
                 write(child);
+            } else {
+                parentNode = node.getNodeType().getLocalName();
+                if (child instanceof ContainerNode == true
+                        || child instanceof AugmentationNode == true) {
+                    if (selectedByParameters(child, mixinParent)) {
+                        write(child);
+                    }
+                } else {
+                    if (checkParentChildRelation(parentNode, child.getNodeType().getLocalName())) {
+                        if (selectedByParameters(child, mixinParent)) {
+                            write(child);
+                        }
+                    }
+                }
             }
         }
         writer.endNode();
@@ -233,7 +287,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
 
     protected boolean writeMapEntryChildren(final MapEntryNode mapEntryNode) throws IOException {
         if (selectedByParameters(mapEntryNode, false)) {
-            writeChildren(mapEntryNode.getValue(), false);
+            writeChildren(mapEntryNode, mapEntryNode.getValue(), false);
         } else if (fields == null && maxDepth != null && currentDepth == maxDepth) {
             writeOnlyKeys(mapEntryNode.getIdentifier().entrySet());
         }
@@ -264,7 +318,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
             if (!n.getNodeType().withoutRevision().equals(ROOT_DATA_QNAME)) {
                 writer.startContainerNode(n.getIdentifier(), childSizeHint(n.getValue()));
                 currentDepth++;
-                processedAsCompositeNode = writeChildren(n.getValue(), false);
+                processedAsCompositeNode = writeChildren(n, n.getValue(), false);
                 currentDepth--;
             } else {
                 // write child nodes of data root container
@@ -283,28 +337,28 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
             final UnkeyedListEntryNode n = (UnkeyedListEntryNode) node;
             writer.startUnkeyedListItem(n.getIdentifier(), childSizeHint(n.getValue()));
             currentDepth++;
-            processedAsCompositeNode = writeChildren(n.getValue(), false);
+            processedAsCompositeNode = writeChildren(n, n.getValue(), false);
             currentDepth--;
         } else if (node instanceof ChoiceNode) {
             final ChoiceNode n = (ChoiceNode) node;
             writer.startChoiceNode(n.getIdentifier(), childSizeHint(n.getValue()));
-            processedAsCompositeNode = writeChildren(n.getValue(), true);
+            processedAsCompositeNode = writeChildren(n, n.getValue(), true);
         } else if (node instanceof AugmentationNode) {
             final AugmentationNode n = (AugmentationNode) node;
             writer.startAugmentationNode(n.getIdentifier());
-            processedAsCompositeNode = writeChildren(n.getValue(), true);
+            processedAsCompositeNode = writeChildren(n, n.getValue(), true);
         } else if (node instanceof UnkeyedListNode) {
             final UnkeyedListNode n = (UnkeyedListNode) node;
             writer.startUnkeyedList(n.getIdentifier(), childSizeHint(n.getValue()));
-            processedAsCompositeNode = writeChildren(n.getValue(), false);
+            processedAsCompositeNode = writeChildren(n, n.getValue(), false);
         } else if (node instanceof OrderedMapNode) {
             final OrderedMapNode n = (OrderedMapNode) node;
             writer.startOrderedMapNode(n.getIdentifier(), childSizeHint(n.getValue()));
-            processedAsCompositeNode = writeChildren(n.getValue(), true);
+            processedAsCompositeNode = writeChildren(n, n.getValue(), true);
         } else if (node instanceof MapNode) {
             final MapNode n = (MapNode) node;
             writer.startMapNode(n.getIdentifier(), childSizeHint(n.getValue()));
-            processedAsCompositeNode = writeChildren(n.getValue(), true);
+            processedAsCompositeNode = writeChildren(n, n.getValue(), true);
         } else if (node instanceof LeafSetNode) {
             final LeafSetNode<?> n = (LeafSetNode<?>) node;
             if (node instanceof OrderedLeafSetNode) {
@@ -313,7 +367,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
                 writer.startLeafSet(n.getIdentifier(), childSizeHint(n.getValue()));
             }
             currentDepth++;
-            processedAsCompositeNode = writeChildren(n.getValue(), true);
+            processedAsCompositeNode = writeChildren(n, n.getValue(), true);
             currentDepth--;
         }
 
@@ -324,8 +378,20 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
         private static final Logger LOG = LoggerFactory.getLogger(OrderedParameterAwareNormalizedNodeWriter.class);
 
         OrderedParameterAwareNormalizedNodeWriter(final NormalizedNodeStreamWriter writer, final Integer maxDepth,
-                                                  final List<Set<QName>> fields) {
-            super(writer, maxDepth, fields);
+                                                  final List<Set<QName>> fields,
+                                                  final List<String> parentChildRelation) {
+            super(writer, maxDepth, fields, parentChildRelation);
+        }
+
+        protected boolean doesNodeExistsInSearchFileds(final NormalizedNode<?, ?> node) {
+            if (fields != null) {
+                for (Set<QName> field : fields) {
+                    if (field.contains(node.getNodeType())) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         @Override
@@ -339,7 +405,12 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
             for (final QName qname : qnames) {
                 final Optional<? extends NormalizedNode<?, ?>> child = node.getChild(new NodeIdentifier(qname));
                 if (child.isPresent()) {
-                    if (selectedByParameters(child.get(), false)) {
+                    if (doesNodeExistsInSearchFileds(child.get())) {
+                        if (selectedByParameters(child.get(), false)) {
+                            write(child.get());
+                        }
+                    }
+                    else {
                         write(child.get());
                     }
                 } else {
@@ -351,7 +422,7 @@ public class ParameterAwareNormalizedNodeWriter implements RestconfNormalizedNod
             currentDepth++;
             // Write all the rest
             final boolean result =
-                    writeChildren(Iterables.filter(node.getValue(), input -> {
+                    writeChildren(node, Iterables.filter(node.getValue(), input -> {
                         if (input instanceof AugmentationNode) {
                             return true;
                         }
