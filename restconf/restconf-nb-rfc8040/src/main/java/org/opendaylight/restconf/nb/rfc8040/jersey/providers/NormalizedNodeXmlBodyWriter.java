@@ -98,12 +98,14 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
         final SchemaPath schemaPath = pathContext.getSchemaNode().getPath();
 
         writeNormalizedNode(xmlWriter, schemaPath, pathContext, data, context.getWriterParameters().getDepth(),
-                context.getWriterParameters().getFields());
+                context.getWriterParameters().getFields(),
+                context.getWriterParameters().getParentChildRelation());
     }
 
     private static void writeNormalizedNode(final XMLStreamWriter xmlWriter,
             final SchemaPath path, final InstanceIdentifierContext<?> pathContext, final NormalizedNode<?, ?> data,
-            final Integer depth, final List<Set<QName>> fields) throws IOException {
+            final Integer depth, final List<Set<QName>> fields,
+            final List<String> parentChildRelation) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
         final SchemaContext schemaCtx = pathContext.getSchemaContext();
 
@@ -117,7 +119,8 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
                     schemaCtx,
                     ((RpcDefinition) pathContext.getSchemaNode()).getOutput().getPath(),
                     depth,
-                    fields);
+                    fields,
+                    parentChildRelation);
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
         } else if (pathContext.getSchemaNode() instanceof ActionDefinition) {
             /*
@@ -125,13 +128,15 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
              *  so we need to emit initial output declaration..
              */
             nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx,
-                ((ActionDefinition) pathContext.getSchemaNode()).getOutput().getPath(), depth, fields);
+                ((ActionDefinition) pathContext.getSchemaNode()).getOutput().getPath(), depth,
+                    fields, parentChildRelation);
             writeElements(xmlWriter, nnWriter, (ContainerNode) data);
         } else {
             if (SchemaPath.ROOT.equals(path)) {
-                nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, path, depth, fields);
+                nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, path, depth, fields, parentChildRelation);
             } else {
-                nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, path.getParent(), depth, fields);
+                nnWriter = createNormalizedNodeWriter(xmlWriter, schemaCtx, path.getParent(), depth,
+                    fields, parentChildRelation);
             }
 
             if (data instanceof MapEntryNode) {
@@ -148,10 +153,11 @@ public class NormalizedNodeXmlBodyWriter implements MessageBodyWriter<Normalized
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(final XMLStreamWriter xmlWriter,
             final SchemaContext schemaContext, final SchemaPath schemaPath, final Integer depth,
-            final List<Set<QName>> fields) {
+            final List<Set<QName>> fields,
+            final List<String> parentChildRelation) {
         final NormalizedNodeStreamWriter xmlStreamWriter = XMLStreamNormalizedNodeStreamWriter
                 .create(xmlWriter, schemaContext, schemaPath);
-        return ParameterAwareNormalizedNodeWriter.forStreamWriter(xmlStreamWriter, depth, fields);
+        return ParameterAwareNormalizedNodeWriter.forStreamWriter(xmlStreamWriter, depth, fields, parentChildRelation);
     }
 
     private static void writeElements(final XMLStreamWriter xmlWriter, final RestconfNormalizedNodeWriter nnWriter,
