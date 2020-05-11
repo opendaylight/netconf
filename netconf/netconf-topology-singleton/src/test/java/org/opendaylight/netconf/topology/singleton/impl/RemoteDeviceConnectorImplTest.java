@@ -67,7 +67,7 @@ import org.opendaylight.yangtools.yang.common.Uint32;
 import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 import scala.concurrent.duration.Duration;
 
-public class RemoteDeviceConnectorImplTest {
+public class RemoteDeviceConnectorImplTest extends AbstractBaseSchemasTest {
 
     private static final NodeId NODE_ID = new NodeId("testing-node");
     private static final String TOPOLOGY_ID = "testing-topology";
@@ -124,16 +124,17 @@ public class RemoteDeviceConnectorImplTest {
         doNothing().when(writeTx).merge(eq(LogicalDatastoreType.OPERATIONAL), any(), any());
         doReturn("Some object").when(writeTx).getIdentifier();
         doReturn(emptyFluentFuture()).when(writeTx).commit();
-        builder = new NetconfTopologySetup.NetconfTopologySetupBuilder();
-        builder.setDataBroker(dataBroker);
-        builder.setRpcProviderRegistry(rpcProviderRegistry);
-        builder.setClusterSingletonServiceProvider(clusterSingletonServiceProvider);
-        builder.setKeepaliveExecutor(keepaliveExecutor);
-        builder.setProcessingExecutor(processingExecutor);
-        builder.setActorSystem(actorSystem);
-        builder.setEventExecutor(eventExecutor);
-        builder.setNetconfClientDispatcher(clientDispatcher);
-        builder.setTopologyId(TOPOLOGY_ID);
+        builder = new NetconfTopologySetup.NetconfTopologySetupBuilder()
+                .setBaseSchemas(BASE_SCHEMAS)
+                .setDataBroker(dataBroker)
+                .setRpcProviderRegistry(rpcProviderRegistry)
+                .setClusterSingletonServiceProvider(clusterSingletonServiceProvider)
+                .setKeepaliveExecutor(keepaliveExecutor)
+                .setProcessingExecutor(processingExecutor)
+                .setActorSystem(actorSystem)
+                .setEventExecutor(eventExecutor)
+                .setNetconfClientDispatcher(clientDispatcher)
+                .setTopologyId(TOPOLOGY_ID);
     }
 
     @SuppressWarnings("unchecked")

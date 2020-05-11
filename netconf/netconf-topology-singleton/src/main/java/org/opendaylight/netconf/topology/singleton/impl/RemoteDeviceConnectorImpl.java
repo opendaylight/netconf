@@ -200,12 +200,14 @@ public class RemoteDeviceConnectorImpl implements RemoteDeviceConnector {
 
         final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device;
         if (node.isSchemaless()) {
-            device = new SchemalessNetconfDevice(remoteDeviceId, salFacade);
+            device = new SchemalessNetconfDevice(netconfTopologyDeviceSetup.getBaseSchemas(), remoteDeviceId,
+                salFacade);
         } else {
             device = new NetconfDeviceBuilder()
                     .setReconnectOnSchemasChange(reconnectOnChangedSchema)
                     .setSchemaResourcesDTO(schemaResourcesDTO)
                     .setGlobalProcessingExecutor(netconfTopologyDeviceSetup.getProcessingExecutor())
+                    .setBaseSchemas(netconfTopologyDeviceSetup.getBaseSchemas())
                     .setId(remoteDeviceId)
                     .setDeviceActionFactory(deviceActionFactory)
                     .setSalFacade(salFacade)

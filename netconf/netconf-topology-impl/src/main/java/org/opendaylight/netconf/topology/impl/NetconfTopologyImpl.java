@@ -30,6 +30,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.NetworkTopology;
@@ -60,9 +61,9 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             final ThreadPool processingExecutor,
             final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService) {
+            final AAAEncryptionService encryptionService, final BaseNetconfSchemas baseSchemas) {
         this(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, null);
+                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, baseSchemas, null);
     }
 
     public NetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
@@ -70,10 +71,11 @@ public class NetconfTopologyImpl extends AbstractNetconfTopology
             final ThreadPool processingExecutor,
             final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService,
+            final AAAEncryptionService encryptionService, final BaseNetconfSchemas baseSchemas,
             final DeviceActionFactory deviceActionFactory) {
         super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor, processingExecutor,
-                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, deviceActionFactory);
+                schemaRepositoryProvider, dataBroker, mountPointService, encryptionService, deviceActionFactory,
+                baseSchemas);
     }
 
     @Override

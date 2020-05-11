@@ -165,7 +165,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Pantelis
  */
 @RunWith(MockitoJUnitRunner.class)
-public class MountPointEndToEndTest {
+public class MountPointEndToEndTest extends AbstractBaseSchemasTest {
     private static final Logger LOG = LoggerFactory.getLogger(MountPointEndToEndTest.class);
 
     private static final String TOP_MODULE_NAME = "opendaylight-mdsal-list-test";
@@ -288,10 +288,11 @@ public class MountPointEndToEndTest {
             PotentialSchemaSource.create(RevisionSourceIdentifier.create(TOP_MODULE_NAME,
                     topModuleInfo.getName().getRevision()), YangTextSchemaSource.class, 1));
 
-        masterNetconfTopologyManager = new NetconfTopologyManager(masterDataBroker, mockRpcProviderRegistry,
-            mockActionProviderRegistry, masterClusterSingletonServiceProvider, mockKeepaliveExecutor, mockThreadPool,
-                mockMasterActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
-                masterMountPointService, mockEncryptionService, deviceActionFactory, resourceManager) {
+        masterNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, masterDataBroker,
+                mockRpcProviderRegistry, mockActionProviderRegistry, masterClusterSingletonServiceProvider,
+                mockKeepaliveExecutor, mockThreadPool, mockMasterActorSystemProvider, eventExecutor,
+                mockClientDispatcher, TOPOLOGY_ID, config, masterMountPointService, mockEncryptionService,
+                deviceActionFactory, resourceManager) {
             @Override
             protected NetconfTopologyContext newNetconfTopologyContext(final NetconfTopologySetup setup,
                 final ServiceGroupIdentifier serviceGroupIdent, final Timeout actorResponseWaitTime,
@@ -327,7 +328,7 @@ public class MountPointEndToEndTest {
         doReturn(mockSlaveClusterSingletonServiceReg).when(mockSlaveClusterSingletonServiceProvider)
                 .registerClusterSingletonService(any());
 
-        slaveNetconfTopologyManager = new NetconfTopologyManager(slaveDataBroker, mockRpcProviderRegistry,
+        slaveNetconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, slaveDataBroker, mockRpcProviderRegistry,
             mockActionProviderRegistry, mockSlaveClusterSingletonServiceProvider, mockKeepaliveExecutor, mockThreadPool,
                 mockSlaveActorSystemProvider, eventExecutor, mockClientDispatcher, TOPOLOGY_ID, config,
                 slaveMountPointService, mockEncryptionService, deviceActionFactory, resourceManager) {

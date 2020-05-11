@@ -8,8 +8,8 @@
 package org.opendaylight.netconf.sal.connect.netconf.schema.mapping;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
-import java.util.Map;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
@@ -28,8 +28,8 @@ import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
 import org.opendaylight.yangtools.yang.data.api.schema.DOMSourceAnyxmlNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -38,13 +38,14 @@ import org.w3c.dom.Element;
  * Transforms base netconf RPCs.
  */
 public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfMessage> {
-
-    private static final Map<QName, ? extends RpcDefinition> MAPPED_RPCS = BaseSchema.BASE_NETCONF_CTX.getMappedRpcs();
-    private static final SchemaContext SCHEMA_CONTEXT = BaseSchema.BASE_NETCONF_CTX.getSchemaContext();
-
+    private final ImmutableMap<QName, ? extends RpcDefinition> mappedRpcs;
+    private final EffectiveModelContext modelContext;
     private final MessageCounter counter;
 
-    public BaseRpcSchemalessTransformer(final MessageCounter counter) {
+    public BaseRpcSchemalessTransformer(final BaseNetconfSchemas baseSchemas, final MessageCounter counter) {
+        final BaseSchema baseSchema = baseSchemas.getBaseSchema();
+        mappedRpcs = baseSchema.getMappedRpcs();
+        modelContext = baseSchema.getEffectiveModelContext();
         this.counter = counter;
     }
 
@@ -58,8 +59,8 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfM
         // In case no input for rpc is defined, we can simply construct the payload here
         final QName rpcQName = rpc.getLastComponent();
 
-        final RpcDefinition mappedRpc = Preconditions.checkNotNull(MAPPED_RPCS.get(rpcQName),
-            "Unknown rpc %s, available rpcs: %s", rpcQName, MAPPED_RPCS.keySet());
+        final RpcDefinition mappedRpc = Preconditions.checkNotNull(mappedRpcs.get(rpcQName),
+            "Unknown rpc %s, available rpcs: %s", rpcQName, mappedRpcs.keySet());
         final DOMResult domResult = NetconfMessageTransformUtil.prepareDomResultForRpcRequest(rpcQName, counter);
         if (mappedRpc.getInput().getChildNodes().isEmpty()) {
             return new NetconfMessage(domResult.getNode().getOwnerDocument());
@@ -74,8 +75,7 @@ public class BaseRpcSchemalessTransformer implements MessageTransformer<NetconfM
         final DOMResult result = domResult;
 
         try {
-            NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result,
-                    inputPath, SCHEMA_CONTEXT);
+            NetconfMessageTransformUtil.writeNormalizedRpc((ContainerNode) payload, result, inputPath, modelContext);
         } catch (final XMLStreamException | IOException | IllegalStateException e) {
             throw new IllegalStateException("Unable to serialize " + inputPath, e);
         }
