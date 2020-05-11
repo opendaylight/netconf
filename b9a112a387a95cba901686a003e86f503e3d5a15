@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d5a2e88d_18a2e6b3",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriterFieldsTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 8208
+      },
+      "writtenOn": "2020-05-11T05:25:29Z",
+      "side": 0,
+      "message": "Not clear why these lines have been removed.",
+      "revId": "b9a112a387a95cba901686a003e86f503e3d5a15",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}

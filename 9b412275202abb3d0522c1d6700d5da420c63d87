@@ -1,0 +1,152 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ae38d549_06d4d427",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 8208
+      },
+      "writtenOn": "2020-05-11T05:25:29Z",
+      "side": 1,
+      "message": "This function is lacking description",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 229,
+        "endChar": 4
+      },
+      "revId": "9b412275202abb3d0522c1d6700d5da420c63d87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fbd0e257_54ec87f5",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 8208
+      },
+      "writtenOn": "2020-05-11T05:25:29Z",
+      "side": 1,
+      "message": "This function is lacking description.",
+      "revId": "9b412275202abb3d0522c1d6700d5da420c63d87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0348638e_484e61c3",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 8208
+      },
+      "writtenOn": "2020-05-11T05:25:29Z",
+      "side": 1,
+      "message": "What happened to the description of this function? Also, if we are now having to pass \u0027node\u0027, why do we need to pass node.getValue()?",
+      "revId": "9b412275202abb3d0522c1d6700d5da420c63d87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "60579d0f_a043a54a",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 8208
+      },
+      "writtenOn": "2020-05-11T05:25:29Z",
+      "side": 1,
+      "message": "Spelling of Fields in the function name. s/doesNodeExistsInSearchFileds/doesNodeExistInSearchFields/",
+      "revId": "9b412275202abb3d0522c1d6700d5da420c63d87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f1b52f29_02325bd5",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriterDepthTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 8208
+      },
+      "writtenOn": "2020-05-11T05:25:29Z",
+      "side": 1,
+      "message": "If this code is not valid anymore, please remove it. The diffs will show that these lines have been removed.\n\nAlso you need to mention that other tests meant for testing the order are set to @Ignore for the same reason.",
+      "range": {
+        "startLine": 116,
+        "startChar": 11,
+        "endLine": 124,
+        "endChar": 11
+      },
+      "revId": "9b412275202abb3d0522c1d6700d5da420c63d87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1904980a_ef3c75b6",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriterFieldsTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 8208
+      },
+      "writtenOn": "2020-05-11T05:25:29Z",
+      "side": 1,
+      "message": "If this is a new test, why is there commented code in the test. If that code is not needed, please remove it.",
+      "revId": "9b412275202abb3d0522c1d6700d5da420c63d87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "858dcfc5_de6ab501",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriterFieldsTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 8208
+      },
+      "writtenOn": "2020-05-11T05:25:29Z",
+      "side": 1,
+      "message": "Not sure why the test moved the expected output from 2 to 3.",
+      "revId": "9b412275202abb3d0522c1d6700d5da420c63d87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "714ba69e_955ceca1",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriterParametersTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 8208
+      },
+      "writtenOn": "2020-05-11T05:25:29Z",
+      "side": 1,
+      "message": "Please explain what in NETCONF-660 rationalizes removing these lines, and then remove the lines.",
+      "revId": "9b412275202abb3d0522c1d6700d5da420c63d87",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
