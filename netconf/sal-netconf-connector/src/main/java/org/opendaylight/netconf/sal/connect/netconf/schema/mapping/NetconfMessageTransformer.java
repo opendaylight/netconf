@@ -94,10 +94,6 @@ public class NetconfMessageTransformer implements MessageTransformer<NetconfMess
     private final boolean strictParsing;
     private final ImmutableMap<SchemaPath, ActionDefinition> actions;
 
-    public NetconfMessageTransformer(final MountPointContext mountContext, final boolean strictParsing) {
-        this(mountContext, strictParsing, BaseSchema.BASE_NETCONF_CTX);
-    }
-
     public NetconfMessageTransformer(final MountPointContext mountContext, final boolean strictParsing,
                                      final BaseSchema baseSchema) {
         this.counter = new MessageCounter();

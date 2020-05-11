@@ -32,7 +32,7 @@ import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransform
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yangtools.rfc8528.data.api.MountPointContext;
 
-public class SchemalessNetconfDeviceTest {
+public class SchemalessNetconfDeviceTest extends AbstractBaseSchemasTest {
 
     private static final String TEST_NAMESPACE = "test:namespace";
     private static final String TEST_MODULE = "test-module";
@@ -47,7 +47,8 @@ public class SchemalessNetconfDeviceTest {
                 InetSocketAddress.createUnresolved("localhost", 22));
         final Throwable throwable = new Throwable();
 
-        final SchemalessNetconfDevice device = new SchemalessNetconfDevice(remoteDeviceId, facade, messageTransformer);
+        final SchemalessNetconfDevice device = new SchemalessNetconfDevice(BASE_SCHEMAS, remoteDeviceId, facade,
+            messageTransformer);
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
                 Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));

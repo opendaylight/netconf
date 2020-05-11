@@ -14,6 +14,7 @@ import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTr
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toPath;
 
 import java.util.Collection;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opendaylight.netconf.api.NetconfMessage;
@@ -21,21 +22,18 @@ import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.yangtools.rcf8528.data.util.EmptyMountPointContext;
 import org.opendaylight.yangtools.yang.common.QName;
-import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.schema.ContainerNode;
-import org.opendaylight.yangtools.yang.data.api.schema.LeafNode;
 import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
-import org.opendaylight.yangtools.yang.data.impl.schema.builder.api.DataContainerNodeBuilder;
+import org.opendaylight.yangtools.yang.data.impl.schema.ImmutableNodes;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 
-public class NetconfToRpcRequestTest {
+public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
 
     private static final String TEST_MODEL_NAMESPACE = "urn:opendaylight:params:xml:ns:yang:controller:md:sal:rpc-test";
     private static final String REVISION = "2014-07-14";
-    private static final QName INPUT_QNAME = QName.create(TEST_MODEL_NAMESPACE, REVISION, "input");
     private static final QName STREAM_NAME = QName.create(TEST_MODEL_NAMESPACE, REVISION, "stream-name");
     private static final QName SUBSCRIBE_RPC_NAME = QName.create(TEST_MODEL_NAMESPACE, REVISION, "subscribe");
 
@@ -44,12 +42,10 @@ public class NetconfToRpcRequestTest {
     private static final String CONFIG_TEST_REVISION = "2014-07-21";
     private static final QName EDIT_CONFIG_QNAME =
             QName.create(CONFIG_TEST_NAMESPACE, CONFIG_TEST_REVISION, "edit-config");
-    private static final QName GET_QNAME = QName.create(CONFIG_TEST_NAMESPACE, CONFIG_TEST_REVISION, "get");
-    private static final QName GET_CONFIG_QNAME =
-            QName.create(CONFIG_TEST_NAMESPACE, CONFIG_TEST_REVISION, "get-config");
 
     static EffectiveModelContext cfgCtx;
-    static NetconfMessageTransformer messageTransformer;
+
+    private  NetconfMessageTransformer messageTransformer;
 
     @BeforeClass
     public static void setup() {
@@ -59,21 +55,20 @@ public class NetconfToRpcRequestTest {
 
         cfgCtx = YangParserTestUtils.parseYangResources(NetconfToRpcRequestTest.class,
             "/schemas/config-test-rpc.yang", "/schemas/rpc-notification-subscription.yang");
-        messageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(cfgCtx), true);
     }
 
-    private static LeafNode<Object> buildLeaf(final QName running, final Object value) {
-        return Builders.leafBuilder().withNodeIdentifier(toId(running)).withValue(value).build();
+    @Before
+    public void before() {
+        messageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(cfgCtx), true,
+            BASE_SCHEMAS.getBaseSchema());
     }
 
     @Test
     public void testUserDefinedRpcCall() throws Exception {
-        final DataContainerNodeBuilder<YangInstanceIdentifier.NodeIdentifier, ContainerNode> rootBuilder =
-                Builders.containerBuilder();
-        rootBuilder.withNodeIdentifier(toId(SUBSCRIBE_RPC_NAME));
-
-        rootBuilder.withChild(buildLeaf(STREAM_NAME, "NETCONF"));
-        final ContainerNode root = rootBuilder.build();
+        final ContainerNode root = Builders.containerBuilder()
+                .withNodeIdentifier(toId(SUBSCRIBE_RPC_NAME))
+                .withChild(ImmutableNodes.leafNode(STREAM_NAME, "NETCONF"))
+                .build();
 
         final NetconfMessage message = messageTransformer.toRpcRequest(toPath(SUBSCRIBE_RPC_NAME), root);
         assertNotNull(message);

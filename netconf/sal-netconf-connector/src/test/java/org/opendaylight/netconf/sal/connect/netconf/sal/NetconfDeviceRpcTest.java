@@ -30,6 +30,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
+import org.opendaylight.netconf.sal.connect.netconf.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.netconf.base._1._0.rev110601.IetfNetconfService;
@@ -47,7 +48,7 @@ import org.opendaylight.yangtools.yang.model.api.RpcDefinition;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.w3c.dom.Node;
 
-public class NetconfDeviceRpcTest {
+public class NetconfDeviceRpcTest extends AbstractBaseSchemasTest {
     private static EffectiveModelContext SCHEMA_CONTEXT;
 
     @Mock
@@ -73,7 +74,7 @@ public class NetconfDeviceRpcTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         NetconfMessageTransformer transformer = new NetconfMessageTransformer(
-            new EmptyMountPointContext(SCHEMA_CONTEXT), true);
+            new EmptyMountPointContext(SCHEMA_CONTEXT), true, BASE_SCHEMAS.getBaseSchema());
         final NetconfMessage reply = new NetconfMessage(XmlUtil.readXmlToDocument(
                 "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n"
                         + "<rpc-reply xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" message-id=\"101\">\n"

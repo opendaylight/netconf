@@ -29,4 +29,12 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
 
     <service ref="schemaResourceManager"
              interface="org.opendaylight.netconf.sal.connect.api.SchemaResourceManager"/>
+
+    <bean id="baseNetconfSchemas"
+          class="org.opendaylight.netconf.sal.connect.netconf.schema.mapping.DefaultBaseNetconfSchemas">
+        <argument ref="parserFactory"/>
+    </bean>
+
+    <service ref="baseNetconfSchemas"
+             interface="org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas"/>
 </blueprint>

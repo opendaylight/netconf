@@ -156,6 +156,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setGlobalProcessingExecutor(getExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
+                .setBaseSchemas(BASE_SCHEMAS)
                 .build();
         // Monitoring supported
         final NetconfSessionPreferences sessionCaps =
@@ -192,6 +193,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setGlobalProcessingExecutor(getExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
+                .setBaseSchemas(BASE_SCHEMAS)
                 .build();
 
         // Monitoring not supported
@@ -241,6 +243,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setReconnectOnSchemasChange(true)
                 .setSchemaResourcesDTO(schemaResourcesDTO)
                 .setGlobalProcessingExecutor(getExecutor())
+                .setBaseSchemas(BASE_SCHEMAS)
                 .setId(getId())
                 .setSalFacade(facade)
                 .build();
@@ -288,6 +291,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setGlobalProcessingExecutor(getExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
+                .setBaseSchemas(BASE_SCHEMAS)
                 .build();
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
@@ -321,6 +325,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setGlobalProcessingExecutor(getExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
+                .setBaseSchemas(BASE_SCHEMAS)
                 .build();
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
                 Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
@@ -358,6 +363,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setGlobalProcessingExecutor(getExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
+                .setBaseSchemas(BASE_SCHEMAS)
                 .build();
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
                 Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
@@ -387,6 +393,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setGlobalProcessingExecutor(getExecutor())
                 .setId(getId())
                 .setSalFacade(facade)
+                .setBaseSchemas(BASE_SCHEMAS)
                 .build();
         final NetconfDevice netconfSpy = Mockito.spy(device);
 

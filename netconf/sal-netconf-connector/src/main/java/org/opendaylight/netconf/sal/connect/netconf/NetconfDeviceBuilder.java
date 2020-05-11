@@ -14,6 +14,7 @@ import io.netty.util.concurrent.EventExecutor;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.optional.rev190614.NetconfNodeAugmentedOptional;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.node.topology.rev150114.NetconfNode;
@@ -29,6 +30,7 @@ public class NetconfDeviceBuilder {
     private NetconfNode node;
     private EventExecutor eventExecutor;
     private NetconfNodeAugmentedOptional nodeOptional;
+    private BaseNetconfSchemas baseSchemas;
 
     public NetconfDeviceBuilder() {
     }
@@ -78,14 +80,20 @@ public class NetconfDeviceBuilder {
         return this;
     }
 
+    public NetconfDeviceBuilder setBaseSchemas(final BaseNetconfSchemas baseSchemas) {
+        this.baseSchemas = requireNonNull(baseSchemas);
+        return this;
+    }
+
     public NetconfDevice build() {
         validation();
-        return new NetconfDevice(this.schemaResourcesDTO, this.id, this.salFacade, this.globalProcessingExecutor,
-                this.reconnectOnSchemasChange, this.deviceActionFactory, this.node, this.eventExecutor,
-                this.nodeOptional);
+        return new NetconfDevice(this.schemaResourcesDTO, this.baseSchemas, this.id, this.salFacade,
+            this.globalProcessingExecutor, this.reconnectOnSchemasChange, this.deviceActionFactory, this.node,
+            this.eventExecutor, this.nodeOptional);
     }
 
     private void validation() {
+        requireNonNull(this.baseSchemas, "BaseSchemas is not initialized");
         requireNonNull(this.id, "RemoteDeviceId is not initialized");
         requireNonNull(this.salFacade, "RemoteDeviceHandler is not initialized");
         requireNonNull(this.globalProcessingExecutor, "ExecutorService is not initialized");

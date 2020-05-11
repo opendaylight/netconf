@@ -12,7 +12,7 @@ import org.junit.BeforeClass;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
-public abstract class AbstractTestModelTest {
+public abstract class AbstractTestModelTest extends AbstractBaseSchemasTest {
     protected static EffectiveModelContext SCHEMA_CONTEXT;
 
     @BeforeClass
