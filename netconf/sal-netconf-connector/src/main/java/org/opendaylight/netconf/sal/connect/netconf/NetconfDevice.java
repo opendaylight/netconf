@@ -46,6 +46,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabi
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCommunicator;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceRpc;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -107,6 +108,7 @@ public class NetconfDevice
     private final NetconfDeviceSchemasResolver stateSchemasResolver;
     private final NotificationHandler notificationHandler;
     private final boolean reconnectOnSchemasChange;
+    private final BaseNetconfSchemas baseSchemas;
     private final NetconfNode node;
     private final EventExecutor eventExecutor;
     private final NetconfNodeAugmentedOptional nodeOptional;
@@ -117,19 +119,19 @@ public class NetconfDevice
     // Message transformer is constructed once the schemas are available
     private MessageTransformer<NetconfMessage> messageTransformer;
 
-    public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id,
-                         final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
-                         final ListeningExecutorService globalProcessingExecutor,
-                         final boolean reconnectOnSchemasChange) {
-        this(schemaResourcesDTO, id, salFacade, globalProcessingExecutor, reconnectOnSchemasChange, null, null, null,
-                null);
+    public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
+            final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
+            final ListeningExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange) {
+        this(schemaResourcesDTO, baseSchemas, id, salFacade, globalProcessingExecutor, reconnectOnSchemasChange, null,
+            null, null, null);
     }
 
-    public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final RemoteDeviceId id,
-            final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
+    public NetconfDevice(final SchemaResourcesDTO schemaResourcesDTO, final BaseNetconfSchemas baseSchemas,
+            final RemoteDeviceId id, final RemoteDeviceHandler<NetconfSessionPreferences> salFacade,
             final ListeningExecutorService globalProcessingExecutor, final boolean reconnectOnSchemasChange,
             final DeviceActionFactory deviceActionFactory, final NetconfNode node, final EventExecutor eventExecutor,
             final NetconfNodeAugmentedOptional nodeOptional) {
+        this.baseSchemas = requireNonNull(baseSchemas);
         this.id = id;
         this.reconnectOnSchemasChange = reconnectOnSchemasChange;
         this.deviceActionFactory = deviceActionFactory;
@@ -251,10 +253,8 @@ public class NetconfDevice
         //NetconfDevice.SchemaSetup can complete after NetconfDeviceCommunicator was closed. In that case do nothing,
         //since salFacade.onDeviceDisconnected was already called.
         if (connected) {
-            final BaseSchema baseSchema =
-                remoteSessionCapabilities.isNotificationsSupported()
-                        ? BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS : BaseSchema.BASE_NETCONF_CTX;
-            this.messageTransformer = new NetconfMessageTransformer(result, true, baseSchema);
+            this.messageTransformer = new NetconfMessageTransformer(result, true,
+                resolveBaseSchema(remoteSessionCapabilities.isNotificationsSupported()));
 
             // salFacade.onDeviceConnected has to be called before the notification handler is initialized
             this.salFacade.onDeviceConnected(result, remoteSessionCapabilities, deviceRpc,
@@ -366,13 +366,14 @@ public class NetconfDevice
         notificationHandler.handleNotification(notification);
     }
 
-    private static BaseSchema resolveBaseSchema(final boolean notificationSupport) {
-        return notificationSupport ? BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS : BaseSchema.BASE_NETCONF_CTX;
+    private BaseSchema resolveBaseSchema(final boolean notificationSupport) {
+        return notificationSupport ? baseSchemas.getBaseSchemaWithNotifications() : baseSchemas.getBaseSchema();
     }
 
     protected NetconfDeviceRpc getDeviceSpecificRpc(final MountPointContext result,
             final RemoteDeviceCommunicator<NetconfMessage> listener) {
-        return new NetconfDeviceRpc(result.getSchemaContext(), listener, new NetconfMessageTransformer(result, true));
+        return new NetconfDeviceRpc(result.getSchemaContext(), listener,
+            new NetconfMessageTransformer(result, true, baseSchemas.getBaseSchema()));
     }
 
     /**

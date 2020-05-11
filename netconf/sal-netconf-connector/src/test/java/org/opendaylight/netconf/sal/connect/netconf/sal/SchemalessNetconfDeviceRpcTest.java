@@ -23,6 +23,7 @@ import org.mockito.MockitoAnnotations;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.RemoteDeviceCommunicator;
+import org.opendaylight.netconf.sal.connect.netconf.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseRpcSchemalessTransformer;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.SchemalessMessageTransformer;
 import org.opendaylight.netconf.sal.connect.util.MessageCounter;
@@ -36,7 +37,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SchemalessNetconfDeviceRpcTest {
+public class SchemalessNetconfDeviceRpcTest extends AbstractBaseSchemasTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(SchemalessNetconfDeviceRpcTest.class);
 
@@ -54,7 +55,7 @@ public class SchemalessNetconfDeviceRpcTest {
         final MessageCounter counter = new MessageCounter();
         deviceRpc = new SchemalessNetconfDeviceRpc(
                 new RemoteDeviceId("device1", InetSocketAddress.createUnresolved("0.0.0.0", 17830)), listener,
-                new BaseRpcSchemalessTransformer(counter), new SchemalessMessageTransformer(counter));
+                new BaseRpcSchemalessTransformer(BASE_SCHEMAS, counter), new SchemalessMessageTransformer(counter));
 
     }
 

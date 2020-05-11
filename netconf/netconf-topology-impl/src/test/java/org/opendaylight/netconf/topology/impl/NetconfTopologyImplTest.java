@@ -48,6 +48,8 @@ import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfDeviceCapabilities;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.DefaultBaseNetconfSchemas;
 import org.opendaylight.netconf.topology.spi.AbstractNetconfTopology;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Host;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.IpAddress;
@@ -74,6 +76,7 @@ import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.IdentifiableIt
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier.PathArgument;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.common.Uint32;
+import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 
 @RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfTopologyImplTest {
@@ -268,6 +271,8 @@ public class NetconfTopologyImplTest {
     }
 
     public static class TestingNetconfTopologyImpl extends NetconfTopologyImpl {
+        private static final BaseNetconfSchemas BASE_SCHEMAS =
+                new DefaultBaseNetconfSchemas(new YangParserFactoryImpl());
 
         public TestingNetconfTopologyImpl(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                           final EventExecutor eventExecutor,
@@ -278,7 +283,7 @@ public class NetconfTopologyImplTest {
                                           final AAAEncryptionService encryptionService) {
             super(topologyId, clientDispatcher, eventExecutor, keepaliveExecutor,
                     processingExecutor, schemaRepositoryProvider, dataBroker,
-                  mountPointService, encryptionService);
+                  mountPointService, encryptionService, BASE_SCHEMAS);
         }
 
         @Override

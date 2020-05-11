@@ -58,6 +58,7 @@ import org.opendaylight.netconf.sal.connect.netconf.listener.UserPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.KeepaliveSalFacade;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfKeystoreAdapter;
 import org.opendaylight.netconf.sal.connect.netconf.schema.YangLibrarySchemaYangSourceProvider;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.sal.connect.util.SslHandlerFactoryImpl;
 import org.opendaylight.netconf.topology.api.NetconfTopology;
@@ -106,6 +107,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     private final DeviceActionFactory deviceActionFactory;
     private final NetconfKeystoreAdapter keystoreAdapter;
     private final SchemaResourceManager schemaManager;
+    private final BaseNetconfSchemas baseSchemas;
 
     protected final ScheduledThreadPool keepaliveExecutor;
     protected final ListeningExecutorService processingExecutor;
@@ -117,12 +119,14 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
     protected final AAAEncryptionService encryptionService;
     protected final HashMap<NodeId, NetconfConnectorDTO> activeConnectors = new HashMap<>();
 
+
     protected AbstractNetconfTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
                                       final EventExecutor eventExecutor, final ScheduledThreadPool keepaliveExecutor,
                                       final ThreadPool processingExecutor, final SchemaResourceManager schemaManager,
                                       final DataBroker dataBroker, final DOMMountPointService mountPointService,
                                       final AAAEncryptionService encryptionService,
-                                      final DeviceActionFactory deviceActionFactory) {
+                                      final DeviceActionFactory deviceActionFactory,
+                                      final BaseNetconfSchemas baseSchemas) {
         this.topologyId = topologyId;
         this.clientDispatcher = clientDispatcher;
         this.eventExecutor = eventExecutor;
@@ -133,6 +137,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
         this.dataBroker = dataBroker;
         this.mountPointService = mountPointService;
         this.encryptionService = encryptionService;
+        this.baseSchemas = requireNonNull(baseSchemas);
 
         this.keystoreAdapter = new NetconfKeystoreAdapter(dataBroker);
     }
@@ -234,7 +239,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
 
         final RemoteDevice<NetconfSessionPreferences, NetconfMessage, NetconfDeviceCommunicator> device;
         if (node.isSchemaless()) {
-            device = new SchemalessNetconfDevice(remoteDeviceId, salFacade);
+            device = new SchemalessNetconfDevice(baseSchemas, remoteDeviceId, salFacade);
         } else {
             device = createNetconfDevice(remoteDeviceId, salFacade, nodeId, node, nodeOptional);
         }
@@ -276,6 +281,7 @@ public abstract class AbstractNetconfTopology implements NetconfTopology {
                 .setEventExecutor(eventExecutor)
                 .setNodeOptional(nodeOptional)
                 .setDeviceActionFactory(deviceActionFactory)
+                .setBaseSchemas(baseSchemas)
                 .build();
 
         final YangLibrary yangLibrary = node.getYangLibrary();

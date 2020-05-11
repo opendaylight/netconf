@@ -29,7 +29,7 @@ import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Document;
 
-public class NetconfToNotificationTest {
+public class NetconfToNotificationTest extends AbstractBaseSchemasTest {
 
     NetconfMessageTransformer messageTransformer;
 
@@ -65,14 +65,16 @@ public class NetconfToNotificationTest {
     @Test(expected =  IllegalArgumentException.class)
     public void testMostRecentWrongYangModel() throws Exception {
         final EffectiveModelContext schemaContext = getNotificationSchemaContext(getClass(), true);
-        messageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(schemaContext), true);
+        messageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(schemaContext), true,
+            BASE_SCHEMAS.getBaseSchema());
         messageTransformer.toNotification(userNotification);
     }
 
     @Test
     public void testToNotificationFunction() throws Exception {
         final EffectiveModelContext schemaContext = getNotificationSchemaContext(getClass(), false);
-        messageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(schemaContext), true);
+        messageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(schemaContext), true,
+            BASE_SCHEMAS.getBaseSchema());
         final DOMNotification domNotification = messageTransformer.toNotification(userNotification);
         final ContainerNode root = domNotification.getBody();
         assertNotNull(root);

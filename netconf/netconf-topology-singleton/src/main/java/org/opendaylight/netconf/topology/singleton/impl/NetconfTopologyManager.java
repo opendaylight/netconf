@@ -42,6 +42,7 @@ import org.opendaylight.mdsal.singleton.common.api.ServiceGroupIdentifier;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.api.DeviceActionFactory;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.topology.singleton.api.NetconfTopologySingletonService;
 import org.opendaylight.netconf.topology.singleton.impl.utils.NetconfTopologySetup;
@@ -72,6 +73,7 @@ public class NetconfTopologyManager
     private final Map<InstanceIdentifier<Node>, ClusterSingletonServiceRegistration>
             clusterRegistrations = new ConcurrentHashMap<>();
 
+    private final BaseNetconfSchemas baseSchemas;
     private final DataBroker dataBroker;
     private final DOMRpcProviderService rpcProviderRegistry;
     private final DOMActionProviderService actionProviderRegistry;
@@ -87,11 +89,13 @@ public class NetconfTopologyManager
     private final AAAEncryptionService encryptionService;
     private final DeviceActionFactory deviceActionFactory;
     private final SchemaResourceManager resourceManager;
+
     private ListenerRegistration<NetconfTopologyManager> dataChangeListenerRegistration;
     private String privateKeyPath;
     private String privateKeyPassphrase;
 
-    public NetconfTopologyManager(final DataBroker dataBroker, final DOMRpcProviderService rpcProviderRegistry,
+    public NetconfTopologyManager(final BaseNetconfSchemas baseSchemas, final DataBroker dataBroker,
+                                  final DOMRpcProviderService rpcProviderRegistry,
                                   final DOMActionProviderService actionProviderService,
                                   final ClusterSingletonServiceProvider clusterSingletonServiceProvider,
                                   final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
@@ -102,6 +106,7 @@ public class NetconfTopologyManager
                                   final AAAEncryptionService encryptionService,
                                   final DeviceActionFactory deviceActionFactory,
                                   final SchemaResourceManager resourceManager) {
+        this.baseSchemas = requireNonNull(baseSchemas);
         this.dataBroker = requireNonNull(dataBroker);
         this.rpcProviderRegistry = requireNonNull(rpcProviderRegistry);
         this.actionProviderRegistry = requireNonNull(actionProviderService);
@@ -290,6 +295,7 @@ public class NetconfTopologyManager
 
         final NetconfTopologySetupBuilder builder = NetconfTopologySetupBuilder.create()
                 .setClusterSingletonServiceProvider(clusterSingletonServiceProvider)
+                .setBaseSchemas(baseSchemas)
                 .setDataBroker(dataBroker)
                 .setInstanceIdentifier(instanceIdentifier)
                 .setRpcProviderRegistry(rpcProviderRegistry)

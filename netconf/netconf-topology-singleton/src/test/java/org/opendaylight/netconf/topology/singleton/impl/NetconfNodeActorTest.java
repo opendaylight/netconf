@@ -119,7 +119,7 @@ import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 
-public class NetconfNodeActorTest {
+public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     private static final Timeout TIMEOUT = new Timeout(Duration.create(5, "seconds"));
     private static final RevisionSourceIdentifier SOURCE_IDENTIFIER1 = RevisionSourceIdentifier.create("yang1");
@@ -187,7 +187,8 @@ public class NetconfNodeActorTest {
         doReturn(masterSchemaRepository).when(schemaResourceDTO).getSchemaRepository();
         doReturn(mockRegistry).when(schemaResourceDTO).getSchemaRegistry();
         final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create().setActorSystem(system)
-                .setIdleTimeout(Duration.apply(1, TimeUnit.SECONDS)).setSchemaResourceDTO(schemaResourceDTO).build();
+                .setIdleTimeout(Duration.apply(1, TimeUnit.SECONDS)).setSchemaResourceDTO(schemaResourceDTO)
+                .setBaseSchemas(BASE_SCHEMAS).build();
 
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT, mockMountPointService);
 
@@ -222,7 +223,7 @@ public class NetconfNodeActorTest {
         final RemoteDeviceId newRemoteDeviceId = new RemoteDeviceId("netconf-topology2",
                 new InetSocketAddress(InetAddresses.forString("127.0.0.2"), 9999));
 
-        final NetconfTopologySetup newSetup = NetconfTopologySetupBuilder.create()
+        final NetconfTopologySetup newSetup = NetconfTopologySetupBuilder.create().setBaseSchemas(BASE_SCHEMAS)
                 .setSchemaResourceDTO(schemaResourceDTO).setActorSystem(system).build();
 
         masterRef.tell(new RefreshSetupMasterActorData(newSetup, newRemoteDeviceId), testKit.getRef());
@@ -231,7 +232,7 @@ public class NetconfNodeActorTest {
     }
 
     @Test
-    public void tesAskForMasterMountPoint() {
+    public void testAskForMasterMountPoint() {
 
         // Test with master not setup yet.
 
@@ -332,8 +333,11 @@ public class NetconfNodeActorTest {
         SchemaResourcesDTO schemaResourceDTO2 = mock(SchemaResourcesDTO.class);
         doReturn(mockRegistry).when(schemaResourceDTO2).getSchemaRegistry();
         doReturn(mockSchemaRepository).when(schemaResourceDTO2).getSchemaRepository();
-        final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create().setSchemaResourceDTO(schemaResourceDTO2)
-                .setActorSystem(system).build();
+        final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create()
+                .setSchemaResourceDTO(schemaResourceDTO2)
+                .setBaseSchemas(BASE_SCHEMAS)
+                .setActorSystem(system)
+                .build();
 
         final ActorRef slaveRef = system.actorOf(NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT,
                 mockMountPointService));
@@ -413,7 +417,8 @@ public class NetconfNodeActorTest {
         doReturn(repository).when(schemaResourceDTO2).getSchemaRegistry();
         doReturn(repository).when(schemaResourceDTO2).getSchemaRepository();
         final NetconfTopologySetup setup = NetconfTopologySetupBuilder.create().setActorSystem(system)
-                .setSchemaResourceDTO(schemaResourceDTO2).setIdleTimeout(Duration.apply(1, TimeUnit.SECONDS)).build();
+                .setSchemaResourceDTO(schemaResourceDTO2).setIdleTimeout(Duration.apply(1, TimeUnit.SECONDS))
+                .setBaseSchemas(BASE_SCHEMAS).build();
         final Props props = NetconfNodeActor.props(setup, remoteDeviceId, TIMEOUT, mockMountPointService);
         ActorRef actor = TestActorRef.create(system, props, "master_messages_2");
 
@@ -625,7 +630,7 @@ public class NetconfNodeActorTest {
         doReturn(mockSchemaRepository).when(schemaResourceDTO2).getSchemaRepository();
         final ActorRef slaveRef = system.actorOf(NetconfNodeActor.props(
                 NetconfTopologySetupBuilder.create().setSchemaResourceDTO(schemaResourceDTO2).setActorSystem(system)
-                .build(), remoteDeviceId, TIMEOUT, mockMountPointService));
+                .setBaseSchemas(BASE_SCHEMAS).build(), remoteDeviceId, TIMEOUT, mockMountPointService));
 
         doReturn(Futures.immediateFuture(mockSchemaContext))
                 .when(mockSchemaContextFactory).createEffectiveModelContext(anyCollection());

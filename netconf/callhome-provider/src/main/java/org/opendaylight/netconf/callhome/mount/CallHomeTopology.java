@@ -19,6 +19,7 @@ import org.opendaylight.netconf.sal.connect.api.RemoteDeviceHandler;
 import org.opendaylight.netconf.sal.connect.api.SchemaResourceManager;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
 import org.opendaylight.netconf.sal.connect.netconf.sal.NetconfDeviceSalFacade;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 
 public class CallHomeTopology extends BaseCallHomeTopology {
@@ -28,10 +29,10 @@ public class CallHomeTopology extends BaseCallHomeTopology {
             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
             final SchemaResourceManager schemaRepositoryProvider,
             final DataBroker dataBroker, final DOMMountPointService mountPointService,
-            final AAAEncryptionService encryptionService) {
+            final AAAEncryptionService encryptionService, final BaseNetconfSchemas baseSchemas) {
         this(topologyId, clientDispatcher, eventExecutor,
                 keepaliveExecutor, processingExecutor, schemaRepositoryProvider,
-                dataBroker, mountPointService, encryptionService, null);
+                dataBroker, mountPointService, encryptionService, baseSchemas, null);
     }
 
     public CallHomeTopology(final String topologyId, final NetconfClientDispatcher clientDispatcher,
@@ -39,11 +40,11 @@ public class CallHomeTopology extends BaseCallHomeTopology {
                             final ScheduledThreadPool keepaliveExecutor, final ThreadPool processingExecutor,
                             final SchemaResourceManager schemaRepositoryProvider,
                             final DataBroker dataBroker, final DOMMountPointService mountPointService,
-                            final AAAEncryptionService encryptionService,
+                            final AAAEncryptionService encryptionService, final BaseNetconfSchemas baseSchemas,
                             final DeviceActionFactory deviceActionFactory) {
         super(topologyId, clientDispatcher, eventExecutor,
                 keepaliveExecutor, processingExecutor, schemaRepositoryProvider,
-                dataBroker, mountPointService, encryptionService, deviceActionFactory);
+                dataBroker, mountPointService, encryptionService, deviceActionFactory, baseSchemas);
     }
 
     @Override

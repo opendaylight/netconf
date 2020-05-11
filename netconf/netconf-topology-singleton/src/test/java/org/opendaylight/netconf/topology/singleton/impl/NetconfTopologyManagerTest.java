@@ -83,7 +83,7 @@ import org.opendaylight.yangtools.yang.binding.YangModuleInfo;
 import org.opendaylight.yangtools.yang.common.Uint16;
 import org.opendaylight.yangtools.yang.parser.impl.YangParserFactoryImpl;
 
-public class NetconfTopologyManagerTest {
+public class NetconfTopologyManagerTest extends AbstractBaseSchemasTest {
     private static final Uint16 ACTOR_RESPONSE_WAIT_TIME = Uint16.valueOf(10);
     private static final String TOPOLOGY_ID = "topologyID";
 
@@ -129,8 +129,8 @@ public class NetconfTopologyManagerTest {
         final DeviceActionFactory deviceActionFactory = mock(DeviceActionFactory.class);
 
         final Config config = new ConfigBuilder().setWriteTransactionIdleTimeout(Uint16.ZERO).build();
-        netconfTopologyManager = new NetconfTopologyManager(dataBroker, rpcProviderRegistry, actionProviderRegistry,
-                clusterSingletonServiceProvider, keepaliveExecutor, processingThreadPool,
+        netconfTopologyManager = new NetconfTopologyManager(BASE_SCHEMAS, dataBroker, rpcProviderRegistry,
+                actionProviderRegistry, clusterSingletonServiceProvider, keepaliveExecutor, processingThreadPool,
                 actorSystemProvider, eventExecutor, clientDispatcher, TOPOLOGY_ID, config,
                 mountPointService, encryptionService, deviceActionFactory,
                 new DefaultSchemaResourceManager(new YangParserFactoryImpl())) {

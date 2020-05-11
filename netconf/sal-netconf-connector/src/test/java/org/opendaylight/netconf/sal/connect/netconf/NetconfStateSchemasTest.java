@@ -33,14 +33,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcImplementationNotAvailableException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
 import org.opendaylight.mdsal.dom.spi.DefaultDOMRpcResult;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.netconf.monitoring.rev101004.NetconfState;
@@ -62,7 +62,8 @@ import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetconfStateSchemasTest {
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
+public class NetconfStateSchemasTest extends AbstractBaseSchemasTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(NetconfStateSchemasTest.class);
 
@@ -80,8 +81,7 @@ public class NetconfStateSchemasTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        schemaContext = BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getEffectiveModelContext();
+        schemaContext = BASE_SCHEMAS.getBaseSchemaWithNotifications().getEffectiveModelContext();
         final DataSchemaNode schemasNode =
                 ((ContainerSchemaNode) schemaContext
                         .getDataChildByName(NetconfState.QNAME)).getDataChildByName(Schemas.QNAME);

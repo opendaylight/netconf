@@ -7,6 +7,8 @@
  */
 package org.opendaylight.netconf.topology.singleton.impl.utils;
 
+import static java.util.Objects.requireNonNull;
+
 import akka.actor.ActorSystem;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import io.netty.util.concurrent.EventExecutor;
@@ -18,6 +20,7 @@ import org.opendaylight.mdsal.dom.api.DOMRpcProviderService;
 import org.opendaylight.mdsal.singleton.common.api.ClusterSingletonServiceProvider;
 import org.opendaylight.netconf.client.NetconfClientDispatcher;
 import org.opendaylight.netconf.sal.connect.netconf.NetconfDevice;
+import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas;
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.Node;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 import scala.concurrent.duration.Duration;
@@ -41,6 +44,7 @@ public class NetconfTopologySetup {
     private final String privateKeyPath;
     private final String privateKeyPassphrase;
     private final AAAEncryptionService encryptionService;
+    private final BaseNetconfSchemas baseSchemas;
 
     NetconfTopologySetup(final NetconfTopologySetupBuilder builder) {
         this.clusterSingletonServiceProvider = builder.getClusterSingletonServiceProvider();
@@ -60,6 +64,7 @@ public class NetconfTopologySetup {
         this.privateKeyPath = builder.getPrivateKeyPath();
         this.privateKeyPassphrase = builder.getPrivateKeyPassphrase();
         this.encryptionService = builder.getEncryptionService();
+        this.baseSchemas = builder.getBaseSchemas();
     }
 
     public ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {
@@ -130,8 +135,11 @@ public class NetconfTopologySetup {
         return encryptionService;
     }
 
-    public static class NetconfTopologySetupBuilder {
+    public BaseNetconfSchemas getBaseSchemas() {
+        return baseSchemas;
+    }
 
+    public static class NetconfTopologySetupBuilder {
         private ClusterSingletonServiceProvider clusterSingletonServiceProvider;
         private DOMRpcProviderService rpcProviderRegistry;
         private DOMActionProviderService actionProviderRegistry;
@@ -149,9 +157,19 @@ public class NetconfTopologySetup {
         private String privateKeyPath;
         private String privateKeyPassphrase;
         private AAAEncryptionService encryptionService;
+        private BaseNetconfSchemas baseSchemas;
 
         public NetconfTopologySetupBuilder() {
 
+        }
+
+        BaseNetconfSchemas getBaseSchemas() {
+            return requireNonNull(baseSchemas, "BaseSchemas not initialized");
+        }
+
+        public NetconfTopologySetupBuilder setBaseSchemas(final BaseNetconfSchemas baseSchemas) {
+            this.baseSchemas = requireNonNull(baseSchemas);
+            return this;
         }
 
         ClusterSingletonServiceProvider getClusterSingletonServiceProvider() {

@@ -55,6 +55,7 @@ import org.opendaylight.mdsal.dom.api.DOMDataTreeIdentifier;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.netconf.sal.connect.netconf.AbstractBaseSchemasTest;
 import org.opendaylight.netconf.sal.connect.netconf.schema.NetconfRemoteSchemaYangSourceProvider;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfBaseOps;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
@@ -90,7 +91,7 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-public class NetconfMessageTransformerTest {
+public class NetconfMessageTransformerTest extends AbstractBaseSchemasTest {
 
     private static final String REVISION_EXAMPLE_SERVER_FARM = "2018-08-07";
     private static final String URN_EXAMPLE_SERVER_FARM = "urn:example:server-farm";
@@ -192,7 +193,7 @@ public class NetconfMessageTransformerTest {
 
         netconfMessageTransformer = getTransformer(SCHEMA);
         actionNetconfMessageTransformer = new NetconfMessageTransformer(new EmptyMountPointContext(ACTION_SCHEMA),
-            true);
+            true, BASE_SCHEMAS.getBaseSchema());
     }
 
     @Test
@@ -208,7 +209,7 @@ public class NetconfMessageTransformerTest {
     @Test
     public void testCreateSubscriberNotificationSchemaNotPresent() throws Exception {
         final NetconfMessageTransformer transformer = new NetconfMessageTransformer(new EmptyMountPointContext(SCHEMA),
-            true, BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS);
+            true, BASE_SCHEMAS.getBaseSchemaWithNotifications());
         NetconfMessage netconfMessage = transformer.toRpcRequest(
                 toPath(CREATE_SUBSCRIPTION_RPC_QNAME),
                 CREATE_SUBSCRIPTION_RPC_CONTENT
@@ -416,7 +417,7 @@ public class NetconfMessageTransformerTest {
                 .node(NetconfState.QNAME).node(Schemas.QNAME).node(Schema.QNAME)
                 .nodeWithKey(Schema.QNAME, keys).build();
         final DataContainerChild<?, ?> editConfigStructure =
-                createEditConfigStructure(BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext(), id,
+                createEditConfigStructure(BASE_SCHEMAS.getBaseSchemaWithNotifications().getEffectiveModelContext(), id,
                     Optional.empty(), Optional.ofNullable(schemaNode));
 
         final DataContainerChild<?, ?> target = NetconfBaseOps.getTargetNode(NETCONF_CANDIDATE_QNAME);
@@ -478,7 +479,7 @@ public class NetconfMessageTransformerTest {
     }
 
     private static NetconfMessageTransformer getTransformer(final EffectiveModelContext schema) {
-        return new NetconfMessageTransformer(new EmptyMountPointContext(schema), true);
+        return new NetconfMessageTransformer(new EmptyMountPointContext(schema), true, BASE_SCHEMAS.getBaseSchema());
     }
 
     @Test

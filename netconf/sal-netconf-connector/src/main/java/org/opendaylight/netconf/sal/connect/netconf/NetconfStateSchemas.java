@@ -11,8 +11,11 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Verify.verify;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_DATA_NODEID;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_NODEID;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_FILTER_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_NODEID;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_GET_PATH;
+import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.NETCONF_TYPE_QNAME;
 import static org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil.toId;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -26,11 +29,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.dom.DOMSource;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.mdsal.dom.api.DOMRpcService;
+import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.api.NetconfDeviceSchemas;
 import org.opendaylight.netconf.sal.connect.netconf.listener.NetconfSessionPreferences;
-import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseSchema;
 import org.opendaylight.netconf.sal.connect.netconf.util.NetconfMessageTransformUtil;
 import org.opendaylight.netconf.sal.connect.util.RemoteDeviceId;
 import org.opendaylight.netconf.util.NetconfUtil;
@@ -53,24 +57,43 @@ import org.opendaylight.yangtools.yang.data.impl.schema.Builders;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 /**
  * Holds QNames for all yang modules reported by ietf-netconf-monitoring/state/schemas.
  */
 public final class NetconfStateSchemas implements NetconfDeviceSchemas {
-
-    private static final Logger LOG = LoggerFactory.getLogger(NetconfStateSchemas.class);
-
     public static final NetconfStateSchemas EMPTY = new NetconfStateSchemas(ImmutableSet.of());
 
+    private static final Logger LOG = LoggerFactory.getLogger(NetconfStateSchemas.class);
     private static final YangInstanceIdentifier STATE_SCHEMAS_IDENTIFIER =
             YangInstanceIdentifier.builder().node(NetconfState.QNAME).node(Schemas.QNAME).build();
+    private static final ContainerNode GET_SCHEMAS_RPC;
 
-    private static final ContainerNode GET_SCHEMAS_RPC = Builders.containerBuilder()
-            .withNodeIdentifier(NETCONF_GET_NODEID)
-            .withChild(NetconfMessageTransformUtil.toFilterStructure(STATE_SCHEMAS_IDENTIFIER,
-                BaseSchema.BASE_NETCONF_CTX_WITH_NOTIFICATIONS.getSchemaContext())).build();
+    static {
+        final Document document = XmlUtil.newDocument();
+
+        final Element filterElem = XmlUtil.createElement(document, NETCONF_FILTER_QNAME.getLocalName(),
+            Optional.of(NETCONF_FILTER_QNAME.getNamespace().toString()));
+        filterElem.setAttributeNS(NETCONF_FILTER_QNAME.getNamespace().toString(), NETCONF_TYPE_QNAME.getLocalName(),
+            "subtree");
+
+        final Element stateElem = XmlUtil.createElement(document, NetconfState.QNAME.getLocalName(),
+            Optional.of(NetconfState.QNAME.getNamespace().toString()));
+        stateElem.appendChild(XmlUtil.createElement(document, Schemas.QNAME.getLocalName(),
+            Optional.of(Schemas.QNAME.getNamespace().toString())));
+        filterElem.appendChild(stateElem);
+
+        GET_SCHEMAS_RPC = Builders.containerBuilder()
+                .withNodeIdentifier(NETCONF_GET_NODEID)
+                .withChild(Builders.anyXmlBuilder()
+                    .withNodeIdentifier(NETCONF_FILTER_NODEID)
+                    .withValue(new DOMSource(filterElem))
+                    .build())
+                .build();
+    }
 
     private final Set<RemoteYangSchema> availableYangSchemas;
 

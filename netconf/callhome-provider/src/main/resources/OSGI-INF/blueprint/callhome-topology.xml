@@ -29,6 +29,8 @@
                interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
     <reference id="schemaManager"
                interface="org.opendaylight.netconf.sal.connect.api.SchemaResourceManager"/>
+    <reference id="baseSchemas"
+               interface="org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas"/>
 
     <bean id="callhomeProvider" class="org.opendaylight.netconf.callhome.mount.IetfZeroTouchCallHomeServerProvider"
           init-method="init"
@@ -44,6 +46,7 @@
         <argument ref="keepAliveExecutor"/>
         <argument ref="processingExecutor"/>
         <argument ref="schemaManager"/>
+        <argument ref="baseSchemas"/>
         <argument ref="dataBroker"/>
         <argument ref="domMountPointService"/>
         <argument ref="encryptionService"/>

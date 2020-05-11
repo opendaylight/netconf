@@ -98,7 +98,7 @@ import org.opendaylight.yangtools.yang.parser.rfc7950.repo.TextToASTTransformer;
  *
  * @author Thomas Pantelis
  */
-public class NetconfNodeManagerTest {
+public class NetconfNodeManagerTest extends AbstractBaseSchemasTest {
     private static final String ACTOR_SYSTEM_NAME = "test";
     private static final RemoteDeviceId DEVICE_ID = new RemoteDeviceId("device", new InetSocketAddress(65535));
     private static final List<SourceIdentifier> SOURCE_IDENTIFIERS =
@@ -168,7 +168,7 @@ public class NetconfNodeManagerTest {
         NetconfTopologySetup masterSetup = new NetconfTopologySetup.NetconfTopologySetupBuilder()
                 .setActorSystem(masterSystem).setDataBroker(mockDataBroker).setSchemaResourceDTO(
                         new NetconfDevice.SchemaResourcesDTO(masterSchemaRepository, masterSchemaRepository,
-                                mockSchemaContextFactory, mockSchemasResolver)).build();
+                                mockSchemaContextFactory, mockSchemasResolver)).setBaseSchemas(BASE_SCHEMAS).build();
 
         testMasterActorRef = TestActorRef.create(masterSystem, Props.create(TestMasterActor.class, masterSetup,
                 DEVICE_ID, responseTimeout, mockMountPointService).withDispatcher(Dispatchers.DefaultDispatcherId()),

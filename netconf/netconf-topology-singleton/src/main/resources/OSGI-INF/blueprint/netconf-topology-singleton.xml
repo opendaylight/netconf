@@ -40,6 +40,8 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
                interface="org.opendaylight.netconf.sal.connect.api.DeviceActionFactory"/>
     <reference id="schemaManager"
                interface="org.opendaylight.netconf.sal.connect.api.SchemaResourceManager"/>
+    <reference id="baseSchemas"
+               interface="org.opendaylight.netconf.sal.connect.netconf.schema.mapping.BaseNetconfSchemas"/>
     <odl:clustered-app-config
             id="singletonConfig"
             binding-class="org.opendaylight.yang.gen.v1.urn.opendaylight.netconf.topology.singleton.config.rev170419.Config"
@@ -60,6 +62,7 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
           init-method="init" destroy-method="close">
         <cm:managed-properties persistent-id="org.opendaylight.netconf.topology.sb.keypair"
                                update-strategy="container-managed"/>
+        <argument ref="baseSchemas"/>
         <argument ref="dataBroker"/>
         <argument ref="rpcRegistry"/>
         <argument ref="actionRegistry"/>
