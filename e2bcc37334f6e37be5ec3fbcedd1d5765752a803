@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "02ebf9d7_93549f9f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-05-11T14:12:41Z",
+      "side": 1,
+      "message": "The issue number should go above the change-id/Signed-off-by like here: https://git.opendaylight.org/gerrit/c/netconf/+/89634\n\nAlso a better commit message body would be nice, something along the lines of \"Introduce rfc8525 yanglib implementation. Also deprecate rfc7895 components as these are obsoleted by the newer rfc.\"\n\nIt needs to be apparent what the patch does from the commit message and the above had me left wondering what was happening here.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 11
+      },
+      "revId": "e2bcc37334f6e37be5ec3fbcedd1d5765752a803",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
