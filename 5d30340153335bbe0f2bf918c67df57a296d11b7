@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2e1ea076_9c72c867",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-05-13T10:56:47Z",
+      "side": 1,
+      "message": "Commit message needs some work.\nFirst of I would elaborate that this is updating the generator to openapi 3.0 spec. Next up it seems that the ui has changed so this should be also mentioned.\nAlso the requests seem to be generated with all the choice case nodes present so that should also make it in.\nIf there is any way to access the old apidocs endpoint can you put that in aswell?",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 24
+      },
+      "revId": "5d30340153335bbe0f2bf918c67df57a296d11b7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b447af3f_9ab69e1f",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocServiceImpl.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-05-13T10:56:47Z",
+      "side": 1,
+      "message": "In case the removal of paging is intentional these can be removed as these are not used in the current iteration.",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 53
+      },
+      "revId": "5d30340153335bbe0f2bf918c67df57a296d11b7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1dc47eda_5f8cb374",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointSwagger.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 3127
+      },
+      "writtenOn": "2020-05-13T10:56:47Z",
+      "side": 1,
+      "message": "You are adding a Logger without using it anywhere, consider adding atleast debug logs where it would make sense, maybe to onMountPointCreated/Removed()? or removing it if its not needed.",
+      "range": {
+        "startLine": 52,
+        "startChar": 4,
+        "endLine": 52,
+        "endChar": 87
+      },
+      "revId": "5d30340153335bbe0f2bf918c67df57a296d11b7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
