@@ -41,10 +41,10 @@
     <script type="text/javascript">
 
     //reloads the swagger UI documentation for the specified mount.
-    var loadMount = function(mountIndex, mountPath) {
+    var loadMount = function(mountIndex, pageNum, mountPath) {
         $("#message").empty();
         $("#message").append( "<p>Loading...</p>" );
-        loadSwagger("/apidoc/18/apis/mounts/" + mountIndex,
+        loadSwagger("/apidoc/18/apis/mounts/" + mountIndex + "?pageNum=" + pageNum,
                 "swagger-ui-container");
         loadPagination("/apidoc/18/apis/mounts/", mountIndex, mountPath, "swagger-ui-container");
         $("#message").empty();
