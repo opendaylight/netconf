@@ -209,33 +209,44 @@ public class DocumentedException extends Exception {
         ErrorSeverity errorSeverity = ErrorSeverity.ERROR;
         Map<String, String> errorInfo = null;
         String errorMessage = "";
+        StringBuilder allErrorMessages = new StringBuilder();
 
         Node rpcReply = fromDoc.getDocumentElement();
 
-        // FIXME: BUG? - we only handle one rpc-error.
+        // FIXME: BUG? - we only handle one rpc-error. For now, shove extra errorMessages
+        // found in multiple rpc-error in the errorInfo Map to at least let them propagate
+        // back to caller.
+        int rpcErrorCount = 0;
 
         NodeList replyChildren = rpcReply.getChildNodes();
         for (int i = 0; i < replyChildren.getLength(); i++) {
             Node replyChild = replyChildren.item(i);
-            if (RPC_ERROR.equals(replyChild.getNodeName())) {
+            if (RPC_ERROR.equals(replyChild.getLocalName())) {
+                rpcErrorCount++;
                 NodeList rpcErrorChildren = replyChild.getChildNodes();
                 for (int j = 0; j < rpcErrorChildren.getLength(); j++) {
                     Node rpcErrorChild = rpcErrorChildren.item(j);
-                    if (ERROR_TYPE.equals(rpcErrorChild.getNodeName())) {
+                    if (ERROR_TYPE.equals(rpcErrorChild.getLocalName())) {
                         errorType = ErrorType.from(rpcErrorChild.getTextContent());
-                    } else if (ERROR_TAG.equals(rpcErrorChild.getNodeName())) {
+                    } else if (ERROR_TAG.equals(rpcErrorChild.getLocalName())) {
                         errorTag = ErrorTag.from(rpcErrorChild.getTextContent());
-                    } else if (ERROR_SEVERITY.equals(rpcErrorChild.getNodeName())) {
+                    } else if (ERROR_SEVERITY.equals(rpcErrorChild.getLocalName())) {
                         errorSeverity = ErrorSeverity.from(rpcErrorChild.getTextContent());
-                    } else if (ERROR_MESSAGE.equals(rpcErrorChild.getNodeName())) {
+                    } else if (ERROR_MESSAGE.equals(rpcErrorChild.getLocalName())) {
                         errorMessage = rpcErrorChild.getTextContent();
-                    } else if (ERROR_INFO.equals(rpcErrorChild.getNodeName())) {
+                        allErrorMessages.append(errorMessage);
+                    } else if (ERROR_INFO.equals(rpcErrorChild.getLocalName())) {
                         errorInfo = parseErrorInfo(rpcErrorChild);
                     }
                 }
-
-                break;
             }
+        }
+
+        if (rpcErrorCount > 1) {
+            if (errorInfo == null) {
+                errorInfo = new HashMap<>();
+            }
+            errorInfo.put("Multiple Errors Found", allErrorMessages.toString());
         }
 
         return new DocumentedException(errorMessage, errorType, errorTag, errorSeverity, errorInfo);
