@@ -55,7 +55,15 @@ public final class NetconfMessageUtil {
     }
 
     public static boolean isErrorMessage(final XmlElement xmlElement) throws NetconfDocumentedException {
+
+        // In the case of multiple rpc-error messages, size will not be 1 but we still want to report as Error
         if (xmlElement.getChildElements().size() != 1) {
+            List<XmlElement> allResults = xmlElement.getChildElements();
+            for (XmlElement result : allResults) {
+                if (result.getName().equals(DocumentedException.RPC_ERROR)) {
+                    return true;
+                }
+            }
             return false;
         }
         try {
