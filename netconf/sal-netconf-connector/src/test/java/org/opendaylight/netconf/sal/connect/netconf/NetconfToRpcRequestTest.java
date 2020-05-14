@@ -17,6 +17,7 @@ import java.util.Collection;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opendaylight.mdsal.dom.api.DOMRpcResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
 import org.opendaylight.netconf.sal.connect.netconf.schema.mapping.NetconfMessageTransformer;
@@ -97,6 +98,38 @@ public class NetconfToRpcRequestTest extends AbstractBaseSchemasTest {
         ));
 
         messageTransformer.toRpcResult(response, toPath(EDIT_CONFIG_QNAME));
+    }
+
+    // The edit config defined in yang has no output
+    @Test
+    public void testRpcErrorResponse() throws Exception {
+        final NetconfMessage response = new NetconfMessage(XmlUtil.readXmlToDocument(
+                "<nc:rpc-reply xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" xmlns:junos=\"http://xml.juniper.net/junos/18.4R1/junos\""
+                        + "           message-id=\"m-81\">"
+                        + "<nc:rpc-error>\n"
+                        + "<nc:error-type>protocol</nc:error-type>\n"
+                        + "<nc:error-tag>operation-failed</nc:error-tag>\n"
+                        + "<nc:error-severity>error</nc:error-severity>\n"
+                        + "<source-daemon>\n"
+                        + "dcd\n"
+                        + "</source-daemon>\n"
+                        + "<nc:error-message>\n"
+                        + "Number of member links configured, i.e [1], "
+                        + "for interface [ae0]is lesser than the required minimum [2].\n"
+                        + "</nc:error-message>\n"
+                        + "</nc:rpc-error>\n"
+                        + "<nc:rpc-error>\n"
+                        + "<nc:error-type>protocol</nc:error-type>\n"
+                        + "<nc:error-tag>operation-failed</nc:error-tag>\n"
+                        + "<nc:error-severity>error</nc:error-severity>\n"
+                        + "<nc:error-message>\n"
+                        + "configuration check-out failed\n"
+                        + "</nc:error-message>\n"
+                        + "</nc:rpc-error>\n"
+                        + "</nc:rpc-reply>"
+        ));
+
+        DOMRpcResult result = messageTransformer.toRpcResult(response, toPath(EDIT_CONFIG_QNAME));
     }
 
 }
