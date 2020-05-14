@@ -359,6 +359,29 @@ public class NetconfDeviceCommunicatorTest {
         assertTrue("Error info contains \"bar\"", errorInfo.contains("<bad-element>bar</bad-element>"));
     }
 
+    @Test
+    public void testOnResponseMessageWithMultipleErrors() throws Exception {
+        setupSession();
+
+        String messageID = UUID.randomUUID().toString();
+        ListenableFuture<RpcResult<NetconfMessage>> resultFuture = sendRequest(messageID, true);
+
+        communicator.onMessage(mockSession, createMultiErrorResponseMessage(messageID));
+
+        RpcError rpcError = verifyErrorRpcResult(resultFuture.get(), RpcError.ErrorType.PROTOCOL,
+                "operation-failed");
+
+        String errorInfo = rpcError.getInfo();
+        assertNotNull("RpcError info is null", errorInfo);
+
+        String errorInfoMessages = rpcError.getInfo();
+        String errMsg1 = "Number of member links configured, i.e [1], "
+                + "for interface [ae0]is lesser than the required minimum [2].";
+        String errMsg2 = "configuration check-out failed";
+        assertTrue(String.format("Error info contains \"%s\" or \"%s\'", errMsg1, errMsg2),
+                errorInfoMessages.contains(errMsg1) && errorInfoMessages.contains(errMsg2));
+    }
+
     /**
      * Test whether reconnect is scheduled properly.
      */
@@ -449,6 +472,37 @@ public class NetconfDeviceCommunicatorTest {
 
         resultFuture = sendRequest(messageID.get(0), false);
         assertNotNull("ListenableFuture is null", resultFuture);
+    }
+
+    private static NetconfMessage createMultiErrorResponseMessage(final String messageID) throws Exception {
+        // multiple rpc-errors which simulate actual response like in NETCONF-666
+        String xmlStr = "<nc:rpc-reply xmlns:nc=\"urn:ietf:params:xml:ns:netconf:base:1.0\" xmlns=\"urn:ietf:params:xml:ns:netconf:base:1.0\" xmlns:junos=\"http://xml.juniper.net/junos/18.4R1/junos\""
+                + "           message-id=\"" + messageID + "\">"
+                + "<nc:rpc-error>\n"
+                + "<nc:error-type>protocol</nc:error-type>\n"
+                + "<nc:error-tag>operation-failed</nc:error-tag>\n"
+                + "<nc:error-severity>error</nc:error-severity>\n"
+                + "<source-daemon>\n"
+                + "dcd\n"
+                + "</source-daemon>\n"
+                + "<nc:error-message>\n"
+                + "Number of member links configured, i.e [1], "
+                + "for interface [ae0]is lesser than the required minimum [2].\n"
+                + "</nc:error-message>\n"
+                + "</nc:rpc-error>\n"
+                + "<nc:rpc-error>\n"
+                + "<nc:error-type>protocol</nc:error-type>\n"
+                + "<nc:error-tag>operation-failed</nc:error-tag>\n"
+                + "<nc:error-severity>error</nc:error-severity>\n"
+                + "<nc:error-message>\n"
+                + "configuration check-out failed\n"
+                + "</nc:error-message>\n"
+                + "</nc:rpc-error>\n"
+                + "</nc:rpc-reply>";
+
+        ByteArrayInputStream bis = new ByteArrayInputStream(xmlStr.getBytes());
+        Document doc = UntrustedXML.newDocumentBuilder().parse(bis);
+        return new NetconfMessage(doc);
     }
 
     private static NetconfMessage createErrorResponseMessage(final String messageID) throws Exception {

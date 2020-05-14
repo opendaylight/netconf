@@ -282,6 +282,7 @@ public abstract class AbstractWriteTx implements DOMDataTreeWriteTransaction {
                         break;
                 }
                 msgBuilder.append(error.getMessage());
+                msgBuilder.append(error.getInfo());
                 errorTag = error.getTag();
             }
         }
