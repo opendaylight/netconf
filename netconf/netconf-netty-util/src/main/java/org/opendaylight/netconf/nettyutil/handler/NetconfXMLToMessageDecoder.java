@@ -18,6 +18,7 @@ import java.util.List;
 import org.opendaylight.netconf.api.FailedNetconfMessage;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.xml.XmlUtil;
+import org.opendaylight.odlparent.logging.markers.Markers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -31,7 +32,7 @@ public final class NetconfXMLToMessageDecoder extends ByteToMessageDecoder {
                        final List<Object> out) throws IOException, SAXException {
         if (in.isReadable()) {
             if (LOG.isTraceEnabled()) {
-                LOG.trace("Received to decode: {}", ByteBufUtil.hexDump(in));
+                LOG.trace(Markers.confidential(), "Received to decode: {}", ByteBufUtil.hexDump(in));
             }
 
             /* According to the XML 1.0 specifications, when there is an XML declaration

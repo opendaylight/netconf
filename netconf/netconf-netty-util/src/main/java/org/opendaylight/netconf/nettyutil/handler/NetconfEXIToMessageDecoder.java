@@ -26,6 +26,7 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
+import org.opendaylight.odlparent.logging.markers.Markers;
 import org.opendaylight.yangtools.util.xml.UntrustedXML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +83,7 @@ public final class NetconfEXIToMessageDecoder extends ByteToMessageDecoder {
         }
 
         if (LOG.isTraceEnabled()) {
-            LOG.trace("Received to decode: {}", ByteBufUtil.hexDump(in));
+            LOG.trace(Markers.confidential(), "Received to decode: {}", ByteBufUtil.hexDump(in));
         }
 
         final TransformerHandler handler = FACTORY.newTransformerHandler();

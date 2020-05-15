@@ -21,6 +21,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.opendaylight.netconf.api.NetconfMessage;
+import org.opendaylight.odlparent.logging.markers.Markers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Comment;
@@ -42,7 +43,7 @@ public class NetconfMessageToXMLEncoder extends MessageToByteEncoder<NetconfMess
     @VisibleForTesting
     public void encode(final ChannelHandlerContext ctx, final NetconfMessage msg, final ByteBuf out)
             throws IOException, TransformerException {
-        LOG.trace("Sent to encode : {}", msg);
+        LOG.trace(Markers.confidential(), "Sent to encode : {}", msg);
 
         if (clientId.isPresent()) {
             Comment comment = msg.getDocument().createComment("clientId:" + clientId.get());
