@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "a7e8227d_e7009947",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 8664
+      },
+      "writtenOn": "2020-05-15T10:07:02Z",
+      "side": 1,
+      "message": "Commit message edited, according to your comment.\nThere is no way to access old apidocs, previous apidocs doesn\u0027t\nhave something that not implemented in the new version.",
+      "parentUuid": "2e1ea076_9c72c867",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 24
+      },
+      "revId": "5d30340153335bbe0f2bf918c67df57a296d11b7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b447af3f_9ab69e1f",
         "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocServiceImpl.java",
         "patchSetId": 17
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "4ea9c22d_396e39bc",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocServiceImpl.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 8664
+      },
+      "writtenOn": "2020-05-15T10:07:02Z",
+      "side": 1,
+      "message": "Removed",
+      "parentUuid": "b447af3f_9ab69e1f",
+      "range": {
+        "startLine": 38,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 53
+      },
+      "revId": "5d30340153335bbe0f2bf918c67df57a296d11b7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1dc47eda_5f8cb374",
         "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointSwagger.java",
         "patchSetId": 17
@@ -68,6 +116,30 @@
       "revId": "5d30340153335bbe0f2bf918c67df57a296d11b7",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e66fca7a_beabf55e",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/mountpoints/MountPointSwagger.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 8664
+      },
+      "writtenOn": "2020-05-15T10:07:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1dc47eda_5f8cb374",
+      "range": {
+        "startLine": 52,
+        "startChar": 4,
+        "endLine": 52,
+        "endChar": 87
+      },
+      "revId": "5d30340153335bbe0f2bf918c67df57a296d11b7",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": false
     }
   ]
 }
