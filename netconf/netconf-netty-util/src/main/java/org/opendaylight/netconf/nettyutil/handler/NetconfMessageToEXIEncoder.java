@@ -22,6 +22,7 @@ import javax.xml.transform.sax.SAXResult;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.shaded.exificient.core.exceptions.EXIException;
 import org.opendaylight.netconf.shaded.exificient.main.api.sax.SAXEncoder;
+import org.opendaylight.odlparent.logging.markers.Markers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ public final class NetconfMessageToEXIEncoder extends MessageToByteEncoder<Netco
     @Override
     protected void encode(final ChannelHandlerContext ctx, final NetconfMessage msg, final ByteBuf out)
             throws IOException, TransformerException, EXIException {
-        LOG.trace("Sent to encode : {}", msg);
+        LOG.trace(Markers.confidential(), "Sent to encode : {}", msg);
 
         try (OutputStream os = new ByteBufOutputStream(out)) {
             final SAXEncoder encoder = codec.getWriter();
