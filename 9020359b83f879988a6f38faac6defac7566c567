@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b1e67bc8_714076e5",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-05-18T23:08:16Z",
+      "side": 1,
+      "message": "any reason you can\u0027t combine all four of these \u0027return true\u0027 cases on this line instead of the else if or else blocks?",
+      "revId": "9020359b83f879988a6f38faac6defac7566c567",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b5b36bf3_692f1382",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriterParametersTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-05-18T23:08:16Z",
+      "side": 1,
+      "message": "I think just delete these altogether if they are not relevant with these changes",
+      "range": {
+        "startLine": 117,
+        "startChar": 0,
+        "endLine": 121,
+        "endChar": 10
+      },
+      "revId": "9020359b83f879988a6f38faac6defac7566c567",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
