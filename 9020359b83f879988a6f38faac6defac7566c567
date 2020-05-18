@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "e25d493a_af1e2dbf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-05-18T23:10:33Z",
+      "side": 1,
+      "message": "remove \"to resolve NETCONF-660\" and add a line above\nthe signed-off-by line like this:\n\nJIRA: NETCONF-660",
+      "revId": "9020359b83f879988a6f38faac6defac7566c567",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b1e67bc8_714076e5",
         "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/jersey/providers/ParameterAwareNormalizedNodeWriter.java",
         "patchSetId": 3
