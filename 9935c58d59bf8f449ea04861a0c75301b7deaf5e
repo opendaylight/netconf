@@ -70,6 +70,30 @@
       "revId": "9935c58d59bf8f449ea04861a0c75301b7deaf5e",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c7fa39cd_5e39d5d8",
+        "filename": "restconf/sal-rest-docgen/src/main/java/org/opendaylight/netconf/sal/rest/doc/impl/ApiDocServiceImpl.java",
+        "patchSetId": 17
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 8125
+      },
+      "writtenOn": "2020-05-18T08:02:13Z",
+      "side": 0,
+      "message": "The problem here is that swagger 1.2 and 3.0 are very different specifications. Before with 1.2 when you made a request to root apidoc/explorer it has created one json that contained only the paths and a specific json for each module right after that. so you could have request that would return a json just with one module.\n\nWith 3.0 you have one huge json that contains all the data at one json all the modules all the paths and swagger ui works with that. It has completely different structure.\n\nOther thing is that swagger ui for 3.0 as far as I could look does not support pagination and I am not sure how it was added to swagger 1.2 but this kind of change would require someone with node js and react very good experience. it s not just a simple javascript or html change. At least I am not UI guy and that is my understanding.\n\nNow however we could make a backend to return json with just a several modules based on pagination from request point of view and if the query parameter would not be specified then it would return all of them (for current UI) as it does right now. If some other project really relies on this.\n\nBut even if it does they will not receive anything even a little bit similar to what they received before and they will have to change the whole code anyway as did we.",
+      "parentUuid": "e8c65c98_135ee316",
+      "range": {
+        "startLine": 114,
+        "startChar": 4,
+        "endLine": 140,
+        "endChar": 5
+      },
+      "revId": "9935c58d59bf8f449ea04861a0c75301b7deaf5e",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
