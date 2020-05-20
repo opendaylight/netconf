@@ -17,6 +17,7 @@ import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.ReconnectStrategyFactory;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 
 public final class NetconfReconnectingClientConfiguration extends NetconfClientConfiguration {
@@ -31,9 +32,10 @@ public final class NetconfReconnectingClientConfiguration extends NetconfClientC
                                            final ReconnectStrategyFactory connectStrategyFactory,
                                            final AuthenticationHandler authHandler,
                                            final SslHandlerFactory sslHandlerFactory,
+                                           final NetconfSshClient sshClient,
                                            final List<Uri> odlHelloCapabilities) {
         super(clientProtocol, address, connectionTimeoutMillis, additionalHeader, sessionListener, reconnectStrategy,
-                authHandler, sslHandlerFactory, odlHelloCapabilities);
+                authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities);
         this.connectStrategyFactory = connectStrategyFactory;
         validateReconnectConfiguration();
     }

@@ -100,14 +100,16 @@ public class NetconfClientDispatcherImpl
         return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
             (ch, sessionPromise) -> new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
                         getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener(),
-                    sshClient).initialize(ch, sessionPromise));
+                currentConfiguration.getSshClient() != null ? currentConfiguration.getSshClient() : sshClient)
+                .initialize(ch, sessionPromise));
     }
 
     private Future<Void> createReconnectingSshClient(
             final NetconfReconnectingClientConfiguration currentConfiguration) {
         LOG.debug("Creating reconnecting SSH client with configuration: {}", currentConfiguration);
         final SshClientChannelInitializer init = new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
-                getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener(), sshClient);
+                getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener(),
+            currentConfiguration.getSshClient() != null ? currentConfiguration.getSshClient() : sshClient);
 
         return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration
                 .getConnectStrategyFactory(), currentConfiguration.getReconnectStrategy(),
