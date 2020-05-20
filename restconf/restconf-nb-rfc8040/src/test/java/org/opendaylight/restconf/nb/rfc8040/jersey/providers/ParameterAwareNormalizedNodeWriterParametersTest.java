@@ -105,9 +105,10 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
         final List<Set<QName>> limitedFields = new ArrayList<>();
         limitedFields.add(Sets.newHashSet(leafSetNodeIdentifier.getNodeType()));
         limitedFields.add(Sets.newHashSet(leafSetEntryNodeIdentifier.getNodeType()));
+        final List<String> parentChildRelation = new ArrayList<>();
 
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, 1, limitedFields);
+                writer, 1, limitedFields, parentChildRelation);
 
         parameterWriter.write(containerNodeData);
 
@@ -127,7 +128,7 @@ public class ParameterAwareNormalizedNodeWriterParametersTest {
     @Test
     public void writeRootDataTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, null, null);
+                writer, null, null, null);
 
         parameterWriter.write(rootDataContainerData);
 
