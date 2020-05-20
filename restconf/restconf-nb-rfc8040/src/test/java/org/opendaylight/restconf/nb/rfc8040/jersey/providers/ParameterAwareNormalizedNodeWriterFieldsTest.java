@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -131,9 +132,15 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
     public void writeContainerWithLimitedFieldsTest() throws Exception {
         final List<Set<QName>> limitedFields = new ArrayList<>();
         limitedFields.add(new HashSet<>());
+        final List<HashMap<QName, QName>> parentChildRelation = new ArrayList<>();
+        HashMap<QName, QName> relationMap = new HashMap<QName, QName>();
+        QName container = QName.create("namespace", "container");
+        QName leafSet = QName.create("namespace", "leaf-set");
+        relationMap.put(container, leafSet);
+        parentChildRelation.add(relationMap);
 
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, null, limitedFields);
+                writer, null, limitedFields, parentChildRelation);
 
         parameterWriter.write(containerNodeData);
 
@@ -151,9 +158,9 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
     public void writeContainerAllFieldsTest() throws Exception {
         final List<Set<QName>> limitedFields = new ArrayList<>();
         limitedFields.add(Sets.newHashSet(leafSetNodeIdentifier.getNodeType()));
-
+        final List<HashMap<QName, QName>> parentChildRelation = new ArrayList<>();
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, null, limitedFields);
+                writer, null, limitedFields, parentChildRelation);
 
         parameterWriter.write(containerNodeData);
 
@@ -174,9 +181,10 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
     public void writeMapEntryNodeWithLimitedFieldsTest() throws Exception {
         final List<Set<QName>> limitedFields = new ArrayList<>();
         limitedFields.add(new HashSet<>());
+        final List<HashMap<QName, QName>> parentChildRelation = new ArrayList<>();
 
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, null, limitedFields);
+                writer, null, limitedFields, parentChildRelation);
 
         parameterWriter.write(mapNodeData);
 
@@ -195,9 +203,10 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
     public void writeMapNodeAllFieldsTest() throws Exception {
         final List<Set<QName>> limitedFields = new ArrayList<>();
         limitedFields.add(Sets.newHashSet(keyLeafNodeData.getNodeType()));
+        final List<HashMap<QName, QName>> parentChildRelation = new ArrayList<>();
 
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, null, limitedFields);
+                writer, null, limitedFields, parentChildRelation);
 
         parameterWriter.write(mapNodeData);
 
