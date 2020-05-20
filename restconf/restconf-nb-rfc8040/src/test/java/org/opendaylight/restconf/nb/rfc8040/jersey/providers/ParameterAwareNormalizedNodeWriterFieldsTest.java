@@ -131,9 +131,11 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
     public void writeContainerWithLimitedFieldsTest() throws Exception {
         final List<Set<QName>> limitedFields = new ArrayList<>();
         limitedFields.add(new HashSet<>());
+        final List<String> parentChildRelation = new ArrayList<>();
+        parentChildRelation.add("container#leaf-set");
 
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, null, limitedFields);
+                writer, null, limitedFields, parentChildRelation);
 
         parameterWriter.write(containerNodeData);
 
@@ -151,9 +153,10 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
     public void writeContainerAllFieldsTest() throws Exception {
         final List<Set<QName>> limitedFields = new ArrayList<>();
         limitedFields.add(Sets.newHashSet(leafSetNodeIdentifier.getNodeType()));
+        final List<String> parentChildRelation = new ArrayList<>();
 
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, null, limitedFields);
+                writer, null, limitedFields, parentChildRelation);
 
         parameterWriter.write(containerNodeData);
 
@@ -169,21 +172,28 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
     /**
      * Test write {@link MapEntryNode} as child of {@link MapNode} when children which will be written are limited.
      * Fields parameter selects 0/1 of map entry node children to be written.
+     * According to RFC-6241, page 24, key (instance identifier components) MAY be included in the subtree filter
+     * output even if it is not explicitly requested. Therefore this code change also ensures key
+     * (instance identifier components) is always returned in the response. As the key is always inserted
+     * in the structure, code for test needs to be modified suitably by increasing “wantedNumberOfInvocations” to 3.
      */
     @Test
     public void writeMapEntryNodeWithLimitedFieldsTest() throws Exception {
         final List<Set<QName>> limitedFields = new ArrayList<>();
         limitedFields.add(new HashSet<>());
+        final List<String> parentChildRelation = new ArrayList<>();
 
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, null, limitedFields);
+                writer, null, limitedFields, parentChildRelation);
 
         parameterWriter.write(mapNodeData);
 
         final InOrder inOrder = Mockito.inOrder(writer);
         inOrder.verify(writer, Mockito.times(1)).startMapNode(mapNodeIdentifier, mapNodeValue.size());
         inOrder.verify(writer, Mockito.times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
-        inOrder.verify(writer, Mockito.times(2)).endNode();
+        inOrder.verify(writer, Mockito.times(1)).startLeafNode(keyLeafNodeIdentifier);
+        inOrder.verify(writer, Mockito.times(1)).scalarValue(keyLeafNodeValue);
+        inOrder.verify(writer, Mockito.times(3)).endNode();
         Mockito.verifyNoMoreInteractions(writer);
     }
 
@@ -195,9 +205,10 @@ public class ParameterAwareNormalizedNodeWriterFieldsTest {
     public void writeMapNodeAllFieldsTest() throws Exception {
         final List<Set<QName>> limitedFields = new ArrayList<>();
         limitedFields.add(Sets.newHashSet(keyLeafNodeData.getNodeType()));
+        final List<String> parentChildRelation = new ArrayList<>();
 
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, null, limitedFields);
+                writer, null, limitedFields, parentChildRelation);
 
         parameterWriter.write(mapNodeData);
 

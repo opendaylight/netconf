@@ -18,6 +18,7 @@ public final class WriterParameters {
     private final boolean prettyPrint;
     private final boolean tagged;
     private final String withDefault;
+    private final List<String> parentChildRelation;
 
     private WriterParameters(final WriterParametersBuilder builder) {
         this.content = builder.content;
@@ -26,6 +27,7 @@ public final class WriterParameters {
         this.prettyPrint = builder.prettyPrint;
         this.tagged = builder.tagged;
         this.withDefault = builder.withDefault;
+        this.parentChildRelation = builder.parentChildRelation;
     }
 
     public String getContent() {
@@ -52,6 +54,10 @@ public final class WriterParameters {
         return withDefault;
     }
 
+    public List<String> getParentChildRelation() {
+        return parentChildRelation;
+    }
+
     public static class WriterParametersBuilder {
         private String content;
         private Integer depth;
@@ -59,6 +65,7 @@ public final class WriterParameters {
         private boolean prettyPrint;
         private boolean tagged;
         private String withDefault;
+        private List<String> parentChildRelation;
 
         public WriterParametersBuilder() {
 
@@ -86,6 +93,11 @@ public final class WriterParameters {
 
         public WriterParametersBuilder setWithDefault(final String withDefault) {
             this.withDefault = withDefault;
+            return this;
+        }
+
+        public WriterParametersBuilder setParentChildRelation(final List<String> parentChildRelation) {
+            this.parentChildRelation = parentChildRelation;
             return this;
         }
 
