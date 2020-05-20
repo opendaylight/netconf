@@ -8,6 +8,7 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,15 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public final class ParserFieldsParameter {
+
+    private static final char COLON = ':';
+    private static final char SEMICOLON = ';';
+    private static final char SLASH = '/';
+    private static final char STARTING_PARENTHESIS = '(';
+    private static final char CLOSING_PARENTHESIS = ')';
+    private static final List<HashMap<QName, QName>> PARENT_CHILD_RELATION_LIST =
+                                                                            new ArrayList<HashMap<QName, QName>>();
+
     private ParserFieldsParameter() {
 
     }
@@ -48,8 +58,17 @@ public final class ParserFieldsParameter {
                     "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
+        PARENT_CHILD_RELATION_LIST.clear();
         parseInput(input, startQNameModule, startNode, parsed, context);
         return parsed;
+    }
+
+    /**
+     * Parse fields parameter and return parent child relation list.
+     * @return {@link List}
+     */
+    public static List<HashMap<QName, QName>> getParentChildRelation() {
+        return PARENT_CHILD_RELATION_LIST;
     }
 
     /**
@@ -227,6 +246,9 @@ public final class ParserFieldsParameter {
 
         // add final childNode node to level nodes
         level.add(childNode.getIdentifier().getNodeType());
+        HashMap<QName, QName> parentChildRelationMap = new HashMap<QName, QName>();
+        parentChildRelationMap.put(currentNode.getIdentifier().getNodeType(), childNode.getIdentifier().getNodeType());
+        PARENT_CHILD_RELATION_LIST.add(parentChildRelationMap);
         return childNode;
     }
 
