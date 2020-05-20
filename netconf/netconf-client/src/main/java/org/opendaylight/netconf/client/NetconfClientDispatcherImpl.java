@@ -13,11 +13,9 @@ import io.netty.util.concurrent.Future;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.netconf.client.conf.NetconfClientConfiguration;
 import org.opendaylight.netconf.client.conf.NetconfReconnectingClientConfiguration;
 import org.opendaylight.netconf.nettyutil.AbstractNetconfDispatcher;
-import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,18 +27,11 @@ public class NetconfClientDispatcherImpl
     private static final Logger LOG = LoggerFactory.getLogger(NetconfClientDispatcherImpl.class);
 
     private final Timer timer;
-    private final NetconfSshClient sshClient;
 
     public NetconfClientDispatcherImpl(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup,
-                                       final Timer timer, @Nullable final NetconfSshClient sshClient) {
+                                       final Timer timer) {
         super(bossGroup, workerGroup);
         this.timer = timer;
-        this.sshClient = sshClient;
-    }
-
-    public NetconfClientDispatcherImpl(final EventLoopGroup bossGroup, final EventLoopGroup workerGroup,
-            final Timer timer) {
-        this(bossGroup, workerGroup, timer, null);
     }
 
     protected Timer getTimer() {
@@ -79,8 +70,7 @@ public class NetconfClientDispatcherImpl
         LOG.debug("Creating TCP client with configuration: {}", currentConfiguration);
         return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
             (ch, promise) -> new TcpClientChannelInitializer(getNegotiatorFactory(currentConfiguration),
-                        currentConfiguration
-                        .getSessionListener()).initialize(ch, promise));
+                        currentConfiguration.getSessionListener()).initialize(ch, promise));
     }
 
     private Future<Void> createReconnectingTcpClient(
@@ -100,14 +90,15 @@ public class NetconfClientDispatcherImpl
         return super.createClient(currentConfiguration.getAddress(), currentConfiguration.getReconnectStrategy(),
             (ch, sessionPromise) -> new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
                         getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener(),
-                    sshClient).initialize(ch, sessionPromise));
+                        currentConfiguration.getSshClient()).initialize(ch, sessionPromise));
     }
 
     private Future<Void> createReconnectingSshClient(
             final NetconfReconnectingClientConfiguration currentConfiguration) {
         LOG.debug("Creating reconnecting SSH client with configuration: {}", currentConfiguration);
         final SshClientChannelInitializer init = new SshClientChannelInitializer(currentConfiguration.getAuthHandler(),
-                getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener(), sshClient);
+                getNegotiatorFactory(currentConfiguration), currentConfiguration.getSessionListener(),
+                currentConfiguration.getSshClient());
 
         return super.createReconnectingClient(currentConfiguration.getAddress(), currentConfiguration
                 .getConnectStrategyFactory(), currentConfiguration.getReconnectStrategy(),

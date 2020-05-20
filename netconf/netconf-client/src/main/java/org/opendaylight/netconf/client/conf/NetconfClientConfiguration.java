@@ -19,6 +19,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ public class NetconfClientConfiguration {
 
     private final AuthenticationHandler authHandler;
     private final SslHandlerFactory sslHandlerFactory;
+    private final NetconfSshClient sshClient;
 
     private final List<Uri> odlHelloCapabilities;
 
@@ -46,7 +48,7 @@ public class NetconfClientConfiguration {
                                final NetconfHelloMessageAdditionalHeader additionalHeader,
                                final NetconfClientSessionListener sessionListener,
                                final ReconnectStrategy reconnectStrategy, final AuthenticationHandler authHandler,
-                               final SslHandlerFactory sslHandlerFactory,
+                               final SslHandlerFactory sslHandlerFactory, final NetconfSshClient sshClient,
                                final List<Uri> odlHelloCapabilities) {
         this.address = address;
         this.connectionTimeoutMillis = connectionTimeoutMillis;
@@ -56,6 +58,7 @@ public class NetconfClientConfiguration {
         this.reconnectStrategy = reconnectStrategy;
         this.authHandler = authHandler;
         this.sslHandlerFactory = sslHandlerFactory;
+        this.sshClient = sshClient;
         this.odlHelloCapabilities = odlHelloCapabilities;
         validateConfiguration();
     }
@@ -90,6 +93,10 @@ public class NetconfClientConfiguration {
 
     public SslHandlerFactory getSslHandlerFactory() {
         return sslHandlerFactory;
+    }
+
+    public NetconfSshClient getSshClient() {
+        return sshClient;
     }
 
     public List<Uri> getOdlHelloCapabilities() {
