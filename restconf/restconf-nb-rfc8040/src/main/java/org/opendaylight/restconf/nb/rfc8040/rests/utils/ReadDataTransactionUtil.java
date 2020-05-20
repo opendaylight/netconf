@@ -169,6 +169,7 @@ public final class ReadDataTransactionUtil {
         // check and set fields
         if (!fields.isEmpty()) {
             builder.setFields(ParserFieldsParameter.parseFieldsParameter(identifier, fields.get(0)));
+            builder.setParentChildRelation(ParserFieldsParameter.getParentChildRelation());
         }
 
         // check and set withDefaults parameter
