@@ -14,8 +14,10 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -105,12 +107,14 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
 
         when(keyLeafNodeData.getValue()).thenReturn(keyLeafNodeValue);
         when(keyLeafNodeData.getIdentifier()).thenReturn(keyLeafNodeIdentifier);
+        when(keyLeafNodeData.getNodeType()).thenReturn(keyLeafNodeIdentifier.getNodeType());
 
         anotherLeafNodeIdentifier = NodeIdentifier.create(QName.create("namespace", "another-field"));
         anotherLeafNodeValue = "another-value";
 
         when(anotherLeafNodeData.getValue()).thenReturn(anotherLeafNodeValue);
         when(anotherLeafNodeData.getIdentifier()).thenReturn(anotherLeafNodeIdentifier);
+        when(anotherLeafNodeData.getNodeType()).thenReturn(anotherLeafNodeIdentifier.getNodeType());
 
         // values
         when(leafSetEntryNodeData.getValue()).thenReturn(leafSetEntryNodeValue);
@@ -134,8 +138,10 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
      */
     @Test
     public void writeContainerWithoutChildrenDepthTest() throws Exception {
+        final List<String> parentChildRelation = new ArrayList<String>();
+        parentChildRelation.add("container#leaf-set");
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter
-                .forStreamWriter(writer, 1, null);
+                .forStreamWriter(writer, 1, null, parentChildRelation);
 
         parameterWriter.write(containerNodeData);
 
@@ -152,7 +158,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeContainerWithChildrenDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, Integer.MAX_VALUE, null);
+                writer, Integer.MAX_VALUE, null, null);
 
         parameterWriter.write(containerNodeData);
 
@@ -168,18 +174,24 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     /**
      * Test write with {@link MapNode} with children but write data only to depth 1 (children will not be written).
      * Depth parameter limits depth to 1.
+     * According to RFC-6241, page 24, key (instance identifier components) MAY be included in the subtree filter
+     * output even if it is not explicitly requested. Therefore this code change also ensures key
+     * (instance identifier components) is always returned in the response. As the key is always inserted
+     * in the structure, code for test needs to be modified suitably by increasing “wantedNumberOfInvocations” to 3.
      */
     @Test
     public void writeMapNodeWithoutChildrenDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter
-                .forStreamWriter(writer, 1, null);
+                .forStreamWriter(writer, false, 1, null, null);
 
         parameterWriter.write(mapNodeData);
 
         final InOrder inOrder = inOrder(writer);
         inOrder.verify(writer, times(1)).startMapNode(mapNodeIdentifier, mapNodeValue.size());
         inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
-        inOrder.verify(writer, times(2)).endNode();
+        inOrder.verify(writer, times(1)).startLeafNode(keyLeafNodeIdentifier);
+        inOrder.verify(writer, times(1)).scalarValue(keyLeafNodeValue);
+        inOrder.verify(writer, times(3)).endNode();
         verifyNoMoreInteractions(writer);
     }
 
@@ -194,7 +206,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeMapNodeWithChildrenDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, Integer.MAX_VALUE, null);
+                writer, Integer.MAX_VALUE, null, null);
 
         parameterWriter.write(mapNodeData);
 
@@ -221,7 +233,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeLeafSetNodeWithoutChildrenDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, 1, null);
+                writer, 1, null, null);
 
         parameterWriter.write(leafSetNodeData);
 
@@ -238,7 +250,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeLeafSetNodeWithChildrenDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, Integer.MAX_VALUE, null);
+                writer, Integer.MAX_VALUE, null, null);
 
         parameterWriter.write(leafSetNodeData);
 
@@ -257,7 +269,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeLeafSetEntryNodeDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, Integer.MAX_VALUE, null);
+                writer, Integer.MAX_VALUE, null, null);
 
         parameterWriter.write(leafSetEntryNodeData);
 
@@ -275,7 +287,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeMapEntryNodeUnorderedOnlyKeysDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, false, 1, null);
+                writer, false, 1, null, null);
 
         parameterWriter.write(mapEntryNodeData);
 
@@ -295,7 +307,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeMapEntryNodeUnorderedDepthTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, false, Integer.MAX_VALUE, null);
+                writer, false, Integer.MAX_VALUE, null, null);
 
         parameterWriter.write(mapEntryNodeData);
 
@@ -312,17 +324,26 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     /**
      * Test write with {@link MapEntryNode} ordered with depth 1 (children will not be written).
      * Depth parameter limits depth to 1.
+     * According to RFC-6241, page 24, key (instance identifier components) MAY be included in the subtree filter
+     * output even if it is not explicitly requested. Therefore this code change also ensures key
+     * (instance identifier components) is always returned in the response. As the key is always inserted
+     * in the structure, code for test needs to be modified suitably by increasing “wantedNumberOfInvocations” to 2.
      */
     @Test
     public void writeMapEntryNodeOrderedWithoutChildrenTest() throws Exception {
+        final List<String> parentChildRelation = new ArrayList<>();
+        parentChildRelation.add("list-entry#key-field");
+        parentChildRelation.add("list-entry#another-field");
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, true, 1, null);
+                writer, true, 1, null, parentChildRelation);
 
         parameterWriter.write(mapEntryNodeData);
 
         final InOrder inOrder = inOrder(writer);
         inOrder.verify(writer, times(1)).startMapEntryNode(mapEntryNodeIdentifier, mapEntryNodeValue.size());
-        inOrder.verify(writer, times(1)).endNode();
+        inOrder.verify(writer, times(1)).startLeafNode(keyLeafNodeIdentifier);
+        inOrder.verify(writer, times(1)).scalarValue(keyLeafNodeValue);
+        inOrder.verify(writer, times(2)).endNode();
         verifyNoMoreInteractions(writer);
     }
 
@@ -337,7 +358,7 @@ public class ParameterAwareNormalizedNodeWriterDepthTest {
     @Test
     public void writeMapEntryNodeOrderedTest() throws Exception {
         final ParameterAwareNormalizedNodeWriter parameterWriter = ParameterAwareNormalizedNodeWriter.forStreamWriter(
-                writer, true, Integer.MAX_VALUE, null);
+                writer, true, Integer.MAX_VALUE, null, null);
 
         parameterWriter.write(mapEntryNodeData);
 
