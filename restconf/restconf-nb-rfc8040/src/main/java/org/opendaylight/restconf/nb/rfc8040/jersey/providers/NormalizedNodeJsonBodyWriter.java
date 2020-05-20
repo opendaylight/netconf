@@ -16,6 +16,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import javax.ws.rs.Produces;
@@ -91,7 +92,8 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         try (JsonWriter jsonWriter = createJsonWriter(entityStream, context.getWriterParameters().isPrettyPrint())) {
             jsonWriter.beginObject();
             writeNormalizedNode(jsonWriter, path, identifierCtx, data,
-                    context.getWriterParameters().getDepth(), context.getWriterParameters().getFields());
+                    context.getWriterParameters().getDepth(), context.getWriterParameters().getFields(),
+                    context.getWriterParameters().getParentChildRelation());
             jsonWriter.endObject();
             jsonWriter.flush();
         }
@@ -99,7 +101,8 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
 
     private static void writeNormalizedNode(final JsonWriter jsonWriter,
             final SchemaPath path, final InstanceIdentifierContext<SchemaNode> context, final NormalizedNode<?, ?> data,
-            final Integer depth, final List<Set<QName>> fields) throws IOException {
+            final Integer depth, final List<Set<QName>> fields,
+            final List<HashMap<QName, QName>> parentChildRelation) throws IOException {
         final RestconfNormalizedNodeWriter nnWriter;
 
         if (context.getSchemaNode() instanceof RpcDefinition) {
@@ -112,7 +115,8 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
                     ((RpcDefinition) context.getSchemaNode()).getOutput().getPath(),
                     jsonWriter,
                     depth,
-                    fields);
+                    fields,
+                    parentChildRelation);
             final Module module = context.getSchemaContext().findModule(data.getNodeType().getModule()).get();
             jsonWriter.name(module.getName() + ":output");
             jsonWriter.beginObject();
@@ -124,7 +128,8 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
              *  so we need to emit initial output declaration..
              */
             nnWriter = createNormalizedNodeWriter(context,
-                ((ActionDefinition) context.getSchemaNode()).getOutput().getPath(), jsonWriter, depth, fields);
+                ((ActionDefinition) context.getSchemaNode()).getOutput().getPath(),
+                jsonWriter, depth, fields, parentChildRelation);
             final Module module = context.getSchemaContext().findModule(data.getNodeType().getModule()).get();
             jsonWriter.name(module.getName() + ":output");
             jsonWriter.beginObject();
@@ -132,9 +137,10 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
             jsonWriter.endObject();
         } else {
             if (SchemaPath.ROOT.equals(path)) {
-                nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth, fields);
+                nnWriter = createNormalizedNodeWriter(context, path, jsonWriter, depth, fields, parentChildRelation);
             } else {
-                nnWriter = createNormalizedNodeWriter(context, path.getParent(), jsonWriter, depth, fields);
+                nnWriter = createNormalizedNodeWriter(context, path.getParent(), jsonWriter,
+                    depth, fields, parentChildRelation);
             }
 
             if (data instanceof MapEntryNode) {
@@ -159,7 +165,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
 
     private static RestconfNormalizedNodeWriter createNormalizedNodeWriter(
             final InstanceIdentifierContext<SchemaNode> context, final SchemaPath path, final JsonWriter jsonWriter,
-            final Integer depth, final List<Set<QName>> fields) {
+            final Integer depth, final List<Set<QName>> fields, final List<HashMap<QName, QName>> parentChildRelation) {
 
         final SchemaNode schema = context.getSchemaNode();
         final JSONCodecFactory codecs = getCodecFactory(context);
@@ -167,7 +173,7 @@ public class NormalizedNodeJsonBodyWriter implements MessageBodyWriter<Normalize
         final NormalizedNodeStreamWriter streamWriter = JSONNormalizedNodeStreamWriter.createNestedWriter(
                 codecs, path, initialNamespaceFor(schema), jsonWriter);
 
-        return ParameterAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth, fields);
+        return ParameterAwareNormalizedNodeWriter.forStreamWriter(streamWriter, depth, fields, parentChildRelation);
     }
 
     private static URI initialNamespaceFor(final SchemaNode schema) {
