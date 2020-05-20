@@ -14,6 +14,7 @@ import org.opendaylight.netconf.client.NetconfClientSessionListener;
 import org.opendaylight.netconf.client.SslHandlerFactory;
 import org.opendaylight.netconf.nettyutil.ReconnectStrategy;
 import org.opendaylight.netconf.nettyutil.handler.ssh.authentication.AuthenticationHandler;
+import org.opendaylight.netconf.nettyutil.handler.ssh.client.NetconfSshClient;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.inet.types.rev130715.Uri;
 
 public class NetconfClientConfigurationBuilder {
@@ -30,6 +31,7 @@ public class NetconfClientConfigurationBuilder {
     private AuthenticationHandler authHandler;
     private NetconfClientConfiguration.NetconfClientProtocol clientProtocol = DEFAULT_CLIENT_PROTOCOL;
     private SslHandlerFactory sslHandlerFactory;
+    private NetconfSshClient sshClient;
     private List<Uri> odlHelloCapabilities;
 
 
@@ -91,6 +93,12 @@ public class NetconfClientConfigurationBuilder {
     }
 
     @SuppressWarnings("checkstyle:hiddenField")
+    public NetconfClientConfigurationBuilder withSshClient(final NetconfSshClient sshClient) {
+        this.sshClient = sshClient;
+        return this;
+    }
+
+    @SuppressWarnings("checkstyle:hiddenField")
     public NetconfClientConfigurationBuilder withOdlHelloCapabilities(final List<Uri> odlHelloCapabilities) {
         this.odlHelloCapabilities = odlHelloCapabilities;
         return this;
@@ -128,12 +136,16 @@ public class NetconfClientConfigurationBuilder {
         return sslHandlerFactory;
     }
 
+    public NetconfSshClient getSshClient() {
+        return sshClient;
+    }
+
     final List<Uri> getOdlHelloCapabilities() {
         return odlHelloCapabilities;
     }
 
     public NetconfClientConfiguration build() {
         return new NetconfClientConfiguration(clientProtocol, address, connectionTimeoutMillis, additionalHeader,
-                sessionListener, reconnectStrategy, authHandler, sslHandlerFactory, odlHelloCapabilities);
+                sessionListener, reconnectStrategy, authHandler, sslHandlerFactory, sshClient, odlHelloCapabilities);
     }
 }
