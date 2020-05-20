@@ -25,6 +25,14 @@ import org.opendaylight.yangtools.yang.model.api.DataSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 
 public final class ParserFieldsParameter {
+
+    private static final char COLON = ':';
+    private static final char SEMICOLON = ';';
+    private static final char SLASH = '/';
+    private static final char STARTING_PARENTHESIS = '(';
+    private static final char CLOSING_PARENTHESIS = ')';
+    private static final List<String> PARENT_CHILD_RELATION_LIST = new ArrayList<String>();
+
     private ParserFieldsParameter() {
 
     }
@@ -48,8 +56,17 @@ public final class ParserFieldsParameter {
                     "Start node missing in " + input, ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
         }
 
+        PARENT_CHILD_RELATION_LIST.clear();
         parseInput(input, startQNameModule, startNode, parsed, context);
         return parsed;
+    }
+
+    /**
+     * Parse fields parameter and return parent child relation list.
+     * @return {@link List}
+     */
+    public static List<String> getParentChildRelation() {
+        return PARENT_CHILD_RELATION_LIST;
     }
 
     /**
@@ -227,6 +244,8 @@ public final class ParserFieldsParameter {
 
         // add final childNode node to level nodes
         level.add(childNode.getIdentifier().getNodeType());
+        PARENT_CHILD_RELATION_LIST.add(currentNode.getIdentifier().getNodeType().getLocalName()
+            + "#" + childNode.getIdentifier().getNodeType().getLocalName());
         return childNode;
     }
 
