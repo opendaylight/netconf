@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2aa4b872_295e6a1b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-05-22T17:02:01Z",
+      "side": 1,
+      "message": "it\u0027s NETCONF-499 not 449",
+      "revId": "2808b3cac58522838b6f0cf8e0c332c6880b0db8",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
