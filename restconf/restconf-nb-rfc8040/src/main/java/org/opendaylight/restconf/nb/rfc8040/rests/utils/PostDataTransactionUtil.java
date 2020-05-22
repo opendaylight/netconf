@@ -44,7 +44,7 @@ import org.opendaylight.yangtools.yang.model.api.SchemaContext;
  */
 public final class PostDataTransactionUtil {
     private PostDataTransactionUtil() {
-        throw new UnsupportedOperationException("Util class.");
+        // Hidden on purpose
     }
 
     /**
@@ -71,7 +71,7 @@ public final class PostDataTransactionUtil {
         final FluentFuture<? extends CommitInfo> future = submitData(
                 payload.getInstanceIdentifierContext().getInstanceIdentifier(), payload.getData(),
                 transactionNode, schemaContextRef.get(), insert, point);
-        final URI location = PostDataTransactionUtil.resolveLocation(uriInfo, transactionNode, schemaContextRef);
+        final URI location = resolveLocation(uriInfo, transactionNode, schemaContextRef);
         final ResponseFactory dataFactory = new ResponseFactory(Status.CREATED).location(location);
         //This method will close transactionChain
         FutureCallbackTx.addCallback(future, RestconfDataServiceConstant.PostData.POST_TX_TYPE, dataFactory,
@@ -104,118 +104,104 @@ public final class PostDataTransactionUtil {
         if (insert == null) {
             makePost(path, data, schemaContext, transactionChain, newReadWriteTransaction);
             return newReadWriteTransaction.commit();
-        } else {
-            final DataSchemaNode schemaNode = PutDataTransactionUtil.checkListAndOrderedType(schemaContext, path);
-            switch (insert) {
-                case "first":
-                    if (schemaNode instanceof ListSchemaNode) {
-                        final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
-                            schemaContext, transactionNode.getTransactionChainHandler(), schemaNode);
-                        final OrderedMapNode readList = (OrderedMapNode) readData;
-                        if (readList == null || readList.getValue().isEmpty()) {
-                            makePost(path, data, schemaContext, transactionChain,
-                                    newReadWriteTransaction);
-                            return newReadWriteTransaction.commit();
-                        } else {
-                            newReadWriteTransaction.delete(LogicalDatastoreType.CONFIGURATION,
-                                    path.getParent().getParent());
-                            simplePost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path, data,
-                                    schemaContext, transactionChain);
-                            makePost(path, readData, schemaContext, transactionChain,
-                                    newReadWriteTransaction);
-                            return newReadWriteTransaction.commit();
-                        }
-                    } else {
-                        final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
-                            schemaContext, transactionNode.getTransactionChainHandler(), schemaNode);
+        }
 
-                        final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
-                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
-                            makePost(path, data, schemaContext, transactionChain,
-                                    newReadWriteTransaction);
-                            return newReadWriteTransaction.commit();
-                        } else {
-                            newReadWriteTransaction.delete(LogicalDatastoreType.CONFIGURATION,
-                                    path.getParent().getParent());
-                            simplePost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path, data,
-                                    schemaContext, transactionChain);
-                            makePost(path, readData, schemaContext, transactionChain,
-                                    newReadWriteTransaction);
-                            return newReadWriteTransaction.commit();
-                        }
+        final DataSchemaNode schemaNode = PutDataTransactionUtil.checkListAndOrderedType(schemaContext, path);
+        switch (insert) {
+            case "first":
+                if (schemaNode instanceof ListSchemaNode) {
+                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
+                        schemaContext, transactionNode.getTransactionChainHandler(), schemaNode);
+                    final OrderedMapNode readList = (OrderedMapNode) readData;
+                    if (readList == null || readList.getValue().isEmpty()) {
+                        makePost(path, data, schemaContext, transactionChain, newReadWriteTransaction);
+                        return newReadWriteTransaction.commit();
                     }
-                case "last":
-                    makePost(path, data, schemaContext, transactionChain,
-                            newReadWriteTransaction);
+
+                    newReadWriteTransaction.delete(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent());
+                    simplePost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path, data, schemaContext,
+                        transactionChain);
+                    makePost(path, readData, schemaContext, transactionChain, newReadWriteTransaction);
                     return newReadWriteTransaction.commit();
-                case "before":
-                    if (schemaNode instanceof ListSchemaNode) {
-                        final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
-                            schemaContext, transactionNode.getTransactionChainHandler(), schemaNode);
-                        final OrderedMapNode readList = (OrderedMapNode) readData;
-                        if (readList == null || readList.getValue().isEmpty()) {
-                            makePost(path, data, schemaContext, transactionChain,
-                                    newReadWriteTransaction);
-                            return newReadWriteTransaction.commit();
-                        } else {
-                            insertWithPointListPost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path,
-                                    data, schemaContext, point, readList, true,
-                                    transactionChain);
-                            return newReadWriteTransaction.commit();
-                        }
-                    } else {
-                        final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
-                            schemaContext, transactionNode.getTransactionChainHandler(), schemaNode);
+                } else {
+                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
+                        schemaContext, transactionNode.getTransactionChainHandler(), schemaNode);
 
-                        final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
-                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
-                            makePost(path, data, schemaContext, transactionChain,
-                                    newReadWriteTransaction);
-                            return newReadWriteTransaction.commit();
-                        } else {
-                            insertWithPointLeafListPost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION,
-                                    path, data, schemaContext, point, readLeafList, true,
-                                    transactionChain);
-                            return newReadWriteTransaction.commit();
-                        }
+                    final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
+                    if (readLeafList == null || readLeafList.getValue().isEmpty()) {
+                        makePost(path, data, schemaContext, transactionChain,
+                            newReadWriteTransaction);
+                        return newReadWriteTransaction.commit();
                     }
-                case "after":
-                    if (schemaNode instanceof ListSchemaNode) {
-                        final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
-                            schemaContext, transactionNode.getTransactionChainHandler(), schemaNode);
-                        final OrderedMapNode readList = (OrderedMapNode) readData;
-                        if (readList == null || readList.getValue().isEmpty()) {
-                            makePost(path, data, schemaContext, transactionChain,
-                                    newReadWriteTransaction);
-                            return newReadWriteTransaction.commit();
-                        } else {
-                            insertWithPointListPost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path,
-                                    data, schemaContext, point, readList, false,
-                                    transactionChain);
-                            return newReadWriteTransaction.commit();
-                        }
-                    } else {
-                        final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
-                            schemaContext, transactionNode.getTransactionChainHandler(), schemaNode);
 
-                        final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
-                        if (readLeafList == null || readLeafList.getValue().isEmpty()) {
-                            makePost(path, data, schemaContext, transactionChain,
-                                    newReadWriteTransaction);
-                            return newReadWriteTransaction.commit();
-                        } else {
-                            insertWithPointLeafListPost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION,
-                                    path, data, schemaContext, point, readLeafList, true,
-                                    transactionChain);
-                            return newReadWriteTransaction.commit();
-                        }
+                    newReadWriteTransaction.delete(LogicalDatastoreType.CONFIGURATION, path.getParent().getParent());
+                    simplePost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path, data, schemaContext,
+                        transactionChain);
+                    makePost(path, readData, schemaContext, transactionChain, newReadWriteTransaction);
+                    return newReadWriteTransaction.commit();
+                }
+            case "last":
+                makePost(path, data, schemaContext, transactionChain, newReadWriteTransaction);
+                return newReadWriteTransaction.commit();
+            case "before":
+                if (schemaNode instanceof ListSchemaNode) {
+                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
+                        schemaContext, transactionNode.getTransactionChainHandler(), schemaNode);
+                    final OrderedMapNode readList = (OrderedMapNode) readData;
+                    if (readList == null || readList.getValue().isEmpty()) {
+                        makePost(path, data, schemaContext, transactionChain, newReadWriteTransaction);
+                        return newReadWriteTransaction.commit();
                     }
-                default:
-                    throw new RestconfDocumentedException(
-                            "Used bad value of insert parameter. Possible values are first, last, before or after, "
-                                    + "but was: " + insert, RestconfError.ErrorType.PROTOCOL,
-                            RestconfError.ErrorTag.BAD_ATTRIBUTE);
-            }
+
+                    insertWithPointListPost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path,
+                        data, schemaContext, point, readList, true, transactionChain);
+                    return newReadWriteTransaction.commit();
+                } else {
+                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
+                        schemaContext, transactionNode.getTransactionChainHandler(), schemaNode);
+
+                    final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
+                    if (readLeafList == null || readLeafList.getValue().isEmpty()) {
+                        makePost(path, data, schemaContext, transactionChain, newReadWriteTransaction);
+                        return newReadWriteTransaction.commit();
+                    }
+
+                    insertWithPointLeafListPost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION,
+                        path, data, schemaContext, point, readLeafList, true, transactionChain);
+                    return newReadWriteTransaction.commit();
+                }
+            case "after":
+                if (schemaNode instanceof ListSchemaNode) {
+                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
+                        schemaContext, transactionNode.getTransactionChainHandler(), schemaNode);
+                    final OrderedMapNode readList = (OrderedMapNode) readData;
+                    if (readList == null || readList.getValue().isEmpty()) {
+                        makePost(path, data, schemaContext, transactionChain, newReadWriteTransaction);
+                        return newReadWriteTransaction.commit();
+                    }
+
+                    insertWithPointListPost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION, path,
+                        data, schemaContext, point, readList, false,
+                        transactionChain);
+                    return newReadWriteTransaction.commit();
+                } else {
+                    final NormalizedNode<?, ?> readData = PutDataTransactionUtil.readList(path.getParent(),
+                        schemaContext, transactionNode.getTransactionChainHandler(), schemaNode);
+
+                    final OrderedLeafSetNode<?> readLeafList = (OrderedLeafSetNode<?>) readData;
+                    if (readLeafList == null || readLeafList.getValue().isEmpty()) {
+                        makePost(path, data, schemaContext, transactionChain, newReadWriteTransaction);
+                        return newReadWriteTransaction.commit();
+                    }
+
+                    insertWithPointLeafListPost(newReadWriteTransaction, LogicalDatastoreType.CONFIGURATION,
+                        path, data, schemaContext, point, readLeafList, true, transactionChain);
+                    return newReadWriteTransaction.commit();
+                }
+            default:
+                throw new RestconfDocumentedException(
+                    "Used bad value of insert parameter. Possible values are first, last, before or after, but was: "
+                            + insert, RestconfError.ErrorType.PROTOCOL, RestconfError.ErrorTag.BAD_ATTRIBUTE);
         }
     }
 
