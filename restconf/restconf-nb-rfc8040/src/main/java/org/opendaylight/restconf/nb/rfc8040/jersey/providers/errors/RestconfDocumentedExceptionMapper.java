@@ -90,7 +90,8 @@ public final class RestconfDocumentedExceptionMapper implements ExceptionMapper<
         LOG.debug("Starting to map received exception to error response: {}", exception.getMessage());
         final Status responseStatus = getResponseStatusCode(exception);
         if (responseStatus != Response.Status.FORBIDDEN
-                && responseStatus.getFamily() == Response.Status.Family.CLIENT_ERROR) {
+                && responseStatus.getFamily() == Response.Status.Family.CLIENT_ERROR
+                && exception.getErrors().isEmpty()) {
             // there should be at least one error entry for 4xx errors except 409 according to the RFC 8040
             // - creation of WARN log that something went wrong way on the server side
             LOG.warn("Input exception has a family of 4xx but doesn't contain any descriptive errors: {}",
