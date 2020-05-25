@@ -1037,6 +1037,8 @@ public final class RestconfImpl implements RestconfService {
         String filter = null;
         boolean leafNodesOnlyUsed = false;
         boolean leafNodesOnly = false;
+        boolean skipNotificationDataUsed = false;
+        boolean skipNotificationData = false;
 
         for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
             switch (entry.getKey()) {
@@ -1072,6 +1074,15 @@ public final class RestconfImpl implements RestconfService {
                         throw new RestconfDocumentedException("Odl-leaf-nodes-only parameter can be used only once.");
                     }
                     break;
+                case "odl-skip-notification-data":
+                    if (!skipNotificationDataUsed) {
+                        skipNotificationDataUsed = true;
+                        skipNotificationData = Boolean.parseBoolean(entry.getValue().iterator().next());
+                    } else {
+                        throw new RestconfDocumentedException(
+                                "Odl-skip-notification-data parameter can be used only once.");
+                    }
+                    break;
                 default:
                     throw new RestconfDocumentedException("Bad parameter used with notifications: " + entry.getKey());
             }
@@ -1081,7 +1092,7 @@ public final class RestconfImpl implements RestconfService {
         }
         URI response = null;
         if (identifier.contains(DATA_SUBSCR)) {
-            response = dataSubs(identifier, uriInfo, start, stop, filter, leafNodesOnly);
+            response = dataSubs(identifier, uriInfo, start, stop, filter, leafNodesOnly, skipNotificationData);
         } else if (identifier.contains(NOTIFICATION_STREAM)) {
             response = notifStream(identifier, uriInfo, start, stop, filter);
         }
@@ -1167,7 +1178,7 @@ public final class RestconfImpl implements RestconfService {
 
         for (final NotificationListenerAdapter listener : listeners) {
             this.broker.registerToListenNotification(listener);
-            listener.setQueryParams(start, Optional.ofNullable(stop), Optional.ofNullable(filter), false);
+            listener.setQueryParams(start, Optional.ofNullable(stop), Optional.ofNullable(filter), false, false);
         }
 
         final UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
@@ -1206,7 +1217,7 @@ public final class RestconfImpl implements RestconfService {
      * @return {@link URI} of location
      */
     private URI dataSubs(final String identifier, final UriInfo uriInfo, final Instant start, final Instant stop,
-            final String filter, final boolean leafNodesOnly) {
+            final String filter, final boolean leafNodesOnly, final boolean skipNotificationData) {
         final String streamName = Notificator.createStreamNameFromUri(identifier);
         if (Strings.isNullOrEmpty(streamName)) {
             throw new RestconfDocumentedException("Stream name is empty.", ErrorType.PROTOCOL, ErrorTag.INVALID_VALUE);
@@ -1217,7 +1228,8 @@ public final class RestconfImpl implements RestconfService {
             throw new RestconfDocumentedException("Stream was not found.", ErrorType.PROTOCOL,
                     ErrorTag.UNKNOWN_ELEMENT);
         }
-        listener.setQueryParams(start, Optional.ofNullable(stop), Optional.ofNullable(filter), leafNodesOnly);
+        listener.setQueryParams(start, Optional.ofNullable(stop), Optional.ofNullable(filter), leafNodesOnly,
+                skipNotificationData);
 
         final Map<String, String> paramToValues = resolveValuesFromUri(identifier);
         final LogicalDatastoreType datastore =
