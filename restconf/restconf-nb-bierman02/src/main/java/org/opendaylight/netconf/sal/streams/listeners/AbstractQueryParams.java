@@ -54,6 +54,7 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
     private Instant stop = null;
     private String filter = null;
     private boolean leafNodesOnly = false;
+    private boolean skipNotificationData = false;
 
     @VisibleForTesting
     public final Instant getStart() {
@@ -71,14 +72,17 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      *            indicate which subset of all possible events are of interest
      * @param leafNodesOnly
      *            if true, notifications will contain changes to leaf nodes only
+     * @param skipNotificationData
+     *            if true, notification will not contain changed data
      */
     @SuppressWarnings("checkstyle:hiddenField")
     public void setQueryParams(final Instant start, final Optional<Instant> stop, final Optional<String> filter,
-                               final boolean leafNodesOnly) {
+                               final boolean leafNodesOnly, final boolean skipNotificationData) {
         this.start = requireNonNull(start);
         this.stop = stop.orElse(null);
         this.filter = filter.orElse(null);
         this.leafNodesOnly = leafNodesOnly;
+        this.skipNotificationData = skipNotificationData;
     }
 
     /**
@@ -88,6 +92,15 @@ abstract class AbstractQueryParams extends AbstractNotificationsData {
      */
     public boolean getLeafNodesOnly() {
         return leafNodesOnly;
+    }
+
+    /**
+     * Check whether this query should notify changes without data.
+     *
+     * @return true if this query should notify about changes with data
+     */
+    public boolean shouldSkipNotificationData() {
+        return skipNotificationData;
     }
 
     @SuppressWarnings("checkstyle:IllegalCatch")

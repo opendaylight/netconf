@@ -80,9 +80,9 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
 
         ListenerAdapterTester(final YangInstanceIdentifier path, final String streamName,
                               final NotificationOutputTypeGrouping.NotificationOutputType outputType,
-                              final boolean leafNodesOnly) {
+                              final boolean leafNodesOnly, final boolean skipNotificationData) {
             super(path, streamName, outputType, controllerContext);
-            setQueryParams(EPOCH, Optional.empty(), Optional.empty(), leafNodesOnly);
+            setQueryParams(EPOCH, Optional.empty(), Optional.empty(), leafNodesOnly, skipNotificationData);
         }
 
         @Override
@@ -127,7 +127,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     @Test
     public void testJsonNotifsLeaves() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-                                        NotificationOutputTypeGrouping.NotificationOutputType.JSON, true);
+                                        NotificationOutputTypeGrouping.NotificationOutputType.JSON, true, false);
         DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
                 .getInstance(DOMDataTreeChangeService.class);
         DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
@@ -156,7 +156,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     @Test
     public void testJsonNotifs() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-                NotificationOutputTypeGrouping.NotificationOutputType.JSON, false);
+                NotificationOutputTypeGrouping.NotificationOutputType.JSON, false, false);
         DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
                 .getInstance(DOMDataTreeChangeService.class);
         DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
