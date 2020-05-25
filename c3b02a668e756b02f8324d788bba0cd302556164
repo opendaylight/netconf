@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "064d510b_f7a0b40f",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/RootFoundApplication.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-05-25T09:06:14Z",
+      "side": 1,
+      "message": "this should not be here",
+      "range": {
+        "startLine": 15,
+        "startChar": 1,
+        "endLine": 15,
+        "endChar": 73
+      },
+      "revId": "c3b02a668e756b02f8324d788bba0cd302556164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5598bbc8_1c9b53d4",
+        "filename": "restconf/restconf-nb-rfc8040/src/main/java/org/opendaylight/restconf/nb/rfc8040/rests/services/api/RootFoundService.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-05-25T09:06:14Z",
+      "side": 1,
+      "message": "This does not seem to be accurate",
+      "range": {
+        "startLine": 2,
+        "startChar": 17,
+        "endLine": 2,
+        "endChar": 35
+      },
+      "revId": "c3b02a668e756b02f8324d788bba0cd302556164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "512c5072_0c714fdd",
+        "filename": "restconf/restconf-nb-rfc8040/src/test/java/org/opendaylight/restconf/nb/rfc8040/test/Rfc8040RestConfWiringTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 649
+      },
+      "writtenOn": "2020-05-25T09:06:14Z",
+      "side": 1,
+      "message": "This does not look right",
+      "range": {
+        "startLine": 81,
+        "startChar": 6,
+        "endLine": 81,
+        "endChar": 11
+      },
+      "revId": "c3b02a668e756b02f8324d788bba0cd302556164",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
+    }
+  ]
+}
