@@ -51,6 +51,13 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     private static final String JSON_NOTIF_CREATE = "/listener-adapter-test/notif-create.json";
     private static final String JSON_NOTIF_UPDATE = "/listener-adapter-test/notif-update.json";
     private static final String JSON_NOTIF_DEL = "/listener-adapter-test/notif-del.json";
+    private static final String JSON_NOTIF_WITHOUT_DATA_CREATE =
+            "/listener-adapter-test/notif-without-data-create.json";
+    private static final String JSON_NOTIF_WITHOUT_DATA_UPDATE =
+            "/listener-adapter-test/notif-without-data-update.json";
+    private static final String JSON_NOTIF_WITHOUT_DATA_DELETE =
+            "/listener-adapter-test/notif-without-data-del.json";
+
 
     private static final YangInstanceIdentifier PATCH_CONT_YIID =
             YangInstanceIdentifier.create(new YangInstanceIdentifier.NodeIdentifier(PatchCont.QNAME));
@@ -79,10 +86,10 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         private String lastNotification = null;
 
         ListenerAdapterTester(final YangInstanceIdentifier path, final String streamName,
-                              final NotificationOutputTypeGrouping.NotificationOutputType outputType,
-                              final boolean leafNodesOnly) {
+                final NotificationOutputTypeGrouping.NotificationOutputType outputType,
+                final boolean leafNodesOnly, final boolean skipNotificationData) {
             super(path, streamName, outputType, controllerContext);
-            setQueryParams(EPOCH, Optional.empty(), Optional.empty(), leafNodesOnly);
+            setQueryParams(EPOCH, Optional.empty(), Optional.empty(), leafNodesOnly, skipNotificationData);
         }
 
         @Override
@@ -127,7 +134,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     @Test
     public void testJsonNotifsLeaves() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-                                        NotificationOutputTypeGrouping.NotificationOutputType.JSON, true);
+                NotificationOutputTypeGrouping.NotificationOutputType.JSON, true, false);
         DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
                 .getInstance(DOMDataTreeChangeService.class);
         DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
@@ -156,7 +163,7 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
     @Test
     public void testJsonNotifs() throws Exception {
         ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
-                NotificationOutputTypeGrouping.NotificationOutputType.JSON, false);
+                NotificationOutputTypeGrouping.NotificationOutputType.JSON, false, false);
         DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
                 .getInstance(DOMDataTreeChangeService.class);
         DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
@@ -180,5 +187,34 @@ public class ListenerAdapterTest extends AbstractConcurrentDataBrokerTest {
         writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
         writeTransaction.commit();
         adapter.assertGot(getNotifJson(JSON_NOTIF_DEL));
+    }
+
+    @Test
+    public void testJsonNotifsWithoutData() throws Exception {
+        ListenerAdapterTester adapter = new ListenerAdapterTester(PATCH_CONT_YIID, "Casey",
+                NotificationOutputTypeGrouping.NotificationOutputType.JSON, false, true);
+        DOMDataTreeChangeService changeService = domDataBroker.getExtensions()
+                .getInstance(DOMDataTreeChangeService.class);
+        DOMDataTreeIdentifier root = new DOMDataTreeIdentifier(LogicalDatastoreType.CONFIGURATION, PATCH_CONT_YIID);
+        changeService.registerDataTreeChangeListener(root, adapter);
+
+        WriteTransaction writeTransaction = dataBroker.newWriteOnlyTransaction();
+        MyList1Builder builder = new MyList1Builder().setMyLeaf11("Jed").setName("Althea");
+        InstanceIdentifier<MyList1> iid = InstanceIdentifier.create(PatchCont.class)
+                .child(MyList1.class, new MyList1Key("Althea"));
+        writeTransaction.mergeParentStructurePut(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
+        writeTransaction.commit();
+        adapter.assertGot(getNotifJson(JSON_NOTIF_WITHOUT_DATA_CREATE));
+
+        writeTransaction = dataBroker.newWriteOnlyTransaction();
+        builder = new MyList1Builder().withKey(new MyList1Key("Althea")).setMyLeaf12("Bertha");
+        writeTransaction.mergeParentStructureMerge(LogicalDatastoreType.CONFIGURATION, iid, builder.build());
+        writeTransaction.commit();
+        adapter.assertGot(getNotifJson(JSON_NOTIF_WITHOUT_DATA_UPDATE));
+
+        writeTransaction = dataBroker.newWriteOnlyTransaction();
+        writeTransaction.delete(LogicalDatastoreType.CONFIGURATION, iid);
+        writeTransaction.commit();
+        adapter.assertGot(getNotifJson(JSON_NOTIF_WITHOUT_DATA_DELETE));
     }
 }
