@@ -155,7 +155,7 @@ abstract class SubscribeToStreamUtil {
                 notificationQueryParams.getStart(),
                 notificationQueryParams.getStop().orElse(null),
                 notificationQueryParams.getFilter().orElse(null),
-                false);
+                false, notificationQueryParams.isSkipNotificationData());
         notificationListenerAdapter.get().setCloseVars(
                 handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
         final NormalizedNode<?, ?> mapToStreams =
@@ -210,7 +210,7 @@ abstract class SubscribeToStreamUtil {
                 notificationQueryParams.getStart(),
                 notificationQueryParams.getStop().orElse(null),
                 notificationQueryParams.getFilter().orElse(null),
-                false);
+                false, notificationQueryParams.isSkipNotificationData());
         listener.get().setCloseVars(handlersHolder.getTransactionChainHandler(), handlersHolder.getSchemaHandler());
         registration(datastoreType, listener.get(), handlersHolder.getDomDataBrokerHandler().get());
 
