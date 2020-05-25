@@ -49,6 +49,9 @@ import org.w3c.dom.Node;
 public class ListenerAdapter extends AbstractCommonSubscriber implements ClusteredDOMDataTreeChangeListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(ListenerAdapter.class);
+    private static final String DATA_CHANGE_EVENT = "data-change-event";
+    private static final String PATH = "path";
+    private static final String OPERATION = "operation";
 
     private final ControllerContext controllerContext;
     private final YangInstanceIdentifier path;
@@ -173,8 +176,15 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
                 continue;
             }
             YangInstanceIdentifier yiid = dataTreeCandidate.getRootPath();
-            addNodeToDataChangeNotificationEventElement(doc, dataChangedNotificationEventElement, candidateNode,
-                    yiid.getParent(), schemaContext, dataSchemaContextTree);
+
+            boolean shouldSkipNotificationData = this.shouldSkipNotificationData();
+            if (shouldSkipNotificationData) {
+                createCreatedChangedDataChangeEventElementWithoutData(doc,
+                        dataChangedNotificationEventElement, dataTreeCandidate.getRootNode());
+            } else {
+                addNodeToDataChangeNotificationEventElement(doc, dataChangedNotificationEventElement, candidateNode,
+                        yiid.getParent(), schemaContext, dataSchemaContextTree);
+            }
         }
     }
 
@@ -252,27 +262,53 @@ public class ListenerAdapter extends AbstractCommonSubscriber implements Cluster
      */
     private Node createDataChangeEventElement(final Document doc, final YangInstanceIdentifier dataPath,
             final Operation operation) {
-        final Element dataChangeEventElement = doc.createElement("data-change-event");
-        final Element pathElement = doc.createElement("path");
+        final Element dataChangeEventElement = doc.createElement(DATA_CHANGE_EVENT);
+        final Element pathElement = doc.createElement(PATH);
         addPathAsValueToElement(dataPath, pathElement);
         dataChangeEventElement.appendChild(pathElement);
 
-        final Element operationElement = doc.createElement("operation");
+        final Element operationElement = doc.createElement(OPERATION);
         operationElement.setTextContent(operation.value);
         dataChangeEventElement.appendChild(operationElement);
 
         return dataChangeEventElement;
     }
 
+    /**
+     * Creates data change notification element without data element.
+     *
+     * @param doc
+     *       {@link Document}
+     * @param dataChangedNotificationEventElement
+     *       {@link Element}
+     * @param candidateNode
+     *       {@link DataTreeCandidateNode}
+     */
+    private void createCreatedChangedDataChangeEventElementWithoutData(final Document doc,
+            final Element dataChangedNotificationEventElement, final DataTreeCandidateNode candidateNode) {
+
+        Operation operation = candidateNode.getDataBefore().isPresent() ? Operation.UPDATED : Operation.CREATED;
+
+        final Element dataChangeEventElement = doc.createElement(DATA_CHANGE_EVENT);
+        final Element pathElement = doc.createElement(PATH);
+        addPathAsValueToElement(getPath(), pathElement);
+        dataChangeEventElement.appendChild(pathElement);
+
+        final Element operationElement = doc.createElement(OPERATION);
+        operationElement.setTextContent(operation.value);
+        dataChangeEventElement.appendChild(operationElement);
+        dataChangedNotificationEventElement.appendChild(dataChangeEventElement);
+    }
+
     private Node createCreatedChangedDataChangeEventElement(final Document doc,
             final YangInstanceIdentifier eventPath, final NormalizedNode normalized, final Operation operation,
             final SchemaContext schemaContext, final DataSchemaContextTree dataSchemaContextTree) {
-        final Element dataChangeEventElement = doc.createElement("data-change-event");
-        final Element pathElement = doc.createElement("path");
+        final Element dataChangeEventElement = doc.createElement(DATA_CHANGE_EVENT);
+        final Element pathElement = doc.createElement(PATH);
         addPathAsValueToElement(eventPath, pathElement);
         dataChangeEventElement.appendChild(pathElement);
 
-        final Element operationElement = doc.createElement("operation");
+        final Element operationElement = doc.createElement(OPERATION);
         operationElement.setTextContent(operation.value);
         dataChangeEventElement.appendChild(operationElement);
 
