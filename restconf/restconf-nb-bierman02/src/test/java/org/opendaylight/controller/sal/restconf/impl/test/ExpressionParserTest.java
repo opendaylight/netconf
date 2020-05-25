@@ -136,7 +136,7 @@ public class ExpressionParserTest {
         Mockito.when(path.getLastPathArgument()).thenReturn(pathValue);
         final ListenerAdapter listener = Notificator.createListener(path, "streamName", NotificationOutputType.JSON,
                 null);
-        listener.setQueryParams(Instant.now(), Optional.empty(), Optional.ofNullable(filter), false);
+        listener.setQueryParams(Instant.now(), Optional.empty(), Optional.ofNullable(filter), false, false);
 
         // FIXME: do not use reflection here
         final Class<?> superclass = listener.getClass().getSuperclass().getSuperclass();

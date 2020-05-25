@@ -173,11 +173,14 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
         private final Instant start;
         private final Instant stop;
         private final String filter;
+        private final boolean skipNotificationData;
 
-        private NotificationQueryParams(final Instant start, final Instant stop, final String filter) {
+        private NotificationQueryParams(final Instant start, final Instant stop, final String filter,
+                final boolean skipNotificationData) {
             this.start = start == null ? Instant.now() : start;
             this.stop = stop;
             this.filter = filter;
+            this.skipNotificationData = skipNotificationData;
         }
 
         static NotificationQueryParams fromUriInfo(final UriInfo uriInfo) {
@@ -187,6 +190,8 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
             boolean stopTimeUsed = false;
             String filter = null;
             boolean filterUsed = false;
+            boolean skipNotificationDataUsed = false;
+            boolean skipNotificationData = false;
 
             for (final Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
                 switch (entry.getKey()) {
@@ -212,6 +217,15 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                             filter = entry.getValue().iterator().next();
                         }
                         break;
+                    case "odl-skip-notification-data":
+                        if (!skipNotificationDataUsed) {
+                            skipNotificationDataUsed = true;
+                            skipNotificationData = Boolean.parseBoolean(entry.getValue().iterator().next());
+                        } else {
+                            throw new RestconfDocumentedException(
+                                    "Odl-skip-notification-data parameter can be used only once.");
+                        }
+                        break;
                     default:
                         throw new RestconfDocumentedException(
                                 "Bad parameter used with notifications: " + entry.getKey());
@@ -221,7 +235,7 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
                 throw new RestconfDocumentedException("Stop-time parameter has to be used with start-time parameter.");
             }
 
-            return new NotificationQueryParams(start, stop, filter);
+            return new NotificationQueryParams(start, stop, filter, skipNotificationData);
         }
 
         /**
@@ -249,6 +263,15 @@ public class RestconfStreamsSubscriptionServiceImpl implements RestconfStreamsSu
          */
         public Optional<String> getFilter() {
             return Optional.ofNullable(filter);
+        }
+
+        /**
+         * Check whether this query should notify changes without data.
+         *
+         * @return true if this query should notify about changes with  data
+         */
+        public boolean isSkipNotificationData() {
+            return skipNotificationData;
         }
     }
 }
