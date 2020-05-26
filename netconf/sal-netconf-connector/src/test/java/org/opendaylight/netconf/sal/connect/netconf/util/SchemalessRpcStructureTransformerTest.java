@@ -7,6 +7,9 @@
  */
 package org.opendaylight.netconf.sal.connect.netconf.util;
 
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -19,11 +22,8 @@ import java.util.Optional;
 import javax.xml.transform.dom.DOMSource;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.opendaylight.netconf.api.ModifyAction;
@@ -44,8 +44,6 @@ public class SchemalessRpcStructureTransformerTest {
 
     private static final String NAMESPACE = "http://example.com/schema/1.2/config";
 
-    @Rule
-    public final ExpectedException thrown = ExpectedException.none();
     private final Class<? extends Exception> expectedException;
 
     private final String expectedConfig;
@@ -74,7 +72,7 @@ public class SchemalessRpcStructureTransformerTest {
     }
 
     @Parameterized.Parameters
-    public static Collection parameters() {
+    public static Collection<Object[]> parameters() {
         Object[][] params = {
                 {YangInstanceIdentifier.builder()
                         .node(createNodeId("top"))
@@ -107,18 +105,22 @@ public class SchemalessRpcStructureTransformerTest {
 
     @Test
     public void testCreateEditConfigStructure() throws Exception {
-        if (expectedException != null) {
-            thrown.expect(expectedException);
-        }
         DOMSourceAnyxmlNode data = Builders.anyXmlBuilder()
                 .withNodeIdentifier(createNodeId(path.getLastPathArgument().getNodeType().getLocalName()))
                 .withValue(source)
                 .build();
+
+        if (expectedException != null) {
+            assertThrows(expectedException,
+                () -> adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(ModifyAction.REPLACE)));
+            return;
+        }
+
         final DOMSourceAnyxmlNode anyXmlNode =
                 adapter.createEditConfigStructure(Optional.of(data), path, Optional.of(ModifyAction.REPLACE));
         final String s = XmlUtil.toString((Element) anyXmlNode.getValue().getNode());
         Diff diff = new Diff(expectedConfig, s);
-        Assert.assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
+        assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
     }
 
     @Test
@@ -126,7 +128,7 @@ public class SchemalessRpcStructureTransformerTest {
         final DOMSourceAnyxmlNode anyXmlNode = (DOMSourceAnyxmlNode) adapter.toFilterStructure(path);
         final String s = XmlUtil.toString((Element) anyXmlNode.getValue().getNode());
         Diff diff = new Diff(expectedFilter, s);
-        Assert.assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
+        assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
     }
 
     @Test
@@ -141,7 +143,7 @@ public class SchemalessRpcStructureTransformerTest {
         final String dataFromReply = XmlUtil.toString(s.getOnlyChildElement().getDomElement());
         final String expectedData = XmlUtil.toString((Element) source.getNode());
         Diff diff = new Diff(expectedData, dataFromReply);
-        Assert.assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
+        assertTrue(String.format("Input %s: %s", testDataset, diff.toString()), diff.similar());
     }
 
     private static NodeIdentifier createNodeId(final String name) {
