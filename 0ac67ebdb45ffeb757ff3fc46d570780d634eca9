@@ -22,6 +22,30 @@
       "revId": "0ac67ebdb45ffeb757ff3fc46d570780d634eca9",
       "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fdf87882_f6f8a620",
+        "filename": "netconf/sal-netconf-connector/src/main/yang/netconf-node-optional.yang",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 2264
+      },
+      "writtenOn": "2020-05-26T18:43:18Z",
+      "side": 1,
+      "message": "@Sowmiya, any update on this work?",
+      "parentUuid": "f39aedcd_c7fb3235",
+      "range": {
+        "startLine": 65,
+        "startChar": 35,
+        "endLine": 65,
+        "endChar": 56
+      },
+      "revId": "0ac67ebdb45ffeb757ff3fc46d570780d634eca9",
+      "serverId": "7fc14799-209e-464c-9743-7a06c2c21a81",
+      "unresolved": true
     }
   ]
 }
