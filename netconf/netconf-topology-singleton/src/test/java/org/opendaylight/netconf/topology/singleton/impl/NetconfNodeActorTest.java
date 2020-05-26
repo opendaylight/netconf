@@ -8,8 +8,13 @@
 package org.opendaylight.netconf.topology.singleton.impl;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
@@ -25,7 +30,6 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -42,6 +46,7 @@ import com.google.common.collect.Lists;
 import com.google.common.io.ByteSource;
 import com.google.common.net.InetAddresses;
 import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -53,11 +58,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.controller.cluster.schema.provider.impl.YangTextSchemaSourceSerializationProxy;
 import org.opendaylight.mdsal.common.api.LogicalDatastoreType;
 import org.opendaylight.mdsal.dom.api.DOMActionException;
@@ -119,6 +124,7 @@ import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     private static final Timeout TIMEOUT = new Timeout(Duration.create(5, "seconds"));
@@ -127,9 +133,6 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     private ActorSystem system = ActorSystem.create();
     private final TestKit testKit = new TestKit(system);
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     private ActorRef masterRef;
     private RemoteDeviceId remoteDeviceId;
@@ -176,8 +179,6 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
     @Before
     public void setup() {
-        initMocks(this);
-
         remoteDeviceId = new RemoteDeviceId("netconf-topology",
                 new InetSocketAddress(InetAddresses.forString("127.0.0.1"), 9999));
 
@@ -275,9 +276,6 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         resetMountPointMocks();
 
         doReturn(mockSchemaSourceReg1).when(mockRegistry).registerSchemaSource(any(), withSourceId(SOURCE_IDENTIFIER1));
-
-        doReturn(mockSchemaContextFactory).when(mockSchemaRepository)
-                .createEffectiveModelContextFactory();
 
         final SchemaSourceRegistration<?> newMockSchemaSourceReg = mock(SchemaSourceRegistration.class);
 
@@ -458,19 +456,20 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
 
         // Test missing source failure.
 
-        exception.expect(MissingSchemaSourceException.class);
-
         schemaSourceReg.close();
 
-        final Future<YangTextSchemaSourceSerializationProxy> failedSchemaFuture =
-                proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
-
-        Await.result(failedSchemaFuture, TIMEOUT.duration());
+        final MissingSchemaSourceException ex = assertThrows(MissingSchemaSourceException.class,
+            () -> {
+                final Future<YangTextSchemaSourceSerializationProxy> failedSchemaFuture =
+                        proxyYangProvider.getYangTextSchemaSource(sourceIdentifier);
+                Await.result(failedSchemaFuture, TIMEOUT.duration());
+            });
+        assertThat(ex.getMessage(), startsWith("No providers registered for source"));
+        assertThat(ex.getMessage(), containsString(sourceIdentifier.toString()));
     }
 
     @Test
-    @SuppressWarnings({"checkstyle:AvoidHidingCauseException", "checkstyle:IllegalThrows"})
-    public void testSlaveInvokeRpc() throws Throwable {
+    public void testSlaveInvokeRpc() throws Exception {
 
         final List<SourceIdentifier> sourceIdentifiers =
                 Lists.newArrayList(RevisionSourceIdentifier.create("testID"));
@@ -531,22 +530,18 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         assertEquals(rpcError, resultOutputError.getErrors().iterator().next());
 
         // RPC failure.
-
-        exception.expect(DOMRpcException.class);
-
         doReturn(FluentFutures.immediateFailedFluentFuture(new ClusteringRpcException("mock")))
-                .when(mockDOMRpcService).invokeRpc(any(), any());
+            .when(mockDOMRpcService).invokeRpc(any(), any());
+        final ListenableFuture<? extends DOMRpcResult> future = slaveDomRPCService.invokeRpc(schemaPath, outputNode);
 
-        try {
-            slaveDomRPCService.invokeRpc(schemaPath, outputNode).get(2, TimeUnit.SECONDS);
-        } catch (ExecutionException e) {
-            throw e.getCause();
-        }
+        final ExecutionException e = assertThrows(ExecutionException.class, () -> future.get(2, TimeUnit.SECONDS));
+        final Throwable cause = e.getCause();
+        assertThat(cause, instanceOf(DOMRpcException.class));
+        assertEquals("mock", cause.getMessage());
     }
 
     @Test
-    @SuppressWarnings({"checkstyle:AvoidHidingCauseException", "checkstyle:IllegalThrows"})
-    public void testSlaveInvokeAction() throws Throwable {
+    public void testSlaveInvokeAction() throws Exception {
         final List<SourceIdentifier> sourceIdentifiers = Lists
             .newArrayList(RevisionSourceIdentifier.create("testActionID"));
         initializeMaster(sourceIdentifiers);
@@ -588,14 +583,15 @@ public class NetconfNodeActorTest extends AbstractBaseSchemasTest {
         assertTrue(result.getErrors().isEmpty());
 
         // Action failure.
-        exception.expect(DOMActionException.class);
         doReturn(FluentFutures.immediateFailedFluentFuture(new ClusteringActionException("mock")))
             .when(mockDOMActionService).invokeAction(any(), any(), any());
-        try {
-            slaveDomActionService.invokeAction(schemaPath, domDataTreeIdentifier, outputNode).get(2, TimeUnit.SECONDS);
-        } catch (ExecutionException e) {
-            throw e.getCause();
-        }
+        final ListenableFuture<? extends DOMActionResult> future = slaveDomActionService.invokeAction(schemaPath,
+            domDataTreeIdentifier, outputNode);
+
+        final ExecutionException e = assertThrows(ExecutionException.class, () -> future.get(2, TimeUnit.SECONDS));
+        final Throwable cause = e.getCause();
+        assertThat(cause, instanceOf(DOMActionException.class));
+        assertEquals("mock", cause.getMessage());
     }
 
     @Test
