@@ -12,8 +12,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFailedFluentFuture;
 import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediateFluentFuture;
 
@@ -27,11 +25,14 @@ import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMRpcAvailabilityListener;
 import org.opendaylight.mdsal.dom.api.DOMRpcException;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -69,6 +70,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class RuntimeRpcTest {
     private static final Logger LOG = LoggerFactory.getLogger(RuntimeRpcTest.class);
     private static final String SESSION_ID_FOR_REPORTING = "netconf-test-session1";
@@ -159,11 +161,7 @@ public class RuntimeRpcTest {
 
     @Before
     public void setUp() throws Exception {
-        initMocks(this);
         doNothing().when(registration).close();
-        doReturn(listener).when(registration).getInstance();
-        doReturn(null).when(schemaService).getGlobalContext();
-        doReturn(null).when(schemaService).getSessionContext();
         doAnswer(invocationOnMock -> {
             ((EffectiveModelContextListener) invocationOnMock.getArguments()[0]).onModelContextUpdated(SCHEMA_CONTEXT);
             return registration;
@@ -180,6 +178,11 @@ public class RuntimeRpcTest {
         }).when(sourceProvider).getSource(any(SourceIdentifier.class));
 
         this.currentSchemaContext = new CurrentSchemaContext(schemaService, sourceProvider);
+    }
+
+    @After
+    public void tearDown() {
+        currentSchemaContext.close();
     }
 
     @Test

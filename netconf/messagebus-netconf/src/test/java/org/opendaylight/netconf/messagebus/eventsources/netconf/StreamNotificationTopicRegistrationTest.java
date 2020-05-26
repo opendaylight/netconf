@@ -8,6 +8,10 @@
 package org.opendaylight.netconf.messagebus.eventsources.netconf;
 
 import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -17,11 +21,11 @@ import static org.opendaylight.yangtools.util.concurrent.FluentFutures.immediate
 import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMNotificationListener;
 import org.opendaylight.mdsal.dom.api.DOMNotificationService;
 import org.opendaylight.yang.gen.v1.urn.cisco.params.xml.ns.yang.messagebus.eventaggregator.rev141202.TopicId;
@@ -33,6 +37,7 @@ import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.
 import org.opendaylight.yang.gen.v1.urn.tbd.params.xml.ns.yang.network.topology.rev131021.network.topology.topology.NodeBuilder;
 import org.opendaylight.yangtools.concepts.ListenerRegistration;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class StreamNotificationTopicRegistrationTest {
 
     private static final String STREAM_NAME = "stream-1";
@@ -53,8 +58,6 @@ public class StreamNotificationTopicRegistrationTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
         Node node = new NodeBuilder().setNodeId(NodeId.getDefaultInstance("node-id")).build();
         when(mount.getNode()).thenReturn(node);
         when(mount.registerNotificationListener(source, ConnectionNotificationTopicRegistration
@@ -73,7 +76,7 @@ public class StreamNotificationTopicRegistrationTest {
     @Test
     public void testActivateNotificationSource() throws Exception {
         registration.activateNotificationSource();
-        Assert.assertTrue(registration.isActive());
+        assertTrue(registration.isActive());
         verify(mount).invokeCreateSubscription(stream);
 
     }
@@ -83,7 +86,7 @@ public class StreamNotificationTopicRegistrationTest {
         registration.setActive(true);
         registration.reActivateNotificationSource();
 
-        Assert.assertTrue(registration.isActive());
+        assertTrue(registration.isActive());
         verify(mount).invokeCreateSubscription(stream, Optional.empty());
     }
 
@@ -94,7 +97,7 @@ public class StreamNotificationTopicRegistrationTest {
         registration.setLastEventTime(lastEventTime);
         registration.reActivateNotificationSource();
 
-        Assert.assertTrue(registration.isActive());
+        assertTrue(registration.isActive());
         verify(mount).invokeCreateSubscription(stream, Optional.of(lastEventTime));
     }
 
@@ -102,7 +105,7 @@ public class StreamNotificationTopicRegistrationTest {
     public void testClose() throws Exception {
         registration.setActive(true);
         registration.close();
-        Assert.assertFalse(registration.isActive());
+        assertFalse(registration.isActive());
     }
 
     @Test
@@ -112,15 +115,15 @@ public class StreamNotificationTopicRegistrationTest {
         final TopicId topic3 = registerTopic("topic3");
         final Set<TopicId> notificationTopicIds =
                 registration.getTopicsForNotification(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
-        Assert.assertNotNull(notificationTopicIds);
-        Assert.assertThat(notificationTopicIds, hasItems(topic1, topic2, topic3));
+        assertNotNull(notificationTopicIds);
+        assertThat(notificationTopicIds, hasItems(topic1, topic2, topic3));
 
         registration.unRegisterNotificationTopic(topic3);
         final Set<TopicId> afterUnregister =
                 registration.getTopicsForNotification(ConnectionNotificationTopicRegistration.EVENT_SOURCE_STATUS_PATH);
-        Assert.assertNotNull(afterUnregister);
-        Assert.assertThat(afterUnregister, hasItems(topic1, topic2));
-        Assert.assertFalse(afterUnregister.contains(topic3));
+        assertNotNull(afterUnregister);
+        assertThat(afterUnregister, hasItems(topic1, topic2));
+        assertFalse(afterUnregister.contains(topic3));
     }
 
     private TopicId registerTopic(final String value) {

@@ -8,8 +8,8 @@
 package org.opendaylight.netconf.util;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 
 import java.util.Collections;
 import javax.xml.transform.dom.DOMResult;
@@ -47,12 +47,10 @@ public class NetconfUtilTest {
     public void testConflictingVersionDetection() throws Exception {
         final Document document = XmlUtil.readXmlToDocument(getClass()
                 .getResourceAsStream("/netconfMessages/conflictingversion/conflictingVersionResponse.xml"));
-        try {
-            NetconfUtil.checkIsMessageOk(document);
-            fail();
-        } catch (final IllegalStateException e) {
-            assertThat(e.getMessage(), containsString("Optimistic lock failed. Expected parent version 21, was 18"));
-        }
+
+        final IllegalStateException e = assertThrows(IllegalStateException.class,
+            () -> NetconfUtil.checkIsMessageOk(document));
+        assertThat(e.getMessage(), containsString("Optimistic lock failed. Expected parent version 21, was 18"));
     }
 
     @Test

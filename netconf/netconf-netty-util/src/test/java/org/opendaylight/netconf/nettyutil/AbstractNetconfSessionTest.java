@@ -18,7 +18,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -28,13 +27,13 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoop;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.handler.codec.MessageToByteEncoder;
-import io.netty.util.concurrent.GenericFutureListener;
 import java.util.Collections;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.netconf.api.NetconfMessage;
 import org.opendaylight.netconf.api.NetconfSessionListener;
 import org.opendaylight.netconf.api.NetconfTerminationReason;
@@ -42,6 +41,7 @@ import org.opendaylight.netconf.api.messages.NetconfHelloMessage;
 import org.opendaylight.netconf.nettyutil.handler.exi.EXIParameters;
 import org.opendaylight.netconf.nettyutil.handler.exi.NetconfStartExiMessage;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class AbstractNetconfSessionTest {
 
     @Mock
@@ -59,20 +59,15 @@ public class AbstractNetconfSessionTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         doNothing().when(listener).onMessage(any(TestingNetconfSession.class), any(NetconfMessage.class));
         doNothing().when(listener).onSessionUp(any(TestingNetconfSession.class));
         doNothing().when(listener).onSessionDown(any(TestingNetconfSession.class), any(Exception.class));
         doNothing().when(listener).onSessionTerminated(any(TestingNetconfSession.class),
                 any(NetconfTerminationReason.class));
 
-        doReturn(writeFuture).when(writeFuture).addListener(any(GenericFutureListener.class));
-
         doReturn(writeFuture).when(channel).newPromise();
-        doReturn(writeFuture).when(channel).writeAndFlush(any(NetconfMessage.class));
         doReturn(writeFuture).when(channel).writeAndFlush(any(NetconfMessage.class), any(ChannelPromise.class));
         doReturn(pipeline).when(channel).pipeline();
-        doReturn("mockChannel").when(channel).toString();
         doReturn(mock(ChannelFuture.class)).when(channel).close();
 
         doReturn(null).when(pipeline).replace(anyString(), anyString(), any(ChannelHandler.class));
@@ -114,7 +109,6 @@ public class AbstractNetconfSessionTest {
     public void testReplaceHandlers() throws Exception {
         final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
         final ChannelHandler mock = mock(ChannelHandler.class);
-        doReturn("handler").when(mock).toString();
 
         testingNetconfSession.replaceMessageDecoder(mock);
         verify(pipeline).replace(AbstractChannelInitializer.NETCONF_MESSAGE_DECODER,
@@ -143,7 +137,7 @@ public class AbstractNetconfSessionTest {
     public void testEndOfInput() throws Exception {
         final TestingNetconfSession testingNetconfSession = new TestingNetconfSession(listener, channel, 1L);
         testingNetconfSession.endOfInput();
-        verifyZeroInteractions(listener);
+        verifyNoMoreInteractions(listener);
         testingNetconfSession.sessionUp();
         testingNetconfSession.endOfInput();
         verify(listener).onSessionDown(any(TestingNetconfSession.class), any(Exception.class));
@@ -157,5 +151,4 @@ public class AbstractNetconfSessionTest {
         testingNetconfSession.sendMessage(hello);
         verify(channel).writeAndFlush(hello, writeFuture);
     }
-
 }

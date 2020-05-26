@@ -13,7 +13,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.util.concurrent.FluentFuture;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -73,23 +72,23 @@ public class NetconfBaseOpsTest extends AbstractTestModelTest {
         final NetconfMessage ok = new NetconfMessage(XmlUtil.readXmlToDocument(okStream));
         final NetconfMessage data = new NetconfMessage(XmlUtil.readXmlToDocument(dataStream));
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_GET_CONFIG_QNAME)))
-                .thenReturn(FluentFuture.from(RpcResultBuilder.success(data).buildFuture()));
+                .thenReturn(RpcResultBuilder.success(data).buildFuture());
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_GET_QNAME)))
-                .thenReturn(FluentFuture.from(RpcResultBuilder.success(data).buildFuture()));
+                .thenReturn(RpcResultBuilder.success(data).buildFuture());
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_EDIT_CONFIG_QNAME)))
-                .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
+                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_COPY_CONFIG_QNAME)))
-                .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
+                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_DISCARD_CHANGES_QNAME)))
-                .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
+                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_VALIDATE_QNAME)))
-                .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
+                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_LOCK_QNAME)))
-                .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
+                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_UNLOCK_QNAME)))
-                .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
+                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
         when(listener.sendRequest(any(), eq(NetconfMessageTransformUtil.NETCONF_COMMIT_QNAME)))
-                .thenReturn(FluentFuture.from(RpcResultBuilder.success(ok).buildFuture()));
+                .thenReturn(RpcResultBuilder.success(ok).buildFuture());
         final MessageTransformer<NetconfMessage> transformer = new NetconfMessageTransformer(
             new EmptyMountPointContext(SCHEMA_CONTEXT), true, BASE_SCHEMAS.getBaseSchema());
         final DOMRpcService rpc = new NetconfDeviceRpc(SCHEMA_CONTEXT, listener, transformer);

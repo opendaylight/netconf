@@ -8,12 +8,11 @@
 package org.opendaylight.netconf.mdsal.connector.ops;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.opendaylight.netconf.mdsal.connector.ops.AbstractNetconfOperationTest.RPC_REPLY_OK;
 import static org.opendaylight.netconf.mdsal.connector.ops.AbstractNetconfOperationTest.SESSION_ID_FOR_REPORTING;
 import static org.opendaylight.netconf.mdsal.connector.ops.AbstractNetconfOperationTest.executeOperation;
@@ -23,7 +22,9 @@ import com.google.common.collect.ImmutableClassToInstanceMap;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMDataBroker;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeReadWriteTransaction;
 import org.opendaylight.netconf.api.DocumentedException;
@@ -33,6 +34,7 @@ import org.opendaylight.netconf.mdsal.connector.TransactionProvider;
 import org.opendaylight.yangtools.util.concurrent.FluentFutures;
 import org.w3c.dom.Document;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class ValidateTest {
     @Mock
     private DOMDataTransactionValidator noopValidator;
@@ -44,8 +46,7 @@ public class ValidateTest {
     private DOMDataBroker dataBroker;
 
     @Before
-    public void setUp() throws Exception {
-        initMocks(this);
+    public void setUp() {
         doReturn(FluentFutures.immediateNullFluentFuture()).when(noopValidator).validate(any());
         doReturn(FluentFutures.immediateFailedFluentFuture(new ValidationFailedException("invalid data")))
             .when(failingValidator).validate(any());
@@ -56,47 +57,38 @@ public class ValidateTest {
     @Test
     public void testValidateUnsupported() throws Exception {
         whenValidatorIsNotDefined();
-        try {
-            validate("messages/mapping/validate/validate.xml");
-            fail("Should have failed - <validate> not supported");
-        } catch (final DocumentedException e) {
-            assertEquals(DocumentedException.ErrorSeverity.ERROR, e.getErrorSeverity());
-            assertEquals(DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED, e.getErrorTag());
-            assertEquals(DocumentedException.ErrorType.PROTOCOL, e.getErrorType());
-        }
+        final DocumentedException e = assertThrows(DocumentedException.class,
+            () -> validate("messages/mapping/validate/validate.xml"));
+        assertEquals(DocumentedException.ErrorSeverity.ERROR, e.getErrorSeverity());
+        assertEquals(DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED, e.getErrorTag());
+        assertEquals(DocumentedException.ErrorType.PROTOCOL, e.getErrorType());
     }
 
     @Test
     public void testSourceMissing() throws Exception {
         whenUsingValidator(noopValidator);
-        try {
-            validate("messages/mapping/validate/validate_no_source.xml");
-            fail("Should have failed - <source> element is missing");
-        } catch (final DocumentedException e) {
-            assertEquals(DocumentedException.ErrorSeverity.ERROR, e.getErrorSeverity());
-            assertEquals(DocumentedException.ErrorTag.MISSING_ELEMENT, e.getErrorTag());
-            assertEquals(DocumentedException.ErrorType.PROTOCOL, e.getErrorType());
-        }
+        final DocumentedException e = assertThrows(DocumentedException.class,
+            () -> validate("messages/mapping/validate/validate_no_source.xml"));
+        assertEquals(DocumentedException.ErrorSeverity.ERROR, e.getErrorSeverity());
+        assertEquals(DocumentedException.ErrorTag.MISSING_ELEMENT, e.getErrorTag());
+        assertEquals(DocumentedException.ErrorType.PROTOCOL, e.getErrorType());
     }
 
     @Test
     public void testSourceRunning() throws Exception {
         whenUsingValidator(noopValidator);
-        try {
-            validate("messages/mapping/validate/validate_running.xml");
-            fail("Should have failed - <running/> is not supported");
-        } catch (final DocumentedException e) {
-            assertEquals(DocumentedException.ErrorSeverity.ERROR, e.getErrorSeverity());
-            assertEquals(DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED, e.getErrorTag());
-            assertEquals(DocumentedException.ErrorType.PROTOCOL, e.getErrorType());
-        }
+        final DocumentedException e = assertThrows(DocumentedException.class,
+            () -> validate("messages/mapping/validate/validate_running.xml"));
+        assertEquals(DocumentedException.ErrorSeverity.ERROR, e.getErrorSeverity());
+        assertEquals(DocumentedException.ErrorTag.OPERATION_NOT_SUPPORTED, e.getErrorTag());
+        assertEquals(DocumentedException.ErrorType.PROTOCOL, e.getErrorType());
     }
 
     @Test
     public void testValidateEmptyTx() throws Exception {
         whenUsingValidator(noopValidator);
         verifyResponse(validate("messages/mapping/validate/validate.xml"), RPC_REPLY_OK);
-        verifyZeroInteractions(noopValidator);
+        verifyNoMoreInteractions(noopValidator);
     }
 
     @Test
@@ -111,14 +103,11 @@ public class ValidateTest {
     public void testValidateFailed() throws Exception {
         whenUsingValidator(failingValidator);
         final TransactionProvider transactionProvider = initCandidateTransaction();
-        try {
-            validate("messages/mapping/validate/validate.xml", transactionProvider);
-            fail("Should have failed - operation failed");
-        } catch (final DocumentedException e) {
-            assertEquals(DocumentedException.ErrorSeverity.ERROR, e.getErrorSeverity());
-            assertEquals(DocumentedException.ErrorTag.OPERATION_FAILED, e.getErrorTag());
-            assertEquals(DocumentedException.ErrorType.APPLICATION, e.getErrorType());
-        }
+        final DocumentedException e = assertThrows(DocumentedException.class,
+            () -> validate("messages/mapping/validate/validate.xml", transactionProvider));
+        assertEquals(DocumentedException.ErrorSeverity.ERROR, e.getErrorSeverity());
+        assertEquals(DocumentedException.ErrorTag.OPERATION_FAILED, e.getErrorTag());
+        assertEquals(DocumentedException.ErrorType.APPLICATION, e.getErrorType());
     }
 
     private void whenValidatorIsNotDefined() {
@@ -136,7 +125,8 @@ public class ValidateTest {
         return transactionProvider;
     }
 
-    private Document validate(final String resource,  final TransactionProvider transactionProvider) throws Exception {
+    private static Document validate(final String resource,  final TransactionProvider transactionProvider)
+            throws Exception {
         final Validate validate = new Validate(SESSION_ID_FOR_REPORTING, transactionProvider);
         return executeOperation(validate, resource);
     }
