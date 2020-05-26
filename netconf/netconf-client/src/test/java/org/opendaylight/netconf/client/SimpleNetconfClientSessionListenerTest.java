@@ -5,13 +5,11 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.client;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -47,8 +45,8 @@ public class SimpleNetconfClientSessionListenerTest {
         channelFuture = mock(ChannelPromise.class);
         mockEventLoop();
         doReturn(channelFuture).when(channel).newPromise();
-        doReturn(channelFuture).when(channel).writeAndFlush(anyObject());
-        doReturn(channelFuture).when(channel).writeAndFlush(anyObject(), any(ChannelPromise.class));
+        doReturn(channelFuture).when(channel).writeAndFlush(any());
+        doReturn(channelFuture).when(channel).writeAndFlush(any(), any(ChannelPromise.class));
         doReturn(channelFuture).when(channelFuture).addListener(any(GenericFutureListener.class));
         caps = Sets.newSet("a", "b");
         helloMessage = NetconfHelloMessage.createServerHello(caps, 10);
@@ -71,7 +69,7 @@ public class SimpleNetconfClientSessionListenerTest {
         SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
         final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
-        verify(channel, times(1)).writeAndFlush(anyObject(), anyObject());
+        verify(channel, times(1)).writeAndFlush(any(), any());
 
         simpleListener.onSessionDown(clientSession, new Exception());
         assertFalse(promise.isSuccess());
@@ -82,7 +80,7 @@ public class SimpleNetconfClientSessionListenerTest {
         SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
         final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
-        verify(channel, times(1)).writeAndFlush(anyObject(), anyObject());
+        verify(channel, times(1)).writeAndFlush(any(), any());
 
         simpleListener.sendRequest(message);
         assertFalse(promise.isSuccess());
@@ -93,7 +91,7 @@ public class SimpleNetconfClientSessionListenerTest {
         SimpleNetconfClientSessionListener simpleListener = new SimpleNetconfClientSessionListener();
         final Future<NetconfMessage> promise = simpleListener.sendRequest(message);
         simpleListener.onSessionUp(clientSession);
-        verify(channel, times(1)).writeAndFlush(anyObject(), anyObject());
+        verify(channel, times(1)).writeAndFlush(any(), any());
 
         simpleListener.onMessage(clientSession, message);
         assertTrue(promise.isSuccess());

@@ -9,14 +9,14 @@ package org.opendaylight.netconf.api.xml;
 
 import static org.hamcrest.CoreMatchers.both;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,26 +51,10 @@ public class XmlElementTest {
         XmlElement.fromDomElementWithExpected(element, "top");
         XmlElement.fromDomElementWithExpected(element, "top", "namespace");
 
-        try {
-            XmlElement.fromString("notXml");
-            fail();
-        } catch (final DocumentedException e) {
-            // expected
-        }
-
-        try {
-            XmlElement.fromDomElementWithExpected(element, "notTop");
-            fail();
-        } catch (final DocumentedException e) {
-            // expected
-        }
-
-        try {
-            XmlElement.fromDomElementWithExpected(element, "top", "notNamespace");
-            fail();
-        } catch (final DocumentedException e) {
-            // expected
-        }
+        assertThrows(DocumentedException.class, () -> XmlElement.fromString("notXml"));
+        assertThrows(DocumentedException.class, () -> XmlElement.fromDomElementWithExpected(element, "notTop"));
+        assertThrows(DocumentedException.class,
+            () -> XmlElement.fromDomElementWithExpected(element, "top", "notNamespace"));
     }
 
     @Test
@@ -103,12 +87,8 @@ public class XmlElementTest {
 
         final XmlElement noNamespaceElement = XmlElement.fromString("<noNamespace/>");
         assertFalse(noNamespaceElement.hasNamespace());
-        try {
-            noNamespaceElement.getNamespace();
-            fail();
-        } catch (final MissingNameSpaceException e) {
-            // expected
-        }
+
+        assertThrows(MissingNameSpaceException.class, () -> noNamespaceElement.getNamespace());
 
         final XmlElement inner = xmlElement.getOnlyChildElement("inner");
         final XmlElement deepInner = inner.getOnlyChildElementWithSameNamespaceOptionally().get();
@@ -122,7 +102,7 @@ public class XmlElementTest {
     @Test
     public void testExtractNamespaces() throws Exception {
         final XmlElement innerPrefixed = xmlElement.getOnlyChildElement("innerPrefixed");
-        Map.Entry<String, String> namespaceOfTextContent = innerPrefixed.findNamespaceOfTextContent();
+        Entry<String, String> namespaceOfTextContent = innerPrefixed.findNamespaceOfTextContent();
 
         assertNotNull(namespaceOfTextContent);
         assertEquals("b", namespaceOfTextContent.getKey());
@@ -139,11 +119,8 @@ public class XmlElementTest {
         xmlElement.checkUnrecognisedElements(xmlElement.getOnlyChildElement("inner"),
                 xmlElement.getOnlyChildElement("innerPrefixed"), xmlElement.getOnlyChildElement("innerNamespace"));
 
-        try {
-            xmlElement.checkUnrecognisedElements(xmlElement.getOnlyChildElement("inner"));
-            fail();
-        } catch (final DocumentedException e) {
-            assertThat(e.getMessage(), both(containsString("innerNamespace")).and(containsString("innerNamespace")));
-        }
+        final DocumentedException e = assertThrows(DocumentedException.class,
+            () -> xmlElement.checkUnrecognisedElements(xmlElement.getOnlyChildElement("inner")));
+        assertThat(e.getMessage(), both(containsString("innerNamespace")).and(containsString("innerNamespace")));
     }
 }

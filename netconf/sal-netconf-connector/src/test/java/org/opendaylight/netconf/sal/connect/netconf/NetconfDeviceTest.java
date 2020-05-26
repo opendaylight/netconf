@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyCollectionOf;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.after;
@@ -19,6 +19,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -44,7 +45,6 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.opendaylight.mdsal.dom.api.DOMActionService;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.mdsal.dom.api.DOMRpcResult;
@@ -84,19 +84,13 @@ import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistration;
 import org.opendaylight.yangtools.yang.model.repo.spi.SchemaSourceRegistry;
 import org.xml.sax.SAXException;
 
-@SuppressWarnings("checkstyle:IllegalCatch")
 public class NetconfDeviceTest extends AbstractTestModelTest {
 
     private static final NetconfMessage NOTIFICATION;
 
-    private static final ContainerNode COMPOSITE_NODE;
+    private static final ContainerNode COMPOSITE_NODE = mockClass(ContainerNode.class);
 
     static {
-        try {
-            COMPOSITE_NODE = mockClass(ContainerNode.class);
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
         try {
             NOTIFICATION = new NetconfMessage(XmlUtil
                     .readXmlToDocument(NetconfDeviceTest.class.getResourceAsStream("/notification-payload.xml")));
@@ -140,7 +134,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             } else {
                 return Futures.immediateFuture(SCHEMA_CONTEXT);
             }
-        }).when(schemaFactory).createEffectiveModelContext(anyCollectionOf(SourceIdentifier.class));
+        }).when(schemaFactory).createEffectiveModelContext(anyCollection());
 
         final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id,
                 schemaContext) -> {
@@ -168,9 +162,9 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 getSessionCaps(true, Lists.newArrayList(TEST_CAPABILITY, TEST_CAPABILITY2));
         device.onRemoteSessionUp(sessionCaps, listener);
 
-        Mockito.verify(facade, Mockito.timeout(5000)).onDeviceConnected(any(MountPointContext.class),
+        verify(facade, timeout(5000)).onDeviceConnected(any(MountPointContext.class),
             any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class), isNull());
-        Mockito.verify(schemaFactory, times(2)).createEffectiveModelContext(anyCollectionOf(SourceIdentifier.class));
+        verify(schemaFactory, times(2)).createEffectiveModelContext(anyCollection());
     }
 
     @Test
@@ -188,7 +182,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 = new SchemaResolutionException("fail first",
                 Collections.emptyList(), HashMultimap.create());
         doReturn(Futures.immediateFailedFuture(schemaResolutionException))
-                .when(schemaFactory).createEffectiveModelContext(anyCollectionOf(SourceIdentifier.class));
+                .when(schemaFactory).createEffectiveModelContext(anyCollection());
 
         final NetconfDevice.SchemaResourcesDTO schemaResourcesDTO = new NetconfDevice
                 .SchemaResourcesDTO(getSchemaRegistry(), schemaRepository, schemaFactory, STATE_SCHEMAS_RESOLVER);
@@ -205,9 +199,9 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
         final NetconfSessionPreferences sessionCaps = getSessionCaps(false, capList);
         device.onRemoteSessionUp(sessionCaps, listener);
 
-        Mockito.verify(facade, Mockito.timeout(5000)).onDeviceDisconnected();
-        Mockito.verify(listener, Mockito.timeout(5000)).close();
-        Mockito.verify(schemaFactory, times(1)).createEffectiveModelContext(anyCollectionOf(SourceIdentifier.class));
+        verify(facade, timeout(5000)).onDeviceDisconnected();
+        verify(listener, timeout(5000)).close();
+        verify(schemaFactory, times(1)).createEffectiveModelContext(anyCollection());
     }
 
     @Test
@@ -229,7 +223,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
             } else {
                 return Futures.immediateFuture(SCHEMA_CONTEXT);
             }
-        }).when(schemaFactory).createEffectiveModelContext(anyCollectionOf(SourceIdentifier.class));
+        }).when(schemaFactory).createEffectiveModelContext(anyCollection());
 
         final NetconfDeviceSchemasResolver stateSchemasResolver = (deviceRpc, remoteSessionCapabilities, id,
             schemaContext) -> {
@@ -257,9 +251,9 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 getSessionCaps(true, Lists.newArrayList(TEST_CAPABILITY, TEST_CAPABILITY2));
         device.onRemoteSessionUp(sessionCaps, listener);
 
-        Mockito.verify(facade, Mockito.timeout(5000)).onDeviceConnected(any(MountPointContext.class),
+        verify(facade, timeout(5000)).onDeviceConnected(any(MountPointContext.class),
             any(NetconfSessionPreferences.class), any(NetconfDeviceRpc.class), isNull());
-        Mockito.verify(schemaFactory, times(1)).createEffectiveModelContext(anyCollectionOf(SourceIdentifier.class));
+        verify(schemaFactory, times(1)).createEffectiveModelContext(anyCollection());
     }
 
     private static SchemaSourceRegistry getSchemaRegistry() {
@@ -400,7 +394,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setSalFacade(facade)
                 .setBaseSchemas(BASE_SCHEMAS)
                 .build();
-        final NetconfDevice netconfSpy = Mockito.spy(device);
+        final NetconfDevice netconfSpy = spy(device);
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(true,
                 Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
@@ -438,7 +432,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setSalFacade(facade)
                 .setBaseSchemas(BASE_SCHEMAS)
                 .build();
-        final NetconfDevice netconfSpy = Mockito.spy(device);
+        final NetconfDevice netconfSpy = spy(device);
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(false,
                 Lists.newArrayList(XmlNetconfConstants.URN_IETF_PARAMS_NETCONF_CAPABILITY_NOTIFICATION_1_0));
@@ -479,7 +473,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setSalFacade(facade)
                 .setBaseSchemas(BASE_SCHEMAS)
                 .build();
-        final NetconfDevice netconfSpy = Mockito.spy(device);
+        final NetconfDevice netconfSpy = spy(device);
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(false,
                 Lists.newArrayList(TEST_NAMESPACE + "?module=" + TEST_MODULE + "&amp;revision=" + TEST_REVISION));
@@ -517,7 +511,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
                 .setSalFacade(facade)
                 .setBaseSchemas(BASE_SCHEMAS)
                 .build();
-        final NetconfDevice netconfSpy = Mockito.spy(device);
+        final NetconfDevice netconfSpy = spy(device);
 
         final NetconfSessionPreferences sessionCaps = getSessionCaps(false, Collections.emptyList());
 
@@ -577,7 +571,7 @@ public class NetconfDeviceTest extends AbstractTestModelTest {
 
     private static <T> T mockClass(final Class<T> remoteDeviceHandlerClass) {
         final T mock = mock(remoteDeviceHandlerClass);
-        Mockito.doReturn(remoteDeviceHandlerClass.getSimpleName()).when(mock).toString();
+        doReturn(remoteDeviceHandlerClass.getSimpleName()).when(mock).toString();
         return mock;
     }
 

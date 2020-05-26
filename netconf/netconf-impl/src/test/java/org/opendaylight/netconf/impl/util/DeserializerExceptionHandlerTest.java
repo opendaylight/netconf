@@ -5,11 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl.util;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -37,7 +35,7 @@ public class DeserializerExceptionHandlerTest {
         doReturn(channel).when(context).channel();
         channelFuture = mock(ChannelFuture.class);
         doReturn(channelFuture).when(channelFuture).addListener(any(GenericFutureListener.class));
-        doReturn(channelFuture).when(channel).writeAndFlush(anyObject());
+        doReturn(channelFuture).when(channel).writeAndFlush(any());
     }
 
     @Test

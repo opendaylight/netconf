@@ -5,11 +5,9 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.netconf.impl.mapping.operations;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -66,7 +64,7 @@ public class DefaultCloseSessionTest {
             return null;
         }).when(sendFuture).addListener(any(GenericFutureListener.class));
         doReturn(sendFuture).when(channel).newPromise();
-        doReturn(sendFuture).when(channel).writeAndFlush(anyObject(), anyObject());
+        doReturn(sendFuture).when(channel).writeAndFlush(any(), any());
         doReturn(true).when(sendFuture).isSuccess();
         final NetconfServerSessionListener listener = mock(NetconfServerSessionListener.class);
         doNothing().when(listener).onSessionTerminated(any(NetconfServerSession.class),

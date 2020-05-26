@@ -9,7 +9,6 @@ package org.opendaylight.netconf.nettyutil.handler.ssh.client;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
@@ -19,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -143,7 +142,7 @@ public class AsyncSshHandlerTest {
         doReturn(channel).when(ctx).channel();
         doReturn(ctx).when(ctx).fireChannelActive();
         doReturn(ctx).when(ctx).fireChannelInactive();
-        doReturn(ctx).when(ctx).fireChannelRead(anyObject());
+        doReturn(ctx).when(ctx).fireChannelRead(any());
         doReturn(mock(ChannelFuture.class)).when(ctx).disconnect(any(ChannelPromise.class));
         doReturn(getMockedPromise()).when(ctx).newPromise();
     }
@@ -283,7 +282,7 @@ public class AsyncSshHandlerTest {
 
         doReturn(ioWriteFuture).when(asyncIn).writePacket(any(Buffer.class));
 
-        verifyZeroInteractions(firstWritePromise, secondWritePromise);
+        verifyNoMoreInteractions(firstWritePromise, secondWritePromise);
 
         // make first write stop pending
         firstWriteListener.operationComplete(ioWriteFuture);
