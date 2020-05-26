@@ -86,7 +86,6 @@ import org.opendaylight.yangtools.yang.data.impl.schema.builder.impl.ImmutableCo
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
-import org.opendaylight.yangtools.yang.parser.spi.meta.ReactorException;
 
 /**
  * Unit tests for JSONRestconfServiceDraft18.
@@ -155,7 +154,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
     private final SchemaContextHandler schemaContextHandler = TestUtils.newSchemaContextHandler(schemaContext);
 
     @BeforeClass
-    public static void init() throws IOException, ReactorException {
+    public static void init() throws IOException {
         schemaContext = TestUtils.loadSchemaContext("/full-versions/yangs");
     }
 
@@ -580,7 +579,7 @@ public class JSONRestconfServiceRfc8040ImplTest {
                 new Object[]{INTERFACE_QNAME, NAME_QNAME, "eth0"});
     }
 
-    DOMMountPoint setupTestMountPoint() throws FileNotFoundException, ReactorException {
+    DOMMountPoint setupTestMountPoint() throws FileNotFoundException {
         final SchemaContext schemaContextTestModule = TestUtils.loadSchemaContext("/full-versions/test-module");
         final DOMMountPoint mockMountPoint = mock(DOMMountPoint.class);
         doReturn(schemaContextTestModule).when(mockMountPoint).getEffectiveModelContext();

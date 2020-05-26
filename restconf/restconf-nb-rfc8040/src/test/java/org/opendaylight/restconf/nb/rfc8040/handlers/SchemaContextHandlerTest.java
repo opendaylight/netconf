@@ -5,15 +5,23 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.handlers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.io.FileNotFoundException;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.common.api.CommitInfo;
 import org.opendaylight.mdsal.dom.api.DOMDataTreeWriteTransaction;
 import org.opendaylight.mdsal.dom.api.DOMSchemaService;
@@ -27,29 +35,42 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 /**
  * Tests for handling {@link SchemaContext}.
  */
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class SchemaContextHandlerTest {
 
     private static final String PATH_FOR_ACTUAL_SCHEMA_CONTEXT = "/modules";
     private static final String PATH_FOR_NEW_SCHEMA_CONTEXT = "/modules/modules-behind-mount-point";
 
+    private static EffectiveModelContext SCHEMA_CONTEXT;
+
     private SchemaContextHandler schemaContextHandler;
-    private EffectiveModelContext schemaContext;
-    private final DOMSchemaService mockDOMSchemaService = Mockito.mock(DOMSchemaService.class);
+
+    @Mock
+    private DOMSchemaService mockDOMSchemaService;
+
+    @BeforeClass
+    public static void beforeClass() throws FileNotFoundException {
+        SCHEMA_CONTEXT = YangParserTestUtils.parseYangFiles(
+            TestRestconfUtils.loadFiles(PATH_FOR_ACTUAL_SCHEMA_CONTEXT));
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        SCHEMA_CONTEXT = null;
+    }
 
     @Before
     public void setup() throws Exception {
-        final TransactionChainHandler txHandler = Mockito.mock(TransactionChainHandler.class);
-        final DOMTransactionChain domTx = Mockito.mock(DOMTransactionChain.class);
-        Mockito.when(txHandler.get()).thenReturn(domTx);
-        final DOMDataTreeWriteTransaction wTx = Mockito.mock(DOMDataTreeWriteTransaction.class);
-        Mockito.when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
-        Mockito.doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
+        final TransactionChainHandler txHandler = mock(TransactionChainHandler.class);
+        final DOMTransactionChain domTx = mock(DOMTransactionChain.class);
+        when(txHandler.get()).thenReturn(domTx);
+        final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
+        when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
+        doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
 
-        this.schemaContextHandler = SchemaContextHandler.newInstance(txHandler, mockDOMSchemaService);
+        this.schemaContextHandler = new SchemaContextHandler(txHandler, mockDOMSchemaService);
 
-        this.schemaContext =
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles(PATH_FOR_ACTUAL_SCHEMA_CONTEXT));
-        this.schemaContextHandler.onModelContextUpdated(this.schemaContext);
+        this.schemaContextHandler.onModelContextUpdated(SchemaContextHandlerTest.SCHEMA_CONTEXT);
     }
 
     /**
@@ -57,17 +78,17 @@ public class SchemaContextHandlerTest {
      */
     @Test
     public void testInitAndClose() {
-        ListenerRegistration<?> mockListenerReg = Mockito.mock(ListenerRegistration.class);
-        Mockito.doReturn(mockListenerReg).when(mockDOMSchemaService)
+        ListenerRegistration<?> mockListenerReg = mock(ListenerRegistration.class);
+        doReturn(mockListenerReg).when(mockDOMSchemaService)
             .registerSchemaContextListener(schemaContextHandler);
 
         schemaContextHandler.init();
 
-        Mockito.verify(mockDOMSchemaService).registerSchemaContextListener(schemaContextHandler);
+        verify(mockDOMSchemaService).registerSchemaContextListener(schemaContextHandler);
 
         schemaContextHandler.close();
 
-        Mockito.verify(mockListenerReg).close();
+        verify(mockListenerReg).close();
     }
 
     /**
@@ -80,7 +101,7 @@ public class SchemaContextHandlerTest {
     @Test
     public void getSchemaContextTest() {
         assertEquals("SchemaContextHandler should has reference to actual SchemaContext",
-                this.schemaContext, this.schemaContextHandler.get());
+                SCHEMA_CONTEXT, this.schemaContextHandler.get());
     }
 
     /**
@@ -98,7 +119,7 @@ public class SchemaContextHandlerTest {
         this.schemaContextHandler.onModelContextUpdated(newSchemaContext);
 
         assertNotEquals("SchemaContextHandler should not has reference to old SchemaContext",
-                this.schemaContext, this.schemaContextHandler.get());
+                SCHEMA_CONTEXT, this.schemaContextHandler.get());
         assertEquals("SchemaContextHandler should has reference to new SchemaContext",
                 newSchemaContext, this.schemaContextHandler.get());
     }
