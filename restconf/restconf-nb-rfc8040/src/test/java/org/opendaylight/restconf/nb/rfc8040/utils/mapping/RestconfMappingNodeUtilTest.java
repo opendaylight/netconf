@@ -9,7 +9,7 @@ package org.opendaylight.restconf.nb.rfc8040.utils.mapping;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 import java.time.Instant;
@@ -21,14 +21,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.IetfYangLibrary;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule;
 import org.opendaylight.restconf.nb.rfc8040.Rfc8040.MonitoringModule.QueryParams;
@@ -49,8 +43,6 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapEntryNode;
 import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.data.api.schema.NormalizedNode;
 import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
-import org.opendaylight.yangtools.yang.model.api.LeafSchemaNode;
-import org.opendaylight.yangtools.yang.model.api.ListSchemaNode;
 import org.opendaylight.yangtools.yang.model.api.Module;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 import org.slf4j.Logger;
@@ -60,23 +52,11 @@ import org.slf4j.LoggerFactory;
  * Unit tests for {@link RestconfMappingNodeUtil}.
  */
 public class RestconfMappingNodeUtilTest {
-
     private static final Logger LOG = LoggerFactory.getLogger(RestconfMappingNodeUtilTest.class);
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
-    @Mock private ListSchemaNode mockStreamList;
-    @Mock private LeafSchemaNode leafName;
-    @Mock private LeafSchemaNode leafDescription;
-    @Mock private LeafSchemaNode leafReplaySupport;
-    @Mock private LeafSchemaNode leafReplayLog;
-    @Mock private LeafSchemaNode leafEvents;
 
     private static Collection<? extends Module> modules;
     private static EffectiveModelContext schemaContext;
     private static EffectiveModelContext schemaContextMonitoring;
-
     private static Collection<? extends Module> modulesRest;
 
     @BeforeClass
@@ -87,18 +67,6 @@ public class RestconfMappingNodeUtilTest {
         modules = schemaContextMonitoring.getModules();
         modulesRest = YangParserTestUtils
                 .parseYangFiles(TestRestconfUtils.loadFiles("/modules/restconf-module-testing")).getModules();
-    }
-
-    @Before
-    public void setup() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
-        when(this.leafName.getQName()).thenReturn(QName.create("", RestconfMappingNodeConstants.NAME));
-        when(this.leafDescription.getQName()).thenReturn(QName.create("", RestconfMappingNodeConstants.DESCRIPTION));
-        when(this.leafReplaySupport.getQName()).thenReturn(
-                QName.create("", RestconfMappingNodeConstants.REPLAY_SUPPORT));
-        when(this.leafReplayLog.getQName()).thenReturn(QName.create("", RestconfMappingNodeConstants.REPLAY_LOG));
-        when(this.leafEvents.getQName()).thenReturn(QName.create("", RestconfMappingNodeConstants.EVENTS));
     }
 
     /**
@@ -137,11 +105,11 @@ public class RestconfMappingNodeUtilTest {
                 }
             }
         }
-        Assert.assertTrue(listOfValues.contains(QueryParams.DEPTH));
-        Assert.assertTrue(listOfValues.contains(QueryParams.FIELDS));
-        Assert.assertTrue(listOfValues.contains(QueryParams.FILTER));
-        Assert.assertTrue(listOfValues.contains(QueryParams.REPLAY));
-        Assert.assertTrue(listOfValues.contains(QueryParams.WITH_DEFAULTS));
+        assertTrue(listOfValues.contains(QueryParams.DEPTH));
+        assertTrue(listOfValues.contains(QueryParams.FIELDS));
+        assertTrue(listOfValues.contains(QueryParams.FILTER));
+        assertTrue(listOfValues.contains(QueryParams.REPLAY));
+        assertTrue(listOfValues.contains(QueryParams.WITH_DEFAULTS));
     }
 
     @Test
@@ -199,8 +167,8 @@ public class RestconfMappingNodeUtilTest {
         for (final DataContainerChild<? extends PathArgument, ?> child : ((MapEntryNode) mappedData).getValue()) {
             if (child instanceof LeafNode) {
                 final LeafNode<?> leaf = (LeafNode<?>) child;
-                Assert.assertTrue(map.containsKey(leaf.getNodeType()));
-                Assert.assertEquals(map.get(leaf.getNodeType()), leaf.getValue());
+                assertTrue(map.containsKey(leaf.getNodeType()));
+                assertEquals(map.get(leaf.getNodeType()), leaf.getValue());
             }
         }
     }
@@ -226,7 +194,7 @@ public class RestconfMappingNodeUtilTest {
                 }
             }
         }
-        Assert.assertTrue(deviationsFound > 0);
+        assertTrue(deviationsFound > 0);
     }
 
     /**

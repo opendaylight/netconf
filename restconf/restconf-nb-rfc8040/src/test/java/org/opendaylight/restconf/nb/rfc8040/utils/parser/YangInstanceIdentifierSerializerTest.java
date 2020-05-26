@@ -8,16 +8,16 @@
 package org.opendaylight.restconf.nb.rfc8040.utils.parser;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.opendaylight.restconf.common.errors.RestconfDocumentedException;
 import org.opendaylight.restconf.nb.rfc8040.TestRestconfUtils;
 import org.opendaylight.restconf.nb.rfc8040.utils.parser.builder.ParserBuilderConstants;
@@ -26,7 +26,7 @@ import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.AugmentationIdentifier;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeIdentifierWithPredicates;
 import org.opendaylight.yangtools.yang.data.api.YangInstanceIdentifier.NodeWithValue;
-import org.opendaylight.yangtools.yang.model.api.SchemaContext;
+import org.opendaylight.yangtools.yang.model.api.EffectiveModelContext;
 import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
 
 /**
@@ -34,16 +34,17 @@ import org.opendaylight.yangtools.yang.test.util.YangParserTestUtils;
  */
 public class YangInstanceIdentifierSerializerTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     // schema context with test modules
-    private SchemaContext schemaContext;
+    private static EffectiveModelContext SCHEMA_CONTEXT;
 
-    @Before
-    public void init() throws Exception {
-        this.schemaContext =
-                YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/restconf/parser/serializer"));
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        SCHEMA_CONTEXT = YangParserTestUtils.parseYangFiles(TestRestconfUtils.loadFiles("/restconf/parser/serializer"));
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        SCHEMA_CONTEXT = null;
     }
 
     /**
@@ -56,7 +57,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .node(QName.create("serializer:test", "2016-06-06", "contA"))
                 .build();
 
-        final String result = YangInstanceIdentifierSerializer.create(this.schemaContext, data);
+        final String result = YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, data);
         assertEquals("Serialization not successful",
                 "serializer-test:contA", result);
     }
@@ -72,7 +73,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .node(QName.create("serializer:test", "2016-06-06", "leaf-A"))
                 .build();
 
-        final String result = YangInstanceIdentifierSerializer.create(this.schemaContext, data);
+        final String result = YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, data);
         assertEquals("Serialization not successful", "serializer-test:contA/leaf-A", result);
     }
 
@@ -93,7 +94,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .node(new NodeWithValue<>(leafList, "instance"))
                 .build();
 
-        final String result = YangInstanceIdentifierSerializer.create(this.schemaContext, data);
+        final String result = YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, data);
         assertEquals("Serialization not successful",
                 "serializer-test:contA/list-A=100/leaf-list-AA=instance",
                 result);
@@ -111,7 +112,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .nodeWithKey(QName.create("serializer:test", "2016-06-06", "list-no-key"), new HashMap<>())
                 .build();
 
-        final String result = YangInstanceIdentifierSerializer.create(this.schemaContext, data);
+        final String result = YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, data);
         assertEquals("Serialization not successful", "serializer-test:list-no-key", result);
     }
 
@@ -128,7 +129,7 @@ public class YangInstanceIdentifierSerializerTest {
                         QName.create("serializer:test", "2016-06-06", "list-one-key"), "value")
                 .build();
 
-        final String result = YangInstanceIdentifierSerializer.create(this.schemaContext, data);
+        final String result = YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, data);
         assertEquals("Serialization not successful", "serializer-test:list-one-key=value", result);
     }
 
@@ -148,7 +149,7 @@ public class YangInstanceIdentifierSerializerTest {
         final YangInstanceIdentifier data = YangInstanceIdentifier.builder()
                 .node(list).nodeWithKey(list, values).build();
 
-        final String result = YangInstanceIdentifierSerializer.create(this.schemaContext, data);
+        final String result = YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, data);
         assertEquals("Serialization not successful", "serializer-test:list-multiple-keys=value-1,2,true", result);
     }
 
@@ -163,7 +164,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .node(QName.create("serializer:test", "2016-06-06", "leaf-0"))
                 .build();
 
-        final String result = YangInstanceIdentifierSerializer.create(this.schemaContext, data);
+        final String result = YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, data);
         assertEquals("Serialization not successful", "serializer-test:leaf-0", result);
     }
 
@@ -179,7 +180,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .node(new NodeWithValue<>(QName.create("serializer:test", "2016-06-06", "leaf-list-0"), "instance"))
                 .build();
 
-        final String result = YangInstanceIdentifierSerializer.create(this.schemaContext, data);
+        final String result = YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, data);
         assertEquals("Serialization not successful", "serializer-test:leaf-list-0=instance", result);
     }
 
@@ -190,8 +191,8 @@ public class YangInstanceIdentifierSerializerTest {
      */
     @Test
     public void serializeNullSchemaContextNegativeTest() {
-        this.thrown.expect(NullPointerException.class);
-        YangInstanceIdentifierSerializer.create(null, YangInstanceIdentifier.empty());
+        assertThrows(NullPointerException.class,
+            () -> YangInstanceIdentifierSerializer.create(null, YangInstanceIdentifier.empty()));
     }
 
     /**
@@ -201,8 +202,8 @@ public class YangInstanceIdentifierSerializerTest {
      */
     @Test
     public void serializeNullDataNegativeTest() {
-        this.thrown.expect(NullPointerException.class);
-        YangInstanceIdentifierSerializer.create(this.schemaContext, null);
+        assertThrows(NullPointerException.class,
+            () -> YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, null));
     }
 
     /**
@@ -212,8 +213,7 @@ public class YangInstanceIdentifierSerializerTest {
      */
     @Test
     public void serializeEmptyDataTest() {
-        final String result = YangInstanceIdentifierSerializer.create(this.schemaContext,
-            YangInstanceIdentifier.empty());
+        final String result = YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, YangInstanceIdentifier.empty());
         assertTrue("Empty identifier is expected", result.isEmpty());
     }
 
@@ -228,8 +228,8 @@ public class YangInstanceIdentifierSerializerTest {
                 .node(QName.create("serializer:test", "2016-06-06", "not-existing-leaf"))
                 .build();
 
-        this.thrown.expect(RestconfDocumentedException.class);
-        YangInstanceIdentifierSerializer.create(this.schemaContext, data);
+        assertThrows(RestconfDocumentedException.class,
+            () -> YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, data));
     }
 
     /**
@@ -266,7 +266,7 @@ public class YangInstanceIdentifierSerializerTest {
                         QName.create("serializer:test", "2016-06-06", "list-one-key"), value)
                 .build();
 
-        final String result = YangInstanceIdentifierSerializer.create(this.schemaContext, data);
+        final String result = YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, data);
         assertEquals("Serialization not successful", "serializer-test:list-one-key=" + encoded, result);
     }
 
@@ -283,7 +283,7 @@ public class YangInstanceIdentifierSerializerTest {
                         QName.create("serializer:test", "2016-06-06", "list-one-key"), value)
                 .build();
 
-        final String result = YangInstanceIdentifierSerializer.create(this.schemaContext, data);
+        final String result = YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, data);
         assertEquals("Serialization not successful", "serializer-test:list-one-key=" + value, result);
     }
 
@@ -303,7 +303,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .node(child)
                 .build();
 
-        final String result = YangInstanceIdentifierSerializer.create(this.schemaContext, data);
+        final String result = YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, data);
 
         assertEquals("Serialization not successful",
                 "serializer-test-included:augmented-list=100/serializer-test:augmented-leaf", result);
@@ -328,7 +328,7 @@ public class YangInstanceIdentifierSerializerTest {
                 .node(child)
                 .build();
 
-        this.thrown.expect(RestconfDocumentedException.class);
-        YangInstanceIdentifierSerializer.create(this.schemaContext, data);
+        assertThrows(RestconfDocumentedException.class,
+            () -> YangInstanceIdentifierSerializer.create(SCHEMA_CONTEXT, data));
     }
 }

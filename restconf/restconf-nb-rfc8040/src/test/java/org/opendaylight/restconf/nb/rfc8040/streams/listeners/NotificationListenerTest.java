@@ -18,9 +18,11 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.MockitoAnnotations;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.opendaylight.mdsal.dom.api.DOMNotification;
 import org.opendaylight.restconf.nb.rfc8040.TestUtils;
 import org.opendaylight.yang.gen.v1.urn.sal.restconf.event.subscription.rev140708.NotificationOutputTypeGrouping.NotificationOutputType;
@@ -41,15 +43,20 @@ import org.opendaylight.yangtools.yang.data.api.schema.MapNode;
 import org.opendaylight.yangtools.yang.model.api.SchemaContext;
 import org.opendaylight.yangtools.yang.model.api.SchemaPath;
 
+@RunWith(MockitoJUnitRunner.StrictStubs.class)
 public class NotificationListenerTest {
     private static final QNameModule MODULE = QNameModule.create(URI.create("notifi:mod"), Revision.of("2016-11-23"));
 
-    private SchemaContext schmeaCtx;
+    private static SchemaContext SCHEMA_CONTEXT;
 
-    @Before
-    public void init() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        this.schmeaCtx = TestUtils.loadSchemaContext("/notifications");
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        SCHEMA_CONTEXT = TestUtils.loadSchemaContext("/notifications");
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        SCHEMA_CONTEXT = null;
     }
 
     @Test
@@ -186,7 +193,6 @@ public class NotificationListenerTest {
     private static MapNode mockList(final QName listQName, final MapEntryNode... entries) {
         final MapNode list = mock(MapNode.class);
         when(list.getIdentifier()).thenReturn(NodeIdentifier.create(listQName));
-        when(list.getNodeType()).thenReturn(listQName);
         when(list.getValue()).thenReturn(Lists.newArrayList(entries));
         return list;
     }
@@ -195,7 +201,6 @@ public class NotificationListenerTest {
                                           final DataContainerChild<? extends PathArgument, ?> child) {
         final ContainerNode cont = mock(ContainerNode.class);
         when(cont.getIdentifier()).thenReturn(NodeIdentifier.create(contQName));
-        when(cont.getNodeType()).thenReturn(contQName);
 
         final Collection<DataContainerChild<? extends PathArgument, ?>> childs = new ArrayList<>();
         childs.add(child);
@@ -211,9 +216,9 @@ public class NotificationListenerTest {
         return child;
     }
 
-    private String prepareJson(final DOMNotification notificationData, final SchemaPath schemaPathNotifi) {
+    private static String prepareJson(final DOMNotification notificationData, final SchemaPath schemaPathNotifi) {
         final NotificationListenerAdapter notifiAdapter = ListenersBroker.getInstance().registerNotificationListener(
                 schemaPathNotifi, "stream-name", NotificationOutputType.JSON);
-        return requireNonNull(notifiAdapter.prepareJson(schmeaCtx, notificationData));
+        return requireNonNull(notifiAdapter.prepareJson(SCHEMA_CONTEXT, notificationData));
     }
 }
