@@ -5,8 +5,20 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.opendaylight.restconf.nb.rfc8040.streams.websockets;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.List;
@@ -15,10 +27,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
-import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.opendaylight.restconf.nb.rfc8040.streams.listeners.BaseListenerInterface;
 
 public class WebSocketSessionHandlerTest {
@@ -32,16 +42,15 @@ public class WebSocketSessionHandlerTest {
         private final ScheduledFuture pingFuture;
 
         private WebSocketTestSessionState(final int maxFragmentSize, final int heartbeatInterval) {
-            listener = Mockito.mock(BaseListenerInterface.class);
-            executorService = Mockito.mock(ScheduledExecutorService.class);
+            listener = mock(BaseListenerInterface.class);
+            executorService = mock(ScheduledExecutorService.class);
             this.heartbeatInterval = heartbeatInterval;
             this.maxFragmentSize = maxFragmentSize;
             webSocketSessionHandler = new WebSocketSessionHandler(executorService, listener, maxFragmentSize,
                     heartbeatInterval);
-            pingFuture = Mockito.mock(ScheduledFuture.class);
-            Mockito.when(executorService.scheduleWithFixedDelay(Mockito.any(Runnable.class),
-                    Mockito.eq((long) heartbeatInterval), Mockito.eq((long) heartbeatInterval),
-                    Mockito.eq(TimeUnit.MILLISECONDS))).thenReturn(pingFuture);
+            pingFuture = mock(ScheduledFuture.class);
+            when(executorService.scheduleWithFixedDelay(any(Runnable.class), eq((long) heartbeatInterval),
+                eq((long) heartbeatInterval), eq(TimeUnit.MILLISECONDS))).thenReturn(pingFuture);
         }
     }
 
@@ -50,14 +59,14 @@ public class WebSocketSessionHandlerTest {
         final int heartbeatInterval = 1000;
         final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(
                 1000, heartbeatInterval);
-        final Session session = Mockito.mock(Session.class);
+        final Session session = mock(Session.class);
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        Mockito.verify(webSocketTestSessionState.listener).addSubscriber(
+        verify(webSocketTestSessionState.listener).addSubscriber(
                 webSocketTestSessionState.webSocketSessionHandler);
-        Mockito.verify(webSocketTestSessionState.executorService).scheduleWithFixedDelay(Mockito.any(Runnable.class),
-                Mockito.eq((long) webSocketTestSessionState.heartbeatInterval),
-                Mockito.eq((long) webSocketTestSessionState.heartbeatInterval), Mockito.eq(TimeUnit.MILLISECONDS));
+        verify(webSocketTestSessionState.executorService).scheduleWithFixedDelay(any(Runnable.class),
+                eq((long) webSocketTestSessionState.heartbeatInterval),
+                eq((long) webSocketTestSessionState.heartbeatInterval), eq(TimeUnit.MILLISECONDS));
     }
 
     @Test
@@ -65,36 +74,36 @@ public class WebSocketSessionHandlerTest {
         final int heartbeatInterval = 0;
         final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(
                 1000, heartbeatInterval);
-        final Session session = Mockito.mock(Session.class);
+        final Session session = mock(Session.class);
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        Mockito.verify(webSocketTestSessionState.listener).addSubscriber(
+        verify(webSocketTestSessionState.listener).addSubscriber(
                 webSocketTestSessionState.webSocketSessionHandler);
-        Mockito.verifyZeroInteractions(webSocketTestSessionState.executorService);
+        verifyNoMoreInteractions(webSocketTestSessionState.executorService);
     }
 
     @Test
     public void onWebSocketConnectedWithAlreadyOpenSession() {
         final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
-        final Session session = Mockito.mock(Session.class);
-        Mockito.when(session.isOpen()).thenReturn(true);
+        final Session session = mock(Session.class);
+        when(session.isOpen()).thenReturn(true);
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        Mockito.verify(webSocketTestSessionState.listener, Mockito.times(1)).addSubscriber(Mockito.any());
+        verify(webSocketTestSessionState.listener, times(1)).addSubscriber(any());
     }
 
     @Test
     public void onWebSocketClosedWithOpenSession() {
         final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(200, 10000);
-        final Session session = Mockito.mock(Session.class);
+        final Session session = mock(Session.class);
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        Mockito.verify(webSocketTestSessionState.listener).addSubscriber(
+        verify(webSocketTestSessionState.listener).addSubscriber(
                 webSocketTestSessionState.webSocketSessionHandler);
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketClosed(200, "Simulated close");
-        Mockito.verify(webSocketTestSessionState.listener).removeSubscriber(
+        verify(webSocketTestSessionState.listener).removeSubscriber(
                 webSocketTestSessionState.webSocketSessionHandler);
     }
 
@@ -102,93 +111,93 @@ public class WebSocketSessionHandlerTest {
     public void onWebSocketClosedWithNotInitialisedSession() {
         final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(300, 12000);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketClosed(500, "Simulated close");
-        Mockito.verifyZeroInteractions(webSocketTestSessionState.listener);
+        verifyNoMoreInteractions(webSocketTestSessionState.listener);
     }
 
     @Test
     public void onWebSocketErrorWithEnabledPingAndLivingSession() {
         final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
-        final Session session = Mockito.mock(Session.class);
-        Mockito.when(session.isOpen()).thenReturn(true);
+        final Session session = mock(Session.class);
+        when(session.isOpen()).thenReturn(true);
         final Throwable sampleError = new IllegalStateException("Simulated error");
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        Mockito.when(webSocketTestSessionState.pingFuture.isCancelled()).thenReturn(false);
-        Mockito.when(webSocketTestSessionState.pingFuture.isDone()).thenReturn(false);
+        when(webSocketTestSessionState.pingFuture.isCancelled()).thenReturn(false);
+        when(webSocketTestSessionState.pingFuture.isDone()).thenReturn(false);
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketError(sampleError);
-        Mockito.verify(webSocketTestSessionState.listener).removeSubscriber(
+        verify(webSocketTestSessionState.listener).removeSubscriber(
                 webSocketTestSessionState.webSocketSessionHandler);
-        Mockito.verify(session).close();
-        Mockito.verify(webSocketTestSessionState.pingFuture).cancel(Mockito.anyBoolean());
+        verify(session).close();
+        verify(webSocketTestSessionState.pingFuture).cancel(anyBoolean());
     }
 
     @Test
     public void onWebSocketErrorWithEnabledPingAndDeadSession() {
         final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
-        final Session session = Mockito.mock(Session.class);
-        Mockito.when(session.isOpen()).thenReturn(false);
+        final Session session = mock(Session.class);
+        when(session.isOpen()).thenReturn(false);
         final Throwable sampleError = new IllegalStateException("Simulated error");
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketError(sampleError);
-        Mockito.verify(webSocketTestSessionState.listener).removeSubscriber(
+        verify(webSocketTestSessionState.listener).removeSubscriber(
                 webSocketTestSessionState.webSocketSessionHandler);
-        Mockito.verify(session, Mockito.never()).close();
-        Mockito.verify(webSocketTestSessionState.pingFuture).cancel(Mockito.anyBoolean());
+        verify(session, never()).close();
+        verify(webSocketTestSessionState.pingFuture).cancel(anyBoolean());
     }
 
     @Test
     public void onWebSocketErrorWithDisabledPingAndDeadSession() {
         final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(150, 8000);
-        final Session session = Mockito.mock(Session.class);
-        Mockito.when(session.isOpen()).thenReturn(false);
+        final Session session = mock(Session.class);
+        when(session.isOpen()).thenReturn(false);
         final Throwable sampleError = new IllegalStateException("Simulated error");
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
-        Mockito.when(webSocketTestSessionState.pingFuture.isCancelled()).thenReturn(false);
-        Mockito.when(webSocketTestSessionState.pingFuture.isDone()).thenReturn(true);
+        when(webSocketTestSessionState.pingFuture.isCancelled()).thenReturn(false);
+        when(webSocketTestSessionState.pingFuture.isDone()).thenReturn(true);
 
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketError(sampleError);
-        Mockito.verify(webSocketTestSessionState.listener).removeSubscriber(
+        verify(webSocketTestSessionState.listener).removeSubscriber(
                 webSocketTestSessionState.webSocketSessionHandler);
-        Mockito.verify(session, Mockito.never()).close();
-        Mockito.verify(webSocketTestSessionState.pingFuture, Mockito.never()).cancel(Mockito.anyBoolean());
+        verify(session, never()).close();
+        verify(webSocketTestSessionState.pingFuture, never()).cancel(anyBoolean());
     }
 
     @Test
     public void sendDataMessageWithDisabledFragmentation() throws IOException {
         final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(0, 0);
-        final Session session = Mockito.mock(Session.class);
-        final RemoteEndpoint remoteEndpoint = Mockito.mock(RemoteEndpoint.class);
-        Mockito.when(session.isOpen()).thenReturn(true);
-        Mockito.when(session.getRemote()).thenReturn(remoteEndpoint);
+        final Session session = mock(Session.class);
+        final RemoteEndpoint remoteEndpoint = mock(RemoteEndpoint.class);
+        when(session.isOpen()).thenReturn(true);
+        when(session.getRemote()).thenReturn(remoteEndpoint);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
 
         final String testMessage = generateRandomStringOfLength(100);
         webSocketTestSessionState.webSocketSessionHandler.sendDataMessage(testMessage);
-        Mockito.verify(remoteEndpoint).sendString(testMessage);
+        verify(remoteEndpoint).sendString(testMessage);
     }
 
     @Test
     public void sendDataMessageWithDisabledFragAndDeadSession() {
         final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(0, 0);
-        final Session session = Mockito.mock(Session.class);
-        final RemoteEndpoint remoteEndpoint = Mockito.mock(RemoteEndpoint.class);
-        Mockito.when(session.isOpen()).thenReturn(false);
-        Mockito.when(session.getRemote()).thenReturn(remoteEndpoint);
+        final Session session = mock(Session.class);
+        final RemoteEndpoint remoteEndpoint = mock(RemoteEndpoint.class);
+        when(session.isOpen()).thenReturn(false);
+        when(session.getRemote()).thenReturn(remoteEndpoint);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
 
         final String testMessage = generateRandomStringOfLength(11);
         webSocketTestSessionState.webSocketSessionHandler.sendDataMessage(testMessage);
-        Mockito.verifyZeroInteractions(remoteEndpoint);
+        verifyNoMoreInteractions(remoteEndpoint);
     }
 
     @Test
     public void sendDataMessageWithEnabledFragAndSmallMessage() throws IOException {
         final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(100, 0);
-        final Session session = Mockito.mock(Session.class);
-        final RemoteEndpoint remoteEndpoint = Mockito.mock(RemoteEndpoint.class);
-        Mockito.when(session.isOpen()).thenReturn(true);
-        Mockito.when(session.getRemote()).thenReturn(remoteEndpoint);
+        final Session session = mock(Session.class);
+        final RemoteEndpoint remoteEndpoint = mock(RemoteEndpoint.class);
+        when(session.isOpen()).thenReturn(true);
+        when(session.getRemote()).thenReturn(remoteEndpoint);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
 
         // in both cases, fragmentation should not be applied
@@ -196,31 +205,31 @@ public class WebSocketSessionHandlerTest {
         final String testMessage2 = generateRandomStringOfLength(50);
         webSocketTestSessionState.webSocketSessionHandler.sendDataMessage(testMessage1);
         webSocketTestSessionState.webSocketSessionHandler.sendDataMessage(testMessage2);
-        Mockito.verify(remoteEndpoint).sendString(testMessage1);
-        Mockito.verify(remoteEndpoint).sendString(testMessage2);
-        Mockito.verify(remoteEndpoint, Mockito.never()).sendPartialString(Mockito.anyString(), Mockito.anyBoolean());
+        verify(remoteEndpoint).sendString(testMessage1);
+        verify(remoteEndpoint).sendString(testMessage2);
+        verify(remoteEndpoint, never()).sendPartialString(anyString(), anyBoolean());
     }
 
     @Test
     public void sendDataMessageWithZeroLength() {
         final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(100, 0);
-        final Session session = Mockito.mock(Session.class);
-        final RemoteEndpoint remoteEndpoint = Mockito.mock(RemoteEndpoint.class);
-        Mockito.when(session.isOpen()).thenReturn(true);
-        Mockito.when(session.getRemote()).thenReturn(remoteEndpoint);
+        final Session session = mock(Session.class);
+        final RemoteEndpoint remoteEndpoint = mock(RemoteEndpoint.class);
+        when(session.isOpen()).thenReturn(true);
+        when(session.getRemote()).thenReturn(remoteEndpoint);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
 
         webSocketTestSessionState.webSocketSessionHandler.sendDataMessage("");
-        Mockito.verifyZeroInteractions(remoteEndpoint);
+        verifyNoMoreInteractions(remoteEndpoint);
     }
 
     @Test
     public void sendDataMessageWithEnabledFragAndLargeMessage1() throws IOException {
         final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(100, 0);
-        final Session session = Mockito.mock(Session.class);
-        final RemoteEndpoint remoteEndpoint = Mockito.mock(RemoteEndpoint.class);
-        Mockito.when(session.isOpen()).thenReturn(true);
-        Mockito.when(session.getRemote()).thenReturn(remoteEndpoint);
+        final Session session = mock(Session.class);
+        final RemoteEndpoint remoteEndpoint = mock(RemoteEndpoint.class);
+        when(session.isOpen()).thenReturn(true);
+        when(session.getRemote()).thenReturn(remoteEndpoint);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
 
         // there should be 10 fragments of length 100 characters
@@ -228,23 +237,23 @@ public class WebSocketSessionHandlerTest {
         webSocketTestSessionState.webSocketSessionHandler.sendDataMessage(testMessage);
         final ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
         final ArgumentCaptor<Boolean> isLastCaptor = ArgumentCaptor.forClass(Boolean.class);
-        Mockito.verify(remoteEndpoint, Mockito.times(10)).sendPartialString(
+        verify(remoteEndpoint, times(10)).sendPartialString(
                 messageCaptor.capture(), isLastCaptor.capture());
 
         final List<String> allMessages = messageCaptor.getAllValues();
         final List<Boolean> isLastFlags = isLastCaptor.getAllValues();
-        Assert.assertTrue(allMessages.stream().allMatch(s -> s.length() == webSocketTestSessionState.maxFragmentSize));
-        Assert.assertTrue(isLastFlags.subList(0, 9).stream().noneMatch(isLast -> isLast));
-        Assert.assertTrue(isLastFlags.get(9));
+        assertTrue(allMessages.stream().allMatch(s -> s.length() == webSocketTestSessionState.maxFragmentSize));
+        assertTrue(isLastFlags.subList(0, 9).stream().noneMatch(isLast -> isLast));
+        assertTrue(isLastFlags.get(9));
     }
 
     @Test
     public void sendDataMessageWithEnabledFragAndLargeMessage2() throws IOException {
         final WebSocketTestSessionState webSocketTestSessionState = new WebSocketTestSessionState(100, 0);
-        final Session session = Mockito.mock(Session.class);
-        final RemoteEndpoint remoteEndpoint = Mockito.mock(RemoteEndpoint.class);
-        Mockito.when(session.isOpen()).thenReturn(true);
-        Mockito.when(session.getRemote()).thenReturn(remoteEndpoint);
+        final Session session = mock(Session.class);
+        final RemoteEndpoint remoteEndpoint = mock(RemoteEndpoint.class);
+        when(session.isOpen()).thenReturn(true);
+        when(session.getRemote()).thenReturn(remoteEndpoint);
         webSocketTestSessionState.webSocketSessionHandler.onWebSocketConnected(session);
 
         // there should be 10 fragments, the last fragment should be the shortest one
@@ -252,16 +261,16 @@ public class WebSocketSessionHandlerTest {
         webSocketTestSessionState.webSocketSessionHandler.sendDataMessage(testMessage);
         final ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
         final ArgumentCaptor<Boolean> isLastCaptor = ArgumentCaptor.forClass(Boolean.class);
-        Mockito.verify(remoteEndpoint, Mockito.times(10)).sendPartialString(
+        verify(remoteEndpoint, times(10)).sendPartialString(
                 messageCaptor.capture(), isLastCaptor.capture());
 
         final List<String> allMessages = messageCaptor.getAllValues();
         final List<Boolean> isLastFlags = isLastCaptor.getAllValues();
-        Assert.assertTrue(allMessages.subList(0, 9).stream().allMatch(s ->
+        assertTrue(allMessages.subList(0, 9).stream().allMatch(s ->
                 s.length() == webSocketTestSessionState.maxFragmentSize));
-        Assert.assertEquals(50, allMessages.get(9).length());
-        Assert.assertTrue(isLastFlags.subList(0, 9).stream().noneMatch(isLast -> isLast));
-        Assert.assertTrue(isLastFlags.get(9));
+        assertEquals(50, allMessages.get(9).length());
+        assertTrue(isLastFlags.subList(0, 9).stream().noneMatch(isLast -> isLast));
+        assertTrue(isLastFlags.get(9));
     }
 
     private static String generateRandomStringOfLength(final int length) {

@@ -241,15 +241,14 @@ public class NetconfCommandsImplTest {
         final AvailableCapabilities avCaps =
                 new AvailableCapabilitiesBuilder().setAvailableCapability(avCapList).build();
 
-        final NetconfNode nn = new NetconfNodeBuilder().setConnectionStatus(cs).setHost(host).setPort(port)
-                .setAvailableCapabilities(avCaps).build();
         final NodeId nodeId = new NodeId(nodeIdent);
         final NodeKey nk = new NodeKey(nodeId);
-        final NodeBuilder nb = new NodeBuilder();
-        nb.withKey(nk);
-        nb.setNodeId(nodeId);
-        nb.addAugmentation(NetconfNode.class, nn);
-        return nb.build();
+        return new NodeBuilder()
+                .withKey(nk)
+                .setNodeId(nodeId)
+                .addAugmentation(new NetconfNodeBuilder()
+                    .setConnectionStatus(cs).setHost(host).setPort(port).setAvailableCapabilities(avCaps).build())
+                .build();
     }
 
     private static void assertBaseNodeAttributes(final Map<?, ?> mapNode) {

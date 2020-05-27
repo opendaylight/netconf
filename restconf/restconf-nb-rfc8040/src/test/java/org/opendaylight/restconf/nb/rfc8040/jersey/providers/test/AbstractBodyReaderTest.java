@@ -52,7 +52,7 @@ public abstract class AbstractBodyReaderTest {
         doReturn(schemaContext).when(mountPoint).getEffectiveModelContext();
         doCallRealMethod().when(mountPoint).getSchemaContext();
 
-        mountPointServiceHandler = DOMMountPointServiceHandler.newInstance(mountPointService);
+        mountPointServiceHandler = new DOMMountPointServiceHandler(mountPointService);
     }
 
     protected abstract MediaType getMediaType();
@@ -62,7 +62,7 @@ public abstract class AbstractBodyReaderTest {
         return TestRestconfUtils.loadSchemaContext(yangPath, schemaContext);
     }
 
-    protected static <T extends AbstractIdentifierAwareJaxRsProvider> void mockBodyReader(
+    protected static <T extends AbstractIdentifierAwareJaxRsProvider<?>> void mockBodyReader(
             final String identifier, final T normalizedNodeProvider,
             final boolean isPost) throws NoSuchFieldException,
             SecurityException, IllegalArgumentException, IllegalAccessException {

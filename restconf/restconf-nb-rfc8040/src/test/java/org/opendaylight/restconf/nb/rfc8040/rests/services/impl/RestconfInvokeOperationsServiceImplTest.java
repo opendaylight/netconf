@@ -66,7 +66,7 @@ public class RestconfInvokeOperationsServiceImplTest {
         final DOMDataTreeWriteTransaction wTx = mock(DOMDataTreeWriteTransaction.class);
         when(domTx.newWriteOnlyTransaction()).thenReturn(wTx);
         doReturn(CommitInfo.emptyFluentFuture()).when(wTx).commit();
-        final SchemaContextHandler schemaContextHandler = SchemaContextHandler.newInstance(txHandler,
+        final SchemaContextHandler schemaContextHandler = new SchemaContextHandler(txHandler,
             mock(DOMSchemaService.class));
         schemaContextHandler.onModelContextUpdated(contextRef.get());
         this.invokeOperationsService =
